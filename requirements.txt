@@ -1,0 +1,6 @@
+Flask==1.1.1
+oauth2client==1.5.2
+PyOpenSSL
+gspread
+flask-bootstrap==3.3.7.1
+authlib==0.14.3
