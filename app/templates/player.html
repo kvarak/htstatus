@@ -5,52 +5,150 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
+      <div class="jumbotron">
+<!--        <img src="{{url_for('static', filename='player.jpg')}}" class="rounded float-right img-fluid-2" height="100"> -->
+        <div class="container">
+          <h1 class="display-4">{{ title }}</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm">
       <div class="card-deck">
         <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
           <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+            <h5 class="card-title">Players</h5>
+            <p class="card-text">
+              <table class="table table-sm table-scroll">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-small">Player</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">First</th>
+                    <th scope="col" class="text-small">Last</th>
+                    <th scope="col" class="text-small">Handle</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th class="text-small" scope="row">Maarten-Jan Dubbelboer</th>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                    <td class="text-small">Mark</td>
+                    <td class="text-small">Otto</td>
+                    <td class="text-small">@mdo</td>
+                  </tr>
+                  <tr>
+                    <th class="text-small" scope="row">Pedro Hermoso</th>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                    <td class="text-small">Jacob</td>
+                    <td class="text-small">Thornton</td>
+                    <td class="text-small">@fat</td>
+                  </tr>
+                  <tr>
+                    <th class="text-small" scope="row">Sergey Rodinov</th>
+                    <td class="text-small" colspan="2">Vitryssland</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                    <td class="text-small" colspan="2">Larry the Bird</td>
+                    <td class="text-small">@twitter</td>
+                  </tr>
+                </tbody>
+              </table>
+            </p>
           </div>
           <div class="card-footer">
             <small class="text-muted">Last updated 3 mins ago</small>
@@ -61,62 +159,6 @@
   </div>
   <div class="row">
     <div class="col-sm"><p></p>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This card has supporting text below as a natural lead-in to additional content.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-        <div class="card">
-          <img src="{{url_for('static', filename='player.jpg')}}" class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </div>

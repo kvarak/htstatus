@@ -23,6 +23,7 @@
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover; 
+      background-attachment: fixed;
     }
 
     #logo {
@@ -31,6 +32,36 @@
       border-bottom-left-radius: 10px;
       border-top-left-radius: 10px;
     }
+
+    .bg-off {
+      background-color:#d6d6d6!important
+    }
+    .bg-roundup {
+      background-color:#34c8db!important
+    }
+    .img-fluid-2 {
+      max-height: 100%;
+      width: auto;
+    }
+
+    .text-small {
+      font-size: 10px;
+    }
+
+    .table-scroll{
+      display: inline-block; 
+      overflow: auto;
+    }
+
+    .td-fixed {
+      background-color:#ffffff!important;
+      position: absolute;
+    }
+
+    .text-small {
+      white-space: nowrap;
+    }
+
 </style>
 {% endblock %}
 
@@ -42,6 +73,12 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
 
 {% endblock %}
 
@@ -60,19 +97,30 @@
         <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/download">Download</a>
-      </li>
-      <li class="nav-item">
+        {% if current_user %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Data
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a class="dropdown-item" href="/team">Team</a>
+            <a class="dropdown-item" href="/player">Players</a>
+            <a class="dropdown-item" href="/matches">Matches</a>
+            <a class="dropdown-item" href="/training">Training</a>
+          </div>
+        </li>
+          {% else %}
         <a class="nav-link" href="/login">Login</a>
+        {% endif %}
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Actions
+          Training
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="/player">Players</a>
-          <a class="dropdown-item" href="/matches">Matches</a>
-          <a class="dropdown-item" href="/training">Training</a>
+          <a class="dropdown-item" href="/trainingcycle">Training Cycles</a>
+          <a class="dropdown-item" href="/basiccycle">Basic cycle</a>
+          <a class="dropdown-item" href="/complexcycle">Complex cycle</a>
         </div>
       </li>
     </ul>

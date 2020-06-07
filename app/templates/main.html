@@ -1,9 +1,34 @@
-<html>
-  <head>
-    <title>{{ title }} - Microblog</title>
-  </head>
-  <body>
-    <h1>Hello, {{ user.username }}!</h1>
-    <p>{{ debug.print }}!</p>
-  </body>
-</html>
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <div class="jumbotron">
+        <div class="container">
+          <h1 class="display-4">{{ apptitle }}</h1>
+          <p class="lead">
+            Helping you train your players, long term.
+          </p>
+          {% if current_user %}
+          <hr class="my-4">
+<!--
+          <p>
+            This page can help you plan your training cycles.
+          </p>
+            <p>
+            The idea comes from <a href="https://www.youtube.com/channel/UCQxmmVoezcT_QP4iqlAoiSw">Uncle Mish's youtube videos</a>.
+          </p>
+-->
+          <p>Welcome {{ current_user }}!</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

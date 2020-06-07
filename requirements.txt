@@ -4,3 +4,4 @@ PyOpenSSL
 gspread
 flask-bootstrap==3.3.7.1
 authlib==0.14.3
+pychpp==0.2.2
