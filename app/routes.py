@@ -30,6 +30,18 @@ def index():
 def player():
     return render_template('player.html', title='Player data')
 
+@app.route('/matches')
+def matches():
+    return render_template('matches.html', title='Matches data')
+
+@app.route('/training')
+def training():
+    return render_template('training.html', title='Training data')
+
+@app.route('/download')
+def download():
+    return render_template('download.html', title='Login')
+
 @app.route('/login')
 def login():
     #redirect_uri = url_for('auth', _external=True)
