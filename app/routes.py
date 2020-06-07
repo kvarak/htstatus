@@ -1,6 +1,9 @@
 from flask import session, render_template, redirect, url_for
 from app import app
 from authlib.integrations.flask_client import OAuth, OAuthError
+from flask_bootstrap import Bootstrap
+
+bootstrap = Bootstrap(app)
 
 oauth = OAuth(app)
 oauth.register(
@@ -19,14 +22,19 @@ def handle_error(error):
 @app.route('/')
 @app.route('/index')
 def index():
-  user = {'username': session.get('user')}
-  debug = {'print': 'oauth.chpp.authorize_redirect(request_token_url)'}
-  return render_template('main.html', title='Home', user=user, debug=debug)
+    user = {'username': session.get('user')}
+    debug = {'print': 'oauth.chpp.authorize_redirect(request_token_url)'}
+    return render_template('base.html', title='Home', user=user, debug=debug)
+
+@app.route('/player')
+def player():
+    return render_template('player.html', title='Player data')
 
 @app.route('/login')
 def login():
-    redirect_uri = url_for('auth', _external=True)
-    return oauth.chpp.authorize_redirect(redirect_uri)
+    #redirect_uri = url_for('auth', _external=True)
+    #return oauth.chpp.authorize_redirect(redirect_uri)
+    return render_template('login.html', title='Login')
 
 @app.route('/auth')
 def auth():
