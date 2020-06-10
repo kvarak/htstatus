@@ -23,129 +23,32 @@
               <table class="table table-sm table-scroll">
                 <thead>
                   <tr>
-                    <th scope="col" class="text-small">Player</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
-                    <th scope="col" class="text-small">First</th>
-                    <th scope="col" class="text-small">Last</th>
-                    <th scope="col" class="text-small">Handle</th>
+                    <th scope="col" class="text-small">Nr</th>
+                    <th scope="col" class="text-small">Country</th>
+                    <th scope="col" class="text-small">Name</th>
+                    <th scope="col" class="text-small">Age</th>
+                    <th scope="col" class="text-small">stamina</th>
+                    <th scope="col" class="text-small">keeper</th>
+                    <th scope="col" class="text-small">defender</th>
+                    <th scope="col" class="text-small">playmaker</th>
+                    <th scope="col" class="text-small">winger</th>
+                    <th scope="col" class="text-small">passing</th>
+                    <th scope="col" class="text-small">scorer</th>
+                    <th scope="col" class="text-small">set_pieces</th>
                   </tr>
                 </thead>
                 <tbody>
+                  {% for p in players %}
                   <tr>
-                    <th class="text-small" scope="row">Maarten-Jan Dubbelboer</th>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
-                    <td class="text-small">Mark</td>
-                    <td class="text-small">Otto</td>
-                    <td class="text-small">@mdo</td>
+                    <td class="text-small">{{ p.number }}</td>
+                    <td class="text-small">{{ p.country }}</td>
+                    <th class="text-small" scope="row">{{ p.name }}</th>
+                    <td class="text-small">{{ p.age }}</td>
+                    {% for s in p.skills %}
+                    <td class="text-small">{{ s }}</td>
+                    {% endfor %}
                   </tr>
-                  <tr>
-                    <th class="text-small" scope="row">Pedro Hermoso</th>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                    <td class="text-small">Jacob</td>
-                    <td class="text-small">Thornton</td>
-                    <td class="text-small">@fat</td>
-                  </tr>
-                  <tr>
-                    <th class="text-small" scope="row">Sergey Rodinov</th>
-                    <td class="text-small" colspan="2">Vitryssland</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                    <td class="text-small" colspan="2">Larry the Bird</td>
-                    <td class="text-small">@twitter</td>
-                  </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </p>

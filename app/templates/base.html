@@ -87,7 +87,6 @@ $(function () {
 ##########################
 {% block navbar %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">HT-Status</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -100,7 +99,7 @@ $(function () {
         {% if current_user %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Data
+            {{ team }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <a class="dropdown-item" href="/team">Team</a>
@@ -109,10 +108,12 @@ $(function () {
             <a class="dropdown-item" href="/training">Training</a>
           </div>
         </li>
-          {% else %}
+        <a class="nav-link" href="/logout">Logout</a>
+      {% else %}
         <a class="nav-link" href="/login">Login</a>
-        {% endif %}
+      {% endif %}
       </li>
+<!--
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Training
@@ -123,6 +124,7 @@ $(function () {
           <a class="dropdown-item" href="/complexcycle">Complex cycle</a>
         </div>
       </li>
+-->
     </ul>
   </div>
 </nav>

@@ -9,9 +9,13 @@
         <img src="{{url_for('static', filename='team.jpg')}}" class="rounded float-right img-fluid-2" height="200">
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
-          <p class="lead">This is a modified jumbotron that occupies the entire horizontal space of its parent.</p>
+          <p class="lead">{{ team }}</p>
           <hr class="my-4">
-          <p>Nothing much here yet...</p>
+<!--
+          {% for your_list_element in teams %}
+          <p>{{ your_list_element }} </p>
+          {% endfor %}
+-->
         </div>
       </div>
     </div>
