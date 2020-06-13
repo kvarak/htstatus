@@ -3,3 +3,5 @@ config.py
 creds.json
 .DS_Store
 data
+push.sh
+serverrun.sh
