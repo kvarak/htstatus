@@ -5,3 +5,4 @@ creds.json
 data
 push.sh
 serverrun.sh
+nohup.out
