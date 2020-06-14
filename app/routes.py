@@ -4,10 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth, OAuthError
 from pprint import pprint
 from pychpp import CHPP
+import time
 
 from config import Config
 from app import app, db
-from models import Usage
+from models import Usage, Players
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
@@ -86,6 +87,7 @@ def login():
 
     current_user = chpp.user()
     session['current_user'] = current_user.username
+    session['current_user_id'] = current_user.ht_id
 
     all_teams = current_user._teams_ht_id
     session['team_id'] = all_teams[0]
@@ -124,8 +126,86 @@ def update():
                 session['access_secret'],
                 )
 
-    current_user = chpp.user()
-    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    the_team = chpp.team(ht_id = session['team_id'])
+
+#    pprint(the_team.players)
+
+    players = []
+    for p in the_team.players:
+
+        thisplayer = {}
+
+        thisplayer['ht_id']    = p.ht_id
+        thisplayer['first_name']    = p.first_name
+        thisplayer['nick_name']    = p.nick_name
+        thisplayer['last_name']    = p.last_name
+        thisplayer['number']    = p.number
+        thisplayer['category_id']    = p.category_id
+        thisplayer['owner_notes']    = p.owner_notes
+        thisplayer['age_years']    = p.age_years
+        thisplayer['age_days']    = p.age_days
+        thisplayer['age']    = p.age
+        thisplayer['next_birthday']    = p.next_birthday
+        thisplayer['arrival_date']    = p.arrival_date
+        thisplayer['form']    = p.form
+        thisplayer['cards']    = p.cards
+        thisplayer['injury_level']    = p.injury_level
+        thisplayer['statement']    = p.statement
+        thisplayer['language']    = p.language
+        thisplayer['language_id']    = p.language_id
+        thisplayer['agreeability']    = p.agreeability
+        thisplayer['aggressiveness']    = p.aggressiveness
+        thisplayer['honesty']    = p.honesty
+        thisplayer['experience']    = p.experience
+        thisplayer['loyalty']    = p.loyalty
+        thisplayer['aggressiveness']    = p.aggressiveness
+        thisplayer['specialty']    = p.specialty
+        thisplayer['native_country_id']    = p.native_country_id
+        thisplayer['native_league_id']    = p.native_league_id
+        thisplayer['native_league_name']    = p.native_league_name
+        thisplayer['tsi']    = p.tsi
+        thisplayer['salary']    = p.salary
+        thisplayer['caps']    = p.caps
+        thisplayer['caps_u20']    = p.caps_u20
+        thisplayer['career_goals']    = p.career_goals
+        thisplayer['career_hattricks']    = p.career_hattricks
+        thisplayer['league_goals']    = p.league_goals
+        thisplayer['cup_goals']    = p.cup_goals
+        thisplayer['friendly_goals']    = p.friendly_goals
+        thisplayer['current_team_matches']    = p.current_team_matches
+        thisplayer['current_team_goals']    = p.current_team_goals
+        thisplayer['national_team_id']    = p.national_team_id
+        thisplayer['national_team_name']    = p.national_team_name
+        thisplayer['is_transfer_listed']    = p.is_transfer_listed
+        thisplayer['team_id']    = p.team_id
+
+        thisplayer['stamina']    = p.skills['stamina']
+        thisplayer['keeper']     = p.skills['keeper']
+        thisplayer['defender']   = p.skills['defender']
+        thisplayer['playmaker']  = p.skills['playmaker']
+        thisplayer['winger']     = p.skills['winger']
+        thisplayer['passing']    = p.skills['passing']
+        thisplayer['scorer']     = p.skills['scorer']
+        thisplayer['set_pieces'] = p.skills['set_pieces']
+        thisplayer['data_date']  = time.strftime('%Y-%m-%d')
+
+
+        dbplayer = db.session.query(Players).filter_by(
+            ht_id = thisplayer['ht_id'],
+            data_date = thisplayer['data_date']
+            ).first()
+
+        if dbplayer:
+            print (thisplayer['first_name'], thisplayer['last_name'], " already exists for today.")
+        else:
+            newplayer = Players(thisplayer)
+            db.session.add(newplayer)
+            db.session.commit()
+            print ("Added ", thisplayer['first_name'], thisplayer['last_name'], " for today.")
+
+        players.append(thisplayer)
+
+    user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.updatedata(user)
     db.session.commit()
 
@@ -184,7 +264,7 @@ def team():
         pprint(vars(this_team))
         teams.append(this_team.name)
 
-    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.team(user)
     db.session.commit()
 
@@ -206,7 +286,6 @@ def player():
                 )
 
     the_team = chpp.team(ht_id = session['team_id'])
-
     pprint(the_team.players)
 
     players = []
@@ -230,8 +309,7 @@ def player():
             }
         players.append(thisplayer)
 
-    current_user = chpp.user()
-    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.player(user)
     db.session.commit()
 
@@ -246,14 +324,7 @@ def player():
 # --------------------------------------------------------------------------------
 @app.route('/matches')
 def matches():
-    chpp = CHPP(consumer_key,
-                consumer_secret,
-                session['access_key'],
-                session['access_secret'],
-                )
-
-    current_user = chpp.user()
-    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.matches(user)
     db.session.commit()
 
@@ -267,14 +338,7 @@ def matches():
 # --------------------------------------------------------------------------------
 @app.route('/training')
 def training():
-    chpp = CHPP(consumer_key,
-                consumer_secret,
-                session['access_key'],
-                session['access_secret'],
-                )
-
-    current_user = chpp.user()
-    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.training(user)
     db.session.commit()
 
