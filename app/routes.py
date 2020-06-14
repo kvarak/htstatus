@@ -120,6 +120,9 @@ def logout():
 # --------------------------------------------------------------------------------
 @app.route('/update')
 def update():
+    if session.get('current_user') is None:
+        return render_template('notloggedin.html')
+
     chpp = CHPP(consumer_key,
                 consumer_secret,
                 session['access_key'],
@@ -222,6 +225,9 @@ def update():
 # --------------------------------------------------------------------------------
 @app.route('/admin')
 def admin():
+    if session.get('current_user') is None:
+        return render_template('notloggedin.html')
+
     allusers = db.session.query(Usage).all()
 
     users = []
@@ -251,6 +257,9 @@ def admin():
 # --------------------------------------------------------------------------------
 @app.route('/team')
 def team():
+    if session.get('current_user') is None:
+        return render_template('notloggedin.html')
+
     chpp = CHPP(consumer_key,
                 consumer_secret,
                 session['access_key'],
@@ -282,6 +291,8 @@ def team():
 # --------------------------------------------------------------------------------
 @app.route('/player')
 def player():
+    if session.get('current_user') is None:
+        return render_template('notloggedin.html')
 
     players = db.session.query(Players).filter_by(owner = session['team_id']).all()
 
@@ -307,6 +318,9 @@ def player():
 # --------------------------------------------------------------------------------
 @app.route('/matches')
 def matches():
+    if session.get('current_user') is None:
+        return render_template('notloggedin.html')
+
     user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.matches(user)
     db.session.commit()
@@ -321,6 +335,9 @@ def matches():
 # --------------------------------------------------------------------------------
 @app.route('/training')
 def training():
+    if session.get('current_user') is None:
+        return render_template('notloggedin.html')
+
     user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.training(user)
     db.session.commit()
