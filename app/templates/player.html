@@ -35,18 +35,29 @@
                     <th scope="col" class="text-small">passing</th>
                     <th scope="col" class="text-small">scorer</th>
                     <th scope="col" class="text-small">set_pieces</th>
+                    <th scope="col" class="text-small">data_date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for p in players %}
                   <tr>
+                    {% if p.number == 100 %}
+                    <td class="text-small">-</td>
+                    {% else %}
                     <td class="text-small">{{ p.number }}</td>
+                    {% endif %}
                     <td class="text-small">{{ p.country }}</td>
-                    <th class="text-small" scope="row">{{ p.name }}</th>
-                    <td class="text-small">{{ p.age }}</td>
-                    {% for s in p.skills %}
-                    <td class="text-small">{{ s }}</td>
-                    {% endfor %}
+                    <th class="text-small" scope="row">{{ p.first_name }} {{ p.last_name }}</th>
+                    <td class="text-small">{{ p.age_years }}</td>
+                    <td class="text-small">{{ p.stamina }}</td>
+                    <td class="text-small">{{ p.keeper }}</td>
+                    <td class="text-small">{{ p.defender }}</td>
+                    <td class="text-small">{{ p.playmaker }}</td>
+                    <td class="text-small">{{ p.winger }}</td>
+                    <td class="text-small">{{ p.passing }}</td>
+                    <td class="text-small">{{ p.scorer }}</td>
+                    <td class="text-small">{{ p.set_pieces }}</td>
+                    <td class="text-small">{{ p.data_date }}</td>
                   </tr>
                   {% endfor %}
                 </tbody>

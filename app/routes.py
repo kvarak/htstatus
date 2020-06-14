@@ -135,49 +135,49 @@ def update():
 
         thisplayer = {}
 
-        thisplayer['ht_id']    = p.ht_id
-        thisplayer['first_name']    = p.first_name
-        thisplayer['nick_name']    = p.nick_name
-        thisplayer['last_name']    = p.last_name
-        thisplayer['number']    = p.number
-        thisplayer['category_id']    = p.category_id
-        thisplayer['owner_notes']    = p.owner_notes
-        thisplayer['age_years']    = p.age_years
-        thisplayer['age_days']    = p.age_days
-        thisplayer['age']    = p.age
-        thisplayer['next_birthday']    = p.next_birthday
-        thisplayer['arrival_date']    = p.arrival_date
-        thisplayer['form']    = p.form
-        thisplayer['cards']    = p.cards
-        thisplayer['injury_level']    = p.injury_level
-        thisplayer['statement']    = p.statement
-        thisplayer['language']    = p.language
-        thisplayer['language_id']    = p.language_id
-        thisplayer['agreeability']    = p.agreeability
-        thisplayer['aggressiveness']    = p.aggressiveness
-        thisplayer['honesty']    = p.honesty
-        thisplayer['experience']    = p.experience
-        thisplayer['loyalty']    = p.loyalty
-        thisplayer['aggressiveness']    = p.aggressiveness
-        thisplayer['specialty']    = p.specialty
+        thisplayer['ht_id']                = p.ht_id
+        thisplayer['first_name']           = p.first_name
+        thisplayer['nick_name']            = p.nick_name
+        thisplayer['last_name']            = p.last_name
+        thisplayer['number']               = p.number
+        thisplayer['category_id']          = p.category_id
+        thisplayer['owner_notes']          = p.owner_notes
+        thisplayer['age_years']            = p.age_years
+        thisplayer['age_days']             = p.age_days
+        thisplayer['age']                  = p.age
+        thisplayer['next_birthday']        = p.next_birthday
+        thisplayer['arrival_date']         = p.arrival_date
+        thisplayer['form']                 = p.form
+        thisplayer['cards']                = p.cards
+        thisplayer['injury_level']         = p.injury_level
+        thisplayer['statement']            = p.statement
+        thisplayer['language']             = p.language
+        thisplayer['language_id']          = p.language_id
+        thisplayer['agreeability']         = p.agreeability
+        thisplayer['aggressiveness']       = p.aggressiveness
+        thisplayer['honesty']              = p.honesty
+        thisplayer['experience']           = p.experience
+        thisplayer['loyalty']              = p.loyalty
+        thisplayer['aggressiveness']       = p.aggressiveness
+        thisplayer['specialty']            = p.specialty
         thisplayer['native_country_id']    = p.native_country_id
-        thisplayer['native_league_id']    = p.native_league_id
-        thisplayer['native_league_name']    = p.native_league_name
-        thisplayer['tsi']    = p.tsi
-        thisplayer['salary']    = p.salary
-        thisplayer['caps']    = p.caps
-        thisplayer['caps_u20']    = p.caps_u20
-        thisplayer['career_goals']    = p.career_goals
-        thisplayer['career_hattricks']    = p.career_hattricks
-        thisplayer['league_goals']    = p.league_goals
-        thisplayer['cup_goals']    = p.cup_goals
-        thisplayer['friendly_goals']    = p.friendly_goals
-        thisplayer['current_team_matches']    = p.current_team_matches
-        thisplayer['current_team_goals']    = p.current_team_goals
-        thisplayer['national_team_id']    = p.national_team_id
-        thisplayer['national_team_name']    = p.national_team_name
-        thisplayer['is_transfer_listed']    = p.is_transfer_listed
-        thisplayer['team_id']    = p.team_id
+        thisplayer['native_league_id']     = p.native_league_id
+        thisplayer['native_league_name']   = p.native_league_name
+        thisplayer['tsi']                  = p.tsi
+        thisplayer['salary']               = p.salary
+        thisplayer['caps']                 = p.caps
+        thisplayer['caps_u20']             = p.caps_u20
+        thisplayer['career_goals']         = p.career_goals
+        thisplayer['career_hattricks']     = p.career_hattricks
+        thisplayer['league_goals']         = p.league_goals
+        thisplayer['cup_goals']            = p.cup_goals
+        thisplayer['friendly_goals']       = p.friendly_goals
+        thisplayer['current_team_matches'] = p.current_team_matches
+        thisplayer['current_team_goals']   = p.current_team_goals
+        thisplayer['national_team_id']     = p.national_team_id
+        thisplayer['national_team_name']   = p.national_team_name
+        thisplayer['is_transfer_listed']   = p.is_transfer_listed
+        thisplayer['team_id']              = p.team_id
 
         thisplayer['stamina']    = p.skills['stamina']
         thisplayer['keeper']     = p.skills['keeper']
@@ -187,7 +187,10 @@ def update():
         thisplayer['passing']    = p.skills['passing']
         thisplayer['scorer']     = p.skills['scorer']
         thisplayer['set_pieces'] = p.skills['set_pieces']
+
         thisplayer['data_date']  = time.strftime('%Y-%m-%d')
+
+        thisplayer['owner']      = session['team_id']
 
 
         dbplayer = db.session.query(Players).filter_by(
@@ -279,35 +282,15 @@ def team():
 # --------------------------------------------------------------------------------
 @app.route('/player')
 def player():
-    chpp = CHPP(consumer_key,
-                consumer_secret,
-                session['access_key'],
-                session['access_secret'],
-                )
 
-    the_team = chpp.team(ht_id = session['team_id'])
-    pprint(the_team.players)
+    players = db.session.query(Players).filter_by(owner = session['team_id']).all()
 
-    players = []
-    for p in the_team.players:
-        skills = [
-            int(p.skills['stamina']),
-            int(p.skills['keeper']),
-            int(p.skills['defender']),
-            int(p.skills['playmaker']),
-            int(p.skills['winger']),
-            int(p.skills['passing']),
-            int(p.skills['scorer']),
-            int(p.skills['set_pieces']),
-        ]
-        thisplayer = {
-            'name': p.first_name + " " + p.last_name,
-            'age': p.age_years,
-            'country': p.language_id,
-            'number': p.number if p.number < 100 else "-",
-            'skills': skills,
-            }
-        players.append(thisplayer)
+    pprint(session['team_id'])
+    pprint(players)
+
+#    for player in players:
+#        olddata = db.session.query(Players).filter_by(ht_id = player.ht_id).order_by("data_date desc").first()
+#        pprint(olddata.data_date)
 
     user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.player(user)

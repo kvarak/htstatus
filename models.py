@@ -56,6 +56,7 @@ class Players(db.Model):
   passing              = db.Column(db.Integer)
   scorer               = db.Column(db.Integer)
   set_pieces           = db.Column(db.Integer)
+  owner                = db.Column(db.Integer)
 
   def __init__(self, playerdata):
     self.ht_id                = playerdata['ht_id']
@@ -109,6 +110,7 @@ class Players(db.Model):
     self.passing              = int(playerdata['passing'])
     self.scorer               = int(playerdata['scorer'])
     self.set_pieces           = int(playerdata['set_pieces'])
+    self.owner                = playerdata['owner']
 
   def __repr__(self):
     return '<name {}>'.format(self.last_name)
