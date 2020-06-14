@@ -116,6 +116,27 @@ def logout():
     return render_template('logout.html', title='Logout')
 
 # --------------------------------------------------------------------------------
+@app.route('/update')
+def update():
+    chpp = CHPP(consumer_key,
+                consumer_secret,
+                session['access_key'],
+                session['access_secret'],
+                )
+
+    current_user = chpp.user()
+    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    u = Usage.updatedata(user)
+    db.session.commit()
+
+    return render_template(
+        'update.html',
+        title = 'Update',
+        current_user = session['current_user'],
+        team = session['team_name'],
+        )
+
+# --------------------------------------------------------------------------------
 @app.route('/admin')
 def admin():
     allusers = db.session.query(Usage).all()
@@ -130,6 +151,7 @@ def admin():
             'c_player': user.c_player,
             'c_matches': user.c_matches,
             'c_login': user.c_login,
+            'c_update': user.c_update,
             'last_login': user.last_login,
             'last_usage': user.last_usage,
             }
