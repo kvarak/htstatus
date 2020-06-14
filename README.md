@@ -41,3 +41,10 @@ $ psql
 - Postgres
 - Python 3+
 - Flask
+- flask_script
+
+### Manage requirements
+```
+python -m pip freeze > requirements.txt
+pip install -r requirements.txt
+```
