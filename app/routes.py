@@ -1,9 +1,13 @@
 from flask import session, render_template, redirect, url_for, request
-from app import app
-from authlib.integrations.flask_client import OAuth, OAuthError
 from flask_bootstrap import Bootstrap
-from pychpp import CHPP
+from flask_sqlalchemy import SQLAlchemy
+from authlib.integrations.flask_client import OAuth, OAuthError
 from pprint import pprint
+from pychpp import CHPP
+
+from config import Config
+from app import app, db
+from models import Usage
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
@@ -87,6 +91,16 @@ def login():
     session['team_id'] = all_teams[0]
     session['team_name'] = chpp.team(ht_id = all_teams[0]).name
 
+    notnew = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    if not notnew:
+        u = Usage(current_user.ht_id)
+        db.session.add(u)
+        db.session.commit()
+    else:
+        user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+        u = Usage.login(user)
+        db.session.commit()
+
     return render_template(
         'login.html',
         title = 'Login',
@@ -100,6 +114,34 @@ def login():
 def logout():
     session.clear()
     return render_template('logout.html', title='Logout')
+
+# --------------------------------------------------------------------------------
+@app.route('/admin')
+def admin():
+    allusers = db.session.query(Usage).all()
+
+    users = []
+
+    for user in allusers:
+        thisuser = {
+            'id': user.user_id,
+            'c_team': user.c_team,
+            'c_training': user.c_training,
+            'c_player': user.c_player,
+            'c_matches': user.c_matches,
+            'c_login': user.c_login,
+            'last_login': user.last_login,
+            'last_usage': user.last_usage,
+            }
+        users.append(thisuser)
+
+    return render_template(
+        'admin.html',
+        title = 'Admin',
+        current_user = session['current_user'],
+        team = session['team_name'],
+        users = users,
+        )
 
 # --------------------------------------------------------------------------------
 @app.route('/team')
@@ -119,6 +161,10 @@ def team():
         this_team = chpp.team(ht_id = teamid)
         pprint(vars(this_team))
         teams.append(this_team.name)
+
+    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    u = Usage.team(user)
+    db.session.commit()
 
     return render_template(
         'team.html',
@@ -162,6 +208,11 @@ def player():
             }
         players.append(thisplayer)
 
+    current_user = chpp.user()
+    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    u = Usage.player(user)
+    db.session.commit()
+
     return render_template(
         'player.html',
         title = 'Players',
@@ -173,6 +224,17 @@ def player():
 # --------------------------------------------------------------------------------
 @app.route('/matches')
 def matches():
+    chpp = CHPP(consumer_key,
+                consumer_secret,
+                session['access_key'],
+                session['access_secret'],
+                )
+
+    current_user = chpp.user()
+    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    u = Usage.matches(user)
+    db.session.commit()
+
     return render_template(
         'matches.html',
         title = 'Matches',
@@ -183,6 +245,17 @@ def matches():
 # --------------------------------------------------------------------------------
 @app.route('/training')
 def training():
+    chpp = CHPP(consumer_key,
+                consumer_secret,
+                session['access_key'],
+                session['access_secret'],
+                )
+
+    current_user = chpp.user()
+    user = db.session.query(Usage).filter_by(user_id = current_user.ht_id).first()
+    u = Usage.training(user)
+    db.session.commit()
+
     return render_template(
         'training.html',
         title = 'Training',

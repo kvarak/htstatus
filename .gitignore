@@ -1,8 +1,11 @@
-config.py
 *.pyc
-creds.json
+
 .DS_Store
-data
+config.py
+creds.json
+nohup.out
 push.sh
 serverrun.sh
-nohup.out
+
+data
+migrations

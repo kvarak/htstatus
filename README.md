@@ -14,4 +14,30 @@ class Config(object):
   CONSUMER_SECRETS         = 'you-will-never-guess'
   CALLBACK_URL             = 'url-to-your-callback'
   CHPP_URL                 = 'https://chpp.hattrick.org/chppxml.ashx'
+  SQLALCHEMY_DATABASE_URI  = 'postgresql:///<dbname>'
+  SQLALCHEMY_TRACK_MODIFICATIONS = False
 ```
+
+## Database
+
+### Postgres
+
+*Create (and upgrade)*
+```
+python manage.py db init
+python manage.py db migrate
+python manage.py db upgrade
+```
+*Check*
+```
+$ psql
+# \c htplanner
+# \dt
+# \d results
+```
+
+## Requirements
+
+- Postgres
+- Python 3+
+- Flask

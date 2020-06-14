@@ -9,10 +9,13 @@
       <div class="jumbotron">
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
+          {% if accesslink %}
           <p class="lead">You need to give {{ apptitle }} permission to access your HT data.</p>
           <hr class="my-4">
-          {% if accesslink %}
           <p>Click <a href="{{ accesslink }}">here to allow</a> {{ apptitle }} access to your team.</p>
+          {% else %}
+          <p class="lead">Success! Access have been granted.</p>
+          <hr class="my-4">
           {% endif %}
           {% if team %}
           <p>{{ team }}</p>
