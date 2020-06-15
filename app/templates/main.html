@@ -10,24 +10,47 @@
         <div class="container">
           <h1 class="display-4">{{ apptitle }}</h1>
           <p class="lead">
-            Helping you train your players, long term.
+            Helping you with your Hattrick experience.
           </p>
-          {% if current_user %}
-            <hr class="my-4">
-<!--
-          <p>
-            This page can help you plan your training cycles.
-          </p>
-            <p>
-            The idea comes from <a href="https://www.youtube.com/channel/UCQxmmVoezcT_QP4iqlAoiSw">Uncle Mish's youtube videos</a>.
-          </p>
--->
-            <p>Welcome {{ current_user }}!</p>
-            <p>{{ debug1 }}</p>
-            <p>{{ debug2 }}</p>
-          {% endif %}
         </div>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Still under development</h5>
+            <p class="card-text">
+              The whole website is under development and will change continuously. Sometimes you'll be logged off and need to re-login (give permission again),
+              but you'll probably not loose any data.
+            </p>
+            <p class="card-text">
+              You're here, so you probably want to help out. If you can't get access to the tool (the login doesn't work),
+              you most likely haven't been added as a betatester in Hattrick. This is only a problem while the application is "Under development"
+              and will not be needed when released. You can <a href="https://github.com/kvarak/htstatus/issues/new/choose">request access as a beta tester</a>.
+            </p>
+            <p class="card-text">
+              If you have access and are able to login, please help out by <a href="https://github.com/kvarak/htstatus/issues/new/choose">reporting bugs and suggesting features</a>.
+            </p>
+            <p class="card-text">
+              If you are savvy in the land of python/flask/postgres, and can't stay out of helping with the development, don't hesitate to suggest pull requests to the public repo.
+              I'm not, so this is definitely a learning experience for me and all help is appreciated.
+            </p>
+            <p class="card-text">
+              <i>Note that asking for beta access and reporting bugs/feature requests requires a <a href="https://github.com/login">GitHub account</a></i>.
+            </p>
+          </div>
+          <div class="card-footer">
+            <small class="text-muted"><i>Status: Alpha</i></small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm"><p></p>
     </div>
   </div>
 </div>

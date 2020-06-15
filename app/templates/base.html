@@ -85,6 +85,9 @@
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
+
+$('.toast').toast(option)
+
 </script>
 
 <script src="{{url_for('static', filename='sorttable.js')}}"></script>
@@ -149,5 +152,8 @@ $(function () {
   </div>
 </div>
 
+<div class="alert alert-warning" role="alert">
+  This HT CHPP application is under construnction and changes are made continuously. <a href="/">Read more on the front page</a>.
+</div>
 
 {% endblock %}
