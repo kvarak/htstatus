@@ -1,6 +1,7 @@
 from flask import session, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from authlib.integrations.flask_client import OAuth, OAuthError
 from pprint import pprint
 from pychpp import CHPP
@@ -294,14 +295,23 @@ def player():
     if session.get('current_user') is None:
         return render_template('notloggedin.html')
 
-    players = db.session.query(Players).filter_by(owner = session['team_id']).all()
+    # Of each of the players you ever have owned, get the last download
+    players_data = db.session.query(Players).filter_by(owner = session['team_id']).order_by("data_date").all()
+    newlst = {}
+    for l in players_data:
+        newlst[l.ht_id] = dict(iter(l))
+    players_now = []
+    for k, val in newlst.items():
+        players_now.append(val)
 
-    pprint(session['team_id'])
-    pprint(players)
-
-#    for player in players:
-#        olddata = db.session.query(Players).filter_by(ht_id = player.ht_id).order_by("data_date desc").first()
-#        pprint(olddata.data_date)
+    # Of each of the players you ever have owned, get the first download
+    players_data = db.session.query(Players).filter_by(owner = session['team_id']).order_by(text("data_date desc")).all()
+    newlst = {}
+    for l in players_data:
+        newlst[l.ht_id] = dict(iter(l))
+    players_oldest = []
+    for k, val in newlst.items():
+        players_oldest.append(val)
 
     user = db.session.query(Usage).filter_by(user_id = session['current_user_id']).first()
     u = Usage.player(user)
@@ -312,7 +322,9 @@ def player():
         title = 'Players',
         current_user = session['current_user'],
         team = session['team_name'],
-        players = players,
+        players = players_now,
+        players_data = players_data,
+        players_oldest = players_oldest,
         )
 
 # --------------------------------------------------------------------------------
