@@ -203,12 +203,14 @@ def update():
             ).first()
 
         if dbplayer:
-            print (thisplayer['first_name'], thisplayer['last_name'], " already exists for today.")
-        else:
-            newplayer = Players(thisplayer)
-            db.session.add(newplayer)
+            print (" - ", thisplayer['first_name'], thisplayer['last_name'], " already exists for today.")
+            db.session.delete(dbplayer)
             db.session.commit()
-            print ("Added ", thisplayer['first_name'], thisplayer['last_name'], " for today.")
+
+        newplayer = Players(thisplayer)
+        db.session.add(newplayer)
+        db.session.commit()
+        print ("+ Added ", thisplayer['first_name'], thisplayer['last_name'], " for today.")
 
         players.append(thisplayer)
 
