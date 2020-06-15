@@ -2,6 +2,7 @@
 
 .DS_Store
 config.py
+config.py-e
 creds.json
 nohup.out
 push.sh
