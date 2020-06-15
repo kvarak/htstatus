@@ -2,7 +2,7 @@
 name: Access to beta
 about: Request access as a beta tester
 title: ''
-labels: ''
+labels: beta access
 assignees: ''
 
 ---
