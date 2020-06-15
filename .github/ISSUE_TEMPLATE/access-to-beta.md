@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **What is your hattrick user or hattrick user id**
-For instance: Kvarak and 182085
+Examples: Kvarak / 182085
 
 **Additional information**
 Add any other information you want here.
