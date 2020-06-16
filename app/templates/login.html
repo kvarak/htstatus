@@ -9,35 +9,103 @@
       <div class="jumbotron">
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
-          {% if accesslink %}
-          <p class="lead">You need to give {{ apptitle }} permission to access your HT data.</p>
-          <hr class="my-4">
-          <p>Click <a href="{{ accesslink }}">here to allow</a> {{ apptitle }} access to your team.</p>
-          {% else %}
-          <p class="lead">Success! Access have been granted.</p>
-          <hr class="my-4">
-          {% endif %}
-          {% if team %}
-          <p>{{ team }}</p>
-          {% endif %}
+        </div>
+        {% if current_user %}
+        <div class="alert alert-success" role="alert">
+          Successfully logged in as {{ current_user }}.
+        </div>
+        {% endif %}
       </div>
-      </div>
-      <p>
-        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
-          Tooltip on top
-        </button>
-        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right">
-          Tooltip on right
-        </button>
-        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
-          Tooltip on bottom
-        </button>
-        <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="left" title="Tooltip on left">
-          Tooltip on left
-        </button>
-      </p>
     </div>
   </div>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
+  {% if not(current_user) %}
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            {% if accesslink %}
+
+            {% if accesslink %}
+              <p class="lead">You need to give {{ apptitle }} permission to access your HT data.</p>
+              <hr class="my-4">
+              <p>Click <a href="{{ accesslink }}">here be sent to Hattrick</a>.</p>
+              {% else %}
+              <p class="lead">Success! Access have been granted.</p>
+              <hr class="my-4">
+              {% endif %}
+              {% if team %}
+              <p>{{ team }}</p>
+              {% endif %}
+
+            {% else %}
+            <form method="POST" action="/login">
+              <div class="form-group row">
+                  <label for="noInputText" class="col-sm-2 col-form-label">&nbsp;</label>
+                <div class="col-sm-10">
+                  {{ apptitle }} credentials, <i><b>not</b> your Hattrick credentials.</i>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="staticEmail" class="col-sm-2 col-form-label text-small">Username</label>
+                <div class="col-sm-10">
+                  <input class="form-control" type="username" name="username" autofocus="">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputPassword" class="col-sm-2 col-form-label text-small">Password</label>
+                <div class="col-sm-10">
+                  <input class="form-control" type="password" name="password" id="inputPassword">
+                  <small id="passwordHelpInline" class="text-muted">
+                    At least 8 characters long.
+                  </small>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputSubmit" class="col-sm-2 col-form-label">&nbsp;</label>
+                <div class="col-sm-10">
+                  <button class="btn btn-primary">Login</button>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label for="inputSubmit" class="col-sm-2 col-form-label">&nbsp;</label>
+                <div class="col-sm-10">
+                  <p class="text-sm11">
+                    If you've forgotten your username and/or password, don't worry,
+                    you will be forwarded to Hattrick where you can give {{ apptitle }} permission to access
+                    your Hattrick data and you'll have access to all of your {{ apptitle }} data.
+                  </p>
+                </div>
+              </div>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p class="text-sm13">
+              You need a <i>free account</i> to use {{ apptitle }}. This account is connected to your Hattrick
+              account via CHPP with oAuth (Hattrick's login system).
+            </p>
+            <p class="text-sm13">
+              If you have used {{ apptitle }} before, just login.
+            </p>
+            <p class="text-sm13">
+              Otherwise write your username and select a password and then you'll be forwarded to Hattrick
+              to give {{ apptitle }} permission to access your Hattrick data.
+            </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
 
 

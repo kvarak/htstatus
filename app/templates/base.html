@@ -8,59 +8,57 @@
 <!-- Bootstrap: Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 
-  <style>
-    body, html {
-      height: 100%;
-    }
-    body {
-      /* <!-- Background vector created by Harryarts - www.freepik.com --> */
-      background-image: url("{{url_for('static', filename='background.jpg')}}");
+<style>
+  body, html {
+    height: 100%;
+  }
+  body {
+    /* <!-- Background vector created by Harryarts - www.freepik.com --> */
+    background-image: url("{{url_for('static', filename='background.jpg')}}");
 
-      /* Full height */
-      height: 100%;
+    /* Full height */
+    height: 100%;
 
-      /* Center and scale the image nicely */
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-attachment: fixed;
-    }
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+  }
 
-    #logo {
-      width: 400px;
-      height: 50px;
-      border-bottom-left-radius: 10px;
-      border-top-left-radius: 10px;
-    }
+  .bg-off {
+    background-color:#d6d6d6!important
+  }
+  .bg-roundup {
+    background-color:#34c8db!important
+  }
+  .img-fluid-2 {
+    max-height: 100%;
+    width: auto;
+  }
 
-    .bg-off {
-      background-color:#d6d6d6!important
-    }
-    .bg-roundup {
-      background-color:#34c8db!important
-    }
-    .img-fluid-2 {
-      max-height: 100%;
-      width: auto;
-    }
+  .text-small {
+    font-size: 10px;
+    white-space: nowrap;
+  }
 
-    .text-small {
-      font-size: 10px;
-    }
+  .table-scroll{
+    display: inline-block;
+    overflow: auto;
+  }
 
-    .table-scroll{
-      display: inline-block;
-      overflow: auto;
-    }
+  .td-fixed {
+    background-color:#ffffff!important;
+    position: absolute;
+  }
 
-    .td-fixed {
-      background-color:#ffffff!important;
-      position: absolute;
-    }
+  .text-sm11 {
+    font-size: 11px;
+  }
 
-    .text-small {
-      white-space: nowrap;
-    }
+  .text-sm13 {
+    font-size: 13px;
+  }
 
   /* Sortable tables */
   table.sortable thead {
@@ -121,26 +119,17 @@ $('.toast').toast(option)
           </div>
         </li>
         <a class="nav-link" href="/update">Update data</a>
+        <a class="nav-link" href="/profile">Profile</a>
         <a class="nav-link" href="/logout">Logout</a>
       {% else %}
-        <a class="nav-link" href="/login">Login</a>
+        <li class="nav-item">
+          <a class="nav-link" href="/login">Login</a>
+        </li>
       {% endif %}
       {% if current_user == "Kvarak" %}
-      <a class="nav-link" href="/admin">Admin</a>
+        <a class="nav-link" href="/admin">Admin</a>
       {% endif %}
-    </li>
-<!--
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Training
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-          <a class="dropdown-item" href="/trainingcycle">Training Cycles</a>
-          <a class="dropdown-item" href="/basiccycle">Basic cycle</a>
-          <a class="dropdown-item" href="/complexcycle">Complex cycle</a>
-        </div>
       </li>
--->
     </ul>
   </div>
 </nav>
@@ -151,9 +140,10 @@ $('.toast').toast(option)
     </div>
   </div>
 </div>
-
+<!--
 <div class="alert alert-warning" role="alert">
-  This HT CHPP application is under construnction and changes are made continuously. <a href="/">Read more on the front page</a>.
+  This HT CHPP application is under construction and changes are made continuously. <a href="/">Read more on the front page</a>.
 </div>
+-->
 
 {% endblock %}

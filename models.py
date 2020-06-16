@@ -2,6 +2,86 @@ from app import db
 from sqlalchemy.dialects.postgresql import JSON
 import time
 
+# --------------------------------------------------------------------------------
+
+class User(db.Model):
+  __tablename__ = 'users'
+
+  ht_id       = db.Column(db.Integer, primary_key = True)
+  ht_user     = db.Column(db.String(100), unique = True)
+  username    = db.Column(db.String(100), unique = True)
+  password    = db.Column(db.String(100))
+  access_key  = db.Column(db.String(100))
+  access_secret = db.Column(db.String(100))
+  c_login     = db.Column(db.Integer, default = 1)
+  c_team      = db.Column(db.Integer, default = 0)
+  c_player    = db.Column(db.Integer, default = 0)
+  c_matches   = db.Column(db.Integer, default = 0)
+  c_training  = db.Column(db.Integer, default = 0)
+  c_update    = db.Column(db.Integer, default = 0)
+  last_login  = db.Column(db.DateTime)
+  last_update = db.Column(db.DateTime)
+  last_usage  = db.Column(db.DateTime)
+  created     = db.Column(db.DateTime)
+
+  def __init__(self, ht_id, ht_user, username, password, access_key, access_secret):
+    self.ht_id       = ht_id
+    self.ht_user     = ht_user
+    self.username    = username
+    self.password    = password
+    self.access_key  = access_key
+    self.access_secret = access_secret
+    self.c_login     = 1
+    self.c_team      = 0
+    self.c_player    = 0
+    self.c_matches   = 0
+    self.c_training  = 0
+    self.c_update    = 0
+    self.last_login  = time.strftime('%Y-%m-%d %H:%M:%S')
+    self.last_update = time.strftime('%Y-%m-%d %H:%M:%S')
+    self.last_usage  = time.strftime('%Y-%m-%d %H:%M:%S')
+    self.created     = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def __repr__(self):
+    return '<id {}>'.format(self.username)
+
+  def claimUser(self, username, password, access_key, access_secret):
+    self.username    = username
+    self.password    = password
+    self.access_key  = access_key
+    self.access_secret = access_secret
+    self.c_login    += 1
+    self.last_login  = time.strftime('%Y-%m-%d %H:%M:%S')
+    self.last_usage  = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def login(self):
+    self.c_login += 1
+    self.last_login = time.strftime('%Y-%m-%d %H:%M:%S')
+    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def player(self):
+    self.c_player += 1
+    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def matches(self):
+    self.c_matches += 1
+    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def team(self):
+    self.c_team = self.c_team + 1
+    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def training(self):
+    self.c_training += 1
+    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+
+  def updatedata(self):
+    self.c_update += 1
+    self.last_update = time.strftime('%Y-%m-%d %H:%M:%S')
+    self.last_usage  = time.strftime('%Y-%m-%d %H:%M:%S')
+
+# --------------------------------------------------------------------------------
+
 class Players(db.Model):
   __tablename__ = 'players'
 
@@ -171,54 +251,4 @@ class Players(db.Model):
             ("owner", self.owner))
     return iter(ret)
 
-class Usage(db.Model):
-  __tablename__ = 'usage'
-
-  user_id    = db.Column(db.Integer, primary_key = True)
-  c_login    = db.Column(db.Integer, default = 0)
-  c_team     = db.Column(db.Integer, default = 0)
-  c_player   = db.Column(db.Integer, default = 0)
-  c_matches  = db.Column(db.Integer, default = 0)
-  c_training = db.Column(db.Integer, default = 0)
-  c_update   = db.Column(db.Integer, default = 0)
-  last_login = db.Column(db.DateTime)
-  last_usage = db.Column(db.DateTime)
-
-  def __init__(self, user_id, c_login = 1, c_team = 0, c_player = 0, c_matches = 0, c_training = 0, c_update = 0):
-    self.user_id = user_id
-    self.c_login = c_login
-    self.c_team = c_team
-    self.c_player = c_player
-    self.c_matches = c_matches
-    self.c_training = c_training
-    self.c_update = c_update
-    self.last_login = time.strftime('%Y-%m-%d %H:%M:%S')
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-
-  def __repr__(self):
-    return '<id {}>'.format(self.user_id)
-
-  def login(self):
-    self.c_login += 1
-    self.last_login = time.strftime('%Y-%m-%d %H:%M:%S')
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-
-  def player(self):
-    self.c_player += 1
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-
-  def matches(self):
-    self.c_matches += 1
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-
-  def team(self):
-    self.c_team = self.c_team + 1
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-
-  def training(self):
-    self.c_training += 1
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-
-  def updatedata(self):
-    self.c_update += 1
-    self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+# --------------------------------------------------------------------------------

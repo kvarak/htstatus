@@ -17,7 +17,7 @@
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">User activities</h5>
+            <h5 class="card-title">User</h5>
             <p class="card-text">
               <table class="table table-sm table-scroll">
                 <thead>
@@ -29,8 +29,10 @@
                     <th scope="col" class="text-small">#matches</th>
                     <th scope="col" class="text-small">#player</th>
                     <th scope="col" class="text-small">#update</th>
-                    <th scope="col" class="text-small">Last login</th>
                     <th scope="col" class="text-small">Last usage</th>
+                    <th scope="col" class="text-small">Last update</th>
+                    <th scope="col" class="text-small">Last login</th>
+                    <th scope="col" class="text-small">Created</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -43,8 +45,10 @@
                     <td class="text-small">{{ u.c_matches }}</td>
                     <td class="text-small">{{ u.c_player }}</td>
                     <td class="text-small">{{ u.c_update }}</td>
-                    <td class="text-small">{{ u.last_login }}</td>
                     <td class="text-small">{{ u.last_usage }}</td>
+                    <td class="text-small">{{ u.last_update }}</td>
+                    <td class="text-small">{{ u.last_login }}</td>
+                    <td class="text-small">{{ u.created }}</td>
                   </tr>
                   {% endfor %}
                 </tbody>

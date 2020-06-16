@@ -2,21 +2,19 @@
 
 {% block content %}
 
-
 <div class="container">
   <div class="row">
     <div class="col-sm">
       <div class="jumbotron">
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
-          <p class="lead">You are now logged out.</p>
           <hr class="my-4">
-          <p>Welcome back!</p>
+          <p>{{ current_user }}</p>
+          <p>{{ team }}</p>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 
 {% endblock %}
