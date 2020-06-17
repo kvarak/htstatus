@@ -26,14 +26,25 @@
                     <th scope="col" class="text-small">Country</th>
                     <th scope="col" class="text-small">Name</th>
                     <th scope="col" class="text-small">Age</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">stamina</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">keeper</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">defender</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">playmaker</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">winger</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">passing</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">scorer</th>
+                    <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">set_pieces</th>
+                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">experience</th>
+                    <th scope="col" class="text-small"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -46,15 +57,77 @@
                     {% endif %}
                     <td class="text-small">{{ p.country }}</td>
                     <th class="text-small" scope="row">{{ p.first_name }} {{ p.last_name }}</th>
-                    <td class="text-small">{{ p.age_years }}</td>
-                    <td class="text-small">{{ p.stamina }}</td>
-                    <td class="text-small">{{ p.keeper }}</td>
-                    <td class="text-small">{{ p.defender }}</td>
-                    <td class="text-small">{{ p.playmaker }}</td>
-                    <td class="text-small">{{ p.winger }}</td>
-                    <td class="text-small">{{ p.passing }}</td>
-                    <td class="text-small">{{ p.scorer }}</td>
-                    <td class="text-small">{{ p.set_pieces }}</td>
+
+                    <td class="text-small" align="right">{{ p.age_years }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].age_years < p.age_years %}
+                        (+{{ p.age_years - players_oldest[p.ht_id].age_years  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.stamina }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].stamina < p.stamina %}
+                        (+{{ p.stamina - players_oldest[p.ht_id].stamina  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.keeper }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].keeper < p.keeper %}
+                        (+{{ p.keeper - players_oldest[p.ht_id].keeper  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.defender }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].defender < p.defender %}
+                        (+{{ p.defender - players_oldest[p.ht_id].defender  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.playmaker }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].playmaker < p.playmaker %}
+                        (+{{ p.playmaker - players_oldest[p.ht_id].playmaker  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.winger }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].winger < p.winger %}
+                        (+{{ p.winger - players_oldest[p.ht_id].winger  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.passing }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].passing < p.passing %}
+                        (+{{ p.passing - players_oldest[p.ht_id].passing  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.scorer }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].scorer < p.scorer %}
+                        (+{{ p.scorer - players_oldest[p.ht_id].scorer  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.set_pieces }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].set_pieces < p.set_pieces %}
+                        (+{{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.experience }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].experience < p.experience %}
+                        (+{{ p.experience - players_oldest[p.ht_id].experience  }})
+                      {% endif %}
+                    </td>
+
                   </tr>
                   {% endfor %}
                 </tbody>

@@ -16,17 +16,17 @@ from models import Players, User
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
-
 bootstrap = Bootstrap(app)
 
 # Set consumer_key and consumer_secret provided for your app by Hattrick
 consumer_key = app.config['CONSUMER_KEY']
 consumer_secret = app.config['CONSUMER_SECRETS']
 
-version = subprocess.check_output(["git", "describe", "--tags"]).strip()
-version = version.decode("utf-8").split('-')
-fullversion = version[0] + "." + version[1] + "-" + version[2]
-version = version[0] + "." + version[1]
+versionstring = subprocess.check_output(["git", "describe", "--tags"]).strip()
+versionstring = versionstring.decode("utf-8").split('-')
+fullversion = versionstring[0] + "." + versionstring[1] + "-" + versionstring[2]
+version = versionstring[0] + "." + versionstring[1]
+
 timenow = time.strftime('%Y-%m-%d %H:%M:%S')
 
 # --------------------------------------------------------------------------------
@@ -490,8 +490,10 @@ def player():
     for l in players_data:
         newlst[l.ht_id] = dict(iter(l))
     players_oldest = []
+    players_oldest_dict = {}
     for k, val in newlst.items():
         players_oldest.append(val)
+        players_oldest_dict[val['ht_id']] = val
 
     user = db.session.query(User).filter_by(ht_id = session['current_user_id']).first()
     u = User.player(user)
@@ -507,7 +509,7 @@ def player():
         team = session['team_name'],
         players = players_now,
         players_data = players_data,
-        players_oldest = players_oldest,
+        players_oldest = players_oldest_dict,
         )
 
 # --------------------------------------------------------------------------------
