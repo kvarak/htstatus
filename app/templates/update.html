@@ -9,7 +9,14 @@
       <div class="jumbotron">
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
+          {% if error %}
+          <div class="alert alert-danger" role="alert">
+            <p>{{ error }}</p>
+            <p><span style="white-space: pre-line">{{ errorinfo }}</span></p>
+          </div>
+          {% else %}
           <p class="lead">Data downloaded!</p>
+          {% endif %}
           <hr class="my-4">
           {% if team %}
           <p>{{ team }}</p>

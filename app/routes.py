@@ -1,3 +1,4 @@
+import traceback
 from flask import session, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
@@ -145,8 +146,8 @@ def login():
             # Once the user has entered their credentials,
             # a code is returned by Hattrick (directly or to the given callback url)
             return render_template(
-                'tochpp.html',
-                accesslink = auth['url'],
+                '_forward.html',
+                url = auth['url'],
                 )
 
         else:
@@ -237,7 +238,10 @@ def logout():
 @app.route('/update')
 def update():
     if session.get('current_user') is None:
-        return render_template('notloggedin.html')
+        return render_template(
+            '_forward.html',
+            url = '/login',
+            )
 
     chpp = CHPP(consumer_key,
                 consumer_secret,
@@ -247,7 +251,19 @@ def update():
 
     the_team = chpp.team(ht_id = session['team_id'])
 
-#    pprint(the_team.players)
+    try:
+        pprint(the_team.players)
+    except:
+        errorinfo = traceback.format_exc()
+        error = "Something went wrong, couldn't download player data."
+        return render_template(
+            'update.html',
+            title = 'Update',
+            current_user = session['current_user'],
+            team = session['team_name'],
+            error = error,
+            errorinfo = errorinfo,
+            )
 
     players = []
     for p in the_team.players:
