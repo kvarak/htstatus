@@ -1,4 +1,5 @@
 import traceback
+import subprocess
 from flask import session, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
@@ -22,6 +23,12 @@ bootstrap = Bootstrap(app)
 consumer_key = app.config['CONSUMER_KEY']
 consumer_secret = app.config['CONSUMER_SECRETS']
 
+version = subprocess.check_output(["git", "describe", "--tags"]).strip()
+version = version.decode("utf-8").split('-')
+fullversion = version[0] + "." + version[1] + "-" + version[2]
+version = version[0] + "." + version[1]
+timenow = time.strftime('%Y-%m-%d %H:%M:%S')
+
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
 @app.route('/')
@@ -34,6 +41,9 @@ def index():
 
     return render_template(
         'main.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Home',
         apptitle = app.config['APP_NAME'],
         current_user = current_user,
@@ -52,6 +62,9 @@ def signup():
 
     return render_template(
         'signup.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Signup',
         apptitle = app.config['APP_NAME'],
         current_user = current_user,
@@ -70,6 +83,9 @@ def profile():
 
     return render_template(
         'profile.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Profile',
         apptitle = app.config['APP_NAME'],
         current_user = current_user,
@@ -91,6 +107,9 @@ def login():
     if not(oauth_verifier) and not(username) and session.get('current_user') is None:
         return render_template(
             'login.html',
+            version = version,
+            timenow = timenow,
+            fullversion = fullversion,
             title = 'Login / Signup',
             apptitle = app.config['APP_NAME'],
             )
@@ -113,6 +132,9 @@ def login():
             print ("Login failed")
             return render_template(
                 'login.html',
+                version = version,
+                timenow = timenow,
+                fullversion = fullversion,
                 title = 'Login / Signup',
                 apptitle = app.config['APP_NAME'],
                 error = 'Login failed',
@@ -128,6 +150,9 @@ def login():
                 print ("Password too short")
                 return render_template(
                     'login.html',
+                    version = version,
+                    timenow = timenow,
+                    fullversion = fullversion,
                     title = 'Login / Signup',
                     apptitle = app.config['APP_NAME'],
                     error = 'Password too short',
@@ -222,6 +247,9 @@ def login():
 
     return render_template(
         'login.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Login',
         apptitle = app.config['APP_NAME'],
         current_user = session['current_user'],
@@ -232,7 +260,13 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    return render_template('logout.html', title='Logout')
+    return render_template(
+        'logout.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
+        title='Logout',
+        )
 
 # --------------------------------------------------------------------------------
 @app.route('/update')
@@ -256,8 +290,12 @@ def update():
     except:
         errorinfo = traceback.format_exc()
         error = "Something went wrong, couldn't download player data."
+        errorinfo = "Most likely your team is playing a game. If this isn't the case, please report this as a bug.<br><br>" + errorinfo
         return render_template(
             'update.html',
+            version = version,
+            timenow = timenow,
+            fullversion = fullversion,
             title = 'Update',
             current_user = session['current_user'],
             team = session['team_name'],
@@ -351,6 +389,9 @@ def update():
 
     return render_template(
         'update.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Update',
         current_user = session['current_user'],
         team = session['team_name'],
@@ -382,6 +423,9 @@ def admin():
 
     return render_template(
         'admin.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Admin',
         current_user = session['current_user'],
         team = session['team_name'],
@@ -416,6 +460,9 @@ def team():
 
     return render_template(
         'team.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Team',
         current_user = session['current_user'],
         teams = teams,
@@ -452,6 +499,9 @@ def player():
 
     return render_template(
         'player.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Players',
         current_user = session['current_user'],
         team = session['team_name'],
@@ -472,6 +522,9 @@ def matches():
 
     return render_template(
         'matches.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Matches',
         current_user = session['current_user'],
         team = session['team_name'],
@@ -489,6 +542,9 @@ def training():
 
     return render_template(
         'training.html',
+        version = version,
+        timenow = timenow,
+        fullversion = fullversion,
         title = 'Training',
         current_user = session['current_user'],
         team = session['team_name'],

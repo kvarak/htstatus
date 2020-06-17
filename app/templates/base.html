@@ -67,6 +67,47 @@
     font-weight: bold;
     cursor: default;
   }
+
+  .parent {
+    overflow: hidden; /* required */
+/*    width: 50%; /* for demo only */
+    height: 1px; /* some non-zero number */
+/*    margin: 25px auto; /* for demo only */
+/*    border:1px solid grey; /* for demo only */
+/*    position: relative; /* required  for demo*/
+  }
+
+  .ribbon {
+    margin: 0;
+    padding: 0;
+    background: rebeccapurple;
+    color:white;
+    padding:1em 0;
+    position: absolute;
+    top:0;
+    right:0;
+    transform: translateX(30%) translateY(0%) rotate(45deg);
+    transform-origin: top left;
+    z-index: 100;
+  }
+  .ribbon:before,
+  .ribbon:after {
+    content: '';
+    position: absolute;
+    top:0;
+    margin: 0 -1px; /* tweak */
+    width: 100%;
+    height: 100%;
+    background: rebeccapurple;
+  }
+  .ribbon:before {
+    right:100%;
+  }
+
+  .ribbon:after {
+    left:100%;
+  }
+
 </style>
 {% endblock %}
 
@@ -96,6 +137,7 @@ $('.toast').toast(option)
 ## Navbar
 ##########################
 {% block navbar %}
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -140,6 +182,11 @@ $('.toast').toast(option)
     </div>
   </div>
 </div>
+
+<div class="parent">
+  <h8 class="ribbon">Beta version {{ version }}</h8>
+</div>
+
 <!--
 <div class="alert alert-warning" role="alert">
   This HT CHPP application is under construction and changes are made continuously. <a href="/">Read more on the front page</a>.
