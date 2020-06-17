@@ -489,10 +489,10 @@ def player():
     newlst = {}
     for l in players_data:
         newlst[l.ht_id] = dict(iter(l))
-    players_oldest = []
+#    players_oldest = []
     players_oldest_dict = {}
     for k, val in newlst.items():
-        players_oldest.append(val)
+#        players_oldest.append(val)
         players_oldest_dict[val['ht_id']] = val
 
     user = db.session.query(User).filter_by(ht_id = session['current_user_id']).first()

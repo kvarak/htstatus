@@ -27,24 +27,35 @@
                     <th scope="col" class="text-small">Name</th>
                     <th scope="col" class="text-small">Age</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">stamina</th>
+                    <th scope="col" class="text-small">STA</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">keeper</th>
+                    <th scope="col" class="text-small">KEEP</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">defender</th>
+                    <th scope="col" class="text-small">DEF</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">playmaker</th>
+                    <th scope="col" class="text-small">PM</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">winger</th>
+                    <th scope="col" class="text-small">WING</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">passing</th>
+                    <th scope="col" class="text-small">PS</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">scorer</th>
+                    <th scope="col" class="text-small">SC</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">set_pieces</th>
+                    <th scope="col" class="text-small">SP</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">experience</th>
+                    <th scope="col" class="text-small">XP</th>
                     <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">FORM</th>
+                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">CRDS</th>
+                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">INJ</th>
+                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">LOY</th>
+                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">TSI</th>
+                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">Comparison</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -70,12 +81,18 @@
                       {% if players_oldest[p.ht_id].stamina < p.stamina %}
                         (+{{ p.stamina - players_oldest[p.ht_id].stamina  }})
                       {% endif %}
+                      {% if players_oldest[p.ht_id].stamina > p.stamina %}
+                        ({{ p.stamina - players_oldest[p.ht_id].stamina  }})
+                      {% endif %}
                     </td>
 
                     <td class="text-small" align="right">{{ p.keeper }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].keeper < p.keeper %}
                         (+{{ p.keeper - players_oldest[p.ht_id].keeper  }})
+                      {% endif %}
+                      {% if players_oldest[p.ht_id].keeper > p.keeper %}
+                        ({{ p.keeper - players_oldest[p.ht_id].keeper  }})
                       {% endif %}
                     </td>
 
@@ -84,12 +101,18 @@
                       {% if players_oldest[p.ht_id].defender < p.defender %}
                         (+{{ p.defender - players_oldest[p.ht_id].defender  }})
                       {% endif %}
+                      {% if players_oldest[p.ht_id].defender > p.defender %}
+                        ({{ p.defender - players_oldest[p.ht_id].defender  }})
+                      {% endif %}
                     </td>
 
                     <td class="text-small" align="right">{{ p.playmaker }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].playmaker < p.playmaker %}
                         (+{{ p.playmaker - players_oldest[p.ht_id].playmaker  }})
+                      {% endif %}
+                      {% if players_oldest[p.ht_id].playmaker > p.playmaker %}
+                        ({{ p.playmaker - players_oldest[p.ht_id].playmaker  }})
                       {% endif %}
                     </td>
 
@@ -98,12 +121,18 @@
                       {% if players_oldest[p.ht_id].winger < p.winger %}
                         (+{{ p.winger - players_oldest[p.ht_id].winger  }})
                       {% endif %}
+                      {% if players_oldest[p.ht_id].winger > p.winger %}
+                        ({{ p.winger - players_oldest[p.ht_id].winger  }})
+                      {% endif %}
                     </td>
 
                     <td class="text-small" align="right">{{ p.passing }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].passing < p.passing %}
                         (+{{ p.passing - players_oldest[p.ht_id].passing  }})
+                      {% endif %}
+                      {% if players_oldest[p.ht_id].passing > p.passing %}
+                        ({{ p.passing - players_oldest[p.ht_id].passing  }})
                       {% endif %}
                     </td>
 
@@ -112,12 +141,18 @@
                       {% if players_oldest[p.ht_id].scorer < p.scorer %}
                         (+{{ p.scorer - players_oldest[p.ht_id].scorer  }})
                       {% endif %}
+                      {% if players_oldest[p.ht_id].scorer > p.scorer %}
+                        ({{ p.scorer - players_oldest[p.ht_id].scorer  }})
+                      {% endif %}
                     </td>
 
                     <td class="text-small" align="right">{{ p.set_pieces }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].set_pieces < p.set_pieces %}
                         (+{{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
+                      {% endif %}
+                      {% if players_oldest[p.ht_id].set_pieces > p.set_pieces %}
+                        ({{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
                       {% endif %}
                     </td>
 
@@ -127,6 +162,43 @@
                         (+{{ p.experience - players_oldest[p.ht_id].experience  }})
                       {% endif %}
                     </td>
+
+                    <td class="text-small" align="right">{{ p.form }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].form < p.form %}
+                        (+{{ p.form - players_oldest[p.ht_id].form  }})
+                      {% endif %}
+                      {% if players_oldest[p.ht_id].form > p.form %}
+                        ({{ p.form - players_oldest[p.ht_id].form  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.cards }}</td>
+                    <td class="text-small">&nbsp;</td>
+
+                    <td class="text-small" align="right">{{ p.injury_level }}</td>
+                    <td class="text-small">&nbsp;</td>
+
+                    <td class="text-small" align="right">{{ p.loyalty }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].loyalty < p.loyalty %}
+                        (+{{ p.loyalty - players_oldest[p.ht_id].loyalty  }})
+                      {% endif %}
+                    </td>
+
+                    <td class="text-small" align="right">{{ p.tsi }}</td>
+                    <td class="text-small">
+                      {% if players_oldest[p.ht_id].tsi < p.tsi %}
+                        (+{{ p.tsi - players_oldest[p.ht_id].tsi  }})
+                      {% endif %}
+                      {% if players_oldest[p.ht_id].tsi > p.tsi %}
+                        ({{ p.tsi - players_oldest[p.ht_id].tsi  }})
+                      {% endif %}
+                    </td>
+
+                    {% set olddate = players_oldest[p.ht_id].data_date | string() %}
+                    {% set thedate = olddate[:10] %}
+                    <td class="text-small" align="right">{{ thedate }}</td>
 
                   </tr>
                   {% endfor %}
