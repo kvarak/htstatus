@@ -1,5 +1,5 @@
 ---
-name: Anything else
+name: 5. Anything else
 about: Not a bug or new feature
 title: ''
 labels: ''
