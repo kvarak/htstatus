@@ -1,6 +1,7 @@
 *.pyc
 
 .DS_Store
+changelog.txt
 config.py
 config.py-e
 creds.json

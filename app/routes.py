@@ -377,7 +377,7 @@ def update():
         )
 
 # --------------------------------------------------------------------------------
-@app.route('/admin')
+@app.route('/debug')
 def admin():
     if session.get('current_user') is None:
         return render_template(
@@ -403,15 +403,19 @@ def admin():
             }
         users.append(thisuser)
 
+    f = open('app/static/changelog.txt')
+    changelog = f.readlines()
+
     return render_template(
-        'admin.html',
+        'debug.html',
         version = version,
         timenow = timenow,
         fullversion = fullversion,
-        title = 'Admin',
+        title = 'Debug',
         current_user = session['current_user'],
         team = session['team_name'],
         users = users,
+        changelog = changelog,
         )
 
 # --------------------------------------------------------------------------------

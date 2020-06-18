@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+./changelog.sh
+
 ## FLASK_ENV=development turns on debug mode when flask starts
 export FLASK_ENV=development
 
