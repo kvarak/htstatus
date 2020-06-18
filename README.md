@@ -45,6 +45,6 @@ $ psql
 
 ### Manage requirements
 ```
-python -m pip freeze > requirements.txt
+pipreqs . --force
 pip install -r requirements.txt
 ```
