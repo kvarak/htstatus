@@ -53,27 +53,6 @@ def index():
         )
 
 # --------------------------------------------------------------------------------
-@app.route('/signup')
-def signup():
-    current_user = session['current_user'] if 'current_user' in session else False
-    team_name = session['team_name'] if 'team_name' in session else False
-    debug1 = ""
-    debug2 = ""
-
-    return render_template(
-        'signup.html',
-        version = version,
-        timenow = timenow,
-        fullversion = fullversion,
-        title = 'Signup',
-        apptitle = app.config['APP_NAME'],
-        current_user = current_user,
-        team = team_name,
-        debug1 = debug1,
-        debug2 = debug2,
-        )
-
-# --------------------------------------------------------------------------------
 @app.route('/profile')
 def profile():
     current_user = session['current_user'] if 'current_user' in session else False
@@ -401,7 +380,10 @@ def update():
 @app.route('/admin')
 def admin():
     if session.get('current_user') is None:
-        return render_template('notloggedin.html')
+        return render_template(
+            '_forward.html',
+            url = '/login',
+            )
 
     allusers = db.session.query(User).all()
     users = []
@@ -436,7 +418,10 @@ def admin():
 @app.route('/team')
 def team():
     if session.get('current_user') is None:
-        return render_template('notloggedin.html')
+        return render_template(
+            '_forward.html',
+            url = '/login',
+            )
 
     chpp = CHPP(consumer_key,
                 consumer_secret,
@@ -473,7 +458,10 @@ def team():
 @app.route('/player')
 def player():
     if session.get('current_user') is None:
-        return render_template('notloggedin.html')
+        return render_template(
+            '_forward.html',
+            url = '/login',
+            )
 
     # Of each of the players you ever have owned, get the last download
     players_data = db.session.query(Players).filter_by(owner = session['team_id']).order_by("data_date").all()
@@ -516,7 +504,10 @@ def player():
 @app.route('/matches')
 def matches():
     if session.get('current_user') is None:
-        return render_template('notloggedin.html')
+        return render_template(
+            '_forward.html',
+            url = '/login',
+            )
 
     user = db.session.query(User).filter_by(ht_id = session['current_user_id']).first()
     u = User.matches(user)
@@ -536,7 +527,10 @@ def matches():
 @app.route('/training')
 def training():
     if session.get('current_user') is None:
-        return render_template('notloggedin.html')
+        return render_template(
+            '_forward.html',
+            url = '/login',
+            )
 
     user = db.session.query(User).filter_by(ht_id = session['current_user_id']).first()
     u = User.training(user)
