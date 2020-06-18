@@ -87,7 +87,11 @@
                       {% endif %}
                     </td>
 
-                    <th class="text-small" scope="row">{{ p.first_name }} {{ p.last_name }}</th>
+                    <th class="text-small" scope="row">
+                      <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}">
+                        {{ p.first_name }} {{ p.last_name }}
+                      </a>
+                    </th>
 
                     <td class="text-small" align="right">{{ p.age_years }}</td>
                     <td class="text-small">
@@ -231,6 +235,113 @@
         </div>
       </div>
     </div>
+    {% for p in players %}
+    <div class="col-sm collapse" id="all-player-details-{{ p.ht_id}}">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}">
+                {% if p.number < 100 %}
+                {{ p.number }}.
+                {% endif %}
+                {{ p.first_name }} {{ p.last_name }}
+              </a>
+
+              {% if p.specialty == 1 %}
+              <img src="{{url_for('static', filename='ico-sp-technical.png')}}" height="25">
+              {% elif p.specialty == 2 %}
+                <img src="{{url_for('static', filename='ico-sp-speed.png')}}" height="25">
+              {% elif p.specialty == 3 %}
+                <img src="{{url_for('static', filename='ico-sp-powerful.png')}}" height="25">
+              {% elif p.specialty == 4 %}
+                <img src="{{url_for('static', filename='ico-sp-unpredictable.png')}}" height="25">
+              {% elif p.specialty == 5 %}
+                <img src="{{url_for('static', filename='ico-sp-head.png')}}" height="25">
+              {% elif p.specialty > 0 %}
+                [{{ p.specialty }}]
+              {% endif %}
+
+              {% if p.is_transfer_listed %}
+              <img src="{{url_for('static', filename='ico-forsale.png')}}" height="25">
+              {% endif %}
+
+              {% if p.cards == 1 %}
+                <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="25">
+              {% elif p.cards == 2 %}
+                <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="25">
+              {% elif p.cards == 3 %}
+                <img src="{{url_for('static', filename='ico-red.png')}}" height="25">
+              {% endif %}
+
+              {% if p.injury_level == 0 %}
+              <img src="{{url_for('static', filename='ico-damage.png')}}" height="25">
+              {% elif p.injury_level > 0 %}
+                <img src="{{url_for('static', filename='ico-injury.png')}}" height="25">{{ p.injury_level }}
+              {% endif %}
+
+            </h5>
+
+            {% if p.nick_name != "None" %}
+            <p class="card-text">
+              <i>"{{ p.nick_name }}"</i>
+            </p>
+            {% endif %}
+
+            {% if p.statement != "None" %}
+            <p class="card-text">
+              <i>"{{ p.statement }}"</i>
+            </p>
+            {% endif %}
+
+            {% if p.owner_notes != "None" %}
+            <p class="card-text">
+              <i>"{{ p.owner_notes }}"</i>
+            </p>
+            {% endif %}
+
+            <p class="card-text text-sm13">
+              {{ p.age }}</br>
+              In {{ team }} since {{ p.arrival_date }}.</br>
+              </br>
+              keeper = {{ p.keeper }}</br>
+              defender = {{ p.defender }}</br>
+              playmaker = {{ p.playmaker }}</br>
+              winger = {{ p.winger }}</br>
+              passing = {{ p.passing }}</br>
+              scorer = {{ p.scorer }}</br>
+              set_pieces = {{ p.set_pieces }}</br>
+              </br>
+              stamina = {{ p.stamina }}</br>
+              form = {{ p.form }}</br>
+              agreeability = {{ p.agreeability }}</br>
+              aggressiveness = {{ p.aggressiveness }}</br>
+              honesty = {{ p.honesty }}</br>
+              experience = {{ p.experience }}</br>
+              loyalty = {{ p.loyalty }}</br>
+              tsi = {{ p.tsi }}</br>
+              salary = {{ p.salary }}</br>
+              </br>
+              caps = {{ p.caps }}</br>
+              caps_u20 = {{ p.caps_u20 }}</br>
+              career_goals = {{ p.career_goals }}</br>
+              career_hattricks = {{ p.career_hattricks }}</br>
+              league_goals = {{ p.league_goals }}</br>
+              cup_goals = {{ p.cup_goals }}</br>
+              friendly_goals = {{ p.friendly_goals }}</br>
+              current_team_matches = {{ p.current_team_matches }}</br>
+              current_team_goals = {{ p.current_team_goals }}</br>
+              national_team_id = {{ p.national_team_id }}</br>
+              national_team_name = {{ p.national_team_name }}</br>
+            </p>
+            <p class="text-sm13">
+              Training plots...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
   </div>
   <div class="row">
     <div class="col-sm"><p></p>
