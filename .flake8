@@ -1,0 +1,4 @@
+[flake8]
+import-order-style = google
+exclude = .git, run.py, __init__.py
+application_import_names = app, config, models
