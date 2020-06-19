@@ -6,16 +6,80 @@
   <div class="row">
     <div class="col-sm">
       <div class="jumbotron">
-        <img src="{{url_for('static', filename='training.jpg')}}" class="rounded float-right img-fluid-2" height="200">
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
           <p class="lead">{{ team }}</p>
-          <hr class="my-4">
-          <p><i>Under construction</i></p>
+          <!-- <hr class="my-4">
+          <p><i>Under construction</i></p> -->
         </div>
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <p class="card-text">
+            <p class="text-sm13">
+              <div class="card-body" id="training" style="width:90%;height:250px;"></div>
+            </p>
+          </p>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm"><p></p>
+    </div>
+  </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{{ super() }}
+<script>
+
+window.onresize = doALoadOfStuff;
+
+function doALoadOfStuff() {
+    Plotly.newPlot('training', data, layout);
+}
+
+trace1 = {
+  type: 'scatter',
+  x: [1, 2, 3, 4],
+  y: [10, 15, 13, 17],
+  mode: 'lines',
+  name: 'Red',
+  line: {
+    color: 'rgb(219, 64, 82)',
+    width: 3
+  }
+};
+
+trace2 = {
+  type: 'scatter',
+  x: [1, 2, 3, 4],
+  y: [12, 9, 15, 12],
+  mode: 'lines',
+  name: 'Blue',
+  line: {
+    color: 'rgb(55, 128, 191)',
+    width: 1
+  }
+};
+
+var layout = {
+  title: 'Training',
+};
+
+var data = [trace1, trace2];
+
+Plotly.newPlot('training', data, layout);
+
+</script>
 
 {% endblock %}

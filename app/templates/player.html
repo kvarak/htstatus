@@ -227,13 +227,19 @@
         </div>
       </div>
     </div>
+  <!-- </div>
+  <div class="row">
+    <div class="col-sm"><p></p>
+    </div>
+  </div>
+  <div class="row"> -->
     {% for p in players %}
     <div class="col-sm collapse" id="all-player-details-{{ p.ht_id}}">
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">
-              <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}">
+              <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}" onclick="doALoadOfStuff()">
                 {% if p.number < 100 %}
                 {{ p.number }}.
                 {% endif %}
@@ -394,9 +400,6 @@
                   </td>
                 </tr>
               </table>
-            </p>
-            <p class="text-sm13">
-              Training plots...
             </p>
           </div>
         </div>
