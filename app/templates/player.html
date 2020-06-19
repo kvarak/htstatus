@@ -72,19 +72,11 @@
 -->
 
                     <td class="text-small">
-                      {% if p.specialty == 1 %}
-                        <img src="{{url_for('static', filename='ico-sp-technical.png')}}" height="13">
-                      {% elif p.specialty == 2 %}
-                        <img src="{{url_for('static', filename='ico-sp-speed.png')}}" height="13">
-                      {% elif p.specialty == 3 %}
-                        <img src="{{url_for('static', filename='ico-sp-powerful.png')}}" height="13">
-                      {% elif p.specialty == 4 %}
-                        <img src="{{url_for('static', filename='ico-sp-unpredictable.png')}}" height="13">
-                      {% elif p.specialty == 5 %}
-                        <img src="{{url_for('static', filename='ico-sp-head.png')}}" height="13">
-                      {% elif p.specialty > 0 %}
-                        [{{ p.specialty }}]
-                      {% endif %}
+                      {% if p.specialty > 0 %}
+                      {% set pngnr = p.specialty | string() %}
+                      {% set pngname = 'ico-sp-' + pngnr + '.png' %}
+                      <img src="{{url_for('static', filename=pngname)}}" height="13">
+                    {% endif %}
                     </td>
 
                     <th class="text-small" scope="row">
@@ -248,18 +240,10 @@
                 {{ p.first_name }} {{ p.last_name }}
               </a>
 
-              {% if p.specialty == 1 %}
-              <img src="{{url_for('static', filename='ico-sp-technical.png')}}" height="25">
-              {% elif p.specialty == 2 %}
-                <img src="{{url_for('static', filename='ico-sp-speed.png')}}" height="25">
-              {% elif p.specialty == 3 %}
-                <img src="{{url_for('static', filename='ico-sp-powerful.png')}}" height="25">
-              {% elif p.specialty == 4 %}
-                <img src="{{url_for('static', filename='ico-sp-unpredictable.png')}}" height="25">
-              {% elif p.specialty == 5 %}
-                <img src="{{url_for('static', filename='ico-sp-head.png')}}" height="25">
-              {% elif p.specialty > 0 %}
-                [{{ p.specialty }}]
+              {% if p.specialty > 0 %}
+                {% set pngnr = p.specialty | string() %}
+                {% set pngname = 'ico-sp-' + pngnr + '.png' %}
+                <img src="{{url_for('static', filename=pngname)}}" height="25">
               {% endif %}
 
               {% if p.is_transfer_listed %}
@@ -300,39 +284,116 @@
             </p>
             {% endif %}
 
-            <p class="card-text text-sm13">
-              {{ p.age }}</br>
-              In {{ team }} since {{ p.arrival_date }}.</br>
-              </br>
-              keeper = {{ p.keeper }}</br>
-              defender = {{ p.defender }}</br>
-              playmaker = {{ p.playmaker }}</br>
-              winger = {{ p.winger }}</br>
-              passing = {{ p.passing }}</br>
-              scorer = {{ p.scorer }}</br>
-              set_pieces = {{ p.set_pieces }}</br>
-              </br>
-              stamina = {{ p.stamina }}</br>
-              form = {{ p.form }}</br>
-              agreeability = {{ p.agreeability }}</br>
-              aggressiveness = {{ p.aggressiveness }}</br>
-              honesty = {{ p.honesty }}</br>
-              experience = {{ p.experience }}</br>
-              loyalty = {{ p.loyalty }}</br>
-              tsi = {{ p.tsi }}</br>
-              salary = {{ p.salary }}</br>
-              </br>
-              caps = {{ p.caps }}</br>
-              caps_u20 = {{ p.caps_u20 }}</br>
-              career_goals = {{ p.career_goals }}</br>
-              career_hattricks = {{ p.career_hattricks }}</br>
-              league_goals = {{ p.league_goals }}</br>
-              cup_goals = {{ p.cup_goals }}</br>
-              friendly_goals = {{ p.friendly_goals }}</br>
-              current_team_matches = {{ p.current_team_matches }}</br>
-              current_team_goals = {{ p.current_team_goals }}</br>
-              national_team_id = {{ p.national_team_id }}</br>
-              national_team_name = {{ p.national_team_name }}</br>
+            <p class="card-text text-sm11">
+              {{ p.first_name }} is {{ p.age }}. He
+              has played <b>{{ p.current_team_matches }}</b> matches
+              and scored <b>{{ p.current_team_goals }}</b> goals for
+              {{ team }} since {{ p.arrival_date }}.
+              In his career, {{ p.first_name }} has scored {{ p.career_goals }}
+              goal{% if p.career_goals != 1 %}s{% endif %}
+              and made {{ p.career_hattricks }}
+              hattrick{% if p.career_hattricks != 1 %}s{% endif %}.
+              {% if p.caps > 0 %}
+                He has played {{ p.caps }} international league
+                game{% if p.caps != 1 %}s{% endif %}.
+              {% endif %}
+              {% if p.caps_u20 > 0 %}
+                Additionally, {{ p.first_name }} attended {{ p.caps_u20 }} international U20
+                league game{% if p.caps_u20 != 1 %}s{% endif %}.
+              {% endif %}
+            </p>
+            <p class="card-text text-sm11">
+              Agreeability: {{ p.agreeability }},
+              Aggressiveness: {{ p.aggressiveness }},
+              Honesty: {{ p.honesty }},
+              Experience: {{ p.experience }},
+              Loyalty: {{ p.loyalty }}</br>
+              TSI: {{ p.tsi }},
+              Salary: {{ p.salary }}
+            </p>
+              <table class="table table-sm">
+                <tr>
+                  <td class="text-small">Keeper</td>
+                  <td class="text-small">{{ p.keeper }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.keeper * 5 }}%" aria-valuenow="{{ p.keeper * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Defender</td>
+                  <td class="text-small">{{ p.defender }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.defender * 5 }}%" aria-valuenow="{{ p.defender * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Playmaker</td>
+                  <td class="text-small">{{ p.playmaker }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.playmaker * 5 }}%" aria-valuenow="{{ p.playmaker * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Winger</td>
+                  <td class="text-small">{{ p.winger }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.winger * 5 }}%" aria-valuenow="{{ p.winger * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Passing</td>
+                  <td class="text-small">{{ p.passing }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.passing * 5 }}%" aria-valuenow="{{ p.passing * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Scorer</td>
+                  <td class="text-small">{{ p.scorer }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.scorer * 5 }}%" aria-valuenow="{{ p.scorer * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Set pieces</td>
+                  <td class="text-small">{{ p.set_pieces }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.set_pieces * 5 }}%" aria-valuenow="{{ p.set_pieces * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Form</td>
+                  <td class="text-small">{{ p.form }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.form / 8 * 100 }}%" aria-valuenow="{{ p.form / 8 * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-small">Stamina</td>
+                  <td class="text-small">{{ p.stamina }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ p.stamina / 9 * 100 }}%" aria-valuenow="{{ p.stamina / 9 * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </p>
             <p class="text-sm13">
               Training plots...
