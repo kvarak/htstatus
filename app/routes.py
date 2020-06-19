@@ -37,7 +37,7 @@ def index():
     if 'current_user' in session:
         current_user = session['current_user']
     else:
-        False
+        current_user = False
     team_name = session['team_name'] if 'team_name' in session else False
     debug1 = ""
     debug2 = ""
@@ -62,7 +62,7 @@ def profile():
     if 'current_user' in session:
         current_user = session['current_user']
     else:
-        False
+        current_user = False
     team_name = session['team_name'] if 'team_name' in session else False
     debug1 = ""
     debug2 = ""
