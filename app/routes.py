@@ -261,6 +261,8 @@ def update():
 
     the_team = chpp.team(ht_id=session['team_id'])
 
+    updated = {}
+
     try:
         pprint(the_team.players)
     except Exception:
@@ -364,6 +366,8 @@ def update():
 
         players.append(thisplayer)
 
+    updated[session['team_name']] = ['/player', 'players']
+
     user = (db.session.query(User)
             .filter_by(ht_id=session['current_user_id'])
             .first())
@@ -372,6 +376,7 @@ def update():
 
     return render_template(
         'update.html',
+        updated=updated,
         version=version,
         timenow=timenow,
         fullversion=fullversion,
