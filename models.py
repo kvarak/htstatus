@@ -5,10 +5,52 @@ from app import db
 # --------------------------------------------------------------------------------
 
 
+class PlayerSetting(db.Model):
+    __tablename__ = 'playersetting'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'))
+    group_id = db.Column(db.Integer, db.ForeignKey('playergroup.id'))
+    player_id = db.Column(db.Integer)
+
+    def __init__(self, player_id, user_id, group_id):
+        self.user_id = user_id
+        self.player_id = player_id
+        self.group_id = group_id
+
+    def __repr__(self):
+        return '<{} {}>'.format(self.player_id, self.group_id)
+
+# --------------------------------------------------------------------------------
+
+
+class Group(db.Model):
+    __tablename__ = 'playergroup'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'))
+    name = db.Column(db.String(100))
+    order = db.Column(db.Integer)
+    textcolor = db.Column(db.String(100))
+    bgcolor = db.Column(db.String(100))
+
+    def __init__(self, user_id, name, order, textcolor, bgcolor):
+        self.user_id = user_id
+        self.name = name
+        self.order = order
+        self.textcolor = textcolor
+        self.bgcolor = bgcolor
+
+    def __repr__(self):
+        return '<{} {}>'.format(self.name, self.order)
+
+# --------------------------------------------------------------------------------
+
+
 class User(db.Model):
     __tablename__ = 'users'
 
-    ht_id = db.Column(db.Integer, primary_key=True)
+    ht_id = db.Column(db.Integer, primary_key=True, unique=True)
     ht_user = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))

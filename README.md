@@ -20,14 +20,26 @@ class Config(object):
 
 ## Database
 
-### Postgres
+### SQLAlchemy
 
-*Create (and upgrade)*
+*Create*
 ```
 python manage.py db init
 python manage.py db migrate
 python manage.py db upgrade
 ```
+*Upgrade*
+```
+python manage.py db migrate
+python manage.py db upgrade
+```
+*On problems*
+```
+python manage.py db stamp head
+```
+
+### Postgres
+
 *Check*
 ```
 $ psql

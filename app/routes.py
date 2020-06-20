@@ -10,7 +10,7 @@ from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import app, db
-from models import Players, User
+from models import Group, Players, PlayerSetting, User
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
@@ -57,15 +57,96 @@ def index():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
+    error = ""
     if 'current_user' in session:
         current_user = session['current_user']
     else:
-        current_user = False
+        return render_template(
+            'profile.html',
+            version=version,
+            timenow=timenow,
+            fullversion=fullversion,
+            title='Profile',
+            apptitle=app.config['APP_NAME'],
+            current_user=current_user)
+
     team_name = session['team_name'] if 'team_name' in session else False
-    debug1 = ""
-    debug2 = ""
+
+    groupname = request.form.get('groupname')
+    grouporder = request.form.get('grouporder')
+    addgroup = request.form.get('addgroup')
+    updategroup = request.form.get('updategroup')
+    deletegroup = request.form.get('deletegroup')
+    groupid = request.form.get('groupid')
+    textcolor = request.form.get('textcolor')
+    bgcolor = request.form.get('bgcolor')
+    if not textcolor:
+        textcolor = "#000000"
+    if not bgcolor:
+        bgcolor = "#FFFFFF"
+
+    if addgroup:
+        if groupname and grouporder:
+            newgroup = Group(
+                user_id=session['current_user_id'],
+                name=groupname,
+                order=grouporder,
+                textcolor=textcolor,
+                bgcolor=bgcolor)
+            db.session.add(newgroup)
+            db.session.commit()
+        else:
+            errormsg = "Groups need both name and order."
+            return render_template(
+                'profile.html',
+                version=version,
+                timenow=timenow,
+                fullversion=fullversion,
+                title='Profile',
+                apptitle=app.config['APP_NAME'],
+                current_user=current_user,
+                error=errormsg)
+
+    elif updategroup and groupid:
+        if groupname and grouporder:
+            (db.session
+             .query(Group)
+             .filter_by(id=groupid)
+             .update({"name": groupname,
+                      "order": grouporder,
+                      "textcolor": textcolor,
+                      "bgcolor": bgcolor}))
+            db.session.commit()
+        else:
+            errormsg = "Groups need both name and order."
+            return render_template(
+                'profile.html',
+                version=version,
+                timenow=timenow,
+                fullversion=fullversion,
+                title='Profile',
+                apptitle=app.config['APP_NAME'],
+                current_user=current_user,
+                error=errormsg)
+
+    elif deletegroup and groupid:
+        try:
+            thegroup = (db.session
+                        .query(Group)
+                        .filter_by(id=groupid)
+                        .first())
+            db.session.delete(thegroup)
+            db.session.commit()
+        except Exception:
+            error = "The group isn't empty, you can't delete it."
+            db.session.rollback()
+
+    group_data = (db.session.query(Group)
+                  .filter_by(user_id=session['current_user_id'])
+                  .order_by("order")
+                  .all())
 
     return render_template(
         'profile.html',
@@ -76,8 +157,8 @@ def profile():
         apptitle=app.config['APP_NAME'],
         current_user=current_user,
         team=team_name,
-        debug1=debug1,
-        debug2=debug2)
+        group_data=group_data,
+        error=error)
 
 # --------------------------------------------------------------------------------
 
@@ -469,12 +550,59 @@ def team():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/player')
+@app.route('/player', methods=['GET', 'POST'])
 def player():
     if session.get('current_user') is None:
         return render_template(
             '_forward.html',
             url='/login')
+
+    updategroup = request.form.get('updategroup')
+    playerid = request.form.get('playerid')
+    groupid = request.form.get('groupid')
+
+    if updategroup and playerid and groupid:
+        if int(groupid) < 0:
+            theconnection = (db.session
+                             .query(PlayerSetting)
+                             .filter_by(player_id=playerid,
+                                        user_id=session['current_user_id'])
+                             .first())
+            db.session.delete(theconnection)
+            db.session.commit()
+        else:
+            connection = (db.session
+                        .query(PlayerSetting)
+                        .filter_by(player_id=playerid,
+                                    user_id=session['current_user_id'])
+                        .first())
+            if connection:
+                (db.session
+                .query(PlayerSetting)
+                .filter_by(player_id=playerid,
+                            user_id=session['current_user_id'])
+                .update({"group_id": groupid}))
+                db.session.commit()
+            else:
+                newconnection = PlayerSetting(
+                    player_id=playerid,
+                    user_id=session['current_user_id'],
+                    group_id=groupid)
+                db.session.add(newconnection)
+                db.session.commit()
+
+    group_data = (db.session.query(Group)
+                  .filter_by(user_id=session['current_user_id'])
+                  .order_by("order")
+                  .all())
+
+    into_groups = (db.session
+                   .query(PlayerSetting)
+                   .filter_by(user_id=session['current_user_id'])
+                   .all())
+
+    # pprint(group_data)
+    # pprint(into_groups)
 
     # Of each of the players you ever have owned, get the last download
     players_data = (db.session.query(Players)
@@ -507,6 +635,21 @@ def player():
     User.player(user)
     db.session.commit()
 
+    # Group the players into groups
+    tmp_player = players_now
+    grouped_players_now = {}
+    for group in group_data:
+        in_this_group = [elem.player_id for elem in into_groups if elem.group_id == group.id]
+        grouped_players_now[group.id] = [player for player in tmp_player if player['ht_id'] in in_this_group]
+        players_now = [player for player in players_now if player['ht_id'] not in in_this_group]
+
+    grouped_players_now[0] = players_now
+    group_data.insert(
+        0,
+        [{'id': 0,
+          'bgcolor': "#000000",
+          'textcolor': "#FFFFFF"}])
+
     return render_template(
         'player.html',
         version=version,
@@ -515,9 +658,11 @@ def player():
         title='Players',
         current_user=session['current_user'],
         team=session['team_name'],
+        grouped_players=grouped_players_now,
         players=players_now,
         players_data=players_data,
-        players_oldest=players_oldest_dict)
+        players_oldest=players_oldest_dict,
+        group_data=group_data)
 
 # --------------------------------------------------------------------------------
 

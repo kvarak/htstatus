@@ -20,12 +20,11 @@
             <h5 class="card-title">Players</h5>
             <p class="card-text">
               <table class="table table-sm table-scroll sortable">
+
                 <thead>
                   <tr>
+                    <th scope="col" class="text-small">Group</th>
                     <th scope="col" class="text-small">Nr</th>
-<!--
-                    <th scope="col" class="text-small">Country</th>
--->
                     <th scope="col" class="text-small">&nbsp;</th>
                     <th scope="col" class="text-small">Name</th>
                     <th scope="col" class="text-small">Age</th>
@@ -60,22 +59,27 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for p in players %}
-                  <tr>
+
+                  {% for group in group_data %}
+
+                  {% set theplayers = grouped_players[group.id] %}
+
+                  {% if theplayers %}
+
+                  {% for p in theplayers %}
+                  <tr style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
+                    <td class="text-small">{{ group.name }}</td>
                     {% if p.number == 100 %}
                     <td class="text-small">-</td>
                     {% else %}
                     <td class="text-small">{{ p.number }}</td>
                     {% endif %}
-<!--
-                    <td class="text-small">{{ p.country }}</td>
--->
 
                     <td class="text-small">
                       {% if p.specialty > 0 %}
                       {% set pngnr = p.specialty | string() %}
                       {% set pngname = 'ico-sp-' + pngnr + '.png' %}
-                      <img src="{{url_for('static', filename=pngname)}}" height="13">
+                      <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color: whitesmoke;">
                     {% endif %}
                     </td>
 
@@ -178,21 +182,21 @@
                     <td class="text-small" align="left">
 
                       {% if p.is_transfer_listed %}
-                        <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13">
+                        <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color: whitesmoke;">
                       {% endif %}
 
                       {% if p.cards == 1 %}
-                        <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13">
+                        <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color: whitesmoke;">
                       {% elif p.cards == 2 %}
-                        <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13">
+                        <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color: whitesmoke;">
                       {% elif p.cards == 3 %}
-                        <img src="{{url_for('static', filename='ico-red.png')}}" height="13">
+                        <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color: whitesmoke;">
                       {% endif %}
 
                       {% if p.injury_level == 0 %}
-                      <img src="{{url_for('static', filename='ico-damage.png')}}" height="13">
+                      <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color: whitesmoke;">
                       {% elif p.injury_level > 0 %}
-                        <img src="{{url_for('static', filename='ico-injury.png')}}" height="13">{{ p.injury_level }}
+                        <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color: whitesmoke;">{{ p.injury_level }}
                       {% endif %}
 
                     </td>
@@ -217,7 +221,9 @@
 
                   </tr>
                   {% endfor %}
-                </tbody>
+                  {% endif %}
+                  {% endfor %}
+                  </tbody>
               </table>
             </p>
           </div>
@@ -233,13 +239,15 @@
     </div>
   </div>
   <div class="row"> -->
-    {% for p in players %}
-    <div class="col-sm collapse" id="all-player-details-{{ p.ht_id}}">
+    {% for group in group_data %}
+    {% set theplayers = grouped_players[group.id] %}
+    {% for p in theplayers %}
+    <div class="col-sm collapse" id="all-player-details-{{ p.ht_id }}">
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">
-              <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}" onclick="doALoadOfStuff()">
+              <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}" onclick="doALoadOfStuff()">
                 {% if p.number < 100 %}
                 {{ p.number }}.
                 {% endif %}
@@ -402,9 +410,30 @@
               </table>
             </p>
           </div>
+          <div class="card-body">
+            <form method="POST" action="/player">
+              <input type="hidden" id="playerid" name="playerid" value="{{ p.ht_id }}">
+              <div class="form-row align-items-center">
+                <div class="col-auto my-1">
+                  <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Select group</label>
+                  <select class="custom-select mr-sm-2" name="groupid">
+                    <option selected>Select group</option>
+                    {% for group in group_data %}
+                    <option value="{{ group.id }}" id="groupid">{{ group.name }}</option>
+                    {% endfor %}
+                    <option value="-1" id="groupid">Clear group</option>
+                  </select>
+                </div>
+                <div class="col-auto my-1">
+                  <button type="submit" class="btn btn-outline-secondary" name="updategroup" value="updatebutton">Update</button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
+    {% endfor %}
     {% endfor %}
   </div>
   <div class="row">

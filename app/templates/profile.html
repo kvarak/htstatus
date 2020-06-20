@@ -9,9 +9,71 @@
         <div class="container">
           <h1 class="display-4">{{ title }}</h1>
           <hr class="my-4">
-          <p>{{ current_user }}</p>
-          <p>{{ team }}</p>
+          <p>
+            User: {{ current_user }}</br>
+            Teams: {{ team }}
+          </p>
+          <p>
+            {{ debug1 }}</br>
+            {{ debug2 }}
+          </p>
         </div>
+      </div>
+    </div>
+  </div>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Player groups</h5>
+            <p class="card-text">
+
+              <form method="POST" action="/profile">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <button type="submit" class="btn btn-outline-secondary" name="addgroup" value="addbutton">Add</button>
+                  </div>
+                  <input type="text" name="groupname" class="form-control" placeholder="Group name" aria-label="Text input with segmented dropdown button">
+                  <input type="number" name="grouporder" class="form-control" placeholder="Order" aria-label="Number input">
+                  <input type="text" name="bgcolor" class="form-control" placeholder="Bg color" aria-label="Text input">
+                  <input type="text" name="textcolor" class="form-control" placeholder="Text color" aria-label="Text input">
+                </div>
+              </form>
+
+              {% for group in group_data %}
+
+              <form method="POST" action="/profile">
+                <input type="hidden" id="groupid" name="groupid" value="{{ group.id }}">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <button type="submit" class="btn btn-outline-secondary" name="updategroup" value="updatebutton">Update</button>
+                  </div>
+                  <input type="text" name="groupname" class="form-control" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
+                  <input type="number" name="grouporder" class="form-control" value="{{ group.order }}" aria-label="Number input">
+                  <input type="text" name="bgcolor" class="form-control" value="{{ group.bgcolor }}" aria-label="Text input">
+                  <input type="text" name="textcolor" class="form-control" value="{{ group.textcolor }}" aria-label="Text input">
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-outline-secondary"  name="deletegroup" value="deletebutton"><font color="red">Delete</font></button>
+                  </div>
+                </div>
+              </form>
+
+              {% endfor %}
+
+            </p>
+          </div>
+        </div>
+        <!-- <div class="card">
+          <div class="card-body">
+            <p></p>
+          </div>
+        </div> -->
       </div>
     </div>
   </div>
