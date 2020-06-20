@@ -643,12 +643,16 @@ def player():
         grouped_players_now[group.id] = [player for player in tmp_player if player['ht_id'] in in_this_group]
         players_now = [player for player in players_now if player['ht_id'] not in in_this_group]
 
-    grouped_players_now[0] = players_now
-    group_data.insert(
-        0,
-        [{'id': 0,
-          'bgcolor': "#000000",
-          'textcolor': "#FFFFFF"}])
+    dummyGroup = Group(
+        user_id=0,
+        name="",
+        order=0,
+        textcolor="#000000",
+        bgcolor="#FFFFFF")
+
+    grouped_players_now[dummyGroup.id] = players_now
+
+    group_data.insert(0, dummyGroup)
 
     return render_template(
         'player.html',
