@@ -42,6 +42,9 @@ def index():
     debug1 = ""
     debug2 = ""
 
+    f = open('app/static/changelog.txt')
+    changelog = f.readlines()
+
     return render_template(
         'main.html',
         version=version,
@@ -52,7 +55,8 @@ def index():
         current_user=current_user,
         team=team_name,
         debug1=debug1,
-        debug2=debug2)
+        debug2=debug2,
+        changelog=changelog)
 
 # --------------------------------------------------------------------------------
 

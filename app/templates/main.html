@@ -65,6 +65,14 @@
             <p class="text-sm13">
               <i>The one with port number 5050.</i> Use this one just for testing new features. There is no guarantee that the data here will be kept safe.
             </p>
+            <h5 class="card-title">Changes</h5>
+            <p class="card-text">
+              <p class="text-sm13">
+                {% for c in changelog %}
+                {{ c }}</br>
+                {% endfor %}
+              </p>
+            </p>
           </div>
           <div class="card-footer">
             <small class="text-muted"><i>version: {{ fullversion }}</i></small>
