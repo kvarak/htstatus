@@ -571,16 +571,16 @@ def player():
             db.session.commit()
         else:
             connection = (db.session
-                        .query(PlayerSetting)
-                        .filter_by(player_id=playerid,
-                                    user_id=session['current_user_id'])
-                        .first())
+                          .query(PlayerSetting)
+                          .filter_by(player_id=playerid,
+                                     user_id=session['current_user_id'])
+                          .first())
             if connection:
                 (db.session
-                .query(PlayerSetting)
-                .filter_by(player_id=playerid,
+                 .query(PlayerSetting)
+                 .filter_by(player_id=playerid,
                             user_id=session['current_user_id'])
-                .update({"group_id": groupid}))
+                 .update({"group_id": groupid}))
                 db.session.commit()
             else:
                 newconnection = PlayerSetting(
@@ -638,9 +638,18 @@ def player():
     tmp_player = players_now
     grouped_players_now = {}
     for group in group_data:
-        in_this_group = [elem.player_id for elem in into_groups if elem.group_id == group.id]
-        grouped_players_now[group.id] = [player for player in tmp_player if player['ht_id'] in in_this_group]
-        players_now = [player for player in players_now if player['ht_id'] not in in_this_group]
+        in_this_group = (
+            [elem.player_id
+             for elem in into_groups
+             if elem.group_id == group.id])
+        grouped_players_now[group.id] = (
+            [player
+             for player in tmp_player
+             if player['ht_id'] in in_this_group])
+        players_now = (
+            [player
+             for player in players_now
+             if player['ht_id'] not in in_this_group])
 
     dummyGroup = Group(
         user_id=0,
