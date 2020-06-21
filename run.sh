@@ -3,7 +3,7 @@
 ./changelog.sh
 
 ## FLASK_ENV=development turns on debug mode when flask starts
-if [ "$1" = "5000" ]
+if [ "$1" = "5050" ]
 then
   export FLASK_ENV=development
 fi
