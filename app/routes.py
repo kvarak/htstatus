@@ -526,9 +526,32 @@ def team():
     teams = []
     for teamid in all_teams:
         print(teamid)
-        this_team = chpp.team(ht_id=teamid)
-        pprint(vars(this_team))
+        this_team = chpp.team(ht_id=int(teamid))
+        # pprint(vars(this_team))
         teams.append(this_team.name)
+        # for p in this_team.players:
+        #     print(p.first_name + " " + p.last_name)
+        # print(this_team._data)
+        # pprint(this_team.players)
+
+        xmldata = chpp.request(
+            file="players",
+            version="2.4",
+            teamID=teamid,
+            actionType="view")
+
+        for child in xmldata.findall('Team'):
+            print("|", child.tag, child.attrib)
+            for c in child.findall('TeamID'):
+                print("|- ID ", c.text)
+            for c in child.findall('TeamName'):
+                print("|- Name ", c.text)
+            for c in child.findall('PlayerList'):
+                print("|-", c.tag, c.attrib)
+                for c2 in c:
+                    print("|--", c2.tag, c2.attrib)
+                    for c3 in c2.findall('FirstName'):
+                        print("|---", c3.text)
 
     user = (db.session.query(User)
             .filter_by(ht_id=session['current_user_id'])
@@ -571,16 +594,16 @@ def player():
             db.session.commit()
         else:
             connection = (db.session
-                        .query(PlayerSetting)
-                        .filter_by(player_id=playerid,
-                                    user_id=session['current_user_id'])
-                        .first())
+                          .query(PlayerSetting)
+                          .filter_by(player_id=playerid,
+                                     user_id=session['current_user_id'])
+                          .first())
             if connection:
                 (db.session
-                .query(PlayerSetting)
-                .filter_by(player_id=playerid,
+                 .query(PlayerSetting)
+                 .filter_by(player_id=playerid,
                             user_id=session['current_user_id'])
-                .update({"group_id": groupid}))
+                 .update({"group_id": groupid}))
                 db.session.commit()
             else:
                 newconnection = PlayerSetting(
@@ -638,9 +661,18 @@ def player():
     tmp_player = players_now
     grouped_players_now = {}
     for group in group_data:
-        in_this_group = [elem.player_id for elem in into_groups if elem.group_id == group.id]
-        grouped_players_now[group.id] = [player for player in tmp_player if player['ht_id'] in in_this_group]
-        players_now = [player for player in players_now if player['ht_id'] not in in_this_group]
+        in_this_group = (
+            [elem.player_id
+             for elem in into_groups
+             if elem.group_id == group.id])
+        grouped_players_now[group.id] = (
+            [player
+             for player in tmp_player
+             if player['ht_id'] in in_this_group])
+        players_now = (
+            [player
+             for player in players_now
+             if player['ht_id'] not in in_this_group])
 
     dummyGroup = Group(
         user_id=0,

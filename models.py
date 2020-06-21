@@ -27,7 +27,11 @@ class PlayerSetting(db.Model):
 class Group(db.Model):
     __tablename__ = 'playergroup'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+        autoincrement=True,
+        unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'))
     name = db.Column(db.String(100))
     order = db.Column(db.Integer)
