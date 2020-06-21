@@ -55,7 +55,7 @@
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">TSI</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">Comparison</th>
+                    <th scope="col" class="text-small">Since</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -79,7 +79,7 @@
                       {% if p.specialty > 0 %}
                       {% set pngnr = p.specialty | string() %}
                       {% set pngname = 'ico-sp-' + pngnr + '.png' %}
-                      <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color: whitesmoke;">
+                      <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                     {% endif %}
                     </td>
 
@@ -182,21 +182,21 @@
                     <td class="text-small" align="left">
 
                       {% if p.is_transfer_listed %}
-                        <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color: whitesmoke;">
+                        <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                       {% endif %}
 
                       {% if p.cards == 1 %}
-                        <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color: whitesmoke;">
+                        <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                       {% elif p.cards == 2 %}
-                        <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color: whitesmoke;">
+                        <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                       {% elif p.cards == 3 %}
-                        <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color: whitesmoke;">
+                        <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                       {% endif %}
 
                       {% if p.injury_level == 0 %}
-                      <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color: whitesmoke;">
+                      <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                       {% elif p.injury_level > 0 %}
-                        <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color: whitesmoke;">{{ p.injury_level }}
+                        <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ p.injury_level }}
                       {% endif %}
 
                     </td>
