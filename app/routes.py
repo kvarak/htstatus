@@ -651,7 +651,8 @@ def player():
 
     grouped_players_now[dummyGroup.id] = players_now
 
-    group_data.insert(0, dummyGroup)
+    # group_data.insert(0, dummyGroup)
+    group_data.append(dummyGroup)
 
     return render_template(
         'player.html',
