@@ -348,10 +348,9 @@ def update():
         pprint(the_team.players)
     except Exception:
         errorincode = traceback.format_exc()
-        error = "Something went wrong, couldn't download player data."
-        errorinfo = "Most likely your team is playing a game."
-        errorinfo += "If this isn't the case, please report this as a"
-        errorinfo += "bug.<br><br>" + errorincode
+        error = "Is your team playing a game?"
+        errorinfo = "If this isn't the case, please report this as a "
+        errorinfo += "bug. " + errorincode
         return render_template(
             'update.html',
             version=version,

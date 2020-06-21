@@ -20,12 +20,14 @@
           <p class="lead">Data downloaded!</p>
           {% endif %}
           <hr class="my-4">
-          {% if team %}
-            {% for key, value in updated.items() %}
-            <p>{{ key }}: <a href="{{ value[0] }}">{{ value[1] }}</a></p>
-            {% endfor %}
+          {% if not(error) %}
+            {% if team %}
+              {% for key, value in updated.items() %}
+              <p>{{ key }}: <a href="{{ value[0] }}">{{ value[1] }}</a></p>
+              {% endfor %}
+            {% endif %}
           {% endif %}
-        </div>
+          </div>
       </div>
     </div>
   </div>
