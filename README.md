@@ -40,6 +40,11 @@ python manage.py db stamp head
 
 ### Postgres
 
+*Create*
+```
+CREATE DATABASE htplanner;
+```
+
 *Check*
 ```
 $ psql
@@ -59,4 +64,9 @@ $ psql
 ```
 pipreqs . --force
 pip install -r requirements.txt
+```
+
+## Start
+```
+nohup ./run.sh 5000 &
 ```
