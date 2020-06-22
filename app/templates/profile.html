@@ -43,8 +43,23 @@
               </form>
 
               {% for group in group_data %}
-
-              <form method="POST" action="/profile">
+              {% if group.name == "<default>" %}
+                <form method="POST" action="/profile">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <button type="submit" class="btn btn-outline-secondary" name="updategroup" value="updatebutton" disabled>Update</button>
+                    </div>
+                    <input type="text" name="groupname" class="form-control" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};" disabled>
+                    <input type="number" name="grouporder" class="form-control" value="{{ group.order }}" aria-label="Number input" disabled>
+                    <input type="text" name="bgcolor" class="form-control" value="{{ group.bgcolor }}" aria-label="Text input" disabled>
+                    <input type="text" name="textcolor" class="form-control" value="{{ group.textcolor }}" aria-label="Text input" disabled>
+                    <div class="input-group-append">
+                      <button type="submit" class="btn btn-outline-secondary"  name="deletegroup" value="deletebutton" disabled><font color="red">Delete</font></button>
+                    </div>
+                  </div>
+                </form>
+                {% else %}
+                <form method="POST" action="/profile">
                 <input type="hidden" id="groupid" name="groupid" value="{{ group.id }}">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
@@ -60,6 +75,7 @@
                 </div>
               </form>
 
+              {% endif %}
               {% endfor %}
 
             </p>

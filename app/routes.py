@@ -27,6 +27,8 @@ version = versionstr[0] + "." + versionstr[1]
 
 timenow = time.strftime('%Y-%m-%d %H:%M:%S')
 
+default_group_order = 99
+
 # --------------------------------------------------------------------------------
 # Help functions
 # --------------------------------------------------------------------------------
@@ -169,6 +171,19 @@ def profile():
                   .filter_by(user_id=session['current_user_id'])
                   .order_by("order")
                   .all())
+
+    # Add a default group
+    default_group = Group(
+        user_id=0,
+        name="<default>",
+        order=default_group_order,
+        textcolor="#000000",
+        bgcolor="#FFFFFF")
+    before_default = [g for g in group_data if g.order < default_group_order]
+    after_default = [g for g in group_data if g.order >= default_group_order]
+    before_default.append(default_group)
+
+    group_data = before_default + after_default
 
     return create_page(
         template='profile.html',
@@ -647,17 +662,20 @@ def player():
              for player in players_now
              if player['ht_id'] not in in_this_group])
 
-    dummyGroup = Group(
+    # Add a default group
+    default_group = Group(
         user_id=0,
         name="",
-        order=0,
+        order=default_group_order,
         textcolor="#000000",
         bgcolor="#FFFFFF")
+    before_default = [g for g in group_data if g.order < default_group_order]
+    after_default = [g for g in group_data if g.order >= default_group_order]
+    before_default.append(default_group)
 
-    grouped_players_now[dummyGroup.id] = players_now
+    group_data = before_default + after_default
 
-    # group_data.insert(0, dummyGroup)
-    group_data.append(dummyGroup)
+    grouped_players_now[default_group.id] = players_now
 
     return create_page(
         template='player.html',
