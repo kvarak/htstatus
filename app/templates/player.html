@@ -423,11 +423,13 @@
                 <div class="col-auto my-1">
                   <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Select group</label>
                   <select class="custom-select mr-sm-2" name="groupid">
+                    {% if not(group.name) %}
                     <option selected>Select group</option>
-                    {% for group in group_data %}
-                    {% if group.id %}
-                    <option value="{{ group.id }}" id="groupid">{{ group.name }}</option>
                     {% endif %}
+                    {% for g in group_data %}
+                      {% if g.id %}
+                      <option {% if group.name == g.name %}selected{% endif %} value="{{ g.id }}" id="groupid">{{ g.name }}</option>
+                      {% endif %}
                     {% endfor %}
                     <option value="-1" id="groupid">Clear group</option>
                   </select>
