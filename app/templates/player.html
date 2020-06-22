@@ -12,6 +12,11 @@
       </div>
     </div>
   </div>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm">
       <div class="card-deck">
@@ -413,6 +418,7 @@
           <div class="card-body">
             <form method="POST" action="/player">
               <input type="hidden" id="playerid" name="playerid" value="{{ p.ht_id }}">
+              <input type="hidden" id="id" name="id" value="{{ teamid }}">
               <div class="form-row align-items-center">
                 <div class="col-auto my-1">
                   <label class="mr-sm-2 sr-only" for="inlineFormCustomSelect">Select group</label>

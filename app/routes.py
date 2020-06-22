@@ -36,9 +36,12 @@ timenow = time.strftime('%Y-%m-%d %H:%M:%S')
 def index():
     if 'current_user' in session:
         current_user = session['current_user']
+        all_teams = session['all_teams']
+        all_team_names = session['all_team_names']
     else:
         current_user = False
-    team_name = session['team_name'] if 'team_name' in session else False
+        all_teams = False
+        all_team_names = False
     debug1 = ""
     debug2 = ""
 
@@ -53,10 +56,11 @@ def index():
         title='Home',
         apptitle=app.config['APP_NAME'],
         current_user=current_user,
-        team=team_name,
         debug1=debug1,
         debug2=debug2,
-        changelog=changelog)
+        changelog=changelog,
+        all_teams=all_teams,
+        all_team_names=all_team_names)
 
 # --------------------------------------------------------------------------------
 
@@ -66,6 +70,8 @@ def profile():
     error = ""
     if 'current_user' in session:
         current_user = session['current_user']
+        all_teams = session['all_teams']
+        all_team_names = session['all_team_names']
     else:
         return render_template(
             'profile.html',
@@ -75,8 +81,6 @@ def profile():
             title='Profile',
             apptitle=app.config['APP_NAME'],
             current_user=current_user)
-
-    team_name = session['team_name'] if 'team_name' in session else False
 
     groupname = request.form.get('groupname')
     grouporder = request.form.get('grouporder')
@@ -160,9 +164,10 @@ def profile():
         title='Profile',
         apptitle=app.config['APP_NAME'],
         current_user=current_user,
-        team=team_name,
         group_data=group_data,
-        error=error)
+        error=error,
+        all_teams=all_teams,
+        all_team_names=all_team_names)
 
 # --------------------------------------------------------------------------------
 
@@ -299,8 +304,13 @@ def login():
 
     current_user = chpp.user()
     all_teams = current_user._teams_ht_id
+    all_team_names = []
+    for id in all_teams:
+        all_team_names.append(chpp.team(ht_id=id).name)
+    session['all_teams'] = all_teams
+    session['all_team_names'] = all_team_names
+
     session['team_id'] = all_teams[0]
-    session['team_name'] = chpp.team(ht_id=all_teams[0]).name
 
     user = db.session.query(User).filter_by(ht_id=current_user.ht_id).first()
     User.login(user)
@@ -314,7 +324,8 @@ def login():
         title='Login',
         apptitle=app.config['APP_NAME'],
         current_user=session['current_user'],
-        team=session['team_name'])
+        all_teams=all_teams,
+        all_team_names=all_team_names)
 
 # --------------------------------------------------------------------------------
 
@@ -344,113 +355,124 @@ def update():
                 session['access_key'],
                 session['access_secret'])
 
-    the_team = chpp.team(ht_id=session['team_id'])
+    all_teams = session['all_teams']
+    all_team_names = session['all_team_names']
 
     updated = {}
 
-    try:
-        pprint(the_team.players)
-    except Exception:
-        errorincode = traceback.format_exc()
-        error = "Is your team playing a game?"
-        errorinfo = "If this isn't the case, please report this as a "
-        errorinfo += "bug. " + errorincode
-        return render_template(
-            'update.html',
-            version=version,
-            timenow=timenow,
-            fullversion=fullversion,
-            title='Update',
-            current_user=session['current_user'],
-            team=session['team_name'],
-            error=error,
-            errorinfo=errorinfo)
+    for i in range(len(all_teams)):
+        updated[all_teams[i]] = [all_team_names[i]]
 
-    players = []
-    for p in the_team.players:
+    for teamid in all_teams:
 
-        thisplayer = {}
+        the_team = chpp.team(ht_id=teamid)
 
-        thisplayer['ht_id'] = p.ht_id
-        thisplayer['first_name'] = p.first_name
-        thisplayer['nick_name'] = p.nick_name
-        thisplayer['last_name'] = p.last_name
-        thisplayer['number'] = p.number
-        thisplayer['category_id'] = p.category_id
-        thisplayer['owner_notes'] = p.owner_notes
-        thisplayer['age_years'] = p.age_years
-        thisplayer['age_days'] = p.age_days
-        thisplayer['age'] = p.age
-        thisplayer['next_birthday'] = p.next_birthday
-        thisplayer['arrival_date'] = p.arrival_date
-        thisplayer['form'] = p.form
-        thisplayer['cards'] = p.cards
-        thisplayer['injury_level'] = p.injury_level
-        thisplayer['statement'] = p.statement
-        thisplayer['language'] = p.language
-        thisplayer['language_id'] = p.language_id
-        thisplayer['agreeability'] = p.agreeability
-        thisplayer['aggressiveness'] = p.aggressiveness
-        thisplayer['honesty'] = p.honesty
-        thisplayer['experience'] = p.experience
-        thisplayer['loyalty'] = p.loyalty
-        thisplayer['aggressiveness'] = p.aggressiveness
-        thisplayer['specialty'] = p.specialty
-        thisplayer['native_country_id'] = p.native_country_id
-        thisplayer['native_league_id'] = p.native_league_id
-        thisplayer['native_league_name'] = p.native_league_name
-        thisplayer['tsi'] = p.tsi
-        thisplayer['salary'] = p.salary
-        thisplayer['caps'] = p.caps
-        thisplayer['caps_u20'] = p.caps_u20
-        thisplayer['career_goals'] = p.career_goals
-        thisplayer['career_hattricks'] = p.career_hattricks
-        thisplayer['league_goals'] = p.league_goals
-        thisplayer['cup_goals'] = p.cup_goals
-        thisplayer['friendly_goals'] = p.friendly_goals
-        thisplayer['current_team_matches'] = p.current_team_matches
-        thisplayer['current_team_goals'] = p.current_team_goals
-        thisplayer['national_team_id'] = p.national_team_id
-        thisplayer['national_team_name'] = p.national_team_name
-        thisplayer['is_transfer_listed'] = p.is_transfer_listed
-        thisplayer['team_id'] = p.team_id
+        try:
+            pprint(the_team.players)
+        except Exception:
+            errorincode = traceback.format_exc()
+            error = "Is your team playing a game?"
+            errorinfo = "If this isn't the case, please report this as a "
+            errorinfo += "bug. " + errorincode
+            return render_template(
+                'update.html',
+                version=version,
+                timenow=timenow,
+                fullversion=fullversion,
+                title='Update',
+                current_user=session['current_user'],
+                error=error,
+                errorinfo=errorinfo,
+                all_teams=session['all_teams'],
+                all_team_names=session['all_team_names'])
 
-        thisplayer['stamina'] = p.skills['stamina']
-        thisplayer['keeper'] = p.skills['keeper']
-        thisplayer['defender'] = p.skills['defender']
-        thisplayer['playmaker'] = p.skills['playmaker']
-        thisplayer['winger'] = p.skills['winger']
-        thisplayer['passing'] = p.skills['passing']
-        thisplayer['scorer'] = p.skills['scorer']
-        thisplayer['set_pieces'] = p.skills['set_pieces']
+        players = []
+        for p in the_team.players:
 
-        thisplayer['data_date'] = time.strftime('%Y-%m-%d')
+            thisplayer = {}
 
-        thisplayer['owner'] = session['team_id']
+            thisplayer['ht_id'] = p.ht_id
+            thisplayer['first_name'] = p.first_name
+            thisplayer['nick_name'] = p.nick_name
+            thisplayer['last_name'] = p.last_name
+            thisplayer['number'] = p.number
+            thisplayer['category_id'] = p.category_id
+            thisplayer['owner_notes'] = p.owner_notes
+            thisplayer['age_years'] = p.age_years
+            thisplayer['age_days'] = p.age_days
+            thisplayer['age'] = p.age
+            thisplayer['next_birthday'] = p.next_birthday
+            thisplayer['arrival_date'] = p.arrival_date
+            thisplayer['form'] = p.form
+            thisplayer['cards'] = p.cards
+            thisplayer['injury_level'] = p.injury_level
+            thisplayer['statement'] = p.statement
+            thisplayer['language'] = p.language
+            thisplayer['language_id'] = p.language_id
+            thisplayer['agreeability'] = p.agreeability
+            thisplayer['aggressiveness'] = p.aggressiveness
+            thisplayer['honesty'] = p.honesty
+            thisplayer['experience'] = p.experience
+            thisplayer['loyalty'] = p.loyalty
+            thisplayer['aggressiveness'] = p.aggressiveness
+            thisplayer['specialty'] = p.specialty
+            thisplayer['native_country_id'] = p.native_country_id
+            thisplayer['native_league_id'] = p.native_league_id
+            thisplayer['native_league_name'] = p.native_league_name
+            thisplayer['tsi'] = p.tsi
+            thisplayer['salary'] = p.salary
+            thisplayer['caps'] = p.caps
+            thisplayer['caps_u20'] = p.caps_u20
+            thisplayer['career_goals'] = p.career_goals
+            thisplayer['career_hattricks'] = p.career_hattricks
+            thisplayer['league_goals'] = p.league_goals
+            thisplayer['cup_goals'] = p.cup_goals
+            thisplayer['friendly_goals'] = p.friendly_goals
+            thisplayer['current_team_matches'] = p.current_team_matches
+            thisplayer['current_team_goals'] = p.current_team_goals
+            thisplayer['national_team_id'] = p.national_team_id
+            thisplayer['national_team_name'] = p.national_team_name
+            thisplayer['is_transfer_listed'] = p.is_transfer_listed
+            thisplayer['team_id'] = p.team_id
 
-        dbplayer = db.session.query(Players).filter_by(
-            ht_id=thisplayer['ht_id'],
-            data_date=thisplayer['data_date']).first()
+            thisplayer['stamina'] = p.skills['stamina']
+            thisplayer['keeper'] = p.skills['keeper']
+            thisplayer['defender'] = p.skills['defender']
+            thisplayer['playmaker'] = p.skills['playmaker']
+            thisplayer['winger'] = p.skills['winger']
+            thisplayer['passing'] = p.skills['passing']
+            thisplayer['scorer'] = p.skills['scorer']
+            thisplayer['set_pieces'] = p.skills['set_pieces']
 
-        if dbplayer:
-            print(" - ",
-                  thisplayer['first_name'],
-                  thisplayer['last_name'],
-                  " already exists for today.")
-            db.session.delete(dbplayer)
+            thisplayer['data_date'] = time.strftime('%Y-%m-%d')
+
+            thisplayer['owner'] = teamid
+
+            dbplayer = db.session.query(Players).filter_by(
+                ht_id=thisplayer['ht_id'],
+                data_date=thisplayer['data_date']).first()
+
+            if dbplayer:
+                print(" - ",
+                    thisplayer['first_name'],
+                    thisplayer['last_name'],
+                    " already exists for today.")
+                db.session.delete(dbplayer)
+                db.session.commit()
+
+            newplayer = Players(thisplayer)
+            db.session.add(newplayer)
             db.session.commit()
+            print("+ Added ",
+                thisplayer['first_name'],
+                thisplayer['last_name'],
+                " for today.")
 
-        newplayer = Players(thisplayer)
-        db.session.add(newplayer)
-        db.session.commit()
-        print("+ Added ",
-              thisplayer['first_name'],
-              thisplayer['last_name'],
-              " for today.")
+            players.append(thisplayer)
 
-        players.append(thisplayer)
-
-    updated[session['team_name']] = ['/player', 'players']
+        # updated[teamid] = ['/player?id=' + str(teamid), 'players']
+        updated[teamid].append('/player?id=' + str(teamid))
+        updated[teamid].append('players')
 
     user = (db.session.query(User)
             .filter_by(ht_id=session['current_user_id'])
@@ -466,7 +488,8 @@ def update():
         fullversion=fullversion,
         title='Update',
         current_user=session['current_user'],
-        team=session['team_name'])
+        all_teams=session['all_teams'],
+        all_team_names=session['all_team_names'])
 
 # --------------------------------------------------------------------------------
 
@@ -505,9 +528,10 @@ def admin():
         fullversion=fullversion,
         title='Debug',
         current_user=session['current_user'],
-        team=session['team_name'],
         users=users,
-        changelog=changelog)
+        changelog=changelog,
+        all_teams=session['all_teams'],
+        all_team_names=session['all_team_names'])
 
 # --------------------------------------------------------------------------------
 
@@ -548,7 +572,8 @@ def team():
         title='Team',
         current_user=session['current_user'],
         teams=teams,
-        team=session['team_name'])
+        all_teams=session['all_teams'],
+        all_team_names=session['all_team_names'])
 
 # --------------------------------------------------------------------------------
 
@@ -563,6 +588,34 @@ def player():
     updategroup = request.form.get('updategroup')
     playerid = request.form.get('playerid')
     groupid = request.form.get('groupid')
+
+    teamid = request.values.get('id')
+
+    if teamid:
+        teamid = int(teamid)
+    else:
+        teamid = request.form.get('id')
+
+    print(teamid)
+
+    all_teams = session['all_teams']
+
+    if teamid not in all_teams:
+        errormsg = "Wrong teamid, try the links."
+        return render_template(
+            'player.html',
+            version=version,
+            timenow=timenow,
+            fullversion=fullversion,
+            title='Players',
+            apptitle=app.config['APP_NAME'],
+            error=errormsg,
+            current_user=session['current_user'],
+            all_teams=session['all_teams'],
+            all_team_names=session['all_team_names'])
+
+    all_team_names = session['all_team_names']
+    teamname = all_team_names[all_teams.index(teamid)]
 
     if updategroup and playerid and groupid:
         if int(groupid) < 0:
@@ -609,7 +662,7 @@ def player():
 
     # Of each of the players you ever have owned, get the last download
     players_data = (db.session.query(Players)
-                    .filter_by(owner=session['team_id'])
+                    .filter_by(owner=teamid)
                     .order_by("number")
                     .order_by("data_date")
                     .all())
@@ -622,7 +675,7 @@ def player():
 
     # Of each of the players you ever have owned, get the first download
     players_data = (db.session.query(Players)
-                    .filter_by(owner=session['team_id'])
+                    .filter_by(owner=teamid)
                     .order_by(text("data_date desc"))
                     .all())
     newlst = {}
@@ -672,14 +725,16 @@ def player():
         version=version,
         timenow=timenow,
         fullversion=fullversion,
-        title='Players',
+        title=teamname,
         current_user=session['current_user'],
-        team=session['team_name'],
+        teamid=teamid,
         grouped_players=grouped_players_now,
         players=players_now,
         players_data=players_data,
         players_oldest=players_oldest_dict,
-        group_data=group_data)
+        group_data=group_data,
+        all_teams=session['all_teams'],
+        all_team_names=session['all_team_names'])
 
 # --------------------------------------------------------------------------------
 
@@ -704,7 +759,8 @@ def matches():
         fullversion=fullversion,
         title='Matches',
         current_user=session['current_user'],
-        team=session['team_name'])
+        all_teams=session['all_teams'],
+        all_team_names=session['all_team_names'])
 
 # --------------------------------------------------------------------------------
 
@@ -729,4 +785,5 @@ def training():
         fullversion=fullversion,
         title='Training',
         current_user=session['current_user'],
-        team=session['team_name'])
+        all_teams=session['all_teams'],
+        all_team_names=session['all_team_names'])

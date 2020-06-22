@@ -21,9 +21,9 @@
           {% endif %}
           <hr class="my-4">
           {% if not(error) %}
-            {% if team %}
+            {% if updated %}
               {% for key, value in updated.items() %}
-              <p>{{ key }}: <a href="{{ value[0] }}">{{ value[1] }}</a></p>
+              <p>{{ value[0] }}: <a href="{{ value[1] }}">{{ value[2] }}</a></p>
               {% endfor %}
             {% endif %}
           {% endif %}

@@ -146,18 +146,20 @@ $('.toast').toast(option)
         <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        {% if current_user %}
+        {% if all_teams %}
+        {% for team in range(all_teams|length) %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {{ team }}
+            {{ all_team_names[team-1] }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item" href="/team">Team</a>
-            <a class="dropdown-item" href="/player">Players</a>
-            <a class="dropdown-item" href="/matches">Matches</a>
-            <a class="dropdown-item" href="/training">Training</a>
+            <a class="dropdown-item" href="/team?id={{ all_teams[team-1] }}">Team</a>
+            <a class="dropdown-item" href="/player?id={{ all_teams[team-1] }}">Players</a>
+            <a class="dropdown-item" href="/matches?id={{ all_teams[team-1] }}">Matches</a>
+            <a class="dropdown-item" href="/training?id={{ all_teams[team-1] }}">Training</a>
           </div>
         </li>
+        {% endfor %}
         <a class="nav-link" href="/update">Update data</a>
         <a class="nav-link" href="/profile">Profile</a>
         <a class="nav-link" href="/logout">Logout</a>
