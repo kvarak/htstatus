@@ -28,12 +28,11 @@ version = versionstr[0] + "." + versionstr[1]
 timenow = time.strftime('%Y-%m-%d %H:%M:%S')
 
 # --------------------------------------------------------------------------------
+# Help functions
 # --------------------------------------------------------------------------------
 
 
-@app.route('/')
-@app.route('/index')
-def index():
+def create_page(template, title, **kwargs):
     if 'current_user' in session:
         current_user = session['current_user']
         all_teams = session['all_teams']
@@ -42,25 +41,34 @@ def index():
         current_user = False
         all_teams = False
         all_team_names = False
-    debug1 = ""
-    debug2 = ""
-
-    f = open('app/static/changelog.txt')
-    changelog = f.readlines()
 
     return render_template(
-        'main.html',
+        template,
+        title=title,
         version=version,
         timenow=timenow,
         fullversion=fullversion,
-        title='Home',
         apptitle=app.config['APP_NAME'],
         current_user=current_user,
-        debug1=debug1,
-        debug2=debug2,
-        changelog=changelog,
         all_teams=all_teams,
-        all_team_names=all_team_names)
+        all_team_names=all_team_names,
+        **kwargs)
+
+# --------------------------------------------------------------------------------
+# Route functions
+# --------------------------------------------------------------------------------
+
+
+@app.route('/')
+@app.route('/index')
+def index():
+    f = open('app/static/changelog.txt')
+    changelog = f.readlines()
+
+    return create_page(
+        template='main.html',
+        title='Home',
+        changelog=changelog)
 
 # --------------------------------------------------------------------------------
 
@@ -68,19 +76,10 @@ def index():
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
     error = ""
-    if 'current_user' in session:
-        current_user = session['current_user']
-        all_teams = session['all_teams']
-        all_team_names = session['all_team_names']
-    else:
+    if not('current_user') in session:
         return render_template(
-            'profile.html',
-            version=version,
-            timenow=timenow,
-            fullversion=fullversion,
-            title='Profile',
-            apptitle=app.config['APP_NAME'],
-            current_user=current_user)
+            '_forward.html',
+            url='/')
 
     groupname = request.form.get('groupname')
     grouporder = request.form.get('grouporder')
@@ -106,16 +105,7 @@ def profile():
             db.session.add(newgroup)
             db.session.commit()
         else:
-            errormsg = "Groups need both name and order."
-            return render_template(
-                'profile.html',
-                version=version,
-                timenow=timenow,
-                fullversion=fullversion,
-                title='Profile',
-                apptitle=app.config['APP_NAME'],
-                current_user=current_user,
-                error=errormsg)
+            error = "Groups need both name and order."
 
     elif updategroup and groupid:
         if groupname and grouporder:
@@ -128,16 +118,7 @@ def profile():
                       "bgcolor": bgcolor}))
             db.session.commit()
         else:
-            errormsg = "Groups need both name and order."
-            return render_template(
-                'profile.html',
-                version=version,
-                timenow=timenow,
-                fullversion=fullversion,
-                title='Profile',
-                apptitle=app.config['APP_NAME'],
-                current_user=current_user,
-                error=errormsg)
+            error = "Groups need both name and order."
 
     elif deletegroup and groupid:
         try:
@@ -156,18 +137,11 @@ def profile():
                   .order_by("order")
                   .all())
 
-    return render_template(
-        'profile.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
+    return create_page(
+        template='profile.html',
         title='Profile',
-        apptitle=app.config['APP_NAME'],
-        current_user=current_user,
         group_data=group_data,
-        error=error,
-        all_teams=all_teams,
-        all_team_names=all_team_names)
+        error=error)
 
 # --------------------------------------------------------------------------------
 
@@ -183,13 +157,9 @@ def login():
     oa = oauth_verifier
 
     if not(oa) and not(username) and session.get('current_user') is None:
-        return render_template(
-            'login.html',
-            version=version,
-            timenow=timenow,
-            fullversion=fullversion,
-            title='Login / Signup',
-            apptitle=app.config['APP_NAME'])
+        return create_page(
+            template='login.html',
+            title='Login / Signup')
 
     # Initialize CHPP instance
     chpp = CHPP(consumer_key, consumer_secret)
@@ -206,15 +176,11 @@ def login():
             session['current_user'] = user.ht_user
             session['current_user_id'] = user.ht_id
         else:
-            print("Login failed")
-            return render_template(
-                'login.html',
-                version=version,
-                timenow=timenow,
-                fullversion=fullversion,
+            error = "Login failed"
+            return create_page(
+                template='login.html',
                 title='Login / Signup',
-                apptitle=app.config['APP_NAME'],
-                error='Login failed')
+                error=error)
 
     else:
         if not (oauth_verifier):
@@ -223,15 +189,11 @@ def login():
 
             if len(password) < 8:
                 # Password too short
-                print("Password too short")
-                return render_template(
-                    'login.html',
-                    version=version,
-                    timenow=timenow,
-                    fullversion=fullversion,
+                error = "Password too short"
+                return create_page(
+                    template='login.html',
                     title='Login / Signup',
-                    apptitle=app.config['APP_NAME'],
-                    error='Password too short')
+                    error=error)
 
             auth = chpp.get_auth(callback_url=app.config['CALLBACK_URL'],
                                  scope="")
@@ -316,16 +278,9 @@ def login():
     User.login(user)
     db.session.commit()
 
-    return render_template(
-        'login.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
-        title='Login',
-        apptitle=app.config['APP_NAME'],
-        current_user=session['current_user'],
-        all_teams=all_teams,
-        all_team_names=all_team_names)
+    return create_page(
+        template='login.html',
+        title='Login')
 
 # --------------------------------------------------------------------------------
 
@@ -333,11 +288,8 @@ def login():
 @app.route('/logout')
 def logout():
     session.clear()
-    return render_template(
-        'logout.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
+    return create_page(
+        template='logout.html',
         title='Logout')
 
 # --------------------------------------------------------------------------------
@@ -453,7 +405,8 @@ def update():
                 data_date=thisplayer['data_date']).first()
 
             if dbplayer:
-                print(" - ",
+                print(
+                    " - ",
                     thisplayer['first_name'],
                     thisplayer['last_name'],
                     " already exists for today.")
@@ -463,7 +416,8 @@ def update():
             newplayer = Players(thisplayer)
             db.session.add(newplayer)
             db.session.commit()
-            print("+ Added ",
+            print(
+                "+ Added ",
                 thisplayer['first_name'],
                 thisplayer['last_name'],
                 " for today.")
@@ -480,16 +434,10 @@ def update():
     User.updatedata(user)
     db.session.commit()
 
-    return render_template(
-        'update.html',
-        updated=updated,
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
+    return create_page(
+        template='update.html',
         title='Update',
-        current_user=session['current_user'],
-        all_teams=session['all_teams'],
-        all_team_names=session['all_team_names'])
+        updated=updated)
 
 # --------------------------------------------------------------------------------
 
@@ -521,17 +469,10 @@ def admin():
     f = open('app/static/changelog.txt')
     changelog = f.readlines()
 
-    return render_template(
-        'debug.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
+    return create_page(
+        template='debug.html',
         title='Debug',
-        current_user=session['current_user'],
-        users=users,
-        changelog=changelog,
-        all_teams=session['all_teams'],
-        all_team_names=session['all_team_names'])
+        changelog=changelog)
 
 # --------------------------------------------------------------------------------
 
@@ -564,16 +505,9 @@ def team():
     User.team(user)
     db.session.commit()
 
-    return render_template(
-        'team.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
-        title='Team',
-        current_user=session['current_user'],
-        teams=teams,
-        all_teams=session['all_teams'],
-        all_team_names=session['all_team_names'])
+    return create_page(
+        template='team.html',
+        title='Team')
 
 # --------------------------------------------------------------------------------
 
@@ -601,18 +535,11 @@ def player():
     all_teams = session['all_teams']
 
     if teamid not in all_teams:
-        errormsg = "Wrong teamid, try the links."
-        return render_template(
-            'player.html',
-            version=version,
-            timenow=timenow,
-            fullversion=fullversion,
+        error = "Wrong teamid, try the links."
+        return create_page(
+            template='player.html',
             title='Players',
-            apptitle=app.config['APP_NAME'],
-            error=errormsg,
-            current_user=session['current_user'],
-            all_teams=session['all_teams'],
-            all_team_names=session['all_team_names'])
+            error=error)
 
     all_team_names = session['all_team_names']
     teamname = all_team_names[all_teams.index(teamid)]
@@ -720,21 +647,15 @@ def player():
     # group_data.insert(0, dummyGroup)
     group_data.append(dummyGroup)
 
-    return render_template(
-        'player.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
+    return create_page(
+        template='player.html',
         title=teamname,
-        current_user=session['current_user'],
         teamid=teamid,
         grouped_players=grouped_players_now,
         players=players_now,
         players_data=players_data,
         players_oldest=players_oldest_dict,
-        group_data=group_data,
-        all_teams=session['all_teams'],
-        all_team_names=session['all_team_names'])
+        group_data=group_data)
 
 # --------------------------------------------------------------------------------
 
@@ -752,15 +673,9 @@ def matches():
     User.player(user)
     db.session.commit()
 
-    return render_template(
-        'matches.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
-        title='Matches',
-        current_user=session['current_user'],
-        all_teams=session['all_teams'],
-        all_team_names=session['all_team_names'])
+    return create_page(
+        template='matches.html',
+        title='Matches')
 
 # --------------------------------------------------------------------------------
 
@@ -778,12 +693,6 @@ def training():
     User.player(user)
     db.session.commit()
 
-    return render_template(
-        'training.html',
-        version=version,
-        timenow=timenow,
-        fullversion=fullversion,
-        title='Training',
-        current_user=session['current_user'],
-        all_teams=session['all_teams'],
-        all_team_names=session['all_team_names'])
+    return create_page(
+        template='training.html',
+        title='Training')
