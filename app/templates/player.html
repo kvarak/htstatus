@@ -425,7 +425,9 @@
                   <select class="custom-select mr-sm-2" name="groupid">
                     <option selected>Select group</option>
                     {% for group in group_data %}
+                    {% if group.id %}
                     <option value="{{ group.id }}" id="groupid">{{ group.name }}</option>
+                    {% endif %}
                     {% endfor %}
                     <option value="-1" id="groupid">Clear group</option>
                   </select>
