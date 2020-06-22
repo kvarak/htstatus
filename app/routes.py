@@ -32,6 +32,36 @@ timenow = time.strftime('%Y-%m-%d %H:%M:%S')
 # --------------------------------------------------------------------------------
 
 
+def count_clicks(page):
+    try:
+        user = (db.session.query(User)
+                .filter_by(ht_id=session['current_user_id'])
+                .first())
+    except Exception:
+        return 1
+
+    if page == "login.html":
+        User.login(user)
+    elif page == "player.html":
+        User.player(user)
+    elif page == "matches.html":
+        User.matches(user)
+    elif page == "team.html":
+        User.team(user)
+    elif page == "training.html":
+        User.training(user)
+    elif page == "update.html":
+        User.updatedata(user)
+    else:
+        return 2
+
+    db.session.commit()
+
+    return 0
+
+# --------------------------------------------------------------------------------
+
+
 def create_page(template, title, **kwargs):
     if 'current_user' in session:
         current_user = session['current_user']
@@ -41,6 +71,8 @@ def create_page(template, title, **kwargs):
         current_user = False
         all_teams = False
         all_team_names = False
+
+    count_clicks(template)
 
     return render_template(
         template,
@@ -53,6 +85,7 @@ def create_page(template, title, **kwargs):
         all_teams=all_teams,
         all_team_names=all_team_names,
         **kwargs)
+
 
 # --------------------------------------------------------------------------------
 # Route functions
@@ -274,10 +307,6 @@ def login():
 
     session['team_id'] = all_teams[0]
 
-    user = db.session.query(User).filter_by(ht_id=current_user.ht_id).first()
-    User.login(user)
-    db.session.commit()
-
     return create_page(
         template='login.html',
         title='Login')
@@ -428,12 +457,6 @@ def update():
         updated[teamid].append('/player?id=' + str(teamid))
         updated[teamid].append('players')
 
-    user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
-            .first())
-    User.updatedata(user)
-    db.session.commit()
-
     return create_page(
         template='update.html',
         title='Update',
@@ -472,7 +495,8 @@ def admin():
     return create_page(
         template='debug.html',
         title='Debug',
-        changelog=changelog)
+        changelog=changelog,
+        users=users)
 
 # --------------------------------------------------------------------------------
 
@@ -498,12 +522,6 @@ def team():
         this_team = chpp.team(ht_id=teamid)
         pprint(vars(this_team))
         teams.append(this_team.name)
-
-    user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
-            .first())
-    User.team(user)
-    db.session.commit()
 
     return create_page(
         template='team.html',
@@ -612,12 +630,6 @@ def player():
     for _k, val in newlst.items():
         players_oldest_dict[val['ht_id']] = val
 
-    user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
-            .first())
-    User.player(user)
-    db.session.commit()
-
     # Group the players into groups
     tmp_player = players_now
     grouped_players_now = {}
@@ -667,12 +679,6 @@ def matches():
             '_forward.html',
             url='/login')
 
-    user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
-            .first())
-    User.player(user)
-    db.session.commit()
-
     return create_page(
         template='matches.html',
         title='Matches')
@@ -686,12 +692,6 @@ def training():
         return render_template(
             '_forward.html',
             url='/login')
-
-    user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
-            .first())
-    User.player(user)
-    db.session.commit()
 
     return create_page(
         template='training.html',
