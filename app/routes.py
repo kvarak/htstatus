@@ -463,7 +463,8 @@ def update():
     all_team_names = session['all_team_names']
 
     updated = {}
-    changesplayers = []
+    changesplayers_day = []
+    changesplayers_week = []
 
     for i in range(len(all_teams)):
         updated[all_teams[i]] = [all_team_names[i]]
@@ -580,9 +581,14 @@ def update():
 
             players.append(thisplayer)
 
+            thischanges = player_diff(thisplayer['ht_id'], 1)
+            if thischanges:
+                changesplayers_day.append(thischanges)
+                dprint(2, thischanges)
+
             thischanges = player_diff(thisplayer['ht_id'], 7)
             if thischanges:
-                changesplayers.append(thischanges)
+                changesplayers_week.append(thischanges)
                 dprint(2, thischanges)
 
         # updated[teamid] = ['/player?id=' + str(teamid), 'players']
@@ -593,7 +599,8 @@ def update():
         template='update.html',
         title='Update',
         updated=updated,
-        changes=changesplayers)
+        changes_day=changesplayers_day,
+        changes_week=changesplayers_week)
 
 # --------------------------------------------------------------------------------
 
