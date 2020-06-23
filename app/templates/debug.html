@@ -81,61 +81,9 @@
             </p>
           </div>
         </div>
-        <div class="card">
-          <div class="card-body" id="tester2" style="width:90%;height:250px;"></div>
-        </div>
       </div>
     </div>
   </div>
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-
-{{ super() }}
-<script>
-
-  window.onresize = doALoadOfStuff;
-
-  function doALoadOfStuff() {
-    Plotly.newPlot('tester2', data, layout);
-  }
-
-  trace1 = {
-    type: 'scatter',
-    x: [1, 2, 3, 4],
-    y: [10, 15, 13, 17],
-    mode: 'lines',
-    name: 'Red',
-    line: {
-      color: 'rgb(219, 64, 82)',
-      width: 3
-    }
-  };
-
-  trace2 = {
-    type: 'scatter',
-    x: [1, 2, 3, 4],
-    y: [12, 9, 15, 12],
-    mode: 'lines',
-    name: 'Blue',
-    line: {
-      color: 'rgb(55, 128, 191)',
-      width: 1
-    }
-  };
-
-  var layout = {
-    title: 'Test plot',
-    // width: 100,
-    // height: 300
-  };
-
-  var data = [trace1, trace2];
-
-  Plotly.newPlot('tester2', data, layout);
-
-</script>
 
 {% endblock %}
