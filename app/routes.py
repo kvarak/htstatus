@@ -1,4 +1,4 @@
-from pprint import pprint
+import inspect
 import subprocess
 import time
 import traceback
@@ -29,8 +29,41 @@ timenow = time.strftime('%Y-%m-%d %H:%M:%S')
 
 default_group_order = 99
 
+logfile = "htplanner.log"
+debug_level = app.config['DEBUG_LEVEL']
+
 # --------------------------------------------------------------------------------
 # Help functions
+# --------------------------------------------------------------------------------
+
+
+def dprint(lvl, *args):
+    if lvl <= debug_level:
+        # 0 represents this line, 1 represents line at caller
+        callerframerecord = inspect.stack()[1]
+        frame = callerframerecord[0]
+        info = inspect.getframeinfo(frame)
+        now = time.strftime('%Y-%m-%d %H:%M:%S')
+        pstr = ""
+        for a in args:
+            pstr = pstr + str(a)
+        print(now + " " + info.function + ":" + str(info.lineno) + " " + pstr)
+
+# --------------------------------------------------------------------------------
+
+
+def debug_print(route, function, *args):
+    for arg in args:
+        towrite = route + " [" + function + "]: " + arg
+        dprint(2, towrite)
+    if debug_level >= 3:
+        file = open(logfile, "a")
+        now = time.strftime('%Y-%m-%d %H:%M:%S')
+        for arg in args:
+            towrite = now + " " + route + " [" + function + "]: " + arg + "\n"
+            file.write(towrite)
+        file.close()
+
 # --------------------------------------------------------------------------------
 
 
@@ -217,7 +250,7 @@ def login():
 
     if username and user:
         if check_password_hash(user.password, password):
-            print("Login success")
+            dprint(1, "Login success")
             # get stuff and add in session
             session['access_key'] = user.access_key
             session['access_secret'] = user.access_secret
@@ -233,7 +266,7 @@ def login():
     else:
         if not (oauth_verifier):
             # New user, connect to CHPP to be able to create user
-            print("New user, connect to CHPP to be able to create user")
+            dprint(1, "New user, connect to CHPP to be able to create user")
 
             if len(password) < 8:
                 # Password too short
@@ -245,6 +278,7 @@ def login():
 
             auth = chpp.get_auth(callback_url=app.config['CALLBACK_URL'],
                                  scope="")
+            debug_print("login", "chpp.get_auth", auth._SOURCE_FILE)
             session['request_token'] = auth["request_token"]
             session['req_secret'] = auth["request_token_secret"]
             session['username'] = username
@@ -256,11 +290,16 @@ def login():
 
         else:
             # New access permissions from Hattrick
-            print("New access permissions from Hattrick")
+            dprint(1, "New access permissions from Hattrick")
             access_token = chpp.get_access_token(
                            request_token=session['request_token'],
                            request_token_secret=session['req_secret'],
                            code=oauth_verifier)
+
+            debug_print(
+                "login",
+                "chpp.get_access_token",
+                access_token._SOURCE_FILE)
 
             session['access_key'] = access_token['key']
             session['access_secret'] = access_token['secret']
@@ -271,6 +310,7 @@ def login():
                         session['access_secret'])
 
             current_user = chpp.user()
+            debug_print("login", "chpp.user", current_user._SOURCE_FILE)
             session['current_user'] = current_user.username
             session['current_user_id'] = current_user.ht_id
 
@@ -282,7 +322,7 @@ def login():
             if ht_id:
                 # existing ht_id in db
                 # then reassign the ownership
-                print("existing ht_id in db")
+                dprint(1, "existing ht_id in db")
                 User.claimUser(
                     ht_id,
                     username=session['username'],
@@ -293,7 +333,7 @@ def login():
 
             else:
                 # create new user with the form data.
-                print("create new user")
+                dprint(1, "create new user")
                 new_user = User(
                     ht_id=current_user.ht_id,
                     ht_user=current_user.username,
@@ -305,7 +345,7 @@ def login():
                 db.session.add(new_user)
                 db.session.commit()
 
-    print("UserID: ", session['current_user_id'])
+    dprint(1, "UserID: ", session['current_user_id'])
 
     chpp = CHPP(consumer_key,
                 consumer_secret,
@@ -313,6 +353,7 @@ def login():
                 session['access_secret'])
 
     current_user = chpp.user()
+    debug_print("login", "chpp.user", current_user._SOURCE_FILE)
     all_teams = current_user._teams_ht_id
     all_team_names = []
     for id in all_teams:
@@ -362,9 +403,10 @@ def update():
     for teamid in all_teams:
 
         the_team = chpp.team(ht_id=teamid)
+        debug_print("update", "chpp.team", the_team._SOURCE_FILE)
 
         try:
-            pprint(the_team.players)
+            dprint(2, the_team.players)
         except Exception:
             errorincode = traceback.format_exc()
             error = "Is your team playing a game?"
@@ -449,7 +491,8 @@ def update():
                 data_date=thisplayer['data_date']).first()
 
             if dbplayer:
-                print(
+                dprint(
+                    1,
                     " - ",
                     thisplayer['first_name'],
                     thisplayer['last_name'],
@@ -460,7 +503,8 @@ def update():
             newplayer = Players(thisplayer)
             db.session.add(newplayer)
             db.session.commit()
-            print(
+            dprint(
+                1,
                 "+ Added ",
                 thisplayer['first_name'],
                 thisplayer['last_name'],
@@ -529,13 +573,14 @@ def team():
                 session['access_secret'])
 
     current_user = chpp.user()
+    debug_print("team", "chpp.user", current_user._SOURCE_FILE)
     all_teams = current_user._teams_ht_id
 
     teams = []
     for teamid in all_teams:
-        print(teamid)
+        dprint(1, teamid)
         this_team = chpp.team(ht_id=teamid)
-        pprint(vars(this_team))
+        dprint(2, vars(this_team))
         teams.append(this_team.name)
 
     return create_page(
@@ -563,7 +608,7 @@ def player():
     else:
         teamid = request.form.get('id')
 
-    print(teamid)
+    dprint(1, teamid)
 
     all_teams = session['all_teams']
 
@@ -617,8 +662,8 @@ def player():
                    .filter_by(user_id=session['current_user_id'])
                    .all())
 
-    # pprint(group_data)
-    # pprint(into_groups)
+    dprint(3, group_data)
+    dprint(3, into_groups)
 
     # Of each of the players you ever have owned, get the last download
     players_data = (db.session.query(Players)

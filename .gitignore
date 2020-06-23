@@ -5,6 +5,7 @@ changelog.txt
 config.py
 config.py-e
 creds.json
+htplanner.log
 nohup.out
 push.sh
 serverrun.sh

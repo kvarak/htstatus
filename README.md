@@ -16,6 +16,7 @@ class Config(object):
   CHPP_URL                 = 'https://chpp.hattrick.org/chppxml.ashx'
   SQLALCHEMY_DATABASE_URI  = 'postgresql:///<dbname>'
   SQLALCHEMY_TRACK_MODIFICATIONS = False
+  DEBUG_LEVEL              = 3 # 0=none, 1=info, 2=debug, 3=full
 ```
 
 ## Database
