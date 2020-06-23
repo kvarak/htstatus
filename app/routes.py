@@ -168,7 +168,8 @@ def player_diff(playerid, daysago):
         "cards",
         "injury_level",
         "form",
-        "stamina"
+        "stamina",
+        "number"
     ]
 
     ret = []
