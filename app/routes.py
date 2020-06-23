@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import inspect
 import subprocess
 import time
@@ -120,6 +121,72 @@ def create_page(template, title, **kwargs):
         all_teams=all_teams,
         all_team_names=all_team_names,
         **kwargs)
+
+
+# --------------------------------------------------------------------------------
+
+
+def player_diff(playerid, daysago):
+    # Prints the changes since <date>
+    datetime_object = (datetime.now() - timedelta(days=daysago)).date()
+
+    all_teams = session['all_teams']
+    all_team_names = session['all_team_names']
+    for owner in all_teams:
+        foundit = db.session.query(Players).filter_by(
+            ht_id=playerid,
+            owner=owner).order_by(text("data_date desc")).first()
+        if foundit:
+            theteam = owner
+            latest = foundit
+            oldest = (db.session
+                      .query(Players)
+                      .filter_by(
+                          ht_id=playerid,
+                          owner=owner)
+                      .filter(Players.data_date >= datetime_object)
+                      .order_by("data_date")
+                      .first())
+
+    if not(oldest):
+        return False
+
+    teamname = all_team_names[all_teams.index(theteam)]
+
+    ignore_list = [
+        "data_date",
+        "age_days",
+        "age",
+        "current_team_matches",
+        "tsi",
+        "salary",
+        "career_goals",
+        "cup_goals",
+        "current_team_goals",
+        "league_goals",
+        "loyalty",
+        "cards",
+        "injury_level",
+        "form",
+        "stamina"
+    ]
+
+    ret = []
+    thediff = {}
+    for key, elem in latest:
+        thediff[key] = elem
+    for key, elem in oldest:
+        if key not in ignore_list:
+            if elem != thediff[key]:
+                retstr = [teamname]
+                retstr.append(oldest.first_name)
+                retstr.append(oldest.last_name)
+                retstr.append(key)
+                retstr.append(elem)
+                retstr.append(thediff[key])
+                ret.append(retstr)
+
+    return ret
 
 
 # --------------------------------------------------------------------------------
@@ -396,6 +463,7 @@ def update():
     all_team_names = session['all_team_names']
 
     updated = {}
+    changesplayers = []
 
     for i in range(len(all_teams)):
         updated[all_teams[i]] = [all_team_names[i]]
@@ -512,6 +580,11 @@ def update():
 
             players.append(thisplayer)
 
+            thischanges = player_diff(thisplayer['ht_id'], 7)
+            if thischanges:
+                changesplayers.append(thischanges)
+                dprint(2, thischanges)
+
         # updated[teamid] = ['/player?id=' + str(teamid), 'players']
         updated[teamid].append('/player?id=' + str(teamid))
         updated[teamid].append('players')
@@ -519,7 +592,8 @@ def update():
     return create_page(
         template='update.html',
         title='Update',
-        updated=updated)
+        updated=updated,
+        changes=changesplayers)
 
 # --------------------------------------------------------------------------------
 

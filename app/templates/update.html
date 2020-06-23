@@ -25,7 +25,23 @@
               {% for key, value in updated.items() %}
               <p>{{ value[0] }}: <a href="{{ value[1] }}">{{ value[2] }}</a></p>
               {% endfor %}
-            {% endif %}
+              <hr class="my-4">
+              <p>Changes since one week ago.</p>
+              <p class="text-sm11">
+                {% for cplayer in changes %}
+                  {{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }} -
+                  {% for c in cplayer %}
+                    {% if c[5] > c[4] %}
+                      {% set color = "green" %}
+                    {% else %}
+                      {% set color = "red" %}
+                    {% endif %}
+                    <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
+                  {% endfor %}
+                  </br>
+                {% endfor %}
+              </p>
+              {% endif %}
           {% endif %}
           </div>
       </div>

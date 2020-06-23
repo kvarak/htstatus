@@ -242,7 +242,8 @@ class Players(db.Model):
         self.owner = playerdata['owner']
 
     def __repr__(self):
-        ret = "<name " + self.first_name
+        ret = "<" + self.first_name + " "
+        ret += self.last_name + " " + str(self.data_date) + ">"
         return ret
 
     def __iter__(self):
