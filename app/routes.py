@@ -118,6 +118,9 @@ def create_page(template, title, **kwargs):
         all_team_names = False
         role = False
 
+    f = open('app/static/changelog.txt')
+    changelog = f.readlines()
+
     count_clicks(template)
 
     return render_template(
@@ -131,6 +134,7 @@ def create_page(template, title, **kwargs):
         all_teams=all_teams,
         all_team_names=all_team_names,
         role=role,
+        changelog=changelog,
         **kwargs)
 
 
@@ -209,13 +213,9 @@ def player_diff(playerid, daysago):
 @app.route('/')
 @app.route('/index')
 def index():
-    f = open('app/static/changelog.txt')
-    changelog = f.readlines()
-
     return create_page(
         template='main.html',
-        title='Home',
-        changelog=changelog)
+        title='Home')
 
 # --------------------------------------------------------------------------------
 
@@ -443,8 +443,8 @@ def login():
     session['team_id'] = all_teams[0]
 
     return create_page(
-        template='login.html',
-        title='Login')
+        template='main.html',
+        title='Logged in')
 
 # --------------------------------------------------------------------------------
 
@@ -683,13 +683,9 @@ def admin():
             'created': user.created}
         users.append(thisuser)
 
-    f = open('app/static/changelog.txt')
-    changelog = f.readlines()
-
     return create_page(
         template='debug.html',
         title='Debug',
-        changelog=changelog,
         users=users,
         error=error)
 
