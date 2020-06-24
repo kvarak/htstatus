@@ -622,7 +622,7 @@ def admin():
     if session.get('current_user') is None:
         return render_template(
             '_forward.html',
-            url='/login')
+            url='/')
 
     error = ""
 
@@ -634,11 +634,11 @@ def admin():
         if role != "Admin":
             return render_template(
                 '_forward.html',
-                url='/login')
+                url='/')
     except Exception:
         return render_template(
             '_forward.html',
-            url='/login')
+            url='/')
 
     adminchecked = request.form.get('admin')
     userid = request.form.get('userid')
