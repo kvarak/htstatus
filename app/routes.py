@@ -103,10 +103,20 @@ def create_page(template, title, **kwargs):
         current_user = session['current_user']
         all_teams = session['all_teams']
         all_team_names = session['all_team_names']
+        try:
+            user = (db.session.query(User)
+                    .filter_by(ht_id=session['current_user_id'])
+                    .first())
+            role = User.getRole(user)
+            if role == "None":
+                role = False
+        except Exception:
+            role = False
     else:
         current_user = False
         all_teams = False
         all_team_names = False
+        role = False
 
     count_clicks(template)
 
@@ -120,6 +130,7 @@ def create_page(template, title, **kwargs):
         current_user=current_user,
         all_teams=all_teams,
         all_team_names=all_team_names,
+        role=role,
         **kwargs)
 
 
@@ -606,18 +617,60 @@ def update():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/debug')
+@app.route('/debug', methods=['GET', 'POST'])
 def admin():
     if session.get('current_user') is None:
         return render_template(
             '_forward.html',
             url='/login')
 
+    error = ""
+
+    try:
+        user = (db.session.query(User)
+                .filter_by(ht_id=session['current_user_id'])
+                .first())
+        role = User.getRole(user)
+        if role != "Admin":
+            return render_template(
+                '_forward.html',
+                url='/login')
+    except Exception:
+        return render_template(
+            '_forward.html',
+            url='/login')
+
+    adminchecked = request.form.get('admin')
+    userid = request.form.get('userid')
+
+    dprint(2, "Checkbox: ", adminchecked)
+    dprint(2, userid)
+
+    if userid:
+        try:
+            user = (db.session.query(User)
+                    .filter_by(ht_id=userid)
+                    .first())
+            if adminchecked:
+                updateto = "Admin"
+            else:
+                updateto = "User"
+
+            dprint(2, updateto)
+
+            User.setRole(user, updateto)
+            db.session.commit()
+
+        except Exception:
+            error = "couldn't change user"
+
     allusers = db.session.query(User).all()
     users = []
     for user in allusers:
         thisuser = {
             'id': user.ht_id,
+            'name': user.ht_user,
+            'role': user.role,
             'c_team': user.c_team,
             'c_training': user.c_training,
             'c_player': user.c_player,
@@ -637,7 +690,8 @@ def admin():
         template='debug.html',
         title='Debug',
         changelog=changelog,
-        users=users)
+        users=users,
+        error=error)
 
 # --------------------------------------------------------------------------------
 

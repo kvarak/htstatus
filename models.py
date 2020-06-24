@@ -70,6 +70,7 @@ class User(db.Model):
     last_update = db.Column(db.DateTime)
     last_usage = db.Column(db.DateTime)
     created = db.Column(db.DateTime)
+    role = db.Column(db.String(100))
 
     def __init__(self, ht_id, ht_user, username,
                  password, access_key, access_secret):
@@ -89,9 +90,16 @@ class User(db.Model):
         self.last_update = time.strftime('%Y-%m-%d %H:%M:%S')
         self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
         self.created = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.role = ""
 
     def __repr__(self):
         return '<id {}>'.format(self.username)
+
+    def getRole(self):
+        return '{}'.format(self.role)
+
+    def setRole(self, newrole):
+        self.role = newrole
 
     def claimUser(self, username, password, access_key, access_secret):
         self.username = username

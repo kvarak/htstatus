@@ -19,10 +19,12 @@
           <div class="card-body">
             <h5 class="card-title">Activity</h5>
             <p class="card-text">
-              <table class="table table-sm table-scroll">
+              <table class="table table-sm">
                 <thead>
                   <tr>
+                    <th scope="col" class="text-small">Admin</th>
                     <th scope="col" class="text-small">ID</th>
+                    <th scope="col" class="text-small">Name</th>
                     <th scope="col" class="text-small">#login</th>
                     <th scope="col" class="text-small">#team</th>
                     <th scope="col" class="text-small">#training</th>
@@ -38,7 +40,29 @@
                 <tbody>
                   {% for u in users %}
                   <tr>
+                    <td class="text-small">
+                      {% if u.name == current_user %}
+                        {{ u.role }}
+                      {% else %}
+                      <form method="POST" action="/debug">
+                        <input type="hidden" id="userid" name="userid" value="{{ u.id }}">
+                        <div class="form-check">
+                          {% if u.id == 182085 %}
+                          <input class="form-check-input position-static" type="checkbox" disabled checked>
+                          {% else %}
+                            {% if u.role == "Admin" %}
+                            <input class="form-check-input position-static" type="checkbox" name="admin" value="admin" onChange="this.form.submit()" checked>
+                            {% else %}
+                            <input class="form-check-input position-static" type="checkbox" name="admin" value="admin" onChange="this.form.submit()">
+                            {% endif %}
+                          <!-- disabled checked -->
+                          {% endif %}
+                        </div>
+                      </form>
+                      {% endif %}
+                    </td>
                     <td class="text-small">{{ u.id }}</td>
+                    <td class="text-small">{{ u.name }}</td>
                     <td class="text-small">{{ u.c_login }}</td>
                     <td class="text-small">{{ u.c_team }}</td>
                     <td class="text-small">{{ u.c_training }}</td>

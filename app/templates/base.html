@@ -163,7 +163,9 @@ $('.toast').toast(option)
         <a class="nav-link" href="/update">Update data</a>
         <a class="nav-link" href="/profile">Profile</a>
         <a class="nav-link" href="/logout">Logout</a>
-        <a class="nav-link" href="/debug"><i>Debug</i></a>
+        {% if role == "Admin" %}
+          <a class="nav-link" href="/debug"><i>Debug</i></a>
+        {% endif %}
       {% else %}
         <li class="nav-item">
           <a class="nav-link" href="/login">Login</a>
