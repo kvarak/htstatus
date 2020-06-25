@@ -22,81 +22,50 @@
   </div>
   {% if current_user %}
   <div class="row">
+    {% for id, team in changesteams.items() %}
     <div class="col-sm">
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Training</h5>
+            <h5 class="card-title">{{ updated[id] }}</h5>
             <p class="card-text text-sm13">
-              <ul>
-                <li class="text-sm13">
-                  According to your plan, you should switch training from Defender to Wing in 1 week.
-                </li>
-                <li class="text-sm13">
-                  2 of your players that are marked as "trained to sell" could be sold now for a hefty profit.
-                </li>
-                <li class="text-sm13">
-                  You have 3 players getting too old for this. Maybe start looking for new forwards?
-                </li>
-              </ul>
+              <p class="text-sm13"><i>Changes since one week ago</i></p>
+              <p class="text-sm11"><i>(Or since the previous update)</i></p>
+              <p class="text-sm11">
+                {% for change in team %}
+                  {{ change[0][1] }} {{ change[0][2] }}:
+                  {% for c in change %}
+                    {% if c[5] > c[4] %}
+                      {% set color = "green" %}
+                    {% else %}
+                      {% set color = "red" %}
+                    {% endif %}
+                    <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
+                  {% endfor %}
+                  </br>
+                {% endfor %}
+              </p>
             </p>
           </div>
           <div class="card-footer">
-            <small class="text-muted"><i>Link to training?</i></small>
+            <small class="text-muted"><i><a href="/player?id={{ id }}">{{ updated[id] }}</a></i></small>
           </div>
         </div>
       </div>
     </div>
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Next game</h5>
-            <p class="card-text text-sm13">
-              <ul>
-                <li class="text-sm13">
-                  Your fans think you'll win against Hotteam BK.
-                </li>
-                <li class="text-sm13">
-                  Watch out, your players are over confident.
-                </li>
-                <li class="text-sm13">
-                  Hotteam BK most often play 3-4-3, attack in the middle, during league games.
-                </li>
-                <li class="text-sm13">
-                  Freddy Fager is their best forward, also technical, you should man-mark him.
-                </li>
-                <li class="text-sm13">
-                  Hotteam BK tried out 2-5-3 in their practise game. That's unlike them...
-                </li>
-              </ul>
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted"><i>Link to matches?</i></small>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% endfor %}
     <div class="col-sm">
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Also in the news...</h5>
             <p class="card-text text-sm13">
-              <ul>
-                <li class="text-sm13">
-                  You haven't updated you data in 4 weeks, it's about time.
-                </li>
-                <li class="text-sm13">
-                  Your league ends in 2 weeks.
-                </li>
-              </ul>
+              Last update: {{ thisuser.last_usage }}</br>
             </p>
           </div>
-          <div class="card-footer">
+          <!-- <div class="card-footer">
             <small class="text-muted"><i>Link to ...?</i></small>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -142,22 +111,9 @@
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
-            <!-- <h5 class="card-title">Servers</h5>
+            <h5 class="card-title">Code changes</h5>
             <p class="card-text">
-              The latest stable version: <a href="ht-stable.kvarak.net">ht-stable.kvarak.net</a>.
-            </p>
-            <p class="text-sm13">
-              <i>The one with port number 5000.</i> Use this one "for real", data here will be kept as safe as possible.
-            </p>
-            <p class="card-text">
-              The latest version: <a href="ht-test.kvarak.net">ht-test.kvarak.net</a>.
-            </p>
-            <p class="text-sm13">
-              <i>The one with port number 5050.</i> Use this one just for testing new features. There is no guarantee that the data here will be kept safe.
-            </p> -->
-            <h5 class="card-title">Changes</h5>
-            <p class="card-text">
-              <p class="text-sm13">
+              <p class="text-sm11">
                 {% for c in changelog %}
                 {{ c }}</br>
                 {% endfor %}

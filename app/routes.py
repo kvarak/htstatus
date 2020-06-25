@@ -216,9 +216,74 @@ def player_diff(playerid, daysago):
 @app.route('/')
 @app.route('/index')
 def index():
+    if not('current_user') in session:
+        return create_page(
+            template='main.html',
+            title='Home')
+
+    all_teams = session['all_teams']
+    all_team_names = session['all_team_names']
+    updated = {}
+
+    for i in range(len(all_teams)):
+        updated[all_teams[i]] = all_team_names[i]
+
+    dprint(2, updated)
+
+    # changesplayers_week = []
+    changesteams = {}
+
+    for teamid in all_teams:
+
+        changesplayers = []
+
+        # Of each of the players you ever have owned, get the last download
+        players_data = (db.session.query(Players)
+                        .filter_by(owner=teamid)
+                        .order_by("data_date")
+                        .all())
+        newlst = {}
+        for thislist in players_data:
+            newlst[thislist.ht_id] = dict(iter(thislist))
+        players_now = []
+        for _k, val in newlst.items():
+            players_now.append(val)
+
+        for thisplayer in players_now:
+
+            thischanges = player_diff(thisplayer['ht_id'], 7)
+            if thischanges:
+                changesplayers.append(thischanges)
+                dprint(2, thischanges)
+
+        changesteams[teamid] = changesplayers
+
+    thisuserdata = (db.session.query(User)
+                    .filter_by(ht_id=session['current_user_id'])
+                    .first())
+    thisuser = {
+        'id': thisuserdata.ht_id,
+        'name': thisuserdata.ht_user,
+        'role': thisuserdata.role,
+        'c_team': thisuserdata.c_team,
+        'c_training': thisuserdata.c_training,
+        'c_player': thisuserdata.c_player,
+        'c_matches': thisuserdata.c_matches,
+        'c_login': thisuserdata.c_login,
+        'c_update': thisuserdata.c_update,
+        'last_update': thisuserdata.last_update,
+        'last_usage': thisuserdata.last_usage,
+        'last_login': thisuserdata.last_login,
+        'created': thisuserdata.created}
+
+    dprint(2, thisuser)
+
     return create_page(
         template='main.html',
-        title='Home')
+        title='Home',
+        changesteams=changesteams,
+        thisuser=thisuser,
+        updated=updated)
 
 # --------------------------------------------------------------------------------
 
