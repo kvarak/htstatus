@@ -27,50 +27,62 @@
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
+            <h5 class="card-title">Settings</h5>
+            <p class="card-text">
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
             <h5 class="card-title">Player groups</h5>
             <p class="card-text">
 
               <form method="POST" action="/profile">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <button type="submit" class="btn btn-outline-secondary" name="addgroup" value="addbutton">Add</button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="addgroup" value="addbutton">Add</button>
                   </div>
-                  <input type="text" name="groupname" class="form-control" placeholder="Group name" aria-label="Text input with segmented dropdown button">
-                  <input type="number" name="grouporder" class="form-control" placeholder="Order" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
-                  <input type="text" name="bgcolor" class="form-control" placeholder="#bgcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
-                  <input type="text" name="textcolor" class="form-control" placeholder="#textcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
+                  <input type="text" name="groupname" class="form-control form-control-sm" placeholder="Group name" aria-label="Text input with segmented dropdown button">
+                  <input type="number" name="grouporder" class="form-control form-control-sm" placeholder="Order" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
+                  <input type="text" name="bgcolor" class="form-control form-control-sm" placeholder="#bgcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
+                  <input type="text" name="textcolor" class="form-control form-control-sm" placeholder="#textcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
                 </div>
               </form>
 
               {% for group in group_data %}
               {% if group.name == "<default>" %}
-                <form method="POST" action="/profile">
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <button type="submit" class="btn btn-outline-secondary" name="updategroup" value="updatebutton" disabled>Update</button>
-                    </div>
-                    <input type="text" name="groupname" class="form-control" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};" disabled>
-                    <input type="number" name="grouporder" class="form-control" value="{{ group.order }}" aria-label="Number input" disabled>
-                    <input type="text" name="bgcolor" class="form-control" value="{{ group.bgcolor }}" aria-label="Text input" disabled>
-                    <input type="text" name="textcolor" class="form-control" value="{{ group.textcolor }}" aria-label="Text input" disabled>
-                    <div class="input-group-append">
-                      <button type="submit" class="btn btn-outline-secondary"  name="deletegroup" value="deletebutton" disabled><font color="red">Delete</font></button>
-                    </div>
+              <form method="POST" action="/profile">
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="updategroup" value="updatebutton" disabled>Update</button>
                   </div>
-                </form>
-                {% else %}
-                <form method="POST" action="/profile">
+                  <input type="text" name="groupname" class="form-control form-control-sm" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};" disabled>
+                  <input type="number" name="grouporder" class="form-control form-control-sm" value="{{ group.order }}" aria-label="Number input" disabled>
+                  <input type="text" name="bgcolor" class="form-control form-control-sm" value="{{ group.bgcolor }}" aria-label="Text input" disabled>
+                  <input type="text" name="textcolor" class="form-control form-control-sm" value="{{ group.textcolor }}" aria-label="Text input" disabled>
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm"  name="deletegroup" value="deletebutton" disabled><font color="red">Delete</font></button>
+                  </div>
+                </div>
+              </form>
+              {% else %}
+              <form method="POST" action="/profile">
                 <input type="hidden" id="groupid" name="groupid" value="{{ group.id }}">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
-                    <button type="submit" class="btn btn-outline-secondary" name="updategroup" value="updatebutton">Update</button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="updategroup" value="updatebutton">Update</button>
                   </div>
-                  <input type="text" name="groupname" class="form-control" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
-                  <input type="number" name="grouporder" class="form-control" value="{{ group.order }}" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
-                  <input type="text" name="bgcolor" class="form-control" value="{{ group.bgcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
-                  <input type="text" name="textcolor" class="form-control" value="{{ group.textcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
+                  <input type="text" name="groupname" class="form-control form-control-sm" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
+                  <input type="number" name="grouporder" class="form-control form-control-sm" value="{{ group.order }}" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
+                  <input type="text" name="bgcolor" class="form-control form-control-sm" value="{{ group.bgcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
+                  <input type="text" name="textcolor" class="form-control form-control-sm" value="{{ group.textcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
                   <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-secondary"  name="deletegroup" value="deletebutton"><font color="red">Delete</font></button>
+                    <button type="submit" class="btn btn-outline-secondary btn-sm"  name="deletegroup" value="deletebutton"><font color="red">Delete</font></button>
                   </div>
                 </div>
               </form>
