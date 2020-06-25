@@ -194,6 +194,7 @@ class Players(db.Model):
     scorer = db.Column(db.Integer)
     set_pieces = db.Column(db.Integer)
     owner = db.Column(db.Integer)
+    old_owner = db.Column(db.Integer)
 
     def __init__(self, playerdata):
         self.ht_id = playerdata['ht_id']
@@ -248,10 +249,11 @@ class Players(db.Model):
         self.scorer = int(playerdata['scorer'])
         self.set_pieces = int(playerdata['set_pieces'])
         self.owner = playerdata['owner']
+        self.old_owner = 0
 
     def __repr__(self):
-        ret = "<" + self.first_name + " "
-        ret += self.last_name + " " + str(self.data_date) + ">"
+        ret = self.first_name + " " + self.last_name
+        ret += " (" + str(self.ht_id) + ")"
         return ret
 
     def __iter__(self):
@@ -306,7 +308,8 @@ class Players(db.Model):
                ("passing", self.passing),
                ("scorer", self.scorer),
                ("set_pieces", self.set_pieces),
-               ("owner", self.owner))
+               ("owner", self.owner),
+               ("old_owner", self.old_owner))
         return iter(ret)
 
 # --------------------------------------------------------------------------------

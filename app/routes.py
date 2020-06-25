@@ -38,6 +38,14 @@ debug_level = app.config['DEBUG_LEVEL']
 # --------------------------------------------------------------------------------
 
 
+def diff(first, second):
+    second = set(second)
+    return [item for item in first if item not in second]
+
+
+# --------------------------------------------------------------------------------
+
+
 def dprint(lvl, *args):
     if lvl <= debug_level:
         # 0 represents this line, 1 represents line at caller
@@ -99,6 +107,7 @@ def count_clicks(page):
 
 
 def create_page(template, title, **kwargs):
+    last_update = ""
     if 'current_user' in session:
         current_user = session['current_user']
         all_teams = session['all_teams']
@@ -110,6 +119,7 @@ def create_page(template, title, **kwargs):
             role = User.getRole(user)
             if role == "None":
                 role = False
+            last_update = user.last_update
         except Exception:
             role = False
     else:
@@ -135,6 +145,7 @@ def create_page(template, title, **kwargs):
         all_team_names=all_team_names,
         role=role,
         changelog=changelog,
+        last_update=last_update,
         **kwargs)
 
 
@@ -187,7 +198,9 @@ def player_diff(playerid, daysago):
         "number",
         "salary",
         "stamina",
-        "tsi"
+        "tsi",
+        "owner",
+        "old_owner"
     ]
 
     ret = []
@@ -549,6 +562,9 @@ def update():
     for i in range(len(all_teams)):
         updated[all_teams[i]] = [all_team_names[i]]
 
+    new_players = []
+    left_players = []
+    playernames = {}
     for teamid in all_teams:
 
         the_team = chpp.team(ht_id=teamid)
@@ -573,7 +589,7 @@ def update():
                 all_teams=session['all_teams'],
                 all_team_names=session['all_team_names'])
 
-        players = []
+        players_fromht = []
         for p in the_team.players:
 
             thisplayer = {}
@@ -635,6 +651,8 @@ def update():
 
             thisplayer['owner'] = teamid
 
+            playernames[p.ht_id] = p.first_name + " " + p.last_name
+
             dbplayer = db.session.query(Players).filter_by(
                 ht_id=thisplayer['ht_id'],
                 data_date=thisplayer['data_date']).first()
@@ -659,7 +677,7 @@ def update():
                 thisplayer['last_name'],
                 " for today.")
 
-            players.append(thisplayer)
+            players_fromht.append(thisplayer['ht_id'])
 
             thischanges = player_diff(thisplayer['ht_id'], 1)
             if thischanges:
@@ -675,12 +693,48 @@ def update():
         updated[teamid].append('/player?id=' + str(teamid))
         updated[teamid].append('players')
 
+        # Of each of the players you ever have owned, get the last download
+        players_data = (db.session.query(Players)
+                        .filter_by(owner=teamid)
+                        .order_by("number")
+                        .order_by("data_date")
+                        .all())
+        players_indb = []
+        for p in players_data:
+            players_indb.append(p.ht_id)
+            playernames[p.ht_id] = p.first_name + " " + p.last_name
+        players_indb = list(set(players_indb))
+
+        # Which players are new
+        players_new = diff(players_fromht, players_indb)
+        dprint(2, "New: ", players_new)
+
+        for p in players_new:
+            new_players.append([updated[teamid][0], playernames[p]])
+
+        # Which players are no longer in the team
+        players_left = diff(players_indb, players_fromht)
+        dprint(2, "Left: ", players_left)
+
+        dprint(2, players_data)
+
+        for p in players_left:
+            left_players.append([updated[teamid][0], playernames[p]])
+            (db.session
+             .query(Players)
+             .filter_by(ht_id=p,
+                        owner=teamid)
+             .update({"old_owner": teamid, "owner": 0}))
+            db.session.commit()
+
     return create_page(
         template='update.html',
         title='Update',
         updated=updated,
         changes_day=changesplayers_day,
-        changes_week=changesplayers_week)
+        changes_week=changesplayers_week,
+        left_players=left_players,
+        new_players=new_players)
 
 # --------------------------------------------------------------------------------
 
