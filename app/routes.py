@@ -169,22 +169,25 @@ def player_diff(playerid, daysago):
     teamname = all_team_names[all_teams.index(theteam)]
 
     ignore_list = [
-        "data_date",
-        "age_days",
         "age",
-        "current_team_matches",
-        "tsi",
-        "salary",
+        "age_days",
         "career_goals",
+        "career_hattricks",
+        "category_id",
         "cup_goals",
         "current_team_goals",
+        "current_team_matches",
+        "data_date",
+        "form",
+        "friendly_goals",
         "league_goals",
         "loyalty",
-        "cards",
-        "injury_level",
-        "form",
+        "national_team_id",
+        "national_team_name",
+        "number",
+        "salary",
         "stamina",
-        "number"
+        "tsi"
     ]
 
     ret = []
