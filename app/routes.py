@@ -438,7 +438,7 @@ def login():
 
             auth = chpp.get_auth(callback_url=app.config['CALLBACK_URL'],
                                  scope="")
-            debug_print("login", "chpp.get_auth", auth._SOURCE_FILE)
+            # debug_print("login", "chpp.get_auth", auth._SOURCE_FILE)
             session['request_token'] = auth["request_token"]
             session['req_secret'] = auth["request_token_secret"]
             session['username'] = username
@@ -456,10 +456,10 @@ def login():
                            request_token_secret=session['req_secret'],
                            code=oauth_verifier)
 
-            debug_print(
-                "login",
-                "chpp.get_access_token",
-                access_token._SOURCE_FILE)
+            # debug_print(
+            #     "login",
+            #     "chpp.get_access_token",
+            #     access_token._SOURCE_FILE)
 
             session['access_key'] = access_token['key']
             session['access_secret'] = access_token['secret']
