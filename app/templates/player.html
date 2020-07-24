@@ -57,8 +57,8 @@
                     <th scope="col" class="text-small">&nbsp;</th> <!-- STATUS-->
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">LOY</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">TSI</th>
+<!--                    <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">TSI</th>-->
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">Since</th>
                   </tr>
@@ -210,7 +210,7 @@
                     <td class="text-small" align="right">{{ p.loyalty }}</td>
                     <td class="text-small">&nbsp;</td>
 
-                    <td class="text-small" align="right">{{ p.tsi }}</td>
+<!--                     <td class="text-small" align="right">{{ p.tsi }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].tsi < p.tsi %}
                         (+{{ p.tsi - players_oldest[p.ht_id].tsi  }})
@@ -219,7 +219,7 @@
                         ({{ p.tsi - players_oldest[p.ht_id].tsi  }})
                       {% endif %}
                     </td>
-
+ -->
                     {% set olddate = players_oldest[p.ht_id].data_date | string() %}
                     {% set thedate = olddate[:10] %}
                     <td class="text-small" align="right">{{ thedate }}</td>
