@@ -48,19 +48,24 @@
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">SP</th>
                     <th scope="col" class="text-small"></th>
+<!--
                     <th scope="col" class="text-small">XP</th>
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">STA</th>
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">FORM</th>
                     <th scope="col" class="text-small"></th>
+-->
                     <th scope="col" class="text-small">&nbsp;</th> <!-- STATUS-->
                     <th scope="col" class="text-small"></th>
+<!--
                     <th scope="col" class="text-small">LOY</th>
-<!--                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">TSI</th>-->
                     <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">TSI</th>
+                    <th scope="col" class="text-small"></th>
+-->
                     <th scope="col" class="text-small">Since</th>
+                    <th scope="col" class="text-small">Notes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -170,7 +175,7 @@
                         ({{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
                       {% endif %}
                     </td>
-
+<!--
                     <td class="text-small" align="right">{{ p.experience }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].experience < p.experience %}
@@ -183,7 +188,7 @@
 
                     <td class="text-small" align="right">{{ p.form }}</td>
                     <td class="text-small"></td>
-
+-->
                     <td class="text-small" align="left">
 
                       {% if p.is_transfer_listed %}
@@ -206,11 +211,11 @@
 
                     </td>
                     <td class="text-small">&nbsp;</td>
-
+<!--
                     <td class="text-small" align="right">{{ p.loyalty }}</td>
                     <td class="text-small">&nbsp;</td>
 
-<!--                     <td class="text-small" align="right">{{ p.tsi }}</td>
+                     <td class="text-small" align="right">{{ p.tsi }}</td>
                     <td class="text-small">
                       {% if players_oldest[p.ht_id].tsi < p.tsi %}
                         (+{{ p.tsi - players_oldest[p.ht_id].tsi  }})
@@ -224,6 +229,7 @@
                     {% set thedate = olddate[:10] %}
                     <td class="text-small" align="right">{{ thedate }}</td>
 
+                    <td class="text-small" align="right">{{ p.owner_notes }}</td>
                   </tr>
                   {% endfor %}
                   {% endif %}
