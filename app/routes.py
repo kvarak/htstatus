@@ -182,6 +182,7 @@ def player_diff(playerid, daysago):
     ignore_list = [
         "age",
         "age_days",
+        "caps",
         "career_goals",
         "career_hattricks",
         "category_id",
@@ -191,6 +192,7 @@ def player_diff(playerid, daysago):
         "data_date",
         "form",
         "friendly_goals",
+        "injury_level",
         "league_goals",
         "loyalty",
         "national_team_id",
@@ -200,6 +202,7 @@ def player_diff(playerid, daysago):
         "stamina",
         "tsi",
         "owner",
+        "owner_notes",
         "old_owner"
     ]
 

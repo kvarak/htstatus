@@ -229,7 +229,12 @@
                     {% set thedate = olddate[:10] %}
                     <td class="text-small" align="right">{{ thedate }}</td>
 
-                    <td class="text-small" align="right">{{ p.owner_notes }}</td>
+                    {% if p.owner_notes == "None" %}
+                    <td class="text-small" align="left">&nbsp;</td>
+                    {% else %}
+                    <td class="text-small" align="left">{{ p.owner_notes }}</td>
+                    {% endif %}
+
                   </tr>
                   {% endfor %}
                   {% endif %}
