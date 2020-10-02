@@ -925,8 +925,8 @@ def player():
     # Of each of the players you ever have owned, get the last download
     players_data = (db.session.query(Players)
                     .filter_by(owner=teamid)
-                    .order_by("number")
                     .order_by("data_date")
+                    .order_by("number")
                     .all())
     newlst = {}
     for thislist in players_data:
