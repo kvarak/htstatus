@@ -448,6 +448,12 @@
                 <div class="col-auto my-1">
                   <button type="submit" class="btn btn-outline-secondary" name="updategroup" value="updatebutton">Update</button>
                 </div>
+                  {% set nrofgroups = group_data | length %}
+                  {% if nrofgroups == 1 %}
+                  <p class="card-text text-sm11">
+                    You haven't specified any groups, you add groups in <a href="/profile">the profile page</a>.
+                  </p>
+                  {% endif %}
               </div>
             </form>
           </div>

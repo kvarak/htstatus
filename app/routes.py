@@ -361,22 +361,23 @@ def profile():
             db.session.commit()
         except Exception:
 
-            error = "The group wasn't empty, removed all players from that group."
+            error = "The group wasn't empty, \
+                removed all players from that group."
             db.session.rollback()
 
             # remove all connected players
             connections = (db.session.query(PlayerSetting)
-                          .filter_by(group_id=groupid,
-                                     user_id=session['current_user_id'])
-                          .all())
+                           .filter_by(group_id=groupid,
+                                      user_id=session['current_user_id'])
+                           .all())
             dprint(2, connections)
 
             for playersetting in connections:
                 connection = (db.session
-                             .query(PlayerSetting)
-                             .filter_by(player_id=playersetting.player_id,
+                              .query(PlayerSetting)
+                              .filter_by(player_id=playersetting.player_id,
                                          user_id=session['current_user_id'])
-                             .first())
+                              .first())
                 db.session.delete(connection)
                 db.session.commit()
 
