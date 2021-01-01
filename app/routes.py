@@ -360,8 +360,32 @@ def profile():
             db.session.delete(thegroup)
             db.session.commit()
         except Exception:
-            error = "The group isn't empty, you can't delete it."
+
+            error = "The group wasn't empty, removed all players from that group."
             db.session.rollback()
+
+            # remove all connected players
+            connections = (db.session.query(PlayerSetting)
+                          .filter_by(group_id=groupid,
+                                     user_id=session['current_user_id'])
+                          .all())
+            dprint(2, connections)
+
+            for playersetting in connections:
+                connection = (db.session
+                             .query(PlayerSetting)
+                             .filter_by(player_id=playersetting.player_id,
+                                         user_id=session['current_user_id'])
+                             .first())
+                db.session.delete(connection)
+                db.session.commit()
+
+            thegroup = (db.session
+                        .query(Group)
+                        .filter_by(id=groupid)
+                        .first())
+            db.session.delete(thegroup)
+            db.session.commit()
 
     group_data = (db.session.query(Group)
                   .filter_by(user_id=session['current_user_id'])
@@ -718,8 +742,6 @@ def update():
         # Which players are no longer in the team
         players_left = diff(players_indb, players_fromht)
         dprint(2, "Left: ", players_left)
-
-        dprint(2, players_data)
 
         for p in players_left:
             left_players.append([updated[teamid][0], playernames[p]])
