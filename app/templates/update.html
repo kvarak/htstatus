@@ -6,23 +6,24 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <div class="jumbotron">
-        <div class="container">
-          <h1 class="display-4">{{ title }}</h1>
-          {% if error %}
-          <div class="alert alert-danger" role="alert">
-            <h5>{{ error }}</h5>
-            <p>{{ timenow }}</p>
-            <p>{{ fullversion }}</p>
-            <p><span style="white-space: pre-line">{{ errorinfo }}</span></p>
-          </div>
-          {% else %}
-          <p class="lead">Data downloaded!</p>
-          {% endif %}
-        </div>
+      <div class="container">
+        <h1 class="display-6">{{ title }}</h1>
       </div>
     </div>
   </div>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    <h5>{{ error }}</h5>
+    <p>{{ timenow }}</p>
+    <p>{{ fullversion }}</p>
+    <p><span style="white-space: pre-line">{{ errorinfo }}</span></p>
+  </div>
+  {% else %}
+    <div class="alert alert-success" role="alert">
+      Data downloaded!
+    </div>
+  {% endif %}
 
   {% if left_players %}
     {% for pl in left_players %}
@@ -31,6 +32,7 @@
     </div>
     {% endfor %}
   {% endif %}
+
   {% if new_players %}
     {% for pl in new_players %}
     <div class="alert alert-success" role="alert">
