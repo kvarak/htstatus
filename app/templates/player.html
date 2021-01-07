@@ -5,10 +5,12 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <div class="container">
-        <h1 class="display-6">Players</h1>
-        <p class="lead">{{ title }}</p>
-      </div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">{{ title }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Players</li>
+        </ol>
+      </nav>
     </div>
   </div>
   {% if error %}

@@ -1044,6 +1044,7 @@ def training():
         teamid = request.form.get('id')
     all_teams = session['all_teams']
 
+    error = ""
     if teamid not in all_teams:
         error = "Wrong teamid, try the links."
         return create_page(
@@ -1078,6 +1079,7 @@ def stats():
         teamid = request.form.get('id')
     all_teams = session['all_teams']
 
+    error = ""
     if teamid not in all_teams:
         error = "Wrong teamid, try the links."
         return create_page(
@@ -1167,4 +1169,4 @@ def stats():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
-        title='Statistics')
+        title='Stats')

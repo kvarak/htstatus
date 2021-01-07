@@ -119,12 +119,12 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <div class="container">
-        <h1 class="display-6">{{ title }}</h1>
-        <p class="lead">{{ teamname }}</p>
-        <!-- <hr class="my-4">
-        <p><i>Under construction</i></p> -->
-      </div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">{{ teamname }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
     </div>
   </div>
 
