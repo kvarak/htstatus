@@ -1036,6 +1036,135 @@ def training():
             '_forward.html',
             url='/login')
 
+    teamid = request.values.get('id')
+
+    if teamid:
+        teamid = int(teamid)
+    else:
+        teamid = request.form.get('id')
+    all_teams = session['all_teams']
+
+    if teamid not in all_teams:
+        error = "Wrong teamid, try the links."
+        return create_page(
+            template='training.html',
+            title='Training')
+
+    all_team_names = session['all_team_names']
+    teamname = all_team_names[all_teams.index(teamid)]
+
     return create_page(
         template='training.html',
+        error=error,
+        teamname=teamname,
+        teamid=teamid,
         title='Training')
+
+# --------------------------------------------------------------------------------
+
+
+@app.route('/stats')
+def stats():
+    if session.get('current_user') is None:
+        return render_template(
+            '_forward.html',
+            url='/login')
+
+    teamid = request.values.get('id')
+
+    if teamid:
+        teamid = int(teamid)
+    else:
+        teamid = request.form.get('id')
+    all_teams = session['all_teams']
+
+    if teamid not in all_teams:
+        error = "Wrong teamid, try the links."
+        return create_page(
+            template='stats.html',
+            title='Statistics')
+
+    all_team_names = session['all_team_names']
+    teamname = all_team_names[all_teams.index(teamid)]
+
+    # Get all players you have ever owned
+    players_data = (db.session.query(Players)
+                    .filter_by(owner=teamid)
+                    .order_by("data_date")
+                    .order_by("ht_id")
+                    .all())
+
+    allplayerids = []
+    allplayers = {}
+    playernames = {}
+    for entry in players_data:
+        allplayers[entry.ht_id] = []
+        if entry.number == 100:
+            playernames[entry.ht_id] = entry.first_name + " " + entry.last_name
+        else:
+            playernames[entry.ht_id] = str(entry.number) + ". " + \
+                entry.first_name + " " + entry.last_name
+        if entry.ht_id not in allplayerids:
+            allplayerids.append(entry.ht_id)
+
+    for player in players_data:
+        allplayers[player.ht_id].append(
+            [
+                datetime.date(player.data_date),
+                (
+                    player.keeper,
+                    player.defender,
+                    player.playmaker,
+                    player.winger,
+                    player.passing,
+                    player.scorer,
+                    player.set_pieces
+                )
+            ])
+
+    for i in allplayers:
+        # Date filler
+        (firstdate, previousskill) = allplayers[i][0]
+        (lastdate, x) = allplayers[i][len(allplayers[i])-1]
+
+        date_modified = firstdate
+        datelist = [firstdate]
+
+        while date_modified < lastdate:
+            date_modified += timedelta(days=1)
+            datelist.append(date_modified)
+
+        newy = []
+        for d in datelist:
+            for (da, y) in allplayers[i]:
+                if (d == da):
+                    previousskill = y
+            newy.append([d, previousskill])
+
+        # Just take every 7th
+        weekly = newy[0::7]
+        # add the last day
+        weekly.append(allplayers[i][len(allplayers[i])-1])
+
+        allplayers[i] = weekly
+
+    skills = [
+        "keeper",
+        "defender",
+        "playmaker",
+        "winger",
+        "passing",
+        "scorer",
+        "set_pieces"
+    ]
+
+    return create_page(
+        template='stats.html',
+        teamname=teamname,
+        error=error,
+        skills=skills,
+        teamid=teamid,
+        playernames=playernames,
+        allplayerids=allplayerids,
+        allplayers=allplayers,
+        title='Statistics')

@@ -106,6 +106,18 @@
     left:100%;
   }
 
+  .chart {
+    vertical-align: middle;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    display: inline-block;
+  }
+
+  canvas {
+    height: 100%;
+  }
+
 </style>
 {% endblock %}
 
@@ -128,8 +140,9 @@ $('.toast').toast(option)
 </script>
 
 <script src="{{url_for('static', filename='plotly-latest.min.js')}}"></script>
-
 <script src="{{url_for('static', filename='sorttable.js')}}"></script>
+<script src="{{url_for('static', filename='Chart.bundle.js')}}"></script>
+
 
 {% endblock %}
 
@@ -162,6 +175,7 @@ $('.toast').toast(option)
             <a class="dropdown-item" href="/player?id={{ all_teams[team-1] }}">Players</a>
             <!-- <a class="dropdown-item" href="/matches?id={{ all_teams[team-1] }}">Matches</a> -->
             <!-- <a class="dropdown-item" href="/training?id={{ all_teams[team-1] }}">Training</a> -->
+            <a class="dropdown-item" href="/stats?id={{ all_teams[team-1] }}">Statistics</a>
           </div>
         </li>
         {% endfor %}

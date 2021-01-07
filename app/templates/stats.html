@@ -7,37 +7,40 @@
 <script>
 
   // Data
-  var data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [{
-      label: "PM",
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      borderColor: "rgba(255, 99, 132)",
+
+  {% for ht_id in allplayerids %}
+
+  {% set thisplayer = allplayers[ht_id] %}
+
+  var data{{ ht_id }} = {
+
+    labels: [
+      {% for (dat, skills) in thisplayer %}
+      "{{ dat }}",
+      {% endfor %}
+    ],
+
+    datasets: [
+      {% for i in range(7) %}
+      {
+      label: "{{ skills[i] }}",
+      backgroundColor: "rgba({{ 255 - i * 40 }}, {{ 155 - i * i }}, {{ i * 30 }}, 0.2)",
+      borderColor: "rgba({{ 255 - i * 40 }}, {{ 155 - i * i }}, {{ i * 30 }})",
       pointColor: "rgba(220,220,220,1)",
       pointStrokeColor: "#fff",
       pointHighlightFill: "#fff",
       pointHighlightStroke: "rgba(220,220,220,1)",
-      data: [6, 6, 7, 7, 8, 8, 8]
-    }, {
-      label: "Wing",
-      backgroundColor: "rgba(54, 162, 235, 0.2)",
-      borderColor: "rgba(54, 162, 235)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
-      pointHighlightFill: "#fff",
-      pointHighlightStroke: "rgba(151,187,205,1)",
-      data: [2, 2, 3, 3, 4, 4, 5]
-    }, {
-      label: "PS",
-      backgroundColor: "rgba(255, 206, 86, 0.2)",
-      borderColor: "rgba(255, 206, 86)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
-      pointHighlightFill: "#fff",
-      pointHighlightStroke: "rgba(151,187,205,1)",
-      data: [12, 12, 12, 13, 13, 13, 14]
-    }]
+      data: [
+        {% for (dat, skills) in thisplayer %}
+        {{ skills[i] }},
+        {% endfor %}
+        ]
+    },
+    {% endfor %}
+    ]
   };
+
+  {% endfor %}
 
   // Global + Custom Chart Config Options
 
@@ -57,12 +60,14 @@
     animateScale : true,
   };
 
-  var ctx1 = document.getElementById('myLineChart');
-  var myLineChart = new Chart(ctx1, {
+  {% for ht_id in allplayerids %}
+  var ctx{{ ht_id }} = document.getElementById('myLineChart{{ ht_id }}');
+  var myLineChart{{ ht_id }} = new Chart(ctx{{ ht_id }}, {
     type: 'line',
-    data: data,
+    data: data{{ ht_id }},
     options: options
   });
+  {% endfor %}
 
 </script>
 
@@ -130,24 +135,60 @@
   {% endif %}
 
   <div class="row">
-
-    <div class="col-sm">
+    <div class="col-3">
       <div class="card-deck">
         <div class="card">
           <p class="card-text">
             <div class="card-body">
-              <h5 class="card-title">Player Playersson</h5>
               <p class="text-sm13">
-
-                <canvas id="myLineChart" width="400" height="400"></canvas>
-
+                {% for ht_id in allplayerids %}
+                  <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
+                    {{ playernames[ht_id] }}
+                  </a>
+                  <br>
+                {% endfor %}
               </p>
             </div>
           </p>
         </div>
       </div>
     </div>
+  {# </div>
+  <div class="row"><div class="col-sm"><p></p></div></div> #}
 
+    <div class="col-9">
+      {% for ht_id in allplayerids %}
+      <div class="row collapse" id="all-player-details-{{ ht_id }}">
+        <div class="col">
+          <div class="card-deck">
+            <div class="card">
+              <p class="card-text">
+                <div class="card-body">
+                  <h5 class="card-title">
+                  <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
+                    {{ playernames[ht_id] }}
+                  </a>
+                  </h5>
+                  <p class="text-sm13">
+
+                    <canvas id="myLineChart{{ ht_id }}" width="400" height="150"></canvas>
+
+                  </p>
+                </div>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row collapse" id="all-player-details-{{ ht_id }}"><div class="col"><p></p></div></div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <div class="row"><div class="col"><p></p></div></div>
+
+  {# <div class="row">
     <div class="col-sm">
       <div class="card-deck">
         <div class="card">
@@ -156,7 +197,7 @@
               <h5 class="card-title">head</h5>
               <p class="text-sm13">
 
-                <canvas id="myChart" width="400" height="400"></canvas>
+                <canvas id="myChart" width="400" height="150"></canvas>
 
 
               </p>
@@ -166,12 +207,7 @@
       </div>
     </div>
 
-  </div>
-
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
-  </div>
+  </div> #}
 
 </div>
 
