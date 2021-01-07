@@ -143,7 +143,7 @@
               <p class="text-sm13">
                 {% for ht_id in allplayerids %}
                   <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
-                    {{ playernames[ht_id] }}
+                    {{ playernames[ht_id] }} <i>({{ increases[ht_id] }})</i>
                   </a>
                   <br>
                 {% endfor %}

@@ -1124,6 +1124,19 @@ def stats():
                 )
             ])
 
+    increases = {}
+    for i in allplayers:
+        increases[i] = \
+            allplayers[i][len(allplayers[i])-1][1][0] - \
+            allplayers[i][0][1][0]
+        for s in range(6):
+            increases[i] = increases[i] + \
+                allplayers[i][len(allplayers[i])-1][1][s] - \
+                allplayers[i][0][1][s]
+
+    # Sort player list based on increases
+    allplayerids = list(reversed(sorted(allplayerids, key = lambda ele: increases[ele])))
+
     for i in allplayers:
         # Date filler
         (firstdate, previousskill) = allplayers[i][0]
@@ -1166,6 +1179,7 @@ def stats():
         error=error,
         skills=skills,
         teamid=teamid,
+        increases=increases,
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
