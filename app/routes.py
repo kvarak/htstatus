@@ -1145,8 +1145,11 @@ def stats():
         (firstdate, previousskill) = allplayers[i][0]
         (lastdate, x) = allplayers[i][len(allplayers[i])-1]
 
-        date_modified = firstdate
-        datelist = [firstdate]
+        friday = firstdate - \
+            timedelta(days=firstdate.weekday()) + timedelta(days=4, weeks=-1)
+
+        date_modified = friday
+        datelist = [friday]
 
         while date_modified < lastdate:
             date_modified += timedelta(days=1)
