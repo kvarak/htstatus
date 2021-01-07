@@ -1135,7 +1135,10 @@ def stats():
                 allplayers[i][0][1][s]
 
     # Sort player list based on increases
-    allplayerids = list(reversed(sorted(allplayerids, key = lambda ele: increases[ele])))
+    allplayerids = sorted(
+        allplayerids,
+        key=lambda ele: increases[ele],
+        reverse=True)
 
     for i in allplayers:
         # Date filler
@@ -1158,8 +1161,10 @@ def stats():
 
         # Just take every 7th
         weekly = newy[0::7]
-        # add the last day
-        weekly.append(allplayers[i][len(allplayers[i])-1])
+        # add the last day if it's not the last day already
+        (lastweekday, x) = weekly[len(weekly)-1]
+        if lastdate != lastweekday:
+            weekly.append(allplayers[i][len(allplayers[i])-1])
 
         allplayers[i] = weekly
 
