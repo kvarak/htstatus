@@ -4,18 +4,113 @@
 
 <div class="container">
   <div class="row">
+
     <div class="col-sm">
-      <div class="jumbotron">
-        <img src="{{url_for('static', filename='match.jpg')}}" class="rounded float-right img-fluid-2" height="200">
-        <div class="container">
-          <h1 class="display-4">{{ title }}</h1>
-          <p class="lead">{{ team }}</p>
-          <hr class="my-4">
-          <p><i>Under construction</i></p>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">{{ teamname }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="col-sm">
+      {% if not(error) %}
+      <form method="POST" action="/matches" style="text-align: center; width:100%;">
+        <input type="hidden" id="id" name="id" value="{{ teamid }}">
+        <!-- <button type="submit" name="updatebutton" value="updatelatest" class="btn btn-primary"  aria-label="Text input">Get latest match</button> -->
+        <button type="submit" name="updatebutton" value="update" class="btn btn-primary"  aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Be careful! This could take a few minutes.">Get all matches</button>
+      </form>
+      {% endif %}
+    </div>
+
+  </div>
+
+  {% if error %}
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-sm table-scroll sortable">
+              <thead>
+                <tr>
+                  <th scope="col" class="text-small">Date</th>
+                  <th scope="col" class="text-small">Match</th>
+                  <th scope="col" class="text-small">Goals</th>
+                  <th scope="col" class="text-small">Matchtype</th>
+                  <th scope="col" class="text-small">Context</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in matches %}
+                <tr>
+                  <td class="text-small">{{ m.datetime }}</td>
+                  <td class="text-small">
+                    <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                      {{ m.home_team_name }} - {{ m.away_team_name }}
+                    </a>
+                  </td>
+                  <td class="text-small">{{ m.home_goals }} - {{ m.away_goals }}</td>
+                  <td class="text-small">{{ HTmatchtype[m.matchtype] }}</td>
+                  <td class="text-small">{{ m.context_id }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  {% for m in matches %}
+  <div class="row collapse" id="all-match-details-{{ m.ht_id }}"><div class="col"><p></p></div></div>
+
+  <div class="row collapse" id="all-match-details-{{ m.ht_id }}">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                {{ m.home_team_name }} - {{ m.away_team_name }}
+              </a>
+            </h5>
+            <table class="table table-sm table-scroll sortable">
+              <thead>
+                <tr>
+                  <th scope="col" class="text-small">Role</td>
+                  <th scope="col" class="text-small">Name</td>
+                  <th scope="col" class="text-small">Stars</td>
+                  <th scope="col" class="text-small">Stars eom</td>
+                  <th scope="col" class="text-small">Behaviour</td>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in matchplays[m.ht_id] %}
+                <tr>
+                  <td class="text-small">{{ HTmatchrole[p.role_id] }}</td>
+                  <td class="text-small">{{ p.first_name }} {{ p.last_name }}</td>
+                  <td class="text-small">{{ p.rating_stars }}</td>
+                  <td class="text-small">{{ p.rating_stars_eom }}</td>
+                  <td class="text-small">{{ HTmatchbehaviour[p.behaviour] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
 </div>
 
 {% endblock %}

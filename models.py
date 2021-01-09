@@ -4,6 +4,80 @@ from app import db
 
 # --------------------------------------------------------------------------------
 
+class MatchPlay(db.Model):
+    __tablename__ = 'matchplay'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    match_id = db.Column(db.Integer, primary_key=True)
+    player_id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime)
+    first_name = db.Column(db.String(100))
+    nick_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    role_id = db.Column(db.Integer)
+    rating_stars = db.Column(db.Float)
+    rating_stars_eom = db.Column(db.Float)
+    behaviour = db.Column(db.Integer)
+
+    def __init__(self, matchdata):
+        self.match_id = matchdata['match_id']
+        self.player_id = matchdata['player_id']
+        self.datetime = matchdata['datetime']
+        self.first_name = matchdata['first_name']
+        self.nick_name = matchdata['nick_name']
+        self.last_name = matchdata['last_name']
+        self.role_id = matchdata['role_id']
+        self.rating_stars = matchdata['rating_stars']
+        self.rating_stars_eom = matchdata['rating_stars_eom']
+        self.behaviour = matchdata['behaviour']
+
+    def __repr__(self):
+        return '{} {}: {}/{}'.format(
+            self.first_name,
+            self.last_name,
+            self.rating_stars,
+            self.rating_stars_eom)
+
+# --------------------------------------------------------------------------------
+
+
+class Match(db.Model):
+    __tablename__ = 'match'
+
+    ht_id = db.Column(db.Integer, primary_key=True)
+    home_team_id = db.Column(db.Integer)
+    home_team_name = db.Column(db.String(100))
+    away_team_id = db.Column(db.Integer)
+    away_team_name = db.Column(db.String(100))
+    datetime = db.Column(db.DateTime)
+    matchtype = db.Column(db.Integer)
+    context_id = db.Column(db.Integer)
+    rule_id = db.Column(db.Integer)
+    cup_level = db.Column(db.Integer)
+    cup_level_index = db.Column(db.Integer)
+    home_goals = db.Column(db.Integer)
+    away_goals = db.Column(db.Integer)
+
+    def __init__(self, matchdata):
+        self.ht_id = matchdata['ht_id']
+        self.home_team_id = matchdata['home_team_id']
+        self.home_team_name = matchdata['home_team_name']
+        self.away_team_id = matchdata['away_team_id']
+        self.away_team_name = matchdata['away_team_name']
+        self.datetime = matchdata['datetime']
+        self.matchtype = matchdata['matchtype']
+        self.context_id = matchdata['context_id']
+        self.rule_id = matchdata['rule_id']
+        self.cup_level = matchdata['cup_level']
+        self.cup_level_index = matchdata['cup_level_index']
+        self.home_goals = matchdata['home_goals']
+        self.away_goals = matchdata['away_goals']
+
+    def __repr__(self):
+        return '{} - {}: {}'.format(self.home_team_name, self.away_team_name, self.ht_id)
+
+# --------------------------------------------------------------------------------
+
 
 class PlayerSetting(db.Model):
     __tablename__ = 'playersetting'

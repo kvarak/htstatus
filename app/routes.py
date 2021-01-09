@@ -11,7 +11,7 @@ from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import app, db
-from models import Group, Players, PlayerSetting, User
+from models import Group, Match, MatchPlay, Players, PlayerSetting, User
 
 # --------------------------------------------------------------------------------
 # --------------------------------------------------------------------------------
@@ -34,6 +34,101 @@ logfile = "htplanner.log"
 debug_level = app.config['DEBUG_LEVEL']
 
 # --------------------------------------------------------------------------------
+# HT definitions
+# --------------------------------------------------------------------------------
+
+
+HTmatchtype = {}
+HTmatchtype[1] = "League match"
+HTmatchtype[2] = "Qualification match"
+HTmatchtype[3] = "Cup match (standard league match)"
+HTmatchtype[4] = "Friendly (normal rules)"
+HTmatchtype[5] = "Friendly (cup rules)"
+HTmatchtype[6] = "Not currently in use, but reserved for international competition matches with normal rules (may or may not be implemented at some future point)."
+HTmatchtype[7] = "Hattrick Masters"
+HTmatchtype[8] = "International friendly (normal rules)"
+HTmatchtype[9] = "Internation friendly (cup rules)"
+HTmatchtype[10] = "National teams competition match (normal rules)"
+HTmatchtype[11] = "National teams competition match (cup rules)"
+HTmatchtype[12] = "National teams friendly"
+HTmatchtype[50] = "Tournament League match"
+HTmatchtype[51] = "Tournament Playoff match"
+HTmatchtype[61] = "Single match"
+HTmatchtype[62] = "Ladder match"
+HTmatchtype[80] = "Preparation match"
+HTmatchtype[100] = "Youth league match"
+HTmatchtype[101] = "Youth friendly match"
+HTmatchtype[102] = "RESERVED"
+HTmatchtype[103] = "Youth friendly match (cup rules)"
+HTmatchtype[104] = "RESERVED"
+HTmatchtype[105] = "Youth international friendly match"
+HTmatchtype[106] = "Youth international friendly match (Cup rules)"
+HTmatchtype[107] = "RESERVED"
+
+HTmatchrole = {}
+HTmatchrole[100] = "Keeper"
+HTmatchrole[101] = "Right back"
+HTmatchrole[102] = "Right central defender"
+HTmatchrole[103] = "Middle central defender"
+HTmatchrole[104] = "Left central defender"
+HTmatchrole[105] = "Left back"
+HTmatchrole[106] = "Right winger"
+HTmatchrole[107] = "Right inner midfield"
+HTmatchrole[108] = "Middle inner midfield"
+HTmatchrole[109] = "Left inner midfield"
+HTmatchrole[110] = "Left winger"
+HTmatchrole[111] = "Right forward"
+HTmatchrole[112] = "Middle forward"
+HTmatchrole[113] = "Left forward"
+HTmatchrole[114] = "Substitution (Keeper)"
+HTmatchrole[115] = "Substitution (Defender)"
+HTmatchrole[116] = "Substitution (Inner midfield)"
+HTmatchrole[117] = "Substitution (Winger)"
+HTmatchrole[118] = "Substitution (Forward)"
+HTmatchrole[200] = "Substitution (Keeper)"
+HTmatchrole[201] = "Substitution (Central defender)"
+HTmatchrole[202] = "Substitution (Wing back)"
+HTmatchrole[203] = "Substitution (Inner midfielder)"
+HTmatchrole[204] = "Substitution (Forward)"
+HTmatchrole[205] = "Substitution (Winger)"
+HTmatchrole[206] = "Substitution (Extra)"
+HTmatchrole[207] = "Backup (Keeper)"
+HTmatchrole[208] = "Backup (Central defender)"
+HTmatchrole[209] = "Backup (Wing back)"
+HTmatchrole[210] = "Backup (Inner midfielder)"
+HTmatchrole[211] = "Backup (Forward)"
+HTmatchrole[212] = "Backup (Winger)"
+HTmatchrole[213] = "Backup (Extra)"
+HTmatchrole[17] = "Set pieces"
+HTmatchrole[18] = "Captain"
+HTmatchrole[19] = "Replaced Player #1"
+HTmatchrole[20] = "Replaced Player #2"
+HTmatchrole[21] = "Replaced Player #3"
+HTmatchrole[22] = "Penalty taker (1)"
+HTmatchrole[23] = "Penalty taker (2)"
+HTmatchrole[24] = "Penalty taker (3)"
+HTmatchrole[25] = "Penalty taker (4)"
+HTmatchrole[26] = "Penalty taker (5)"
+HTmatchrole[27] = "Penalty taker (6)"
+HTmatchrole[28] = "Penalty taker (7)"
+HTmatchrole[29] = "Penalty taker (8)"
+HTmatchrole[30] = "Penalty taker (9)"
+HTmatchrole[31] = "Penalty taker (10)"
+HTmatchrole[32] = "Penalty taker (11)"
+
+HTmatchbehaviour = {}
+HTmatchbehaviour[-1] = "No change"
+HTmatchbehaviour[0] = "Normal"
+HTmatchbehaviour[1] = "Offensive"
+HTmatchbehaviour[2] = "Defensive"
+HTmatchbehaviour[3] = "Towards middle"
+HTmatchbehaviour[4] = "Towards wing"
+HTmatchbehaviour[5] = "Extra forward"
+HTmatchbehaviour[6] = "Extra inner midfield"
+HTmatchbehaviour[7] = "Extra defender"
+
+
+# --------------------------------------------------------------------------------
 # Help functions
 # --------------------------------------------------------------------------------
 
@@ -41,7 +136,6 @@ debug_level = app.config['DEBUG_LEVEL']
 def diff(first, second):
     second = set(second)
     return [item for item in first if item not in second]
-
 
 # --------------------------------------------------------------------------------
 
@@ -1015,15 +1109,121 @@ def player():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/matches')
+@app.route('/matches', methods=['GET', 'POST'])
 def matches():
     if session.get('current_user') is None:
         return render_template(
             '_forward.html',
             url='/login')
 
+    teamid = request.values.get('id')
+
+    if teamid:
+        teamid = int(teamid)
+    else:
+        teamid = request.form.get('id')
+    all_teams = session['all_teams']
+
+    doupdate = request.form.get('updatebutton')
+
+    error = ""
+    if teamid not in all_teams:
+        error = "Wrong teamid, try the links."
+        return create_page(
+            template='matches.html',
+            error=error,
+            title='Matches')
+
+    all_team_names = session['all_team_names']
+    teamname = all_team_names[all_teams.index(teamid)]
+
+    if doupdate == "update":
+
+        chpp = CHPP(consumer_key,
+                    consumer_secret,
+                    session['access_key'],
+                    session['access_secret'])
+
+        the_matches = chpp.matches_archive(ht_id=teamid, youth=False)
+
+        for match in the_matches:
+            dprint(2, "---------------")
+
+            # TODO: get more details about the match lile below
+            # the_match = chpp.match(ht_id=match.ht_id)
+
+            thedate = datetime(
+                match.datetime.year,
+                match.datetime.month,
+                match.datetime.day,
+                match.datetime.hour,
+                match.datetime.minute)
+
+            dprint(2, "Adding match ", match.ht_id, " to database.")
+
+            dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
+
+            if dbmatch:
+                dprint(1, "WARNING: This match already exists.")
+            else:
+                thismatch = {}
+                thismatch['ht_id'] = match.ht_id
+                thismatch['home_team_id'] = match.home_team_id
+                thismatch['home_team_name'] = match.home_team_name
+                thismatch['away_team_id'] = match.away_team_id
+                thismatch['away_team_name'] = match.away_team_name
+                thismatch['datetime'] = thedate
+                thismatch['matchtype'] = match.type
+                thismatch['context_id'] = match.context_id
+                thismatch['rule_id'] = match.rule_id
+                thismatch['cup_level'] = match.cup_level
+                thismatch['cup_level_index'] = match.cup_level_index
+                thismatch['home_goals'] = match.home_goals
+                thismatch['away_goals'] = match.away_goals
+
+                newmatch = Match(thismatch)
+                db.session.add(newmatch)
+                db.session.commit()
+
+                matchlineup = chpp.match_lineup(ht_id=match.ht_id, team_id=teamid)
+                for p in matchlineup.lineup_players:
+                    dprint(2, " - Adding ", p.first_name, " ", p.last_name, " to database")
+                    thismatchlineup = {}
+                    thismatchlineup['match_id'] = match.ht_id
+                    thismatchlineup['player_id'] = p.ht_id
+                    thismatchlineup['datetime'] = thedate
+                    thismatchlineup['role_id'] = p.role_id
+                    thismatchlineup['first_name'] = p.first_name
+                    thismatchlineup['nick_name'] = p.nick_name
+                    thismatchlineup['last_name'] = p.last_name
+                    thismatchlineup['rating_stars'] = p.rating_stars
+                    thismatchlineup['rating_stars_eom'] = p.rating_stars_eom
+                    thismatchlineup['behaviour'] = p.behaviour
+
+                    newmatchlineup = MatchPlay(thismatchlineup)
+                    db.session.add(newmatchlineup)
+                    db.session.commit()
+
+
+    # Get all registered matches
+    dbmatches = db.session.query(Match).filter(
+        (Match.away_team_id==teamid) |
+        (Match.home_team_id==teamid)).order_by(text("datetime desc")).all()
+    dbmatchplays = {}
+    for m in dbmatches:
+        dbmatch = db.session.query(MatchPlay).filter_by(match_id=m.ht_id).all()
+        dbmatchplays[m.ht_id] = dbmatch
+
     return create_page(
         template='matches.html',
+        error=error,
+        matches=dbmatches,
+        matchplays=dbmatchplays,
+        teamname=teamname,
+        teamid=teamid,
+        HTmatchtype=HTmatchtype,
+        HTmatchrole=HTmatchrole,
+        HTmatchbehaviour=HTmatchbehaviour,
         title='Matches')
 
 # --------------------------------------------------------------------------------
