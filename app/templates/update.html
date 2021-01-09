@@ -61,12 +61,29 @@
                   {% for cplayer in changes_day %}
                     {{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }} -
                     {% for c in cplayer %}
+
                       {% if c[5] > c[4] %}
                         {% set color = "green" %}
                       {% else %}
                         {% set color = "red" %}
                       {% endif %}
-                      <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
+
+                      {% if c[3] == "injury_level" %}
+
+                        {% if c[5] > c[4] %}
+                          <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ c[5] }}
+                        {% endif %}
+
+                      {% elif c[3] == "cards" %}
+
+                        {% if c[5] == 3 %}
+                          <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                        {% endif %}
+
+                      {% else %}
+                        <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
+                      {% endif %}
+
                     {% endfor %}
                     </br>
                   {% endfor %}
