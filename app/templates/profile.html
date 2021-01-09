@@ -1,5 +1,35 @@
 {% extends 'base.html' %}
 
+{% block scripts %}
+
+{{ super() }}
+
+<script>
+  var color = jSuites.color(document.getElementById('color-picker-bg-new'), {
+      closeOnChange: true,
+  });
+
+  var color = jSuites.color(document.getElementById('color-picker-text-new'), {
+      closeOnChange: true,
+  });
+
+  {% for group in group_data %}
+    {% if group.name != "<default>" %}
+
+    var color = jSuites.color(document.getElementById('color-picker-bg-{{ group.id }}'), {
+        closeOnChange: true,
+    });
+
+    var color = jSuites.color(document.getElementById('color-picker-text-{{ group.id }}'), {
+        closeOnChange: true,
+    });
+    {% endif %}
+  {% endfor %}
+
+</script>
+
+{% endblock %}
+
 {% block content %}
 
 <div class="container">
@@ -47,8 +77,8 @@
                   </div>
                   <input type="text" name="groupname" class="form-control form-control-sm" placeholder="Group name" aria-label="Text input with segmented dropdown button">
                   <input type="number" name="grouporder" class="form-control form-control-sm" placeholder="Order" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
-                  <input type="text" name="bgcolor" class="form-control form-control-sm" placeholder="#bgcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
-                  <input type="text" name="textcolor" class="form-control form-control-sm" placeholder="#textcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
+                  <input type="text" id="color-picker-bg-new" name="bgcolor" class="form-control form-control-sm" placeholder="#bgcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Background color">
+                  <input type="text" id="color-picker-text-new" name="textcolor" class="form-control form-control-sm" placeholder="#textcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Text color">
                 </div>
               </form>
 
@@ -77,8 +107,8 @@
                   </div>
                   <input type="text" name="groupname" class="form-control form-control-sm" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
                   <input type="number" name="grouporder" class="form-control form-control-sm" value="{{ group.order }}" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
-                  <input type="text" name="bgcolor" class="form-control form-control-sm" value="{{ group.bgcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
-                  <input type="text" name="textcolor" class="form-control form-control-sm" value="{{ group.textcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="You can choose colors as text or hex (for instance 'white' or '#FFFFFF').">
+                  <input type="text" id="color-picker-bg-{{ group.id }}" name="bgcolor" class="form-control form-control-sm" value="{{ group.bgcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Background color">
+                  <input type="text" id="color-picker-text-{{ group.id }}" name="textcolor" class="form-control form-control-sm" value="{{ group.textcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Text color">
                   <div class="input-group-append">
                     <button type="submit" class="btn btn-outline-secondary btn-sm"  name="deletegroup" value="deletebutton"><font color="red">Delete</font></button>
                   </div>
