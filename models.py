@@ -4,6 +4,7 @@ from app import db
 
 # --------------------------------------------------------------------------------
 
+
 class MatchPlay(db.Model):
     __tablename__ = 'matchplay'
 
@@ -74,7 +75,10 @@ class Match(db.Model):
         self.away_goals = matchdata['away_goals']
 
     def __repr__(self):
-        return '{} - {}: {}'.format(self.home_team_name, self.away_team_name, self.ht_id)
+        return '{} - {}: {}'.format(
+            self.home_team_name,
+            self.away_team_name,
+            self.ht_id)
 
 # --------------------------------------------------------------------------------
 

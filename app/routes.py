@@ -44,7 +44,9 @@ HTmatchtype[2] = "Qualification match"
 HTmatchtype[3] = "Cup match (standard league match)"
 HTmatchtype[4] = "Friendly (normal rules)"
 HTmatchtype[5] = "Friendly (cup rules)"
-HTmatchtype[6] = "Not currently in use, but reserved for international competition matches with normal rules (may or may not be implemented at some future point)."
+HTmatchtype[6] = "Not currently in use, but reserved for international \
+                  competition matches with normal rules (may or may not \
+                  be implemented at some future point)."
 HTmatchtype[7] = "Hattrick Masters"
 HTmatchtype[8] = "International friendly (normal rules)"
 HTmatchtype[9] = "Internation friendly (cup rules)"
@@ -731,11 +733,11 @@ def update():
             thisplayer['next_birthday'] = p.next_birthday
 
             thedate = datetime(
-            p.arrival_date.year,
-            p.arrival_date.month,
-            p.arrival_date.day,
-            p.arrival_date.hour,
-            p.arrival_date.minute)
+                p.arrival_date.year,
+                p.arrival_date.month,
+                p.arrival_date.day,
+                p.arrival_date.hour,
+                p.arrival_date.minute)
 
             thisplayer['arrival_date'] = thedate
             thisplayer['form'] = p.form
@@ -1084,7 +1086,7 @@ def player():
                    .all())
         p['max_stars'] = "-"
         for m in dbmatch:
-            if m.rating_stars != None:
+            if m.rating_stars is not None:
                 p['max_stars'] = m.rating_stars
                 break
         dbmatch = (db.session.query(MatchPlay)
@@ -1093,7 +1095,7 @@ def player():
                    .all())
         p['last_stars'] = "-"
         for m in dbmatch:
-            if m.rating_stars != None and m.rating_stars != 0:
+            if m.rating_stars is not None and m.rating_stars != 0:
                 p['last_stars'] = m.rating_stars
                 break
 
@@ -1194,7 +1196,9 @@ def matches():
 
             dprint(2, "Adding match ", match.ht_id, " to database.")
 
-            dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
+            dbmatch = (db.session.query(Match)
+                       .filter_by(ht_id=match.ht_id)
+                       .first())
 
             if dbmatch:
                 dprint(1, "WARNING: This match already exists.")
@@ -1218,9 +1222,11 @@ def matches():
                 db.session.add(newmatch)
                 db.session.commit()
 
-                matchlineup = chpp.match_lineup(ht_id=match.ht_id, team_id=teamid)
+                matchlineup = chpp.match_lineup(ht_id=match.ht_id,
+                                                team_id=teamid)
                 for p in matchlineup.lineup_players:
-                    dprint(2, " - Adding ", p.first_name, " ", p.last_name, " to database")
+                    dprint(2, " - Adding ", p.first_name, " ",
+                           p.last_name, " to database")
                     thismatchlineup = {}
                     thismatchlineup['match_id'] = match.ht_id
                     thismatchlineup['player_id'] = p.ht_id
@@ -1237,11 +1243,10 @@ def matches():
                     db.session.add(newmatchlineup)
                     db.session.commit()
 
-
     # Get all registered matches
     dbmatches = db.session.query(Match).filter(
-        (Match.away_team_id==teamid) |
-        (Match.home_team_id==teamid)).order_by(text("datetime desc")).all()
+        (Match.away_team_id == teamid) |
+        (Match.home_team_id == teamid)).order_by(text("datetime desc")).all()
     dbmatchplays = {}
     for m in dbmatches:
         dbmatch = db.session.query(MatchPlay).filter_by(match_id=m.ht_id).all()
