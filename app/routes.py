@@ -1064,6 +1064,27 @@ def player():
     for _k, val in newlst.items():
         players_oldest_dict[val['ht_id']] = val
 
+    # Add stars to the list of players
+    for p in players_now:
+        dbmatch = (db.session.query(MatchPlay)
+                   .filter_by(player_id=p['ht_id'])
+                   .order_by(text("rating_stars desc"))
+                   .all())
+        p['max_stars'] = "-"
+        for m in dbmatch:
+            if m.rating_stars != None:
+                p['max_stars'] = m.rating_stars
+                break
+        dbmatch = (db.session.query(MatchPlay)
+                   .filter_by(player_id=p['ht_id'])
+                   .order_by(text("datetime desc"))
+                   .all())
+        p['last_stars'] = "-"
+        for m in dbmatch:
+            if m.rating_stars != None and m.rating_stars != 0:
+                p['last_stars'] = m.rating_stars
+                break
+
     # Group the players into groups
     tmp_player = players_now
     grouped_players_now = {}

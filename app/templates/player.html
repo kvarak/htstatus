@@ -49,6 +49,8 @@
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">SP</th>
                     <th scope="col" class="text-small"></th>
+                    <th scope="col" class="text-small">Max stars</th>
+                    <th scope="col" class="text-small">Last match</th>
 <!--
                     <th scope="col" class="text-small">XP</th>
                     <th scope="col" class="text-small"></th>
@@ -176,6 +178,8 @@
                         ({{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
                       {% endif %}
                     </td>
+                    <td class="text-small" align="right">{{ p.max_stars }}</td>
+                    <td class="text-small" align="right">{{ p.last_stars }}</td>
 <!--
                     <td class="text-small" align="right">{{ p.experience }}</td>
                     <td class="text-small">
