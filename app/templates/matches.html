@@ -36,8 +36,46 @@
     <div class="col-sm">
       <div class="card-deck">
         <div class="card">
+          <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#matchtype-league">
+                League
+            </button>
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#matchtype-cup">
+                Cup
+            </button>
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#matchtype-friendly">
+                Friendly
+            </button>
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#matchtype-other">
+                Other
+            </button>
+          </div>
           <div class="card-body">
-            <table class="table table-sm table-scroll sortable">
+            <p class="text-sm13">
+              {% for m in matches %}
+                {% if m.matchtype == 1 %}
+                  {% set matchtype = "league" %}
+                {% elif m.matchtype == 3 %}
+                  {% set matchtype = "cup" %}
+                {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %}
+                  {% set matchtype = "friendly" %}
+                {% else %}
+                  {% set matchtype = "other" %}
+                {% endif %}
+              {# league: 1 #}
+              {# cup: 2 #}
+              {# friendly: 4, 5, 8, 9 #}
+              {# other: else #}
+                <p class="text-sm13 collapse show" id="matchtype-{{ matchtype }}">
+                  {{ m.home_goals }}-{{ m.away_goals }}
+                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                    {{ m.home_team_name }} - {{ m.away_team_name }}
+                  </a>
+                  <i>({{ HTmatchtype[m.matchtype] }})</i>
+                </p>
+              {% endfor %}
+            </p>
+            {# <table class="table table-sm table-scroll sortable">
               <thead>
                 <tr>
                   <th scope="col" class="text-small">Date</th>
@@ -62,54 +100,208 @@
                 </tr>
                 {% endfor %}
               </tbody>
-            </table>
+            </table> #}
           </div>
         </div>
       </div>
     </div>
-  </div>
+  {# </div> #}
 
-  {% for m in matches %}
-  <div class="row collapse" id="all-match-details-{{ m.ht_id }}"><div class="col"><p></p></div></div>
+    <div class="col-9">
 
-  <div class="row collapse" id="all-match-details-{{ m.ht_id }}">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
-              <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
-                {{ m.home_team_name }} - {{ m.away_team_name }}
-              </a>
-            </h5>
-            <table class="table table-sm table-scroll sortable">
-              <thead>
-                <tr>
-                  <th scope="col" class="text-small">Role</td>
-                  <th scope="col" class="text-small">Name</td>
-                  <th scope="col" class="text-small">Stars</td>
-                  <th scope="col" class="text-small">Stars eom</td>
-                  <th scope="col" class="text-small">Behaviour</td>
-                </tr>
-              </thead>
-              <tbody>
-                {% for p in matchplays[m.ht_id] %}
-                <tr>
-                  <td class="text-small">{{ HTmatchrole[p.role_id] }}</td>
-                  <td class="text-small">{{ p.first_name }} {{ p.last_name }}</td>
-                  <td class="text-small">{{ p.rating_stars }}</td>
-                  <td class="text-small">{{ p.rating_stars_eom }}</td>
-                  <td class="text-small">{{ HTmatchbehaviour[p.behaviour] }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+      {% for m in matches %}
+      <div class="row collapse" id="all-match-details-{{ m.ht_id }}">
+        <div class="col">
+          <div class="card-deck">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                    {{ m.home_team_name }} - {{ m.away_team_name }}
+                  </a>
+                </h5>
+                <p class="text-small">{{ m.datetime }}<br>
+                  {{ HTmatchtype[m.matchtype] }}<br>
+                  {# {{ m.context_id }} #}
+                </p>
+                <table class="table table-bordered">
+                  <tr>
+                    <td class="text-small" style="text-align: center"></td>
+                    <td class="text-small" style="text-align: center"></td>
+                    <td class="text-small" style="text-align: center">Keeper<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 100 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center"></td>
+                    <td class="text-small" style="text-align: center"></td>
+                  </tr>
+                  <tr>
+                    <td class="text-small" style="text-align: center">Right back<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 101 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Right central defender<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 102 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Middle central defender<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 103 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Left central defender<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 104 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Left back<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 105 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-small" style="text-align: center">Right winger<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 106 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Right inner midfield<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 107 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Middle inner midfield<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 108 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Left inner midfield<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 109 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Left winger<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 110 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-small" style="text-align: center"></td>
+                    <td class="text-small" style="text-align: center">Right forward<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 111 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Middle forward<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 112 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center">Right forward<br>
+                    {% for p in matchplays[m.ht_id] %}
+                      {% if p.role_id == 113 %}
+                        {{ p.first_name }} {{ p.last_name }}<br>
+                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
+                        {{ HTmatchbehaviour[p.behaviour] }}
+                      {% endif %}
+                    {% endfor %}
+                    </td>
+                    <td class="text-small" style="text-align: center"></td>
+                  </tr>
+                </table>
+                <br><br>
+
+
+              <table class="table table-sm table-scroll sortable">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-small">Role</td>
+                    <th scope="col" class="text-small">Name</td>
+                    {# <th scope="col" class="text-small">Stars</td>
+                    <th scope="col" class="text-small">Stars eom</td>
+                    <th scope="col" class="text-small">Behaviour</td> #}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in matchplays[m.ht_id] %}
+                  {% if p.role_id > 113 %}
+                  <tr>
+                    <td class="text-small">{{ HTmatchrole[p.role_id] }} ({{ p.role_id }})</td>
+                    <td class="text-small">{{ p.first_name }} {{ p.last_name }}</td>
+                    {# <td class="text-small">{{ p.rating_stars }}</td>
+                    <td class="text-small">{{ p.rating_stars_eom }}</td>
+                    <td class="text-small">{{ HTmatchbehaviour[p.behaviour] }}</td> #}
+                  </tr>
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <div class="row collapse" id="all-match-details-{{ m.ht_id }}"><div class="col"><p></p></div></div>
+    {% endfor %}
   </div>
-  {% endfor %}
+</div>
 
 </div>
 

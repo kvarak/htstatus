@@ -49,7 +49,7 @@ HTmatchtype[6] = "Not currently in use, but reserved for international \
                   be implemented at some future point)."
 HTmatchtype[7] = "Hattrick Masters"
 HTmatchtype[8] = "International friendly (normal rules)"
-HTmatchtype[9] = "Internation friendly (cup rules)"
+HTmatchtype[9] = "International friendly (cup rules)"
 HTmatchtype[10] = "National teams competition match (normal rules)"
 HTmatchtype[11] = "National teams competition match (cup rules)"
 HTmatchtype[12] = "National teams friendly"

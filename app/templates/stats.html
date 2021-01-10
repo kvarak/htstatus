@@ -138,19 +138,17 @@
     <div class="col-3">
       <div class="card-deck">
         <div class="card">
-          <p class="card-text">
-            <div class="card-body">
-              <p class="text-sm13">
-                <u><i>Nr. Name (increases)</i></u><br>
-                {% for ht_id in allplayerids %}
-                  <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
-                    {{ playernames[ht_id] }} <i>({{ increases[ht_id] }})</i>
-                  </a>
-                  <br>
-                {% endfor %}
-              </p>
-            </div>
-          </p>
+          <div class="card-body">
+            <p class="text-sm13">
+              <u><i>Nr. Name (increases)</i></u><br>
+              {% for ht_id in allplayerids %}
+                <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
+                  {{ playernames[ht_id] }} <i>({{ increases[ht_id] }})</i>
+                </a>
+                <br>
+              {% endfor %}
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -163,20 +161,18 @@
         <div class="col">
           <div class="card-deck">
             <div class="card">
-              <p class="card-text">
-                <div class="card-body">
-                  <h5 class="card-title">
-                  <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
-                    {{ playernames[ht_id] }}
-                  </a>
-                  </h5>
-                  <p class="text-sm13">
+              <div class="card-body">
+                <h5 class="card-title">
+                <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
+                  {{ playernames[ht_id] }}
+                </a>
+                </h5>
+                <p class="text-sm13">
 
-                    <canvas id="myLineChart{{ ht_id }}" width="400" height="150"></canvas>
+                  <canvas id="myLineChart{{ ht_id }}" width="400" height="150"></canvas>
 
-                  </p>
-                </div>
-              </p>
+                </p>
+              </div>
             </div>
           </div>
         </div>
