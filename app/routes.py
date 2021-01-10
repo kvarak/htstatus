@@ -727,7 +727,15 @@ def update():
             thisplayer['age_days'] = p.age_days
             thisplayer['age'] = p.age
             thisplayer['next_birthday'] = p.next_birthday
-            thisplayer['arrival_date'] = p.arrival_date
+
+            thedate = datetime(
+            p.arrival_date.year,
+            p.arrival_date.month,
+            p.arrival_date.day,
+            p.arrival_date.hour,
+            p.arrival_date.minute)
+
+            thisplayer['arrival_date'] = thedate
             thisplayer['form'] = p.form
             thisplayer['cards'] = p.cards
             thisplayer['injury_level'] = p.injury_level
