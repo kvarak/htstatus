@@ -226,6 +226,8 @@ def create_page(template, title, **kwargs):
 
     f = open('app/static/changelog.txt')
     changelog = f.readlines()
+    f = open('app/static/changelog-full.txt')
+    changelogfull = f.readlines()
 
     count_clicks(template)
 
@@ -241,6 +243,7 @@ def create_page(template, title, **kwargs):
         all_team_names=all_team_names,
         role=role,
         changelog=changelog,
+        changelogfull=changelogfull,
         last_update=last_update,
         **kwargs)
 
