@@ -269,6 +269,8 @@ class Players(db.Model):
     set_pieces = db.Column(db.Integer)
     owner = db.Column(db.Integer)
     old_owner = db.Column(db.Integer)
+    mother_club_bonus = db.Column(db.Boolean)
+    leadership = db.Column(db.Integer)
 
     def __init__(self, playerdata):
         self.ht_id = playerdata['ht_id']
@@ -312,7 +314,7 @@ class Players(db.Model):
         self.current_team_goals = playerdata['current_team_goals']
         self.national_team_id = playerdata['national_team_id']
         self.national_team_name = playerdata['national_team_name']
-        self.is_transfer_listed = playerdata['is_transfer_listed']
+        self.is_transfer_listed = bool(playerdata['is_transfer_listed'])
         self.team_id = playerdata['team_id']
         self.stamina = int(playerdata['stamina'])
         self.keeper = int(playerdata['keeper'])
@@ -324,6 +326,8 @@ class Players(db.Model):
         self.set_pieces = int(playerdata['set_pieces'])
         self.owner = playerdata['owner']
         self.old_owner = 0
+        self.mother_club_bonus = bool(playerdata['mother_club_bonus'])
+        self.leadership = int(playerdata['leadership'])
 
     def __repr__(self):
         ret = self.first_name + " " + self.last_name
@@ -383,7 +387,9 @@ class Players(db.Model):
                ("scorer", self.scorer),
                ("set_pieces", self.set_pieces),
                ("owner", self.owner),
-               ("old_owner", self.old_owner))
+               ("old_owner", self.old_owner),
+               ("mother_club_bonus", self.mother_club_bonus),
+               ("leadership", self.leadership))
         return iter(ret)
 
 # --------------------------------------------------------------------------------

@@ -195,6 +195,9 @@
                     <td class="text-small"></td>
 -->
                     <td class="text-small" align="left">
+                      {% if p.mother_club_bonus %}
+                        <img src="{{url_for('static', filename='ico-homegrown.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                      {% endif %}
 
                       {% if p.is_transfer_listed %}
                         <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
@@ -338,6 +341,7 @@
               {% endif %}
             </p>
             <p class="card-text text-sm11">
+              Leadership: {{ p.leadership }},
               Agreeability: {{ p.agreeability }},
               Aggressiveness: {{ p.aggressiveness }},
               Honesty: {{ p.honesty }},

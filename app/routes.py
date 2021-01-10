@@ -297,7 +297,9 @@ def player_diff(playerid, daysago):
         "tsi",
         "owner",
         "owner_notes",
-        "old_owner"
+        "old_owner",
+        "leadership",
+        "mother_club_bonus"
     ]
 
     ret = []
@@ -767,6 +769,8 @@ def update():
             thisplayer['national_team_name'] = p.national_team_name
             thisplayer['is_transfer_listed'] = p.is_transfer_listed
             thisplayer['team_id'] = p.team_id
+            thisplayer['mother_club_bonus'] = p.mother_club_bonus
+            thisplayer['leadership'] = p.leadership
 
             thisplayer['stamina'] = p.skills['stamina']
             thisplayer['keeper'] = p.skills['keeper']
