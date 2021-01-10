@@ -5,13 +5,18 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <div class="jumbotron">
-        <div class="container">
-          <h1 class="display-4">{{ title }}</h1>
-        </div>
-      </div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
     </div>
   </div>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm">
       <div class="card-deck">

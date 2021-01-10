@@ -6,20 +6,59 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <div class="jumbotron">
-        <div class="container">
-          <h1 class="display-4">{{ apptitle }}</h1>
-          <p class="lead">
-            {% if title == "Logged in" %}
-            Successfully logged in as {{ current_user }}.
-            {% else %}
-            Helping you with your Hattrick experience.
-            {% endif %}
-          </p>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active" aria-current="page">Hattrick Planner</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-sm">
+      <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <p class="card-text">
+              Welcome and thanks for checking this tools out. I'm hoping that it can help you organize
+              your team, players, matches and training. It's always under development and still ongoing
+              changes now and then, so expect changes.
+            </p>
+            <p class="card-text">
+              Start by clicking "Update data" and then you can view your players in the players section.
+              Don't forget to go to "Profile" to add groups, so that you can arrange your players in a much
+              nicer player view. Later on, don't miss that you can also fetch your old matches.
+            </p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p class="card-text">
+              If you have access and are able to login, please help out by
+              <a href="https://github.com/kvarak/htstatus/issues">reporting bugs and suggesting features</a>.
+              Note that reporting bugs/feature requests requires a
+              <a href="https://github.com/login">GitHub account</a>.
+              Let me know that you use version {{ version }} when you report bugs.
+            </p>
+            <p class="card-text">
+              If you are savvy in the land of python/flask/postgres, and can't stay out of helping with
+              the development, don't hesitate to suggest pull requests to the public repo.
+              I'm not, so this is definitely a learning experience for me and all help is appreciated.
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Break -->
+  <div class="row"><div class="col-sm"><p></p></div></div>
+
   {% if current_user and changesteams %}
   <div class="row">
     {% for id, team in changesteams.items() %}
@@ -58,79 +97,25 @@
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Also in the news...</h5>
-            <p class="card-text text-sm13">
-              Last update: {{ thisuser.last_usage }}</br>
-            </p>
-          </div>
-          <!-- <div class="card-footer">
-            <small class="text-muted"><i>Link to ...?</i></small>
-          </div> -->
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
-  </div>
-  {% endif %}
-  <div class="row">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Still under development</h5>
-            <p class="card-text">
-              The whole website is under development and will change continuously. Sometimes you'll be logged off and need to re-login (give permission again),
-              but you'll probably not loose any data.
-            </p>
-            <p class="card-text">
-              You're here, so you probably want to help out. If you can't get access to the tool (the login doesn't work),
-              you most likely haven't been added as a betatester in Hattrick. This is only a problem while the application is "Under development"
-              and will not be needed when released. You can <a href="https://github.com/kvarak/htstatus/issues/new/choose">request access as a beta tester</a>.
-            </p>
-            <p class="card-text">
-              If you have access and are able to login, please help out by <a href="https://github.com/kvarak/htstatus/issues">reporting bugs and suggesting features</a>.
-            </p>
-            <p class="card-text">
-              If you are savvy in the land of python/flask/postgres, and can't stay out of helping with the development, don't hesitate to suggest pull requests to the public repo.
-              I'm not, so this is definitely a learning experience for me and all help is appreciated.
-            </p>
-            <p class="card-text">
-              <i>Note that asking for beta access and reporting bugs/feature requests requires a <a href="https://github.com/login">GitHub account</a></i>.
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted"><i>Status: Not released yet</i></small>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Code changes</h5>
-            <p class="card-text">
-              <p class="text-sm11">
-                {% for c in changelog %}
+            <h5 class="card-title">Change log</h5>
+            <p class="card-text text-sm11">
+              {% for c in changelog %}
                 {{ c }}</br>
-                {% endfor %}
-              </p>
+              {% endfor %}
             </p>
           </div>
           <div class="card-footer">
-            <small class="text-muted"><i>version: {{ fullversion }}</i></small>
+            <small class="text-muted"><i>Full version: {{ fullversion }}</i></small>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
-  </div>
+
+  <!-- Break -->
+  <div class="row"><div class="col-sm"><p></p></div></div>
+  {% endif %}
+
 </div>
 
 
