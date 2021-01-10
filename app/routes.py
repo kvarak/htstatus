@@ -923,7 +923,7 @@ def admin():
         except Exception:
             error = "couldn't change user"
 
-    allusers = db.session.query(User).all()
+    allusers = db.session.query(User).order_by(text('last_usage desc')).all()
     users = []
     for user in allusers:
         thisuser = {
