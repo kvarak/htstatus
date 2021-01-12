@@ -1270,6 +1270,41 @@ def matches():
 # --------------------------------------------------------------------------------
 
 
+@app.route('/stats')
+def stats():
+    if session.get('current_user') is None:
+        return render_template(
+            '_forward.html',
+            url='/login')
+
+    teamid = request.values.get('id')
+
+    if teamid:
+        teamid = int(teamid)
+    else:
+        teamid = request.form.get('id')
+    all_teams = session['all_teams']
+
+    error = ""
+    if teamid not in all_teams:
+        error = "Wrong teamid, try the links."
+        return create_page(
+            template='stats.html',
+            title='Stats')
+
+    all_team_names = session['all_team_names']
+    teamname = all_team_names[all_teams.index(teamid)]
+
+    return create_page(
+        template='stats.html',
+        error=error,
+        teamname=teamname,
+        teamid=teamid,
+        title='Stats')
+
+# --------------------------------------------------------------------------------
+
+
 @app.route('/training')
 def training():
     if session.get('current_user') is None:
@@ -1291,41 +1326,6 @@ def training():
         return create_page(
             template='training.html',
             title='Training')
-
-    all_team_names = session['all_team_names']
-    teamname = all_team_names[all_teams.index(teamid)]
-
-    return create_page(
-        template='training.html',
-        error=error,
-        teamname=teamname,
-        teamid=teamid,
-        title='Training')
-
-# --------------------------------------------------------------------------------
-
-
-@app.route('/stats')
-def stats():
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/login')
-
-    teamid = request.values.get('id')
-
-    if teamid:
-        teamid = int(teamid)
-    else:
-        teamid = request.form.get('id')
-    all_teams = session['all_teams']
-
-    error = ""
-    if teamid not in all_teams:
-        error = "Wrong teamid, try the links."
-        return create_page(
-            template='stats.html',
-            title='Statistics')
 
     all_team_names = session['all_team_names']
     teamname = all_team_names[all_teams.index(teamid)]
@@ -1423,7 +1423,7 @@ def stats():
     ]
 
     return create_page(
-        template='stats.html',
+        template='training.html',
         teamname=teamname,
         error=error,
         skills=skills,
@@ -1432,4 +1432,4 @@ def stats():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
-        title='Stats')
+        title='Training')

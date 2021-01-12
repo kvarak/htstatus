@@ -7,40 +7,37 @@
 <script>
 
   // Data
-
-  {% for ht_id in allplayerids %}
-
-  {% set thisplayer = allplayers[ht_id] %}
-
-  var data{{ ht_id }} = {
-
-    labels: [
-      {% for (dat, skills) in thisplayer %}
-      "{{ dat }}",
-      {% endfor %}
-    ],
-
-    datasets: [
-      {% for i in range(7) %}
-      {
-      label: "{{ skills[i] }}",
-      backgroundColor: "rgba({{ 255 - i * 40 }}, {{ 155 - i * i }}, {{ i * 30 }}, 0.2)",
-      borderColor: "rgba({{ 255 - i * 40 }}, {{ 155 - i * i }}, {{ i * 30 }})",
+  var data = {
+    labels: ["January", "February", "March", "April", "May", "June", "July"],
+    datasets: [{
+      label: "PM",
+      backgroundColor: "rgba(255, 99, 132, 0.2)",
+      borderColor: "rgba(255, 99, 132)",
       pointColor: "rgba(220,220,220,1)",
       pointStrokeColor: "#fff",
       pointHighlightFill: "#fff",
       pointHighlightStroke: "rgba(220,220,220,1)",
-      data: [
-        {% for (dat, skills) in thisplayer %}
-        {{ skills[i] }},
-        {% endfor %}
-        ]
-    },
-    {% endfor %}
-    ]
+      data: [6, 6, 7, 7, 8, 8, 8]
+    }, {
+      label: "Wing",
+      backgroundColor: "rgba(54, 162, 235, 0.2)",
+      borderColor: "rgba(54, 162, 235)",
+      pointColor: "rgba(151,187,205,1)",
+      pointStrokeColor: "#fff",
+      pointHighlightFill: "#fff",
+      pointHighlightStroke: "rgba(151,187,205,1)",
+      data: [2, 2, 3, 3, 4, 4, 5]
+    }, {
+      label: "PS",
+      backgroundColor: "rgba(255, 206, 86, 0.2)",
+      borderColor: "rgba(255, 206, 86)",
+      pointColor: "rgba(151,187,205,1)",
+      pointStrokeColor: "#fff",
+      pointHighlightFill: "#fff",
+      pointHighlightStroke: "rgba(151,187,205,1)",
+      data: [12, 12, 12, 13, 13, 13, 14]
+    }]
   };
-
-  {% endfor %}
 
   // Global + Custom Chart Config Options
 
@@ -60,14 +57,12 @@
     animateScale : true,
   };
 
-  {% for ht_id in allplayerids %}
-  var ctx{{ ht_id }} = document.getElementById('myLineChart{{ ht_id }}');
-  var myLineChart{{ ht_id }} = new Chart(ctx{{ ht_id }}, {
+  var ctx1 = document.getElementById('myLineChart');
+  var myLineChart = new Chart(ctx1, {
     type: 'line',
-    data: data{{ ht_id }},
+    data: data,
     options: options
   });
-  {% endfor %}
 
 </script>
 
@@ -119,12 +114,12 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#">{{ teamname }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-        </ol>
-      </nav>
+      <div class="container">
+        <h1 class="display-6">{{ title }}</h1>
+        <p class="lead">{{ teamname }}</p>
+        <!-- <hr class="my-4">
+        <p><i>Under construction</i></p> -->
+      </div>
     </div>
   </div>
 
@@ -135,57 +130,24 @@
   {% endif %}
 
   <div class="row">
-    <div class="col-3">
+
+    <div class="col-sm">
       <div class="card-deck">
         <div class="card">
-          <div class="card-body">
-            <p class="text-sm13">
-              <u><i>Nr. Name (increases)</i></u><br>
-              {% for ht_id in allplayerids %}
-                <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
-                  {{ playernames[ht_id] }} <i>({{ increases[ht_id] }})</i>
-                </a>
-                <br>
-              {% endfor %}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  {# </div>
-  <div class="row"><div class="col-sm"><p></p></div></div> #}
+          <p class="card-text">
+            <div class="card-body">
+              <h5 class="card-title">Player Playersson</h5>
+              <p class="text-sm13">
 
-    <div class="col-9">
-      {% for ht_id in allplayerids %}
-      <div class="row collapse" id="all-player-details-{{ ht_id }}">
-        <div class="col">
-          <div class="card-deck">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">
-                <a data-toggle="collapse" href="#all-player-details-{{ ht_id }}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ ht_id }}">
-                  {{ playernames[ht_id] }}
-                </a>
-                </h5>
-                <p class="text-sm13">
+                <canvas id="myLineChart" width="400" height="400"></canvas>
 
-                  <canvas id="myLineChart{{ ht_id }}" width="400" height="150"></canvas>
-
-                </p>
-              </div>
+              </p>
             </div>
-          </div>
+          </p>
         </div>
       </div>
-      <div class="row collapse" id="all-player-details-{{ ht_id }}"><div class="col"><p></p></div></div>
-      {% endfor %}
     </div>
 
-  </div>
-
-  <div class="row"><div class="col"><p></p></div></div>
-
-  {# <div class="row">
     <div class="col-sm">
       <div class="card-deck">
         <div class="card">
@@ -194,7 +156,7 @@
               <h5 class="card-title">head</h5>
               <p class="text-sm13">
 
-                <canvas id="myChart" width="400" height="150"></canvas>
+                <canvas id="myChart" width="400" height="400"></canvas>
 
 
               </p>
@@ -204,7 +166,12 @@
       </div>
     </div>
 
-  </div> #}
+  </div>
+
+  <div class="row">
+    <div class="col-sm"><p></p>
+    </div>
+  </div>
 
 </div>
 
