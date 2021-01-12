@@ -118,6 +118,31 @@
     height: 100%;
   }
 
+  .loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+    margin: -76px 0 0 -76px;
+    border-top: 12px solid blue;
+    border-right: 12px solid green;
+    border-bottom: 12px solid red;
+    border-left: 12px solid pink;
+    /* border: 12px solid #f3f3f3; */
+    border-radius: 50%;
+    /* border-top: 12px solid #3498db; */
+    -webkit-animation: spin 1s alternate infinite;
+    animation: spin 1s alternate infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
 </style>
 {% endblock %}
 
@@ -146,6 +171,13 @@ $('.toast').toast(option)
 <!-- https://jsuites.net/v3/color-picker -->
 <link rel="stylesheet" href="{{url_for('static', filename='jsuites.css')}}" media="screen">
 <script type="text/javascript" src="{{url_for('static', filename='jsuites.js')}}"></script>
+
+<script type="text/javascript">// <![CDATA[
+  function loading(){
+    $("#loading").show();
+    $("#content").hide();
+  }
+// ]]></script>
 
 {% endblock %}
 
@@ -182,7 +214,7 @@ $('.toast').toast(option)
           </div>
         </li>
         {% endfor %}
-        <a class="nav-link" href="/update">Update data</a>
+        <a class="nav-link" href="/update" onclick="loading();">Update data</a>
         <a class="nav-link" href="/profile">Profile</a>
         <a class="nav-link" href="/logout">Logout</a>
         {% if role == "Admin" %}
@@ -209,5 +241,6 @@ $('.toast').toast(option)
   <h8 class="ribbon">Beta version {{ version }}</h8>
 </div>
 
+<div class="loader" id="loading"></div>
 
 {% endblock %}
