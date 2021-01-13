@@ -1,9 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import inspect
 import subprocess
 import time
 import traceback
 
+from dateutil.relativedelta import relativedelta
 from flask import render_template, request, session
 from flask_bootstrap import Bootstrap
 from pychpp import CHPP
@@ -333,10 +334,17 @@ def player_diff(playerid, daysago):
 @app.route('/')
 @app.route('/index')
 def index():
+
+    allusers = db.session.query(User).all()
+    time3m = date.today() - relativedelta(months=3)
+    activeusers = db.session.query(User).filter(User.last_usage > time3m).all()
+
     if not('current_user') in session:
         return create_page(
             template='main.html',
-            title='Home')
+            title='Home',
+            usercount=len(allusers),
+            activeusers=len(activeusers))
 
     all_teams = session['all_teams']
     all_team_names = session['all_team_names']
@@ -400,6 +408,8 @@ def index():
         title='Home',
         changesteams=changesteams,
         thisuser=thisuser,
+        usercount=len(allusers),
+        activeusers=len(activeusers),
         updated=updated)
 
 # --------------------------------------------------------------------------------
