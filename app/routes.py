@@ -725,6 +725,11 @@ def update():
 
             the_player = chpp.player(ht_id=p.ht_id)
 
+            if the_player.transfer_details:
+                dprint(2,
+                       "transfer details --- ",
+                       the_player.transfer_details.deadline)
+
             thisplayer['ht_id'] = p.ht_id
             thisplayer['first_name'] = p.first_name
             thisplayer['nick_name'] = p.nick_name
@@ -775,7 +780,7 @@ def update():
             thisplayer['national_team_id'] = p.national_team_id
             thisplayer['national_team_name'] = p.national_team_name
             thisplayer['is_transfer_listed'] = the_player.is_transfer_listed
-            thisplayer['team_id'] = p.team_id
+            thisplayer['team_id'] = p.team_ht_id
             thisplayer['mother_club_bonus'] = p.mother_club_bonus
             thisplayer['leadership'] = p.leadership
 
