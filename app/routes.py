@@ -364,6 +364,82 @@ def player_diff(playerid, daysago):
     return ret
 
 # --------------------------------------------------------------------------------
+# Talk to CHPP functions
+# --------------------------------------------------------------------------------
+
+
+def downloadMatches(teamid):
+    chpp = CHPP(consumer_key,
+                consumer_secret,
+                session['access_key'],
+                session['access_secret'])
+
+    the_matches = chpp.matches_archive(ht_id=teamid, youth=False)
+
+    for match in the_matches:
+        dprint(2, "---------------")
+
+        # TODO: get more details about the match like below
+        # the_match = chpp.match(ht_id=match.ht_id)
+
+        thedate = datetime(
+            match.datetime.year,
+            match.datetime.month,
+            match.datetime.day,
+            match.datetime.hour,
+            match.datetime.minute)
+
+        dprint(2, "Adding match ", match.ht_id, " to database.")
+
+        dbmatch = (db.session.query(Match)
+                    .filter_by(ht_id=match.ht_id)
+                    .first())
+
+        if dbmatch:
+            dprint(1, "WARNING: This match already exists.")
+        else:
+            thismatch = {}
+            thismatch['ht_id'] = match.ht_id
+            thismatch['home_team_id'] = match.home_team_id
+            thismatch['home_team_name'] = match.home_team_name
+            thismatch['away_team_id'] = match.away_team_id
+            thismatch['away_team_name'] = match.away_team_name
+            thismatch['datetime'] = thedate
+            thismatch['matchtype'] = match.type
+            thismatch['context_id'] = match.context_id
+            thismatch['rule_id'] = match.rule_id
+            thismatch['cup_level'] = match.cup_level
+            thismatch['cup_level_index'] = match.cup_level_index
+            thismatch['home_goals'] = match.home_goals
+            thismatch['away_goals'] = match.away_goals
+
+            newmatch = Match(thismatch)
+            db.session.add(newmatch)
+            db.session.commit()
+
+            matchlineup = chpp.match_lineup(ht_id=match.ht_id,
+                                            team_id=teamid)
+            for p in matchlineup.lineup_players:
+                dprint(2, " - Adding ", p.first_name, " ",
+                        p.last_name, " to database")
+                thismatchlineup = {}
+                thismatchlineup['match_id'] = match.ht_id
+                thismatchlineup['player_id'] = p.ht_id
+                thismatchlineup['datetime'] = thedate
+                thismatchlineup['role_id'] = p.role_id
+                thismatchlineup['first_name'] = p.first_name
+                thismatchlineup['nick_name'] = p.nick_name
+                thismatchlineup['last_name'] = p.last_name
+                thismatchlineup['rating_stars'] = p.rating_stars
+                thismatchlineup['rating_stars_eom'] = p.rating_stars_eom
+                thismatchlineup['behaviour'] = p.behaviour
+
+                newmatchlineup = MatchPlay(thismatchlineup)
+                db.session.add(newmatchlineup)
+                db.session.commit()
+
+
+# --------------------------------------------------------------------------------
 # Route functions
 # --------------------------------------------------------------------------------
 
@@ -775,6 +851,8 @@ def update():
     left_players = []
     playernames = {}
     for teamid in all_teams:
+
+        downloadMatches(teamid)
 
         the_team = chpp.team(ht_id=teamid)
         debug_print("update", "chpp.team", the_team._SOURCE_FILE)
@@ -1274,75 +1352,7 @@ def matches():
     teamname = all_team_names[all_teams.index(teamid)]
 
     if doupdate == "update":
-
-        chpp = CHPP(consumer_key,
-                    consumer_secret,
-                    session['access_key'],
-                    session['access_secret'])
-
-        the_matches = chpp.matches_archive(ht_id=teamid, youth=False)
-
-        for match in the_matches:
-            dprint(2, "---------------")
-
-            # TODO: get more details about the match lile below
-            # the_match = chpp.match(ht_id=match.ht_id)
-
-            thedate = datetime(
-                match.datetime.year,
-                match.datetime.month,
-                match.datetime.day,
-                match.datetime.hour,
-                match.datetime.minute)
-
-            dprint(2, "Adding match ", match.ht_id, " to database.")
-
-            dbmatch = (db.session.query(Match)
-                       .filter_by(ht_id=match.ht_id)
-                       .first())
-
-            if dbmatch:
-                dprint(1, "WARNING: This match already exists.")
-            else:
-                thismatch = {}
-                thismatch['ht_id'] = match.ht_id
-                thismatch['home_team_id'] = match.home_team_id
-                thismatch['home_team_name'] = match.home_team_name
-                thismatch['away_team_id'] = match.away_team_id
-                thismatch['away_team_name'] = match.away_team_name
-                thismatch['datetime'] = thedate
-                thismatch['matchtype'] = match.type
-                thismatch['context_id'] = match.context_id
-                thismatch['rule_id'] = match.rule_id
-                thismatch['cup_level'] = match.cup_level
-                thismatch['cup_level_index'] = match.cup_level_index
-                thismatch['home_goals'] = match.home_goals
-                thismatch['away_goals'] = match.away_goals
-
-                newmatch = Match(thismatch)
-                db.session.add(newmatch)
-                db.session.commit()
-
-                matchlineup = chpp.match_lineup(ht_id=match.ht_id,
-                                                team_id=teamid)
-                for p in matchlineup.lineup_players:
-                    dprint(2, " - Adding ", p.first_name, " ",
-                           p.last_name, " to database")
-                    thismatchlineup = {}
-                    thismatchlineup['match_id'] = match.ht_id
-                    thismatchlineup['player_id'] = p.ht_id
-                    thismatchlineup['datetime'] = thedate
-                    thismatchlineup['role_id'] = p.role_id
-                    thismatchlineup['first_name'] = p.first_name
-                    thismatchlineup['nick_name'] = p.nick_name
-                    thismatchlineup['last_name'] = p.last_name
-                    thismatchlineup['rating_stars'] = p.rating_stars
-                    thismatchlineup['rating_stars_eom'] = p.rating_stars_eom
-                    thismatchlineup['behaviour'] = p.behaviour
-
-                    newmatchlineup = MatchPlay(thismatchlineup)
-                    db.session.add(newmatchlineup)
-                    db.session.commit()
+        downloadMatches(teamid)
 
     # Get all registered matches
     dbmatches = db.session.query(Match).filter(
