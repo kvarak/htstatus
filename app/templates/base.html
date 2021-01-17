@@ -143,6 +143,30 @@
     100% { transform: rotate(360deg); }
   }
 
+  .list-group-item {
+    padding: 0.25rem 1.25rem;
+  }
+
+  div.vertical {
+    margin-left: -10px;
+    /* position: absolute; */
+    width: 24px;
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg); /* Safari/Chrome */
+    -moz-transform: rotate(-90deg);    /* Firefox */
+    -o-transform: rotate(-90deg);      /* Opera */
+    -ms-transform: rotate(-90deg);     /* IE 9 */
+  }
+
+  th.vertical {
+    max-width: 50px;
+    height: 85px;
+    line-height: 14px;
+    padding-left: 15px;
+    padding-bottom: 10px;
+    text-align: inherit;
+  }
+
 </style>
 {% endblock %}
 
@@ -167,6 +191,7 @@ $('.toast').toast(option)
 <script src="{{url_for('static', filename='plotly-latest.min.js')}}"></script>
 <script src="{{url_for('static', filename='sorttable.js')}}"></script>
 <script src="{{url_for('static', filename='Chart.bundle.js')}}"></script>
+<script src="{{url_for('static', filename='Sortable.js')}}"></script>
 
 <!-- https://jsuites.net/v3/color-picker -->
 <link rel="stylesheet" href="{{url_for('static', filename='jsuites.css')}}" media="screen">

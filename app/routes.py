@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta
 import inspect
+import re
 import subprocess
 import time
 import traceback
@@ -130,6 +131,43 @@ HTmatchbehaviour[5] = "Extra forward"
 HTmatchbehaviour[6] = "Extra inner midfield"
 HTmatchbehaviour[7] = "Extra defender"
 
+# --------------------------------------------------------------------------------
+
+
+allcolumns = [
+    ('Group', 'group'), ('Number', 'number'),
+    ('Specialty', 'specialty'), ('Name', 'name'),
+    ('Age', 'age_years'), ('Keeper', 'keeper'),
+    ('Defence', 'defender'), ('Playmaking', 'playmaker'),
+    ('Winger', 'winger'), ('Passing', 'passing'),
+    ('Scorer', 'scorer'), ('Set pieces', 'set_pieces'),
+    ('Max stars', 'max_stars'), ('Last stars', 'last_stars'),
+    ('Status', 'status'), ('First seen', 'firstseen'),
+    ('Player notes', 'owner_notes'),
+    ('Leadership', 'leadership'), ('Agreeability', 'agreeability'),
+    ('Aggressiveness', 'aggressiveness'), ('Honesty', 'honesty'),
+    ('Experience', 'experience'), ('Loyalty', 'loyalty'), ('TSI', 'tsi'),
+    ('Form', 'form'), ('Stamina', 'stamina'),
+    ('Career goals', 'career_goals'), ('Statement', 'statement'),
+    ('Salary', 'salary')
+]
+
+defaultcolumns = [
+    ('Group', 'group'), ('Number', 'number'),
+    ('Specialty', 'specialty'), ('Name', 'name'),
+    ('Age', 'age_years'), ('Keeper', 'keeper'),
+    ('Defence', 'defender'), ('Playmaking', 'playmaker'),
+    ('Winger', 'winger'), ('Passing', 'passing'),
+    ('Scorer', 'scorer'), ('Set pieces', 'set_pieces'),
+    ('Max stars', 'max_stars'), ('Last stars', 'last_stars'),
+    ('Status', 'status'), ('First seen', 'firstseen')
+]
+
+tracecolumns = [
+    'keeper', 'defender', 'playmaker',
+    'winger', 'passing', 'scorer', 'set_pieces',
+    'loyalty'
+]
 
 # --------------------------------------------------------------------------------
 # Help functions
@@ -325,7 +363,6 @@ def player_diff(playerid, daysago):
 
     return ret
 
-
 # --------------------------------------------------------------------------------
 # Route functions
 # --------------------------------------------------------------------------------
@@ -436,6 +473,39 @@ def profile():
     if not bgcolor:
         bgcolor = "#FFFFFF"
 
+    user = (db.session.query(User)
+            .filter_by(ht_id=session['current_user_id'])
+            .first())
+    columns = User.getColumns(user)
+    if len(columns) == 0:
+        columns = defaultcolumns
+
+    columnsorder = request.form.get('columnsorder')
+    setcolumnsdefault = request.form.get('defaultcolumns')
+    showdefaultcolumns = False
+    if columnsorder and columnsorder != "empty":
+        columns = []
+        columngroups = columnsorder.split('Hidden columns')
+        # Columns to show
+        for r in columngroups[0].split('<div'):
+            r = r.strip()
+            if r == "":
+                continue
+            key = re.search('id="(.+?)"', r)
+            text = re.search('>(.+?)</div>', r)
+            if key:
+                # dprint(2, key.group(1), text.group(1))
+                columns.append((text.group(1), key.group(1)))
+        User.updateColumns(user, columns)
+        db.session.commit()
+            # else:
+            #     dprint(2, r)
+    elif setcolumnsdefault == "defaultcolumns":
+        columns = defaultcolumns
+        showdefaultcolumns = True
+
+    hiddencolumns = [item for item in allcolumns if item not in columns]
+
     if addgroup:
         if groupname and grouporder:
             newgroup = Group(
@@ -520,6 +590,9 @@ def profile():
     return create_page(
         template='profile.html',
         title='Profile',
+        columns=columns,
+        hiddencolumns=hiddencolumns,
+        showdefaultcolumns=showdefaultcolumns,
         group_data=group_data,
         error=error)
 
@@ -1070,8 +1143,8 @@ def player():
                    .filter_by(user_id=session['current_user_id'])
                    .all())
 
-    dprint(3, group_data)
-    dprint(3, into_groups)
+    # dprint(3, group_data)
+    # dprint(3, into_groups)
 
     # Of each of the players you ever have owned, get the last download
     players_data = (db.session.query(Players)
@@ -1151,10 +1224,21 @@ def player():
 
     grouped_players_now[default_group.id] = players_now
 
+    user = (db.session.query(User)
+            .filter_by(ht_id=session['current_user_id'])
+            .first())
+    columns = User.getColumns(user)
+    if len(columns) == 0:
+        columns = defaultcolumns
+
+    dprint(2, columns)
+
     return create_page(
         template='player.html',
         title=teamname,
         teamid=teamid,
+        columns=columns,
+        tracecolumns=tracecolumns,
         grouped_players=grouped_players_now,
         players=players_now,
         players_data=players_data,

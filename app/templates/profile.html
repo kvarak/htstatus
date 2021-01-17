@@ -28,6 +28,27 @@
 
 </script>
 
+
+<script>
+
+var columnfilter = document.getElementById('columnfilter');
+new Sortable(columnfilter, {
+    filter: '.filtered', // 'filtered' class is not draggable
+    animation: 150
+});
+
+function submit(){
+  var idsInOrder = $("#columnfilter").sortable("toArray");
+  //-----------------^^^^
+  console.log(idsInOrder);
+}
+
+function saveorder(){
+  document.getElementById('columnsorder').value = columnfilter.innerHTML;
+}
+
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -55,9 +76,32 @@
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Settings</h5>
-            <p class="card-text">
-            </p>
+            <div id="filter" class="row">
+
+              <div id="filter" class="col">
+                <h5 class="card-title">Player columns</h5>
+                <p class="text-sm13 card-text">Select what columns you want to show in your player table.</p>
+                    <form method="POST" action="/profile">
+                  <input type="hidden" id="columnsorder" name="columnsorder" value="empty">
+                  <button type="submit" class="btn btn-outline-secondary btn-sm" name="savecolumns" value="savecolumns" onclick="saveorder();">Save</button>
+                  <button type="submit" class="btn btn-outline-secondary btn-sm" name="defaultcolumns" value="defaultcolumns">Show default</button>
+                </form>
+                {% if showdefaultcolumns %}
+                <p class="text-sm13 card-text" style="color: red; font-size: xx-small;">Just showing the default columns, you need to click save to save it.</p>
+                {% endif %}
+              </div>
+
+              <div id="columnfilter" class="list-group col">
+                {% for (n, c) in columns %}
+                <div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>
+                {% endfor %}
+                <div class="list-group-item text-sm11 bg-roundup filtered">Hidden columns</div>
+                {% for (n, c) in hiddencolumns %}
+                <div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>
+                {% endfor %}
+              </div>
+
+            </div>
           </div>
         </div>
       </div>

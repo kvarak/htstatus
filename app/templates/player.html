@@ -29,7 +29,14 @@
 
                 <thead>
                   <tr>
-                    <th scope="col" class="text-small">Group</th>
+                    {% for (title, val) in columns %}
+                      <th scope="col" class="text-small vertical"><div class="vertical">{{ title }}</div></th>
+                      {% if val in tracecolumns %}
+                      <th scope="col" class="text-small"></th>
+                      {% endif %}
+                    {% endfor %}
+
+                    <!-- <th scope="col" class="text-small">Group</th>
                     <th scope="col" class="text-small">Nr</th>
                     <th scope="col" class="text-small">&nbsp;</th>
                     <th scope="col" class="text-small">Name</th>
@@ -51,24 +58,10 @@
                     <th scope="col" class="text-small"></th>
                     <th scope="col" class="text-small">Max stars</th>
                     <th scope="col" class="text-small">Last match</th>
-<!--
-                    <th scope="col" class="text-small">XP</th>
+                    <th scope="col" class="text-small">&nbsp;</th>
                     <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">STA</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">FORM</th>
-                    <th scope="col" class="text-small"></th>
--->
-                    <th scope="col" class="text-small">&nbsp;</th> <!-- STATUS-->
-                    <th scope="col" class="text-small"></th>
-<!--
-                    <th scope="col" class="text-small">LOY</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">TSI</th>
-                    <th scope="col" class="text-small"></th>
--->
                     <th scope="col" class="text-small">First seen</th>
-                    <th scope="col" class="text-small">Notes</th>
+                    <th scope="col" class="text-small">Notes</th> -->
                   </tr>
                 </thead>
                 <tbody>
@@ -81,167 +74,87 @@
 
                   {% for p in theplayers %}
                   <tr style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
-                    <td class="text-small">{{ group.name }}</td>
-                    {% if p.number == 100 %}
-                    <td class="text-small">-</td>
-                    {% else %}
-                    <td class="text-small">{{ p.number }}</td>
-                    {% endif %}
 
-                    <td class="text-small">
-                      {% if p.specialty > 0 %}
-                      {% set pngnr = p.specialty | string() %}
-                      {% set pngname = 'ico-sp-' + pngnr + '.png' %}
-                      <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                    {% endif %}
-                    </td>
+                    {% for (title, val) in columns %}
 
-                    <th class="text-small" scope="row">
-                      <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}" style="color: {{ group.textcolor }};">
-                        {{ p.first_name }} {{ p.last_name }}
-                      </a>
-                    </th>
+                      {% if val in tracecolumns %}
+                        <td class="text-small" align="right">{{ p[val] }}</td>
+                        <td class="text-small">
+                          {% if players_oldest[p.ht_id][val] < p[val] %}
+                            (+{{ p[val] - players_oldest[p.ht_id][val]  }})
+                          {% endif %}
+                          {% if players_oldest[p.ht_id][val] > p[val] %}
+                            ({{ p[val] - players_oldest[p.ht_id][val]  }})
+                          {% endif %}
+                        </td>
 
-                    <td class="text-small" align="right">{{ p.age_years }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].age_years < p.age_years %}
-                        (+{{ p.age_years - players_oldest[p.ht_id].age_years  }})
-                      {% endif %}
-                    </td>
+                      {% elif val == "group" %}
+                        <td class="text-small">{{ group.name }}</td>
 
-                    <td class="text-small" align="right">{{ p.keeper }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].keeper < p.keeper %}
-                        (+{{ p.keeper - players_oldest[p.ht_id].keeper  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].keeper > p.keeper %}
-                        ({{ p.keeper - players_oldest[p.ht_id].keeper  }})
-                      {% endif %}
-                    </td>
+                      {% elif val == "number" %}
+                        {% if p.number == 100 %}
+                        <td class="text-small">-</td>
+                        {% else %}
+                        <td class="text-small">{{ p.number }}</td>
+                        {% endif %}
 
-                    <td class="text-small" align="right">{{ p.defender }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].defender < p.defender %}
-                        (+{{ p.defender - players_oldest[p.ht_id].defender  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].defender > p.defender %}
-                        ({{ p.defender - players_oldest[p.ht_id].defender  }})
-                      {% endif %}
-                    </td>
+                      {% elif val == "specialty" %}
+                        <td class="text-small">
+                          {% if p.specialty > 0 %}
+                            {% set pngnr = p.specialty | string() %}
+                            {% set pngname = 'ico-sp-' + pngnr + '.png' %}
+                            <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% endif %}
+                        </td>
 
-                    <td class="text-small" align="right">{{ p.playmaker }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].playmaker < p.playmaker %}
-                        (+{{ p.playmaker - players_oldest[p.ht_id].playmaker  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].playmaker > p.playmaker %}
-                        ({{ p.playmaker - players_oldest[p.ht_id].playmaker  }})
-                      {% endif %}
-                    </td>
+                      {% elif val == "name" %}
+                        <td class="text-small" scope="row">
+                          <a data-toggle="collapse" href="#all-player-details-{{ p.ht_id}}" role="button" aria-expanded="false" aria-controls="all-player-details-{{ p.ht_id}}" style="color: {{ group.textcolor }};">
+                            {{ p.first_name }} {{ p.last_name }}
+                          </a>
+                        </td>
 
-                    <td class="text-small" align="right">{{ p.winger }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].winger < p.winger %}
-                        (+{{ p.winger - players_oldest[p.ht_id].winger  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].winger > p.winger %}
-                        ({{ p.winger - players_oldest[p.ht_id].winger  }})
-                      {% endif %}
-                    </td>
+                      {% elif val == "status" %}
+                        <td class="text-small" align="left">
+                          {% if p.mother_club_bonus %}
+                            <img src="{{url_for('static', filename='ico-homegrown.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% endif %}
 
-                    <td class="text-small" align="right">{{ p.passing }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].passing < p.passing %}
-                        (+{{ p.passing - players_oldest[p.ht_id].passing  }})
+                          {% if p.is_transfer_listed %}
+                            <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% endif %}
+
+                          {% if p.cards == 1 %}
+                            <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% elif p.cards == 2 %}
+                            <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% elif p.cards == 3 %}
+                            <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% endif %}
+
+                          {% if p.injury_level == 0 %}
+                          <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
+                          {% elif p.injury_level > 0 %}
+                            <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ p.injury_level }}
+                          {% endif %}
+                        </td>
+
+                      {% elif val == "firstseen" %}
+                        {% set olddate = players_oldest[p.ht_id].data_date | string() %}
+                        {% set thedate = olddate[:10] %}
+                        <td class="text-small" align="right">{{ thedate }}</td>
+
+
+                      {% else %}
+                        {% if p[val] == "None" %}
+                        <td class="text-small" align="left">&nbsp;</td>
+                        {% else %}
+                        <td class="text-small" align="left">{{ p[val] }}</td>
+                        {% endif %}
+
                       {% endif %}
-                      {% if players_oldest[p.ht_id].passing > p.passing %}
-                        ({{ p.passing - players_oldest[p.ht_id].passing  }})
-                      {% endif %}
-                    </td>
 
-                    <td class="text-small" align="right">{{ p.scorer }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].scorer < p.scorer %}
-                        (+{{ p.scorer - players_oldest[p.ht_id].scorer  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].scorer > p.scorer %}
-                        ({{ p.scorer - players_oldest[p.ht_id].scorer  }})
-                      {% endif %}
-                    </td>
-
-                    <td class="text-small" align="right">{{ p.set_pieces }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].set_pieces < p.set_pieces %}
-                        (+{{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].set_pieces > p.set_pieces %}
-                        ({{ p.set_pieces - players_oldest[p.ht_id].set_pieces  }})
-                      {% endif %}
-                    </td>
-                    <td class="text-small" align="right">{{ p.max_stars }}</td>
-                    <td class="text-small" align="right">{{ p.last_stars }}</td>
-<!--
-                    <td class="text-small" align="right">{{ p.experience }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].experience < p.experience %}
-                        (+{{ p.experience - players_oldest[p.ht_id].experience  }})
-                      {% endif %}
-                    </td>
-
-                    <td class="text-small" align="right">{{ p.stamina }}</td>
-                    <td class="text-small"></td>
-
-                    <td class="text-small" align="right">{{ p.form }}</td>
-                    <td class="text-small"></td>
--->
-                    <td class="text-small" align="left">
-                      {% if p.mother_club_bonus %}
-                        <img src="{{url_for('static', filename='ico-homegrown.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                      {% endif %}
-
-                      {% if p.is_transfer_listed %}
-                        <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                      {% endif %}
-
-                      {% if p.cards == 1 %}
-                        <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                      {% elif p.cards == 2 %}
-                        <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                      {% elif p.cards == 3 %}
-                        <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                      {% endif %}
-
-                      {% if p.injury_level == 0 %}
-                      <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                      {% elif p.injury_level > 0 %}
-                        <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ p.injury_level }}
-                      {% endif %}
-
-                    </td>
-                    <td class="text-small">&nbsp;</td>
-<!--
-                    <td class="text-small" align="right">{{ p.loyalty }}</td>
-                    <td class="text-small">&nbsp;</td>
-
-                     <td class="text-small" align="right">{{ p.tsi }}</td>
-                    <td class="text-small">
-                      {% if players_oldest[p.ht_id].tsi < p.tsi %}
-                        (+{{ p.tsi - players_oldest[p.ht_id].tsi  }})
-                      {% endif %}
-                      {% if players_oldest[p.ht_id].tsi > p.tsi %}
-                        ({{ p.tsi - players_oldest[p.ht_id].tsi  }})
-                      {% endif %}
-                    </td>
- -->
-                    {% set olddate = players_oldest[p.ht_id].data_date | string() %}
-                    {% set thedate = olddate[:10] %}
-                    <td class="text-small" align="right">{{ thedate }}</td>
-
-                    {% if p.owner_notes == "None" %}
-                    <td class="text-small" align="left">&nbsp;</td>
-                    {% else %}
-                    <td class="text-small" align="left">{{ p.owner_notes }}</td>
-                    {% endif %}
+                    {% endfor %}
 
                   </tr>
                   {% endfor %}

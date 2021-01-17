@@ -1,3 +1,4 @@
+import pickle
 import time
 
 from app import db
@@ -149,6 +150,7 @@ class User(db.Model):
     last_usage = db.Column(db.DateTime)
     created = db.Column(db.DateTime)
     role = db.Column(db.String(100))
+    player_columns = db.Column(db.PickleType())
 
     def __init__(self, ht_id, ht_user, username,
                  password, access_key, access_secret):
@@ -169,6 +171,7 @@ class User(db.Model):
         self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
         self.created = time.strftime('%Y-%m-%d %H:%M:%S')
         self.role = ""
+        self.player_columns = pickle.dumps([])
 
     def __repr__(self):
         return '<id {}>'.format(self.username)
@@ -213,6 +216,17 @@ class User(db.Model):
         self.c_update += 1
         self.last_update = time.strftime('%Y-%m-%d %H:%M:%S')
         self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+
+    def updateColumns(self, cols):
+        pcols = pickle.dumps(cols)
+        self.player_columns = pcols
+
+    def getColumns(self):
+        try:
+            pcols = pickle.loads(self.player_columns)
+            return pcols
+        except Exception:
+            return []
 
 # --------------------------------------------------------------------------------
 
