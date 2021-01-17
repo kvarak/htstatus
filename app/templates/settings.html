@@ -81,7 +81,7 @@ function saveorder(){
               <div id="filter" class="col">
                 <h5 class="card-title">Player columns</h5>
                 <p class="text-sm13 card-text">Select what columns you want to show in your player table.</p>
-                    <form method="POST" action="/profile">
+                    <form method="POST" action="/settings">
                   <input type="hidden" id="columnsorder" name="columnsorder" value="empty">
                   <button type="submit" class="btn btn-outline-secondary btn-sm" name="savecolumns" value="savecolumns" onclick="saveorder();">Save</button>
                   <button type="submit" class="btn btn-outline-secondary btn-sm" name="defaultcolumns" value="defaultcolumns">Show default</button>
@@ -114,7 +114,7 @@ function saveorder(){
             <h5 class="card-title">Player groups</h5>
             <p class="card-text">
 
-              <form method="POST" action="/profile">
+              <form method="POST" action="/settings">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <button type="submit" class="btn btn-outline-secondary btn-sm" name="addgroup" value="addbutton">Add</button>
@@ -128,7 +128,7 @@ function saveorder(){
 
               {% for group in group_data %}
               {% if group.name == "<default>" %}
-              <form method="POST" action="/profile">
+              <form method="POST" action="/settings">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <button type="submit" class="btn btn-outline-secondary btn-sm" name="updategroup" value="updatebutton" disabled>Update</button>
@@ -143,7 +143,7 @@ function saveorder(){
                 </div>
               </form>
               {% else %}
-              <form method="POST" action="/profile">
+              <form method="POST" action="/settings">
                 <input type="hidden" id="groupid" name="groupid" value="{{ group.id }}">
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">

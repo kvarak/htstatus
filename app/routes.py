@@ -452,8 +452,8 @@ def index():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
     error = ""
     if not('current_user') in session:
         return render_template(
@@ -494,12 +494,9 @@ def profile():
             key = re.search('id="(.+?)"', r)
             text = re.search('>(.+?)</div>', r)
             if key:
-                # dprint(2, key.group(1), text.group(1))
                 columns.append((text.group(1), key.group(1)))
         User.updateColumns(user, columns)
         db.session.commit()
-            # else:
-            #     dprint(2, r)
     elif setcolumnsdefault == "defaultcolumns":
         columns = defaultcolumns
         showdefaultcolumns = True
@@ -588,8 +585,8 @@ def profile():
     group_data = before_default + after_default
 
     return create_page(
-        template='profile.html',
-        title='Profile',
+        template='settings.html',
+        title='Settings',
         columns=columns,
         hiddencolumns=hiddencolumns,
         showdefaultcolumns=showdefaultcolumns,
