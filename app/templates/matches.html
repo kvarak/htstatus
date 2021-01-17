@@ -51,58 +51,64 @@
                 Other
             </button>
           </div>
-          <div class="card-body">
-            <p class="text-sm13">
+          <!-- <div class="card-body"> -->
+            <table>
               {% for m in matches %}
-                {% if m.matchtype == 1 %}
-                  {% set matchtype = "league" %}
-                {% elif m.matchtype == 3 %}
-                  {% set matchtype = "cup" %}
-                {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %}
-                  {% set matchtype = "friendly" %}
-                {% else %}
-                  {% set matchtype = "other" %}
-                {% endif %}
+
               {# league: 1 #}
               {# cup: 2 #}
               {# friendly: 4, 5, 8, 9 #}
               {# other: else #}
-                <p class="text-sm13 collapse show" id="matchtype-{{ matchtype }}">
+
+              {% if m.matchtype == 1 %}
+                {% set matchtype = "league" %}
+              {% elif m.matchtype == 3 %}
+                {% set matchtype = "cup" %}
+              {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %}
+                {% set matchtype = "friendly" %}
+              {% else %}
+                {% set matchtype = "other" %}
+              {% endif %}
+
+              {% set matchcolor = "#eeeeee" %}
+              {% if m.home_team_name == teamname %}
+                {% if m.home_goals > m.away_goals %}
+                  {% set matchcolor = "#f1f8e9" %}
+                {% elif m.home_goals < m.away_goals %}
+                  {% set matchcolor = "#ffebee" %}
+                {% endif %}
+              {% else %}
+                {% if m.home_goals > m.away_goals %}
+                  {% set matchcolor = "#ffebee" %}
+                {% elif m.home_goals < m.away_goals %}
+                  {% set matchcolor = "#f1f8e9" %}
+                {% endif %}
+              {% endif %}
+
+              <tr class="collapse show" id="matchtype-{{ matchtype }}" style="background-color: {{ matchcolor }};">
+                <td class="text-nowrap" style="font-size: x-small;">
+
                   {{ m.home_goals }}-{{ m.away_goals }}
+                </td>
+                <td style="font-size: x-small;">
+                  {% if m.home_team_name == teamname %}
                   <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
-                    {{ m.home_team_name }} - {{ m.away_team_name }}
+                    {{ m.away_team_name }}
                   </a>
-                  <i>({{ HTmatchtype[m.matchtype] }})</i>
-                </p>
+                  {% else %}
+                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                    {{ m.home_team_name }}
+                  </a>
+                  {% endif %}
+                </td>
+                <td style="font-size: x-small;">
+                  <i>({{ matchtype }})</i>
+                </td>
+              </tr>
               {% endfor %}
-            </p>
-            {# <table class="table table-sm table-scroll sortable">
-              <thead>
-                <tr>
-                  <th scope="col" class="text-small">Date</th>
-                  <th scope="col" class="text-small">Match</th>
-                  <th scope="col" class="text-small">Goals</th>
-                  <th scope="col" class="text-small">Matchtype</th>
-                  <th scope="col" class="text-small">Context</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for m in matches %}
-                <tr>
-                  <td class="text-small">{{ m.datetime }}</td>
-                  <td class="text-small">
-                    <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
-                      {{ m.home_team_name }} - {{ m.away_team_name }}
-                    </a>
-                  </td>
-                  <td class="text-small">{{ m.home_goals }} - {{ m.away_goals }}</td>
-                  <td class="text-small">{{ HTmatchtype[m.matchtype] }}</td>
-                  <td class="text-small">{{ m.context_id }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table> #}
-          </div>
+            </table>
+
+          <!-- </div> -->
         </div>
       </div>
     </div>
