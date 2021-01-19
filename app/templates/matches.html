@@ -117,7 +117,13 @@
     <div class="col-9">
 
       {% for m in matches %}
+
+      {% if m.ht_id == matchidtoshow %}
+      <div class="row collapse.show" id="all-match-details-{{ m.ht_id }}">
+      {% else %}
       <div class="row collapse" id="all-match-details-{{ m.ht_id }}">
+      {% endif %}
+
         <div class="col">
           <div class="card-deck">
             <div class="card">

@@ -95,7 +95,7 @@
                         </td>
 
                       {% elif val == "status" %}
-                        <td class="text-small" align="left">
+                        <td class="text-small" align="center">
                           {% if p.mother_club_bonus %}
                             <img src="{{url_for('static', filename='ico-homegrown.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
                           {% endif %}
@@ -122,14 +122,19 @@
                       {% elif val == "firstseen" %}
                         {% set olddate = players_oldest[p.ht_id].data_date | string() %}
                         {% set thedate = olddate[:10] %}
-                        <td class="text-small" align="right">{{ thedate }}</td>
+                        <td class="text-small" align="center">{{ thedate }}</td>
 
+                      {% elif val == "last_stars" %}
+                        <td class="text-small" align="center"><a href="/matches?id={{ teamid }}&m={{ p.last_stars_match_id }}" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">{{ p.last_stars }}</a></td>
+
+                      {% elif val == "max_stars" %}
+                        <td class="text-small" align="center"><a href="/matches?id={{ teamid }}&m={{ p.max_stars_match_id }}" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">{{ p.max_stars }}</a></td>
 
                       {% else %}
                         {% if p[val] == "None" %}
-                        <td class="text-small" align="left">&nbsp;</td>
+                        <td class="text-small" align="center">&nbsp;</td>
                         {% else %}
-                        <td class="text-small" align="left">{{ p[val] }}</td>
+                        <td class="text-small" align="center">{{ p[val] }}</td>
                         {% endif %}
 
                       {% endif %}

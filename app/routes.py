@@ -1448,6 +1448,7 @@ def player():
         for m in dbmatch:
             if m.rating_stars is not None:
                 p['max_stars'] = m.rating_stars
+                p['max_stars_match_id'] = m.match_id
                 break
         dbmatch = (db.session.query(MatchPlay)
                    .filter_by(player_id=p['ht_id'])
@@ -1457,6 +1458,7 @@ def player():
         for m in dbmatch:
             if m.rating_stars is not None and m.rating_stars != 0:
                 p['last_stars'] = m.rating_stars
+                p['last_stars_match_id'] = m.match_id
                 break
 
     # Get the columns
@@ -1542,11 +1544,16 @@ def matches():
             url='/login')
 
     teamid = request.values.get('id')
+    matchid = request.values.get('m')
 
     if teamid:
         teamid = int(teamid)
     else:
         teamid = request.form.get('id')
+    if matchid:
+        matchid = int(matchid)
+    else:
+        matchid = request.form.get('m')
     all_teams = session['all_teams']
 
     doupdate = request.form.get('updatebutton')
@@ -1579,6 +1586,7 @@ def matches():
         error=error,
         matches=dbmatches,
         matchplays=dbmatchplays,
+        matchidtoshow=matchid,
         teamname=teamname,
         teamid=teamid,
         HTmatchtype=HTmatchtype,
