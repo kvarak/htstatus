@@ -188,8 +188,7 @@ defaultcolumns = [
 
 tracecolumns = [
     'keeper', 'defender', 'playmaker',
-    'winger', 'passing', 'scorer', 'set_pieces',
-    'loyalty'
+    'winger', 'passing', 'scorer', 'set_pieces'
 ]
 
 calccolumns = [
@@ -1486,7 +1485,6 @@ def player():
             p['bestposition'] = bestposition
             # Form multiplies to skills
             p['formfactor'] = round(math.pow(((p['form'] - 0.5) / 7), 0.45), 2)
-
 
     # Group the players into groups
     tmp_player = players_now
