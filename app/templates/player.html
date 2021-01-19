@@ -30,38 +30,15 @@
                 <thead>
                   <tr>
                     {% for (title, val) in columns %}
-                      <th scope="col" class="text-small vertical"><div class="vertical">{{ title }}</div></th>
-                      {% if val in tracecolumns %}
-                      <th scope="col" class="text-small"></th>
+                      {% if val in calccolumns %}
+                        <th scope="col" class="text-small vertical"><div class="vertical">{{ val }}</div></th>
+                      {% else %}
+                        <th scope="col" class="text-small vertical"><div class="vertical">{{ title }}</div></th>
+                        {% if val in tracecolumns %}
+                          <th scope="col" class="text-small"></th>
+                        {% endif %}
                       {% endif %}
                     {% endfor %}
-
-                    <!-- <th scope="col" class="text-small">Group</th>
-                    <th scope="col" class="text-small">Nr</th>
-                    <th scope="col" class="text-small">&nbsp;</th>
-                    <th scope="col" class="text-small">Name</th>
-                    <th scope="col" class="text-small">Age</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">KEEP</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">DEF</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">PM</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">WING</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">PS</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">SC</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">SP</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">Max stars</th>
-                    <th scope="col" class="text-small">Last match</th>
-                    <th scope="col" class="text-small">&nbsp;</th>
-                    <th scope="col" class="text-small"></th>
-                    <th scope="col" class="text-small">First seen</th>
-                    <th scope="col" class="text-small">Notes</th> -->
                   </tr>
                 </thead>
                 <tbody>
@@ -87,6 +64,9 @@
                             ({{ p[val] - players_oldest[p.ht_id][val]  }})
                           {% endif %}
                         </td>
+
+                      {% elif val in calccolumns %}
+                        <td class="text-small">{{ p[val] }}</td>
 
                       {% elif val == "group" %}
                         <td class="text-small">{{ group.name }}</td>

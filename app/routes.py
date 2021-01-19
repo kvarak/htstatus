@@ -149,7 +149,27 @@ allcolumns = [
     ('Experience', 'experience'), ('Loyalty', 'loyalty'), ('TSI', 'tsi'),
     ('Form', 'form'), ('Stamina', 'stamina'),
     ('Career goals', 'career_goals'), ('Statement', 'statement'),
-    ('Salary', 'salary')
+    ('Salary', 'salary'),
+    ('Goalkeeper contribution (GC)', 'GC'),
+    ("Central Defender Normal contribution (CD)", "CD"),
+    ("Side Central Defender Normal (SCD)", "SCD"),
+    ("Central Defender Offensive (CDO)", "CDO"),
+    ("Central Defender Towards Wing (CDTW)", "CDTW"),
+    ("Wing Back Defensive (WBD)", "WBD"),
+    ("Wingback Normal (WBN)", "WBN"),
+    ("Wing Back Offensive (WBO)", "WBO"),
+    ("Wingback Towards Middle (WBTM)", "WBTM"),
+    ("Winger Offensive (WO)", "WO"),
+    ("Winger Towards Middle (WTM)", "WTM"),
+    ("Winger Normal (WN)", "WN"),
+    ("Winger Defensive (WD)", "WD"),
+    ("Inner Midfielder Normal (IMN)", "IMN"),
+    ("Inner Midfielder Defensive (IMD)", "IMD"),
+    ("Inner Midfielder Offensive (IMO)", "IMO"),
+    ("Inner Midfielder Towards Wing (IMTW)", "IMTW"),
+    ("Forward Normal (FW)", "FW"),
+    ("Forward Towards Wing (FTW) ", "FTW"),
+    ("Defensive Forward (DF)", "DF")
 ]
 
 defaultcolumns = [
@@ -168,6 +188,166 @@ tracecolumns = [
     'winger', 'passing', 'scorer', 'set_pieces',
     'loyalty'
 ]
+
+calccolumns = [
+    'GC', 'CD', 'SCD', 'CDO', 'CDTW',
+    'WBD', 'WBN', 'WBO', 'WBTM',
+    'WO', 'WTM', 'WN', 'WD',
+    'IMN', 'IMD', 'IMO', 'IMTW',
+    'FW', 'FTW', 'DF'
+]
+
+# --------------------------------------------------------------------------------
+# Contribution functions
+# --------------------------------------------------------------------------------
+
+
+def calculateContribution(position, player):
+    contr = 0
+    # Goalkeeper
+    if position == "GC":
+        contr += 0.87 * player['keeper']
+        contr += 0.61 * player['keeper']
+        contr += 0.35 * player['defender']
+        contr += 0.25 * player['defender']
+    # Central Defender
+    elif position == "CD":
+        contr += 1.00 * player['defender']
+        contr += 0.26 * player['defender']
+        contr += 0.26 * player['defender']
+        contr += 0.25 * player['playmaker']
+    elif position == "SCD":
+        contr += 1.00 * player['defender']
+        contr += 0.52 * player['defender']
+        contr += 0.25 * player['playmaker']
+    elif position == "CDO":
+        contr += 0.73 * player['defender']
+        contr += 0.20 * player['defender']
+        contr += 0.20 * player['defender']
+        contr += 0.40 * player['playmaker']
+    elif position == "CDTW":
+        contr += 0.67 * player['defender']
+        contr += 0.81 * player['defender']
+        contr += 0.26 * player['winger']
+        contr += 0.15 * player['playmaker']
+    # Wingback
+    elif position == "WBD":
+        contr += 0.43 * player['defender']
+        contr += 1.00 * player['defender']
+        contr += 0.10 * player['playmaker']
+        contr += 0.45 * player['winger']
+    elif position == "WBN":
+        contr += 0.38 * player['defender']
+        contr += 0.92 * player['defender']
+        contr += 0.15 * player['playmaker']
+        contr += 0.59 * player['winger']
+    elif position == "WBO":
+        contr += 0.35 * player['defender']
+        contr += 0.74 * player['defender']
+        contr += 0.20 * player['playmaker']
+        contr += 0.69 * player['winger']
+    elif position == "WBTM":
+        contr += 0.70 * player['defender']
+        contr += 0.75 * player['defender']
+        contr += 0.20 * player['playmaker']
+        contr += 0.35 * player['winger']
+    # Winger
+    elif position == "WO":
+        contr += 1.00 * player['winger']
+        contr += 0.30 * player['playmaker']
+        contr += 0.13 * player['defender']
+        contr += 0.22 * player['defender']
+        contr += 0.13 * player['passing']
+        contr += 0.29 * player['passing']
+    elif position == "WTM":
+        contr += 0.74 * player['winger']
+        contr += 0.55 * player['playmaker']
+        contr += 0.25 * player['defender']
+        contr += 0.29 * player['defender']
+        contr += 0.15 * player['passing']
+        contr += 0.16 * player['passing']
+    elif position == "WN":
+        contr += 0.86 * player['winger']
+        contr += 0.45 * player['playmaker']
+        contr += 0.20 * player['defender']
+        contr += 0.35 * player['defender']
+        contr += 0.26 * player['passing']
+        contr += 0.11 * player['passing']
+    elif position == "WD":
+        contr += 0.69 * player['winger']
+        contr += 0.30 * player['playmaker']
+        contr += 0.25 * player['defender']
+        contr += 0.61 * player['defender']
+        contr += 0.21 * player['passing']
+        contr += 0.05 * player['passing']
+    # Inner Midfielder
+    elif position == "IMN":
+        contr += 1.00 * player['playmaker']
+        contr += 0.40 * player['defender']
+        contr += 0.09 * player['defender']
+        contr += 0.09 * player['defender']
+        contr += 0.33 * player['passing']
+        contr += 0.13 * player['passing']
+        contr += 0.13 * player['passing']
+        contr += 0.22 * player['scorer']
+    elif position == "IMD":
+        contr += 0.95 * player['playmaker']
+        contr += 0.58 * player['defender']
+        contr += 0.14 * player['defender']
+        contr += 0.14 * player['defender']
+        contr += 0.18 * player['passing']
+        contr += 0.07 * player['passing']
+        contr += 0.07 * player['passing']
+        contr += 0.13 * player['scorer']
+    elif position == "IMO":
+        contr += 0.95 * player['playmaker']
+        contr += 0.16 * player['defender']
+        contr += 0.04 * player['defender']
+        contr += 0.04 * player['defender']
+        contr += 0.49 * player['passing']
+        contr += 0.18 * player['passing']
+        contr += 0.18 * player['passing']
+        contr += 0.31 * player['scorer']
+    elif position == "IMTW":
+        contr += 0.90 * player['playmaker']
+        contr += 0.59 * player['winger']
+        contr += 0.33 * player['defender']
+        contr += 0.24 * player['defender']
+        contr += 0.31 * player['passing']
+        contr += 0.24 * player['passing']
+    # Forward
+    elif position == "FW":
+        contr += 1.00 * player['scorer']
+        contr += 0.27 * player['scorer']
+        contr += 0.27 * player['scorer']
+        contr += 0.33 * player['passing']
+        contr += 0.14 * player['passing']
+        contr += 0.14 * player['passing']
+        contr += 0.24 * player['winger']
+        contr += 0.24 * player['winger']
+        contr += 0.25 * player['playmaker']
+    elif position == "FTW":
+        contr += 0.66 * player['scorer']
+        contr += 0.51 * player['scorer']
+        contr += 0.19 * player['scorer']
+        contr += 0.23 * player['passing']
+        contr += 0.21 * player['passing']
+        contr += 0.06 * player['passing']
+        contr += 0.64 * player['winger']
+        contr += 0.21 * player['winger']
+        contr += 0.15 * player['playmaker']
+    elif position == "DF":
+        contr += 0.56 * player['scorer']
+        contr += 0.13 * player['scorer']
+        contr += 0.13 * player['scorer']
+        contr += 0.53 * player['passing']
+        contr += 0.31 * player['passing']
+        contr += 0.31 * player['passing']
+        contr += 0.13 * player['winger']
+        contr += 0.13 * player['winger']
+        contr += 0.35 * player['playmaker']
+    return round(contr, 2)
+
 
 # --------------------------------------------------------------------------------
 # Help functions
@@ -1267,6 +1447,24 @@ def player():
                 p['last_stars'] = m.rating_stars
                 break
 
+    # Get the columns
+    user = (db.session.query(User)
+            .filter_by(ht_id=session['current_user_id'])
+            .first())
+    columns = User.getColumns(user)
+    if len(columns) == 0:
+        columns = defaultcolumns
+
+    # Calculate contributions
+    for x,c in columns:
+        if c in calccolumns:
+            for p in players_now:
+                p[c] = calculateContribution(c, p)
+            # for group in grouped_players_now:
+            #     for p in group:
+            #         p[c] = calculateContribution(c, p)
+
+
     # Group the players into groups
     tmp_player = players_now
     grouped_players_now = {}
@@ -1299,21 +1497,13 @@ def player():
 
     grouped_players_now[default_group.id] = players_now
 
-    user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
-            .first())
-    columns = User.getColumns(user)
-    if len(columns) == 0:
-        columns = defaultcolumns
-
-    dprint(2, columns)
-
     return create_page(
         template='player.html',
         title=teamname,
         teamid=teamid,
         columns=columns,
         tracecolumns=tracecolumns,
+        calccolumns=calccolumns,
         grouped_players=grouped_players_now,
         players=players_now,
         players_data=players_data,
