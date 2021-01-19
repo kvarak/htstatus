@@ -169,7 +169,8 @@ allcolumns = [
     ("Inner Midfielder Towards Wing (IMTW)", "IMTW"),
     ("Forward Normal (FW)", "FW"),
     ("Forward Towards Wing (FTW) ", "FTW"),
-    ("Defensive Forward (DF)", "DF")
+    ("Defensive Forward (DF)", "DF"),
+    ("Best position", "bestposition")
 ]
 
 defaultcolumns = [
@@ -180,7 +181,8 @@ defaultcolumns = [
     ('Winger', 'winger'), ('Passing', 'passing'),
     ('Scorer', 'scorer'), ('Set pieces', 'set_pieces'),
     ('Max stars', 'max_stars'), ('Last stars', 'last_stars'),
-    ('Status', 'status'), ('First seen', 'firstseen')
+    ('Status', 'status'), ('First seen', 'firstseen'),
+    ("Best position", "bestposition")
 ]
 
 tracecolumns = [
@@ -1460,9 +1462,17 @@ def player():
         if c in calccolumns:
             for p in players_now:
                 p[c] = calculateContribution(c, p)
-            # for group in grouped_players_now:
-            #     for p in group:
-            #         p[c] = calculateContribution(c, p)
+
+    for x,c in columns:
+        for p in players_now:
+            bestposition = "-"
+            bestval = 0
+            for c in calccolumns:
+                tmp = calculateContribution(c, p)
+                if tmp > bestval:
+                    bestposition = c
+                    bestval = tmp
+            p['bestposition'] = bestposition
 
 
     # Group the players into groups
