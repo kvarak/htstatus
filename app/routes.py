@@ -574,8 +574,8 @@ def downloadMatches(teamid):
         dprint(2, "Adding match ", match.ht_id, " to database.")
 
         dbmatch = (db.session.query(Match)
-                    .filter_by(ht_id=match.ht_id)
-                    .first())
+                   .filter_by(ht_id=match.ht_id)
+                   .first())
 
         if dbmatch:
             dprint(1, "WARNING: This match already exists.")
@@ -603,7 +603,7 @@ def downloadMatches(teamid):
                                             team_id=teamid)
             for p in matchlineup.lineup_players:
                 dprint(2, " - Adding ", p.first_name, " ",
-                        p.last_name, " to database")
+                       p.last_name, " to database")
                 thismatchlineup = {}
                 thismatchlineup['match_id'] = match.ht_id
                 thismatchlineup['player_id'] = p.ht_id
@@ -1458,12 +1458,12 @@ def player():
         columns = defaultcolumns
 
     # Calculate contributions
-    for x,c in columns:
+    for _x, c in columns:
         if c in calccolumns:
             for p in players_now:
                 p[c] = calculateContribution(c, p)
 
-    for x,c in columns:
+    for _x, c in columns:
         for p in players_now:
             bestposition = "-"
             bestval = 0
@@ -1473,7 +1473,6 @@ def player():
                     bestposition = c
                     bestval = tmp
             p['bestposition'] = bestposition
-
 
     # Group the players into groups
     tmp_player = players_now
