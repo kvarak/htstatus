@@ -326,7 +326,7 @@ def calculateContribution(position, player):
         contr += 0.33 * (player['defender'] + xp + loy)
         contr += 0.24 * (player['defender'] + xp + loy)
         contr += 0.31 * (player['passing'] + xp + loy)
-        contr += 0.24 * (player['passing'] + xp + loy)
+        contr += 0.23 * (player['passing'] + xp + loy)
     # Forward
     elif position == "FW":
         contr += 1.00 * (player['scorer'] + xp + loy)
