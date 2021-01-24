@@ -353,8 +353,12 @@ def calculateContribution(position, player):
         contr += 0.13 * (player['scorer'] + xp + loy)
         contr += 0.13 * (player['scorer'] + xp + loy)
         contr += 0.53 * (player['passing'] + xp + loy)
-        contr += 0.31 * (player['passing'] + xp + loy)
-        contr += 0.31 * (player['passing'] + xp + loy)
+        if player['specialty'] == 1: # technical defensive forward
+            contr += 0.41 * (player['passing'] + xp + loy)
+            contr += 0.41 * (player['passing'] + xp + loy)
+        else:
+            contr += 0.31 * (player['passing'] + xp + loy)
+            contr += 0.31 * (player['passing'] + xp + loy)
         contr += 0.13 * (player['winger'] + xp + loy)
         contr += 0.13 * (player['winger'] + xp + loy)
         contr += 0.35 * (player['playmaker'] + xp + loy)
