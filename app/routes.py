@@ -152,10 +152,11 @@ allcolumns = [
     ('Career goals', 'career_goals'), ('Statement', 'statement'),
     ('Salary', 'salary'),
     ('Goalkeeper contribution (GC)', 'GC'),
-    ("Central Defender Normal contribution (CD)", "CD"),
-    ("Side Central Defender Normal (SCD)", "SCD"),
+    ("Central Defender Normal (CD)", "CD"),
     ("Central Defender Offensive (CDO)", "CDO"),
-    ("Central Defender Towards Wing (CDTW)", "CDTW"),
+    # ("Side Central Defender Normal (SCD)", "SCD"),
+    # ("Side Central Defender Offensive (SCD)", "SCDO"),
+    ("Side Central Defender Towards Wing (CDTW)", "CDTW"),
     ("Wing Back Defensive (WBD)", "WBD"),
     ("Wingback Normal (WBN)", "WBN"),
     ("Wing Back Offensive (WBO)", "WBO"),
@@ -167,8 +168,12 @@ allcolumns = [
     ("Inner Midfielder Normal (IMN)", "IMN"),
     ("Inner Midfielder Defensive (IMD)", "IMD"),
     ("Inner Midfielder Offensive (IMO)", "IMO"),
+    # ("Side Inner Midfielder Normal (SIMN)", "SIMN"),
+    # ("Side Inner Midfielder Defensive (SIMD)", "SIMD"),
+    # ("Side Inner Midfielder Offensive (SIMO)", "SIMO"),
     ("Inner Midfielder Towards Wing (IMTW)", "IMTW"),
     ("Forward Normal (FW)", "FW"),
+    # ("Side Forward Normal (SFW)", "SFW"),
     ("Forward Towards Wing (FTW) ", "FTW"),
     ("Defensive Forward (DF)", "DF"),
     ("Best position", "bestposition")
@@ -192,11 +197,17 @@ tracecolumns = [
 ]
 
 calccolumns = [
-    'GC', 'CD', 'SCD', 'CDO', 'CDTW',
+    'GC',
+    'CD', 'CDO', 'CDTW',
+    # 'SCD',
+    # 'SCDO',
     'WBD', 'WBN', 'WBO', 'WBTM',
     'WO', 'WTM', 'WN', 'WD',
     'IMN', 'IMD', 'IMO', 'IMTW',
-    'FW', 'FTW', 'DF'
+    # 'SIMN', 'SIMO', 'SIMD',
+    'FW',
+    # 'SFW',
+    'FTW', 'DF'
 ]
 
 # --------------------------------------------------------------------------------
@@ -218,150 +229,204 @@ def calculateContribution(position, player):
 
     # Goalkeeper
     if position == "GC":
-        contr += 0.87 * (player['keeper'] + xp + loy)
-        contr += 0.61 * (player['keeper'] + xp + loy)
-        contr += 0.35 * (player['defender'] + xp + loy)
-        contr += 0.25 * (player['defender'] + xp + loy)
+        contr += 0.611 * (player['keeper'] + xp + loy)
+        contr += 0.543 * (player['keeper'] + xp + loy)
+        contr += 0.611 * (player['keeper'] + xp + loy)
+        contr += 0.251 * (player['defender'] + xp + loy)
+        contr += 0.218 * (player['defender'] + xp + loy)
+        contr += 0.251 * (player['defender'] + xp + loy)
     # Central Defender
     elif position == "CD":
-        contr += 1.00 * (player['defender'] + xp + loy)
-        contr += 0.26 * (player['defender'] + xp + loy)
-        contr += 0.26 * (player['defender'] + xp + loy)
-        contr += 0.25 * (player['playmaker'] + xp + loy)
-    elif position == "SCD":
-        contr += 1.00 * (player['defender'] + xp + loy)
-        contr += 0.52 * (player['defender'] + xp + loy)
-        contr += 0.25 * (player['playmaker'] + xp + loy)
+        contr += 0.261 * (player['defender'] + xp + loy)
+        contr += 0.624 * (player['defender'] + xp + loy)
+        contr += 0.261 * (player['defender'] + xp + loy)
+        contr += 0.117 * (player['playmaker'] + xp + loy)
     elif position == "CDO":
-        contr += 0.73 * (player['defender'] + xp + loy)
-        contr += 0.20 * (player['defender'] + xp + loy)
-        contr += 0.20 * (player['defender'] + xp + loy)
-        contr += 0.40 * (player['playmaker'] + xp + loy)
+        contr += 0.200 * (player['defender'] + xp + loy)
+        contr += 0.456 * (player['defender'] + xp + loy)
+        contr += 0.200 * (player['defender'] + xp + loy)
+        contr += 0.187 * (player['playmaker'] + xp + loy)
+    # elif position == "SCD":
+    #     contr += 0.521 * (player['defender'] + xp + loy)
+    #     contr += 0.624 * (player['defender'] + xp + loy)
+    #     contr += 0.000 * (player['defender'] + xp + loy)
+    #     contr += 0.117 * (player['playmaker'] + xp + loy)
+    # elif position == "SCDO":
+    #     contr += 0.401 * (player['defender'] + xp + loy)
+    #     contr += 0.456 * (player['defender'] + xp + loy)
+    #     contr += 0.000 * (player['defender'] + xp + loy)
+    #     contr += 0.187 * (player['playmaker'] + xp + loy)
     elif position == "CDTW":
-        contr += 0.67 * (player['defender'] + xp + loy)
-        contr += 0.81 * (player['defender'] + xp + loy)
-        contr += 0.26 * (player['winger'] + xp + loy)
-        contr += 0.15 * (player['playmaker'] + xp + loy)
+        contr += 0.812 * (player['defender'] + xp + loy)
+        contr += 0.418 * (player['defender'] + xp + loy)
+        contr += 0.000 * (player['defender'] + xp + loy)
+        contr += 0.070 * (player['playmaker'] + xp + loy)
+        contr += 0.205 * (player['winger'] + xp + loy)
     # Wingback
-    elif position == "WBD":
-        contr += 0.43 * (player['defender'] + xp + loy)
-        contr += 1.00 * (player['defender'] + xp + loy)
-        contr += 0.10 * (player['playmaker'] + xp + loy)
-        contr += 0.45 * (player['winger'] + xp + loy)
     elif position == "WBN":
-        contr += 0.38 * (player['defender'] + xp + loy)
-        contr += 0.92 * (player['defender'] + xp + loy)
-        contr += 0.15 * (player['playmaker'] + xp + loy)
-        contr += 0.59 * (player['winger'] + xp + loy)
+        contr += 0.922 * (player['defender'] + xp + loy)
+        contr += 0.237 * (player['defender'] + xp + loy)
+        contr += 0.000 * (player['defender'] + xp + loy)
+        contr += 0.058 * (player['playmaker'] + xp + loy)
+        contr += 0.466 * (player['winger'] + xp + loy)
+    elif position == "WBD":
+        contr += 1.002 * (player['defender'] + xp + loy)
+        contr += 0.268 * (player['defender'] + xp + loy)
+        contr += 0.000 * (player['defender'] + xp + loy)
+        contr += 0.039 * (player['playmaker'] + xp + loy)
+        contr += 0.355 * (player['winger'] + xp + loy)
     elif position == "WBO":
-        contr += 0.35 * (player['defender'] + xp + loy)
-        contr += 0.74 * (player['defender'] + xp + loy)
-        contr += 0.20 * (player['playmaker'] + xp + loy)
-        contr += 0.69 * (player['winger'] + xp + loy)
+        contr += 0.741 * (player['defender'] + xp + loy)
+        contr += 0.218 * (player['defender'] + xp + loy)
+        contr += 0.000 * (player['defender'] + xp + loy)
+        contr += 0.077 * (player['playmaker'] + xp + loy)
+        contr += 0.544 * (player['winger'] + xp + loy)
     elif position == "WBTM":
-        contr += 0.70 * (player['defender'] + xp + loy)
-        contr += 0.75 * (player['defender'] + xp + loy)
-        contr += 0.20 * (player['playmaker'] + xp + loy)
-        contr += 0.35 * (player['winger'] + xp + loy)
+        contr += 0.752 * (player['defender'] + xp + loy)
+        contr += 0.437 * (player['defender'] + xp + loy)
+        contr += 0.000 * (player['defender'] + xp + loy)
+        contr += 0.077 * (player['playmaker'] + xp + loy)
+        contr += 0.276 * (player['winger'] + xp + loy)
     # Winger
-    elif position == "WO":
-        contr += 1.00 * (player['winger'] + xp + loy)
-        contr += 0.30 * (player['playmaker'] + xp + loy)
-        contr += 0.13 * (player['defender'] + xp + loy)
-        contr += 0.22 * (player['defender'] + xp + loy)
-        contr += 0.13 * (player['passing'] + xp + loy)
-        contr += 0.29 * (player['passing'] + xp + loy)
-    elif position == "WTM":
-        contr += 0.74 * (player['winger'] + xp + loy)
-        contr += 0.55 * (player['playmaker'] + xp + loy)
-        contr += 0.25 * (player['defender'] + xp + loy)
-        contr += 0.29 * (player['defender'] + xp + loy)
-        contr += 0.15 * (player['passing'] + xp + loy)
-        contr += 0.16 * (player['passing'] + xp + loy)
     elif position == "WN":
-        contr += 0.86 * (player['winger'] + xp + loy)
-        contr += 0.45 * (player['playmaker'] + xp + loy)
-        contr += 0.20 * (player['defender'] + xp + loy)
-        contr += 0.35 * (player['defender'] + xp + loy)
-        contr += 0.26 * (player['passing'] + xp + loy)
-        contr += 0.11 * (player['passing'] + xp + loy)
+        contr += 0.679 * (player['winger'] + xp + loy)
+        contr += 0.351 * (player['defender'] + xp + loy)
+        contr += 0.125 * (player['defender'] + xp + loy)
+        contr += 0.174 * (player['playmaker'] + xp + loy)
+        contr += 0.205 * (player['passing'] + xp + loy)
+        contr += 0.062 * (player['passing'] + xp + loy)
     elif position == "WD":
-        contr += 0.69 * (player['winger'] + xp + loy)
-        contr += 0.30 * (player['playmaker'] + xp + loy)
-        contr += 0.25 * (player['defender'] + xp + loy)
-        contr += 0.61 * (player['defender'] + xp + loy)
-        contr += 0.21 * (player['passing'] + xp + loy)
-        contr += 0.05 * (player['passing'] + xp + loy)
+        contr += 0.544 * (player['winger'] + xp + loy)
+        contr += 0.611 * (player['defender'] + xp + loy)
+        contr += 0.156 * (player['defender'] + xp + loy)
+        contr += 0.116 * (player['playmaker'] + xp + loy)
+        contr += 0.166 * (player['passing'] + xp + loy)
+        contr += 0.028 * (player['passing'] + xp + loy)
+    elif position == "WO":
+        contr += 0.789 * (player['winger'] + xp + loy)
+        contr += 0.220 * (player['defender'] + xp + loy)
+        contr += 0.081 * (player['defender'] + xp + loy)
+        contr += 0.116 * (player['playmaker'] + xp + loy)
+        contr += 0.229 * (player['passing'] + xp + loy)
+        contr += 0.073 * (player['passing'] + xp + loy)
+    elif position == "WTM":
+        contr += 0.584 * (player['winger'] + xp + loy)
+        contr += 0.291 * (player['defender'] + xp + loy)
+        contr += 0.156 * (player['defender'] + xp + loy)
+        contr += 0.212 * (player['playmaker'] + xp + loy)
+        contr += 0.118 * (player['passing'] + xp + loy)
+        contr += 0.090 * (player['passing'] + xp + loy)
     # Inner Midfielder
+
     elif position == "IMN":
-        contr += 1.00 * (player['playmaker'] + xp + loy)
-        contr += 0.40 * (player['defender'] + xp + loy)
-        contr += 0.09 * (player['defender'] + xp + loy)
-        contr += 0.09 * (player['defender'] + xp + loy)
-        contr += 0.33 * (player['passing'] + xp + loy)
-        contr += 0.13 * (player['passing'] + xp + loy)
-        contr += 0.13 * (player['passing'] + xp + loy)
-        contr += 0.22 * (player['scorer'] + xp + loy)
+        contr += 0.386 * (player['playmaker'] + xp + loy)
+        contr += 0.074 * (player['defender'] + xp + loy)
+        contr += 0.206 * (player['defender'] + xp + loy)
+        contr += 0.074 * (player['defender'] + xp + loy)
+        contr += 0.085 * (player['passing'] + xp + loy)
+        contr += 0.016 * (player['passing'] + xp + loy)
+        contr += 0.085 * (player['passing'] + xp + loy)
+        contr += 0.011 * (player['scorer'] + xp + loy)
     elif position == "IMD":
-        contr += 0.95 * (player['playmaker'] + xp + loy)
-        contr += 0.58 * (player['defender'] + xp + loy)
-        contr += 0.14 * (player['defender'] + xp + loy)
-        contr += 0.14 * (player['defender'] + xp + loy)
-        contr += 0.18 * (player['passing'] + xp + loy)
-        contr += 0.07 * (player['passing'] + xp + loy)
-        contr += 0.07 * (player['passing'] + xp + loy)
-        contr += 0.13 * (player['scorer'] + xp + loy)
+        contr += 0.445 * (player['playmaker'] + xp + loy)
+        contr += 0.140 * (player['defender'] + xp + loy)
+        contr += 0.362 * (player['defender'] + xp + loy)
+        contr += 0.140 * (player['defender'] + xp + loy)
+        contr += 0.055 * (player['passing'] + xp + loy)
+        contr += 0.107 * (player['passing'] + xp + loy)
+        contr += 0.055 * (player['passing'] + xp + loy)
+        contr += 0.077 * (player['scorer'] + xp + loy)
     elif position == "IMO":
-        contr += 0.95 * (player['playmaker'] + xp + loy)
-        contr += 0.16 * (player['defender'] + xp + loy)
-        contr += 0.04 * (player['defender'] + xp + loy)
-        contr += 0.04 * (player['defender'] + xp + loy)
-        contr += 0.49 * (player['passing'] + xp + loy)
-        contr += 0.18 * (player['passing'] + xp + loy)
-        contr += 0.18 * (player['passing'] + xp + loy)
-        contr += 0.31 * (player['scorer'] + xp + loy)
+        contr += 0.445 * (player['playmaker'] + xp + loy)
+        contr += 0.040 * (player['defender'] + xp + loy)
+        contr += 0.140 * (player['defender'] + xp + loy)
+        contr += 0.040 * (player['defender'] + xp + loy)
+        contr += 0.142 * (player['passing'] + xp + loy)
+        contr += 0.291 * (player['passing'] + xp + loy)
+        contr += 0.142 * (player['passing'] + xp + loy)
+        contr += 0.184 * (player['scorer'] + xp + loy)
+    # elif position == "SIMN":
+    #     contr += 0.468 * (player['playmaker'] + xp + loy)
+    #     contr += 0.190 * (player['defender'] + xp + loy)
+    #     contr += 0.250 * (player['defender'] + xp + loy)
+    #     contr += 0.000 * (player['defender'] + xp + loy)
+    #     contr += 0.205 * (player['passing'] + xp + loy)
+    #     contr += 0.196 * (player['passing'] + xp + loy)
+    #     contr += 0.000 * (player['passing'] + xp + loy)
+    #     contr += 0.131 * (player['scorer'] + xp + loy)
+    # elif position == "SIMD":
+    #     contr += 0.445 * (player['playmaker'] + xp + loy)
+    #     contr += 0.271 * (player['defender'] + xp + loy)
+    #     contr += 0.362 * (player['defender'] + xp + loy)
+    #     contr += 0.000 * (player['defender'] + xp + loy)
+    #     contr += 0.110 * (player['passing'] + xp + loy)
+    #     contr += 0.107 * (player['passing'] + xp + loy)
+    #     contr += 0.000 * (player['passing'] + xp + loy)
+    #     contr += 0.077 * (player['scorer'] + xp + loy)
+    # elif position == "SIMO":
+    #     contr += 0.445 * (player['playmaker'] + xp + loy)
+    #     contr += 0.090 * (player['defender'] + xp + loy)
+    #     contr += 0.100 * (player['defender'] + xp + loy)
+    #     contr += 0.000 * (player['defender'] + xp + loy)
+    #     contr += 0.284 * (player['passing'] + xp + loy)
+    #     contr += 0.291 * (player['passing'] + xp + loy)
+    #     contr += 0.000 * (player['passing'] + xp + loy)
+    #     contr += 0.184 * (player['scorer'] + xp + loy)
     elif position == "IMTW":
-        contr += 0.90 * (player['playmaker'] + xp + loy)
-        contr += 0.59 * (player['winger'] + xp + loy)
-        contr += 0.33 * (player['defender'] + xp + loy)
-        contr += 0.24 * (player['defender'] + xp + loy)
-        contr += 0.31 * (player['passing'] + xp + loy)
-        contr += 0.23 * (player['passing'] + xp + loy)
+        contr += 0.421 * (player['playmaker'] + xp + loy)
+        contr += 0.240 * (player['defender'] + xp + loy)
+        contr += 0.206 * (player['defender'] + xp + loy)
+        contr += 0.000 * (player['defender'] + xp + loy)
+        contr += 0.245 * (player['passing'] + xp + loy)
+        contr += 0.137 * (player['passing'] + xp + loy)
+        contr += 0.000 * (player['passing'] + xp + loy)
+        contr += 0.466 * (player['winger'] + xp + loy)
     # Forward
     elif position == "FW":
-        contr += 1.00 * (player['scorer'] + xp + loy)
-        contr += 0.27 * (player['scorer'] + xp + loy)
-        contr += 0.27 * (player['scorer'] + xp + loy)
-        contr += 0.33 * (player['passing'] + xp + loy)
-        contr += 0.14 * (player['passing'] + xp + loy)
-        contr += 0.14 * (player['passing'] + xp + loy)
-        contr += 0.24 * (player['winger'] + xp + loy)
-        contr += 0.24 * (player['winger'] + xp + loy)
-        contr += 0.25 * (player['playmaker'] + xp + loy)
-    elif position == "FTW":
-        contr += 0.66 * (player['scorer'] + xp + loy)
-        contr += 0.51 * (player['scorer'] + xp + loy)
-        contr += 0.19 * (player['scorer'] + xp + loy)
-        contr += 0.23 * (player['passing'] + xp + loy)
-        contr += 0.21 * (player['passing'] + xp + loy)
-        contr += 0.06 * (player['passing'] + xp + loy)
-        contr += 0.64 * (player['winger'] + xp + loy)
-        contr += 0.21 * (player['winger'] + xp + loy)
-        contr += 0.15 * (player['playmaker'] + xp + loy)
+    #     contr += 0.213 * (player['scorer'] + xp + loy)
+    #     contr += 0.563 * (player['scorer'] + xp + loy)
+    #     contr += 0.213 * (player['scorer'] + xp + loy)
+    #     contr += 0.105 * (player['passing'] + xp + loy)
+    #     contr += 0.196 * (player['passing'] + xp + loy)
+    #     contr += 0.105 * (player['passing'] + xp + loy)
+    #     contr += 0.179 * (player['winger'] + xp + loy)
+    #     contr += 0.179 * (player['winger'] + xp + loy)
+    #     contr += 0.111 * (player['playmaker'] + xp + loy)
+    # elif position == "SFW":
+        contr += 0.213 * (player['scorer'] + xp + loy)
+        contr += 0.594 * (player['scorer'] + xp + loy)
+        contr += 0.213 * (player['scorer'] + xp + loy)
+        contr += 0.110 * (player['passing'] + xp + loy)
+        contr += 0.196 * (player['passing'] + xp + loy)
+        contr += 0.110 * (player['passing'] + xp + loy)
+        contr += 0.189 * (player['winger'] + xp + loy)
+        contr += 0.189 * (player['winger'] + xp + loy)
+        contr += 0.117 * (player['playmaker'] + xp + loy)
     elif position == "DF":
-        contr += 0.56 * (player['scorer'] + xp + loy)
-        contr += 0.13 * (player['scorer'] + xp + loy)
-        contr += 0.13 * (player['scorer'] + xp + loy)
-        contr += 0.53 * (player['passing'] + xp + loy)
+        contr += 0.103 * (player['scorer'] + xp + loy)
+        contr += 0.333 * (player['scorer'] + xp + loy)
+        contr += 0.103 * (player['scorer'] + xp + loy)
         if player['specialty'] == 1: # technical defensive forward
-            contr += 0.41 * (player['passing'] + xp + loy)
-            contr += 0.41 * (player['passing'] + xp + loy)
+            contr += 0.323 * (player['passing'] + xp + loy)
+            contr += 0.315 * (player['passing'] + xp + loy)
+            contr += 0.323 * (player['passing'] + xp + loy)
         else:
-            contr += 0.31 * (player['passing'] + xp + loy)
-            contr += 0.31 * (player['passing'] + xp + loy)
-        contr += 0.13 * (player['winger'] + xp + loy)
-        contr += 0.13 * (player['winger'] + xp + loy)
-        contr += 0.35 * (player['playmaker'] + xp + loy)
+            contr += 0.245 * (player['passing'] + xp + loy)
+            contr += 0.315 * (player['passing'] + xp + loy)
+            contr += 0.245 * (player['passing'] + xp + loy)
+        contr += 0.103 * (player['winger'] + xp + loy)
+        contr += 0.103 * (player['winger'] + xp + loy)
+        contr += 0.164 * (player['playmaker'] + xp + loy)
+    elif position == "FTW":
+        contr += 0.402 * (player['scorer'] + xp + loy)
+        contr += 0.392 * (player['scorer'] + xp + loy)
+        contr += 0.150 * (player['scorer'] + xp + loy)
+        contr += 0.166 * (player['passing'] + xp + loy)
+        contr += 0.137 * (player['passing'] + xp + loy)
+        contr += 0.047 * (player['passing'] + xp + loy)
+        contr += 0.505 * (player['winger'] + xp + loy)
+        contr += 0.166 * (player['winger'] + xp + loy)
+        contr += 0.070 * (player['playmaker'] + xp + loy)
     return round(contr * formfactor, 2)
 
 
