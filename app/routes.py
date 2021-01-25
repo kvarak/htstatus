@@ -154,8 +154,6 @@ allcolumns = [
     ('Goalkeeper contribution (GC)', 'GC'),
     ("Central Defender Normal (CD)", "CD"),
     ("Central Defender Offensive (CDO)", "CDO"),
-    # ("Side Central Defender Normal (SCD)", "SCD"),
-    # ("Side Central Defender Offensive (SCD)", "SCDO"),
     ("Side Central Defender Towards Wing (CDTW)", "CDTW"),
     ("Wing Back Defensive (WBD)", "WBD"),
     ("Wingback Normal (WBN)", "WBN"),
@@ -168,12 +166,8 @@ allcolumns = [
     ("Inner Midfielder Normal (IMN)", "IMN"),
     ("Inner Midfielder Defensive (IMD)", "IMD"),
     ("Inner Midfielder Offensive (IMO)", "IMO"),
-    # ("Side Inner Midfielder Normal (SIMN)", "SIMN"),
-    # ("Side Inner Midfielder Defensive (SIMD)", "SIMD"),
-    # ("Side Inner Midfielder Offensive (SIMO)", "SIMO"),
     ("Inner Midfielder Towards Wing (IMTW)", "IMTW"),
     ("Forward Normal (FW)", "FW"),
-    # ("Side Forward Normal (SFW)", "SFW"),
     ("Forward Towards Wing (FTW) ", "FTW"),
     ("Defensive Forward (DF)", "DF"),
     ("Best position", "bestposition")
@@ -199,14 +193,10 @@ tracecolumns = [
 calccolumns = [
     'GC',
     'CD', 'CDO', 'CDTW',
-    # 'SCD',
-    # 'SCDO',
     'WBD', 'WBN', 'WBO', 'WBTM',
     'WO', 'WTM', 'WN', 'WD',
     'IMN', 'IMD', 'IMO', 'IMTW',
-    # 'SIMN', 'SIMO', 'SIMD',
     'FW',
-    # 'SFW',
     'FTW', 'DF'
 ]
 
@@ -246,16 +236,6 @@ def calculateContribution(position, player):
         contr += 0.73 * (player['defender'] + xp + loy)
         contr += 0.20 * (player['defender'] + xp + loy)
         contr += 0.40 * (player['playmaker'] + xp + loy)
-    # elif position == "SCD":
-    #     contr += 0.521 * (player['defender'] + xp + loy)
-    #     contr += 0.624 * (player['defender'] + xp + loy)
-    #     contr += 0.000 * (player['defender'] + xp + loy)
-    #     contr += 0.117 * (player['playmaker'] + xp + loy)
-    # elif position == "SCDO":
-    #     contr += 0.401 * (player['defender'] + xp + loy)
-    #     contr += 0.456 * (player['defender'] + xp + loy)
-    #     contr += 0.000 * (player['defender'] + xp + loy)
-    #     contr += 0.187 * (player['playmaker'] + xp + loy)
     elif position == "CDTW":
         contr += 0.81 * (player['defender'] + xp + loy)
         contr += 0.67 * (player['defender'] + xp + loy)
@@ -345,33 +325,6 @@ def calculateContribution(position, player):
         contr += 0.49 * (player['passing'] + xp + loy)
         contr += 0.18 * (player['passing'] + xp + loy)
         contr += 0.31 * (player['scorer'] + xp + loy)
-    # elif position == "SIMN":
-    #     contr += 0.468 * (player['playmaker'] + xp + loy)
-    #     contr += 0.190 * (player['defender'] + xp + loy)
-    #     contr += 0.250 * (player['defender'] + xp + loy)
-    #     contr += 0.000 * (player['defender'] + xp + loy)
-    #     contr += 0.205 * (player['passing'] + xp + loy)
-    #     contr += 0.196 * (player['passing'] + xp + loy)
-    #     contr += 0.000 * (player['passing'] + xp + loy)
-    #     contr += 0.131 * (player['scorer'] + xp + loy)
-    # elif position == "SIMD":
-    #     contr += 0.445 * (player['playmaker'] + xp + loy)
-    #     contr += 0.271 * (player['defender'] + xp + loy)
-    #     contr += 0.362 * (player['defender'] + xp + loy)
-    #     contr += 0.000 * (player['defender'] + xp + loy)
-    #     contr += 0.110 * (player['passing'] + xp + loy)
-    #     contr += 0.107 * (player['passing'] + xp + loy)
-    #     contr += 0.000 * (player['passing'] + xp + loy)
-    #     contr += 0.077 * (player['scorer'] + xp + loy)
-    # elif position == "SIMO":
-    #     contr += 0.445 * (player['playmaker'] + xp + loy)
-    #     contr += 0.090 * (player['defender'] + xp + loy)
-    #     contr += 0.100 * (player['defender'] + xp + loy)
-    #     contr += 0.000 * (player['defender'] + xp + loy)
-    #     contr += 0.284 * (player['passing'] + xp + loy)
-    #     contr += 0.291 * (player['passing'] + xp + loy)
-    #     contr += 0.000 * (player['passing'] + xp + loy)
-    #     contr += 0.184 * (player['scorer'] + xp + loy)
     elif position == "IMTW":
         contr += 0.90 * (player['playmaker'] + xp + loy)
         contr += 0.24 * (player['defender'] + xp + loy)
@@ -383,16 +336,6 @@ def calculateContribution(position, player):
         contr += 0.59 * (player['winger'] + xp + loy)
     # Forward
     elif position == "FW":
-    #     contr += 0.213 * (player['scorer'] + xp + loy)
-    #     contr += 0.563 * (player['scorer'] + xp + loy)
-    #     contr += 0.213 * (player['scorer'] + xp + loy)
-    #     contr += 0.105 * (player['passing'] + xp + loy)
-    #     contr += 0.196 * (player['passing'] + xp + loy)
-    #     contr += 0.105 * (player['passing'] + xp + loy)
-    #     contr += 0.179 * (player['winger'] + xp + loy)
-    #     contr += 0.179 * (player['winger'] + xp + loy)
-    #     contr += 0.111 * (player['playmaker'] + xp + loy)
-    # elif position == "SFW":
         contr += 0.27 * (player['scorer'] + xp + loy)
         contr += 1.00 * (player['scorer'] + xp + loy)
         contr += 0.27 * (player['scorer'] + xp + loy)
