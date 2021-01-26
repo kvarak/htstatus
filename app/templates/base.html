@@ -232,18 +232,18 @@ $('.toast').toast(option)
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team-1] }}">Team</a> -->
-            <a class="dropdown-item" href="/player?id={{ all_teams[team-1] }}">Players</a>
-            <a class="dropdown-item" href="/matches?id={{ all_teams[team-1] }}">Matches</a>
-            <a class="dropdown-item" href="/training?id={{ all_teams[team-1] }}">Training</a>
+            <a class="dropdown-item" href="/player?id={{ all_teams[team-1] }}" onclick="loading();">Players</a>
+            <a class="dropdown-item" href="/matches?id={{ all_teams[team-1] }}" onclick="loading();">Matches</a>
+            <a class="dropdown-item" href="/training?id={{ all_teams[team-1] }}" onclick="loading();">Training</a>
             <!-- <a class="dropdown-item" href="/stats?id={{ all_teams[team-1] }}">Statistics</a> -->
           </div>
         </li>
         {% endfor %}
         <a class="nav-link" href="/update" onclick="loading();">Update data</a>
-        <a class="nav-link" href="/settings">Settings</a>
+        <a class="nav-link" href="/settings" onclick="loading();">Settings</a>
         <a class="nav-link" href="/logout">Logout</a>
         {% if role == "Admin" %}
-          <a class="nav-link" href="/debug"><i>Debug</i></a>
+          <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
         {% endif %}
       {% else %}
         <li class="nav-item">
