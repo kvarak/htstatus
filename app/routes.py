@@ -170,7 +170,8 @@ allcolumns = [
     ("Forward Normal (FW)", "FW"),
     ("Forward Towards Wing (FTW) ", "FTW"),
     ("Defensive Forward (DF)", "DF"),
-    ("Best position", "bestposition")
+    ("Best position", "bestposition"),
+    ("Man marking capability", "MMC")
 ]
 
 defaultcolumns = [
@@ -204,6 +205,22 @@ calccolumns = [
 # Contribution functions
 # --------------------------------------------------------------------------------
 
+
+def calculateManmark(player):
+    xp = math.log(player['experience']) * 4 / 3
+    loy = player['loyalty'] / 20
+    formfactor = round(math.pow(((player['form'] - 0.5) / 7), 0.45), 2)
+    defending = player['defender'] + xp + loy
+
+    manmarkco = math.pow(defending, 3.5) / (math.pow(defending, 3.5) + math.pow(10, 3.5))
+    manmarkco = manmarkco * formfactor
+
+    if player['specialty'] == 3: # powerful
+        manmarkco = manmarkco * 1.1
+    elif player['specialty'] == 0: # no speciality
+        manmarkco = manmarkco * 1.05
+
+    return round(manmarkco, 2)
 
 def calculateContribution(position, player):
     contr = 0
@@ -1486,6 +1503,7 @@ def player():
         if c in calccolumns:
             for p in players_now:
                 p[c] = calculateContribution(c, p)
+                p['MMC'] = calculateManmark(p)
 
     for _x, c in columns:
         for p in players_now:
