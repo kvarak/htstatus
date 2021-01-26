@@ -212,15 +212,20 @@ def calculateManmark(player):
     formfactor = round(math.pow(((player['form'] - 0.5) / 7), 0.45), 2)
     defending = player['defender'] + xp + loy
 
-    manmarkco = math.pow(defending, 3.5) / (math.pow(defending, 3.5) + math.pow(10, 3.5))
+    manmarkco = (math.pow(defending, 3.5) /
+                 (math.pow(defending, 3.5) +
+                  math.pow(10, 3.5)))
     manmarkco = manmarkco * formfactor
 
-    if player['specialty'] == 3: # powerful
+    # powerful
+    if player['specialty'] == 3:
         manmarkco = manmarkco * 1.1
-    elif player['specialty'] == 0: # no speciality
+    # no speciality
+    elif player['specialty'] == 0:
         manmarkco = manmarkco * 1.05
 
     return round(manmarkco, 2)
+
 
 def calculateContribution(position, player):
     contr = 0
@@ -314,7 +319,6 @@ def calculateContribution(position, player):
         contr += 0.15 * (player['passing'] + xp + loy)
         contr += 0.16 * (player['passing'] + xp + loy)
     # Inner Midfielder
-
     elif position == "IMN":
         contr += 1.00 * (player['playmaker'] + xp + loy)
         contr += 0.09 * (player['defender'] + xp + loy)
@@ -366,7 +370,8 @@ def calculateContribution(position, player):
         contr += 0.13 * (player['scorer'] + xp + loy)
         contr += 0.56 * (player['scorer'] + xp + loy)
         contr += 0.13 * (player['scorer'] + xp + loy)
-        if player['specialty'] == 1: # technical defensive forward
+        # technical defensive forward
+        if player['specialty'] == 1:
             contr += 0.41 * (player['passing'] + xp + loy)
             contr += 0.53 * (player['passing'] + xp + loy)
             contr += 0.41 * (player['passing'] + xp + loy)
