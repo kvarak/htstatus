@@ -400,6 +400,12 @@ def calculateContribution(position, player):
 # --------------------------------------------------------------------------------
 
 
+def diff_month(d1, d2):
+    return (d1.year - d2.year) * 12 + d1.month - d2.month
+
+# --------------------------------------------------------------------------------
+
+
 def diff(first, second):
     second = set(second)
     return [item for item in first if item not in second]
@@ -1317,6 +1323,16 @@ def admin():
     allusers = db.session.query(User).order_by(text('last_usage desc')).all()
     users = []
     for user in allusers:
+        if (user.last_update - user.created).days < 1:
+            active_time = "< 1 day"
+        elif (user.last_update - user.created).days == 1:
+            active_time = "1 day"
+        elif diff_month(user.last_update, user.created) < 2:
+            active_time = str((user.last_update - user.created).days) + " days"
+        else:
+            active_time = (str(diff_month(user.last_update, user.created)) +
+                           " months")
+
         thisuser = {
             'id': user.ht_id,
             'name': user.ht_user,
@@ -1330,7 +1346,8 @@ def admin():
             'last_update': user.last_update,
             'last_usage': user.last_usage,
             'last_login': user.last_login,
-            'created': user.created}
+            'created': user.created,
+            'active_time': active_time}
         users.append(thisuser)
 
     return create_page(

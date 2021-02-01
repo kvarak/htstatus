@@ -30,13 +30,14 @@
                     <th scope="col" class="text-small">Admin</th>
                     <th scope="col" class="text-small">ID</th>
                     <th scope="col" class="text-small">Name</th>
+                    <th scope="col" class="text-small">Active time</th>
+                    <th scope="col" class="text-small">Last usage</th>
                     <th scope="col" class="text-small">#login</th>
                     <th scope="col" class="text-small">#team</th>
                     <th scope="col" class="text-small">#training</th>
                     <th scope="col" class="text-small">#matches</th>
                     <th scope="col" class="text-small">#player</th>
                     <th scope="col" class="text-small">#update</th>
-                    <th scope="col" class="text-small">Last usage</th>
                     <th scope="col" class="text-small">Last update</th>
                     <th scope="col" class="text-small">Last login</th>
                     <th scope="col" class="text-small">Created</th>
@@ -44,7 +45,11 @@
                 </thead>
                 <tbody>
                   {% for u in users %}
+                  {% if u.active_time == "< 1 day" %}
                   <tr>
+                  {% else %}
+                  <tr style="font-weight: bold;">
+                  {% endif %}
                     <td class="text-small">
                       {% if u.name == current_user %}
                         {{ u.role }}
@@ -68,13 +73,14 @@
                     </td>
                     <td class="text-small">{{ u.id }}</td>
                     <td class="text-small">{{ u.name }}</td>
+                    <td class="text-small">{{ u.active_time }}</td>
+                    <td class="text-small">{{ u.last_usage }}</td>
                     <td class="text-small">{{ u.c_login }}</td>
                     <td class="text-small">{{ u.c_team }}</td>
                     <td class="text-small">{{ u.c_training }}</td>
                     <td class="text-small">{{ u.c_matches }}</td>
                     <td class="text-small">{{ u.c_player }}</td>
                     <td class="text-small">{{ u.c_update }}</td>
-                    <td class="text-small">{{ u.last_usage }}</td>
                     <td class="text-small">{{ u.last_update }}</td>
                     <td class="text-small">{{ u.last_login }}</td>
                     <td class="text-small">{{ u.created }}</td>
