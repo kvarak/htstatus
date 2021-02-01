@@ -126,15 +126,15 @@
     width: 100px;
     height: 100px;
     margin: -76px 0 0 -76px;
-    border-top: 10px solid rgb(0, 0, 223);
+    /* border-top: 10px solid rgb(0, 0, 223);
     border-right: 10px solid rgb(70, 235, 70);
     border-bottom: 10px solid rgb(70, 235, 70);
-    border-left: 10px solid rgb(70, 235, 70);
+    border-left: 10px solid rgb(70, 235, 70); */
     border-radius: 70%;
     /* -webkit-animation: spin 1s alternate infinite;
     animation: spin 1s alternate infinite; */
-    -webkit-animation: spin 0.7s linear infinite;
-    animation: spin 0.7s linear infinite;
+    -webkit-animation: spin 1.7s linear infinite;
+    animation: spin 1.7s linear infinite;
     display: none;
   }
 
@@ -266,6 +266,6 @@ $('.toast').toast(option)
   <h8 class="ribbon">Beta version {{ version }}</h8>
 </div>
 
-<div class="loader" id="loading"></div>
+<div class="loader" id="loading"><img src="{{url_for('static', filename='soccer_ball.png')}}" width="100"></div>
 
 {% endblock %}
