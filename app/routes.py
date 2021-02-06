@@ -400,6 +400,88 @@ def calculateContribution(position, player):
 # --------------------------------------------------------------------------------
 
 
+def get_training(players_data):
+
+    allplayerids = []
+    allplayers = {}
+    playernames = {}
+    for entry in players_data:
+        allplayers[entry.ht_id] = []
+        if entry.number == 100:
+            playernames[entry.ht_id] = entry.first_name + " " + entry.last_name
+        else:
+            playernames[entry.ht_id] = str(entry.number) + ". " + \
+                entry.first_name + " " + entry.last_name
+        if entry.ht_id not in allplayerids:
+            allplayerids.append(entry.ht_id)
+
+    for player in players_data:
+        allplayers[player.ht_id].append(
+            [
+                datetime.date(player.data_date),
+                (
+                    player.keeper,
+                    player.defender,
+                    player.playmaker,
+                    player.winger,
+                    player.passing,
+                    player.scorer,
+                    player.set_pieces
+                )
+            ])
+
+    increases = {}
+    for i in allplayers:
+        increases[i] = \
+            allplayers[i][len(allplayers[i])-1][1][0] - \
+            allplayers[i][0][1][0]
+        for s in range(6):
+            increases[i] = increases[i] + \
+                allplayers[i][len(allplayers[i])-1][1][s] - \
+                allplayers[i][0][1][s]
+
+    # Sort player list based on increases
+    allplayerids = sorted(
+        allplayerids,
+        key=lambda ele: increases[ele],
+        reverse=True)
+
+    for i in allplayers:
+        # Date filler
+        (firstdate, previousskill) = allplayers[i][0]
+        (lastdate, x) = allplayers[i][len(allplayers[i])-1]
+
+        friday = firstdate - \
+            timedelta(days=firstdate.weekday()) + timedelta(days=4, weeks=-1)
+
+        date_modified = friday
+        datelist = [friday]
+
+        while date_modified < lastdate:
+            date_modified += timedelta(days=1)
+            datelist.append(date_modified)
+
+        newy = []
+        for d in datelist:
+            for (da, y) in allplayers[i]:
+                if (d == da):
+                    previousskill = y
+            newy.append([d, previousskill])
+
+        # Just take every 7th
+        weekly = newy[0::7]
+        # add the last day if it's not the last day already
+        (lastweekday, x) = weekly[len(weekly)-1]
+        if lastdate != lastweekday:
+            weekly.append(allplayers[i][len(allplayers[i])-1])
+
+        allplayers[i] = weekly
+
+    return (allplayerids, allplayers, playernames)
+
+# --------------------------------------------------------------------------------
+
+
 def diff_month(d1, d2):
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
@@ -1470,6 +1552,9 @@ def player():
                     .order_by("data_date")
                     .order_by("number")
                     .all())
+
+    (allplayerids, allplayers, playernames) = get_training(players_data)
+
     newlst = {}
     for thislist in players_data:
         newlst[thislist.ht_id] = dict(iter(thislist))
@@ -1583,7 +1668,11 @@ def player():
         players=players_now,
         players_data=players_data,
         players_oldest=players_oldest_dict,
-        group_data=group_data)
+        group_data=group_data,
+        skills=tracecolumns,
+        playernames=playernames,
+        allplayerids=allplayerids,
+        allplayers=allplayers,)
 
 # --------------------------------------------------------------------------------
 
@@ -1791,21 +1880,11 @@ def training():
 
         allplayers[i] = weekly
 
-    skills = [
-        "keeper",
-        "defender",
-        "playmaker",
-        "winger",
-        "passing",
-        "scorer",
-        "set_pieces"
-    ]
-
     return create_page(
         template='training.html',
         teamname=teamname,
         error=error,
-        skills=skills,
+        skills=tracecolumns,
         teamid=teamid,
         increases=increases,
         playernames=playernames,
