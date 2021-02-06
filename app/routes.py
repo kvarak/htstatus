@@ -681,8 +681,8 @@ def downloadMatches(teamid):
 def index():
 
     allusers = db.session.query(User).all()
-    time3m = date.today() - relativedelta(months=3)
-    activeusers = db.session.query(User).filter(User.last_usage > time3m).all()
+    time2m = date.today() - relativedelta(months=2)
+    activeusers = db.session.query(User).filter(User.last_usage > time2m).all()
 
     if not('current_user') in session:
         return create_page(
