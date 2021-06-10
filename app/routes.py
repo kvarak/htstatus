@@ -231,7 +231,10 @@ def calculateContribution(position, player):
     contr = 0
 
     # XP adds to skills
-    xp = math.log(player['experience']) * 4 / 3
+    if player['experience'] == 0:
+        xp = 0
+    else:
+        xp = math.log(player['experience']) * 4 / 3
 
     # Loyalty adds to skills (good enough approximation)
     loy = player['loyalty'] / 20
