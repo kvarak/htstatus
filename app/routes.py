@@ -207,7 +207,10 @@ calccolumns = [
 
 
 def calculateManmark(player):
-    xp = math.log(player['experience']) * 4 / 3
+    if player['experience'] > 0:
+        xp = math.log(player['experience']) * 4 / 3
+    else:
+        xp = 0
     loy = player['loyalty'] / 20
     formfactor = round(math.pow(((player['form'] - 0.5) / 7), 0.45), 2)
     defending = player['defender'] + xp + loy
