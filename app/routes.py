@@ -683,6 +683,80 @@ def player_diff(playerid, daysago):
 
     return ret
 
+
+def player_diff_v2(playerid, daysago):
+    # Prints the changes since <date>
+    datetime_object = (datetime.now() - timedelta(days=daysago)).date()
+
+    all_teams = session['all_teams']
+    all_team_names = session['all_team_names']
+    for owner in all_teams:
+        foundit = db.session.query(Players).filter_by(
+            ht_id=playerid,
+            owner=owner).order_by(text("data_date desc")).first()
+        if foundit:
+            theteam = owner
+            latest = foundit
+            oldest = (db.session
+                      .query(Players)
+                      .filter_by(
+                          ht_id=playerid,
+                          owner=owner)
+                      .filter(Players.data_date >= datetime_object)
+                      .order_by("data_date")
+                      .first())
+
+    if not(oldest):
+        return False
+
+    teamname = all_team_names[all_teams.index(theteam)]
+
+    ignore_list = [
+        "age",
+        "age_days",
+        "caps",
+        "career_goals",
+        "career_hattricks",
+        "category_id",
+        "cup_goals",
+        "current_team_goals",
+        "current_team_matches",
+        "data_date",
+        "form",
+        "friendly_goals",
+        "injury_level",
+        "league_goals",
+        "loyalty",
+        "national_team_id",
+        "national_team_name",
+        "number",
+        "salary",
+        "stamina",
+        "tsi",
+        "owner",
+        "owner_notes",
+        "old_owner",
+        "leadership",
+        "mother_club_bonus"
+    ]
+
+    ret = []
+    thediff = {}
+    for key, elem in latest:
+        thediff[key] = elem
+    for key, elem in oldest:
+        if key not in ignore_list:
+            if elem != thediff[key]:
+                retstr = [teamname]
+                retstr.append(oldest.first_name)
+                retstr.append(oldest.last_name)
+                retstr.append(key)
+                retstr.append(elem)
+                retstr.append(thediff[key])
+                ret.append(retstr)
+
+    return ret
+
 # --------------------------------------------------------------------------------
 # Talk to CHPP functions
 # --------------------------------------------------------------------------------
@@ -790,10 +864,12 @@ def index():
 
     # changesplayers_week = []
     changesteams = {}
+    changesteams_v2 = {}
 
     for teamid in all_teams:
 
         changesplayers = []
+        changesplayers_v2 = []
 
         # Of each of the players you ever have owned, get the last download
         players_data = (db.session.query(Players)
@@ -810,11 +886,14 @@ def index():
         for thisplayer in players_now:
 
             thischanges = player_diff(thisplayer['ht_id'], 7)
+            thischanges_v2 = player_diff_v2(thisplayer['ht_id'], 7)
             if thischanges:
                 changesplayers.append(thischanges)
+                changesplayers_v2.append(thischanges_v2)
                 dprint(2, thischanges)
 
         changesteams[teamid] = changesplayers
+        changesteams_v2[teamid] = changesplayers_v2
 
     thisuserdata = (db.session.query(User)
                     .filter_by(ht_id=session['current_user_id'])
@@ -840,6 +919,7 @@ def index():
         template='main.html',
         title='Home',
         changesteams=changesteams,
+        changesteams_v2=changesteams_v2,
         thisuser=thisuser,
         usercount=len(allusers),
         activeusers=len(activeusers),
