@@ -3,6 +3,7 @@
 .DS_Store
 changelog.txt
 changelog-full.txt
+command.sh
 config.py
 config.py-e
 creds.json
