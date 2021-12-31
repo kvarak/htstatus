@@ -19,9 +19,9 @@ jobs:
       # You may pin to the exact commit or the version.
       # uses: py-actions/flake8@6b71483a8fe60d4cb967d3aa4ee56e5e52711d30
       uses: py-actions/flake8@v2.0.0
-#      with:
-#        # Path to source file or directory (default='.')
-#        path: # optional, default is .
+      with:
+        # Path to source file or directory (default='.')
+        path: app # optional, default is .
 #        # Boolean for pip upgrade prior to flake8 installation (default='false')
 #        update-pip: # optional, default is false
 #        # Comma delimited list of ignored flake8 rule codes (optional)
