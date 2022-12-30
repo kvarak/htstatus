@@ -1252,7 +1252,7 @@ def update():
     playernames = {}
     for teamid in all_teams:
 
-        downloadMatches(teamid)
+        # downloadMatches(teamid)
 
         the_team = chpp.team(ht_id=teamid)
         debug_print("update", "chpp.team", the_team._SOURCE_FILE)
@@ -1796,8 +1796,8 @@ def matches():
     all_team_names = session['all_team_names']
     teamname = all_team_names[all_teams.index(teamid)]
 
-    if doupdate == "update":
-        downloadMatches(teamid)
+    # if doupdate == "update":
+    #     downloadMatches(teamid)
 
     # Get all registered matches
     dbmatches = db.session.query(Match).filter(
