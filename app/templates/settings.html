@@ -95,7 +95,7 @@ function saveorder(){
                 {% for (n, c) in columns %}
                 <div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>
                 {% endfor %}
-                <div class="list-group-item text-sm11 bg-roundup filtered">Hidden columns</div>
+                <div class="list-group-item text-sm13 bg-roundup filtered"><b>▼ Hidden columns ▼</b></div>
                 {% for (n, c) in hiddencolumns %}
                 <div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>
                 {% endfor %}
