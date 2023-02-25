@@ -863,37 +863,37 @@ def index():
     dprint(2, updated)
 
     # changesplayers_week = []
-    changesteams = {}
-    changesteams_v2 = {}
+    # changesteams = {}
+    # changesteams_v2 = {}
 
-    for teamid in all_teams:
+    # for teamid in all_teams:
 
-        changesplayers = []
-        changesplayers_v2 = []
+    #     changesplayers = []
+    #     changesplayers_v2 = []
 
-        # Of each of the players you ever have owned, get the last download
-        players_data = (db.session.query(Players)
-                        .filter_by(owner=teamid)
-                        .order_by("data_date")
-                        .all())
-        newlst = {}
-        for thislist in players_data:
-            newlst[thislist.ht_id] = dict(iter(thislist))
-        players_now = []
-        for _k, val in newlst.items():
-            players_now.append(val)
+    #     # Of each of the players you ever have owned, get the last download
+    #     players_data = (db.session.query(Players)
+    #                     .filter_by(owner=teamid)
+    #                     .order_by("data_date")
+    #                     .all())
+    #     newlst = {}
+    #     for thislist in players_data:
+    #         newlst[thislist.ht_id] = dict(iter(thislist))
+    #     players_now = []
+    #     for _k, val in newlst.items():
+    #         players_now.append(val)
 
-        for thisplayer in players_now:
+    #     for thisplayer in players_now:
 
-            thischanges = player_diff(thisplayer['ht_id'], 7)
-            thischanges_v2 = player_diff_v2(thisplayer['ht_id'], 7)
-            if thischanges:
-                changesplayers.append(thischanges)
-                changesplayers_v2.append(thischanges_v2)
-                dprint(2, thischanges)
+    #         thischanges = player_diff(thisplayer['ht_id'], 7)
+    #         thischanges_v2 = player_diff_v2(thisplayer['ht_id'], 7)
+    #         if thischanges:
+    #             changesplayers.append(thischanges)
+    #             changesplayers_v2.append(thischanges_v2)
+    #             dprint(2, thischanges)
 
-        changesteams[teamid] = changesplayers
-        changesteams_v2[teamid] = changesplayers_v2
+    #     changesteams[teamid] = changesplayers
+    #     changesteams_v2[teamid] = changesplayers_v2
 
     thisuserdata = (db.session.query(User)
                     .filter_by(ht_id=session['current_user_id'])
@@ -918,8 +918,8 @@ def index():
     return create_page(
         template='main.html',
         title='Home',
-        changesteams=changesteams,
-        changesteams_v2=changesteams_v2,
+        # changesteams=changesteams,
+        # changesteams_v2=changesteams_v2,
         thisuser=thisuser,
         usercount=len(allusers),
         activeusers=len(activeusers),

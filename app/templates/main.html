@@ -58,12 +58,34 @@
             </p>
           </div>
         </div>
+        <div class="card">
+          <div class="card-body">
+            <p class="card-text text-sm11"><b>Thanks to</b><br>
+              - <a href="http://www.hattrick.org/">Hattrick</a><br>
+              - <a href="https://framagit.org/Pierre86/pychpp">pyCHPP - Python framework</a>
+            </p>
+            <!-- <p class="card-text text-sm11"><b>Beta testers</b><br>
+              - <a href="https://www.hattrick.org/en/Club/Manager/?userId=10507783">Skjoldar</a><br>
+              - <a href="https://www.hattrick.org/en/Club/Manager/?userId=2570032">cassiolaw</a><br>
+            </p> -->
+            <p class="card-text text-sm11"><b>Source code</b><br>
+              - <a href="https://github.com/kvarak/htstatus">github/kvarak/htstatus</a><br>
+            </p>
+            <p class="card-text text-sm11"><b>Users</b><br>
+              - Total users: {{ usercount }}<br>
+              - Active users: {{ activeusers }}
+            </p>
+            <p class="card-text text-sm11"><b>Full version</b><br>
+              - {{ fullversion }}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Break -->
-  <div class="row"><div class="col-sm"><p></p></div></div>
+  <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
 
   <!-- <div class="alert alert-warning" role="alert">
     <b>Note:</b> Match retrievals have temporarily been put on hold, they take too much
@@ -71,10 +93,10 @@
   </div> -->
 
   <!-- Break -->
-  <div class="row"><div class="col-sm"><p></p></div></div>
+  <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
 
-  <div class="row">
-    {% if current_user and changesteams %}
+  <!-- <div class="row"> -->
+    <!-- {% if current_user and changesteams %}
     {% for id, team in changesteams.items() %}
     <div class="col-sm">
       <div class="card-deck">
@@ -107,9 +129,9 @@
       </div>
     </div>
     {% endfor %}
-    {% endif %}
+    {% endif %} -->
 
-    <div class="col-sm">
+    <!-- <div class="col-sm">
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
@@ -134,8 +156,8 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </div> -->
+  <!-- </div> -->
 
   <!-- Break -->
   <div class="row"><div class="col-sm"><p></p></div></div>
