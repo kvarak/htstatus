@@ -632,7 +632,7 @@ def player_diff(playerid, daysago):
                       .order_by("data_date")
                       .first())
 
-    if not(oldest):
+    if not (oldest):
         return False
 
     teamname = all_team_names[all_teams.index(theteam)]
@@ -706,7 +706,7 @@ def player_diff_v2(playerid, daysago):
                       .order_by("data_date")
                       .first())
 
-    if not(oldest):
+    if not (oldest):
         return False
 
     teamname = all_team_names[all_teams.index(theteam)]
@@ -846,7 +846,7 @@ def index():
     time2m = date.today() - relativedelta(months=2)
     activeusers = db.session.query(User).filter(User.last_usage > time2m).all()
 
-    if not('current_user') in session:
+    if not ('current_user') in session:
         return create_page(
             template='main.html',
             title='Home',
@@ -931,7 +931,7 @@ def index():
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     error = ""
-    if not('current_user') in session:
+    if not ('current_user') in session:
         return render_template(
             '_forward.html',
             url='/')
@@ -1082,7 +1082,7 @@ def login():
     oauth_verifier = request.values.get('oauth_verifier')
     oa = oauth_verifier
 
-    if not(oa) and not(username) and session.get('current_user') is None:
+    if not (oa) and not (username) and session.get('current_user') is None:
         return create_page(
             template='login.html',
             title='Login / Signup')
@@ -1783,8 +1783,6 @@ def matches():
         matchid = request.form.get('m')
     all_teams = session['all_teams']
 
-    doupdate = request.form.get('updatebutton')
-
     error = ""
     if teamid not in all_teams:
         error = "Wrong teamid, try the links."
@@ -1795,9 +1793,6 @@ def matches():
 
     all_team_names = session['all_team_names']
     teamname = all_team_names[all_teams.index(teamid)]
-
-    # if doupdate == "update":
-    #     downloadMatches(teamid)
 
     # Get all registered matches
     dbmatches = db.session.query(Match).filter(
