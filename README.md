@@ -60,6 +60,8 @@ $ psql
 - Python 3+
 - Flask
 - flask_script
+- psycopg2-binary
+- python-dateutil
 
 ### Manage requirements
 ```
