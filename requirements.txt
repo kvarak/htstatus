@@ -1,6 +1,6 @@
 Flask_Migrate==2.5.3
 SQLAlchemy>=1.4.18
-Werkzeug==3.0.1
+Werkzeug==2.2.3
 alembic>=1.9.2
 Flask_Bootstrap==3.3.7.1
 Flask_Script==2.0.5
