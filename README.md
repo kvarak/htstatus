@@ -63,9 +63,11 @@ $ psql
 - psycopg2-binary
 - python-dateutil
 
+```
 pip3 install flask-script
 pip3 install psycopg2-binary
 pip3 install python-dateutil
+```
 
 ### Manage requirements
 ```
