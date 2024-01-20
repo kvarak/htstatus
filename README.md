@@ -1,5 +1,12 @@
 # HT Status
 
+## Usage
+
+This tool is hosted by me on https://ht.kvarak.net/ and you can freely us it there.
+
+I don't have any more instructions for running it locally except what is loosely described below.
+
+
 ## Configuration
 
 You need a `config.py` file in the base folder with the following config:
