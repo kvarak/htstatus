@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Football/Sports Management Design System */
+
+@layer base {
+  :root {
+    /* Core football pitch theme */
+    --background: 120 8% 97%;
+    --foreground: 120 20% 12%;
+
+    /* Card system */
+    --card: 0 0% 100%;
+    --card-foreground: 120 20% 12%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 120 20% 12%;
+
+    /* Primary - Football Green */
+    --primary: 120 45% 25%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 120 60% 45%;
+
+    /* Secondary - Light pitch green */
+    --secondary: 120 25% 88%;
+    --secondary-foreground: 120 20% 12%;
+
+    /* Muted tones */
+    --muted: 120 15% 92%;
+    --muted-foreground: 120 10% 45%;
+
+    /* Accent - Bright football green */
+    --accent: 120 60% 45%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Destructive - Red card */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Success - Goal green */
+    --success: 120 70% 35%;
+    --success-foreground: 0 0% 98%;
+
+    /* Warning - Yellow card */
+    --warning: 45 90% 55%;
+    --warning-foreground: 45 20% 15%;
+
+    /* Borders and inputs */
+    --border: 120 20% 85%;
+    --input: 120 20% 85%;
+    --ring: 120 45% 25%;
+
+    /* Sidebar - Dark green theme */
+    --sidebar-background: 120 35% 15%;
+    --sidebar-foreground: 120 15% 85%;
+    --sidebar-primary: 120 60% 45%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 120 25% 25%;
+    --sidebar-accent-foreground: 120 15% 85%;
+    --sidebar-border: 120 20% 25%;
+    --sidebar-ring: 120 60% 45%;
+
+    /* Gradients - Football pitch inspired */
+    --gradient-pitch: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)), hsl(var(--muted)));
+
+    /* Shadows - Enhanced football theme */
+    --shadow-football: 0 4px 12px hsl(var(--primary) / 0.15);
+    --shadow-glow: 0 0 20px hsl(var(--primary-glow) / 0.3);
+    --shadow-elegant: 0 8px 25px -8px hsl(var(--primary) / 0.2);
+
+    /* Border radius */
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 120 35% 8%;
+    --foreground: 120 15% 88%;
+    --card: 120 25% 12%;
+    --card-foreground: 120 15% 88%;
+    --popover: 120 25% 12%;
+    --popover-foreground: 120 15% 88%;
+    --primary: 120 60% 45%;
+    --primary-foreground: 120 35% 8%;
+    --secondary: 120 20% 20%;
+    --secondary-foreground: 120 15% 88%;
+    --muted: 120 15% 18%;
+    --muted-foreground: 120 10% 55%;
+    --accent: 120 60% 45%;
+    --accent-foreground: 120 35% 8%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 120 70% 40%;
+    --success-foreground: 0 0% 98%;
+    --warning: 45 85% 60%;
+    --warning-foreground: 45 20% 15%;
+    --border: 120 15% 25%;
+    --input: 120 15% 25%;
+    --ring: 120 60% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
