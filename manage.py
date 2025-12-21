@@ -1,20 +1,20 @@
+"""
+Database migration management using Flask-Migrate.
+Usage: flask db <command>
+"""
+from dotenv import load_dotenv
+load_dotenv()  # Load environment variables before anything else
 
-from flask_migrate import Migrate, MigrateCommand
-from flask_script import Manager
+from flask_migrate import Migrate
+from app.factory import create_app, db
 
-from app import app, db
-from config import Config
+# Create app instance
+app = create_app()
 
-# --------------------------------------------------------------------------------
-
-app.config.from_object(Config)
-
+# Initialize Flask-Migrate
 migrate = Migrate(app, db)
-manager = Manager(app)
-
-manager.add_command('db', MigrateCommand)
-
-# --------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    manager.run()
+    # For backwards compatibility, but prefer using: flask db upgrade
+    print("Use 'flask db upgrade' to apply migrations")
+    print("Use 'flask db migrate' to create new migrations")

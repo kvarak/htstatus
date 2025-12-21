@@ -1,8 +1,22 @@
 """Flask application factory for HT Status application."""
 
+import os
+import importlib.util
+import pkgutil
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+
+# Python 3.14 removed pkgutil.get_loader; add a minimal shim for Flask/werkzeug
+if not hasattr(pkgutil, "get_loader"):
+    def _get_loader(name):
+        spec = importlib.util.find_spec(name)
+        return spec.loader if spec else None
+    pkgutil.get_loader = _get_loader  # type: ignore[attr-defined]
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -44,10 +58,12 @@ def create_app(config_object=None, include_routes=True):
 
 
 def setup_routes(app_instance, db_instance):
-    """Set up routes with the app and db instances."""
-    # Import routes and set the global variables
-    from app import routes
-    routes.app = app_instance
-    routes.db = db_instance
-    # Initialize routes module
-    routes.initialize_routes()
+    """Set up routes with the app and db instances using Blueprint pattern."""
+    # Import Blueprint routes and initialize
+    from app.routes_bp import main_bp, initialize_routes
+
+    # Initialize the routes module with app and db
+    initialize_routes(app_instance, db_instance)
+
+    # Register the Blueprint
+    app_instance.register_blueprint(main_bp)
