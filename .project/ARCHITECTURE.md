@@ -120,10 +120,12 @@ Database queries → Skill calculations → Template/React rendering → User in
 
 ### Backend
 - **Framework**: Flask 2.3.2
+- **Dependencies**: UV for fast dependency management (replaces pip)
 - **Database**: PostgreSQL with SQLAlchemy 2.0.32
 - **API Integration**: pychpp 0.3.12
 - **Migrations**: Flask-Migrate 4.0.7
 - **Authentication**: Werkzeug security + OAuth
+- **Development Environment**: Docker Compose for services
 
 ### Frontend (Legacy)
 - **Templates**: Jinja2 + Flask-Bootstrap 3.3.7.1
@@ -168,23 +170,37 @@ dprint(level, message)  # Respects DEBUG_LEVEL config (0-3)
 
 ## Development Workflow
 
-### Local Development
+### Local Development with UV + Docker Compose
 ```bash
-# Flask backend
-./run.sh                 # Starts Flask on port 5000
+# Start all services (PostgreSQL, Redis, etc.)
+docker-compose up -d
 
-# React frontend
+# Install/update Python dependencies with UV
+uv sync
+uv sync --extra dev  # Include development dependencies
+
+# Run Flask backend (with services from Docker Compose)
+source .venv/bin/activate  # or just use `uv run`
+uv run python run.py
+# or
+./run.sh
+
+# React frontend (in separate terminal)
 npm run dev              # Starts Vite on port 8080
 
-# Database management
-python manage.py db migrate   # Create migration
-python manage.py db upgrade   # Apply migration
+# Database management (using UV)
+uv run python manage.py db migrate   # Create migration
+uv run python manage.py db upgrade   # Apply migration
+
+# Stop services
+docker-compose down
 ```
 
 ### Configuration Requirements
-- PostgreSQL database running locally
+- Docker and Docker Compose for services (PostgreSQL, Redis)
+- UV for Python dependency management
 - Valid Hattrick CHPP credentials in `config.py`
-- Python 3.9+ environment with requirements.txt
+- Python 3.9+ (managed by UV)
 
 ## Security Considerations
 
@@ -203,6 +219,8 @@ python manage.py db upgrade   # Apply migration
 ## Future Architecture Direction
 
 - Migrate from Flask templates to React SPA
-- Potential backend rewrite in Go (planned)
+- UV-based dependency management (✅ completed)
+- Docker Compose for development environment (🔄 in progress)
 - Enhanced real-time data synchronization
 - Improved tactical analysis algorithms
+- Production containerization with multi-stage Docker builds

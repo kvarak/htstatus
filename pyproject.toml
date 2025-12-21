@@ -1,0 +1,220 @@
+[project]
+name = "htstatus"
+version = "2.0.0"
+description = "Hattrick team management application with dual Flask/React architecture"
+authors = [
+    {name = "kvarak", email = "kvarak@example.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+keywords = ["hattrick", "football", "flask", "react", "chpp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment",
+    "Framework :: Flask",
+]
+
+dependencies = [
+    "alembic==1.13.2",
+    "flask-bootstrap==3.3.7.1",
+    "flask-migrate==4.0.7",
+    "flask-script==2.0.6",
+    "flask-sqlalchemy==3.1.1",
+    "python-dateutil==2.9.0.post0",
+    "sqlalchemy==2.0.32",
+    "flask==2.3.2",
+    "werkzeug==2.3.8",
+    "pychpp==0.3.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-flask>=1.2.0",
+    "pytest-mock>=3.10.0",
+
+    # Code quality
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+
+    # Security
+    "bandit>=1.7.0",
+    "safety>=2.0.0",
+
+    # Development tools
+    "pre-commit>=3.0.0",
+    "ipython>=8.0.0",
+]
+
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-flask>=1.2.0",
+    "pytest-mock>=3.10.0",
+]
+
+lint = [
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://ht.kvarak.net"
+Repository = "https://github.com/kvarak/htstatus-2.0"
+Documentation = "https://github.com/kvarak/htstatus-2.0/blob/main/README.md"
+"Bug Tracker" = "https://github.com/kvarak/htstatus-2.0/issues"
+
+[project.scripts]
+htstatus = "run:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app", "models.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=app",
+    "--cov=models",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-fail-under=80"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "chpp: marks tests that require CHPP API access",
+]
+
+[tool.coverage.run]
+source = ["app", "models"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/env/*",
+    "*/__pycache__/*",
+    "run.py",
+    "manage.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+exclude = [
+    ".git",
+    "__pycache__",
+    "migrations",
+    "env",
+    "node_modules",
+    ".venv",
+    "dist",
+    "build",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "ARG001", # unused-function-argument
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "W191",  # indentation contains tabs
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"] # Ignore unused imports in __init__.py
+"migrations/*" = ["ALL"] # Ignore all issues in migration files
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311', 'py312']
+extend-exclude = '''
+/(
+  | migrations
+  | env
+  | node_modules
+  | \.venv
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+skip = ["migrations", "env", "node_modules", ".venv"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pychpp.*",
+    "flask_bootstrap.*",
+    "flask_migrate.*",
+    "flask_script.*",
+]
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", "env", "node_modules"]
+skips = ["B101"] # Skip assert_used test
+
+[tool.bandit.assert_used]
+skips = ["*_test.py", "test_*.py"]

@@ -1,10 +1,23 @@
 
 ## Plan
 
+## Project Requirements
+**⚠️ All work must comply with these requirements:**
+- DB always needs to be backwards compatible
+- Always test with `make test`
+- Always keep ARCHITECTURE.md up to date
+- Always keep PLAN.md up to date, adding new items and checking/updating done items
+- Always keep project requirements up to date in this PLAN.md file
+- Always keep README.md up to date, adding/modifying external information
+- Local development must use UV for Python dependency management
+- Docker Compose must provide complete local development environment (PostgreSQL, services)
+
+---
+
 ## Current Status
 - **COMPLETED**: Task 1 - Architecture documentation
-- **NEXT**: Task 2 - Local Development Modernization (UV + Docker + Makefile)
-- **PRIORITY**: Developer experience and consistent environments
+- **NEXT**: Task 2 - Local Development Modernization (UV + Docker Compose + Makefile)
+- **PRIORITY**: Developer experience with UV for Python + Docker Compose for services
 
 ---
 
@@ -16,22 +29,33 @@
 **Status: 🔄 NEXT - IN PROGRESS**
 
 **Implementation Plan:**
-1. **UV Migration (2A)**: Create pyproject.toml, migrate from requirements.txt, add dev dependencies
-2. **Docker Development (2B)**: Create Dockerfile.dev + docker-compose.yml with PostgreSQL, hot reloading
-3. **Makefile Integration (2C)**: Consolidate shell scripts, add UV/Docker commands, testing infrastructure
+1. **UV Migration (2A)**: ✅ COMPLETED - Created pyproject.toml, migrated dependencies, added dev tools
+2. **Docker Compose Setup (2B)**: ✅ COMPLETED - Created docker-compose.yml with PostgreSQL + Redis, environment variables
+3. **Makefile Integration (2C)**: 🔄 NEXT - Consolidate shell scripts, add UV/Docker Compose commands, testing infrastructure
+
+**Key Requirements to Fulfill:**
+- ✅ UV for Python dependency management
+- ✅ Docker Compose for complete development environment (PostgreSQL, Redis, services)
+- ⏳ `make test` command availability
+- ⏳ Backward compatible database changes
+- ✅ Keep documentation updated (ARCHITECTURE.md, PLAN.md, README.md)
 
 **Current State Analysis:**
-- ❌ Uses requirements.txt + pip (slow dependency management)
-- ❌ Manual PostgreSQL setup required
-- ❌ Shell scripts for basic operations (run.sh, changelog.sh)
-- ❌ No containerized development environment
+- ✅ Uses UV for fast Python dependency management (replaces pip/requirements.txt)
+- ✅ Development dependencies configured (pytest, ruff, black, mypy, etc.)
+- ✅ Virtual environment (.venv) created automatically by UV
+- ✅ Documentation updated with UV + Docker Compose workflow
+- ✅ Docker Compose provides PostgreSQL + Redis services
+- ✅ Environment variable configuration with backwards compatibility
+- ❌ Shell scripts for basic operations (run.sh, changelog.sh) → Need Makefile
+- ❌ No standardized make commands → Need `make test`, `make dev`, etc.
 - ✅ GitHub Actions CI exists (basic flake8 linting)
 - ✅ Dual frontend architecture documented
 
 **Next Steps:**
-- [ ] Replace pip/requirements.txt with UV for faster Python dependency management
-- [ ] Create Docker development environment for consistent local setup
-- [ ] Add Makefile that leverages UV and Docker for streamlined commands
+- [x] Replace pip/requirements.txt with UV for faster Python dependency management
+- [x] Create Docker Compose environment for PostgreSQL and services
+- [ ] Add Makefile that leverages UV and Docker Compose for streamlined commands
 
 ### Task 2.1 - Testing Foundation
 **Status: ⏳ WAITING (requires Task 2 completion)**

@@ -1,4 +1,5 @@
 *.pyc
+__pycache__/
 
 .DS_Store
 changelog.txt
@@ -12,6 +13,42 @@ nohup.out
 push.sh
 serverrun.sh
 
+# Virtual environments
 data
 env
+.venv
+.env
+
+# Environment files
+.env.local
+.env.development
+.env.production
+
+# Database migrations (keep structure, ignore in development)
 migrations
+
+# UV artifacts
+.python-version
+uv.lock
+
+# Testing and coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Development tools
+.mypy_cache/
+.ruff_cache/
+
+# Docker volumes and data
+docker-compose.override.yml
+.docker/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
