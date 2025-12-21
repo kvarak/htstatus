@@ -1,10 +1,10 @@
-from datetime import date, datetime, timedelta
 import inspect
 import math
 import re
 import subprocess
 import time
 import traceback
+from datetime import date, datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask import render_template, request, session
@@ -847,7 +847,7 @@ def index():
     time1m = date.today() - relativedelta(months=1)
     activeusers = db.session.query(User).filter(User.last_usage > time1m).all()
 
-    if not ('current_user') in session:
+    if ('current_user') not in session:
         return create_page(
             template='main.html',
             title='Home',
@@ -932,7 +932,7 @@ def index():
 @app.route('/settings', methods=['GET', 'POST'])
 def settings():
     error = ""
-    if not ('current_user') in session:
+    if ('current_user') not in session:
         return render_template(
             '_forward.html',
             url='/')

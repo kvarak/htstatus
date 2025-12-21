@@ -199,8 +199,50 @@ docker-compose down
 ### Configuration Requirements
 - Docker and Docker Compose for services (PostgreSQL, Redis)
 - UV for Python dependency management
+- Make for standardized development commands
 - Valid Hattrick CHPP credentials in `config.py`
 - Python 3.9+ (managed by UV)
+
+## Development Workflow
+
+### Modern Development Stack (2024 Update)
+
+The project has been modernized with a comprehensive development toolchain:
+
+#### UV Package Management
+- **Fast Python dependency management** replacing pip/requirements.txt
+- **Automatic virtual environment** creation and management (.venv)
+- **Lock file support** (uv.lock) for reproducible builds
+- **Dev dependencies** for testing and code quality tools
+
+#### Docker Compose Services
+- **PostgreSQL 13** for local development database
+- **Redis 7** for caching and session storage
+- **pgAdmin** (optional) for database administration
+- **Health checks** and service dependencies
+- **Environment variable** configuration support
+
+#### Makefile Development Commands
+- **Standardized interface** replacing scattered shell scripts
+- **UV integration** for Python commands
+- **Docker Compose integration** for service management
+- **Code quality tools** (lint, format, typecheck, security)
+- **Testing infrastructure** with coverage reporting
+
+#### Key Development Commands
+```bash
+make help        # Show all available commands
+make setup       # Initialize development environment
+make dev         # Start development server (includes services)
+make test        # Run test suite (critical requirement)
+make lint        # Code quality checks
+make clean       # Clean temporary files
+```
+
+#### Legacy Support
+- `run.sh` → `make dev` (deprecated but functional)
+- `changelog.sh` → `make changelog` (deprecated but functional)
+- Direct UV/Docker commands still available for advanced use
 
 ## Security Considerations
 
@@ -219,8 +261,9 @@ docker-compose down
 ## Future Architecture Direction
 
 - Migrate from Flask templates to React SPA
-- UV-based dependency management (✅ completed)
-- Docker Compose for development environment (🔄 in progress)
+- ✅ UV-based dependency management (completed)
+- ✅ Docker Compose for development environment (completed)
+- ✅ Makefile for standardized development workflow (completed)
 - Enhanced real-time data synchronization
 - Improved tactical analysis algorithms
 - Production containerization with multi-stage Docker builds

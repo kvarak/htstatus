@@ -34,11 +34,7 @@ class MatchPlay(db.Model):
         self.behaviour = matchdata['behaviour']
 
     def __repr__(self):
-        return '{} {}: {}/{}'.format(
-            self.first_name,
-            self.last_name,
-            self.rating_stars,
-            self.rating_stars_eom)
+        return f'{self.first_name} {self.last_name}: {self.rating_stars}/{self.rating_stars_eom}'
 
 # --------------------------------------------------------------------------------
 
@@ -76,10 +72,7 @@ class Match(db.Model):
         self.away_goals = matchdata['away_goals']
 
     def __repr__(self):
-        return '{} - {}: {}'.format(
-            self.home_team_name,
-            self.away_team_name,
-            self.ht_id)
+        return f'{self.home_team_name} - {self.away_team_name}: {self.ht_id}'
 
 # --------------------------------------------------------------------------------
 
@@ -98,7 +91,7 @@ class PlayerSetting(db.Model):
         self.group_id = group_id
 
     def __repr__(self):
-        return '<{} {}>'.format(self.player_id, self.group_id)
+        return f'<{self.player_id} {self.group_id}>'
 
 # --------------------------------------------------------------------------------
 
@@ -125,7 +118,7 @@ class Group(db.Model):
         self.bgcolor = bgcolor
 
     def __repr__(self):
-        return '<{} {}>'.format(self.name, self.order)
+        return f'<{self.name} {self.order}>'
 
 # --------------------------------------------------------------------------------
 
@@ -174,10 +167,10 @@ class User(db.Model):
         self.player_columns = pickle.dumps([])
 
     def __repr__(self):
-        return '<id {}>'.format(self.username)
+        return f'<id {self.username}>'
 
     def getRole(self):
-        return '{}'.format(self.role)
+        return f'{self.role}'
 
     def setRole(self, newrole):
         self.role = newrole

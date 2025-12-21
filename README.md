@@ -1,15 +1,25 @@
 # HT Status
 
-## Local Development with UV
+## Local Development with UV + Docker + Makefile
 
-This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency management and virtual environment handling.
+This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency management, Docker Compose for services, and Make for standardized development commands.
 
 ### Quick Start
 
 1. **Install Dependencies**:
    ```bash
    # Install UV (if not already installed)
+   # macOS:
    brew install uv
+
+   # Linux (Ubuntu/Debian):
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+
+   # Linux (Arch):
+   pacman -S uv
+
+   # Or using pip (cross-platform):
+   pip install uv
 
    # Install Docker and Docker Compose
    # macOS: Docker Desktop includes Docker Compose
@@ -26,25 +36,14 @@ This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency ma
    cp .env.example .env
    # Edit .env with your Hattrick CHPP credentials
 
-   # Install Python dependencies (creates .venv automatically)
-   uv sync --extra dev
+   # Setup complete development environment
+   make setup
    ```
 
-3. **Start Services & Application**:
+3. **Start Development**:
    ```bash
-   # Start PostgreSQL and Redis services
-   docker-compose up -d
-
-   # Wait for database to be ready
-   ./docker/wait-for-postgres.sh
-
-   # Run database migrations
-   uv run python manage.py db upgrade
-
-   # Start Flask development server
-   uv run python run.py
-   # or
-   ./run.sh
+   # Start development server (includes services)
+   make dev
    ```
 
 4. **Access Application**:
@@ -52,12 +51,46 @@ This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency ma
    - **React Dev Server**: `npm run dev` (http://localhost:8080)
    - **pgAdmin** (optional): `docker-compose --profile admin up -d` (http://localhost:5050)
 
-- `uv sync` - Install/update dependencies
-- `uv sync --extra dev` - Include development dependencies
-- `uv add <package>` - Add new dependency
-- `uv remove <package>` - Remove dependency
-- `uv run <command>` - Run command in project environment
-- `uv lock` - Update lock file
+### Make Commands
+
+Run `make help` to see all available commands:
+
+**Development Workflow:**
+- `make setup` - Initialize development environment (UV sync + Docker services)
+- `make dev` - Start development server
+- `make services` - Start only Docker Compose services
+- `make test` - Run test suite (**required** by project standards)
+
+**Python Development:**
+- `make install` - Install dependencies using UV
+- `make update` - Update dependencies and sync environment
+- `make shell` - Open Python shell in UV environment
+
+**Code Quality:**
+- `make lint` - Run ruff linting (with fixes)
+- `make format` - Format code with black and ruff
+- `make typecheck` - Run mypy type checking
+- `make security` - Run security checks (bandit, safety)
+
+**Testing:**
+- `make test` - Run basic test suite
+- `make test-coverage` - Run tests with coverage reporting
+- `make test-integration` - Run integration tests with services
+
+**Database:**
+- `make db-migrate` - Create new database migration
+- `make db-upgrade` - Apply database migrations
+
+**Utilities:**
+- `make clean` - Remove temporary files and caches
+- `make reset` - Clean and rebuild environment
+- `make changelog` - Generate changelog
+
+### Legacy Commands (Deprecated but Functional)
+
+The following shell scripts are still available but deprecated in favor of Make commands:
+- `./run.sh` → Use `make dev`
+- `./changelog.sh` → Use `make changelog`
 
 ### Development Commands
 
