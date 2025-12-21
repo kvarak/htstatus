@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services install update shell lint format typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade
+.PHONY: help setup dev services stop install update shell lint format typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade
 
 # Variables
 PYTHON := uv run python
@@ -32,6 +32,13 @@ setup: ## Initialize development environment (UV sync, Docker setup)
 dev: services ## Start development server (equivalent to run.sh)
 	@echo "🌐 Starting HT Status development server..."
 	@$(PYTHON) run.py
+
+stop: ## Stop dev server and Docker Compose services
+	@echo "🛑 Stopping HT Status development services..."
+	@$(DOCKER_COMPOSE) stop >/dev/null 2>&1 || docker compose stop >/dev/null 2>&1 || true
+	@pkill -f "python.*run.py" >/dev/null 2>&1 || true
+	@pkill -f "flask run" >/dev/null 2>&1 || true
+	@echo "✅ Services stopped (Flask, Docker Compose)"
 
 services: ## Start Docker Compose services only
 	@echo "🐳 Starting Docker Compose services..."

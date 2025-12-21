@@ -35,14 +35,14 @@
 - **COMPLETED**: Task 2.7 - Code Quality Tools (integrated in Makefile) ✅
 - **COMPLETED**: Task 2.1 - Testing Foundation ✅
 - **COMPLETED**: Task 2.2 - Functional Web App Setup (fix circular imports, enable local testing) ✅
-- **NEXT**: Task 2.9 - Makefile Stop Target (add `make stop` to halt servers/compose)
-- **DEFERRED**: Task 2.0.1 - Security & Quality Remediation (after confirming app functionality)
+- **COMPLETED**: Task 2.9 - Makefile Stop Target (add `make stop` to halt servers/compose) ✅
+- **NEXT**: Task 2.0.1 - Security & Quality Remediation (after confirming app functionality)
 - **BLOCKED**: All Task 3+ (blocked by functional web app requirement)
-- **PRIORITY**: Add `make stop` target to cleanly halt dev servers and compose services
+- **PRIORITY**: Resume Task 2.0.1 - Security & Quality Remediation
 
 **Key Achievement**: Testing foundation established with Flask factory pattern and comprehensive test infrastructure.
 **Strategy Change**: Focus on getting functional web app running locally before addressing security/quality issues.
-**Next Focus**: Add Makefile `make stop` target to halt servers/compose cleanly.
+**Next Focus**: Resume Task 2.0.1 (security/quality remediation) now that the web app is functional.
 
 ---
 
@@ -180,6 +180,12 @@
 ### Task 2.8 - API Documentation
 **Status: ⏳ WAITING (requires Task 2.1 completion)**
 - [ ] Document and test existing Flask API endpoints
+
+### Task 2.9 - Makefile Stop Target
+**Status: ✅ COMPLETED - Added `make stop` to halt dev services**
+- [x] Add `make stop` target to stop Flask dev server and Docker Compose services
+- [x] Document `make stop` usage in README
+- [x] Keep compose stop non-destructive (no volume removal)
 
 ---
 

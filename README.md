@@ -44,6 +44,9 @@ This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency ma
    ```bash
    # Start development server (includes services)
    make dev
+
+   # Stop dev server and services
+   make stop
    ```
 
 4. **Access Application**:
@@ -59,6 +62,7 @@ Run `make help` to see all available commands:
 - `make setup` - Initialize development environment (UV sync + Docker services)
 - `make dev` - Start development server
 - `make services` - Start only Docker Compose services
+- `make stop` - Stop Flask dev server and Docker Compose services
 - `make test` - Run test suite (**required** by project standards)
 
 **Python Development:**
