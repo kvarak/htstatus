@@ -1,16 +1,12 @@
-from flask import Flask
+"""HT Status Flask Application Package."""
 
-# from flask_sqlalchemy import ForeignKey, relationship, SQLAlchemy
-from flask_sqlalchemy import SQLAlchemy
+import os
+from app.factory import create_app, db
 
-from config import Config
+# Create application instance for backward compatibility
+# Only include routes for production/development (not testing)
+include_routes = os.environ.get('FLASK_ENV') != 'testing'
+app = create_app(include_routes=include_routes)
 
-# --------------------------------------------------------------------------------
-
-app = Flask(__name__)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-
-# --------------------------------------------------------------------------------
-
-from app import routes
+# Make db available at module level for existing code
+__all__ = ['app', 'db']

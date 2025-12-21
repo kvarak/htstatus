@@ -13,28 +13,45 @@ from pychpp import CHPP
 from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app import app, db
 from models import Group, Match, MatchPlay, Players, PlayerSetting, User
 
-# --------------------------------------------------------------------------------
-# --------------------------------------------------------------------------------
-bootstrap = Bootstrap(app)
+# Initialize these after app is created
+app = None
+db = None
 
-# Set consumer_key and consumer_secret provided for your app by Hattrick
-consumer_key = app.config['CONSUMER_KEY']
-consumer_secret = app.config['CONSUMER_SECRETS']
+# Global variables set during initialization
+bootstrap = None
+consumer_key = None
+consumer_secret = None
+versionstr = None
+fullversion = None
+version = None
+timenow = None
+debug_level = None
 
-versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip()
-versionstr = versionstr.decode("utf-8").split('-')
-fullversion = versionstr[0] + "." + versionstr[1] + "-" + versionstr[2]
-version = versionstr[0] + "." + versionstr[1]
+def initialize_routes():
+    """Initialize routes module with app and db instances."""
+    global bootstrap, consumer_key, consumer_secret, versionstr, fullversion, version, timenow, debug_level
 
-timenow = time.strftime('%Y-%m-%d %H:%M:%S')
+    # --------------------------------------------------------------------------------
+    # --------------------------------------------------------------------------------
+    bootstrap = Bootstrap(app)
 
+    # Set consumer_key and consumer_secret provided for your app by Hattrick
+    consumer_key = app.config['CONSUMER_KEY']
+    consumer_secret = app.config['CONSUMER_SECRETS']
+
+    versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip()
+    versionstr = versionstr.decode("utf-8").split('-')
+    fullversion = versionstr[0] + "." + versionstr[1] + "-" + versionstr[2]
+    version = versionstr[0] + "." + versionstr[1]
+
+    timenow = time.strftime('%Y-%m-%d %H:%M:%S')
+    debug_level = app.config['DEBUG_LEVEL']
+
+# Module constants
 default_group_order = 99
-
 logfile = "htplanner.log"
-debug_level = app.config['DEBUG_LEVEL']
 
 # --------------------------------------------------------------------------------
 # HT definitions

@@ -33,6 +33,7 @@ dependencies = [
     "flask==2.3.2",
     "werkzeug==2.3.8",
     "pychpp==0.3.12",
+    "psycopg2-binary>=2.9.0",
 ]
 
 [project.optional-dependencies]

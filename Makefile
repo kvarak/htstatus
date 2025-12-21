@@ -73,26 +73,30 @@ security: ## Run bandit and safety security checks
 	@$(UV) run safety check
 
 # Testing Infrastructure
-test: services ## Run test suite (critical requirement)
-	@echo "🧪 Running test suite..."
-	@mkdir -p tests
-	@touch tests/__init__.py
-	@if [ ! -f tests/test_basic.py ]; then \
-		echo "Creating basic test structure..."; \
-		echo "def test_placeholder():" > tests/test_basic.py; \
-		echo "    \"\"\"Placeholder test to satisfy make test requirement.\"\"\"" >> tests/test_basic.py; \
-		echo "    assert True" >> tests/test_basic.py; \
-	fi
-	@$(UV) run pytest tests/test_basic.py::test_placeholder tests/test_basic.py::TestBasicFunctionality -v --tb=short --cov-fail-under=0
-	@echo "✅ Basic test suite validated (make test requirement satisfied)"
+test: services ## Run comprehensive test suite
+	@echo "🧪 Running comprehensive test suite..."
+	@$(UV) run pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0
+	@echo "✅ Test suite completed"
 
-test-coverage: services ## Run tests with coverage reporting
-	@echo "📊 Running tests with coverage..."
-	@$(UV) run pytest tests/test_basic.py::test_placeholder tests/test_basic.py::TestBasicFunctionality --cov=tests --cov-report=html --cov-report=term --cov-fail-under=50
+test-unit: services ## Run unit tests only (fast)
+	@echo "🔬 Running unit tests..."
+	@$(UV) run pytest tests/ -v --tb=short -m "not integration"
 
 test-integration: services ## Run integration tests with Docker services
 	@echo "🔗 Running integration tests..."
-	@$(UV) run pytest tests/ -m "integration" -v || echo "Integration tests not yet implemented"
+	@$(UV) run pytest tests/ -v --tb=short -m "integration"
+
+test-coverage: services ## Run tests with detailed coverage reporting
+	@echo "📊 Running tests with coverage analysis..."
+	@$(UV) run pytest tests/ --cov=app --cov=tests --cov-report=html --cov-report=term-missing --cov-fail-under=60
+	@echo "📋 Coverage report generated in htmlcov/"
+
+test-watch: services ## Run tests in watch mode (reruns on file changes)
+	@echo "👀 Running tests in watch mode..."
+	@$(UV) run pytest-watch tests/ -- -v --tb=short
+
+test-all: lint security test ## Run all quality gates (lint + security + tests)
+	@echo "✅ All quality gates passed!"
 
 # Utility Commands
 clean: ## Clean up temporary files, caches
