@@ -1,4 +1,9 @@
+
 # HT Status - AI Coding Agent Instructions
+
+## Critical AI Agent Rule
+**ALWAYS read all files in the .project directory before making any code or documentation changes.**
+This ensures you are aware of all project requirements, standards, and current planning context.
 
 ## Project Overview
 **HT Status** is a Hattrick team management application with dual architecture: a legacy Flask backend serving traditional HTML templates and a modern React frontend. It integrates with Hattrick's CHPP (Community Hattrick Public Platform) API for football team data management.

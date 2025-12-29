@@ -1,0 +1,196 @@
+{
+  "tasks": [
+    {
+      "name": "plan",
+      "title": "Plan the next development task",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Do not git add or commit any changes.",
+        "Include the following sections in your response:",
+        "# Plan Next Task",
+        "## Task Analysis",
+        "## Proposed Solution",
+        "## Implementation Steps",
+        "## Potential Challenges",
+        "## Testing and Validation",
+        "## Conclusion"
+      ]
+    },
+    {
+      "name": "execute",
+      "title": "Execute the planned development task",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Follow the detailed plan created in the 'Plan the next task' step.",
+        "Implement the solution according to the outlined steps.",
+        "Test that changes work correctly (test functionality, verify integrations).",
+        "Update relevant documentation (README.md, architecture.md as needed).",
+        "Update backlog.md when task milestones are completed.",
+        "Update progress.md with accomplishments and next steps.",
+        "Document any deviations from the plan and reasons for those changes.",
+        "Do not git add or commit any changes."
+      ]
+    },
+    {
+      "name": "review",
+      "title": "Review previous development work",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Carefully review the last completed task to ensure it meets all specified requirements.",
+        "Check for accuracy, completeness, and adherence to guidelines outlined in plan.md.",
+        "Verify that all project requirements are still being met.",
+        "Confirm that documentation updates were made (architecture.md, README.md, backlog.md, progress.md).",
+        "Check alignment with strategic goals and objectives.",
+        "Provide constructive feedback and suggest improvements if necessary.",
+        "Do not git add or commit any changes."
+      ]
+    },
+    {
+      "name": "update",
+      "title": "Update project status and planning",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Review current state in progress.md and backlog.md.",
+        "Update backlog.md with completed tasks and current status.",
+        "Update progress.md with recent accomplishments and metrics.",
+        "Mark dependencies as unblocked where appropriate in backlog.md.",
+        "Update architecture.md if structural changes were made.",
+        "Ensure all project requirements are still being met.",
+        "Check if any tasks in backlog.md can now move to active status.",
+        "Update strategic progress in goals.md if major milestones achieved.",
+        "Do not git add or commit any changes."
+      ]
+    },
+    {
+      "name": "commit",
+      "title": "Adds and commits, a brief summary, since the last commit following all git commit guidelines",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Analyze all changes made since the last commit.",
+        "If possible, group related changes into logical units for separate commits.",
+        "For each commit, write a concise summary that follows git commit guidelines.",
+        "Follow these git commit guidelines as much as possible",
+        " - Separate subject from body with a blank line",
+        " - Limit the subject line to 50 characters",
+        " - Capitalize the subject line",
+        " - Do not end the subject line with a period",
+        " - Use the imperative mood in the subject line",
+        " - Wrap the body at 72 characters",
+        " - Use the body to explain what and why vs. how",
+        " - Mention any related issues or tasks from backlog.md by their IDs",
+        "Stage the changes for commit.",
+        "Create the commit with the written summary.",
+        "Do not push the commits to the remote repository."
+      ]
+    },
+    {
+      "name": "add-to-backlog",
+      "title": "Add a new task to the project backlog",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Analyze the new task provided by the user in the context of all project documentation.",
+        "Determine how the task aligns with strategic goals and existing work.",
+        "Identify any dependencies on existing tasks or initiatives.",
+        "Suggest the appropriate category (Strategic Initiative, Infrastructure, Documentation, etc.).",
+        "Recommend priority level based on strategic alignment and current needs.",
+        "Add the new task to backlog.md with all relevant details.",
+        "Include the following sections in your response:",
+        "# Backlog Addition Analysis",
+        "## Task Analysis",
+        "## Strategic Alignment",
+        "## Dependencies and Prerequisites",
+        "## Recommended Placement",
+        "## Priority Assessment",
+        "## Implementation Considerations"
+      ]
+    },
+    {
+      "name": "execute-backlog-item",
+      "title": "Plan and execute a specific backlog item",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Focus exclusively on the backlog item specified by the user.",
+        "Analyze the task requirements, acceptance criteria, and dependencies.",
+        "Create a detailed implementation plan with specific steps.",
+        "Execute the plan step by step, implementing the solution.",
+        "Test and validate the implementation against acceptance criteria.",
+        "Update relevant documentation (README.md, architecture.md as needed).",
+        "Update backlog.md when task milestones are completed.",
+        "Update progress.md with accomplishments and next steps.",
+        "Add all tech findings in proper documentation in .project folder.",
+        "Mark the task as completed in backlog.md.",
+        "Do not git add or commit any changes.",
+        "Include the following sections in your response:",
+        "# Backlog Item Execution: [TASK-ID]",
+        "## Task Overview",
+        "## Implementation Plan",
+        "## Execution Steps",
+        "## Validation and Testing",
+        "## Documentation Updates",
+        "## Completion Summary"
+      ]
+    },
+    {
+      "name": "analyze-project",
+      "title": "Comprehensive project analysis for systematic documentation maintenance",
+      "what to do": [
+        "Perform systematic analysis of all project documentation for coherence and completeness.",
+        "Read all .project files comprehensively",
+        "Read all root documentation files: README.md, TECHNICAL.md",
+        "Analyze cross-references and dependencies between all files to identify inconsistencies.",
+        "Identify content duplications, outdated information, and strategic misalignment.",
+        "Verify compliance with file structure standards and documentation requirements from plan.md.",
+        "Validate strategic alignment with goals.md objectives and architecture.md constraints.",
+        "Check DevAgent methodology compliance across all development workflows.",
+        "Assess AI assistant backend platform focus consistency across all documentation.",
+        "Determine if restructuring is needed based on identified gaps, redundancies, or misalignments.",
+        "When restructuring is needed, provide specific actionable recommendations with clear rationale.",
+        "Preserve all critical information while improving organization and coherence.",
+        "Ensure all changes support the project vision and methodology principles.",
+        "Do not git add or commit any changes.",
+        "Include the following sections in your response:",
+        "# Comprehensive Project Analysis",
+        "## Documentation Inventory",
+        "## Cross-Reference Analysis",
+        "## Coherence Assessment",
+        "## Strategic Alignment Review",
+        "## Compliance Verification",
+        "## Restructuring Recommendations",
+        "## Implementation Priorities",
+        "## Conclusion and Next Steps"
+      ]
+    },
+    {
+      "name": "organize-backlog",
+      "title": "Systematic project management enhancement through priority-driven task organization",
+      "what to do": [
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Analyze task dependencies and prerequisites to determine optimal execution order.",
+        "Evaluate strategic alignment of each task with current project momentum.",
+        "Assess task complexity, effort estimates, and blocking dependencies to refine prioritization.",
+        "Create priority summary section at the top of backlog.md with organized task lists by priority level.",
+        "Generate markdown links from priority summary to detailed task sections preserving all existing task IDs.",
+        "Restructure backlog.md to improve navigation and task discovery while maintaining all original content.",
+        "Ensure restructuring supports enhanced 'plan' prompt effectiveness for automatic next-task identification.",
+        "Validate that restructured files maintain compliance with file structure standards from plan.md.",
+        "Preserve all critical information, task IDs, acceptance criteria, and strategic context during reorganization.",
+        "Do not git add or commit any changes.",
+        "Include the following sections in your response:",
+        "# Project Management Enhancement",
+        "## Current Status Analysis",
+        "## Priority Assessment Framework",
+        "## Backlog Restructuring Plan",
+        "## Implementation Steps",
+        "## Next Task Recommendations",
+        "## Validation and Compliance Check"
+      ]
+    }
+  ]
+}
