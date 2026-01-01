@@ -16,11 +16,10 @@
 	- *Completed*: January 1, 2026 - All items categorized (DOC, INFRA, TEST, etc.)
 - [x] **[INFRA-002] Fix 'make test' dependency setup for new machines**
 	- *Completed*: January 1, 2026 - Added UV dependency checking, helpful error messages, config.py creation, and fallback support for systems without UV
+- [x] **[DOC-001] Create CHANGELOG.md**
+	- *Completed*: January 1, 2026 - CHANGELOG.md created following Keep a Changelog format with comprehensive 2.0.0 documentation; referenced in README.md
 
 ### HIGH Priority
-- [ ] **[DOC-001] Create CHANGELOG.md**
-	- *Acceptance Criteria*: CHANGELOG.md exists in root directory following Keep a Changelog format; referenced properly in documentation.
-	- *Dependencies*: None
 - [ ] **[DOC-002] Remove ROTWA-specific language from documentation**
 	- *Acceptance Criteria*: All ROTWA references removed from HTStatus documentation; project focus is clear and consistent.
 	- *Dependencies*: None
