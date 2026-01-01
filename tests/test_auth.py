@@ -1,7 +1,5 @@
 """Test authentication and session management."""
 
-import pytest
-from tests.mock_chpp import create_mock_chpp_client
 
 
 def test_session_structure(client):

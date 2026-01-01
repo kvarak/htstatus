@@ -7,7 +7,7 @@ def test_basic_imports():
     assert models is not None
 
     # Test that we can import factory
-    from app.factory import db, create_app
+    from app.factory import create_app, db
     assert db is not None
     assert create_app is not None
 

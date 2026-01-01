@@ -1,11 +1,10 @@
 """Test CHPP API integration and mocking."""
 
-import pytest
 from tests.mock_chpp import (
     create_mock_chpp_client,
     create_mock_player,
     create_mock_team,
-    create_mock_user
+    create_mock_user,
 )
 
 

@@ -1,7 +1,8 @@
 """Integration tests for Flask app with services."""
 
-import pytest
 import os
+
+import pytest
 
 
 @pytest.mark.integration
