@@ -14,6 +14,8 @@
 	- *Completed*: January 1, 2026 - prompts.json updated with comprehensive workflows
 - [x] **[DOC-009] Restructure backlog with typed IDs**
 	- *Completed*: January 1, 2026 - All items categorized (DOC, INFRA, TEST, etc.)
+- [x] **[INFRA-002] Fix 'make test' dependency setup for new machines**
+	- *Completed*: January 1, 2026 - Added UV dependency checking, helpful error messages, config.py creation, and fallback support for systems without UV
 
 ### HIGH Priority
 - [ ] **[DOC-001] Create CHANGELOG.md**
@@ -25,12 +27,23 @@
 - [ ] **[INFRA-001] Implement environment configuration templates for deployment**
 	- *Acceptance Criteria*: Templates exist for all required environments; setup is documented in README and plan.md.
 	- *Dependencies*: None
+	- *Status*: **Ready for Implementation** - Benefits from established config.py foundation with environment-specific classes
+	- *Implementation Note*: Can build upon existing Config/TestConfig/ProductionConfig structure
+- [ ] **[TEST-002] Resolve remaining integration test failures**
+	- *Acceptance Criteria*: All 34 tests pass consistently; integration test suite provides reliable CI/CD foundation.
+	- *Dependencies*: None (isolated to 2 specific complex integration tests)
+	- *Status*: **Ready for Implementation** - Testing infrastructure stable, specific tests identified for refinement
+	- *Progress Note*: 32/34 tests passing (94% success), 2 integration tests need fixture or environment refinement
 - [ ] **[TEST-001] Add automated tests for core features**
 	- *Acceptance Criteria*: Test suite covers all critical app logic; `make test` passes with >80% coverage.
-	- *Dependencies*: INFRA-001 (environment setup)
+	- *Dependencies*: None (infrastructure ready)
+	- *Status*: **Ready for Implementation** - Professional testing infrastructure in place (94% current success rate)
+	- *Progress Note*: Testing foundation established, SQLAlchemy fixtures modernized, quality gates operational
 - [ ] **[SEC-001] Security & Quality Remediation (Task 2.0.1)**
 	- *Acceptance Criteria*: All critical security and code quality issues are resolved; linter and security checks pass.
-	- *Dependencies*: TEST-001 (test foundation)
+	- *Dependencies*: TEST-001 (expanded test coverage recommended)
+	- *Status*: **Partially Ready** - Code quality tools operational, security scanning needs expanded test foundation
+	- *Progress Note*: Quality gates implemented (ruff, black, mypy), 91 code quality issues identified with improvement path
 
 ### MEDIUM Priority
 - [ ] **[DOC-003] Add cross-references between related .project files**

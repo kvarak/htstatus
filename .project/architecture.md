@@ -43,7 +43,7 @@ HT Status is a Hattrick football team management application built with a dual f
 #### Flask Application Core
 - **Main File**: `/app/routes.py` (1976 lines - primary application logic)
 - **Database**: `/models.py` - SQLAlchemy models
-- **Configuration**: `/config.py` - CHPP credentials and app settings
+- **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig/ProductionConfig classes
 - **Initialization**: `/app/__init__.py` - Flask app setup
 
 #### Key Backend Components
