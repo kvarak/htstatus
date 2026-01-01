@@ -1,6 +1,7 @@
 """HT Status Flask Application Package."""
 
 import os
+
 from app.factory import create_app, db
 
 # Create application instance for backward compatibility

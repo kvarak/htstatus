@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-import platform
 import os
+import platform
 
 print("Python version " + platform.python_version())
 

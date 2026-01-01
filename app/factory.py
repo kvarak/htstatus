@@ -1,12 +1,12 @@
 """Flask application factory for HT Status application."""
 
-import os
 import importlib.util
 import pkgutil
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+
 from dotenv import load_dotenv
+from flask import Flask
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 # Python 3.14 removed pkgutil.get_loader; add a minimal shim for Flask/werkzeug
 if not hasattr(pkgutil, "get_loader"):
@@ -48,7 +48,6 @@ def create_app(config_object=None, include_routes=True):
     migrate.init_app(app, db)
 
     # Import models after db is initialized to avoid circular imports
-    import models
 
     # Set up routes only if requested (allows testing without complex routes)
     if include_routes:
@@ -60,7 +59,7 @@ def create_app(config_object=None, include_routes=True):
 def setup_routes(app_instance, db_instance):
     """Set up routes with the app and db instances using Blueprint pattern."""
     # Import Blueprint routes and initialize
-    from app.routes_bp import main_bp, initialize_routes
+    from app.routes_bp import initialize_routes, main_bp
 
     # Initialize the routes module with app and db
     initialize_routes(app_instance, db_instance)

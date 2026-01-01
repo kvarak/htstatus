@@ -3,9 +3,11 @@ Database migration management using Flask-Migrate.
 Usage: flask db <command>
 """
 from dotenv import load_dotenv
+
 load_dotenv()  # Load environment variables before anything else
 
 from flask_migrate import Migrate
+
 from app.factory import create_app, db
 
 # Create app instance

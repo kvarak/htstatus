@@ -2,13 +2,14 @@
 """Test database connection with the Flask app configuration."""
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
-from app.factory import create_app
-from app.factory import db
 import os
 
-print(f"Environment variables:")
+from app.factory import create_app, db
+
+print("Environment variables:")
 print(f"  POSTGRES_USER: {os.environ.get('POSTGRES_USER')}")
 print(f"  POSTGRES_PASSWORD: {os.environ.get('POSTGRES_PASSWORD')}")
 print(f"  POSTGRES_HOST: {os.environ.get('POSTGRES_HOST')}")

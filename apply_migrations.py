@@ -2,10 +2,12 @@
 """Apply database migrations programmatically."""
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from alembic import command
 from alembic.config import Config as AlembicConfig
+
 from app.factory import create_app
 
 # Create Flask app

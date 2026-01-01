@@ -1,21 +1,13 @@
 """Flask routes converted to Blueprint pattern for HT Status application."""
 
 import inspect
-import math
-import re
 import subprocess
 import time
-import traceback
-from datetime import date, datetime, timedelta
 
-from dateutil.relativedelta import relativedelta
-from flask import render_template, request, session, Blueprint, current_app
+from flask import Blueprint, current_app, render_template, session
 from flask_bootstrap import Bootstrap
-from pychpp import CHPP
-from sqlalchemy import text
-from werkzeug.security import check_password_hash, generate_password_hash
 
-from models import Group, Match, MatchPlay, Players, PlayerSetting, User
+from models import User
 
 # Create Blueprint for routes
 main_bp = Blueprint('main', __name__)

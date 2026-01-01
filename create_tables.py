@@ -2,10 +2,10 @@
 """Create all database tables using SQLAlchemy."""
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from app.factory import create_app, db
-import models  # Import models to register them with SQLAlchemy
 
 # Create Flask app
 app = create_app()
