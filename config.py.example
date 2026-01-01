@@ -1,0 +1,104 @@
+"""Configuration classes for HT Status application.
+
+This is an example configuration file. Copy this to config.py and customize
+the settings for your environment. 
+
+For production deployments, use environment variables instead of hardcoded values.
+See .env.example for the complete list of environment variables.
+"""
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+
+class Config:
+    """Base configuration class."""
+
+    # Flask settings
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    FLASK_ENV = os.environ.get('FLASK_ENV') or 'development'
+    DEBUG = os.environ.get('FLASK_ENV') == 'development'
+
+    # Application settings
+    APP_NAME = os.environ.get('APP_NAME') or 'HT Status'
+    DEBUG_LEVEL = int(os.environ.get('DEBUG_LEVEL', 0))
+    LOCAL_RUN = os.environ.get('LOCAL_RUN', 'false').lower() == 'true'
+
+    # Database configuration
+    SQLALCHEMY_DATABASE_URI = (
+        os.environ.get('DATABASE_URL') or
+        'postgresql://htstatus:development@localhost:5432/htplanner'
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = DEBUG
+
+    # Hattrick CHPP API configuration
+    CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
+    CONSUMER_SECRETS = os.environ.get('CONSUMER_SECRETS')
+    CALLBACK_URL = os.environ.get('CALLBACK_URL') or 'http://localhost:5000/login'
+    CHPP_URL = os.environ.get('CHPP_URL') or 'https://chpp.hattrick.org/chppxml.ashx'
+
+    # Redis configuration
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://:development@localhost:6379/0'
+    REDIS_HOST = os.environ.get('REDIS_HOST') or 'localhost'
+    REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+    REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD') or 'development'
+
+
+class DevelopmentConfig(Config):
+    """Development configuration."""
+
+    DEBUG = True
+    SQLALCHEMY_ECHO = True
+
+
+class TestConfig(Config):
+    """Testing configuration."""
+
+    TESTING = True
+    DEBUG = True
+    WTF_CSRF_ENABLED = False
+
+    # Use separate test database
+    SQLALCHEMY_DATABASE_URI = (
+        os.environ.get('TEST_DATABASE_URL') or
+        'postgresql://htstatus:development@localhost:5432/htplanner_test'
+    )
+
+    # Disable CHPP API calls in tests
+    CONSUMER_KEY = 'test-key'
+    CONSUMER_SECRETS = 'test-secret'
+
+    # Use test Redis database
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://:development@localhost:6379/1'
+
+
+class ProductionConfig(Config):
+    """Production configuration."""
+
+    DEBUG = False
+    SQLALCHEMY_ECHO = False
+
+    # Ensure all required env vars are set for production
+    @classmethod
+    def init_app(cls, app):
+        """Initialize production-specific settings."""
+        Config.init_app(app)
+
+        # Ensure critical settings are configured
+        assert os.environ.get('SECRET_KEY'), 'SECRET_KEY environment variable must be set'
+        assert os.environ.get('DATABASE_URL'), 'DATABASE_URL environment variable must be set'
+        assert os.environ.get('CONSUMER_KEY'), 'CONSUMER_KEY environment variable must be set'
+        assert os.environ.get('CONSUMER_SECRETS'), 'CONSUMER_SECRETS environment variable must be set'
+
+
+# Configuration mapping
+config = {
+    'development': DevelopmentConfig,
+    'testing': TestConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}

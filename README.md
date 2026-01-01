@@ -36,6 +36,10 @@ This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency ma
    cp .env.example .env
    # Edit .env with your Hattrick CHPP credentials
 
+   # Copy configuration template and customize if needed
+   cp config.py.example config.py
+   # Edit config.py if you need custom configuration beyond environment variables
+
    # Setup complete development environment
    make setup
    ```
@@ -138,7 +142,18 @@ cp .env.example .env
 
 You can still use a `config.py` file, but environment variables take priority:
 
+```bash
+# Copy the example configuration
+cp config.py.example config.py
+# Edit config.py for your environment
 ```
+
+The configuration provides multiple environment classes:
+- `DevelopmentConfig`: For local development
+- `TestConfig`: For automated testing  
+- `ProductionConfig`: For production deployment with validation
+
+```python
 import os
 
 class Config(object):
