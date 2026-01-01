@@ -3,6 +3,7 @@
 import os
 
 import pytest
+from sqlalchemy import text
 
 
 @pytest.mark.integration
@@ -13,12 +14,13 @@ def test_app_with_database_services(app, db_session):
         from app.factory import db
         assert db.engine is not None
 
-        # Test basic database operation
-        result = db.engine.execute("SELECT current_database()")
-        db_name = result.fetchone()[0]
+        # Test basic database operation using modern SQLAlchemy pattern
+        with db.engine.connect() as connection:
+            result = connection.execute(text("SELECT current_database()"))
+            db_name = result.fetchone()[0]
 
-        # Should be connected to test database
-        assert 'test' in db_name.lower() or 'htplanner' in db_name.lower()
+            # Should be connected to test database
+            assert 'test' in db_name.lower() or 'htplanner' in db_name.lower()
 
 
 @pytest.mark.integration
@@ -85,15 +87,15 @@ def test_database_transaction_isolation(app, db_session):
 
         # Start with clean state
         initial_tables = db_session.execute(
-            "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"
+            text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
         ).fetchone()[0]
 
         # Create a temporary table in transaction
-        db_session.execute("CREATE TEMP TABLE integration_test (id SERIAL)")
+        db_session.execute(text("CREATE TEMP TABLE integration_test (id SERIAL)"))
 
         # Should be able to use the table in same transaction
-        db_session.execute("INSERT INTO integration_test DEFAULT VALUES")
-        result = db_session.execute("SELECT count(*) FROM integration_test")
+        db_session.execute(text("INSERT INTO integration_test DEFAULT VALUES"))
+        result = db_session.execute(text("SELECT count(*) FROM integration_test"))
         count = result.fetchone()[0]
 
         assert count == 1
