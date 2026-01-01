@@ -100,7 +100,7 @@ Database queries → Skill calculations → Template/React rendering → User in
 ...existing code...
 # HTStatus Architecture
 
-*Adapted from ROTWA architecture documentation for the HTStatus project.*
+*This architecture documentation reflects the current HTStatus project structure and design decisions.*
 
 ## System Overview
 

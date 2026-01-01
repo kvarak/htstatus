@@ -1,10 +1,10 @@
 # HTStatus Development Methodology Guide
 
-*This file is adapted from the ROTWA project to provide a structured, AI-assisted development workflow for the HTStatus project.*
+*This file provides a structured, AI-assisted development workflow for the HTStatus project.*
 
 ## Overview
 
-This guide documents the development methodology for HTStatus, inspired by the ROTWA DevAgent workflow. It covers structured task execution, quality assurance, documentation standards, and infrastructure setup for efficient, maintainable development.
+This guide documents the professional development methodology for HTStatus, featuring systematic task execution, quality assurance, documentation standards, and infrastructure setup for efficient, maintainable development.
 
 ## Development Philosophy
 
