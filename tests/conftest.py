@@ -1,7 +1,9 @@
 """Pytest configuration and fixtures for HT Status tests."""
 
-import pytest
 import os
+
+import pytest
+
 from app.factory import create_app, db
 from config import TestConfig
 
@@ -34,19 +36,20 @@ def client(app):
 def db_session(app):
     """Create a database session for testing with transaction rollback."""
     with app.app_context():
-        # Start a transaction
+        # Use the existing db.session for simpler compatibility
+        # Start a transaction that we can rollback
         connection = db.engine.connect()
         transaction = connection.begin()
-
-        # Configure session to use the transaction
-        session = db.create_scoped_session(
-            options={"bind": connection, "binds": {}}
-        )
-        db.session = session
+        
+        # Create new session bound to this connection
+        from sqlalchemy.orm import sessionmaker
+        Session = sessionmaker(bind=connection)
+        session = Session()
 
         yield session
 
-        # Rollback transaction after test
+        # Clean up
+        session.close()
         transaction.rollback()
         connection.close()
 

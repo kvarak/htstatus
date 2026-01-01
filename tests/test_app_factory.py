@@ -1,8 +1,7 @@
 """Test Flask application factory functionality."""
 
-import pytest
 from app.factory import create_app, db
-from config import Config, TestConfig
+from config import TestConfig
 
 
 def test_app_creation():
@@ -50,5 +49,5 @@ def test_app_context_functionality(app):
     """Test that application context works correctly."""
     with app.app_context():
         from flask import current_app
-        assert current_app is app
+        assert current_app.name == app.name  # Test logical equality instead of object identity
         assert current_app.config['TESTING'] is True

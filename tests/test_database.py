@@ -1,15 +1,14 @@
 """Test database operations and models."""
 
-import pytest
-from datetime import datetime
+from sqlalchemy import text
 from app.factory import db
 
 
 def test_database_connection(app, db_session):
     """Test that database connection works."""
     with app.app_context():
-        # Test basic database connectivity
-        result = db.engine.execute("SELECT 1")
+        # Test basic database connectivity using modern SQLAlchemy
+        result = db_session.execute(text("SELECT 1"))
         assert result.fetchone()[0] == 1
 
 
@@ -31,11 +30,11 @@ def test_database_session_rollback(app, db_session):
         # This test ensures our test isolation is working
         # Any changes made here should be rolled back after the test
 
-        # Try a simple transaction
+        # Try a simple transaction using modern SQLAlchemy
         try:
-            db.session.execute("CREATE TEMPORARY TABLE test_rollback (id INTEGER)")
-            db.session.commit()
-        except:
+            db_session.execute(text("CREATE TEMPORARY TABLE test_rollback (id INTEGER)"))
+            db_session.commit()
+        except Exception:
             # If it fails, that's fine - we're just testing the rollback mechanism
             pass
 
