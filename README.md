@@ -94,6 +94,8 @@ Run `make help` to see all available commands:
 - `make reset` - Clean and rebuild environment
 - `make changelog` - Generate changelog
 
+For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
+
 ### Legacy Commands (Deprecated but Functional)
 
 The following shell scripts are still available but deprecated in favor of Make commands:
