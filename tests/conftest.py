@@ -40,7 +40,7 @@ def db_session(app):
         # Start a transaction that we can rollback
         connection = db.engine.connect()
         transaction = connection.begin()
-        
+
         # Create new session bound to this connection
         from sqlalchemy.orm import sessionmaker
         Session = sessionmaker(bind=connection)

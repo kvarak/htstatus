@@ -1,6 +1,7 @@
 """Test database operations and models."""
 
 from sqlalchemy import text
+
 from app.factory import db
 
 

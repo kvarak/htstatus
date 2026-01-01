@@ -46,6 +46,7 @@
         "Confirm that documentation updates were made (architecture.md, README.md, backlog.md, progress.md).",
         "Check alignment with strategic goals and objectives.",
         "Provide constructive feedback and suggest improvements if necessary.",
+        "Make necessary adjustments to the completed work based on the review.",
         "Do not git add or commit any changes."
       ]
     },
