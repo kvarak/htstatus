@@ -1,13 +1,38 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade
+.PHONY: help setup dev services stop install update shell lint format typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
 
 # Variables
 PYTHON := uv run python
 PIP := uv pip
 UV := uv
 DOCKER_COMPOSE := docker-compose
+
+# Check if UV is available, provide helpful error message if not
+check-uv:
+	@command -v uv >/dev/null 2>&1 || { \
+		echo "❌ ERROR: UV is not installed"; \
+		echo ""; \
+		echo "UV is required for this project. Install it using one of these methods:"; \
+		echo ""; \
+		echo "📦 Using package managers:"; \
+		echo "  # macOS:"; \
+		echo "  brew install uv"; \
+		echo ""; \
+		echo "  # Linux (Ubuntu/Debian):"; \
+		echo "  curl -LsSf https://astral.sh/uv/install.sh | sh"; \
+		echo ""; \
+		echo "  # Linux (Arch):"; \
+		echo "  pacman -S uv"; \
+		echo ""; \
+		echo "  # Or using pip (cross-platform):"; \
+		echo "  pip install uv"; \
+		echo ""; \
+		echo "🔄 After installation, restart your terminal and try again."; \
+		echo "📖 For more info: https://docs.astral.sh/uv/getting-started/installation/"; \
+		exit 1; \
+	}
 
 # Default target
 help: ## Show this help message
@@ -22,14 +47,14 @@ help: ## Show this help message
 	@echo ""
 
 # Development Environment Commands
-setup: ## Initialize development environment (UV sync, Docker setup)
+setup: check-uv ## Initialize development environment (UV sync, Docker setup)
 	@echo "🚀 Setting up HT Status development environment..."
 	@$(UV) sync --dev
 	@$(DOCKER_COMPOSE) pull
 	@echo "✅ Development environment ready!"
 	@echo "   Next: 'make dev' to start development server"
 
-dev: services ## Start development server (equivalent to run.sh)
+dev: check-uv services ## Start development server (equivalent to run.sh)
 	@echo "🌐 Starting HT Status development server..."
 	@$(PYTHON) run.py
 
@@ -46,59 +71,67 @@ services: ## Start Docker Compose services only
 	@echo "✅ Services started (PostgreSQL, Redis)"
 
 # Python Development Commands
-install: ## Install dependencies using UV
+install: check-uv ## Install dependencies using UV
 	@echo "📦 Installing dependencies..."
 	@$(UV) sync
 
-update: ## Update dependencies and sync environment
+update: check-uv ## Update dependencies and sync environment
 	@echo "🔄 Updating dependencies..."
 	@$(UV) sync --upgrade
 	@$(UV) lock --upgrade
 
-shell: ## Open Python shell in UV environment
+shell: check-uv ## Open Python shell in UV environment
 	@echo "🐍 Opening Python shell..."
 	@$(PYTHON) -c "import IPython; IPython.start_ipython()" 2>/dev/null || $(PYTHON)
 
 # Code Quality Commands
-lint: ## Run ruff linting
+lint: check-uv ## Run ruff linting
 	@echo "🔍 Running ruff linting..."
 	@$(UV) run ruff check . --fix
 
-format: ## Run black and ruff formatting
+format: check-uv ## Run black and ruff formatting
 	@echo "🎨 Formatting code..."
 	@$(UV) run black .
 	@$(UV) run ruff check . --fix --select I
 	@$(UV) run ruff format .
 
-typecheck: ## Run mypy type checking
+typecheck: check-uv ## Run mypy type checking
 	@echo "🔬 Running type checking..."
 	@$(UV) run mypy . --ignore-missing-imports
 
-security: ## Run bandit and safety security checks
+security: check-uv ## Run bandit and safety security checks
 	@echo "🔒 Running security checks..."
 	@$(UV) run bandit -r app/ -f json 2>/dev/null || $(UV) run bandit -r app/
 	@$(UV) run safety check
 
 # Testing Infrastructure
+# Testing Infrastructure with fallback support
 test: services ## Run comprehensive test suite
 	@echo "🧪 Running comprehensive test suite..."
-	@$(UV) run pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0
-	@echo "✅ Test suite completed"
+	@if command -v uv >/dev/null 2>&1; then \
+		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0; \
+	else \
+		echo "⚠️  UV not available, falling back to system Python..."; \
+		python -m pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
+		python3 -m pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
+		{ echo "❌ ERROR: Neither UV nor pytest available. Please install UV or pytest."; exit 1; }; \
+	fi
+	@echo "✅ Test suite completed (note: 2 integration tests need additional work)"
 
-test-unit: services ## Run unit tests only (fast)
+test-unit: check-uv services ## Run unit tests only (fast)
 	@echo "🔬 Running unit tests..."
 	@$(UV) run pytest tests/ -v --tb=short -m "not integration"
 
-test-integration: services ## Run integration tests with Docker services
+test-integration: check-uv services ## Run integration tests with Docker services
 	@echo "🔗 Running integration tests..."
 	@$(UV) run pytest tests/ -v --tb=short -m "integration"
 
-test-coverage: services ## Run tests with detailed coverage reporting
+test-coverage: check-uv services ## Run tests with detailed coverage reporting
 	@echo "📊 Running tests with coverage analysis..."
 	@$(UV) run pytest tests/ --cov=app --cov=tests --cov-report=html --cov-report=term-missing --cov-fail-under=60
 	@echo "📋 Coverage report generated in htmlcov/"
 
-test-watch: services ## Run tests in watch mode (reruns on file changes)
+test-watch: check-uv services ## Run tests in watch mode (reruns on file changes)
 	@echo "👀 Running tests in watch mode..."
 	@$(UV) run pytest-watch tests/ -- -v --tb=short
 
@@ -126,11 +159,11 @@ changelog: ## Generate changelog (from changelog.sh)
 	@bash changelog.sh
 
 # Database Commands
-db-migrate: ## Run database migrations
+db-migrate: check-uv ## Run database migrations
 	@echo "🗄️  Creating database migration..."
 	@$(PYTHON) manage.py db migrate
 
-db-upgrade: services ## Apply database upgrades
+db-upgrade: check-uv services ## Apply database upgrades
 	@echo "🗄️  Applying database upgrades..."
 	@$(PYTHON) manage.py db upgrade
 
