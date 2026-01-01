@@ -47,6 +47,7 @@
         "Check alignment with strategic goals and objectives.",
         "Provide constructive feedback and suggest improvements if necessary.",
         "Make necessary adjustments to the completed work based on the review.",
+        "Potential new tasks identified during the review should be added to backlog.md.",
         "Do not git add or commit any changes."
       ]
     },
@@ -58,6 +59,7 @@
         "Review current state in progress.md and backlog.md.",
         "Update backlog.md with completed tasks and current status.",
         "Update progress.md with recent accomplishments and metrics.",
+        "Potential new tasks identified during the review should be added to backlog.md.",
         "Mark dependencies as unblocked where appropriate in backlog.md.",
         "Update architecture.md if structural changes were made.",
         "Ensure all project requirements are still being met.",
@@ -82,7 +84,7 @@
         " - Do not end the subject line with a period",
         " - Use the imperative mood in the subject line",
         " - Wrap the body at 72 characters",
-        " - Use the body to explain what and why vs. how",
+        " - Use the body to explain what and why",
         " - Mention any related issues or tasks from backlog.md by their IDs",
         "Stage the changes for commit.",
         "Create the commit with the written summary.",
