@@ -23,8 +23,11 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 ## File Structure
 - `/app/routes.py`: Main Flask app logic
 - `/models.py`: SQLAlchemy models
-- `/src/`: React frontend
+- `/src/`: React frontend  
 - `/app/templates/`: Jinja2 templates
+- `/scripts/`: Utility scripts (use `make` commands instead)
+- `/environments/`: Environment configuration templates
+- `/configs/`: Docker Compose configurations and build tools
 - `/docker/`, `docker-compose.yml`: Container orchestration
 - `/Makefile`: Standardized dev commands
 - `/tests/`: Test suite

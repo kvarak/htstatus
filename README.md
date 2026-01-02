@@ -33,11 +33,11 @@ This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency ma
    cd htstatus-2.0
 
    # Copy environment template and configure
-   cp .env.example .env
+   cp environments/.env.development.example .env
    # Edit .env with your Hattrick CHPP credentials
 
    # Copy configuration template and customize if needed
-   cp config.py.example config.py
+   cp environments/config.py.example config.py
    # Edit config.py if you need custom configuration beyond environment variables
 
    # Setup complete development environment
@@ -98,9 +98,11 @@ For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
 
 ### Legacy Commands (Deprecated but Functional)
 
-The following shell scripts are still available but deprecated in favor of Make commands:
-- `./run.sh` → Use `make dev`
-- `./scripts/changelog.sh` → Use `make changelog`
+The following scripts are still available but deprecated in favor of Make commands:
+- `./run.sh` → Use `make dev`  
+- `scripts/changelog.sh` → Use `make changelog`
+
+**Status**: All scripts in `scripts/` directory are maintained but Makefile commands are preferred for consistency.
 
 ### Development Commands
 
