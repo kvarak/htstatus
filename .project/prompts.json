@@ -72,14 +72,11 @@
     },
     {
       "name": "commit",
-      "title": "Adds and commits, a brief summary, since the last commit following all git commit guidelines",
+      "title": "Create commits for changes since last commit following git guidelines",
       "what to do": [
-        "Read all files in the .project folder for project requirements and standards.",
-        "Read all root documentation files: README.md, TECHNICAL.md.",
         "Analyze all changes made since the last commit.",
-        "If possible, group related changes into logical units for separate commits.",
-        "For each commit, write a concise summary that follows git commit guidelines.",
-        "Follow these git commit guidelines as much as possible",
+        "Group related changes into logical units for separate commits if needed.",
+        "Write commit summaries following git commit guidelines:",
         " - Separate subject from body with a blank line",
         " - Limit the subject line to 50 characters",
         " - Capitalize the subject line",
@@ -87,11 +84,15 @@
         " - Use the imperative mood in the subject line",
         " - Wrap the body at 72 characters",
         " - Use the body to explain what and why",
-        " - the body needs to be a super-short summary of changes made",
-        " - Mention any related issues or tasks from backlog.md by their IDs",
+        " - Include brief summary of changes made",
+        " - Reference related task IDs from backlog.md when applicable",
+        " - IMPORTANT: Keep commit messages factual and objective",
+        " - Avoid promotional language like 'excellent', 'optimal', 'professional-grade'",
+        " - Avoid subjective assessments of quality or strategic impact",
+        " - Focus on what was changed, not editorial commentary about how good it is",
         "Stage the changes for commit.",
         "Create the commit with the written summary.",
-        "Do not push the commits to the remote repository."
+        "Do not push commits to remote repository."
       ]
     },
     {
