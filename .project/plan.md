@@ -1,5 +1,9 @@
 # Plan
 
+## Quick Navigation
+🔗 **Project Documentation**: [Architecture](architecture.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)  
+🚀 **Development**: [Prompts](prompts.json) • [Technical Docs](../TECHNICAL.md) • [README](../README.md)
+
 ## Project Requirements
 
 ### Goals
@@ -45,6 +49,22 @@
 **Foundation**: Rich historical data for algorithms; existing skill calculations as foundation; React dashboard for visualizations.
 
 *Generated January 2, 2026 - These opportunities leverage HTStatus's unique position in Hattrick ecosystem and strong technical foundation*
+
+## Related Documentation
+
+📋 **Planning & Tracking**: 
+- [Current Backlog](backlog.md) - Active and planned development tasks
+- [Progress Tracking](progress.md) - Recent accomplishments and project status  
+- [Strategic Goals](goals.md) - Vision, objectives, and success metrics
+
+🏗️ **Architecture & Implementation**:
+- [System Architecture](architecture.md) - High-level design and component breakdown
+- [Technical Documentation](../TECHNICAL.md) - Implementation details and development standards
+- [User Guide](../README.md) - Setup, usage, and development commands
+
+🛠️ **Development Workflows**:
+- [Development Prompts](prompts.json) - AI-assisted development workflows and systematic processes
+- [Change History](../CHANGELOG.md) - Version history and notable changes
 
 ---
 

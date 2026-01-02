@@ -1,5 +1,9 @@
 # HTStatus Architecture
 
+## Quick Navigation
+🔗 **Project Context**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)  
+🛠️ **Technical Details**: [Implementation Guide](../TECHNICAL.md) • [Setup Instructions](../README.md)
+
 *This file preserves all 2.0 architecture documentation, adapted to the new format. Update as the project evolves.*
 
 ## System Overview
@@ -139,3 +143,17 @@ HTStatus is designed as a web-based platform for managing and visualizing footba
 ---
 
 *Update this file with any major architectural changes or new integrations.*
+
+## Related Documentation
+
+📋 **Project Management**: 
+- [Development Plan](plan.md) - Requirements, standards, and development guidelines
+- [Current Progress](progress.md) - Implementation status and recent accomplishments  
+- [Strategic Goals](goals.md) - Vision and objectives driving architectural decisions
+
+🛠️ **Implementation Details**:
+- [Technical Documentation](../TECHNICAL.md) - Implementation specifics and development standards  
+- [Setup Guide](../README.md) - Local development setup and usage instructions
+- [Change History](../CHANGELOG.md) - Version history and architectural evolution
+
+📋 **Development Tasks**: [Project Backlog](backlog.md) - Architecture-related tasks and technical debt items
