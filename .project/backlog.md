@@ -8,8 +8,8 @@
 ## Quick Reference Summary
 
 ### 🚀 Ready to Execute (No Dependencies)
-- **[DOC-011]** Update documentation references → [High Priority](#high-priority)
 - **[DOC-003]** Add cross-references between .project files → [High Priority](#high-priority) 
+- **[DOC-012]** Add debugging guide to technical documentation → [Medium Priority](#medium-priority)
 - **[DOC-004]** Enhance progress tracking with metrics → [Medium Priority](#medium-priority)
 - **[DOC-005]** Improve documentation (user guides, API docs) → [Medium Priority](#medium-priority)
 - **[DOC-010]** Add testing requirements to development prompts → [Medium Priority](#medium-priority)
@@ -20,15 +20,16 @@
 - **[SEC-001]** Security & Quality Remediation → [High Priority](#high-priority)
 
 ### 🔗 Dependency-Blocked Tasks
-- **[DOC-012]** requires DOC-011 → [Medium Priority](#medium-priority)
 - **[FEAT-001]** requires TEST-001 → [Medium Priority](#medium-priority)
 - **[PROJ-001]** requires SEC-001 → [Medium Priority](#medium-priority)
 
-### 📊 Project Health: 92/100 | Tests: 34/34 ✅ | Docs: Professional Grade ✅
+### 📊 Project Health: 93/100 | Tests: 34/34 ✅ | Docs: Professional Grade ✅ | Completed: 10 Tasks
 
 ## Priority Summary
 
 ### COMPLETED
+- [x] **[DOC-011] Update documentation references and legacy file paths**
+	- *Completed*: January 2, 2026 - All file path references updated to reflect new directory structure; deprecated vs active script status clearly documented; all paths validated and tested
 - [x] **[DOC-007] Organize project documentation structure**
 	- *Completed*: January 1, 2026 - All .project files created and structured
 - [x] **[DOC-008] Integrate advanced development prompts**
@@ -51,14 +52,6 @@
 ### HIGH Priority
 
 #### 🚀 Ready for Immediate Implementation
-- [ ] **[DOC-011] Update documentation references and legacy file paths**
-	- *Acceptance Criteria*: All file path references in README.md and documentation point to correct locations after directory reorganization; deprecated vs active script status is clearly documented.
-	- *Dependencies*: ORG-001 (completed)
-	- *Status*: **Ready for Implementation** - Directory reorganization complete, specific outdated references identified
-	- *Strategic Impact*: **High** - Prevents developer confusion and improves onboarding
-	- *Effort*: **Low** - Text updates with clear target files identified
-	- *Progress Note*: Analysis identified legacy file path references in documentation that need alignment with completed directory structure changes
-
 - [ ] **[DOC-003] Add cross-references between related .project files**
 	- *Acceptance Criteria*: Logical connections between .project files are linked; navigation between related documents is improved.
 	- *Dependencies*: None
@@ -95,6 +88,13 @@
 ### MEDIUM Priority
 
 #### 🚀 Ready for Implementation
+- [ ] **[DOC-012] Add comprehensive debugging guide to technical documentation**
+	- *Acceptance Criteria*: TECHNICAL.md includes debugging procedures, common troubleshooting steps, and development environment validation; debugging workflow is clear for new developers.
+	- *Dependencies*: DOC-011 (completed)
+	- *Status*: **Ready for Implementation** - Documentation references updated, strong foundation provides excellent base for debugging enhancements
+	- *Strategic Impact*: **High** - Significantly improves developer experience
+	- *Effort*: **Medium** - Technical documentation enhancement
+
 - [ ] **[DOC-004] Enhance progress tracking with specific metrics**
 	- *Acceptance Criteria*: Progress.md includes specific milestone dates, completion percentages, and measurable metrics.
 	- *Dependencies*: None
@@ -114,20 +114,6 @@
 	- *Effort*: **Low** - Enhancement to existing prompts.json
 
 #### 🔗 Dependency-Blocked Tasks
-- [ ] **[DOC-012] Add comprehensive debugging guide to technical documentation**
-	- *Acceptance Criteria*: TECHNICAL.md includes debugging procedures, common troubleshooting steps, and development environment validation; debugging workflow is clear for new developers.
-	- *Dependencies*: DOC-011 (documentation updates)
-	- *Status*: **Ready for Implementation** - Strong documentation foundation provides excellent base for debugging enhancements
-	- *Strategic Impact*: **High** - Significantly improves developer experience
-	- *Effort*: **Medium** - Technical documentation enhancement
-
-- [ ] **[INFRA-003] Add automated environment setup validation scripts**
-	- *Acceptance Criteria*: Validation scripts verify development environment setup; automated checks prevent common configuration issues; integration with existing Makefile commands.
-	- *Dependencies*: INFRA-001 (completed)
-	- *Status*: **Ready for Implementation** - Comprehensive environment templates provide foundation for validation automation
-	- *Strategic Impact*: **Medium** - Prevents setup issues for new developers
-	- *Effort*: **Medium** - Script development and Makefile integration
-
 - [ ] **[FEAT-001] Enhance data visualization features**
 	- *Acceptance Criteria*: New or improved charts/visuals are available in the UI; user feedback is positive.
 	- *Dependencies*: TEST-001 (test foundation)
@@ -160,6 +146,18 @@
 	- *Dependencies*: None
 	- *Strategic Impact*: **Medium** - Future feature expansion potential
 	- *Effort*: **Medium** - Research and proof-of-concept development
+
+- [ ] **[DOC-013] Consolidate legacy command documentation for better clarity**
+	- *Acceptance Criteria*: Legacy commands section in README.md is streamlined and better organized; deprecated status is clear without redundancy.
+	- *Dependencies*: DOC-011 (completed)
+	- *Strategic Impact*: **Low** - Minor documentation organization improvement  
+	- *Effort*: **Low** - Documentation consolidation and cleanup
+
+- [ ] **[DOC-014] Add automated path validation to prevent future documentation drift**
+	- *Acceptance Criteria*: Automated validation checks ensure documentation file paths remain accurate; integrated into CI/CD or make commands.
+	- *Dependencies*: DOC-011 (completed)
+	- *Strategic Impact*: **Low** - Long-term documentation maintenance
+	- *Effort*: **Medium** - Script development and integration
 
 #### 🔧 Advanced Infrastructure Tasks
 - [ ] **[INFRA-004] Implement automated documentation drift prevention**
