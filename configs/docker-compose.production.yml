@@ -1,0 +1,101 @@
+# Docker Compose override for production environment
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.production.yml up
+# WARNING: This is for reference only - production should use managed services
+
+services:
+  # PostgreSQL with production settings (NOT recommended - use managed DB service)
+  postgres:
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}  # Required - no defaults
+      POSTGRES_USER: ${POSTGRES_USER}  # Required
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # Required
+    # Production: No exposed ports (internal only)
+    ports: []
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    # Production: Strict health checks
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    # Production: Resource limits and security
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+
+  # Redis with production settings (NOT recommended - use managed service)
+  redis:
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    # Production: No exposed ports (internal only)  
+    ports: []
+    volumes:
+      - redis_prod_data:/data
+    # Production: Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+    security_opt:
+      - no-new-privileges:true
+
+  # pgAdmin disabled in production
+  pgadmin:
+    profiles: ["never"]  # Never start in production
+
+  # Production monitoring (optional)
+  monitoring:
+    image: prom/node-exporter:latest
+    profiles: ["monitoring"]
+    ports:
+      - "127.0.0.1:9100:9100"  # Localhost only
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=0.0.0.0:9100'
+    volumes:
+      - '/:/host:ro,rslave'
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_prod_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /opt/htstatus/data/postgres  # Persistent storage
+      o: bind
+  redis_prod_data:
+    driver: local
+    driver_opts:
+      type: none  
+      device: /opt/htstatus/data/redis  # Persistent storage
+      o: bind
+
+networks:
+  htstatus_network:
+    driver: bridge
+    internal: true  # Production: Internal network only
+
+# Production deployment notes:
+# 1. Use managed database services (AWS RDS, Azure Database, etc.)
+# 2. Use managed Redis services (AWS ElastiCache, Azure Cache, etc.) 
+# 3. This compose file is for reference/emergency only
+# 4. Implement proper secrets management
+# 5. Use load balancers and reverse proxies
+# 6. Set up monitoring and logging
+# 7. Implement automated backups
+# 8. Use SSL/TLS for all connections

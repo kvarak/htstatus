@@ -119,11 +119,17 @@ HTStatus is designed as a web-based platform for managing and visualizing footba
 - **Data Storage**: File-based or database (as implemented)
 - **Testing**: Automated tests (if present)
 
-## File Structure
-- `app/` - Application code (routes, logic, templates, static assets)
-- `models.py` - Data models
-- `manage.py` - Management scripts
-- `requirements.txt` - Python dependencies
+## File Structure (Updated January 2026)
+- `app/` - Flask application code (routes, logic, templates, static assets)
+- `src/` - React frontend components and pages
+- `scripts/` - Utility scripts (migrations, changelog, database tools)
+- `environments/` - Environment configuration templates (.env examples)
+- `configs/` - Tool configurations and Docker compose overrides
+- `models.py` - Database models
+- `tests/` - Test suites and fixtures
+- `pyproject.toml` - Python dependencies (UV-managed)
+- `docker-compose.yml` - Development services
+- `Makefile` - Development automation
 - `.project/` - Development documentation and planning
 
 ## Security & Maintenance

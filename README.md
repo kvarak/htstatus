@@ -100,7 +100,7 @@ For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
 
 The following shell scripts are still available but deprecated in favor of Make commands:
 - `./run.sh` → Use `make dev`
-- `./changelog.sh` → Use `make changelog`
+- `./scripts/changelog.sh` → Use `make changelog`
 
 ### Development Commands
 
@@ -122,38 +122,120 @@ The following shell scripts are still available but deprecated in favor of Make 
 
 ## Configuration
 
-### Environment Variables
+HTStatus supports multiple environment configurations with comprehensive templates and validation. Choose the approach that works best for your deployment scenario.
 
-Copy `.env.example` to `.env` and configure:
+### Quick Setup (Development)
+
+For development, use the development-specific environment template:
 
 ```bash
-cp .env.example .env
+# Copy development template
+cp environments/.env.development.example .env
+
+# Edit with your CHPP API credentials
+nano .env  # or your preferred editor
 ```
 
-**Required Configuration:**
-- `CONSUMER_KEY` - Your Hattrick CHPP consumer key
-- `CONSUMER_SECRETS` - Your Hattrick CHPP consumer secret
-- `CALLBACK_URL` - OAuth callback URL (usually http://localhost:5000/login)
-- `SECRET_KEY` - Flask secret key (change from default)
+### Environment-Specific Setup
 
-**Database Configuration (automatic with Docker Compose):**
+HTStatus provides environment templates for different deployment scenarios:
+
+#### Development Environment
+```bash
+# Use development template with detailed comments
+cp environments/.env.development.example .env
+
+# Start with development Docker configuration
+docker-compose -f docker-compose.yml -f configs/docker-compose.development.yml up -d
+
+# Run development server
+make dev
+```
+
+#### Staging Environment
+```bash
+# Use staging template with security enhancements
+cp environments/.env.staging.example .env
+
+# Configure staging-specific values (see template comments)
+nano .env
+
+# Start with staging Docker configuration
+docker-compose -f docker-compose.yml -f configs/docker-compose.staging.yml up -d
+```
+
+#### Production Environment
+```bash
+# Use production template (requires all security settings)
+cp environments/.env.production.example .env
+
+# IMPORTANT: Replace ALL placeholder values with secure production values
+# See template file for detailed security requirements
+nano .env
+
+# Production should use managed services, not Docker Compose
+# See configs/docker-compose.production.yml for reference only
+```
+
+### Configuration Validation
+
+HTStatus automatically validates configuration based on the environment:
+
+- **Development**: Warnings for missing CHPP credentials, allows development defaults
+- **Staging**: Requires secure SECRET_KEY, validates critical settings  
+- **Production**: Strict validation of all security settings, requires SSL, validates secret strength
+
+### Environment Variables Reference
+
+**Required for all environments:**
+- `FLASK_ENV` - Environment type: `development`, `staging`, `production`
+- `SECRET_KEY` - Flask secret key (must be secure for staging/production)
 - `DATABASE_URL` - PostgreSQL connection string
-- `POSTGRES_*` - Individual database connection parameters
+
+**CHPP API Configuration:**
+- `CONSUMER_KEY` - Your Hattrick CHPP consumer key ([Get here](https://chpp.hattrick.org/))
+- `CONSUMER_SECRETS` - Your Hattrick CHPP consumer secret
+- `CALLBACK_URL` - OAuth callback URL for your environment
+
+**Database Configuration (managed by Docker Compose in development):**
+- `POSTGRES_DB` - Database name
+- `POSTGRES_USER` - Database user
+- `POSTGRES_PASSWORD` - Database password
+- `POSTGRES_HOST` - Database host
+- `POSTGRES_PORT` - Database port
+
+**Redis Configuration:**
+- `REDIS_URL` - Redis connection URL
+- `REDIS_HOST` - Redis host
+- `REDIS_PORT` - Redis port  
+- `REDIS_PASSWORD` - Redis password
+
+**Security Settings (staging/production):**
+- `SESSION_COOKIE_SECURE` - Enable secure cookies (HTTPS required)
+- `SESSION_COOKIE_HTTPONLY` - Prevent JavaScript access to session cookies
+- `SESSION_COOKIE_SAMESITE` - CSRF protection (`Lax` or `Strict`)
+- `PERMANENT_SESSION_LIFETIME` - Session timeout in seconds
 
 ### Legacy config.py (Still Supported)
 
-You can still use a `config.py` file, but environment variables take priority:
+You can still use a `config.py` file, but environment variables take priority. The configuration system now provides enhanced environment support:
 
-```bash
-# Copy the example configuration
-cp config.py.example config.py
-# Edit config.py for your environment
+```python
+# config.py structure
+from config import get_config, Config, DevelopmentConfig, StagingConfig, ProductionConfig
+
+# Auto-detect configuration based on FLASK_ENV
+ConfigClass = get_config()
+
+# Or explicitly specify
+ConfigClass = get_config('production')
 ```
 
-The configuration provides multiple environment classes:
-- `DevelopmentConfig`: For local development
-- `TestConfig`: For automated testing  
-- `ProductionConfig`: For production deployment with validation
+**Available Configuration Classes:**
+- `DevelopmentConfig`: Development with helpful defaults and warnings
+- `StagingConfig`: Staging with enhanced security and validation
+- `TestConfig`: Testing with isolated databases and mocked services
+- `ProductionConfig`: Production with strict validation and security requirements
 
 ```python
 import os

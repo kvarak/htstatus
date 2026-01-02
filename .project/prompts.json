@@ -41,6 +41,7 @@
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
         "Carefully review the last completed task to ensure it meets all specified requirements.",
+        "Make sure to review all changes since the last commit.",
         "Check for accuracy, completeness, and adherence to guidelines outlined in plan.md.",
         "Verify that all project requirements are still being met.",
         "Confirm that documentation updates were made (architecture.md, README.md, backlog.md, progress.md).",

@@ -22,28 +22,27 @@
 	- *Completed*: January 1, 2026 - All ROTWA references removed from HTStatus documentation; project focus is clear and consistent with enhanced HTStatus branding
 - [x] **[TEST-002] Resolve remaining integration test failures**
 	- *Completed*: January 1, 2026 - All 34 tests pass consistently (100% success rate); integration test suite provides reliable CI/CD foundation with modern SQLAlchemy compatibility
+- [x] **[INFRA-001] Implement environment configuration templates for deployment**
+	- *Completed*: January 2, 2026 - Environment templates created for development/staging/production with comprehensive validation, Docker Compose profiles, enhanced Makefile commands, and security guidelines
+- [x] **[ORG-001] Reorganize root directory structure for better maintainability**
+	- *Completed*: January 2, 2026 - Root directory reorganized with logical grouping: scripts/ for utilities, environments/ for templates, configs/ for Docker/tools; all references updated and functionality preserved
 
 ### HIGH Priority
 - [ ] **[TEST-001] Add automated tests for core features**
 	- *Acceptance Criteria*: Test suite covers all critical app logic; `make test` passes with >80% coverage.
 	- *Dependencies*: None (infrastructure ready)
-	- *Status*: **Ready for Implementation** - Professional testing infrastructure in place with 100% test success foundation
-	- *Progress Note*: Testing foundation established, SQLAlchemy fixtures modernized, quality gates operational, reliable CI/CD foundation achieved
-- [ ] **[INFRA-001] Implement environment configuration templates for deployment**
-	- *Acceptance Criteria*: Templates exist for all required environments; setup is documented in README and plan.md.
-	- *Dependencies*: None
-	- *Status*: **Ready for Implementation** - Benefits from established config.py foundation with environment-specific classes
-	- *Implementation Note*: Can build upon existing Config/TestConfig/ProductionConfig structure
+	- *Status*: **Ready for Implementation** - Professional testing infrastructure in place with 100% test success foundation and robust environment configuration
+	- *Progress Note*: Testing foundation established, SQLAlchemy fixtures modernized, quality gates operational, reliable CI/CD foundation achieved, environment templates provide deployment flexibility
 - [ ] **[SEC-001] Security & Quality Remediation (Task 2.0.1)**
 	- *Acceptance Criteria*: All critical security and code quality issues are resolved; linter and security checks pass.
 	- *Dependencies*: TEST-001 (expanded test coverage recommended)
-	- *Status*: **Enhanced Readiness** - Code quality tools operational, 100% test success provides strong foundation
-	- *Progress Note*: Quality gates implemented (ruff, black, mypy), 91 code quality issues identified with improvement path, reliable testing foundation established
+	- *Status*: **Significantly Enhanced Readiness** - Production security templates provide comprehensive guidelines, code quality tools operational, 100% test success foundation
+	- *Progress Note*: Production environment templates include security requirements, quality gates implemented (ruff, black, mypy), 91 code quality issues identified with improvement path, reliable testing foundation established
 - [ ] **[DOC-003] Add cross-references between related .project files**
 	- *Acceptance Criteria*: Logical connections between .project files are linked; navigation between related documents is improved.
 	- *Dependencies*: None
-	- *Status*: **Ready for Implementation** - Documentation cleanup complete, optimal time to enhance cross-references
-	- *Implementation Note*: Build upon clean HTStatus branding foundation established by DOC-002
+	- *Status*: **Ready for Implementation** - Documentation cleanup complete, clean project organization provides optimal foundation for cross-references
+	- *Implementation Note*: Build upon clean HTStatus branding foundation established by DOC-002 and organized structure from ORG-001
 
 ### MEDIUM Priority
 - [ ] **[DOC-004] Enhance progress tracking with specific metrics**

@@ -1,0 +1,52 @@
+# Docker Compose override for development environment
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.development.yml up
+
+services:
+  # PostgreSQL with development settings
+  postgres:
+    environment:
+      # Development database settings
+      POSTGRES_DB: ${POSTGRES_DB:-htplanner}
+      POSTGRES_USER: ${POSTGRES_USER:-htstatus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-development}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+      # Development: Add sample data initialization
+      - ./docker/dev-sample-data.sql:/docker-entrypoint-initdb.d/99-sample-data.sql:ro
+    # Development: Less strict health checks
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-htstatus} -d ${POSTGRES_DB:-htplanner}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Redis with development settings
+  redis:
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-development}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+
+  # pgAdmin enabled by default in development
+  pgadmin:
+    profiles: ["dev", "admin"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@htstatus.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-development}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    profiles: [] # Remove profile to enable by default
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  htstatus_network:
+    driver: bridge

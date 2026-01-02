@@ -70,6 +70,46 @@ services: ## Start Docker Compose services only
 	@$(DOCKER_COMPOSE) up -d postgres redis
 	@echo "✅ Services started (PostgreSQL, Redis)"
 
+services-dev: ## Start services with development configuration
+	@echo "🐳 Starting Docker Compose services (development)..."
+	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.development.yml up -d
+	@echo "✅ Services started (PostgreSQL, Redis, pgAdmin)"
+
+services-staging: ## Start services with staging configuration  
+	@echo "🐳 Starting Docker Compose services (staging)..."
+	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.staging.yml up -d
+	@echo "✅ Services started (PostgreSQL, Redis) with staging configuration"
+
+services-stop: ## Stop all Docker Compose services
+	@echo "🛑 Stopping Docker Compose services..."
+	@$(DOCKER_COMPOSE) down >/dev/null 2>&1 || docker compose down >/dev/null 2>&1 || true
+	@echo "✅ Services stopped"
+
+config-validate: check-uv ## Validate configuration for current environment
+	@echo "🔍 Validating configuration..."
+	@$(PYTHON) -c "from config import get_config; cfg = get_config(); cfg.validate_config(); print('✅ Configuration is valid')"
+
+config-help: ## Show configuration setup help
+	@echo "⚙️  HTStatus Configuration Help"
+	@echo "=============================="
+	@echo ""
+	@echo "Environment Templates:"
+	@echo "  Development: cp environments/.env.development.example .env"
+	@echo "  Staging:     cp environments/.env.staging.example .env" 
+	@echo "  Production:  cp environments/.env.production.example .env"
+	@echo ""
+	@echo "Environment Detection:"
+	@echo "  Set FLASK_ENV=development|staging|production"
+	@echo ""
+	@echo "Validation:"
+	@echo "  make config-validate  # Check current configuration"
+	@echo ""
+	@echo "Templates provide:"
+	@echo "  - Environment-specific defaults"
+	@echo "  - Security guidelines"
+	@echo "  - Required vs optional settings"
+	@echo "  - Deployment instructions"
+
 # Python Development Commands
 install: check-uv ## Install dependencies using UV
 	@echo "📦 Installing dependencies..."
@@ -154,9 +194,9 @@ reset: clean ## Reset environment (clean + fresh install)
 	@$(UV) sync --dev
 	@echo "✅ Environment reset complete"
 
-changelog: ## Generate changelog (from changelog.sh)
+changelog: ## Generate changelog (from scripts/changelog.sh)
 	@echo "📝 Generating changelog..."
-	@bash changelog.sh
+	@bash scripts/changelog.sh
 
 # Database Commands
 db-migrate: check-uv ## Run database migrations
@@ -175,4 +215,4 @@ legacy-run: ## [DEPRECATED] Use 'make dev' instead
 
 legacy-changelog: ## [DEPRECATED] Use 'make changelog' instead
 	@echo "⚠️  WARNING: This command is deprecated. Use 'make changelog' instead."
-	@bash changelog.sh
+	@bash scripts/changelog.sh
