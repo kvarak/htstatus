@@ -87,6 +87,7 @@
         " - Use the imperative mood in the subject line",
         " - Wrap the body at 72 characters",
         " - Use the body to explain what and why",
+        " - the body needs to be a super-short summary of changes made",
         " - Mention any related issues or tasks from backlog.md by their IDs",
         "Stage the changes for commit.",
         "Create the commit with the written summary.",
