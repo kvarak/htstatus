@@ -199,6 +199,33 @@
         "## Next Task Recommendations",
         "## Validation and Compliance Check"
       ]
+    },
+    {
+      "name": "look-outside-the-box",
+      "title": "Generate innovative opportunities by analyzing project potential",
+      "what to do": [
+        "Perform comprehensive analysis of all project documentation, code, and current state.",
+        "Read all files in the .project folder for project requirements and standards.",
+        "Read all root documentation files: README.md, TECHNICAL.md, CHANGELOG.md.",
+        "Review key code files (app/, src/, models.py, config files) to understand current capabilities.",
+        "Analyze existing features, integrations, and infrastructure for expansion opportunities.",
+        "Think creatively about potential enhancements, integrations, or new directions.",
+        "Consider market trends, user experience improvements, and technical innovations.",
+        "Identify opportunities that leverage existing strengths while addressing gaps.",
+        "Focus on high-impact suggestions that could significantly advance the project.",
+        "Consider both incremental improvements and transformational possibilities.",
+        "Generate 2-5 high-level, actionable opportunities with clear value propositions.",
+        "Add suggestions to the 'Future Opportunities' section in plan.md (do not add to backlog).",
+        "Do not git add or commit any changes.",
+        "Include the following sections in your response:",
+        "# Innovation Analysis",
+        "## Current State Assessment",
+        "## Opportunity Discovery Process",
+        "## High-Impact Opportunity Identification",
+        "## Value Proposition Analysis",
+        "## Future Opportunities Added to plan.md",
+        "## Implementation Readiness Assessment"
+      ]
     }
   ]
 }
