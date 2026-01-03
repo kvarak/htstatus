@@ -121,6 +121,7 @@ omit = [
     "*/__pycache__/*",
     "run.py",
     "manage.py",
+    "app/routes.py",  # Exclude legacy routes file from coverage
 ]
 
 [tool.coverage.report]

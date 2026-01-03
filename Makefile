@@ -149,14 +149,14 @@ security: check-uv ## Run bandit and safety security checks
 test: services ## Run comprehensive test suite
 	@echo "🧪 Running comprehensive test suite..."
 	@if command -v uv >/dev/null 2>&1; then \
-		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0; \
+		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=models --cov-report=term-missing --cov-fail-under=0; \
 	else \
 		echo "⚠️  UV not available, falling back to system Python..."; \
-		python -m pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
-		python3 -m pytest tests/ -v --tb=short --cov=app --cov=tests --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
+		python -m pytest tests/ -v --tb=short --cov=app --cov=models --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
+		python3 -m pytest tests/ -v --tb=short --cov=app --cov=models --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
 		{ echo "❌ ERROR: Neither UV nor pytest available. Please install UV or pytest."; exit 1; }; \
 	fi
-	@echo "✅ Test suite completed successfully (100% test success rate achieved)"
+	@echo "✅ Test suite completed successfully with optimized coverage tracking"
 
 test-unit: check-uv services ## Run unit tests only (fast)
 	@echo "🔬 Running unit tests..."
