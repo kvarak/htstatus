@@ -18,6 +18,12 @@ def app_with_routes():
     with app.app_context():
         db.create_all()
         yield app
+        # Clean up any pending transactions
+        try:
+            db.session.rollback()
+            db.session.close()
+        except:
+            pass
         db.drop_all()
 
 
@@ -30,6 +36,12 @@ def routes_client(app_with_routes):
 @pytest.fixture(scope='function')
 def sample_user(app_with_routes):
     """Create a sample user for testing."""
+    # First, clean up any existing user with this ID
+    existing_user = db.session.query(User).filter_by(ht_id=12345).first()
+    if existing_user:
+        db.session.delete(existing_user)
+        db.session.commit()
+    
     user = User(
         ht_id=12345,
         ht_user='testuser',

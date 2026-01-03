@@ -9,7 +9,7 @@ from app import db
 class MatchPlay(db.Model):
     __tablename__ = 'matchplay'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime)
