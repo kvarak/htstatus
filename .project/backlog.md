@@ -1,132 +1,176 @@
-
 # Project Backlog
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)  
-📊 **Project Health**: 95/100 • 173/173 Tests ✅ • 15 Tasks Complete • **Advanced Testing Infrastructure Established** ✅
+📊 **Project Health**: 96/100 • 173/173 Tests ✅ • 16 Tasks Complete • **Testing Infrastructure Reliable & Advanced** ✅
 
 *Advanced testing infrastructure successfully established! TEST-001 foundation expanded with 173 professional-grade tests, enabling confident advanced development with comprehensive coverage strategies.*
 
-## Current Focus: Advanced Development Ready
+## Backlog Management Rules
 
-### 🎯 **COMPLETED** - Advanced Testing Infrastructure
-**[TEST-001] Add automated tests for core features** → **COMPLETED** ✅
-- **Achievement**: Expanded from 48 to 86 tests with 100% success rate
-- **Coverage Improvement**: Enhanced test coverage from 13% baseline to comprehensive coverage
-- **Infrastructure**: Professional-grade testing framework with comprehensive model, route, business logic, and frontend pattern testing
-- **Safety Net Established**: Comprehensive test coverage enabling safe refactoring and confident code improvements
-- **Quality Gates**: All tests pass with robust fixtures, mocking, and database transaction isolation
+**For AI Agents**: Use [Priority Summary](#priority-summary) for automatic next-task identification. All task details are in [Task Catalog](#task-catalog) sections below.
 
-**[TEST-003] Advanced test coverage expansion** → **COMPLETED** ✅
-- **Achievement**: Expanded from 86 to 173 tests with strategic coverage approach
-- **Infrastructure Enhancement**: Professional testing patterns with blueprint focus, comprehensive mocking, edge case coverage
-- **Strategic Value**: Advanced testing foundation enabling confident development and refactoring
-- **Coverage Strategy**: Targeted approach for routes_bp.py and achievable coverage metrics
-- **Professional Methodology**: Multiple testing approaches (focused, minimal, comprehensive, strategic) for maximum effectiveness
+**For Humans**: Navigate using section links. Task categories reflect execution readiness and strategic priority.
 
-**[ORG-001] Configuration architecture analysis** → **COMPLETED** ✅
-- **Analysis Result**: Root directory placement is optimal and follows Flask best practices
-- **Flask Compliance**: Aligned with Flask documentation patterns for application factory and multi-environment configuration
-- **Professional Implementation**: Robust 252-line config with validation, environment classes, and .env integration
-- **Impact**: Zero refactoring required - current structure exceeds industry standards
+**Task ID Format**: [TYPE-###] where TYPE is FEAT, DOC, INFRA, TEST, SEC, PROJ, RESEARCH, MONITOR, ORG
 
-## Ready to Execute
+## Priority Summary
 
-### 🚀 **UNBLOCKED** - Advanced Testing Infrastructure Complete, Ready for High-Impact Development
-2. **[FEAT-001] Data visualization features** → High Impact, High Effort  
-   - **Now Unblocked**: Advanced test infrastructure provides comprehensive safety net for feature development
-   - New/improved charts and visuals in UI with test-driven development
-   - Dependencies: TEST-001 ✅, TEST-003 ✅ (both completed)  
-   - Strategic value: Enhanced user experience with reliable testing coverage
+### 🚀 **Tier 1: High Impact Ready** (Execute Next)
+1. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
+2. **[DOC-012] Debugging Guide** → [Details](#doc-012-debugging-guide) | *Unblocks development workflow*  
+3. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *Data-driven project management*
 
-3. **[REFACTOR-001] Code maintainability** → Medium Impact, High Effort
-   - **Now Unblocked**: Comprehensive test coverage (173 tests) enables safe refactoring
-   - Cleaner, more modular, maintainable codebase with confidence
-   - Dependencies: TEST-001 ✅, TEST-003 ✅ (both completed)
-   - Strategic value: Technical debt reduction backed by robust testing
+### ⚡ **Tier 2: Quick Wins & Strategic Prep**
+4. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *Workflow consistency*
+5. **[DOC-005] User Documentation** → [Details](#doc-005-user-documentation) | *User adoption enablement*
+6. **[INFRA-006] Schema Validation** → [Details](#infra-006-database-schema-validation) | *Proactive infrastructure*
 
-4. **[SEC-001] Security & Quality Remediation** → Very High Impact, High Effort
-   - **Now Safer with Advanced Tests**: 173 tests provide comprehensive safety net for remediation work
-   - 91 code quality issues, security checks, production deployment readiness
-   - Dependencies: TEST-001 ✅, TEST-003 ✅ (both completed) - provides comprehensive testing safety net
-   - Strategic value: Production readiness with testing confidence
+### 🔒 **Tier 3: Production Gate Required**
+7. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *Critical milestone*
+8. **[PROJ-001] Advanced Development** → [Details](#proj-001-resume-development) | *Unlocked by SEC-001*
 
-### ⚡ Quick Wins - No Dependencies  
-5. **[INFRA-005] Test coverage configuration optimization** → High Impact, Low Effort
-   - Adjust coverage thresholds to focus on actively maintained code (exclude legacy routes.py)
-   - Optimize `make test` performance and eliminate hanging on coverage calculations
-   - Dependencies: None
-   - Strategic value: Unblocks testing workflow, improves development velocity
+### 📚 **Tier 4: Strategic Investments** 
+9. **[DOC-006] Architecture Clarity** → [Details](#strategic-documentation--organization) | *Low effort cleanup*
+10. **[RESEARCH-001] Additional Integrations** → [Details](#strategic-research--infrastructure) | *Future expansion*
 
-6. **[DOC-012] Debugging guide** → High Impact, Medium Effort
-   - TECHNICAL.md debugging procedures, troubleshooting steps, environment validation
-   - Dependencies: DOC-011 ✅ (completed)
-   - Strategic value: Unblocks development, improves developer experience
+---
 
-7. **[DOC-004] Progress metrics** → Medium Impact, Low Effort  
-   - Progress.md with milestone dates, completion percentages, measurable metrics
-   - Dependencies: None
-   - Strategic value: Project visibility, data-driven decisions
+## Task Catalog
 
-8. **[DOC-010] Testing prompts** → Medium Impact, Low Effort
-   - prompts.json testing validation steps, Makefile command references
-   - Dependencies: None  
-   - Strategic value: Workflow consistency, regression prevention
+### 🚀 Game-Changing Development
 
-9. **[FEAT-002] Mobile-First PWA** → Very High Impact, Medium Effort
-   - Mobile-optimized PWA, offline functionality, real-time match management
-   - Dependencies: None (React + Vite PWA-ready)
-   - Strategic value: Critical market gap, competitive advantage
+#### [FEAT-002] Mobile-First PWA
+**Priority**: Very High Impact, Medium Effort | **Status**: Ready to Execute  
+**Dependencies**: None (React + Vite PWA-ready)  
+**Strategic Value**: Critical market gap, competitive advantage  
+**Implementation**: Mobile-optimized PWA, offline functionality, real-time match management
 
-10. **[DOC-005] User documentation** → Medium Impact, Medium Effort
-   - User guides, API docs in README and dedicated docs  
-   - Dependencies: None
-   - Strategic value: User adoption, developer onboarding
+#### [SEC-001] Production Readiness  
+**Priority**: Very High Impact, High Effort | **Status**: Ready to Execute  
+**Dependencies**: TEST-001 ✅, TEST-003 ✅, INFRA-005 ✅ (all completed)  
+**Strategic Value**: Production readiness with reliable testing foundation  
+**Implementation**: 91 code quality issues, security checks, production deployment readiness
 
-## Waiting for Dependencies
+### ⚡ Quick Wins & High Value
 
-### 🔒 Blocked by SEC-001
-**[PROJ-001] Resume Task 3+ development phase** → Very High Impact, Variable Effort
-- Next development phase unlocked after production readiness
-- Dependencies: SEC-001 (production readiness)
-- Strategic value: Advanced development phase with production-ready foundation
+#### [DOC-012] Debugging Guide
+**Priority**: High Impact, Medium Effort | **Status**: Ready to Execute  
+**Dependencies**: DOC-011 ✅ (completed)  
+**Strategic Value**: Unblocks development, improves developer experience  
+**Implementation**: TECHNICAL.md debugging procedures, troubleshooting steps, environment validation
 
-## Strategic Investments
+#### [DOC-004] Progress Metrics  
+**Priority**: Medium Impact, Low Effort | **Status**: Ready to Execute  
+**Dependencies**: None  
+**Strategic Value**: Project visibility, data-driven decisions  
+**Implementation**: Progress.md with milestone dates, completion percentages, measurable metrics
 
-### 📚 Documentation & Organization
-**[DOC-006] Architecture clarity** → Low Impact, Low Effort | No dependencies
-**[DOC-013] Legacy command cleanup** → Low Impact, Low Effort | DOC-011 ✅  
-**[DOC-014] Automated path validation** → Low Impact, Medium Effort | DOC-011 ✅
+#### [DOC-010] Testing Prompts
+**Priority**: Medium Impact, Low Effort | **Status**: Ready to Execute  
+**Dependencies**: None  
+**Strategic Value**: Workflow consistency, regression prevention  
+**Implementation**: prompts.json testing validation steps, Makefile command references
 
-### 🔬 Research & Infrastructure  
-**[RESEARCH-001] Additional integrations** → Medium Impact, Medium Effort | No dependencies
-**[INFRA-004] Documentation automation** → Medium Impact, High Effort | DOC-011 ✅
-**[MONITOR-001] Performance monitoring** → Medium Impact, Medium Effort | INFRA-001 ✅, SEC-001
+#### [DOC-005] User Documentation
+**Priority**: Medium Impact, Medium Effort | **Status**: Ready to Execute  
+**Dependencies**: None  
+**Strategic Value**: User adoption, developer onboarding  
+**Implementation**: User guides, API docs in README and dedicated docs
+
+#### [INFRA-006] Database Schema Validation
+**Priority**: Medium Impact, Low Effort | **Status**: Ready to Execute  
+**Dependencies**: No dependencies  
+**Strategic Value**: Proactive infrastructure reliability, prevent future hanging/blocking issues  
+**Implementation**: Automated schema validation tests and DDL generation checks  
+**Purpose**: Prevent schema issues like composite primary key problems discovered in INFRA-005
+
+### 🔒 Blocked by Dependencies
+
+#### [PROJ-001] Resume Development
+**Priority**: Very High Impact, Variable Effort | **Status**: Blocked by SEC-001  
+**Dependencies**: SEC-001 (production readiness)  
+**Strategic Value**: Advanced development phase with production-ready foundation  
+**Implementation**: Next development phase unlocked after production readiness
+
+### Strategic Documentation & Organization
+
+#### [DOC-006] Architecture Clarity
+**Priority**: Low Impact, Low Effort | **Status**: Ready to Execute  
+**Dependencies**: No dependencies  
+
+#### [DOC-013] Legacy Command Cleanup  
+**Priority**: Low Impact, Low Effort | **Status**: Ready to Execute  
+**Dependencies**: DOC-011 ✅
+
+#### [DOC-014] Automated Path Validation
+**Priority**: Low Impact, Medium Effort | **Status**: Ready to Execute  
+**Dependencies**: DOC-011 ✅
+
+### Strategic Research & Infrastructure
+
+#### [RESEARCH-001] Additional Integrations
+**Priority**: Medium Impact, Medium Effort | **Status**: Ready to Execute  
+**Dependencies**: No dependencies
+
+#### [INFRA-004] Documentation Automation
+**Priority**: Medium Impact, High Effort | **Status**: Ready to Execute  
+**Dependencies**: DOC-011 ✅
+
+#### [MONITOR-001] Performance Monitoring
+**Priority**: Medium Impact, Medium Effort | **Status**: Partially Blocked  
+**Dependencies**: INFRA-001 ✅, SEC-001
+
+### Legacy Development Tasks
+
+#### [FEAT-001] Data Visualization Features
+**Priority**: High Impact, High Effort | **Status**: Ready to Execute  
+**Dependencies**: TEST-001 ✅, TEST-003 ✅, INFRA-005 ✅ (all completed)  
+**Strategic Value**: Enhanced user experience with reliable testing foundation  
+**Implementation**: New/improved charts and visuals in UI with test-driven development  
+**Note**: **Fully Ready** - Reliable test infrastructure enables confident feature development
+
+#### [REFACTOR-001] Code Maintainability
+**Priority**: Medium Impact, High Effort | **Status**: Ready to Execute  
+**Dependencies**: TEST-001 ✅, TEST-003 ✅, INFRA-005 ✅ (all completed)  
+**Strategic Value**: Technical debt reduction with reliable testing foundation  
+**Implementation**: Cleaner, more modular, maintainable codebase with confidence  
+**Note**: **Fully Ready** - Reliable test execution (173 tests) enables safe refactoring
 
 ## Completed Achievements
 
 ### ✅ Foundation Excellence (January 2026)
-**Testing Foundation (2 major tasks):**
-- [x] TEST-001: Comprehensive testing framework (86 tests, professional infrastructure)
-- [x] TEST-003: Advanced testing infrastructure (173 tests, strategic coverage approach, blueprint architecture focus)
 
-**Documentation & Navigation (4 tasks):**
-- [x] DOC-003: Cross-reference navigation system
-- [x] DOC-011: Documentation path updates  
-- [x] DOC-007: Project documentation structure
-- [x] DOC-008: Advanced development prompts
+#### Testing Foundation (4 major tasks):
+- [x] **[TEST-001]**: Comprehensive testing framework (86 tests, professional infrastructure)
+- [x] **[TEST-003]**: Advanced testing infrastructure (173 tests, strategic coverage approach, blueprint architecture focus)  
+- [x] **[INFRA-005]**: Testing execution reliability (transaction cleanup, hanging resolution) - **Most Recent**
+- [x] **[TEST-002]**: Integration test resolution (100% success rate)
 
-**Infrastructure & Quality (4 tasks):**
-- [x] INFRA-002: 'make test' dependency resolution
-- [x] INFRA-001: Environment configuration templates
-- [x] TEST-002: Integration test resolution (100% success rate)
-- [x] ORG-001: Configuration architecture analysis and Flask best practices validation
+#### Documentation & Navigation (4 tasks):
+- [x] **[DOC-003]**: Cross-reference navigation system
+- [x] **[DOC-011]**: Documentation path updates  
+- [x] **[DOC-007]**: Project documentation structure
+- [x] **[DOC-008]**: Advanced development prompts
 
-**Project Identity (3 tasks):**
-- [x] DOC-001: Professional CHANGELOG.md
-- [x] DOC-002: HTStatus branding enhancement  
-- [x] DOC-009: Backlog structure with typed IDs
+#### Infrastructure & Quality (3 tasks):
+- [x] **[INFRA-002]**: 'make test' dependency resolution
+- [x] **[INFRA-001]**: Environment configuration templates  
+- [x] **[ORG-001]**: Configuration architecture analysis and Flask best practices validation
+
+#### Project Identity (3 tasks):
+- [x] **[DOC-001]**: Professional CHANGELOG.md
+- [x] **[DOC-002]**: HTStatus branding enhancement  
+- [x] **[DOC-009]**: Backlog structure with typed IDs
+
+### Latest Completion Details
+
+#### [INFRA-005] Fix Hanging Test Execution ✅ **COMPLETED**
+**Root Cause**: Database transaction not properly cleaned up between tests  
+**Solution**: Added db.session.rollback() and db.session.close() in test fixture teardown  
+**Result**: Full 173-test suite runs to 100% completion without hanging  
+**Impact**: Testing workflow fully restored, development velocity unblocked
 
 ---
 
-*Updated for advanced testing infrastructure achievement. Navigate efficiently: Current Focus → Ready to Execute → Strategic Investments*
+*Enhanced navigation structure implemented. Use Priority Summary for quick task identification and Task Catalog for detailed information.*
