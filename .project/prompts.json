@@ -84,7 +84,7 @@
         " - Use the imperative mood in the subject line",
         " - Wrap the body at 72 characters",
         " - Use the body to explain what and why",
-        " - Include brief summary of changes made",
+        " - The body should be a super-short summary of changes made",
         " - Reference related task IDs from backlog.md when applicable",
         " - IMPORTANT: Keep commit messages factual and objective",
         " - Avoid promotional language like 'excellent', 'optimal', 'professional-grade'",
