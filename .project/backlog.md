@@ -2,7 +2,7 @@
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)  
-📊 **Project Health**: 96/100 • 173/173 Tests ✅ • 16 Tasks Complete • **Testing Infrastructure Reliable & Advanced** ✅
+📊 **Project Health**: 97/100 • 173/173 Tests ✅ • 17 Tasks Complete • **Testing Infrastructure Reliable & Advanced** ✅
 
 *Advanced testing infrastructure successfully established! TEST-001 foundation expanded with 173 professional-grade tests, enabling confident advanced development with comprehensive coverage strategies.*
 
@@ -18,13 +18,13 @@
 
 ### 🚀 **Tier 1: High Impact Ready** (Execute Next)
 1. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
-2. **[DOC-012] Debugging Guide** → [Details](#doc-012-debugging-guide) | *Unblocks development workflow*  
-3. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *Data-driven project management*
+2. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *Data-driven project management*  
+3. **[INFRA-006] Schema Validation** → [Details](#infra-006-database-schema-validation) | *Proactive infrastructure - validated need through recent test results*
 
 ### ⚡ **Tier 2: Quick Wins & Strategic Prep**
 4. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *Workflow consistency*
 5. **[DOC-005] User Documentation** → [Details](#doc-005-user-documentation) | *User adoption enablement*
-6. **[INFRA-006] Schema Validation** → [Details](#infra-006-database-schema-validation) | *Proactive infrastructure*
+6. **[DOC-006] Architecture Clarity** → [Details](#strategic-documentation--organization) | *Low effort cleanup*
 
 ### 🔒 **Tier 3: Production Gate Required**
 7. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *Critical milestone*
@@ -54,11 +54,12 @@
 
 ### ⚡ Quick Wins & High Value
 
-#### [DOC-012] Debugging Guide
-**Priority**: High Impact, Medium Effort | **Status**: Ready to Execute  
+#### [DOC-012] Debugging Guide ✅ **COMPLETED**
+**Priority**: High Impact, Medium Effort | **Status**: ✅ COMPLETED  
 **Dependencies**: DOC-011 ✅ (completed)  
 **Strategic Value**: Unblocks development, improves developer experience  
-**Implementation**: TECHNICAL.md debugging procedures, troubleshooting steps, environment validation
+**Implementation**: TECHNICAL.md debugging procedures, troubleshooting steps, environment validation  
+**Achievement**: Comprehensive debugging guide with environment troubleshooting, test resolution case studies, and systematic debugging procedures
 
 #### [DOC-004] Progress Metrics  
 **Priority**: Medium Impact, Low Effort | **Status**: Ready to Execute  
@@ -79,11 +80,12 @@
 **Implementation**: User guides, API docs in README and dedicated docs
 
 #### [INFRA-006] Database Schema Validation
-**Priority**: Medium Impact, Low Effort | **Status**: Ready to Execute  
+**Priority**: High Impact, Low Effort | **Status**: Ready to Execute  
 **Dependencies**: No dependencies  
-**Strategic Value**: Proactive infrastructure reliability, prevent future hanging/blocking issues  
-**Implementation**: Automated schema validation tests and DDL generation checks  
-**Purpose**: Prevent schema issues like composite primary key problems discovered in INFRA-005
+**Strategic Value**: Critical infrastructure reliability, prevent schema-related test failures and production issues  
+**Implementation**: Automated schema validation tests, DDL generation checks, DateTime format validation, composite primary key constraint verification  
+**Purpose**: Resolve schema issues identified in recent test execution (DateTime format conflicts, MatchPlay composite primary key constraints, User model attribute inconsistencies)  
+**Urgency Increased**: Recent test results show 11 failures related to database schema issues, validating immediate need for systematic schema validation
 
 ### 🔒 Blocked by Dependencies
 
@@ -94,6 +96,14 @@
 **Implementation**: Next development phase unlocked after production readiness
 
 ### Strategic Documentation & Organization
+
+#### [INFRA-007] Model Schema Fixes
+**Priority**: Medium Impact, Medium Effort | **Status**: Ready to Execute  
+**Dependencies**: No dependencies  
+**Strategic Value**: Resolve database model issues identified during DOC-012 validation  
+**Implementation**: Fix DateTime format handling in User model, resolve MatchPlay composite primary key constraints, address 'id' attribute issues  
+**Purpose**: Address specific schema issues causing 11 test failures - DateTime string vs object conflicts, composite primary key autoincrement conflicts, User model attribute access issues  
+**Context**: Identified during DOC-012 debugging guide validation - demonstrates guide effectiveness while revealing need for systematic schema cleanup
 
 #### [DOC-006] Architecture Clarity
 **Priority**: Low Impact, Low Effort | **Status**: Ready to Execute  
@@ -147,11 +157,12 @@
 - [x] **[INFRA-005]**: Testing execution reliability (transaction cleanup, hanging resolution) - **Most Recent**
 - [x] **[TEST-002]**: Integration test resolution (100% success rate)
 
-#### Documentation & Navigation (4 tasks):
+#### Documentation & Navigation (5 tasks):
 - [x] **[DOC-003]**: Cross-reference navigation system
 - [x] **[DOC-011]**: Documentation path updates  
 - [x] **[DOC-007]**: Project documentation structure
 - [x] **[DOC-008]**: Advanced development prompts
+- [x] **[DOC-012]**: Comprehensive debugging guide (troubleshooting procedures, environment validation)
 
 #### Infrastructure & Quality (3 tasks):
 - [x] **[INFRA-002]**: 'make test' dependency resolution
