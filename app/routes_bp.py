@@ -140,10 +140,8 @@ def index():
     """Home page."""
     return create_page('main.html', 'Home')
 
-@main_bp.route('/login')
-def login():
-    """Login page."""
-    return create_page('login.html', 'Login')
+# Note: /login route is in routes.py (legacy) - Blueprint migration incomplete
+# TODO: Migrate full OAuth login logic to Blueprint pattern
 
 @main_bp.route('/logout')
 def logout():
