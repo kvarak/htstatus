@@ -1,7 +1,7 @@
 # HTStatus Architecture
 
 ## Quick Navigation
-🔗 **Project Context**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)  
+🔗 **Project Context**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
 🛠️ **Technical Details**: [Implementation Guide](../TECHNICAL.md) • [Setup Instructions](../README.md)
 
 *This file preserves all 2.0 architecture documentation, adapted to the new format. Update as the project evolves.*
@@ -101,7 +101,45 @@ Database queries → Skill calculations → Template/React rendering → User in
 ```
 
 ## File Structure
-...existing code...
+
+### Root Directory
+```
+htstatus-2.0/
+├── .project/           # Project management (backlog, plan, goals, architecture, progress)
+├── app/               # Flask backend application
+│   ├── __init__.py
+│   ├── factory.py     # Application factory pattern
+│   ├── routes.py      # Legacy routes (1,993 lines) - contains OAuth logic
+│   ├── routes_bp.py   # Blueprint routes (stub migration, incomplete)
+│   ├── static/        # Static assets (CSS, JS, images)
+│   └── templates/     # Jinja2 HTML templates
+├── src/               # React frontend application
+│   ├── components/    # React components
+│   ├── pages/         # Page-level components
+│   ├── types/         # TypeScript type definitions
+│   └── lib/          # Utility libraries
+├── migrations/        # Database migrations (30 Alembic versions)
+├── tests/            # Test suite (173 tests, 100% passing)
+├── environments/      # Environment configuration templates
+├── configs/          # Tool and Docker configurations
+├── scripts/          # Utility scripts
+├── docker/           # Docker-related files
+├── models.py         # SQLAlchemy database models (406 lines)
+├── config.py         # Application configuration (58 lines)
+├── run.py            # Development server entry point
+├── Makefile          # Development commands
+└── README.md         # User documentation
+```
+
+### Key Architectural Notes
+- **Dual Frontend**: Legacy Flask templates + Modern React SPA coexist
+- **Incomplete Migration**: Blueprint pattern (routes_bp.py) started but not finished
+  - Factory only imports Blueprint routes
+  - Legacy routes.py with OAuth never imported (causes /login 404 error)
+  - Requires completion or hybrid approach
+- **Testing Foundation**: 173 passing tests enable confident refactoring
+- **Multi-environment**: Development, staging, test, production configs ready
+
 # HTStatus Architecture
 
 *This architecture documentation reflects the current HTStatus project structure and design decisions.*
@@ -146,13 +184,13 @@ HTStatus is designed as a web-based platform for managing and visualizing footba
 
 ## Related Documentation
 
-📋 **Project Management**: 
+📋 **Project Management**:
 - [Development Plan](plan.md) - Requirements, standards, and development guidelines
-- [Current Progress](progress.md) - Implementation status and recent accomplishments  
+- [Current Progress](progress.md) - Implementation status and recent accomplishments
 - [Strategic Goals](goals.md) - Vision and objectives driving architectural decisions
 
 🛠️ **Implementation Details**:
-- [Technical Documentation](../TECHNICAL.md) - Implementation specifics and development standards  
+- [Technical Documentation](../TECHNICAL.md) - Implementation specifics and development standards
 - [Setup Guide](../README.md) - Local development setup and usage instructions
 - [Change History](../CHANGELOG.md) - Version history and architectural evolution
 
