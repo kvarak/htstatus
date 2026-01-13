@@ -23,14 +23,53 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 ## File Structure
 - `/app/routes.py`: Main Flask app logic
 - `/models.py`: SQLAlchemy models
-- `/src/`: React frontend  
+- `/src/`: React frontend
 - `/app/templates/`: Jinja2 templates
-- `/scripts/`: Utility scripts (use `make` commands instead)
+- `/scripts/`: Development utilities and debugging tools
 - `/environments/`: Environment configuration templates
 - `/configs/`: Docker Compose configurations and build tools
 - `/docker/`, `docker-compose.yml`: Container orchestration
 - `/Makefile`: Standardized dev commands
 - `/tests/`: Test suite
+
+## Development Scripts
+
+HTStatus includes debugging utilities in the `scripts/` directory, created during troubleshooting and preserved for future development use.
+
+### Database Utilities (`scripts/database/`)
+
+**`apply_migrations.py`**: Safe database migration utility
+- Creates Flask app with proper context handling
+- Bypasses route loading for migration-only operations
+- Use when standard `make db-upgrade` encounters issues
+
+**`test_db_connection.py`**: PostgreSQL connection diagnostics
+- Tests direct database connectivity bypassing SQLAlchemy
+- Provides detailed error diagnostics for troubleshooting
+- Helpful for diagnosing authentication, networking, or service issues
+
+Usage:
+```bash
+# Test database connectivity
+python scripts/database/test_db_connection.py
+
+# Apply migrations safely
+python scripts/database/apply_migrations.py
+```
+
+### Migration Utilities (`scripts/migration/`)
+
+**`temp_migrate.py`**: Quick migration execution
+- Simplified script for emergency migration scenarios
+- Minimal setup with basic error handling
+- Use `scripts/database/apply_migrations.py` for safer operations
+
+Common Troubleshooting Scenarios:
+- **macOS PostgreSQL conflicts**: Use connection tester to identify port conflicts
+- **Authentication failures**: Migration utility creates proper Flask context
+- **Service startup issues**: Scripts can run independently of main application
+
+*These utilities were created during INFRA-011 (authentication system restoration) and are maintained as permanent development tools.*
 
 ## Development Standards
 - See `.project/plan.md` for requirements and standards
@@ -348,8 +387,8 @@ with app.app_context():
 
 # Monitor database performance:
 docker-compose exec postgres psql -U postgres -d htstatus -c "
-SELECT query, calls, total_time, mean_time 
-FROM pg_stat_statements 
+SELECT query, calls, total_time, mean_time
+FROM pg_stat_statements
 ORDER BY total_time DESC LIMIT 10;
 "
 ```
