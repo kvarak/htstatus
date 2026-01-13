@@ -44,10 +44,31 @@ HT Status is a Hattrick football team management application built with a dual f
 
 ### 2. Backend Layer
 
+### 2. Backend Layer
+
 #### Flask Application Core
 - **Main File**: `/app/routes.py` (1976 lines - primary application logic)
 - **Database**: `/models.py` - SQLAlchemy models
 - **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig/ProductionConfig classes
+- **Route Architecture**: Dual system with manual route registration and blueprint pattern in `/app/routes_bp.py` (complexity noted for future refactoring)
+
+#### Authentication & API Integration
+- **Hattrick OAuth**: CHPP (Community Hattrick Public Platform) integration using `pychpp` library
+- **Session Management**: Flask sessions store OAuth tokens and team data
+- **Error Handling**: Enhanced with comprehensive try/catch blocks and user-friendly error messages (FEAT-020)
+
+#### Database Layer
+- **PostgreSQL**: Production database with SQLAlchemy ORM
+- **Migrations**: Alembic-based with 27+ migration files in `/migrations/versions/`
+- **Models**: Complex schema supporting multi-team management, player tracking, match analysis
+- **Current Challenge**: 26 test failures indicate schema validation issues requiring attention (INFRA-006 priority)
+
+#### Testing Infrastructure
+- **Framework**: pytest with 173 total tests, currently 147 passing (85% success rate)
+- **Coverage**: Available via `make test-coverage`
+- **Integration**: Docker-based services for realistic testing
+- **Mock Systems**: CHPP API mocking in `/tests/mock_chpp.py`
+- **Current Status**: 26 failing tests blocking reliable development - highest priority for resolution
 - **Initialization**: `/app/__init__.py` - Flask app setup
 
 #### Key Backend Components
