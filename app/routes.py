@@ -7,7 +7,7 @@ import traceback
 from datetime import date, datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from flask import render_template, request, session
+from flask import render_template, request, session, redirect, url_for, flash
 from flask_bootstrap import Bootstrap
 from pychpp import CHPP
 from sqlalchemy import text
@@ -1237,25 +1237,68 @@ def login():
 
 # @app.route('/logout')  # Registered manually in factory.py
 def logout():
+    print("LOGOUT FUNCTION CALLED - DEBUGGING")  # Force console output
+    dprint(1, f"Logging out user: {session.get('current_user', 'Unknown')}")
+
+    # Clear session first
+    user_before = session.get('current_user', 'No user')
     session.clear()
-    return create_page(
-        template='logout.html',
-        title='Logout')
+    print(f"Session cleared for user: {user_before}")
+
+    # Force explicit redirect
+    print("Attempting redirect to /login")
+    from flask import make_response
+    response = make_response()
+    response.status_code = 302
+    response.headers['Location'] = '/login'
+    return response
 
 # --------------------------------------------------------------------------------
 
 
 # @app.route('/update')  # Registered manually in factory.py
 def update():
+    dprint(1, "=== DATA UPDATE PROCESS STARTED ===")
+
     if session.get('current_user') is None:
+        dprint(1, "ERROR: No current_user in session, redirecting to login")
         return render_template(
             '_forward.html',
             url='/login')
 
-    chpp = CHPP(consumer_key,
-                consumer_secret,
-                session['access_key'],
-                session['access_secret'])
+    # Session state validation
+    dprint(1, f"Current user: {session.get('current_user')}")
+    dprint(1, f"Access key available: {bool(session.get('access_key'))}")
+    dprint(1, f"Access secret available: {bool(session.get('access_secret'))}")
+    dprint(1, f"All teams: {session.get('all_teams')}")
+    dprint(1, f"Team names: {session.get('all_team_names')}")
+
+    try:
+        # Initialize CHPP with enhanced error handling
+        dprint(1, "Initializing CHPP client...")
+        chpp = CHPP(consumer_key,
+                    consumer_secret,
+                    session['access_key'],
+                    session['access_secret'])
+        dprint(1, "CHPP client initialized successfully")
+
+        # Test basic API connectivity
+        dprint(1, "Testing CHPP API connectivity...")
+        test_user = chpp.user()
+        dprint(1, f"API connectivity test successful, user ID: {test_user.ht_id}")
+
+    except Exception as e:
+        error_details = traceback.format_exc()
+        dprint(1, f"CRITICAL ERROR: CHPP initialization failed: {str(e)}")
+        dprint(1, f"Full error traceback: {error_details}")
+
+        return create_page(
+            template='update.html',
+            title='Update Failed',
+            error=f"Cannot connect to Hattrick API: {str(e)}",
+            errorinfo="Please check your internet connection and try again. If the problem persists, Hattrick servers may be unavailable.",
+            all_teams=session.get('all_teams', []),
+            all_team_names=session.get('all_team_names', []))
 
     all_teams = session['all_teams']
     all_team_names = session['all_team_names']
@@ -1270,20 +1313,48 @@ def update():
     new_players = []
     left_players = []
     playernames = {}
+
+    dprint(1, f"Processing {len(all_teams)} teams for data update")
+
     for teamid in all_teams:
+        dprint(1, f"Processing team ID: {teamid}")
 
         # downloadMatches(teamid)
 
-        the_team = chpp.team(ht_id=teamid)
-        debug_print("update", "chpp.team", the_team._SOURCE_FILE)
+        try:
+            dprint(1, f"Fetching team data for team ID: {teamid}")
+            the_team = chpp.team(ht_id=teamid)
+            debug_print("update", "chpp.team", the_team._SOURCE_FILE)
+            dprint(1, f"Team data fetched successfully: {the_team.name}")
+
+        except Exception as e:
+            error_details = traceback.format_exc()
+            dprint(1, f"ERROR: Failed to fetch team data for team {teamid}: {str(e)}")
+            dprint(1, f"Team fetch error traceback: {error_details}")
+
+            return create_page(
+                template='update.html',
+                title='Update Failed',
+                error=f"Failed to fetch team data for team {teamid}: {str(e)}",
+                errorinfo=error_details,
+                all_teams=session['all_teams'],
+                all_team_names=session['all_team_names'])
 
         try:
+            dprint(1, f"Fetching players for team: {the_team.name}")
+            players_count = len(the_team.players)
+            dprint(1, f"Found {players_count} players in team")
             dprint(2, the_team.players)
-        except Exception:
+
+        except Exception as e:
             errorincode = traceback.format_exc()
-            error = "Is your team playing a game?"
-            errorinfo = "If this isn't the case, please report this as a "
-            errorinfo += "bug. " + errorincode
+            dprint(1, f"ERROR: Failed to access players for team {teamid}: {str(e)}")
+            dprint(1, f"Players access error traceback: {errorincode}")
+
+            error = "Cannot access player data. Is your team playing a match right now?"
+            errorinfo = "If your team is not currently playing, please report this as a bug.\n\n"
+            errorinfo += f"Technical details: {str(e)}\n\n{errorincode}"
+
             return render_template(
                 'update.html',
                 version=version,
@@ -1377,29 +1448,40 @@ def update():
 
             playernames[p.ht_id] = p.first_name + " " + p.last_name
 
-            dbplayer = db.session.query(Players).filter_by(
-                ht_id=thisplayer['ht_id'],
-                data_date=thisplayer['data_date']).first()
+            try:
+                dprint(2, f"Checking for existing player {p.first_name} {p.last_name} (ID: {p.ht_id}) in database")
+                dbplayer = db.session.query(Players).filter_by(
+                    ht_id=thisplayer['ht_id'],
+                    data_date=thisplayer['data_date']).first()
 
-            if dbplayer:
+                if dbplayer:
+                    dprint(
+                        1,
+                        f"Updating existing player: {thisplayer['first_name']} {thisplayer['last_name']}")
+                    db.session.delete(dbplayer)
+                    db.session.commit()
+
+                dprint(2, f"Adding new player data to database: {thisplayer['first_name']} {thisplayer['last_name']}")
+                newplayer = Players(thisplayer)
+                db.session.add(newplayer)
+                db.session.commit()
                 dprint(
                     1,
-                    " - ",
-                    thisplayer['first_name'],
-                    thisplayer['last_name'],
-                    " already exists for today.")
-                db.session.delete(dbplayer)
-                db.session.commit()
+                    f"✅ Successfully added {thisplayer['first_name']} {thisplayer['last_name']} for {thisplayer['data_date']}")
 
-            newplayer = Players(thisplayer)
-            db.session.add(newplayer)
-            db.session.commit()
-            dprint(
-                1,
-                "+ Added ",
-                thisplayer['first_name'],
-                thisplayer['last_name'],
-                " for today.")
+            except Exception as e:
+                db.session.rollback()
+                error_details = traceback.format_exc()
+                dprint(1, f"ERROR: Database operation failed for player {thisplayer['first_name']} {thisplayer['last_name']}: {str(e)}")
+                dprint(1, f"Database error traceback: {error_details}")
+
+                return create_page(
+                    template='update.html',
+                    title='Update Failed',
+                    error=f"Database error while saving player data: {str(e)}",
+                    errorinfo=f"Failed to save {thisplayer['first_name']} {thisplayer['last_name']} to database.\n\n{error_details}",
+                    all_teams=session['all_teams'],
+                    all_team_names=session['all_team_names'])
 
             players_fromht.append(thisplayer['ht_id'])
 
@@ -1449,9 +1531,16 @@ def update():
              .update({"old_owner": teamid, "owner": 0}))
             db.session.commit()
 
+    dprint(1, "=== DATA UPDATE PROCESS COMPLETED SUCCESSFULLY ===")
+    dprint(1, f"Teams processed: {len(all_teams)}")
+    dprint(1, f"Total new players: {len(new_players)}")
+    dprint(1, f"Total departed players: {len(left_players)}")
+    dprint(1, f"Daily changes tracked: {len(changesplayers_day)}")
+    dprint(1, f"Weekly changes tracked: {len(changesplayers_week)}")
+
     return create_page(
         template='update.html',
-        title='Update',
+        title='Update Complete',
         updated=updated,
         changes_day=changesplayers_day,
         changes_week=changesplayers_week,
@@ -1991,4 +2080,4 @@ def training():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
-        title='Training')
+        weeks=weeks)
