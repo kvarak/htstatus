@@ -6,6 +6,7 @@
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Use `make help` to understand available commands and project structure.",
         "Do not git add or commit any changes.",
         "Include the following sections in your response:",
         "# Plan Next Task",
@@ -23,6 +24,7 @@
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Use `make help` to understand available commands and project structure.",
         "Make sure to validate all changes with `make test` and ensure that no new issues are introduced.",
         "Follow the detailed plan created in the 'Plan the next task' step.",
         "Implement the solution according to the outlined steps.",
@@ -40,6 +42,7 @@
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Use `make help` to understand available commands and project structure.",
         "Make sure to validate all changes with `make test` and ensure that no new issues are introduced.",
         "Carefully review the last completed task to ensure it meets all specified requirements.",
         "Make sure to review all changes since the last commit.",
@@ -59,6 +62,7 @@
       "title": "Update project status and planning",
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
+        "Use and update `make help` to reflect any new commands or changes in project structure.",
         "Review current state in progress.md and backlog.md.",
         "Update backlog.md with completed tasks and current status.",
         "Update progress.md with recent accomplishments and metrics.",
@@ -102,6 +106,7 @@
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Use `make help` to understand available commands and project structure.",
         "Analyze the new task provided by the user in the context of all project documentation.",
         "Determine how the task aligns with strategic goals and existing work.",
         "Identify any dependencies on existing tasks or initiatives.",

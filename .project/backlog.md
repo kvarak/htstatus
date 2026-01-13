@@ -4,7 +4,7 @@
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)
 📊 **Project Health**: 97/100 • 173/173 Tests ✅ • 18 Tasks Complete • **Authentication System Restored** ✅
 
-*INFRA-011 authentication fix completed! Application fully functional with 21 routes registered. Ready to execute quick wins.*
+*INFRA-011 authentication fix completed! INFRA-014 added for organizing debugging scripts. Ready to execute quick wins.*
 
 ## Backlog Management Rules
 
@@ -22,43 +22,73 @@
 
 ## Priority Summary
 
+### 🧹 **Immediate: Repository Organization** (Clean git history)
+1. **[INFRA-014] Organize Debugging Scripts** → [Details](#infra-014-organize-debugging-scripts) | *15 min - Move temp files to scripts/ with documentation*
+
 ### 🚨 **CRITICAL: Application Authentication** (Recently Completed)
-1. **[INFRA-011] Fix Broken /login Route** ✅ **COMPLETED** → [Details](#infra-011-fix-broken-login-route) | *RESOLVED - Authentication restored, application functional*
+2. **[INFRA-011] Fix Broken /login Route** ✅ **COMPLETED** → [Details](#infra-011-fix-broken-login-route) | *RESOLVED - Authentication restored, application functional*
 
 ### 🎯 **Tier 1: Quick Wins** (Execute First - Low Effort, High Value)
-2. **[DOC-015] Fix Architecture Placeholder** → [Details](#doc-015-fix-architecture-placeholder) | *15 min - Remove incomplete section*
-3. **[DOC-018] Config.py Template & Documentation** → [Details](#doc-018-configpy-template--documentation) | *20-30 min - Create root template matching actual structure*
-4. **[DOC-017] Document Deployment Process** → [Details](#doc-017-document-deployment-process) | *30-45 min - Document push.sh & Raspberry Pi deployment*
-5. **[DOC-016] Document Root Scripts** → [Details](#doc-016-document-root-scripts) | *15 min - Clarify command.sh purpose*
-6. **[DOC-019] macOS Setup Guide** → [Details](#doc-019-macos-setup-guide) | *30 min - Document PostgreSQL conflicts*
-7. **[INFRA-013] Cleanup Debugging Files** → [Details](#infra-013-cleanup-temporary-debugging-files) | *5 min - Remove temporary files*
-8. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *1 hour - Add measurable tracking*
-9. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *1 hour - Workflow integration*
+3. **[DOC-015] Fix Architecture Placeholder** → [Details](#doc-015-fix-architecture-placeholder) | *15 min - Remove incomplete section*
+4. **[DOC-018] Config.py Template & Documentation** → [Details](#doc-018-configpy-template--documentation) | *20-30 min - Create root template matching actual structure*
+5. **[DOC-017] Document Deployment Process** → [Details](#doc-017-document-deployment-process) | *30-45 min - Document push.sh & Raspberry Pi deployment*
+6. **[DOC-016] Document Root Scripts** → [Details](#doc-016-document-root-scripts) | *15 min - Clarify command.sh purpose*
+7. **[DOC-019] macOS Setup Guide** → [Details](#doc-019-macos-setup-guide) | *30 min - Document PostgreSQL conflicts*
+8. **[INFRA-013] Cleanup Debugging Files** → [Details](#infra-013-cleanup-temporary-debugging-files) | *5 min - Remove temporary files*
+9. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *1 hour - Add measurable tracking*
+10. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *1 hour - Workflow integration*
 
 ### 🚀 **Tier 2: High Impact Development** (Execute Next - Strategic Value)
-10. **[INFRA-006] Schema Validation** → [Details](#infra-006-database-schema-validation) | *Critical - Resolve 11 test failures*
-11. **[INFRA-007] Model Schema Fixes** → [Details](#infra-007-model-schema-fixes) | *Foundation for schema validation*
-12. **[REFACTOR-002] Complete Blueprint Migration** → [Details](#refactor-002-complete-blueprint-migration) | *Follow-up to INFRA-011*
-13. **[INFRA-012] Migration Workflow** → [Details](#infra-012-migration-workflow) | *Database procedures*
-14. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
-15. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *91 quality issues + security*
+11. **[INFRA-006] Schema Validation** → [Details](#infra-006-database-schema-validation) | *Critical - Resolve 11 test failures*
+12. **[INFRA-007] Model Schema Fixes** → [Details](#infra-007-model-schema-fixes) | *Foundation for schema validation*
+13. **[REFACTOR-002] Complete Blueprint Migration** → [Details](#refactor-002-complete-blueprint-migration) | *Follow-up to INFRA-011*
+14. **[INFRA-012] Migration Workflow** → [Details](#infra-012-migration-workflow) | *Database procedures*
+15. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
+16. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *91 quality issues + security*
 
 ### 📚 **Tier 3: Strategic Enhancement** (Medium Priority - Foundation Building)
-16. **[DOC-011-API] API Documentation** → [Details](#doc-011-api-api-documentation) | *Developer experience*
-17. **[DOC-005] User Documentation** → [Details](#doc-005-user-documentation) | *User adoption*
-18. **[INFRA-008] Type Sync Validation** → [Details](#infra-008-type-sync-validation) | *Prevent type drift*
-19. **[INFRA-009] Dependency Strategy** → [Details](#infra-009-dependency-strategy) | *Maintenance planning*
-20. **[INFRA-010] Audit Non-Tracked Files** → [Details](#infra-010-audit-and-cleanup-non-tracked-files) | *Repository hygiene*
+17. **[DOC-011-API] API Documentation** → [Details](#doc-011-api-api-documentation) | *Developer experience*
+18. **[DOC-005] User Documentation** → [Details](#doc-005-user-documentation) | *User adoption*
+19. **[INFRA-008] Type Sync Validation** → [Details](#infra-008-type-sync-validation) | *Prevent type drift*
+20. **[INFRA-009] Dependency Strategy** → [Details](#infra-009-dependency-strategy) | *Maintenance planning*
+21. **[INFRA-010] Audit Non-Tracked Files** → [Details](#infra-010-audit-and-cleanup-non-tracked-files) | *Repository hygiene*
 
 ### 🔮 **Tier 4: Future Opportunities** (Long-term Strategic)
-21. **[FEAT-001] Data Visualization** → [Details](#feat-001-data-visualization-features) | *Enhanced charts*
-22. **[REFACTOR-001] Code Maintainability** → [Details](#refactor-001-code-maintainability) | *Technical debt*
-23. **[RESEARCH-001] Additional Integrations** → [Details](#research-001-additional-integrations) | *Expansion*
-24. **[PROJ-001] Advanced Development** → [Details](#proj-001-advanced-development-phase) | *After SEC-001*
+22. **[FEAT-001] Data Visualization** → [Details](#feat-001-data-visualization-features) | *Enhanced charts*
+23. **[REFACTOR-001] Code Maintainability** → [Details](#refactor-001-code-maintainability) | *Technical debt*
+24. **[RESEARCH-001] Additional Integrations** → [Details](#research-001-additional-integrations) | *Expansion*
+25. **[PROJ-001] Advanced Development** → [Details](#proj-001-advanced-development-phase) | *After SEC-001*
 
 ---
 
 ## Task Catalog
+
+### 🧹 Immediate: Repository Organization
+
+#### [INFRA-014] Organize Debugging Scripts
+**Priority**: Very Low Effort, Medium Value | **Status**: 🎯 Ready to Execute
+**Estimated Time**: 10-15 minutes
+**Dependencies**: INFRA-011 completion ✅ (created the files to organize)
+**Strategic Value**: Improve developer experience and repository organization
+**Problem**: Temporary debugging files from INFRA-011 troubleshooting are untracked in git
+**Current Situation**:
+- `apply_migrations.py`: Proper Flask migration utility with safe app context
+- `test_db_connection.py`: PostgreSQL connection validation with detailed diagnostics
+- `temp_migrate.py`: Quick migration script (simpler version of apply_migrations.py)
+**Solution**: Organize as development utilities rather than discard valuable debugging tools
+**Implementation**:
+- Create `scripts/` directory for development utilities
+- Add proper documentation headers to each script explaining purpose and usage
+- Update TECHNICAL.md with section on development scripts
+- Consider creating `make migrate` command wrapper for apply_migrations.py
+- Commit files with proper git tracking
+**Acceptance Criteria**:
+- All temporary files moved to appropriate scripts/ directory
+- Each script has proper documentation header with usage instructions
+- TECHNICAL.md documents the development utilities
+- No untracked files remain in root directory
+- Files become part of project's permanent development toolkit
+**Strategic Impact**: Clean git history, reusable development tools, improved developer onboarding
 
 ### 🚨 CRITICAL: Application Broken
 
