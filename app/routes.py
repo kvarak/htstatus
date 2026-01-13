@@ -35,7 +35,9 @@ def initialize_routes():
 
     # --------------------------------------------------------------------------------
     # --------------------------------------------------------------------------------
-    bootstrap = Bootstrap(app)
+    # Bootstrap already initialized in routes_bp.py, just reference it
+    from app.routes_bp import bootstrap as bp_bootstrap
+    bootstrap = bp_bootstrap
 
     # Set consumer_key and consumer_secret provided for your app by Hattrick
     consumer_key = app.config['CONSUMER_KEY']
@@ -855,8 +857,8 @@ def downloadMatches(teamid):
 # --------------------------------------------------------------------------------
 
 
-@app.route('/')
-@app.route('/index')
+# @app.route('/')  # Registered manually in factory.py
+# @app.route('/index')  # Registered manually in factory.py
 def index():
 
     allusers = db.session.query(User).all()
@@ -946,7 +948,7 @@ def index():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/settings', methods=['GET', 'POST'])
+# @app.route('/settings', methods=['GET', 'POST'])  # Registered manually in factory.py
 def settings():
     error = ""
     if ('current_user') not in session:
@@ -1090,7 +1092,7 @@ def settings():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/login', methods=['GET', 'POST'])
+# @app.route('/login', methods=['GET', 'POST'])  # Registered manually in factory.py
 def login():
 
     # this comes from form
@@ -1233,7 +1235,7 @@ def login():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/logout')
+# @app.route('/logout')  # Registered manually in factory.py
 def logout():
     session.clear()
     return create_page(
@@ -1243,7 +1245,7 @@ def logout():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/update')
+# @app.route('/update')  # Registered manually in factory.py
 def update():
     if session.get('current_user') is None:
         return render_template(
@@ -1459,7 +1461,7 @@ def update():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/debug', methods=['GET', 'POST'])
+# @app.route('/debug', methods=['GET', 'POST'])  # Registered manually in factory.py
 def admin():
     if session.get('current_user') is None:
         return render_template(
@@ -1545,7 +1547,7 @@ def admin():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/team')
+# @app.route('/team')  # Registered manually in factory.py
 def team():
     if session.get('current_user') is None:
         return render_template(
@@ -1575,7 +1577,7 @@ def team():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/player', methods=['GET', 'POST'])
+# @app.route('/player', methods=['GET', 'POST'])  # Registered manually in factory.py
 def player():
     if session.get('current_user') is None:
         return render_template(
@@ -1781,7 +1783,7 @@ def player():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/matches', methods=['GET', 'POST'])
+# @app.route('/matches', methods=['GET', 'POST'])  # Registered manually in factory.py
 def matches():
     if session.get('current_user') is None:
         return render_template(
@@ -1837,7 +1839,7 @@ def matches():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/stats')
+# @app.route('/stats')  # Registered manually in factory.py
 def stats():
     if session.get('current_user') is None:
         return render_template(
@@ -1872,7 +1874,7 @@ def stats():
 # --------------------------------------------------------------------------------
 
 
-@app.route('/training')
+# @app.route('/training')  # Registered manually in factory.py
 def training():
     if session.get('current_user') is None:
         return render_template(

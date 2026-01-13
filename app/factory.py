@@ -66,3 +66,32 @@ def setup_routes(app_instance, db_instance):
 
     # Register the Blueprint
     app_instance.register_blueprint(main_bp)
+
+    # Import legacy routes module WITHOUT executing @app.route decorators
+    # We'll manually register the route functions instead
+    import sys
+
+    # Temporarily replace app.routes.app to prevent decorator failures during import
+    import app.routes as routes_module
+
+    # Set app and db instances
+    routes_module.app = app_instance
+    routes_module.db = db_instance
+
+    # Call initialize_routes() to set up remaining module globals
+    routes_module.initialize_routes()
+
+    # Manually register all route functions (bypassing failed decorators)
+    # This is necessary because @app.route decorators failed during import when app=None
+    app_instance.add_url_rule('/', 'index', routes_module.index, methods=['GET'])
+    app_instance.add_url_rule('/index', 'index', routes_module.index, methods=['GET'])
+    app_instance.add_url_rule('/settings', 'settings', routes_module.settings, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/login', 'login', routes_module.login, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/logout', 'logout', routes_module.logout, methods=['GET'])
+    app_instance.add_url_rule('/update', 'update', routes_module.update, methods=['GET'])
+    app_instance.add_url_rule('/debug', 'admin', routes_module.admin, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/team', 'team', routes_module.team, methods=['GET'])
+    app_instance.add_url_rule('/player', 'player', routes_module.player, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/matches', 'matches', routes_module.matches, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/stats', 'stats', routes_module.stats, methods=['GET'])
+    app_instance.add_url_rule('/training', 'training', routes_module.training, methods=['GET'])
