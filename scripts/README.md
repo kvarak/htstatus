@@ -8,8 +8,10 @@ This directory contains utility scripts for development and maintenance tasks.
 - **`changelog.sh`** - Generate changelog from git history (use `make changelog`)
 - **`create_tables.py`** - Initialize database tables
 - **`manage.py`** - Database management utilities
-- **`test_db_connection.py`** - Test database connectivity
 - **`run.sh`** - Development server startup script (deprecated, use `make dev`)
+
+### Database Utilities (`database/`)
+- **`test_db_connection.py`** - Test database connectivity with diagnostics
 
 ## Usage
 
