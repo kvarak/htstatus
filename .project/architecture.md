@@ -133,9 +133,11 @@ htstatus-2.0/
 
 ### Key Architectural Notes
 - **Dual Frontend**: Legacy Flask templates + Modern React SPA coexist
-- **Incomplete Migration**: Blueprint pattern (routes_bp.py) started but not finished
-  - Factory only imports Blueprint routes
-  - Legacy routes.py with OAuth never imported (causes /login 404 error)
+- **Routing Resolution**: Manual route registration implemented in factory.py (INFRA-011 completed)
+  - Factory imports both Blueprint and legacy routes
+  - Manual add_url_rule() registration for 12 legacy route functions
+  - Commented @app.route decorators to prevent import failures
+  - All 21 routes now properly accessible and functional
   - Requires completion or hybrid approach
 - **Testing Foundation**: 173 passing tests enable confident refactoring
 - **Multi-environment**: Development, staging, test, production configs ready

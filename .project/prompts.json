@@ -40,6 +40,7 @@
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
+        "Make sure to validate all changes with `make test` and ensure that no new issues are introduced.",
         "Carefully review the last completed task to ensure it meets all specified requirements.",
         "Make sure to review all changes since the last commit.",
         "Check for accuracy, completeness, and adherence to guidelines outlined in plan.md.",
