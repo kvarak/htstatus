@@ -145,8 +145,18 @@ def index():
 
 @main_bp.route('/logout')
 def logout():
-    """Logout page."""
-    return create_page('logout.html', 'Logout')
+    """Logout page - Clear session and redirect to login."""
+    print("BLUEPRINT LOGOUT FUNCTION CALLED - DEBUGGING")  # Force console output
+    from flask import session, redirect
+
+    # Clear session first
+    user_before = session.get('current_user', 'No user')
+    session.clear()
+    print(f"Blueprint: Session cleared for user: {user_before}")
+
+    # Force explicit redirect
+    print("Blueprint: Attempting redirect to /login")
+    return redirect('/login')
 
 @main_bp.route('/player')
 def player():

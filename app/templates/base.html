@@ -184,7 +184,8 @@ $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
 
-$('.toast').toast(option)
+// Fix undefined option variable - initialize toasts properly
+$('.toast').toast('show')
 
 </script>
 
@@ -241,7 +242,7 @@ $('.toast').toast(option)
         {% endfor %}
         <a class="nav-link" href="/update" onclick="loading();">Update data</a>
         <a class="nav-link" href="/settings" onclick="loading();">Settings</a>
-        <a class="nav-link" href="/logout">Logout</a>
+        <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
         {% if role == "Admin" %}
           <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
         {% endif %}
