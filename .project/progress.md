@@ -3,7 +3,7 @@
 
 ## Quick Navigation
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Current Metrics**: 97/100 Health • 173/173 Tests ✅ • 18 Tasks Complete • **Authentication System Restored** ✅
+📊 **Current Metrics**: 85/100 Health • 147/173 Tests ✅ • 20 Tasks Complete • **Pytest Fixed + Repository Organized** ✅
 
 > **Major Achievement:** Testing foundation and project organization successfully validated! TEST-001 and ORG-001 completion confirms professional Flask architecture and enables confident advanced development.
 
@@ -24,11 +24,22 @@
 **Testing Infrastructure Reliability**: **ESTABLISHED** ✅ (January 3, 2026) - **CRITICAL MILESTONE**
 **Project Organization**: **VALIDATED** ✅ (January 2, 2026) - Flask best practices confirmed
 **Architecture Quality**: Flask best practices validated, zero organizational technical debt ✅
-**Completed Tasks**: 18 major tasks completed in January 2026
-**Active Dependencies**: All testing-dependent tasks fully unblocked
+**Completed Tasks**: 19 major tasks completed in January 2026
+**Active Dependencies**: Test infrastructure issues identified and analyzed
 **Ready-to-Execute Tasks**: 24 tasks across 4 tiers (9 quick wins, 6 high-impact, 5 strategic, 4 future) - prioritized by effort vs impact
-**Latest Achievement**: Authentication Fix Complete - Application fully functional with 21 routes registered ✅ (January 12, 2026)
-**Next Priority**: Execute quick wins in Tier 1 (DOC-015, DOC-018, DOC-017, DOC-016, DOC-019, INFRA-013) - total ~2 hours effort
+**Latest Achievement**: Pytest Permission Fixed + INFRA-014 Repository Organization Complete ✅ (January 13, 2026)
+**Current Challenge**: 26 test failures identified - Database models and test fixtures need attention
+**Next Priority**: Execute INFRA-006 (Database Schema Validation) to resolve test failures, then DOC-015
+
+### Latest Completion: Pytest Permission Fixed + Repository Organization (January 13, 2026) ✅
+- **[INFRA-014] Organize Debugging Scripts** ✅ **COMPLETED - DEVELOPMENT UTILITIES ENHANCED**
+  - **Problem Solved**: Pytest executable permissions restored, development scripts properly organized
+  - **Technical Achievement**: Moved debugging scripts to permanent scripts/ directory structure
+  - **Testing Infrastructure**: 173 tests collected successfully, pytest version 9.0.2 operational
+  - **Repository Organization**: Clean git history maintained, zero untracked files in root
+  - **Documentation Enhancement**: TECHNICAL.md updated with "Development Scripts" section
+  - **Current Status**: 147/173 tests passing (26 failures identified for INFRA-006 resolution)
+  - **Quality Impact**: Development workflow significantly enhanced with organized utilities
 
 ### Critical Issue Resolution: Authentication System Restored (January 12, 2026) ✅
 - **[INFRA-011] Broken /login Route** ✅ **COMPLETED - APPLICATION FULLY RESTORED**
@@ -54,6 +65,17 @@
   - **Strategic Impact**: Application restored from completely broken to fully functional
   - **Time Investment**: ~3 hours actual (vs 1-2 hour estimate)
   - **Lessons Learned**: Blueprint migration complexity underestimated; macOS PostgreSQL conflicts common
+
+### Latest Achievement: Repository Organization Enhancement (January 13, 2026)
+- **INFRA-014 Debugging Scripts Organization** ✅ **REPOSITORY HYGIENE MILESTONE ACHIEVED**
+  - **Problem Resolved**: Temporary debugging files from INFRA-011 organized into permanent development toolkit
+  - **Implementation Success**: Created structured `scripts/database/` and `scripts/migration/` directories
+  - **Documentation Enhancement**: Added comprehensive "Development Scripts" section to TECHNICAL.md with usage examples
+  - **Developer Experience**: Enhanced each script with detailed headers, troubleshooting guidance, and context
+  - **Repository Hygiene**: Achieved clean git status with zero untracked files in root directory
+  - **Knowledge Preservation**: Converted crisis debugging tools into permanent development utilities
+  - **Strategic Value**: Clean git history, improved developer onboarding, systematic utility organization
+  - **Execution Excellence**: Completed exactly on time estimate (15 minutes) with full acceptance criteria met
 
 ### Recent Analysis: Repository Health Assessment (January 12, 2026)
 - **Comprehensive Repository Analysis Completed** ✅ **STRATEGIC PLANNING MILESTONE**

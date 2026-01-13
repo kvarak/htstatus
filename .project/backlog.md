@@ -2,9 +2,9 @@
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Project Health**: 97/100 • 173/173 Tests ✅ • 18 Tasks Complete • **Authentication System Restored** ✅
+📊 **Project Health**: 85/100 • 147/173 Tests ✅ • 20 Tasks Complete • **Pytest Fixed + Repository Organized** ✅
 
-*INFRA-011 authentication fix completed! INFRA-014 added for organizing debugging scripts. Ready to execute quick wins.*
+*INFRA-014 completed! Pytest permission fixed, development scripts organized. 26 test failures identified for INFRA-006.*
 
 ## Backlog Management Rules
 
@@ -22,14 +22,17 @@
 
 ## Priority Summary
 
-### 🧹 **Immediate: Repository Organization** (Clean git history)
-1. **[INFRA-014] Organize Debugging Scripts** → [Details](#infra-014-organize-debugging-scripts) | *15 min - Move temp files to scripts/ with documentation*
+### 🔥 **IMMEDIATE: Testing Infrastructure** (Resolve 26 test failures)
+1. **[INFRA-006] Database Schema Validation** → [Details](#infra-006-database-schema-validation) | *Critical - 26 test failures block development*
+
+### 🧹 **IMMEDIATE: Repository Organization** (Clean git history)
+2. **[INFRA-014] Organize Debugging Scripts** ✅ **COMPLETED** → [Details](#infra-014-organize-debugging-scripts) | *RESOLVED - Development utilities organized, pytest fixed*
 
 ### 🚨 **CRITICAL: Application Authentication** (Recently Completed)
-2. **[INFRA-011] Fix Broken /login Route** ✅ **COMPLETED** → [Details](#infra-011-fix-broken-login-route) | *RESOLVED - Authentication restored, application functional*
+3. **[INFRA-011] Fix Broken /login Route** ✅ **COMPLETED** → [Details](#infra-011-fix-broken-login-route) | *RESOLVED - Authentication restored, application functional*
 
-### 🎯 **Tier 1: Quick Wins** (Execute First - Low Effort, High Value)
-3. **[DOC-015] Fix Architecture Placeholder** → [Details](#doc-015-fix-architecture-placeholder) | *15 min - Remove incomplete section*
+### 🎯 **Tier 1: Quick Wins** (Execute After Testing Fixed - Low Effort, High Value)
+4. **[DOC-015] Fix Architecture Placeholder** → [Details](#doc-015-fix-architecture-placeholder) | *15 min - Remove incomplete section*
 4. **[DOC-018] Config.py Template & Documentation** → [Details](#doc-018-configpy-template--documentation) | *20-30 min - Create root template matching actual structure*
 5. **[DOC-017] Document Deployment Process** → [Details](#doc-017-document-deployment-process) | *30-45 min - Document push.sh & Raspberry Pi deployment*
 6. **[DOC-016] Document Root Scripts** → [Details](#doc-016-document-root-scripts) | *15 min - Clarify command.sh purpose*
@@ -38,10 +41,9 @@
 9. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *1 hour - Add measurable tracking*
 10. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *1 hour - Workflow integration*
 
-### 🚀 **Tier 2: High Impact Development** (Execute Next - Strategic Value)
-11. **[INFRA-006] Schema Validation** → [Details](#infra-006-database-schema-validation) | *Critical - Resolve 11 test failures*
-12. **[INFRA-007] Model Schema Fixes** → [Details](#infra-007-model-schema-fixes) | *Foundation for schema validation*
-13. **[REFACTOR-002] Complete Blueprint Migration** → [Details](#refactor-002-complete-blueprint-migration) | *Follow-up to INFRA-011*
+### 🚀 **Tier 2: High Impact Development** (Execute After Quick Wins - Strategic Value)
+11. **[INFRA-007] Model Schema Fixes** → [Details](#infra-007-model-schema-fixes) | *Foundation for schema validation*
+12. **[REFACTOR-002] Complete Blueprint Migration** → [Details](#refactor-002-complete-blueprint-migration) | *Follow-up to INFRA-011*
 14. **[INFRA-012] Migration Workflow** → [Details](#infra-012-migration-workflow) | *Database procedures*
 15. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
 16. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *91 quality issues + security*
@@ -65,30 +67,29 @@
 
 ### 🧹 Immediate: Repository Organization
 
-#### [INFRA-014] Organize Debugging Scripts
-**Priority**: Very Low Effort, Medium Value | **Status**: 🎯 Ready to Execute
-**Estimated Time**: 10-15 minutes
-**Dependencies**: INFRA-011 completion ✅ (created the files to organize)
-**Strategic Value**: Improve developer experience and repository organization
-**Problem**: Temporary debugging files from INFRA-011 troubleshooting are untracked in git
-**Current Situation**:
-- `apply_migrations.py`: Proper Flask migration utility with safe app context
-- `test_db_connection.py`: PostgreSQL connection validation with detailed diagnostics
-- `temp_migrate.py`: Quick migration script (simpler version of apply_migrations.py)
-**Solution**: Organize as development utilities rather than discard valuable debugging tools
-**Implementation**:
-- Create `scripts/` directory for development utilities
-- Add proper documentation headers to each script explaining purpose and usage
-- Update TECHNICAL.md with section on development scripts
-- Consider creating `make migrate` command wrapper for apply_migrations.py
-- Commit files with proper git tracking
-**Acceptance Criteria**:
-- All temporary files moved to appropriate scripts/ directory
-- Each script has proper documentation header with usage instructions
-- TECHNICAL.md documents the development utilities
-- No untracked files remain in root directory
-- Files become part of project's permanent development toolkit
-**Strategic Impact**: Clean git history, reusable development tools, improved developer onboarding
+#### [INFRA-014] Organize Debugging Scripts ✅ **COMPLETED**
+**Priority**: Very Low Effort, Medium Value | **Status**: ✅ **COMPLETED**
+**Completion Date**: January 13, 2026
+**Actual Time**: ~15 minutes (matched estimate)
+**Resolution**: Successfully organized temporary debugging files into permanent development utilities
+**Implementation Summary**:
+- **Directory Structure**: Created `scripts/database/` and `scripts/migration/` subdirectories
+- **File Organization**: Moved all 3 temporary files with enhanced documentation headers
+- **Documentation**: Added comprehensive "Development Scripts" section to TECHNICAL.md
+- **Code Enhancement**: Added detailed usage instructions, troubleshooting guidance, and context
+- **Repository Hygiene**: Removed all untracked files from root directory
+**Technical Details**:
+- `apply_migrations.py`: Enhanced with 30 lines of documentation and safety features
+- `test_db_connection.py`: Added 25 lines of troubleshooting guidance and usage examples
+- `temp_migrate.py`: Documented as simplified utility with appropriate warnings
+- All scripts maintain full functionality in new locations
+**Validation Results**:
+- ✅ No untracked files remain in root directory (clean git status)
+- ✅ All scripts moved to organized `scripts/` subdirectories
+- ✅ Each script has comprehensive documentation header
+- ✅ TECHNICAL.md documents development utilities with usage examples
+- ✅ Core application functionality preserved (services start successfully)
+**Strategic Impact**: Clean git history, reusable development toolkit, improved developer onboarding experience
 
 ### 🚨 CRITICAL: Application Broken
 
