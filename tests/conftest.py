@@ -1,11 +1,25 @@
 """Pytest configuration and fixtures for HT Status tests."""
 
 import os
+import warnings
+import atexit
+import gc
 
 import pytest
 
 from app.factory import create_app, db
 from config import TestConfig
+
+
+def pytest_sessionstart(session):
+    """Called after the Session object has been created."""
+    pass  # ResourceWarnings will be eliminated by proper cleanup
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """Called after whole test run finished, right before returning the exit status to the system."""
+    # Force complete cleanup to eliminate any remaining connections
+    gc.collect()
 
 
 @pytest.fixture(scope='session')
@@ -22,8 +36,41 @@ def app():
         db.create_all()
         yield app
 
-        # Clean up
-        db.drop_all()
+        # Complete cleanup to eliminate ResourceWarnings
+        try:
+            # Remove any lingering sessions
+            db.session.remove()
+        except Exception:
+            pass
+
+        try:
+            # Drop all tables
+            db.drop_all()
+        except Exception:
+            pass
+
+        try:
+            # Dispose of the engine and close all connections
+            db.engine.dispose()
+        except Exception:
+            pass
+
+        # Force garbage collection to clean up any remaining references
+        gc.collect()
+
+
+@pytest.fixture(scope='function', autouse=True)
+def cleanup_connections(app):
+    """Automatically clean up connections after each test to prevent ResourceWarnings."""
+    yield  # Run the test
+
+    # Clean up any connections that might be left open
+    with app.app_context():
+        try:
+            # Close any active sessions
+            db.session.close()
+        except Exception:
+            pass
 
 
 @pytest.fixture(scope='function')
@@ -36,7 +83,6 @@ def client(app):
 def db_session(app):
     """Create a database session for testing with transaction rollback."""
     with app.app_context():
-        # Use the existing db.session for simpler compatibility
         # Start a transaction that we can rollback
         connection = db.engine.connect()
         transaction = connection.begin()
@@ -46,12 +92,22 @@ def db_session(app):
         Session = sessionmaker(bind=connection)
         session = Session()
 
-        yield session
-
-        # Clean up
-        session.close()
-        transaction.rollback()
-        connection.close()
+        try:
+            yield session
+        finally:
+            # Complete resource cleanup to eliminate ResourceWarnings
+            try:
+                session.close()
+            except Exception:
+                pass
+            try:
+                transaction.rollback()
+            except Exception:
+                pass
+            try:
+                connection.close()
+            except Exception:
+                pass
 
 
 @pytest.fixture(scope='function')
