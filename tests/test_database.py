@@ -121,11 +121,11 @@ def test_player_creation(app, db_session):
             'mother_club_bonus': True,
             'leadership': 6
         }
-        
+
         player = Players(player_data)
         db_session.add(player)
         db_session.commit()
-        
+
         # Test player was created with correct values
         assert player.ht_id == 123456
         assert player.first_name == 'John'
@@ -197,20 +197,20 @@ def test_player_skill_calculations(app, db_session):
             'mother_club_bonus': False,
             'leadership': 7
         }
-        
+
         player = Players(player_data)
         db_session.add(player)
         db_session.commit()
-        
+
         # Test high-level skills
         assert player.scorer == 10  # Excellent scorer
         assert player.stamina == 9   # Excellent stamina
         assert player.playmaker == 8 # Formidable playmaker
-        
+
         # Test experience and form interaction
         assert player.experience == 8
         assert player.form == 8
-        
+
         # Test specialty and leadership
         assert player.specialty == 2
         assert player.leadership == 7
@@ -274,18 +274,18 @@ def test_player_repr(app, db_session):
             'mother_club_bonus': False,
             'leadership': 5
         }
-        
+
         player = Players(player_data)
         db_session.add(player)
         db_session.commit()
-        
+
         player_str = str(player)
         assert 'Representation Player' in player_str
         assert '999999' in player_str
 
 
 # ============================================================================
-# Match Model Tests  
+# Match Model Tests
 # ============================================================================
 
 def test_match_creation(app, db_session):
@@ -306,11 +306,11 @@ def test_match_creation(app, db_session):
             'home_goals': 2,
             'away_goals': 1
         }
-        
+
         match = Match(match_data)
         db_session.add(match)
         db_session.commit()
-        
+
         # Test match was created with correct values
         assert match.ht_id == 987654
         assert match.home_team_name == 'Home Team'
@@ -338,11 +338,11 @@ def test_match_repr(app, db_session):
             'home_goals': 3,
             'away_goals': 0
         }
-        
+
         match = Match(match_data)
         db_session.add(match)
         db_session.commit()
-        
+
         match_str = str(match)
         assert 'Test FC - Sample United' in match_str
         assert '111222' in match_str
@@ -367,11 +367,12 @@ def test_matchplay_creation(app, db_session):
             'rating_stars_eom': 7.0,
             'behaviour': 1
         }
-        
+
         matchplay = MatchPlay(matchplay_data)
+        matchplay.id = 1  # Set id manually after creation
         db_session.add(matchplay)
         db_session.commit()
-        
+
         # Test matchplay was created with correct values
         assert matchplay.match_id == 987654
         assert matchplay.player_id == 123456
@@ -397,11 +398,12 @@ def test_matchplay_repr(app, db_session):
             'rating_stars_eom': 7.5,
             'behaviour': 1
         }
-        
+
         matchplay = MatchPlay(matchplay_data)
+        matchplay.id = 2  # Set id manually after creation
         db_session.add(matchplay)
         db_session.commit()
-        
+
         matchplay_str = str(matchplay)
         assert 'Jane Smith' in matchplay_str
         assert '8.0/7.5' in matchplay_str
@@ -417,7 +419,7 @@ def test_user_creation(app, db_session):
         user = User(12345, 'test_ht_user', 'testuser', 'password123', 'access_key', 'access_secret')
         db_session.add(user)
         db_session.commit()
-        
+
         # Test user was created with correct values
         assert user.ht_id == 12345
         assert user.ht_user == 'test_ht_user'
@@ -436,32 +438,32 @@ def test_user_methods(app, db_session):
         user = User(12346, 'test_ht_user2', 'testuser2', 'password123', 'access_key2', 'access_secret2')
         db_session.add(user)
         db_session.commit()
-        
+
         # Test role methods
         user.setRole('admin')
         assert user.getRole() == 'admin'
-        
+
         # Test activity tracking methods
         initial_login_count = user.c_login
         user.login()
         assert user.c_login == initial_login_count + 1
-        
+
         initial_player_count = user.c_player
         user.player()
         assert user.c_player == initial_player_count + 1
-        
+
         initial_matches_count = user.c_matches
         user.matches()
         assert user.c_matches == initial_matches_count + 1
-        
+
         initial_team_count = user.c_team
         user.team()
         assert user.c_team == initial_team_count + 1
-        
+
         initial_training_count = user.c_training
         user.training()
         assert user.c_training == initial_training_count + 1
-        
+
         initial_update_count = user.c_update
         user.updatedata()
         assert user.c_update == initial_update_count + 1
@@ -473,13 +475,13 @@ def test_user_columns_methods(app, db_session):
         user = User(12347, 'test_ht_user3', 'testuser3', 'password123', 'access_key3', 'access_secret3')
         db_session.add(user)
         db_session.commit()
-        
+
         # Test setting and getting columns
         test_columns = ['name', 'age', 'stamina', 'keeper', 'defender']
         user.updateColumns(test_columns)
         retrieved_columns = user.getColumns()
         assert retrieved_columns == test_columns
-        
+
         # Test empty columns
         user.updateColumns([])
         empty_columns = user.getColumns()
@@ -497,12 +499,12 @@ def test_group_creation(app, db_session):
         user = User(12345, 'test_user', 'testuser', 'password', 'access_key', 'access_secret')
         db_session.add(user)
         db_session.commit()
-        
+
         # Create the group
         group = Group(12345, 'Goalkeepers', 1, '#000000', '#FFD700')
         db_session.add(group)
         db_session.commit()
-        
+
         # Test group was created with correct values
         assert group.user_id == 12345
         assert group.name == 'Goalkeepers'
@@ -518,17 +520,17 @@ def test_player_setting_creation(app, db_session):
         user = User(12346, 'test_user_ps', 'testuser_ps', 'password', 'access_key', 'access_secret')
         db_session.add(user)
         db_session.commit()
-        
-        # Create a group first (foreign key requirement) 
+
+        # Create a group first (foreign key requirement)
         group = Group(12346, 'Test Group', 1, '#000000', '#FFFFFF')
         db_session.add(group)
         db_session.commit()
-        
+
         # Create the player setting with the group id
         player_setting = PlayerSetting(123456, 12346, group.id)
         db_session.add(player_setting)
         db_session.commit()
-        
+
         # Test player setting was created with correct values
         assert player_setting.player_id == 123456
         assert player_setting.user_id == 12346
@@ -597,11 +599,11 @@ def test_player_data_date_formatting(app, db_session):
             'mother_club_bonus': False,
             'leadership': 5
         }
-        
+
         player = Players(player_data)
         db_session.add(player)
         db_session.commit()
-        
+
         # Test that data_date is set (the model uses time.strftime which returns string)
         # Note: The model sets data_date to current date string in __init__
         assert player.data_date is not None
@@ -672,11 +674,11 @@ def test_boolean_field_conversion(app, db_session):
             'mother_club_bonus': 1,  # Truthy value
             'leadership': 6
         }
-        
+
         player = Players(player_data)
         db_session.add(player)
         db_session.commit()
-        
+
         # Test boolean conversion
         assert player.is_transfer_listed is True
         assert player.mother_club_bonus is True

@@ -70,7 +70,7 @@ class TestPlayerBusinessLogic:
                 'mother_club_bonus': True,  # Often true for young players
                 'leadership': 2  # Low leadership for young player
             }
-            
+
             # Test veteran player
             veteran_player_data = {
                 'ht_id': 501002,
@@ -127,23 +127,23 @@ class TestPlayerBusinessLogic:
                 'mother_club_bonus': False,
                 'leadership': 8  # High leadership for veteran
             }
-            
+
             young_player = Players(young_player_data)
             veteran_player = Players(veteran_player_data)
             db_session.add(young_player)
             db_session.add(veteran_player)
             db_session.commit()
-            
+
             # Test age-related business logic
             assert young_player.age_years < 18  # Youth player
             assert veteran_player.age_years > 30  # Veteran
-            
+
             # Test experience correlation with age
             assert young_player.experience < veteran_player.experience
-            
+
             # Test leadership correlation with age/experience
             assert young_player.leadership < veteran_player.leadership
-            
+
             # Test TSI correlation with experience
             assert young_player.tsi < veteran_player.tsi
 
@@ -206,7 +206,7 @@ class TestPlayerBusinessLogic:
                 'mother_club_bonus': False,
                 'leadership': 7
             }
-            
+
             # Striker profile
             striker_data = {
                 'ht_id': 502002,
@@ -263,21 +263,21 @@ class TestPlayerBusinessLogic:
                 'mother_club_bonus': False,
                 'leadership': 6
             }
-            
+
             goalkeeper = Players(goalkeeper_data)
             striker = Players(striker_data)
             db_session.add(goalkeeper)
             db_session.add(striker)
             db_session.commit()
-            
+
             # Test position-specific skill expectations
             assert goalkeeper.keeper > striker.keeper  # Keeper should have better keeper skill
             assert striker.scorer > goalkeeper.scorer  # Striker should have better scoring
-            
+
             # Test goal statistics alignment with position
             assert goalkeeper.career_goals == 0  # Goalkeepers rarely score
             assert striker.career_goals > 0  # Strikers should have goals
-            
+
             # Test position-appropriate specialties
             assert goalkeeper.specialty == 1  # Quick specialty for goalkeeper
             assert striker.specialty == 3  # Head specialty for striker
@@ -341,7 +341,7 @@ class TestPlayerBusinessLogic:
                 'mother_club_bonus': False,
                 'leadership': 7
             }
-            
+
             # Budget player
             budget_player_data = {
                 'ht_id': 503002,
@@ -398,26 +398,26 @@ class TestPlayerBusinessLogic:
                 'mother_club_bonus': False,
                 'leadership': 4
             }
-            
+
             star_player = Players(star_player_data)
             budget_player = Players(budget_player_data)
             db_session.add(star_player)
             db_session.add(budget_player)
             db_session.commit()
-            
+
             # Test value correlations
             assert star_player.tsi > budget_player.tsi * 3  # Star player much higher TSI
             assert star_player.salary > budget_player.salary * 5  # Higher salary for better player
-            
+
             # Test skill quality differences
             assert star_player.playmaker > budget_player.playmaker
             assert star_player.scorer > budget_player.scorer
             assert star_player.stamina > budget_player.stamina
-            
+
             # Test transfer list status impact
             assert not star_player.is_transfer_listed  # Star players not usually for sale
             assert budget_player.is_transfer_listed  # Budget players more likely for sale
-            
+
             # Test injury status impact
             assert star_player.injury_level == 0  # Star players better maintained
             assert budget_player.injury_level > 0  # Budget players may have issues
@@ -445,7 +445,7 @@ class TestMatchBusinessLogic:
                 'home_goals': 3,
                 'away_goals': 1
             }
-            
+
             # Away win match
             away_win_data = {
                 'ht_id': 601002,
@@ -462,7 +462,7 @@ class TestMatchBusinessLogic:
                 'home_goals': 0,
                 'away_goals': 2
             }
-            
+
             # Draw match
             draw_data = {
                 'ht_id': 601003,
@@ -479,7 +479,7 @@ class TestMatchBusinessLogic:
                 'home_goals': 2,
                 'away_goals': 2
             }
-            
+
             home_win = Match(home_win_data)
             away_win = Match(away_win_data)
             draw = Match(draw_data)
@@ -487,29 +487,29 @@ class TestMatchBusinessLogic:
             db_session.add(away_win)
             db_session.add(draw)
             db_session.commit()
-            
+
             # Test result classifications
             # Home win
             assert home_win.home_goals > home_win.away_goals
-            
+
             # Away win
             assert away_win.home_goals < away_win.away_goals
-            
+
             # Draw
             assert draw.home_goals == draw.away_goals
-            
+
             # Test team 50001 record (2 matches, 1 win, 1 draw)
             team_50001_matches = db_session.query(Match).filter(
                 (Match.home_team_id == 50001) | (Match.away_team_id == 50001)
             ).all()
-            
+
             assert len(team_50001_matches) == 3  # Team played 3 matches
-            
+
             # Calculate wins, draws, losses for team 50001
             wins = 0
             draws = 0
             losses = 0
-            
+
             for match in team_50001_matches:
                 if match.home_team_id == 50001:  # Playing at home
                     if match.home_goals > match.away_goals:
@@ -525,7 +525,7 @@ class TestMatchBusinessLogic:
                         draws += 1
                     else:
                         losses += 1
-            
+
             assert wins == 2  # Team 50001 won 2 matches
             assert draws == 1  # Team 50001 drew 1 match
             assert losses == 0  # Team 50001 lost 0 matches
@@ -546,7 +546,7 @@ class TestMatchBusinessLogic:
                 'rating_stars_eom': 8.5,  # End of match rating
                 'behaviour': 1  # Normal behaviour
             }
-            
+
             # Poor performance
             poor_performance_data = {
                 'match_id': 601001,
@@ -560,7 +560,7 @@ class TestMatchBusinessLogic:
                 'rating_stars_eom': 4.5,  # Slightly better end of match
                 'behaviour': 1  # Normal behaviour
             }
-            
+
             # Average performance
             average_performance_data = {
                 'match_id': 601002,
@@ -574,24 +574,27 @@ class TestMatchBusinessLogic:
                 'rating_stars_eom': 6.0,  # End of match rating
                 'behaviour': 1  # Normal behaviour
             }
-            
+
             excellent_perf = MatchPlay(excellent_performance_data)
+            excellent_perf.id = 1  # Set id manually after creation
             poor_perf = MatchPlay(poor_performance_data)
+            poor_perf.id = 2  # Set id manually after creation
             average_perf = MatchPlay(average_performance_data)
+            average_perf.id = 3  # Set id manually after creation
             db_session.add(excellent_perf)
             db_session.add(poor_perf)
             db_session.add(average_perf)
             db_session.commit()
-            
+
             # Test performance categorization
             assert excellent_perf.rating_stars >= 8.0  # Excellent performance
             assert poor_perf.rating_stars <= 5.0  # Poor performance
             assert 6.0 <= average_perf.rating_stars <= 7.0  # Average performance
-            
+
             # Test player consistency (player 701001 played multiple matches)
             player_performances = db_session.query(MatchPlay).filter_by(player_id=701001).all()
             assert len(player_performances) == 2  # Player played 2 matches
-            
+
             # Calculate average rating
             total_rating = sum(perf.rating_stars for perf in player_performances)
             average_rating = total_rating / len(player_performances)
@@ -608,7 +611,7 @@ class TestUserBusinessLogic:
             active_user = User(80001, 'active_user_ht', 'active_user', 'password', 'key1', 'secret1')
             db_session.add(active_user)
             db_session.commit()
-            
+
             # Simulate active usage patterns
             for _ in range(5):
                 active_user.login()
@@ -620,14 +623,14 @@ class TestUserBusinessLogic:
                 active_user.training()
             for _ in range(2):
                 active_user.updatedata()
-            
+
             # Test activity levels
             assert active_user.c_login >= 5  # Multiple logins
             assert active_user.c_player >= 10  # Regular player viewing
             assert active_user.c_matches >= 7  # Regular match viewing
             assert active_user.c_training >= 3  # Some training usage
             assert active_user.c_update >= 2  # Data updates
-            
+
             # Test most active features
             assert active_user.c_player > active_user.c_matches  # More player than match activity
             assert active_user.c_matches > active_user.c_training  # More match than training activity
@@ -637,22 +640,22 @@ class TestUserBusinessLogic:
         with app.app_context():
             # Regular user
             regular_user = User(80002, 'regular_user_ht', 'regular_user', 'password', 'key2', 'secret2')
-            
+
             # Admin user
             admin_user = User(80003, 'admin_user_ht', 'admin_user', 'password', 'key3', 'secret3')
-            
+
             db_session.add(regular_user)
             db_session.add(admin_user)
             db_session.commit()
-            
+
             # Set roles
             regular_user.setRole('user')
             admin_user.setRole('admin')
-            
+
             # Test role assignment
             assert regular_user.getRole() == 'user'
             assert admin_user.getRole() == 'admin'
-            
+
             # Test role permissions (conceptual)
             assert admin_user.getRole() != regular_user.getRole()
 
@@ -662,23 +665,23 @@ class TestUserBusinessLogic:
             user = User(80004, 'pref_user_ht', 'pref_user', 'password', 'key4', 'secret4')
             db_session.add(user)
             db_session.commit()
-            
+
             # Test default preferences
             default_columns = user.getColumns()
             assert default_columns == []  # Empty by default
-            
+
             # Set preferred columns
             preferred_columns = ['name', 'age', 'stamina', 'keeper', 'defender', 'playmaker', 'scorer']
             user.updateColumns(preferred_columns)
-            
+
             # Test preference persistence
             retrieved_columns = user.getColumns()
             assert retrieved_columns == preferred_columns
-            
+
             # Test preference modification
             modified_columns = ['name', 'age', 'form', 'stamina', 'scorer', 'leadership']
             user.updateColumns(modified_columns)
-            
+
             updated_columns = user.getColumns()
             assert updated_columns == modified_columns
             assert updated_columns != preferred_columns
@@ -691,7 +694,7 @@ class TestCalculationBusinessLogic:
         """Test team-level statistics calculations."""
         with app.app_context():
             team_id = 90001
-            
+
             # Create team players with varying skills
             players_data = []
             for i in range(11):  # Full team
@@ -751,36 +754,36 @@ class TestCalculationBusinessLogic:
                     'leadership': 3 + (i % 6)
                 }
                 players_data.append(player_data)
-            
+
             # Add players to database
             for player_data in players_data:
                 player = Players(player_data)
                 db_session.add(player)
-            
+
             db_session.commit()
-            
+
             # Test team statistics
             team_players = db_session.query(Players).filter_by(team_id=team_id).all()
             assert len(team_players) == 11  # Full team
-            
+
             # Calculate team averages
             avg_age = sum(p.age_years for p in team_players) / len(team_players)
             avg_experience = sum(p.experience for p in team_players) / len(team_players)
             avg_stamina = sum(p.stamina for p in team_players) / len(team_players)
             total_salary = sum(p.salary for p in team_players)
             total_tsi = sum(p.tsi for p in team_players)
-            
+
             # Test reasonable team statistics
             assert 20 <= avg_age <= 28  # Reasonable average age
             assert avg_experience >= 3  # Some team experience
             assert avg_stamina >= 5  # Decent team fitness
             assert total_salary > 100000  # Significant total salary
             assert total_tsi > 15000  # Significant total TSI
-            
+
             # Test positional distribution
             goalkeepers = [p for p in team_players if p.keeper >= 7]
             outfield_players = [p for p in team_players if p.keeper < 7]
-            
+
             assert len(goalkeepers) >= 1  # At least one goalkeeper
             assert len(outfield_players) >= 10  # At least 10 outfield players
 
@@ -843,7 +846,7 @@ class TestCalculationBusinessLogic:
                 'mother_club_bonus': False,
                 'leadership': 7
             }
-            
+
             # Low form, low experience player
             inexperienced_poor_form_data = {
                 'ht_id': 910002,
@@ -900,25 +903,25 @@ class TestCalculationBusinessLogic:
                 'mother_club_bonus': True,
                 'leadership': 2
             }
-            
+
             experienced_player = Players(experienced_form_data)
             inexperienced_player = Players(inexperienced_poor_form_data)
             db_session.add(experienced_player)
             db_session.add(inexperienced_player)
             db_session.commit()
-            
+
             # Test form and experience correlations
             assert experienced_player.form > inexperienced_player.form
             assert experienced_player.experience > inexperienced_player.experience
-            
+
             # Test performance indicators
             assert experienced_player.career_goals > inexperienced_player.career_goals
             assert experienced_player.current_team_matches > inexperienced_player.current_team_matches
-            
+
             # Test value correlations
             assert experienced_player.tsi > inexperienced_player.tsi * 3
             assert experienced_player.salary > inexperienced_player.salary * 5
-            
+
             # Test injury impact on form/value
             assert inexperienced_player.injury_level > experienced_player.injury_level
             assert inexperienced_player.form < 5  # Poor form often correlates with injuries
