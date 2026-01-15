@@ -13,12 +13,38 @@ from config import TestConfig
 
 def pytest_sessionstart(session):
     """Called after the Session object has been created."""
-    pass  # ResourceWarnings will be eliminated by proper cleanup
+    # Ensure clean start for resource tracking
+    import sqlite3
+    # Close any existing SQLite connections that might be lingering
+    try:
+        # Force cleanup of any existing connections
+        import gc
+        gc.collect()
+    except Exception:
+        pass
 
 
 def pytest_sessionfinish(session, exitstatus):
     """Called after whole test run finished, right before returning the exit status to the system."""
     # Force complete cleanup to eliminate any remaining connections
+    import sqlite3
+    import gc
+
+    # Ensure all SQLite connections are closed
+    try:
+        # Force garbage collection to trigger connection cleanup
+        gc.collect()
+        # Clear any remaining SQLite objects
+        for obj in gc.get_objects():
+            if isinstance(obj, sqlite3.Connection):
+                try:
+                    obj.close()
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
+    # Final garbage collection
     gc.collect()
 
 

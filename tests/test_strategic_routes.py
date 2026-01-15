@@ -5,6 +5,8 @@ avoiding the database schema issues in the main application.
 """
 import os
 import pytest
+import sqlite3
+import gc
 from unittest.mock import Mock, patch, MagicMock
 from flask import Flask
 from app.factory import create_app
@@ -27,6 +29,7 @@ class StrategicTestConfig:
 def strategic_app():
     """Create app for strategic testing."""
     os.environ['FLASK_ENV'] = 'testing'
+    app = None
     # Patch the problematic MatchPlay model creation
     with patch('models.MatchPlay'):
         app = create_app(StrategicTestConfig, include_routes=True)
@@ -35,11 +38,61 @@ def strategic_app():
             with patch('app.factory.db.create_all'):
                 yield app
 
+    # Cleanup outside app context to ensure proper disposal
+    if app:
+        with app.app_context():
+            try:
+                from app.factory import db
+                # Close all sessions first
+                if hasattr(db, 'session'):
+                    db.session.remove()
+                # Dispose of engine to close all connections
+                if hasattr(db, 'engine'):
+                    db.engine.dispose()
+                # Force immediate cleanup
+                import gc
+                gc.collect()
+            except Exception:
+                pass
+
 
 @pytest.fixture(scope='function')
 def strategic_client(strategic_app):
     """Create test client for strategic testing."""
     return strategic_app.test_client()
+
+
+@pytest.fixture(scope='function', autouse=True)
+def cleanup_strategic_connections():
+    """Automatically clean up strategic test connections."""
+    # Clean up before test
+    try:
+        for obj in gc.get_objects():
+            if isinstance(obj, sqlite3.Connection):
+                try:
+                    obj.close()
+                except Exception:
+                    pass
+        gc.collect()
+    except Exception:
+        pass
+
+    yield  # Run the test
+
+    # Force cleanup after test
+    try:
+        # Find and close any SQLite connections
+        for obj in gc.get_objects():
+            if isinstance(obj, sqlite3.Connection):
+                try:
+                    obj.close()
+                except Exception:
+                    pass
+        # Force garbage collection
+        gc.collect()
+    except Exception:
+        pass
+        pass
 
 
 class TestBlueprintRoutesCoverage:
