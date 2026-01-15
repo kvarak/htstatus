@@ -16,7 +16,8 @@
         "## Implementation Steps",
         "## Potential Challenges",
         "## Testing and Validation",
-        "## Conclusion"
+        "## Conclusion",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -35,7 +36,8 @@
         "Update backlog.md when task milestones are completed.",
         "Update progress.md with accomplishments and next steps.",
         "Document any deviations from the plan and reasons for those changes.",
-        "Do not git add or commit any changes."
+        "Do not git add or commit any changes.",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -56,7 +58,8 @@
         "Provide constructive feedback and suggest improvements if necessary.",
         "Make necessary adjustments to the completed work based on the review.",
         "Potential new tasks identified during the review should be added to backlog.md.",
-        "Do not git add or commit any changes."
+        "Do not git add or commit any changes.",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -74,7 +77,8 @@
         "Ensure all project requirements are still being met.",
         "Check if any tasks in backlog.md can now move to active status.",
         "Update strategic progress in goals.md if major milestones achieved.",
-        "Do not git add or commit any changes."
+        "Do not git add or commit any changes.",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -99,7 +103,8 @@
         " - Focus on what was changed, not editorial commentary about how good it is",
         "Stage the changes for commit.",
         "Create the commit with the written summary.",
-        "Do not push commits to remote repository."
+        "Do not push commits to remote repository.",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -122,7 +127,8 @@
         "## Dependencies and Prerequisites",
         "## Recommended Placement",
         "## Priority Assessment",
-        "## Implementation Considerations"
+        "## Implementation Considerations",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -149,7 +155,8 @@
         "## Execution Steps",
         "## Validation and Testing",
         "## Documentation Updates",
-        "## Completion Summary"
+        "## Completion Summary",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -182,7 +189,8 @@
         "## Identified Issues and Gaps",
         "## Project Health Score",
         "## Prioritized Recommendations",
-        "## Next Steps"
+        "## Next Steps",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -211,7 +219,8 @@
         "## Backlog Restructuring Plan",
         "## Implementation Steps",
         "## Next Task Recommendations",
-        "## Validation and Compliance Check"
+        "## Validation and Compliance Check",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     },
     {
@@ -238,7 +247,8 @@
         "## High-Impact Opportunity Identification",
         "## Value Proposition Analysis",
         "## Future Opportunities Added to plan.md",
-        "## Implementation Readiness Assessment"
+        "## Implementation Readiness Assessment",
+        "I want the summary at the end of the reponse to be short and to the point"
       ]
     }
   ]
