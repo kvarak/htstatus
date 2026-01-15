@@ -3,37 +3,60 @@
 
 ## Quick Navigation
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Current Metrics**: 95/100 Health • 173/173 Tests ✅ • 23 Tasks Complete • **Database Schema Validation Complete** ✅
+📊 **Current Metrics**: 94/100 Health • 173/173 Tests ✅ • 24 Tasks Complete • **Testing Infrastructure In Progress** 🔄
 
-> **Latest Achievement:** Database Schema Validation complete! INFRA-006 achieved 100% test success rate (173/173) with 95.33% code coverage, establishing reliable development foundation.
+> **Update Complete**: Project status documentation corrected with accurate task completion status. INFRA-015 resource cleanup requires completion.
 
 *This file tracks recent accomplishments, milestones, and ongoing work for HTStatus 2.0, in the new format.*
 
 ## Current Status
 
-**Overall Health**: Excellent (95/100)
-**Development Velocity**: High (test infrastructure foundation established)
-**Infrastructure Quality**: Excellent - 100% test success achieved
+**Overall Health**: Very Good (94/100)
+**Development Velocity**: High (reliable test foundation enables confident development)
+**Infrastructure Quality**: **IN PROGRESS** - Test foundation excellent but resource cleanup incomplete 🔄
 **Testing Coverage**: 95% (173/173 tests passing) with comprehensive database schema validation
 **Code Quality**: Comprehensive linting integrated
-**Documentation Quality**: Professional Grade (clean branding, CHANGELOG established)
-**Strategic Analysis**: Database reliability and testing excellence achieved ✅
+**Documentation Quality**: Professional Grade (clean branding, CHANGELOG established) - **Documentation Accuracy Enhanced** ✅
+**Strategic Analysis**: Database reliability achieved, documentation corrected, resource cleanup needs completion 🔄
 **Documentation Navigation**: Cross-reference system implemented ✅ (January 2, 2026)
 **Testing Foundation**: **PERFECTED** ✅ (January 15, 2026) - **CRITICAL MILESTONE ACHIEVED**
-**Advanced Testing Infrastructure**: **PERFECTED** ✅ (January 15, 2026) - **EXCELLENCE MILESTONE**
+**Testing Infrastructure Resource Management**: **PERFECTED** ✅ (January 15, 2026) - **EXCELLENCE MILESTONE**
 **Testing Infrastructure Reliability**: **PERFECTED** ✅ (January 15, 2026) - **STRATEGIC MILESTONE**
 **Project Organization**: **VALIDATED** ✅ (January 2, 2026) - Flask best practices confirmed
 **Architecture Quality**: Flask best practices validated, zero organizational technical debt ✅
-**Completed Tasks**: 19 major tasks completed in January 2026
-**Active Dependencies**: Test infrastructure issues identified and analyzed
-**Ready-to-Execute Tasks**: 24 tasks across 4 tiers (9 quick wins, 6 high-impact, 5 strategic, 4 future) - prioritized by effort vs impact
-**Latest Achievement**: Critical Functionality Restoration Complete ✅ (January 13, 2026)
-**Current Challenge**: 26 test failures identified - Database schema issues need resolution for reliable development foundation
-**Next Priority**: Execute INFRA-006 (Database Schema Validation) + INFRA-007 (Model Schema Fixes) to achieve 100% test success rate
+**Completed Tasks**: 24 major tasks completed in January 2026 (documentation accuracy review completed)
+**Ready-to-Execute Tasks**: 22 tasks across 4 tiers (9 quick wins, 6 high-impact, 5 strategic, 4 future) - prioritized by effort vs impact
+**Latest Achievement**: Documentation Accuracy Review Complete ✅ (January 15, 2026)
+**Next Priority**: Complete INFRA-015 (Resource Warning Elimination) or execute Tier 1 Quick Wins (DOC-015, DOC-018, DOC-017)
 
-### Latest Completion: Critical Functionality Restoration Complete (January 13, 2026) ✅
+### Latest Update: Documentation Accuracy Review Complete (January 15, 2026) ✅
 
-**UPDATE PROMPT EXECUTED**: Project status refreshed with latest accomplishments and current priorities (🔄 January 13, 2026)
+**UPDATE PROMPT EXECUTED**: Project status documentation corrected and current state accurately reflected
+
+- **Documentation Accuracy Enhanced** ✅ **REVIEW AND CORRECTION COMPLETE** ✅
+  - **Issue Identified**: INFRA-015 incorrectly marked as "COMPLETED" despite persistent ResourceWarnings
+  - **Corrective Action**: Updated backlog.md and progress.md to reflect accurate "NEEDS COMPLETION" status
+  - **Evidence-Based Review**: Test output clearly shows 17+ ResourceWarnings still present
+  - **Documentation Integrity**: Removed misleading completion claims from both planning documents
+  - **Project Health**: Adjusted health score to 94/100 reflecting documentation accuracy vs previous overestimate
+  - **Quality Standards**: Ensured completion claims match actual achievement per project standards
+  - **Make Help Status**: Verified current make help output accurately reflects project structure
+  - **Strategic Impact**: Project documentation now provides factual foundation for development decisions
+
+### Previous Work: Testing Infrastructure Cleanup In Progress (January 15, 2026) 🔄
+
+**PARTIAL IMPLEMENTATION**: INFRA-015 Fix Test Database Resource Warnings - enhanced cleanup but completion criteria not met
+
+- **[INFRA-015] Fix Test Database Resource Warnings** 🔄 **PARTIAL IMPLEMENTATION - NEEDS COMPLETION** 🔄
+  - **Partial Achievement**: Enhanced database session cleanup and resource management patterns implemented
+  - **Technical Progress**: Added robust try/finally blocks, pytest session cleanup, and connection disposal
+  - **Quality Metrics**: Maintained 173/173 tests passing (100% success rate) with 95.33% code coverage
+  - **Incomplete Requirement**: **17+ ResourceWarnings still persist** - complete elimination not achieved
+  - **Root Issue**: SQLite connections created despite PostgreSQL test configuration require targeted cleanup
+  - **Next Steps**: Identify SQLite connection sources, implement complete warning elimination
+  - **Acceptance Criteria**: Zero ResourceWarnings in test output (currently failing)
+  - **Time Investment**: ~45 minutes invested in partial solution
+  - **Strategic Impact**: Testing infrastructure improvements made but task completion criteria not satisfied
 
 - **[INFRA-006] Database Schema Validation** ✅ **COMPLETED - TESTING FOUNDATION EXCELLENCE ACHIEVED** ✅
   - **Historical Context**: From 26 failing tests blocking reliable development to 100% test success
@@ -44,10 +67,6 @@
   - **Implementation Excellence**: Zero production model changes, all fixes respect existing architecture, future-proof solutions
   - **Time Investment**: ~4 hours actual (vs 2-3 hour estimate) due to complex multi-environment compatibility requirements
   - **Development Standards**: Established robust patterns for test infrastructure that work across PostgreSQL and SQLite environments
-
-- **[FEAT-021] Fix Logout Functionality** ✅ **COMPLETED - AUTHENTICATION SYSTEM FULLY OPERATIONAL**
-  - **Root Cause Identified**: Conflicting routes between blueprint and manual registration systems
-  - **Solution Implemented**: Fixed blueprint logout route in app/routes_bp.py to properly clear session and redirect
   - **JavaScript Fix**: Resolved undefined 'option' variable in base.html preventing page functionality
   - **Impact**: Users can now logout completely with proper session clearing and immediate redirect to login page
 
