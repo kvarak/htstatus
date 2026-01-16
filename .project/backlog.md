@@ -2,11 +2,11 @@
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Project Health**: 95/100 • 173/173 Tests ✅ • 25 Tasks Complete • **Testing Infrastructure Excellence Achieved** ✅
+📊 **Project Health**: 96/100 • 218/218 Tests ✅ • 26 Tasks Complete • **Testing Infrastructure Excellence Achieved** ✅
 
 ## Backlog Management Rules
 
-**For AI Agents**: Use [Current Focus](#current-focus) for active work, [Ready to Execute](#ready-to-execute) for next-task identification. Navigate to [Task Details](#task-details) for full specifications.
+**For AI Agents**: Use [Current Focus](#current-focus) for active work, [Ready to Execute](#ready-to-execute) for next-task identification. Navigate to [Task Details](#task-details) for full specifications. Move completed tasks to backlog-done.md.
 
 **For Humans**: Priority tiers indicate execution readiness. Start with Tier 1 quick wins, advance to higher tiers.
 
@@ -21,14 +21,14 @@
 ## Current Focus
 
 ### 🚀 Active Work
-- **[INFRA-016] Testing Strategy Optimization** → Coverage gaps analysis + command optimization
+- **No active tasks** → INFRA-016 Testing Strategy Optimization completed ✅
 
 ### 🎯 Next Priority
-After INFRA-016 completion: Execute Tier 1 Quick Wins (8 documentation tasks, ~3 hours total effort)
+Execute Tier 1 Quick Wins (9 documentation tasks, ~3.5 hours total effort)
 
 ## Ready to Execute
 
-### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3 hours total)
+### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3.5 hours total)
 1. **[DOC-015] Fix Architecture Placeholder** → [Details](#doc-015-fix-architecture-placeholder) | *15 min*
 2. **[DOC-016] Document Root Scripts** → [Details](#doc-016-document-root-scripts) | *15 min*
 3. **[INFRA-013] Cleanup Debugging Files** → [Details](#infra-013-cleanup-debugging-files) | *5 min*
@@ -37,12 +37,14 @@ After INFRA-016 completion: Execute Tier 1 Quick Wins (8 documentation tasks, ~3
 6. **[DOC-017] Document Deployment Process** → [Details](#doc-017-document-deployment-process) | *45 min*
 7. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *1 hour*
 8. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *30 min*
+9. **[DOC-020] UV Installation & Troubleshooting Guide** → [Details](#doc-020-uv-installation--troubleshooting-guide) | *30 min*
 
 ### 🚀 **Tier 2: High Impact Development** (Strategic Value - Execute After Quick Wins)
 1. **[REFACTOR-002] Complete Blueprint Migration** → [Details](#refactor-002-complete-blueprint-migration) | *Follow-up to INFRA-011*
 2. **[INFRA-012] Migration Workflow** → [Details](#infra-012-migration-workflow) | *Database procedures*
 3. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
 4. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *91 quality issues + security*
+5. **[INFRA-017] Script Environment Audit** → [Details](#infra-017-script-environment-audit) | *Validate UV consistency*
 
 ### 📚 **Tier 3: Strategic Enhancement** (Foundation Building)
 1. **[DOC-011-API] API Documentation** → [Details](#doc-011-api-api-documentation) | *Developer experience*
@@ -171,6 +173,21 @@ After INFRA-016 completion: Execute Tier 1 Quick Wins (8 documentation tasks, ~3
 - AI-friendly testing procedures
 **Expected Outcomes**: Consistent testing practices, improved AI agent testing capabilities
 
+#### [DOC-020] UV Installation & Troubleshooting Guide
+**Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None
+**Strategic Value**: Development onboarding, environment consistency
+**Implementation**:
+1. Create comprehensive UV installation guide for all platforms
+2. Document common UV troubleshooting scenarios and solutions
+3. Add environment debugging procedures specific to UV
+4. Include UV best practices and development patterns
+**Acceptance Criteria**:
+- Complete installation instructions for macOS, Linux, Windows
+- Common error scenarios with solutions documented
+- UV-specific debugging procedures included
+**Expected Outcomes**: Reduced onboarding friction, consistent UV usage, faster issue resolution
+
 ### 🚀 Tier 2: High Impact Development (Strategic Value)
 
 #### [INFRA-016] Testing Strategy Optimization 🚀 **ACTIVE**
@@ -240,6 +257,21 @@ After INFRA-016 completion: Execute Tier 1 Quick Wins (8 documentation tasks, ~3
 - Validation and rollback processes tested
 - Automated backup integration
 **Expected Outcomes**: Safe database evolution, reduced migration risks, operational confidence
+
+#### [INFRA-017] Script Environment Audit
+**Priority**: Low Impact, Low Effort (1-2 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None
+**Strategic Value**: Environment consistency, development reliability
+**Implementation**:
+1. Audit all scripts in scripts/ directory for UV usage patterns
+2. Update any direct python calls to use uv run prefix
+3. Validate that all development utilities use correct environment
+4. Add environment validation to script headers where appropriate
+**Acceptance Criteria**:
+- All scripts consistently use UV environment
+- No direct python calls in development utilities
+- Environment validation where needed
+**Expected Outcomes**: Consistent environment usage, reduced environment-related issues
 
 #### [FEAT-002] Mobile-First PWA
 **Priority**: High Impact, High Effort (12-16 hours) | **Status**: 🎯 Ready to Execute
