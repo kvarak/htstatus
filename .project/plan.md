@@ -1,7 +1,7 @@
 # Plan
 
 ## Quick Navigation
-🔗 **Project Documentation**: [Architecture](architecture.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)  
+🔗 **Project Documentation**: [Architecture](architecture.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
 🚀 **Development**: [Prompts](prompts.json) • [Technical Docs](../TECHNICAL.md) • [README](../README.md)
 
 ## Project Requirements
@@ -12,6 +12,7 @@
 ### Core Quality Standards
 - **Testing Gate**: Verify changes with tests before completion (if tests are present)
 - **Code Quality Gate**: Run linter and address critical issues (if linter is present)
+- **Python Environment**: Always use `uv run python` instead of direct python calls to ensure correct environment
 
 ### Documentation Standards
 - **architecture.md**: Update with structural changes
@@ -38,7 +39,7 @@
 **Value**: First AI-enhanced Hattrick management tool providing predictive formation optimization and player development recommendations.
 **Foundation**: Time-series player data provides ML training datasets; React dashboard ready for interactive AI insights; continuous data flow via pyCHPP.
 
-### 🌐 Collaborative Team Analytics Platform  
+### 🌐 Collaborative Team Analytics Platform
 **Vision**: Extend beyond individual teams to become collaborative platform for leagues, tournaments, and team networks.
 **Value**: Create network effects in Hattrick community; enable league analytics, scouting networks, and competitive intelligence.
 **Foundation**: Multi-team architecture extends to multi-organization; OAuth supports federated auth; PostgreSQL naturally extends to leagues.
@@ -52,9 +53,9 @@
 
 ## Related Documentation
 
-📋 **Planning & Tracking**: 
+📋 **Planning & Tracking**:
 - [Current Backlog](backlog.md) - Active and planned development tasks
-- [Progress Tracking](progress.md) - Recent accomplishments and project status  
+- [Progress Tracking](progress.md) - Recent accomplishments and project status
 - [Strategic Goals](goals.md) - Vision, objectives, and success metrics
 
 🏗️ **Architecture & Implementation**:
