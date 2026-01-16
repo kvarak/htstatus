@@ -51,10 +51,10 @@ HTStatus includes debugging utilities in the `scripts/` directory, created durin
 Usage:
 ```bash
 # Test database connectivity
-python scripts/database/test_db_connection.py
+uv run python scripts/database/test_db_connection.py
 
 # Apply migrations safely
-python scripts/database/apply_migrations.py
+uv run python scripts/database/apply_migrations.py
 ```
 
 ### Migration Utilities (`scripts/migration/`)
@@ -93,7 +93,7 @@ Common Troubleshooting Scenarios:
 
 **Application Issues:**
 - Check Docker logs: `docker-compose logs postgres redis`
-- Validate environment: `python -c "from config import get_config; get_config().validate_config()"`
+- Validate environment: `uv run python -c "from config import get_config; get_config().validate_config()"`
 - Database connection: `make db-upgrade` then test connectivity
 
 ### Environment Debugging

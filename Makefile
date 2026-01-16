@@ -75,7 +75,7 @@ services-dev: ## Start services with development configuration
 	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.development.yml up -d
 	@echo "✅ Services started (PostgreSQL, Redis, pgAdmin)"
 
-services-staging: ## Start services with staging configuration  
+services-staging: ## Start services with staging configuration
 	@echo "🐳 Starting Docker Compose services (staging)..."
 	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.staging.yml up -d
 	@echo "✅ Services started (PostgreSQL, Redis) with staging configuration"
@@ -95,7 +95,7 @@ config-help: ## Show configuration setup help
 	@echo ""
 	@echo "Environment Templates:"
 	@echo "  Development: cp environments/.env.development.example .env"
-	@echo "  Staging:     cp environments/.env.staging.example .env" 
+	@echo "  Staging:     cp environments/.env.staging.example .env"
 	@echo "  Production:  cp environments/.env.production.example .env"
 	@echo ""
 	@echo "Environment Detection:"
@@ -149,14 +149,14 @@ security: check-uv ## Run bandit and safety security checks
 test: services ## Run comprehensive test suite
 	@echo "🧪 Running comprehensive test suite..."
 	@if command -v uv >/dev/null 2>&1; then \
-		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=models --cov-report=term-missing --cov-fail-under=0; \
+		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0; \
 	else \
 		echo "⚠️  UV not available, falling back to system Python..."; \
-		python -m pytest tests/ -v --tb=short --cov=app --cov=models --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
-		python3 -m pytest tests/ -v --tb=short --cov=app --cov=models --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
+		python -m pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
+		python3 -m pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
 		{ echo "❌ ERROR: Neither UV nor pytest available. Please install UV or pytest."; exit 1; }; \
 	fi
-	@echo "✅ Test suite completed successfully with optimized coverage tracking"
+	@echo "✅ Test suite completed successfully with config.py coverage included"
 
 test-unit: check-uv services ## Run unit tests only (fast)
 	@echo "🔬 Running unit tests..."
@@ -168,7 +168,7 @@ test-integration: check-uv services ## Run integration tests with Docker service
 
 test-coverage: check-uv services ## Run tests with detailed coverage reporting
 	@echo "📊 Running tests with coverage analysis..."
-	@$(UV) run pytest tests/ --cov=app --cov=tests --cov-report=html --cov-report=term-missing --cov-fail-under=60
+	@$(UV) run pytest tests/ --cov=app --cov=models --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=80
 	@echo "📋 Coverage report generated in htmlcov/"
 
 test-watch: check-uv services ## Run tests in watch mode (reruns on file changes)

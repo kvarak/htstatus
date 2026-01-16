@@ -99,7 +99,7 @@ For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
 ### Legacy Commands (Deprecated but Functional)
 
 The following scripts are still available but deprecated in favor of Make commands:
-- `./run.sh` → Use `make dev`  
+- `./run.sh` → Use `make dev`
 - `scripts/changelog.sh` → Use `make changelog`
 
 **Status**: All scripts in `scripts/` directory are maintained but Makefile commands are preferred for consistency.
@@ -184,7 +184,7 @@ nano .env
 HTStatus automatically validates configuration based on the environment:
 
 - **Development**: Warnings for missing CHPP credentials, allows development defaults
-- **Staging**: Requires secure SECRET_KEY, validates critical settings  
+- **Staging**: Requires secure SECRET_KEY, validates critical settings
 - **Production**: Strict validation of all security settings, requires SSL, validates secret strength
 
 ### Environment Variables Reference
@@ -209,7 +209,7 @@ HTStatus automatically validates configuration based on the environment:
 **Redis Configuration:**
 - `REDIS_URL` - Redis connection URL
 - `REDIS_HOST` - Redis host
-- `REDIS_PORT` - Redis port  
+- `REDIS_PORT` - Redis port
 - `REDIS_PASSWORD` - Redis password
 
 **Security Settings (staging/production):**
@@ -279,14 +279,14 @@ uv run python manage.py db stamp head
 
 *Create*
 ```
-python manage.py db init
-python manage.py db migrate
-python manage.py db upgrade
+uv run python manage.py db init
+uv run python manage.py db migrate
+uv run python manage.py db upgrade
 ```
 *Upgrade*
 ```
-python manage.py db migrate
-python manage.py db upgrade
+uv run python manage.py db migrate
+uv run python manage.py db upgrade
 ```
 ```
 *On problems*

@@ -113,7 +113,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["app", "models"]
+source = ["app", "models", "config"]
 omit = [
     "*/tests/*",
     "*/migrations/*",
