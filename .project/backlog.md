@@ -2,13 +2,13 @@
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Project Health**: 96/100 • 218/218 Tests ✅ • 26 Tasks Complete • **Testing Infrastructure Excellence Achieved** ✅
+📊 **Project Health**: 96/100 • 218/218 Tests ✅ • 27 Tasks Complete • **Testing Infrastructure Excellence Achieved** ✅
 
 ## Backlog Management Rules
 
-**For AI Agents**: Use [Current Focus](#current-focus) for active work, [Ready to Execute](#ready-to-execute) for next-task identification. Navigate to [Task Details](#task-details) for full specifications. Move completed tasks to backlog-done.md.
+**For AI Agents**: Use [Current Focus](#current-focus) for active work, [Ready to Execute](#ready-to-execute) for immediate next-task identification. All task details are organized by tier below for efficient navigation. Move completed tasks to backlog-done.md.
 
-**For Humans**: Priority tiers indicate execution readiness. Start with Tier 1 quick wins, advance to higher tiers.
+**For Humans**: Priority tiers indicate execution readiness. Start with Tier 1 quick wins, advance to higher tiers. Task details immediately follow each tier summary.
 
 **Task Status Legend**:
 - 🚀 **ACTIVE** - Currently being executed
@@ -21,66 +21,40 @@
 ## Current Focus
 
 ### 🚀 Active Work
-- **No active tasks** → INFRA-016 Testing Strategy Optimization completed ✅
+- **DOC-016**: Document Root Scripts → 🚀 ACTIVE execution in progress
 
 ### 🎯 Next Priority
-Execute Tier 1 Quick Wins (9 documentation tasks, ~3.5 hours total effort)
-
-## Ready to Execute
-
-### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3.5 hours total)
-1. **[DOC-015] Fix Architecture Placeholder** → [Details](#doc-015-fix-architecture-placeholder) | *15 min*
-2. **[DOC-016] Document Root Scripts** → [Details](#doc-016-document-root-scripts) | *15 min*
-3. **[INFRA-013] Cleanup Debugging Files** → [Details](#infra-013-cleanup-debugging-files) | *5 min*
-4. **[DOC-018] Config.py Template & Documentation** → [Details](#doc-018-configpy-template--documentation) | *30 min*
-5. **[DOC-019] macOS Setup Guide** → [Details](#doc-019-macos-setup-guide) | *30 min*
-6. **[DOC-017] Document Deployment Process** → [Details](#doc-017-document-deployment-process) | *45 min*
-7. **[DOC-004] Progress Metrics** → [Details](#doc-004-progress-metrics) | *1 hour*
-8. **[DOC-010] Testing Prompts** → [Details](#doc-010-testing-prompts) | *30 min*
-9. **[DOC-020] UV Installation & Troubleshooting Guide** → [Details](#doc-020-uv-installation--troubleshooting-guide) | *30 min*
-
-### 🚀 **Tier 2: High Impact Development** (Strategic Value - Execute After Quick Wins)
-1. **[REFACTOR-002] Complete Blueprint Migration** → [Details](#refactor-002-complete-blueprint-migration) | *Follow-up to INFRA-011*
-2. **[INFRA-012] Migration Workflow** → [Details](#infra-012-migration-workflow) | *Database procedures*
-3. **[FEAT-002] PWA Development** → [Details](#feat-002-mobile-first-pwa) | *Game-changing mobile experience*
-4. **[SEC-001] Production Readiness** → [Details](#sec-001-production-readiness) | *91 quality issues + security*
-5. **[INFRA-017] Script Environment Audit** → [Details](#infra-017-script-environment-audit) | *Validate UV consistency*
-
-### 📚 **Tier 3: Strategic Enhancement** (Foundation Building)
-1. **[DOC-011-API] API Documentation** → [Details](#doc-011-api-api-documentation) | *Developer experience*
-2. **[DOC-005] User Documentation** → [Details](#doc-005-user-documentation) | *User adoption*
-3. **[INFRA-008] Type Sync Validation** → [Details](#infra-008-type-sync-validation) | *Prevent type drift*
-4. **[INFRA-009] Dependency Strategy** → [Details](#infra-009-dependency-strategy) | *Maintenance planning*
-5. **[INFRA-010] Audit Non-Tracked Files** → [Details](#infra-010-audit-non-tracked-files) | *Repository hygiene*
-
-### 🔮 **Tier 4: Future Opportunities** (Long-term Strategic)
-1. **[FEAT-001] Data Visualization** → [Details](#feat-001-data-visualization-features) | *Enhanced charts*
-2. **[REFACTOR-001] Code Maintainability** → [Details](#refactor-001-code-maintainability) | *Technical debt*
-3. **[RESEARCH-001] Additional Integrations** → [Details](#research-001-additional-integrations) | *Expansion*
-
-### 🔒 **Blocked Tasks**
-1. **[PROJ-001] Advanced Development Phase** → [Details](#proj-001-advanced-development-phase) | *Blocked by SEC-001*
+Execute remaining Tier 1 Quick Wins (7 documentation tasks, ~3 hours total effort)
 
 ---
 
-## Task Details
+## Ready to Execute
 
-### 🎯 Tier 1: Quick Wins (Low Effort, High Value)
+### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3 hours total)
 
-#### [DOC-015] Fix Architecture Placeholder
-**Priority**: Low Impact, Very Low Effort (15 min) | **Status**: 🎯 Ready to Execute
-**Dependencies**: None
-**Strategic Value**: Documentation completeness
+**Execute First**: Complete remaining 7 tasks for immediate value and project polish.
+
+1. **[DOC-016] Document Root Scripts** (15 min) - **🚀 ACTIVE**
+2. **[INFRA-013] Cleanup Debugging Files** (5 min)
+3. **[DOC-018] Config.py Template & Documentation** (30 min)
+4. **[DOC-019] macOS Setup Guide** (30 min)
+5. **[DOC-017] Document Deployment Process** (45 min)
+6. **[DOC-004] Progress Metrics** (1 hour)
+7. **[DOC-010] Testing Prompts** (30 min)
+
+#### [DOC-015] Fix Architecture Placeholder ✅ **COMPLETED**
+**Priority**: Low Impact, Very Low Effort (15 min) | **Status**: ✅ Completed
+**Dependencies**: None | **Strategic Value**: Documentation completeness
 **Implementation**:
-- Remove "...existing code..." placeholder at line 80 in architecture.md
-- Complete file structure section or remove incomplete content
-- Ensure all architectural descriptions are accurate and complete
-**Rationale**: Discovered during repository analysis - minor documentation gap affecting professionalism
+- ✅ Removed duplicate "HTStatus Architecture" section and associated content
+- ✅ Updated test counts to reflect current state (218 tests, 96% coverage)
+- ✅ Corrected outdated status information in architecture documentation
+- ✅ Ensured all architectural descriptions are accurate and complete
+**Completion**: Documentation placeholder and duplication issues resolved, architecture.md now clean and accurate
 
 #### [DOC-016] Document Root Scripts
 **Priority**: Low Impact, Very Low Effort (15 min) | **Status**: 🎯 Ready to Execute
-**Dependencies**: None
-**Strategic Value**: Code clarity, maintenance
+**Dependencies**: None | **Strategic Value**: Code clarity, maintenance
 **Implementation**:
 - Add purpose comment headers to command.sh (if actively used)
 - Document usage in README or mark as deprecated
@@ -90,8 +64,7 @@ Execute Tier 1 Quick Wins (9 documentation tasks, ~3.5 hours total effort)
 
 #### [INFRA-013] Cleanup Debugging Files
 **Priority**: Very Low Impact, Very Low Effort (5 min) | **Status**: 🎯 Ready to Execute
-**Dependencies**: None
-**Strategic Value**: Repository hygiene
+**Dependencies**: None | **Strategic Value**: Repository hygiene
 **Implementation**:
 - Remove any remaining temporary debugging files from development
 - Ensure all debugging utilities are properly organized in scripts/ directory
@@ -99,6 +72,319 @@ Execute Tier 1 Quick Wins (9 documentation tasks, ~3.5 hours total effort)
 **Rationale**: Discovered during repository analysis - maintain clean workspace
 
 #### [DOC-018] Config.py Template & Documentation
+**Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Developer onboarding, configuration clarity
+**Implementation**:
+1. Create comprehensive config.py.template with all configuration options
+2. Document each configuration parameter and its purpose
+3. Include environment-specific examples (development, staging, production)
+4. Add configuration validation guidelines
+**Acceptance Criteria**:
+- Complete config template covering all options
+- Clear documentation for each configuration parameter
+- Environment-specific usage examples
+**Expected Outcomes**: Easier project setup, reduced configuration errors, better developer onboarding
+
+#### [DOC-019] macOS Setup Guide
+**Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Developer onboarding, platform support
+**Implementation**:
+1. Create dedicated macOS setup section in README or separate guide
+2. Document Homebrew installation of dependencies
+3. Include macOS-specific environment setup steps
+4. Add troubleshooting section for common macOS issues
+**Acceptance Criteria**:
+- Complete macOS setup instructions
+- Homebrew-based dependency installation guide
+- Platform-specific troubleshooting included
+**Expected Outcomes**: Improved macOS developer experience, reduced setup friction
+
+#### [DOC-017] Document Deployment Process
+**Priority**: Medium Impact, Medium Effort (45 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Operations, deployment reliability
+**Implementation**:
+1. Document push.sh script functionality and usage
+2. Create deployment checklist and process guide
+3. Document environment-specific deployment considerations
+4. Include rollback procedures and troubleshooting
+**Acceptance Criteria**:
+- Complete deployment process documentation
+- Push.sh script usage guide
+- Environment-specific deployment notes
+- Rollback and troubleshooting procedures
+**Expected Outcomes**: Reliable deployments, reduced deployment errors, operational confidence
+
+#### [DOC-004] Progress Metrics
+**Priority**: Medium Impact, Medium Effort (1 hour) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Project visibility, progress tracking
+**Implementation**:
+1. Create automated progress metrics collection system
+2. Document key project health indicators and their calculation
+3. Establish baseline metrics and progress targets
+4. Create dashboard or reporting mechanism for progress visibility
+**Acceptance Criteria**:
+- Automated metrics collection system
+- Documented progress indicators
+- Baseline metrics established
+- Progress reporting mechanism
+**Expected Outcomes**: Better project visibility, data-driven decision making, progress transparency
+
+#### [DOC-010] Testing Prompts
+**Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Development efficiency, testing consistency
+**Implementation**:
+1. Document testing workflow and best practices
+2. Create prompts for AI-assisted test development
+3. Establish testing standards and coverage requirements
+4. Document test debugging and troubleshooting procedures
+**Acceptance Criteria**:
+- Comprehensive testing workflow documentation
+- AI testing prompts for development assistance
+- Testing standards clearly defined
+**Expected Outcomes**: Consistent testing practices, improved AI agent testing capabilities
+
+#### [DOC-020] UV Installation & Troubleshooting Guide
+**Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Development onboarding, environment consistency
+**Implementation**:
+1. Create comprehensive UV installation guide for all platforms
+2. Document common UV troubleshooting scenarios and solutions
+3. Add environment debugging procedures specific to UV
+4. Include UV best practices and development patterns
+**Acceptance Criteria**:
+- Complete installation instructions for macOS, Linux, Windows
+- Common error scenarios with solutions documented
+- UV-specific debugging procedures included
+**Expected Outcomes**: Reduced onboarding friction, consistent UV usage, faster issue resolution
+
+### 🚀 **Tier 2: High Impact Development** (Strategic Value - Execute After Quick Wins)
+
+**Execute Second**: These 5 tasks provide strategic development value and build on foundation.
+
+1. **[REFACTOR-002] Complete Blueprint Migration** (Follow-up to INFRA-011)
+2. **[INFRA-012] Migration Workflow** (Database procedures)
+3. **[FEAT-002] PWA Development** (Game-changing mobile experience)
+4. **[SEC-001] Production Readiness** (91 quality issues + security)
+5. **[INFRA-017] Script Environment Audit** (Validate UV consistency)
+
+#### [REFACTOR-002] Complete Blueprint Migration
+**Priority**: High Impact, Medium Effort (6-8 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: INFRA-011 (completed) | **Strategic Value**: Code organization, scalability
+**Implementation**:
+1. Complete migration of remaining routes from routes.py to blueprints
+2. Implement proper route organization by functional area
+3. Update all route imports and references
+4. Ensure all URL patterns maintain backward compatibility
+**Acceptance Criteria**:
+- All routes properly organized in blueprints
+- Zero breaking changes to existing URLs
+- Improved code organization and maintainability
+**Expected Outcomes**: Better code organization, easier feature development, improved maintainability
+
+#### [INFRA-012] Migration Workflow
+**Priority**: High Impact, Medium Effort (4-6 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Database reliability, development workflow
+**Implementation**:
+1. Establish automated database migration procedures
+2. Create migration validation and testing workflow
+3. Document migration best practices and rollback procedures
+4. Implement migration status tracking and validation
+**Acceptance Criteria**:
+- Automated migration workflow established
+- Migration testing procedures documented
+- Rollback procedures validated
+**Expected Outcomes**: Safe database evolution, reduced migration risks, operational confidence
+
+#### [FEAT-002] Mobile-First PWA
+**Priority**: Very High Impact, High Effort (20+ hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: User experience, mobile accessibility, competitive advantage
+**Implementation**:
+1. Design mobile-first responsive interface
+2. Implement Progressive Web App (PWA) capabilities
+3. Add offline functionality for core features
+4. Optimize performance for mobile devices
+**Acceptance Criteria**:
+- Responsive design works on all device sizes
+- PWA installation and offline capabilities
+- Core features accessible offline
+**Expected Outcomes**: Enhanced mobile experience, increased user engagement, competitive differentiation
+
+#### [SEC-001] Production Readiness
+**Priority**: Critical Impact, Very High Effort (15-20 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: Testing infrastructure (achieved) | **Strategic Value**: Security, reliability, deployment readiness
+**Implementation**:
+1. Address 91 quality issues identified in security audit
+2. Implement comprehensive security headers and HTTPS enforcement
+3. Add rate limiting, input validation, and XSS protection
+4. Configure production-ready logging, monitoring, and error handling
+**Acceptance Criteria**:
+- Zero critical security vulnerabilities
+- Production security standards compliance
+- Monitoring and alerting configured
+**Expected Outcomes**: Production-ready deployment, security compliance, operational reliability
+
+#### [INFRA-017] Script Environment Audit
+**Priority**: Low Impact, Low Effort (1-2 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Environment consistency, development reliability
+**Implementation**:
+1. Audit all scripts in scripts/ directory for UV usage patterns
+2. Update any direct python calls to use uv run prefix
+3. Validate that all development utilities use correct environment
+4. Add environment validation to script headers where appropriate
+**Acceptance Criteria**:
+- All scripts consistently use UV environment
+- No direct python calls in development utilities
+- Environment validation where needed
+**Expected Outcomes**: Consistent environment usage, reduced environment-related issues
+
+### 📚 **Tier 3: Strategic Enhancement** (Foundation Building)
+
+**Execute Third**: These 5 tasks build strategic foundations for long-term success.
+
+1. **[DOC-011-API] API Documentation** (Developer experience)
+2. **[DOC-005] User Documentation** (User adoption)
+3. **[INFRA-008] Type Sync Validation** (Prevent type drift)
+4. **[INFRA-009] Dependency Strategy** (Maintenance planning)
+5. **[INFRA-010] Audit Non-Tracked Files** (Repository hygiene)
+
+#### [DOC-011-API] API Documentation
+**Priority**: High Impact, Medium Effort (4-6 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Developer experience, API adoption, integration support
+**Implementation**:
+1. Document all API endpoints with request/response examples
+2. Create interactive API documentation (OpenAPI/Swagger)
+3. Add authentication and error handling documentation
+4. Include integration guides and code examples
+**Acceptance Criteria**:
+- Complete API endpoint documentation
+- Interactive documentation interface
+- Integration examples provided
+**Expected Outcomes**: Improved developer experience, easier API adoption, better integration support
+
+#### [DOC-005] User Documentation
+**Priority**: High Impact, Medium Effort (4-6 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: User adoption, product usability, support reduction
+**Implementation**:
+1. Create comprehensive user guides and tutorials
+2. Document all features with screenshots and examples
+3. Add troubleshooting guides and FAQ section
+4. Create getting started guide for new users
+**Acceptance Criteria**:
+- Complete user documentation covering all features
+- Visual guides with screenshots
+- Troubleshooting and FAQ sections
+**Expected Outcomes**: Improved user experience, reduced support burden, increased feature adoption
+
+#### [INFRA-008] Type Sync Validation
+**Priority**: Medium Impact, Medium Effort (3-4 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Type safety, development reliability, integration integrity
+**Implementation**:
+1. Implement automated validation between Python models and TypeScript interfaces
+2. Create type generation scripts or validation tools
+3. Add CI checks to prevent type drift
+4. Document type synchronization procedures
+**Acceptance Criteria**:
+- Automated type sync validation
+- CI integration for type checking
+- Type drift prevention mechanisms
+**Expected Outcomes**: Improved type safety, reduced integration bugs, better development experience
+
+#### [INFRA-009] Dependency Strategy
+**Priority**: Medium Impact, Medium Effort (3-4 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Maintenance efficiency, security, long-term sustainability
+**Implementation**:
+1. Audit all dependencies for security, maintenance status, and alternatives
+2. Create dependency update strategy and automation
+3. Document dependency selection criteria and upgrade procedures
+4. Implement automated dependency scanning and updates
+**Acceptance Criteria**:
+- Complete dependency audit completed
+- Automated update strategy implemented
+- Security scanning integrated
+**Expected Outcomes**: Improved security posture, reduced maintenance burden, better dependency management
+
+#### [INFRA-010] Audit Non-Tracked Files
+**Priority**: Low Impact, Low Effort (1-2 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Repository hygiene, security, development efficiency
+**Implementation**:
+1. Audit all non-tracked files in repository
+2. Update .gitignore to properly exclude temporary files
+3. Remove unnecessary files and organize development artifacts
+4. Document file organization standards
+**Acceptance Criteria**:
+- Clean repository with proper .gitignore
+- Unnecessary files removed
+- File organization standards documented
+**Expected Outcomes**: Cleaner repository, better development experience, reduced clutter
+
+### 🔮 **Tier 4: Future Opportunities** (Long-term Strategic)
+
+**Execute Last**: These 3 tasks represent long-term strategic opportunities.
+
+1. **[FEAT-001] Data Visualization** (Enhanced charts)
+2. **[REFACTOR-001] Code Maintainability** (Technical debt)
+3. **[RESEARCH-001] Additional Integrations** (Expansion)
+
+#### [FEAT-001] Data Visualization Features
+**Priority**: Medium Impact, High Effort (12-15 hours) | **Status**: 🔮 Future Opportunity
+**Dependencies**: Core functionality maturity | **Strategic Value**: User experience, data insights, competitive advantage
+**Implementation**:
+1. Implement advanced charting and visualization components
+2. Add interactive data exploration features
+3. Create dashboard views with customizable widgets
+4. Integrate with existing player and match data
+**Acceptance Criteria**:
+- Advanced charting capabilities implemented
+- Interactive data exploration available
+- Customizable dashboard created
+**Expected Outcomes**: Enhanced user experience, better data insights, competitive differentiation
+
+#### [REFACTOR-001] Code Maintainability
+**Priority**: Medium Impact, High Effort (20-24 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: Testing infrastructure excellence (achieved) | **Strategic Value**: Long-term maintainability, development velocity, code quality
+**Implementation**:
+1. Refactor large functions in routes.py (1976 lines)
+2. Extract business logic into service layers
+3. Implement proper separation of concerns
+4. Add comprehensive type annotations
+**Acceptance Criteria**:
+- Reduced cyclomatic complexity
+- Clear separation of concerns
+- Comprehensive type coverage
+**Expected Outcomes**: Improved maintainability, faster development, reduced bugs
+
+#### [RESEARCH-001] Additional Integrations
+**Priority**: Low Impact, Variable Effort | **Status**: 🔮 Future Research
+**Dependencies**: Core functionality maturity | **Strategic Value**: Feature expansion, user value, ecosystem integration
+**Research Areas**:
+1. Additional sports data APIs
+2. Social features and team collaboration
+3. Advanced analytics and predictions
+4. Third-party service integrations
+**Expected Outcomes**: Expanded feature set, increased user value, competitive advantages
+
+### 🔒 **Blocked Tasks**
+
+**Execute When Unblocked**: These tasks are waiting on dependencies.
+
+#### [PROJ-001] Advanced Development Phase
+**Priority**: High Impact, Very High Effort (40+ hours) | **Status**: 🔒 Blocked
+**Blocker**: SEC-001 (Production Readiness) must be completed first
+**Dependencies**: Production readiness, security compliance, performance optimization
+**Strategic Value**: Feature expansion, user growth, competitive positioning
+**Future Implementation**:
+1. Advanced team management features
+2. Competitive analysis tools
+3. Training optimization algorithms
+4. Social features and league integration
+**Unblocking Criteria**: SEC-001 completion, production deployment success, user base establishment
+**Expected Timeline**: Q2 2026 (after foundation completion)
+
+---
+
+## Completed Achievements
+
+### ✅ Foundation Excellence (January 2026)
 **Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
 **Dependencies**: None
 **Strategic Value**: Development onboarding, security compliance

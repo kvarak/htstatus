@@ -59,16 +59,16 @@ HT Status is a Hattrick football team management application built with a dual f
 
 #### Database Layer
 - **PostgreSQL**: Production database with SQLAlchemy ORM
-- **Migrations**: Alembic-based with 27+ migration files in `/migrations/versions/`
+- **Migrations**: Alembic-based with 30 migration files in `/migrations/versions/`
 - **Models**: Complex schema supporting multi-team management, player tracking, match analysis
-- **Current Challenge**: 26 test failures indicate schema validation issues requiring attention (INFRA-006 priority)
+- **Current Status**: Database schema stable and fully functional with comprehensive testing
 
 #### Testing Infrastructure
-- **Framework**: pytest with 173 total tests, currently 147 passing (85% success rate)
-- **Coverage**: Available via `make test-coverage`
+- **Framework**: pytest with 218 total tests, all passing (100% success rate)
+- **Coverage**: 96% overall project coverage via `make test-coverage`
 - **Integration**: Docker-based services for realistic testing
 - **Mock Systems**: CHPP API mocking in `/tests/mock_chpp.py`
-- **Current Status**: 26 failing tests blocking reliable development - highest priority for resolution
+- **Current Status**: Testing infrastructure excellence achieved with comprehensive coverage
 - **Initialization**: `/app/__init__.py` - Flask app setup
 
 #### Key Backend Components
@@ -140,7 +140,7 @@ htstatus-2.0/
 │   ├── types/         # TypeScript type definitions
 │   └── lib/          # Utility libraries
 ├── migrations/        # Database migrations (30 Alembic versions)
-├── tests/            # Test suite (173 tests, 100% passing)
+├── tests/            # Test suite (218 tests, 100% passing)
 ├── environments/      # Environment configuration templates
 ├── configs/          # Tool and Docker configurations
 ├── scripts/          # Utility scripts
@@ -160,50 +160,8 @@ htstatus-2.0/
   - Commented @app.route decorators to prevent import failures
   - All 21 routes now properly accessible and functional
   - Requires completion or hybrid approach
-- **Testing Foundation**: 173 passing tests enable confident refactoring
+- **Testing Foundation**: 218 passing tests enable confident refactoring
 - **Multi-environment**: Development, staging, test, production configs ready
-
-# HTStatus Architecture
-
-*This architecture documentation reflects the current HTStatus project structure and design decisions.*
-
-## System Overview
-
-HTStatus is designed as a web-based platform for managing and visualizing football team statistics and player data. The architecture emphasizes maintainability, modularity, and clear separation of concerns.
-
-## Architecture Principles
-
-- **Modular Design**: Separation of core logic, routes, templates, and static assets
-- **On-Demand Data Processing**: Data is processed and visualized as needed for user interactions
-- **Configuration-Driven**: Use of configuration files and environment variables for flexible deployment
-- **Security**: Sensitive data managed via environment variables or secure config files
-
-## Technical Stack
-- **Backend**: Python (Flask or similar framework)
-- **Frontend**: HTML, CSS, JavaScript (with Chart.js, Plotly, etc.)
-- **Data Storage**: File-based or database (as implemented)
-- **Testing**: Automated tests (if present)
-
-## File Structure (Updated January 2026)
-- `app/` - Flask application code (routes, logic, templates, static assets)
-- `src/` - React frontend components and pages
-- `scripts/` - Utility scripts (migrations, changelog, database tools)
-- `environments/` - Environment configuration templates (.env examples)
-- `configs/` - Tool configurations and Docker compose overrides
-- `models.py` - Database models
-- `tests/` - Test suites and fixtures
-- `pyproject.toml` - Python dependencies (UV-managed)
-- `docker-compose.yml` - Development services
-- `Makefile` - Development automation
-- `.project/` - Development documentation and planning
-
-## Security & Maintenance
-- Use `.env` or similar for secrets (not committed)
-- Document all architectural changes in this file
-
----
-
-*Update this file with any major architectural changes or new integrations.*
 
 ## Related Documentation
 
