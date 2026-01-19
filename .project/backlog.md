@@ -39,6 +39,8 @@
 **Priority 3: Core Functionality** (It does what it should) - ✅ COMPLETE
 - ✅ [FEAT-002] Mobile-First PWA (20+ hours) - COMPLETED - Mobile accessibility and offline functionality
 - ✅ [UI-003] Complete Training Page Restructure - COMPLETED - Modern responsive interface fully implemented
+- 🔮 [FEAT-003] Formation Tester & Tactics Analyzer - Research & Planning Phase
+- 🎯 [FEAT-005] Team Statistics Dashboard (8-10 hours) - Performance analytics
 
 **Priority 4: Stability & Maintainability** (It stays working) - 🎯 NEXT PRIORITY
 - 🎯 [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization
@@ -52,12 +54,20 @@
 - 🎯 [DOC-019] macOS Setup Guide (30 min) - Platform support
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
+- 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
 - 🎯 [DOC-011-API] API Documentation (4-6 hours) - Developer experience
 - 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
 - 🎯 [DOC-004] Progress Metrics (1 hour) - Project visibility
+- 🎯 [DOC-021] New Player Tutorial (3-5 hours) - Onboarding walkthrough
+- 🎯 [FEAT-007] Team Series View (4-6 hours) - Historical performance tracking
 - 🎯 [FEAT-001] Data Visualization (12-15 hours) - Enhanced charts
+- 🎯 [UI-004] Bulk Player Group Editor (3-4 hours) - Workflow optimization
+- 🎯 [UI-005] Player Table Filtering (4-6 hours) - Advanced data discovery
+- 🎯 [UI-006] Transfer Bid Display (2-3 hours) - Market visibility
+- 🎯 [UI-007] Update Report Icon Display (2-3 hours) - Change visualization
+- 🎯 [FEAT-004] Hattrick Language Localization (4-6 hours) - Multi-language support
 - 🔮 [RESEARCH-001] Additional Integrations - Future research
 
 ---
@@ -152,6 +162,129 @@
 - Lighthouse PWA score >90
 
 **Expected Outcomes**: Modern mobile experience, increased engagement, competitive advantage
+
+---
+
+### [FEAT-003] Formation Tester & Tactics Analyzer
+**Status**: 🔮 Research & Planning | **Effort**: 24-32 hours (estimated) | **Impact**: Tactical decision support
+**Dependencies**: Player data system (completed), Backend API structure | **Strategic Value**: Competitive advantage, engagement
+
+**Problem Statement**:
+Users need a way to experiment with different formations and see how effective they would be based on player skills and positions. Currently only "Player" and "Training" pages exist per team. A third "Formations" page would allow users to:
+- Visually design and test different formations
+- Get feedback on formation quality (based on player skills and position-suitability)
+- Compare different tactical approaches
+- Export or save formations for reference
+
+**Research Phase** (Required before implementation):
+1. **Industry Analysis** (4-6 hours):
+   - Study how Hattrick community (e.g., top guilds/clans) implements formation testing
+   - Research existing Hattrick formation analyzers and tools
+   - Identify best practices in formation evaluation algorithms
+   - Check community recommendations and resources
+
+2. **Technical Investigation** (3-4 hours):
+   - Research drag-and-drop libraries (React DnD, dnd-kit, react-beautiful-dnd)
+   - Evaluate soccer field visualization libraries
+   - Investigate Hattrick position contribution calculations
+   - Determine skill weighting algorithms
+
+3. **Algorithm Design** (4-6 hours):
+   - Define how formation quality is scored
+   - Model position-to-player compatibility
+   - Create skill contribution multipliers
+   - Design formation comparison logic
+
+**Implementation Phases** (Post-research):
+1. **Backend API** (6-8 hours): Formation evaluation endpoints, player skill analysis
+2. **UI Components** (8-10 hours): Soccer field visualization, drag-and-drop interface
+3. **Integration** (4-6 hours): Connect to player data, save formations, export functionality
+4. **Polish & Testing** (2-4 hours): Edge cases, performance, accessibility
+
+**Acceptance Criteria** (Post-research):
+- Formation tester page accessible from team view
+- Drag-and-drop player placement on field
+- Real-time formation quality feedback
+- Formation comparison functionality
+- Save/load formation templates
+- Mobile-responsive design
+
+**Expected Outcomes**: Enhanced tactical planning, improved user engagement, competitive advantage in Hattrick gameplay
+
+---
+
+### [FEAT-005] Team Statistics Dashboard
+**Status**: 🎯 Ready to Execute | **Effort**: 8-10 hours | **Impact**: Performance analytics and insights
+**Dependencies**: Player data system (completed), Match history (completed) | **Strategic Value**: Data-driven decisions, engagement
+
+**Problem Statement** (Feature request from Dec 31, 2020, GitHub issue #40):
+Users need a dedicated statistics page to view comprehensive team and player performance metrics. Currently, statistics are scattered across different pages. A unified "Statistics" dashboard would allow users to:
+- View all-time team scorers and top performers
+- Track player match history and playing time
+- Analyze team performance trends
+- Identify performance gaps and opportunities
+- Make data-driven decisions about training and tactics
+
+**Implementation**:
+1. **Player Statistics** (3-4 hours):
+   - All-time goal scorers (top scorers list)
+   - Most appearances/matches played per player
+   - Career statistics per player (goals, assists, rating)
+   - Player performance trends over time
+   - Best performing players by position
+
+2. **Team Statistics** (2-3 hours):
+   - Total goals scored/conceded by season
+   - Team win/loss/draw record
+   - Home/away performance comparison
+   - Average team rating trends
+   - Match statistics (possession, shots, etc. if available from CHPP)
+
+3. **Comparative Analysis** (2-3 hours):
+   - Compare players by position and role
+   - Position-specific statistics
+   - Form trends (recent vs career)
+   - Training effectiveness analysis
+   - Player development trajectories
+
+4. **UI & Visualization** (1-2 hours):
+   - Charts showing performance trends
+   - Sortable/filterable statistics tables
+   - Period selection (season, all-time, custom range)
+   - Export statistics capability
+   - Mobile-responsive design
+
+**Acceptance Criteria**:
+- Dedicated statistics page accessible from team view
+- All-time goal scorers ranked list
+- Matches played per player statistics
+- Team aggregate statistics
+- Trend charts showing performance over time
+- Filterable/sortable statistics tables
+- Period selection (season, all-time, custom)
+- Mobile-responsive design maintained
+- Export statistics data (CSV/PDF optional)
+
+**Data Sources**:
+- Player career data from database (matches, goals, assists)
+- Team match history for aggregate statistics
+- Hattrick match data from CHPP for detailed match stats
+- Player rating data over time
+
+**Statistics to Display**:
+- **Player Stats**: Goals, assists, appearances, minutes, avg rating, specialties
+- **Team Stats**: Total goals, goals conceded, wins/losses/draws, seasons played
+- **Top Performers**: Best scorers, most appearances, highest rated, best position fit
+- **Trends**: Performance trajectory, training progress, form changes
+
+**UI Layout**:
+- Tab-based navigation: "Overall", "Players", "Teams", "Trends"
+- Dashboard with key metrics cards at top
+- Detailed statistics tables below
+- Charts for trend visualization
+- Filter/sort controls for customization
+
+**Expected Outcomes**: Better insight into team and player performance, data-driven decision making, improved user engagement
 
 ---
 
@@ -391,6 +524,138 @@
 
 ---
 
+### [DOC-021] New Player Tutorial
+**Status**: 🎯 Ready to Execute | **Effort**: 3-5 hours | **Impact**: User onboarding and feature discovery
+**Dependencies**: Core UI features (completed) | **Strategic Value**: Reduced learning curve, improved user retention
+
+**Problem Statement**:
+New players need guided onboarding to understand HT Status features and workflows. Returning players also benefit from tutorials about newly added features. Currently, users must explore the interface without guidance, leading to:
+- Longer initial learning curve
+- Missed features and capabilities
+- Support questions about basic functionality
+- Reduced feature adoption for advanced capabilities
+
+**Implementation**:
+1. **Interactive Tutorial Walkthrough** (1.5-2 hours):
+   - Create step-by-step guided tour of main features
+   - Highlight key pages: Team, Players, Training, Matches, Settings
+   - Add tooltips and highlights for UI elements
+   - Implement "skip" and "restart" functionality
+   - Persist tutorial completion state per user
+
+2. **Feature-Specific Guides** (1-1.5 hours):
+   - Player group management (just added as FEAT-006)
+   - Training data tracking and interpretation
+   - Match analysis features
+   - Settings customization options
+   - Data update and synchronization
+
+3. **What's New Alerts** (0.5-1 hour):
+   - Detect new features since user last login
+   - Display contextual "New Feature" badges
+   - Link to relevant tutorial sections for new features
+   - Allow dismissal and "show later" options
+
+4. **Tutorial Content** (1-1.5 hours):
+   - Write clear, concise instructional text
+   - Create or capture screenshots
+   - Document common workflows
+   - Include Hattrick-specific terminology explanations
+
+**Acceptance Criteria**:
+- Interactive tutorial available on first login or from help menu
+- All major features have tutorial coverage
+- Users can restart or skip tutorial anytime
+- New feature alerts display appropriately
+- Tutorial state persists across sessions
+- Tutorial content is clear and actionable
+- Mobile-responsive tutorial experience
+- Tutorial works in multiple supported languages (if FEAT-004 completed)
+
+**Scope**:
+- **Includes**: Guided tour, feature explanations, new feature alerts, contextual help
+- **Excludes**: Hattrick game rules education (out of scope), advanced strategy guides
+- **Focus**: HT Status feature functionality and workflows
+
+**Technical Approach**:
+- Use a tutorial library (e.g., Intro.js, Shepherd.js, or custom implementation)
+- Store tutorial state in user settings/preferences
+- Implement feature detection for new alerts
+- Create reusable tutorial component/system for future features
+
+**Expected Outcomes**: Improved user onboarding, faster time-to-productivity, reduced support burden, better adoption of newly added features, increased user retention
+
+---
+
+### [FEAT-007] Team Series View
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Historical performance tracking and analysis
+**Dependencies**: Match history (completed), Player data system (completed) | **Strategic Value**: Season-by-season analysis, trend identification
+
+**Problem Statement**:
+Users need a way to view their team's historical performance across multiple seasons (series in Hattrick terminology). Currently, the match and player history views show individual matches and player records, but there's no unified "Series" or "Seasons" view that aggregates team performance by season. This would allow managers to:
+- Compare performance across different seasons
+- Track team progression and improvement over time
+- Identify seasonal patterns and trends
+- View season-specific statistics and achievements
+- Analyze peak performance periods
+
+**Implementation**:
+1. **Series Data Retrieval** (1-1.5 hours):
+   - Fetch team season/series data from Hattrick via CHPP API
+   - Extract season identifiers and timeframes
+   - Retrieve season-specific match records and statistics
+   - Build series aggregation from existing match history data
+
+2. **Series Overview Tab** (1.5-2 hours):
+   - Create new "Series" view/tab under team section (similar to Players, Training, Matches tabs)
+   - Display list of all seasons with basic stats: Games Played, Wins/Draws/Losses, Goals For/Against
+   - Show season dates and league/division information
+   - Implement season selection for detailed view
+   - Add sorting by season, performance, etc.
+
+3. **Series Details View** (1-1.5 hours):
+   - Show comprehensive statistics for selected season:
+     - Full match history for that season
+     - Top scorers for season
+     - Best defensive performance
+     - Average team rating
+     - Position in league/cup standings if available
+   - Display player availability/injuries during season
+   - Show significant events (transfers, key matches)
+
+4. **Visualization & Analysis** (0.5-1 hour):
+   - Charts showing performance trends (wins/draws/losses by season)
+   - Goals for/against comparison across seasons
+   - Rating progression through season
+   - Season-to-season comparison visualizations
+
+**Acceptance Criteria**:
+- Series tab visible in team view navigation
+- All seasons displayed with key statistics
+- Series detail view shows comprehensive season statistics
+- Season-to-season comparison available
+- Mobile-responsive layout
+- Performance data accurately aggregated
+- Matches historical Hattrick season terminology
+- Works with multi-team support (each team's series shown separately)
+
+**Scope**:
+- **Includes**: Season overview, season details, statistics aggregation, visualizations, season comparison
+- **Excludes**: Predictions or forecasting, deep tactical analysis (separate from match analysis)
+- **Focus**: Historical performance tracking and trend analysis
+
+**Technical Approach**:
+- Query CHPP team API for series/season data
+- Aggregate match records by season (use match dates to group)
+- Use existing Match and MatchPlay tables, group by season identifier
+- Create series aggregation queries in models/routes
+- Visualize with Chart.js or Recharts
+- Store series metadata for efficient access
+
+**Expected Outcomes**: Enhanced team analysis capabilities, better performance tracking over time, improved decision-making based on historical trends, competitive advantage through seasonal analysis
+
+---
+
 ### [FEAT-001] Data Visualization Features
 **Status**: 🎯 Ready to Execute | **Effort**: 12-15 hours | **Impact**: User experience
 **Dependencies**: Core functionality stability | **Strategic Value**: Data insights, competitive advantage
@@ -449,6 +714,375 @@
 - Deduplication: Dual-level (React memoization + backend processing) for reliability
 - Backward compatibility: No database schema changes required
 - Styling: TailwindCSS + Radix UI components with responsive grid layout
+
+---
+
+### [UI-004] Bulk Player Group Editor
+**Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Impact**: Workflow optimization
+**Dependencies**: Player management system (completed) | **Strategic Value**: Improved user efficiency
+
+**Problem Statement**:
+When managing a team with 20+ players, reassigning multiple players to different groups (e.g., "Formation 1", "Reserves", "Youth Development") requires clicking individual player edit buttons. A bulk edit feature with checkboxes would allow users to:
+- Select multiple players at once
+- Change all selected players' groups simultaneously
+- Save time on repetitive team organization tasks
+- Improve workflow efficiency for team managers
+
+**Implementation**:
+1. **UI Components** (1-1.5 hours):
+   - Add checkboxes to player list rows
+   - Add "Select All" / "Deselect All" buttons
+   - Create bulk action toolbar (appears when items selected)
+   - Add group dropdown selector in toolbar
+
+2. **State Management** (0.5-1 hour):
+   - Track selected player IDs in component state
+   - Handle checkbox change logic
+   - Manage selection count display
+
+3. **Backend API** (1-1.5 hours):
+   - Create bulk update endpoint: `PUT /api/players/bulk-update`
+   - Validate group assignments
+   - Update all selected players' groups atomically
+   - Return success/error response
+
+4. **User Feedback** (0.5 hour):
+   - Toast notification on successful bulk update
+   - Error handling for failed updates
+   - Confirmation dialog before applying bulk changes
+
+**Acceptance Criteria**:
+- Checkboxes appear on all player list rows
+- "Select All" functionality works correctly
+- Bulk action toolbar appears/disappears appropriately
+- Group dropdown allows selection of any valid group
+- Bulk update applies to all selected players
+- Confirmation dialog prevents accidental bulk changes
+- Success/error messages displayed to user
+- Mobile-responsive design maintained
+
+**Expected Outcomes**: Faster team organization, reduced clicks for bulk operations, improved user experience
+
+---
+
+### [UI-005] Player Table Filtering
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Data discovery and analysis
+**Dependencies**: Player table UI (completed) | **Strategic Value**: Improved workflow efficiency
+
+**Problem Statement** (Feature request from June 2020):
+The player table currently supports sorting but lacks filtering capabilities. Users need to be able to filter players by multiple criteria (skill levels, age, status, group, position) to:
+- Quickly find players matching specific criteria
+- Identify potential lineup candidates based on skill thresholds
+- Discover training opportunities and development gaps
+- Manage and organize players more efficiently across groups
+- Plan tactics and formations based on available skill pools
+
+**Implementation**:
+1. **Filter Controls** (1.5-2 hours):
+   - Add filter bar above player table with multiple filter options
+   - Filters: Skill ranges (keeper, defender, playmaker, etc.), Age range, Status, Group, Position
+   - Searchable dropdowns for group and position selection
+   - Range sliders for skill levels and age
+   - "Reset Filters" button to clear all selections
+
+2. **Filter Logic** (1-1.5 hours):
+   - Implement client-side filtering for instant feedback
+   - Support multiple simultaneous filters (AND logic)
+   - Preserve sort order when filtering applied
+   - Display count of filtered results vs total players
+
+3. **State Management** (0.5-1 hour):
+   - Store filter state in URL query parameters for bookmarkable searches
+   - Persist filter preferences in localStorage (optional)
+   - Handle filter updates efficiently
+
+4. **UI/UX Polish** (1-1.5 hours):
+   - Visual indication of active filters
+   - Clear filter badge showing count of active criteria
+   - Responsive design for mobile/tablet
+   - Accessibility: ARIA labels for filter controls
+
+**Acceptance Criteria**:
+- Filter controls appear above player table with intuitive UI
+- Multiple filters can be applied simultaneously
+- Results update instantly as filters change
+- Filtered count displayed (e.g., "Showing 12 of 23 players")
+- Sort order persists when filters applied
+- Reset filters button works correctly
+- Filter state preserved in URL for sharing/bookmarking
+- Mobile-responsive design maintained
+- All filter types work correctly (skills, age, status, group, position)
+
+**Filter Types Supported**:
+- **Skill Ranges**: Separate sliders for each of 7 core skills (0-20 scale)
+- **Age Range**: Min/max age selector
+- **Status**: Dropdown (Active, Injured, Sold, etc.)
+- **Group**: Multi-select from user-defined groups
+- **Position**: Multi-select from field positions
+- **Search**: Text search on player name/number
+
+**Expected Outcomes**: Faster player discovery, easier tactical planning, improved team management workflow
+
+---
+
+### [UI-006] Transfer Bid Display
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Impact**: Transfer market visibility
+**Dependencies**: CHPP API (pychpp 0.2.11+, completed) | **Strategic Value**: Real-time transfer information
+
+**Problem Statement** (Feature request from June 2020):
+Users need to see current bids on players they've listed for transfer/sale directly in the player table. Currently, they must:
+- Navigate to transfer market separately
+- Find their listed players manually
+- Check bids elsewhere in the interface
+
+A new column showing current bids would allow users to:
+- Monitor transfer activity at a glance
+- Make quick decisions about bid acceptance
+- Track selling opportunities in the player management view
+- Improve transfer workflow efficiency
+
+**Historical Context**:
+- Requested June 23, 2020 (GitHub issue #27)
+- Required additional CHPP API data that wasn't available
+- Blocked until pychpp 0.2.11 fix was released (January 13, 2021)
+- Now unblocked and ready to implement
+
+**Implementation**:
+1. **Backend API Integration** (0.5-1 hour):
+   - Add transfer/bid data retrieval from CHPP API (pychpp 0.2.11+)
+   - Fetch current bids for players listed for sale
+   - Cache bid data with appropriate TTL (e.g., 10-15 minutes)
+   - Handle players not on market gracefully (null/empty display)
+
+2. **Data Processing** (0.5 hour):
+   - Match player IDs to transfer listings
+   - Extract current bid amount and bidding team
+   - Format bid information for display
+   - Handle multiple bids/countries
+
+3. **UI Implementation** (1-1.5 hours):
+   - Add "Current Bid" column to player table
+   - Display bid amount and team name (if available)
+   - Show "Not listed" or empty for players without active bids
+   - Add tooltip with bid details (amount, bidding team, deadline)
+   - Sort capability on bid column
+
+**Acceptance Criteria**:
+- "Current Bid" column appears in player table (optional column, can be toggled)
+- Shows bid amount for players listed for transfer
+- Displays bidding team name when available
+- Shows "Not listed" or empty for players not on market
+- Bid data updates with API calls
+- Column sortable by bid amount
+- Mobile-responsive design maintained
+- No performance degradation
+
+**UI Considerations**:
+- Column position: Near the end of table (after group, before actions)
+- Display format: Currency amount + team name (e.g., "€150,000 - Hamburg")
+- Conditional formatting: Highlight rows with active bids?
+- Refresh: Auto-update when transfer data is fetched
+
+**Technical Notes**:
+- Requires pychpp 0.2.11+ (already available as of January 2021)
+- CHPP transfer data only reflects bids from public transfer market
+- Bid data may have slight delay from Hattrick interface
+
+**Expected Outcomes**: Improved transfer market visibility, faster decision-making for selling players, better integration of transfer activities
+
+---
+
+### [UI-007] Update Report Icon Display
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Impact**: Change visualization and readability
+**Dependencies**: Update/change report UI (completed) | **Strategic Value**: Better visual communication of important changes
+
+**Problem Statement** (Feature request from June 2020, GitHub issue #37):
+The update/change report currently displays player changes as text (e.g., "cards 1->0", "injury band-aid"). Users need visual icon-based representation to:
+- Quickly identify critical changes (red cards, injuries)
+- Reduce text clutter in change reports
+- Visually highlight the most important changes
+- Make important stats/changes more prominent
+
+**Historical Context**:
+- Requested June 28, 2020
+- Partially implemented in January 2021 (commit 6cbfcf7)
+- Current implementation shows icons for red cards and injuries
+- Enhancement requested: Make important changes bold/larger, improve visual hierarchy
+
+**Implementation**:
+1. **Icon Display** (0.5-1 hour):
+   - Display red card icon instead of text (🟥 or red card icon)
+   - Display injury icon instead of text (⚕️ or band-aid icon)
+   - Only show red cards (not yellow), only show real injuries (not band-aids)
+   - Use consistent icon set throughout application
+
+2. **Visual Hierarchy** (1-1.5 hours):
+   - Make main stat changes bold or larger font
+   - Highlight trained/developed skills with emphasis
+   - Differentiate critical changes (red card, injury) from minor changes
+   - Use color coding for different change types
+   - Add visual spacing and grouping for readability
+
+3. **UI Refinement** (0.5 hour):
+   - Ensure icons are accessible (alt text, tooltips)
+   - Maintain responsive design
+   - Test readability across device sizes
+   - Ensure icons are color-blind friendly
+
+**Acceptance Criteria**:
+- Red card changes display with icon (not text)
+- Injury changes display with icon (not text)
+- Yellow cards NOT shown as icons (red cards only)
+- Band-aids NOT shown as icons (injuries only)
+- Main stat changes (trained) displayed bold or larger
+- Important changes visually distinguished from minor ones
+- Tooltips explain what each icon represents
+- Mobile-responsive display maintained
+- No layout breaks due to icon display
+
+**Icon Usage**:
+- **Red Card**: 🟥 or card icon (when red card given)
+- **Injury**: ⚕️ or medical icon (when player injured)
+- **Trained**: Bold/larger text for skill increases (main training)
+- **Stats**: Regular text for minor changes
+
+**Visual Hierarchy Examples**:
+- "**Defender 14→15** ⚕️ Injured" (main change + critical status)
+- "Keeper 12→13" (secondary improvement, regular text)
+- "Passing 8→9 🟥 Red card" (with penalty/disciplinary info)
+
+**Expected Outcomes**: Improved change report readability, faster identification of critical player updates, better visual communication of update data
+
+---
+
+### [FEAT-006] Default Player Groups for New Users
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Impact**: Onboarding and user experience
+**Dependencies**: Player grouping system (completed) | **Strategic Value**: Reduced onboarding friction, improved adoption
+
+**Problem Statement** (Feature request from Oct 16, 2023, GitHub issue #52):
+New users starting with HT Status have a blank slate with no player groups, making it difficult to understand:
+- What groups are and how to use them
+- How to organize their squad effectively
+- How to get started quickly with the application
+
+The threshold for understanding what to do and making the interface useful is too high. Default groups would lower the barrier to entry and help new users:
+- Get started immediately without confusion
+- Understand the grouping system by example
+- Have a structured team organization from day one
+- Improve time-to-value for new users
+
+**Implementation**:
+1. **Default Group Templates** (0.5-1 hour):
+   - Create sensible default groups on new user registration
+   - Suggested defaults: "Formation 1", "Substitutes", "Youth", "Development", "For Sale"
+   - Alternative approach: Groups based on common strategies (e.g., "Starters", "Bench", "Prospects")
+   - Allow users to customize defaults in settings (future enhancement)
+
+2. **Automatic Group Assignment** (0.5-1 hour):
+   - On first team import, suggest automatic assignment of players to groups
+   - Based on match role, age, or player status
+   - Allow user to review and modify assignments
+   - Manual override of automatic suggestions
+
+3. **Onboarding Enhancement** (1 hour):
+   - Show tooltip/hint explaining groups on first visit
+   - Highlight default groups in UI
+   - Link to help documentation explaining group usage
+   - Optional guided tour (future enhancement)
+
+**Acceptance Criteria**:
+- New users automatically receive default player groups on registration
+- Default groups are sensible and useful for common use cases
+- Group names are clear and self-explanatory
+- Users can view and modify default groups
+- Users can delete default groups if desired
+- Existing users unaffected (no retroactive group creation)
+- Default groups appear in group dropdown/selector
+- Help text explains purpose of each default group
+- Mobile-responsive interface maintained
+
+**Suggested Default Groups**:
+1. **Formation 1** - Current starting lineup
+2. **Formation 2** - Alternative tactics/formation
+3. **Substitutes** - Backup players
+4. **Youth** - Young development players
+5. **Development** - Players being trained/improved
+6. **For Sale** - Players listed for transfer
+
+**Alternative Approach** (based on team size):
+- Small teams (0-20 players): Simplified defaults ("Starters", "Subs", "Youth")
+- Larger teams (20+ players): Full defaults with more categories
+
+**User Customization** (Phase 2, future):
+- Allow users to choose default group templates on signup
+- Pre-built templates: "Competitive", "Development", "Minimal", "Advanced"
+- Custom group templates created by experienced users
+
+**Technical Implementation**:
+- Create database seeding for default groups
+- Trigger on first user/team registration
+- Handle existing users gracefully (no changes)
+- Provide admin/management option to reset to defaults
+
+**Expected Outcomes**: Reduced onboarding friction, faster time-to-value, improved user adoption, better first-time user experience
+
+---
+
+### [FEAT-004] Hattrick Language Localization
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: User experience and accessibility
+**Dependencies**: CHPP API integration (completed) | **Strategic Value**: Multi-language support, consistency with Hattrick
+
+**Problem Statement**:
+Currently, HT Status displays content in English regardless of the user's language preference in their Hattrick account. Users need the application to use Hattrick's official translations from their CHPP translation files to:
+- Maintain consistency with Hattrick's UI language
+- Provide native language experience matching their account setting
+- Reuse existing, professionally maintained translations
+- Support a global user base across different regions
+
+**Implementation**:
+1. **Extract Language from Hattrick** (1 hour):
+   - Retrieve user's language preference from CHPP `user()` response
+   - Store language preference in session on user login
+   - Map language code to supported language
+
+2. **Integrate Hattrick Translation Files** (1.5-2 hours):
+   - Access Hattrick's translation files via CHPP API (if available) or documentation
+   - Parse Hattrick translation strings for supported languages
+   - Create translation mapping for common UI terms
+   - Build fallback structure for untranslated terms
+
+3. **Apply Translations to Templates** (1.5-2 hours):
+   - Update Flask templates to use Hattrick translations
+   - Translate UI strings (buttons, labels, messages, form placeholders)
+   - Handle common team management terminology
+   - Apply locale-specific formatting (dates, numbers)
+
+4. **Scope & Supported Languages**:
+   - Languages available in Hattrick translation system
+   - Primary focus: Swedish, English, German, French, Finnish, Norwegian
+   - Use Hattrick's official terminology for consistency
+
+**Acceptance Criteria**:
+- User's Hattrick language preference is detected on login
+- Flask templates display strings using Hattrick translations
+- All supported languages properly mapped and displayed
+- Date and number formatting respects user's language/locale
+- Fallback to English for untranslated strings
+- No breaking changes to existing functionality
+- UI terminology matches Hattrick's official translations
+
+**Scope Notes**:
+- **Includes**: UI strings, buttons, labels, form messages using Hattrick translations
+- **Excludes**: Player/team data from Hattrick (already in user's language), custom app-specific strings
+- **Focus**: Reusing Hattrick's existing translation infrastructure
+
+**Technical Approach**:
+- Retrieve translations from CHPP translation files documentation
+- Create mapping dictionary for common UI terms
+- Apply translations in Jinja2 templates
+- Store mapping in configuration for easy updates
+
+**Expected Outcomes**: Consistent experience with Hattrick, improved user experience for non-English speakers, reduced language barrier for international adoption
 
 ---
 
