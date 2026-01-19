@@ -1,7 +1,10 @@
 *.pyc
 __pycache__/
+*.pyo
+*.pyd
 
 .DS_Store
+*.log
 changelog.txt
 changelog-full.txt
 command.sh
@@ -38,10 +41,14 @@ htmlcov/
 .coverage.*
 coverage.xml
 *.cover
+.tox/
 
 # Development tools
 .mypy_cache/
 .ruff_cache/
+*.swp
+*.swo
+*~
 
 # Docker volumes and data
 docker-compose.override.yml
@@ -50,5 +57,9 @@ docker-compose.override.yml
 # IDE
 .vscode/
 .idea/
-*.swp
-*.swo
+
+# Node.js (for React frontend)
+node_modules/
+dist/
+build/
+*.tsbuildinfo

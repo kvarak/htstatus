@@ -264,10 +264,14 @@ test-all: ## ✅ Run all quality gates (lint + security + config + comprehensive
 clean: ## Clean up temporary files, caches
 	@echo "🧹 Cleaning up..."
 	@find . -type f -name "*.pyc" -delete
+	@find . -type f -name "*.pyo" -delete
+	@find . -type f -name "*.pyd" -delete
+	@find . -type f -name ".DS_Store" -delete
 	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	@find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
 	@find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
-	@rm -rf .coverage htmlcov/ .ruff_cache/
+	@find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
+	@rm -rf .coverage htmlcov/ *.log
 	@echo "✅ Cleanup complete"
 
 reset: clean ## Reset environment (clean + fresh install)

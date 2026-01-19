@@ -36,6 +36,48 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 - `/Makefile`: Standardized dev commands
 - `/tests/`: Test suite
 
+## File Organization Standards
+
+### Version Control Strategy
+
+**Tracked Files** (in git):
+- Source code: `*.py`, `*.ts`, `*.tsx`, `*.js`
+- Configuration templates: `*.example`, `*.template`
+- Documentation: `*.md`
+- Project structure: `Makefile`, `pyproject.toml`, `package.json`
+- Docker configurations: `docker-compose.yml`, `Dockerfile`
+
+**Ignored Files** (not in git):
+- Environment-specific: `.env`, `config.py`, credentials
+- Auto-generated: `__pycache__/`, `*.pyc`, `migrations/`
+- Development artifacts: `.coverage`, `htmlcov/`, `*.log`
+- System files: `.DS_Store` (macOS), `*.swp` (vim)
+- Dependencies: `.venv/`, `node_modules/`, `env/`
+- Data directories: `data/` (test data), build outputs
+
+**Rationale**: Keep repository clean and secure by excluding:
+1. Credentials and secrets (security)
+2. Environment-specific configuration (portability)
+3. Generated files that can be recreated (efficiency)
+4. Large dependency directories (performance)
+
+### Cleanup Commands
+
+```bash
+# Remove temporary files and caches
+make clean
+
+# Complete environment reset
+make reset
+
+# Manual cleanup patterns
+find . -name "*.pyc" -delete
+find . -name "__pycache__" -delete
+find . -name ".DS_Store" -delete
+```
+
+See `.gitignore` for complete exclusion patterns.
+
 ## Development Scripts
 
 HTStatus includes debugging utilities in the `scripts/` directory, created during troubleshooting and preserved for future development use.
