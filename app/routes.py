@@ -2047,6 +2047,17 @@ def training():
 
         allplayers[i] = weekly
 
+    # Deduplicate consecutive rows with identical skill values
+    for player_id in allplayers:
+        deduped = []
+        prev_skills = None
+        for entry in allplayers[player_id]:
+            date, skills = entry
+            if skills != prev_skills:
+                deduped.append(entry)
+                prev_skills = skills
+        allplayers[player_id] = deduped
+
     return create_page(
         template='training.html',
         teamname=teamname,
