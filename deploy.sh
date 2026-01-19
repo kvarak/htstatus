@@ -34,6 +34,7 @@ pip3 install uv
 python3 -m uv sync
 python3 -m uv run python3 scripts/manage.py db migrate
 python3 -m uv run python3 scripts/manage.py db upgrade
+systemctl restart htstatus
 ''' >> command.sh
 
 chmod a+x command.sh
