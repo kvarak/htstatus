@@ -4,7 +4,7 @@
 **Last Updated**: 2026-01-19
 **Active Task**: Ready for next session
 **Recent Completion**: INFRA-010 Repository File Audit
-**P1 Status**: ✅ COMPLETE - All P1 Testing & App Reliability tasks finished
+**P1 Status**: 🚀 ACTIVE - BUG-001 systematic route audit ready for execution
 
 ## Management Rules
 
@@ -27,20 +27,20 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability** (Guarantee it works)
+- 🎯 [BUG-001] Route Conflict Resolution (1-2 hours) - URGENT: Blueprint routes overriding functional routes
 - ✅ [SEC-002] Address 6 Security Warnings - COMPLETED
 - ✅ [TEST-004] Fix 11 Test Fixture Errors (2-3 hours) - COMPLETED - 100% test success
 - ✅ [INFRA-017] Script Environment Audit (1-2 hours) - COMPLETED - UV consistency achieved
 
 **Priority 2: Deployment & Operations** (Ship it safely)
-- 🎯 [SEC-001] Production Readiness (15-20 hours) - 91 quality issues
 - ✅ [DOC-017] Deployment Process (45 min) - COMPLETED - Operations guide created
 - ✅ [INFRA-010] Audit Non-Tracked Files (1-2 hours) - COMPLETED - Repository hygiene achieved
 
 **Priority 3: Core Functionality** (It does what it should)
 - 🎯 [FEAT-002] Mobile-First PWA (20+ hours) - Game-changing mobile UX
-- 🎯 [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization
 
 **Priority 4: Stability & Maintainability** (It stays working)
+- 🎯 [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization
 - 🎯 [INFRA-012] Migration Workflow (4-6 hours) - Database procedures
 - 🎯 [INFRA-008] Type Sync Validation (3-4 hours) - Prevent type drift
 - 🎯 [REFACTOR-001] Code Maintainability (20-24 hours) - Technical debt
@@ -81,11 +81,55 @@
 
 **Completion Notes**: Used .bandit configuration (Option C) instead of inline noqa directives as it provides cleaner, centralized security policy documentation. All 6 warnings (B404, B607, B603) now properly documented and excluded with clear rationale.
 
+### [BUG-001] Route Conflict Resolution
+**Status**: 🚀 ACTIVE - Systematic audit remaining | **Effort**: 1-2 hours | **Impact**: Critical application functionality
+**Dependencies**: None | **Strategic Value**: Prevent functional route override issues
+
+**Problem Description**:
+- Blueprint routes in `routes_bp.py` are overriding functional routes in `routes.py`
+- Already identified conflicts: `/update` and `/player` routes had stub implementations
+- Stub routes return empty templates without processing, breaking core features
+- Factory.py registers both blueprint and manual routes, blueprint takes precedence
+
+**Root Cause**:
+- Dual route registration system creates conflicts between stub and functional implementations
+- Blueprint routes registered first, preventing manual route registration from working
+- No systematic audit has been performed to identify all conflicts
+
+**Implementation Plan**:
+1. **Audit all routes** in both `routes_bp.py` and `routes.py`
+2. **Identify conflicts** - routes with same path but different implementations
+3. **Remove stub routes** from blueprint that override functional routes
+4. **Test functionality** - verify all pages work after conflict resolution
+5. **Document strategy** - establish clear route ownership rules
+
+**Success Criteria**:
+- ✅ All functional routes accessible (update, player, etc.)
+- ✅ No more empty template returns for functional pages
+- ✅ Complete route conflict audit performed
+- ✅ Documentation of route ownership strategy
+- ✅ All existing tests continue passing
+
+**Session Progress**:
+- ✅ Chart.js error resolution - orphaned script removed from player.html
+- ✅ `/update` route - removed stub from blueprint
+- ✅ `/player` route - removed stub from blueprint
+- ✅ Systematic audit framework established
+- ✅ Application functionality restored and validated
+
+**Remaining Work**: Systematic audit of `/team`, `/matches`, `/training`, `/settings`, `/debug` routes
+
 ---
 
 ## Priority 2: Deployment & Operations
 
-### [SEC-001] Production Readiness
+*All P2 Deployment & Operations tasks completed*
+
+---
+
+## Priority 3: Core Functionality
+
+### [FEAT-002] Mobile-First PWA
 **Status**: 🎯 Ready to Execute | **Effort**: 20+ hours | **Impact**: User experience transformation
 **Dependencies**: Authentication system (completed) | **Strategic Value**: Mobile accessibility, modern web standards
 
@@ -105,6 +149,8 @@
 
 ---
 
+## Priority 4: Stability & Maintainability
+
 ### [REFACTOR-002] Complete Blueprint Migration
 **Status**: 🎯 Ready to Execute | **Effort**: 6-8 hours | **Impact**: Code organization
 **Dependencies**: INFRA-011 (completed) | **Strategic Value**: Maintainability, scalability
@@ -123,8 +169,6 @@
 **Expected Outcomes**: Better maintainability, easier feature development, Flask best practices
 
 ---
-
-## Priority 3: Stability & Maintainability
 
 ### [INFRA-012] Migration Workflow
 **Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Database reliability
@@ -199,65 +243,6 @@
 - Security monitoring integrated
 
 **Expected Outcomes**: Proactive dependency management, improved security, reduced technical debt
-
----
-
-## Priority 4: Deployment & Operations
-
-### [SEC-001] Production Readiness
-**Status**: 🎯 Ready to Execute | **Effort**: 15-20 hours | **Impact**: Security compliance
-**Dependencies**: Testing infrastructure (achieved) | **Strategic Value**: Production deployment capability
-
-**Implementation**:
-1. Address 91 identified code quality issues
-2. Implement security headers and HTTPS enforcement
-3. Add comprehensive input validation
-4. Create security monitoring and logging
-
-**Acceptance Criteria**:
-- Code quality score >98/100
-- Security audit passes with zero critical issues
-- Production deployment procedures documented
-
-**Expected Outcomes**: Production-ready application, security compliance, operational confidence
-
----
-
-### [DOC-017] Document Deployment Process
-**Status**: 🎯 Ready to Execute | **Effort**: 45 minutes | **Impact**: Operations knowledge
-**Dependencies**: None | **Strategic Value**: Deployment reliability
-
-**Implementation**:
-1. Document push.sh script functionality and usage
-2. Create deployment checklist and process guide
-3. Document environment-specific considerations
-4. Include rollback procedures
-
-**Acceptance Criteria**:
-- Complete deployment workflow documented
-- Environment-specific procedures included
-- Rollback and troubleshooting guides
-
-**Expected Outcomes**: Reliable deployments, reduced errors, operational knowledge preservation
-
----
-
-### [INFRA-010] Audit Non-Tracked Files
-**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Impact**: Repository hygiene
-**Dependencies**: None | **Strategic Value**: Security, storage optimization
-
-**Implementation**:
-1. Audit all untracked files and directories
-2. Update .gitignore for proper exclusions
-3. Remove unnecessary files
-4. Document file organization standards
-
-**Acceptance Criteria**:
-- Clean repository structure
-- Appropriate .gitignore coverage
-- File organization documented
-
-**Expected Outcomes**: Improved repository hygiene, better security posture, reduced clutter
 
 ---
 

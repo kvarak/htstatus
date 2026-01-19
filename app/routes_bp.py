@@ -163,11 +163,6 @@ def logout():
     print("Blueprint: Attempting redirect to /login")
     return redirect('/login')
 
-@main_bp.route('/player')
-def player():
-    """Player page."""
-    return create_page('player.html', 'Players')
-
 @main_bp.route('/team')
 def team():
     """Team page."""
@@ -182,11 +177,6 @@ def matches():
 def training():
     """Training page."""
     return create_page('training.html', 'Training')
-
-@main_bp.route('/update')
-def update():
-    """Update page."""
-    return create_page('update.html', 'Update')
 
 @main_bp.route('/settings')
 def settings():
