@@ -6,6 +6,9 @@
 {% block styles %}
 
 <link rel="icon" href="{{url_for('static', filename='ico.jpg')}}">
+<link rel="manifest" href="{{url_for('static', filename='manifest.json')}}">
+<meta name="theme-color" content="#1f2937">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Bootstrap: Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -167,6 +170,69 @@
     text-align: inherit;
   }
 
+  /* PWA Mobile Optimizations */
+  @media (max-width: 768px) {
+    .container {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .table-responsive {
+      font-size: 12px;
+    }
+
+    .navbar-nav {
+      text-align: center;
+    }
+
+    .table th, .table td {
+      padding: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    /* Hide non-essential columns on mobile */
+    .table .d-none-mobile {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .table th, .table td {
+      padding: 0.3rem;
+      font-size: 0.8rem;
+    }
+
+    .navbar-brand {
+      font-size: 1rem;
+    }
+  }
+
+  /* PWA Install Button */
+  #install-pwa {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1f2937;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-size: 14px;
+  }
+
 </style>
 {% endblock %}
 
@@ -204,6 +270,57 @@ $('.toast').toast('show')
     $("#content").hide();
   }
 // ]]></script>
+
+<!-- PWA Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/static/sw.js')
+      .then(function(registration) {
+        console.log('HTStatus PWA: Service Worker registered with scope: ', registration.scope);
+
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content available, prompt user to refresh
+              if (confirm('HTStatus has been updated. Refresh to get the latest version?')) {
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(function(err) {
+        console.log('HTStatus PWA: Service Worker registration failed: ', err);
+      });
+  });
+}
+
+// PWA install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show install button or notification
+  const installButton = document.getElementById('install-pwa');
+  if (installButton) {
+    installButton.style.display = 'block';
+    installButton.addEventListener('click', () => {
+      installButton.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('HTStatus PWA installed');
+        }
+        deferredPrompt = null;
+      });
+    });
+  }
+});
+</script>
 
 {% endblock %}
 
@@ -255,6 +372,11 @@ $('.toast').toast('show')
     </ul>
   </div>
 </nav>
+
+<!-- PWA Install Button -->
+<button id="install-pwa" title="Install HTStatus as an app">
+  📱 Install App
+</button>
 
 <div class="container">
   <div class="row">

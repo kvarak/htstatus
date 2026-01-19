@@ -1,0 +1,57 @@
+{
+  "name": "HT Status",
+  "short_name": "HTStatus",
+  "description": "Hattrick team management and player analysis tool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["sports", "productivity"],
+  "icons": [
+    {
+      "src": "/static/ico.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/soccer_ball.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/ico.jpg",
+      "sizes": "128x128",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Players",
+      "short_name": "Players",
+      "description": "View team players and skills",
+      "url": "/player",
+      "icons": [{"src": "/static/ico.png", "sizes": "48x48"}]
+    },
+    {
+      "name": "Team Overview",
+      "short_name": "Team",
+      "description": "View team statistics and information",
+      "url": "/team",
+      "icons": [{"src": "/static/ico.png", "sizes": "48x48"}]
+    },
+    {
+      "name": "Match History",
+      "short_name": "Matches",
+      "description": "View match results and analysis",
+      "url": "/matches",
+      "icons": [{"src": "/static/ico.png", "sizes": "48x48"}]
+    }
+  ],
+  "prefer_related_applications": false
+}

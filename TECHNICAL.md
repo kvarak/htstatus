@@ -12,6 +12,7 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 - **Database**: PostgreSQL
 - **API Integration**: pychpp (OAuth, CHPP API)
 - **Dev Tools**: Makefile, Docker Compose, UV (Python deps), pytest, ruff, mypy
+- **PWA Features**: Service Worker, App Manifest, responsive design, offline functionality
 
 ## Implementation Details
 - **Session Management**: Flask sessions store OAuth tokens and team data
@@ -19,6 +20,8 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 - **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked
 - **CI/CD**: GitHub Actions for linting and basic CI
 - **Route Architecture**: Dual registration system with functional routes in routes.py and blueprint organization in routes_bp.py
+- **PWA Implementation**: Service Worker with cache-first strategy for static assets, network-first for dynamic content, offline functionality for core routes
+- **Mobile Optimization**: Responsive CSS, touch-friendly navigation, installable PWA with app manifest
 - **Security**:
   - .env for secrets, never committed; database migrations tested on copies of production structure
   - Subprocess usage policy: Limited to development tooling only (git version detection)
