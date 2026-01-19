@@ -2,7 +2,7 @@
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Project Health**: 96/100 • 209/218 Tests (9 config test failures) • 29 Tasks Complete • **Deployment Configuration Excellence Achieved** ✅
+📊 **Project Health**: 96/100 • 209/218 Tests (**9 config, 54 lint, 6 security issues**) • 31 Tasks Complete • **Test Fixes Priority** 🚨
 
 ## Backlog Management Rules
 
@@ -20,29 +20,77 @@
 
 ## Current Focus
 
-### 🚀 Active Work
-- **INFRA-013**: Cleanup Debugging Files → 🚀 ACTIVE ready for execution
+### 🚀 Active Work - Test Failures to Fix
+**Priority**: Fix all test-all failures before continuing with other tasks
 
-### 🎯 Next Priority
-Execute remaining Tier 1 Quick Wins (9 documentation tasks, ~5.5 hours total effort)
+1. **[INFRA-018] Fix Configuration Test Failures** (2 hours) - 9/45 config tests failing
+2. **[INFRA-019] Fix Code Quality Issues** (3-4 hours) - 54 linting errors identified
+3. **[SEC-002] Address Security Findings** (1-2 hours) - 6 low-severity subprocess issues
+
+### 🎯 Next Priority (After Test Fixes)
+Execute remaining Tier 1 Quick Wins (5 documentation tasks, ~2.5 hours total effort)
 
 ---
 
 ## Ready to Execute
 
-### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3 hours total)
+### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3 hours remaining)
 
-**Execute First**: Complete remaining 9 tasks for immediate value and project polish.
+**Execute After Test Fixes**: Complete remaining 5 tasks for immediate value and project polish (~2.5 hours total).
 
-1. **[INFRA-013] Cleanup Debugging Files** (5 min) - **🚀 ACTIVE**
-2. **[DOC-018] Config.py Template & Documentation** (30 min)
-3. **[DOC-019] macOS Setup Guide** (30 min)
-4. **[DOC-017] Document Deployment Process** (45 min)
-5. **[DOC-004] Progress Metrics** (1 hour)
-6. **[DOC-010] Testing Prompts** (30 min)
-7. **[INFRA-018] Fix Configuration Test Failures** (2 hours)
-8. **[DOC-021] Deployment Environment Guide** (45 min)
-9. **[DOC-020] UV Installation & Troubleshooting Guide** (30 min)
+1. **[DOC-019] macOS Setup Guide** (30 min)
+2. **[DOC-017] Document Deployment Process** (45 min)
+3. **[DOC-004] Progress Metrics** (1 hour)
+4. **[DOC-010] Testing Prompts** (30 min)
+5. **[DOC-020] UV Installation & Troubleshooting Guide** (30 min)
+
+#### [INFRA-019] Fix Code Quality Issues ⭐ **MOVED TO ACTIVE**
+**Priority**: High Impact, Medium Effort (3-4 hours) | **Status**: 🚀 Moved to Active Work
+**Dependencies**: None | **Strategic Value**: Code quality, maintainability, CI readiness
+**Root Cause**: 54 linting errors identified in make test-all Step 1/4
+**Implementation**:
+1. Fix 54 linting errors: unused variables (F841), unused function arguments (ARG001), assert False usage (B011), bare except clauses (E722)
+2. Update nested with statements to use single with statement (SIM117, SIM105)
+3. Address remaining style and code quality issues
+4. Ensure all fixes maintain test functionality
+**Specific Error Categories**:
+- F841: 2 unused variable assignments (response, initial_tables)
+- ARG001: 4 unused function arguments in test fixtures
+- B011: 3 assert False statements (should raise AssertionError)
+- E722: 1 bare except clause
+- SIM117: 4 nested with statements to combine
+- SIM105: 2 try-except-pass blocks to use contextlib.suppress
+**Testing Commands**:
+- `make lint` - Run linting checks in isolation
+- `make test-all` - Validate all fixes in full pipeline
+**Acceptance Criteria**:
+- Zero linting errors in make lint
+- All 218 tests continue passing
+- Code quality improves without functionality regression
+
+#### [SEC-002] Address Security Findings ⭐ **MOVED TO ACTIVE**
+**Priority**: Medium Impact, Low Effort (1-2 hours) | **Status**: 🚀 Moved to Active Work
+**Dependencies**: None | **Strategic Value**: Security compliance, production readiness
+**Root Cause**: 6 low-severity security findings in make test-all Step 2/4
+**Implementation**:
+1. Review subprocess usage in routes.py and routes_bp.py for git version detection
+2. Consider alternatives to subprocess.check_output for git commands
+3. Add security comments or use shlex.quote for subprocess calls
+4. Document security rationale for git command usage
+**Specific Security Findings**:
+- B404: subprocess module usage (2 instances)
+- B607: partial executable path "git" (2 instances)
+- B603: subprocess without shell=True (2 instances)
+**Note**: All findings are low-severity and relate to git version detection, not user input processing
+**Testing Commands**:
+- `make security` - Run security analysis in isolation
+- `make test-all` - Validate security improvements in full pipeline
+**Acceptance Criteria**:
+- Security findings addressed or documented as acceptable risk
+- No new security vulnerabilities introduced
+- Git version detection continues functioning
+
+#### [INFRA-018] Fix Configuration Test Failures ⭐ **MOVED TO ACTIVE**
 
 #### [DOC-015] Fix Architecture Placeholder ✅ **COMPLETED**
 **Priority**: Low Impact, Very Low Effort (15 min) | **Status**: ✅ Completed
@@ -74,26 +122,30 @@ Execute remaining Tier 1 Quick Wins (9 documentation tasks, ~5.5 hours total eff
 **Rationale**: Discovered during repository analysis - command.sh purpose unclear
 **Note**: command.sh is generated dynamically by push.sh deployment script
 
-#### [INFRA-013] Cleanup Debugging Files
-**Priority**: Very Low Impact, Very Low Effort (5 min) | **Status**: 🎯 Ready to Execute
+#### [INFRA-013] Cleanup Debugging Files ✅ **COMPLETED**
+**Priority**: Very Low Impact, Very Low Effort (5 min) | **Status**: ✅ Completed
 **Dependencies**: None | **Strategic Value**: Repository hygiene
 **Implementation**:
-- Remove any remaining temporary debugging files from development
-- Ensure all debugging utilities are properly organized in scripts/ directory
-- Verify no untracked files remain in git status
-**Rationale**: Discovered during repository analysis - maintain clean workspace
+- ✅ Verified repository cleanliness - no untracked debugging files present
+- ✅ Confirmed debugging utilities properly organized in scripts/ directory
+- ✅ All debugging files serve legitimate development purposes as documented in TECHNICAL.md
+**Completion**: Repository is clean with no temporary debugging artifacts. All debugging utilities are properly organized and documented.
+**Rationale**: Repository analysis confirmed no cleanup needed - workspace already clean
 
-#### [DOC-018] Config.py Template & Documentation
-**Priority**: Medium Impact, Low Effort (30 min) | **Status**: 🎯 Ready to Execute
+#### [DOC-018] Config.py Template & Documentation ✅ **COMPLETED**
+**Priority**: Medium Impact, Low Effort (30 min) | **Status**: ✅ Completed 2025-01-19
 **Dependencies**: None | **Strategic Value**: Developer onboarding, configuration clarity
 **Implementation**:
-1. Create comprehensive config.py.template with all configuration options
-2. Document each configuration parameter and its purpose
-3. Include environment-specific examples (development, staging, production)
-4. Add configuration validation guidelines
+✅ Created comprehensive config.py.template with all configuration options
+✅ Documented each configuration parameter and its purpose
+✅ Included environment-specific examples (development, staging, production)
+✅ Added configuration validation guidelines
+✅ Updated README.md Configuration section with template-based approach
 **Acceptance Criteria**:
-- Complete config template covering all options
-- Clear documentation for each configuration parameter
+✅ Complete config template covering all options
+✅ Clear documentation for each configuration parameter
+✅ Integration tested with existing development environment
+**Notes**: Template works perfectly with existing .env configuration. Test failures are environment isolation issues in test suite, not configuration functionality.
 - Environment-specific usage examples
 **Expected Outcomes**: Easier project setup, reduced configuration errors, better developer onboarding
 
@@ -169,22 +221,31 @@ Execute remaining Tier 1 Quick Wins (9 documentation tasks, ~5.5 hours total eff
 - UV-specific debugging procedures included
 **Expected Outcomes**: Reduced onboarding friction, consistent UV usage, faster issue resolution
 
-#### [INFRA-018] Fix Configuration Test Failures
-**Priority**: Medium Impact, Medium Effort (2 hours) | **Status**: 🎯 Ready to Execute
-**Dependencies**: None | **Strategic Value**: Testing reliability, development confidence
+**Priority**: High Impact, Medium Effort (2 hours) | **Status**: 🚀 Moved to Active Work
+**Dependencies**: DOC-018 Config Template (✅ Completed) | **Strategic Value**: Testing reliability, development confidence
+**Enhanced Infrastructure**: 🔧 New `make test-config` target added for isolated configuration testing, integrated into `make test-all` quality gates
+**Root Cause Analysis**: Tests expect None values for CHPP credentials when not set, but working development environment has real credentials in .env file. Configuration system works correctly - issue is test environment isolation.
 **Implementation**:
-1. Address 9 failing configuration tests identified in test suite
-2. Fix environment variable isolation issues in config tests
-3. Resolve DATABASE_URL construction test expectations
-4. Update test expectations to match current .env defaults
+1. Fix environment variable isolation in config tests - tests should run in clean environment
+2. Update DATABASE_URL construction test expectations to match current priority system
+3. Add proper test environment variable mocking/cleanup between tests
+4. Resolve invalid DEBUG_LEVEL string handling test (needs try/catch validation)
+**Specific Test Failures** (9 total):
+- `test_consumer_key_none_when_not_set` - expects None but gets real CHPP key
+- `test_consumer_secrets_none_when_not_set` - expects None but gets real secret
+- 5x `test_database_url_construction_*` - URL construction logic mismatch with .env values
+- `test_debug_level_invalid_string` - needs proper error handling for non-numeric DEBUG_LEVEL
+**Testing Commands**:
+- `make test-config` - Run configuration tests in isolation for debugging
+- `make test-all` - Now includes dedicated configuration test step (Step 3/4)
 **Acceptance Criteria**:
 - All 218 tests passing (currently 209/218)
-- Configuration test reliability restored
-- Environment variable handling properly tested
-**Expected Outcomes**: Complete test suite reliability, improved development confidence
+- Configuration test reliability restored with proper environment isolation
+- Tests work regardless of developer's .env file contents
+- `make test-config` passes without failures
 
-#### [DOC-021] Deployment Environment Guide
-**Priority**: Medium Impact, Low Effort (45 min) | **Status**: 🎯 Ready to Execute
+#### [DOC-021] Deployment Environment Guide ✅ **COMPLETED**
+**Priority**: Medium Impact, Low Effort (45 min) | **Status**: ✅ Completed 2026-01-19
 **Dependencies**: None | **Strategic Value**: Operations, deployment reliability
 **Implementation**:
 1. Document deployment variable configuration for each environment

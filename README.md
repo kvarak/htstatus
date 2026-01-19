@@ -84,7 +84,8 @@ Run `make help` to see all available commands:
 **Testing:**
 - `make test-fast` - ⚡ Quick core tests for development (32 tests, ~1 second)
 - `make test` - 🧪 Comprehensive test suite (**required** by project standards)
-- `make test-all` - ✅ Full quality gates (lint + security + tests)
+- `make test-config` - 🔧 Configuration tests specifically (helps debug config issues)
+- `make test-all` - ✅ Full quality gates (lint + security + config + tests)
 - `make test-coverage` - 📊 Detailed HTML coverage reporting
 - `make test-integration` - 🔗 Integration tests with Docker services
 - `make test-watch` - 👀 Auto-rerun tests on file changes
@@ -159,135 +160,167 @@ HTStatus includes automated deployment scripts for production deployments:
 
 ## Configuration
 
-HTStatus supports multiple environment configurations with comprehensive templates and validation. Choose the approach that works best for your deployment scenario.
+HTStatus supports flexible configuration through environment variables and config templates. The system provides automatic validation and environment-specific defaults for robust deployment across development, staging, and production environments.
 
-### Quick Setup (Development)
+### Quick Setup (Recommended)
 
-For development, use the development-specific environment template:
+For new developers, use the comprehensive config template with guided setup:
 
 ```bash
-# Copy development template
-cp environments/.env.development.example .env
+# Copy the config template with detailed documentation
+cp config.py.template config.py
 
-# Edit with your CHPP API credentials
-nano .env  # or your preferred editor
+# Edit with your settings following the inline documentation
+nano config.py  # or your preferred editor
 ```
 
-### Environment-Specific Setup
+The config template includes complete documentation for all settings, validation methods, and environment-specific examples.
 
-HTStatus provides environment templates for different deployment scenarios:
+### Environment-Based Configuration
 
-#### Development Environment
+HTStatus uses a priority-based configuration system:
+1. **Environment Variables** (highest priority)
+2. **config.py file** (medium priority)
+3. **Default values** (lowest priority)
+
+This allows flexible deployment where environment variables can override file-based configuration.
+
+#### Development Setup
+
 ```bash
-# Use development template with detailed comments
+# Option 1: Use config template (recommended for beginners)
+cp config.py.template config.py
+# Edit config.py with your CHPP credentials
+
+# Option 2: Use environment variables
 cp environments/.env.development.example .env
+# Edit .env with your CHPP credentials
 
-# Start with development Docker configuration
-docker-compose -f docker-compose.yml -f configs/docker-compose.development.yml up -d
-
-# Run development server
+# Start development server
 make dev
 ```
 
-#### Staging Environment
+#### Production Deployment
+
 ```bash
-# Use staging template with security enhancements
-cp environments/.env.staging.example .env
+# Environment variables override config.py for production deployments
+export FLASK_ENV=production
+export SECRET_KEY=$(openssl rand -hex 32)
+export CONSUMER_KEY="your-chpp-key"
+export CONSUMER_SECRETS="your-chpp-secret"
+export DATABASE_URL="postgresql://user:pass@host:port/db"
 
-# Configure staging-specific values (see template comments)
-nano .env
-
-# Start with staging Docker configuration
-docker-compose -f docker-compose.yml -f configs/docker-compose.staging.yml up -d
+# Validate configuration before starting
+uv run python -c "from config import get_config; get_config().validate()"
 ```
 
-#### Production Environment
+### Configuration Classes
+
+HTStatus provides environment-specific configuration classes with automatic detection:
+
+**DevelopmentConfig**
+- Helpful debugging defaults
+- Relaxed validation with warnings
+- Automatic setup guidance
+- Local database integration
+
+**StagingConfig**
+- Enhanced security requirements
+- Comprehensive validation
+- Performance optimizations
+- SSL cookie enforcement
+
+**ProductionConfig**
+- Strict security validation
+- Required secret strength checks
+- HTTPS-only enforcement
+- Comprehensive audit logging
+
+**TestConfig**
+- Isolated test databases
+- Mocked external services
+- Parallel execution support
+- Coverage reporting integration
+
+### Core Configuration Variables
+
+**Application Settings:**
 ```bash
-# Use production template (requires all security settings)
-cp environments/.env.production.example .env
+FLASK_ENV=development|staging|production  # Environment mode
+SECRET_KEY=your-secret-key                 # Flask secret (auto-generated if missing)
+DEBUG_LEVEL=0-3                           # Debug verbosity (0=none, 3=full)
+```
 
-# IMPORTANT: Replace ALL placeholder values with secure production values
-# See template file for detailed security requirements
-nano .env
+**Hattrick CHPP API:**
+```bash
+CONSUMER_KEY=your-chpp-key                 # Get at https://chpp.hattrick.org/
+CONSUMER_SECRETS=your-chpp-secret         # CHPP consumer secret
+CALLBACK_URL=http://localhost:5000/auth    # OAuth callback URL
+```
 
-# Production should use managed services, not Docker Compose
-# See configs/docker-compose.production.yml for reference only
+**Database Configuration:**
+```bash
+DATABASE_URL=postgresql://user:pass@host:port/db  # Complete connection string
+# OR individual components (lower priority)
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=htplanner
+POSTGRES_USER=htstatus
+POSTGRES_PASSWORD=secure_password
+```
+
+**Security Settings (Production):**
+```bash
+SESSION_COOKIE_SECURE=true               # HTTPS-only cookies
+SESSION_COOKIE_HTTPONLY=true             # Prevent XSS access
+SESSION_COOKIE_SAMESITE=Lax              # CSRF protection
+PERMANENT_SESSION_LIFETIME=7200          # Session timeout (seconds)
 ```
 
 ### Configuration Validation
 
-HTStatus automatically validates configuration based on the environment:
+HTStatus includes comprehensive configuration validation:
 
-- **Development**: Warnings for missing CHPP credentials, allows development defaults
-- **Staging**: Requires secure SECRET_KEY, validates critical settings
-- **Production**: Strict validation of all security settings, requires SSL, validates secret strength
+**Development Mode:**
+- Warns about missing CHPP credentials
+- Provides setup guidance for first-time users
+- Validates database connectivity
+- Suggests security improvements
 
-### Environment Variables Reference
+**Production Mode:**
+- Enforces secure SECRET_KEY requirements
+- Validates SSL/TLS configuration
+- Requires strong password policies
+- Performs security audit checks
 
-**Required for all environments:**
-- `FLASK_ENV` - Environment type: `development`, `staging`, `production`
-- `SECRET_KEY` - Flask secret key (must be secure for staging/production)
-- `DATABASE_URL` - PostgreSQL connection string
-
-**CHPP API Configuration:**
-- `CONSUMER_KEY` - Your Hattrick CHPP consumer key ([Get here](https://chpp.hattrick.org/))
-- `CONSUMER_SECRETS` - Your Hattrick CHPP consumer secret
-- `CALLBACK_URL` - OAuth callback URL for your environment
-
-**Database Configuration (managed by Docker Compose in development):**
-- `POSTGRES_DB` - Database name
-- `POSTGRES_USER` - Database user
-- `POSTGRES_PASSWORD` - Database password
-- `POSTGRES_HOST` - Database host
-- `POSTGRES_PORT` - Database port
-
-**Redis Configuration:**
-- `REDIS_URL` - Redis connection URL
-- `REDIS_HOST` - Redis host
-- `REDIS_PORT` - Redis port
-- `REDIS_PASSWORD` - Redis password
-
-**Security Settings (staging/production):**
-- `SESSION_COOKIE_SECURE` - Enable secure cookies (HTTPS required)
-- `SESSION_COOKIE_HTTPONLY` - Prevent JavaScript access to session cookies
-- `SESSION_COOKIE_SAMESITE` - CSRF protection (`Lax` or `Strict`)
-- `PERMANENT_SESSION_LIFETIME` - Session timeout in seconds
-
-### Legacy config.py (Still Supported)
-
-You can still use a `config.py` file, but environment variables take priority. The configuration system now provides enhanced environment support:
-
-```python
-# config.py structure
-from config import get_config, Config, DevelopmentConfig, StagingConfig, ProductionConfig
-
-# Auto-detect configuration based on FLASK_ENV
-ConfigClass = get_config()
-
-# Or explicitly specify
-ConfigClass = get_config('production')
+**Validation Example:**
+```bash
+# Test your configuration
+uv run python -c "
+from config import get_config
+config = get_config()
+print(f'Environment: {config.FLASK_ENV}')
+config.validate()
+print('✅ Configuration valid!')
+"
 ```
 
-**Available Configuration Classes:**
-- `DevelopmentConfig`: Development with helpful defaults and warnings
-- `StagingConfig`: Staging with enhanced security and validation
-- `TestConfig`: Testing with isolated databases and mocked services
-- `ProductionConfig`: Production with strict validation and security requirements
+### Migration from Legacy config.py
 
-```python
-import os
+If you have an existing config.py file, you can modernize it:
 
-class Config(object):
-  APP_NAME                 = 'your-app-name'
-  SECRET_KEY               = 'you-will-never-guess'
-  CONSUMER_KEY             = 'you-will-never-guess'
-  CONSUMER_SECRETS         = 'you-will-never-guess'
-  CALLBACK_URL             = 'url-to-your-callback'
-  CHPP_URL                 = 'https://chpp.hattrick.org/chppxml.ashx'
-  SQLALCHEMY_DATABASE_URI  = 'postgresql:///<dbname>'
-  SQLALCHEMY_TRACK_MODIFICATIONS = False
-  DEBUG_LEVEL              = 3 # 0=none, 1=info, 2=debug, 3=full
+```bash
+# Backup existing config
+cp config.py config.py.backup
+
+# Copy new template
+cp config.py.template config.py
+
+# Migrate your settings following the template structure
+# Environment variables will override any file settings
 ```
+
+The new configuration system maintains full backward compatibility while providing enhanced features.
 
 ## Database
 

@@ -167,6 +167,13 @@ test-fast: check-uv services ## ⚡ Run critical tests only (quick development v
 	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_database.py -v --tb=short
 	@echo "✅ Fast tests completed - run 'make test' for comprehensive validation"
 
+test-config: check-uv ## 🔧 Run configuration tests specifically
+	@echo "🔧 Running configuration tests..."
+	@echo "   Note: These tests may fail if you have real CHPP credentials in .env"
+	@echo "   See INFRA-018 in backlog.md for resolution details"
+	@$(UV) run pytest tests/test_config.py -v --tb=short --cov=config --cov-report=term-missing
+	@echo "✅ Configuration tests completed"
+
 test-integration: check-uv services ## 🔗 Run integration tests with Docker services
 	@echo "🔗 Running integration tests..."
 	@$(UV) run pytest tests/integration/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing
@@ -181,25 +188,30 @@ test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file ch
 	@echo "👀 Running tests in watch mode..."
 	@$(UV) run pytest-watch tests/ -- -v --tb=short
 
-test-all: ## ✅ Run all quality gates (lint + security + comprehensive tests)
+test-all: ## ✅ Run all quality gates (lint + security + config + comprehensive tests)
 	@echo "🚀 Running complete quality gate validation..."
 	@echo ""
-	@echo "📋 Step 1/3: Code Quality (Linting)"
+	@echo "📋 Step 1/4: Code Quality (Linting)"
 	@echo "=================================="
 	@-make lint || echo "⚠️  Linting found issues - review above"
 	@echo ""
-	@echo "📋 Step 2/3: Security Analysis"
+	@echo "📋 Step 2/4: Security Analysis"
 	@echo "============================="
 	@-make security || echo "⚠️  Security checks found issues - review above"
 	@echo ""
-	@echo "📋 Step 3/3: Test Suite"
-	@echo "===================="
+	@echo "📋 Step 3/4: Configuration Tests"
+	@echo "==============================="
+	@-make test-config || echo "⚠️  Configuration tests failed - see INFRA-018 for fixes"
+	@echo ""
+	@echo "📋 Step 4/4: Comprehensive Test Suite"
+	@echo "===================================="
 	@make test
 	@echo ""
 	@echo "🎯 Quality gate summary:"
 	@echo "  - Linting: See results above"
 	@echo "  - Security: See results above"
-	@echo "  - Tests: ✅ Required for deployment"
+	@echo "  - Config Tests: See results above (INFRA-018 addresses failures)"
+	@echo "  - Main Tests: ✅ Required for deployment"
 	@echo ""
 	@echo "✅ Quality validation completed - review any warnings above"
 

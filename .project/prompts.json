@@ -30,6 +30,7 @@
         "Read all root documentation files: README.md, TECHNICAL.md.",
         "Use `make help` to understand available commands and project structure.",
         "Make sure to validate all changes with `make test-all` and ensure that no new issues are introduced.",
+        "For configuration-specific issues, use `make test-config` to run configuration tests in isolation.",
         "Make sure that the database is not changed as it must be backwards compatible due to multiple deployed versions are using the same database.",
         "Follow the detailed plan created in the 'Plan the next task' step.",
         "Implement the solution according to the outlined steps.",
