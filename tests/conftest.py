@@ -1,9 +1,7 @@
 """Pytest configuration and fixtures for HT Status tests."""
 
-import os
-import warnings
-import atexit
 import gc
+import os
 
 import pytest
 
@@ -14,7 +12,6 @@ from config import TestConfig
 def pytest_sessionstart(session):
     """Called after the Session object has been created."""
     # Ensure clean start for resource tracking
-    import sqlite3
     # Close any existing SQLite connections that might be lingering
     try:
         # Force cleanup of any existing connections
@@ -27,8 +24,8 @@ def pytest_sessionstart(session):
 def pytest_sessionfinish(session, exitstatus):
     """Called after whole test run finished, right before returning the exit status to the system."""
     # Force complete cleanup to eliminate any remaining connections
-    import sqlite3
     import gc
+    import sqlite3
 
     # Ensure all SQLite connections are closed
     try:

@@ -5,10 +5,12 @@ This module tests all configuration classes, environment variable handling,
 database URI construction, and configuration validation.
 """
 
-import os
-import pytest
 import importlib
-from unittest.mock import patch, MagicMock
+import os
+from unittest.mock import patch
+
+import pytest
+
 import config
 
 
@@ -38,7 +40,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'SECRET_KEY': test_key}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.SECRET_KEY == test_key
+            assert test_key == config_instance.SECRET_KEY
 
     def test_default_app_name(self):
         """Test default APP_NAME when not provided via environment."""
@@ -53,7 +55,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'APP_NAME': test_name}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.APP_NAME == test_name
+            assert test_name == config_instance.APP_NAME
 
     def test_consumer_key_from_env(self):
         """Test CONSUMER_KEY retrieval from environment."""
@@ -61,7 +63,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'CONSUMER_KEY': test_key}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.CONSUMER_KEY == test_key
+            assert test_key == config_instance.CONSUMER_KEY
 
     def test_consumer_key_none_when_not_set(self):
         """Test CONSUMER_KEY is None when not in environment."""
@@ -76,7 +78,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'CONSUMER_SECRETS': test_secret}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.CONSUMER_SECRETS == test_secret
+            assert test_secret == config_instance.CONSUMER_SECRETS
 
     def test_consumer_secrets_none_when_not_set(self):
         """Test CONSUMER_SECRETS is None when not in environment."""
@@ -98,7 +100,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'CALLBACK_URL': test_url}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.CALLBACK_URL == test_url
+            assert test_url == config_instance.CALLBACK_URL
 
     def test_default_chpp_url(self):
         """Test default CHPP_URL when not provided via environment."""
@@ -113,7 +115,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'CHPP_URL': test_url}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.CHPP_URL == test_url
+            assert test_url == config_instance.CHPP_URL
 
     def test_sqlalchemy_track_modifications_disabled(self):
         """Test that SQLALCHEMY_TRACK_MODIFICATIONS is disabled."""
@@ -155,7 +157,7 @@ class TestConfigClass:
         with patch.dict(os.environ, {'REDIS_URL': test_url}, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.REDIS_URL == test_url
+            assert test_url == config_instance.REDIS_URL
 
 
 class TestDatabaseConfiguration:
@@ -175,7 +177,7 @@ class TestDatabaseConfiguration:
         with patch.dict(os.environ, env_vars, clear=True):
             reload_config_module()
             config_instance = config.Config()
-            assert config_instance.SQLALCHEMY_DATABASE_URI == test_url
+            assert test_url == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_database_url_construction_all_components(self):
         """Test database URI construction from individual components."""
@@ -190,7 +192,7 @@ class TestDatabaseConfiguration:
             reload_config_module()
             config_instance = config.Config()
             expected = 'postgresql://testuser:testpass@testhost:5433/testdb'
-            assert config_instance.SQLALCHEMY_DATABASE_URI == expected
+            assert expected == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_database_url_construction_with_defaults(self):
         """Test database URI construction with default values."""
@@ -198,7 +200,7 @@ class TestDatabaseConfiguration:
             reload_config_module()
             config_instance = config.Config()
             expected = 'postgresql://postgres:@localhost:5432/htplanner'
-            assert config_instance.SQLALCHEMY_DATABASE_URI == expected
+            assert expected == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_database_url_construction_partial_env(self):
         """Test database URI construction with some environment variables set."""
@@ -210,7 +212,7 @@ class TestDatabaseConfiguration:
             reload_config_module()
             config_instance = config.Config()
             expected = 'postgresql://customuser:@localhost:5432/customdb'
-            assert config_instance.SQLALCHEMY_DATABASE_URI == expected
+            assert expected == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_database_url_construction_empty_password(self):
         """Test database URI construction handles empty password correctly."""
@@ -224,7 +226,7 @@ class TestDatabaseConfiguration:
             reload_config_module()
             config_instance = config.Config()
             expected = 'postgresql://testuser:@testhost:5432/testdb'
-            assert config_instance.SQLALCHEMY_DATABASE_URI == expected
+            assert expected == config_instance.SQLALCHEMY_DATABASE_URI
 
 
 class TestTestConfig:
@@ -285,7 +287,7 @@ class TestTestConfig:
         with patch.dict(os.environ, env_vars, clear=True):
             reload_config_module()
             config_instance = config.TestConfig()
-            assert config_instance.SQLALCHEMY_DATABASE_URI == test_url
+            assert test_url == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_test_database_url_construction_defaults(self):
         """Test test database URI construction with defaults."""
@@ -293,7 +295,7 @@ class TestTestConfig:
             reload_config_module()
             config_instance = config.TestConfig()
             expected = 'postgresql://htstatus:development@localhost:5432/htplanner_test'
-            assert config_instance.SQLALCHEMY_DATABASE_URI == expected
+            assert expected == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_test_database_url_construction_custom(self):
         """Test test database URI construction with custom values."""
@@ -306,7 +308,7 @@ class TestTestConfig:
             reload_config_module()
             config_instance = config.TestConfig()
             expected = 'postgresql://testuser:testpass@localhost:5432/custom_test_db'
-            assert config_instance.SQLALCHEMY_DATABASE_URI == expected
+            assert expected == config_instance.SQLALCHEMY_DATABASE_URI
 
     def test_test_config_inherits_parent_attributes(self):
         """Test that TestConfig inherits non-overridden attributes from Config."""

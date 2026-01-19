@@ -1,12 +1,11 @@
 """Test database operations and models."""
 
-import time
 from datetime import datetime
 
 from sqlalchemy import text
 
 from app.factory import db
-from models import Players, Match, MatchPlay, User, Group, PlayerSetting
+from models import Group, Match, MatchPlay, Players, PlayerSetting, User
 
 
 def test_database_connection(app, db_session):

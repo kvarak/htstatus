@@ -1,19 +1,17 @@
 """Test Flask routes and API endpoints."""
 
-import json
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
-from flask import session
 
 from app.factory import db
-from models import User, Players, Match
+from models import Match, Players, User
 
 
 def test_index_route_no_auth(client):
     """Test index route without authentication."""
     response = client.get('/')
-    
+
     # Should redirect to authentication or show public page
     assert response.status_code in [200, 302, 404]  # Different behaviors allowed depending on implementation
 
@@ -21,7 +19,7 @@ def test_index_route_no_auth(client):
 def test_index_route_with_auth(authenticated_session):
     """Test index route with authentication."""
     response = authenticated_session.get('/')
-    
+
     # Should either show authenticated content or redirect
     assert response.status_code in [200, 302, 404]
 
@@ -33,7 +31,7 @@ def test_session_management(client):
         session['access_key'] = 'test_key'
         session['access_secret'] = 'test_secret'
         session['current_user'] = 'test_user'
-        
+
     # Verify session persists
     with client.session_transaction() as session:
         assert session.get('access_key') == 'test_key'
@@ -55,7 +53,7 @@ def test_database_access_in_routes(app, db_session):
         user = User(12345, 'route_test_user', 'testuser', 'password', 'access_key', 'access_secret')
         db_session.add(user)
         db_session.commit()
-        
+
         # Test querying user as routes would do
         queried_user = db_session.query(User).filter_by(ht_id=12345).first()
         assert queried_user is not None
@@ -121,20 +119,20 @@ def test_player_data_access_patterns(app, db_session):
             'mother_club_bonus': False,
             'leadership': 6
         }
-        
+
         player = Players(player_data)
         db_session.add(player)
         db_session.commit()
-        
+
         # Test typical queries routes might use
         players_by_team = db_session.query(Players).filter_by(team_id=54321).all()
         assert len(players_by_team) == 1
         assert players_by_team[0].first_name == 'Route'
-        
+
         # Test skill-based filtering
         high_stamina_players = db_session.query(Players).filter(Players.stamina >= 8).all()
         assert len(high_stamina_players) >= 1
-        
+
         # Test goal statistics
         top_scorers = db_session.query(Players).filter(Players.league_goals > 5).all()
         assert len(top_scorers) >= 1
@@ -159,17 +157,17 @@ def test_match_data_access_patterns(app, db_session):
             'home_goals': 3,
             'away_goals': 1
         }
-        
+
         match = Match(match_data)
         db_session.add(match)
         db_session.commit()
-        
+
         # Test typical match queries
         team_matches = db_session.query(Match).filter(
             (Match.home_team_id == 54321) | (Match.away_team_id == 54321)
         ).all()
         assert len(team_matches) == 1
-        
+
         # Test result analysis
         home_wins = db_session.query(Match).filter(
             Match.home_team_id == 54321,
@@ -200,7 +198,7 @@ def test_chpp_integration_error_handling(app, mock_chpp_client):
     with app.app_context():
         # Test handling of API errors
         mock_chpp_client.user.side_effect = Exception("API Error")
-        
+
         # Routes should handle CHPP errors gracefully
         # This is more of a pattern test than actual route test
         try:
@@ -217,16 +215,16 @@ def test_user_activity_tracking(app, db_session):
         user = User(12346, 'activity_test_user', 'activityuser', 'password', 'access_key', 'access_secret')
         db_session.add(user)
         db_session.commit()
-        
+
         # Test activity tracking methods
         initial_login_count = user.c_login
         user.login()
         assert user.c_login == initial_login_count + 1
-        
+
         initial_player_count = user.c_player
         user.player()
         assert user.c_player == initial_player_count + 1
-        
+
         initial_matches_count = user.c_matches
         user.matches()
         assert user.c_matches == initial_matches_count + 1
@@ -238,7 +236,7 @@ def test_session_authentication_patterns(client):
     with client.session_transaction() as session:
         assert 'current_user' not in session
         assert 'access_key' not in session
-        
+
     # Test authenticated session setup
     with client.session_transaction() as session:
         session['current_user'] = 'testuser'
@@ -247,7 +245,7 @@ def test_session_authentication_patterns(client):
         session['access_secret'] = 'test_access_secret'
         session['all_teams'] = [54321]
         session['all_team_names'] = ['Test Team']
-        
+
     # Verify authentication state
     with client.session_transaction() as session:
         assert session['current_user'] == 'testuser'
@@ -314,7 +312,7 @@ def test_team_data_filtering(app, db_session):
             'mother_club_bonus': False,
             'leadership': 5
         }
-        
+
         team_b_player_data = {
             'ht_id': 777002,
             'first_name': 'TeamB',
@@ -370,17 +368,17 @@ def test_team_data_filtering(app, db_session):
             'mother_club_bonus': False,
             'leadership': 7
         }
-        
+
         player_a = Players(team_a_player_data)
         player_b = Players(team_b_player_data)
         db_session.add(player_a)
         db_session.add(player_b)
         db_session.commit()
-        
+
         # Test team-specific filtering
         team_a_players = db_session.query(Players).filter_by(team_id=11111).all()
         team_b_players = db_session.query(Players).filter_by(team_id=22222).all()
-        
+
         assert len(team_a_players) == 1
         assert len(team_b_players) == 1
         assert team_a_players[0].first_name == 'TeamA'
@@ -409,7 +407,7 @@ def test_config_access_patterns(app):
         consumer_key = app.config.get('CONSUMER_KEY', 'default_key')
         consumer_secret = app.config.get('CONSUMER_SECRETS', 'default_secret')
         debug_level = app.config.get('DEBUG_LEVEL', 1)
-        
+
         assert consumer_key is not None
         assert consumer_secret is not None
         assert isinstance(debug_level, int)
@@ -427,7 +425,7 @@ def test_template_context_patterns(app):
             'version': '2.0.0',
             'debug_level': 1
         }
-        
+
         # Verify all expected context keys exist
         assert 'current_user' in context
         assert 'all_teams' in context
@@ -444,7 +442,7 @@ def test_form_data_processing_patterns(client):
         'group_id': '1',
         'action': 'update'
     }
-    
+
     # Routes should handle form data gracefully
     with client.application.app_context():
         assert 'player_id' in form_data
@@ -465,7 +463,7 @@ def test_json_response_patterns(app):
             },
             'timestamp': '2024-01-02 12:00:00'
         }
-        
+
         # Verify JSON structure
         assert isinstance(response_data, dict)
         assert 'success' in response_data
@@ -534,18 +532,18 @@ def test_pagination_patterns(app, db_session):
                 'mother_club_bonus': i % 3 == 0,
                 'leadership': 4 + (i % 5)
             }
-            
+
             player = Players(player_data)
             db_session.add(player)
-        
+
         db_session.commit()
-        
+
         # Test pagination queries
         page_size = 10
         all_players = db_session.query(Players).filter_by(team_id=99999).all()
         page_1 = db_session.query(Players).filter_by(team_id=99999).limit(page_size).all()
         page_2 = db_session.query(Players).filter_by(team_id=99999).offset(page_size).limit(page_size).all()
-        
+
         assert len(all_players) == 15
         assert len(page_1) == 10
         assert len(page_2) == 5  # Remaining players on second page

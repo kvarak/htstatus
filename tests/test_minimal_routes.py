@@ -3,11 +3,13 @@ Minimal route testing to achieve coverage goals for TEST-003.
 This file tests route functionality without requiring full database setup.
 """
 import os
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 from flask import Flask
+
 from app.factory import create_app
-from app.routes_bp import main_bp, initialize_routes, create_page, dprint
+from app.routes_bp import create_page, dprint, initialize_routes, main_bp
 
 
 class MinimalTestConfig:
@@ -215,9 +217,7 @@ class TestModuleFunctionality:
 
     def test_module_level_imports(self):
         """Test that all necessary imports work at module level."""
-        from app.routes_bp import (
-            main_bp, initialize_routes, create_page, dprint
-        )
+        from app.routes_bp import create_page, dprint, initialize_routes, main_bp
         assert all([
             main_bp is not None,
             callable(initialize_routes),

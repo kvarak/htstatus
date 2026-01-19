@@ -3,12 +3,13 @@ Strategic route testing to maximize coverage for TEST-003.
 This file targets improving routes_bp.py coverage from 51% to 80%+ while
 avoiding the database schema issues in the main application.
 """
-import os
-import pytest
-import sqlite3
 import gc
-from unittest.mock import Mock, patch, MagicMock
-from flask import Flask
+import os
+import sqlite3
+from unittest.mock import Mock, patch
+
+import pytest
+
 from app.factory import create_app
 
 
@@ -369,10 +370,10 @@ class TestRequestContextHandling:
     def test_app_context_in_functions(self, strategic_app):
         """Test that functions work properly in app context."""
         with strategic_app.app_context():
-            from app.routes_bp import dprint
-
             # App context should be available
             from flask import current_app
+
+            from app.routes_bp import dprint
             assert current_app == strategic_app
 
             # Functions should work in this context

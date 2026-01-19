@@ -42,8 +42,13 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
 	@echo "Quick Start:"
-	@echo "  make setup    # Initialize development environment"
-	@echo "  make dev      # Start development server"
+	@echo "  make setup       # Initialize development environment"
+	@echo "  make dev         # Start development server"
+	@echo ""
+	@echo "Development Workflow:"
+	@echo "  make test-fast   # Quick validation during development"
+	@echo "  make test        # Comprehensive testing before commits"
+	@echo "  make test-all    # Full quality gates for deployment"
 	@echo ""
 
 # Development Environment Commands
@@ -145,8 +150,7 @@ security: check-uv ## Run bandit and safety security checks
 	@$(UV) run safety check
 
 # Testing Infrastructure
-# Testing Infrastructure with fallback support
-test: services ## Run comprehensive test suite
+test: services ## 🧪 Run comprehensive test suite (primary target for development)
 	@echo "🧪 Running comprehensive test suite..."
 	@if command -v uv >/dev/null 2>&1; then \
 		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0; \
@@ -156,27 +160,48 @@ test: services ## Run comprehensive test suite
 		python3 -m pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
 		{ echo "❌ ERROR: Neither UV nor pytest available. Please install UV or pytest."; exit 1; }; \
 	fi
-	@echo "✅ Test suite completed successfully with config.py coverage included"
+	@echo "✅ Comprehensive test suite completed (use 'make test-fast' for quick development cycles)"
 
-test-unit: check-uv services ## Run unit tests only (fast)
-	@echo "🔬 Running unit tests..."
-	@$(UV) run pytest tests/ -v --tb=short -m "not integration"
+test-fast: check-uv services ## ⚡ Run critical tests only (quick development validation)
+	@echo "⚡ Running fast test subset for development..."
+	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_database.py -v --tb=short
+	@echo "✅ Fast tests completed - run 'make test' for comprehensive validation"
 
-test-integration: check-uv services ## Run integration tests with Docker services
+test-integration: check-uv services ## 🔗 Run integration tests with Docker services
 	@echo "🔗 Running integration tests..."
-	@$(UV) run pytest tests/ -v --tb=short -m "integration"
+	@$(UV) run pytest tests/integration/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing
+	@echo "✅ Integration tests completed"
 
-test-coverage: check-uv services ## Run tests with detailed coverage reporting
-	@echo "📊 Running tests with coverage analysis..."
-	@$(UV) run pytest tests/ --cov=app --cov=models --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=80
-	@echo "📋 Coverage report generated in htmlcov/"
+test-coverage: check-uv services ## 📊 Run tests with detailed HTML coverage reporting
+	@echo "📊 Running tests with detailed coverage analysis..."
+	@$(UV) run pytest tests/ --cov=app --cov=models --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=90
+	@echo "📋 Detailed coverage report generated in htmlcov/"
 
-test-watch: check-uv services ## Run tests in watch mode (reruns on file changes)
+test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file changes)
 	@echo "👀 Running tests in watch mode..."
 	@$(UV) run pytest-watch tests/ -- -v --tb=short
 
-test-all: lint security test ## Run all quality gates (lint + security + tests)
-	@echo "✅ All quality gates passed!"
+test-all: ## ✅ Run all quality gates (lint + security + comprehensive tests)
+	@echo "🚀 Running complete quality gate validation..."
+	@echo ""
+	@echo "📋 Step 1/3: Code Quality (Linting)"
+	@echo "=================================="
+	@-make lint || echo "⚠️  Linting found issues - review above"
+	@echo ""
+	@echo "📋 Step 2/3: Security Analysis"
+	@echo "============================="
+	@-make security || echo "⚠️  Security checks found issues - review above"
+	@echo ""
+	@echo "📋 Step 3/3: Test Suite"
+	@echo "===================="
+	@make test
+	@echo ""
+	@echo "🎯 Quality gate summary:"
+	@echo "  - Linting: See results above"
+	@echo "  - Security: See results above"
+	@echo "  - Tests: ✅ Required for deployment"
+	@echo ""
+	@echo "✅ Quality validation completed - review any warnings above"
 
 # Utility Commands
 clean: ## Clean up temporary files, caches

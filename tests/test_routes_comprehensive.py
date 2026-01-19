@@ -1,12 +1,12 @@
 """Comprehensive route testing for HT Status application to achieve 70% coverage."""
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 import os
-from flask import session
+
+import pytest
+
 from app.factory import create_app, db
 from config import TestConfig
-from models import User, Players, Match, Group, PlayerSetting
+from models import Group, Players, User
 
 
 @pytest.fixture(scope='function')

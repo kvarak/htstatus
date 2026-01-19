@@ -4,8 +4,9 @@ This file targets the properly structured blueprint routes in app/routes_bp.py
 to work around structural issues in the legacy app/routes.py file.
 """
 import os
+
 import pytest
-from flask import session
+
 from app.factory import create_app, db
 from models import User
 
