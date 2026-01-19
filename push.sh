@@ -19,7 +19,7 @@ cd '"$DEPLOY_REPO_PATH"'
 git fetch --all
 git reset --hard '"$DEPLOY_GIT_BRANCH"'
 git pull
-./changelog.sh
+./scripts/changelog.sh || ./changelog.sh
 touch app/routes.py
 ''' >> command.sh
 if [ "$1" = "major" ]
@@ -30,10 +30,10 @@ then
   ''' >> command.sh
 fi
 echo '''
-source '"$DEPLOY_PYTHON_ENV"'
-pip3 install -r requirements.txt
-python3 manage.py db migrate
-python3 manage.py db upgrade
+pip3 install uv
+python3 -m uv sync
+python3 -m uv run python3 scripts/manage.py db migrate
+python3 -m uv run python3 scripts/manage.py db upgrade
 ''' >> command.sh
 
 chmod a+x command.sh
