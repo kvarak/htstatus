@@ -7,8 +7,7 @@ import traceback
 from datetime import date, datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from flask import render_template, request, session, redirect, url_for, flash
-from flask_bootstrap import Bootstrap
+from flask import render_template, request, session
 from pychpp import CHPP
 from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash

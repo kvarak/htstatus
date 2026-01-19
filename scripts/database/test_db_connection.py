@@ -34,6 +34,7 @@ Created: January 13, 2026 (INFRA-011 authentication fix)
 """
 
 import psycopg2
+
 from config import Config
 
 config = Config()

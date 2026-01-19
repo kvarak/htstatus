@@ -26,9 +26,9 @@ Author: HTStatus Development Team
 Created: January 13, 2026 (INFRA-011 authentication fix)
 """
 
-import os
-from app.factory import create_app, db
 from flask_migrate import upgrade
+
+from app.factory import create_app
 
 if __name__ == "__main__":
     # Create app with routes disabled to avoid startup issues

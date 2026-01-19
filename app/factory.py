@@ -69,7 +69,6 @@ def setup_routes(app_instance, db_instance):
 
     # Import legacy routes module WITHOUT executing @app.route decorators
     # We'll manually register the route functions instead
-    import sys
 
     # Temporarily replace app.routes.app to prevent decorator failures during import
     import app.routes as routes_module

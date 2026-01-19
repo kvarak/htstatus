@@ -147,7 +147,7 @@ def index():
 def logout():
     """Logout page - Clear session and redirect to login."""
     print("BLUEPRINT LOGOUT FUNCTION CALLED - DEBUGGING")  # Force console output
-    from flask import session, redirect
+    from flask import redirect, session
 
     # Clear session first
     user_before = session.get('current_user', 'No user')

@@ -10,11 +10,13 @@ Usage: python scripts/test_chpp_api.py
 
 import os
 import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from pychpp import CHPP
-from config import Config
 import traceback
+
+from config import Config
+
 
 def test_chpp_connection():
     """Test basic CHPP API connectivity and authentication."""
