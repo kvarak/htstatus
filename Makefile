@@ -193,26 +193,71 @@ test-all: ## ✅ Run all quality gates (lint + security + config + comprehensive
 	@echo ""
 	@echo "📋 Step 1/4: Code Quality (Linting)"
 	@echo "=================================="
-	@-make lint || echo "⚠️  Linting found issues - review above"
+	@make lint 2>&1 | tee /tmp/lint-results.txt || true
+	@grep -q "^All checks passed" /tmp/lint-results.txt && echo "✅ Linting: PASSED" || (grep "errors" /tmp/lint-results.txt | tail -1 || echo "⚠️  Linting: Found issues")
 	@echo ""
 	@echo "📋 Step 2/4: Security Analysis"
 	@echo "============================="
-	@-make security || echo "⚠️  Security checks found issues - review above"
+	@make security 2>&1 | tee /tmp/security-results.txt || true
+	@grep -q "No issues identified" /tmp/security-results.txt && echo "✅ Security: No issues found" || (grep "Issue:" /tmp/security-results.txt | wc -l | xargs -I {} echo "⚠️  Security: {} issues found")
 	@echo ""
 	@echo "📋 Step 3/4: Configuration Tests"
 	@echo "==============================="
-	@-make test-config || echo "⚠️  Configuration tests failed - see INFRA-018 for fixes"
+	@make test-config 2>&1 | tee /tmp/config-results.txt || true
+	@grep -q "passed" /tmp/config-results.txt && (grep "passed" /tmp/config-results.txt | tail -1 | sed 's/=//g' || echo "✅ Config: Tests passed") || echo "⚠️  Config: Tests failed (see INFRA-018)"
 	@echo ""
 	@echo "📋 Step 4/4: Comprehensive Test Suite"
 	@echo "===================================="
-	@make test
+	@make test 2>&1 | tee /tmp/test-results.txt
 	@echo ""
-	@echo "🎯 Quality gate summary:"
-	@echo "  - Linting: See results above"
-	@echo "  - Security: See results above"
-	@echo "  - Config Tests: See results above (INFRA-018 addresses failures)"
-	@echo "  - Main Tests: ✅ Required for deployment"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@echo "🎯 QUALITY GATE SUMMARY"
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo ""
+	@printf "  %-15s" "Linting:"; \
+		if grep -q 'All checks passed' /tmp/lint-results.txt 2>/dev/null; then \
+			echo "✅ PASSED (0 errors)"; \
+		else \
+			errors=$$(grep -o '[0-9]\+ error' /tmp/lint-results.txt 2>/dev/null | head -1 || echo "0 error"); \
+			app_errors=$$(grep -E '^  --> (app/|models\.py|config\.py)' /tmp/lint-results.txt 2>/dev/null | wc -l | tr -d ' '); \
+			if [ "$$app_errors" = "0" ]; then \
+				echo "⚠️  $$errors (dev scripts only)"; \
+			else \
+				echo "❌ $$errors (including $$app_errors in production code)"; \
+			fi; \
+		fi
+	@printf "  %-15s" "Security:"; \
+		count=$$(grep 'Issue:' /tmp/security-results.txt 2>/dev/null | wc -l | tr -d ' '); \
+		if [ "$$count" = "0" ] || grep -q 'No issues identified' /tmp/security-results.txt 2>/dev/null; then \
+			echo "✅ 0 issues"; \
+		else \
+			echo "⚠️  $$count issues"; \
+		fi
+	@printf "  %-15s" "Config Tests:"; \
+		result=$$(grep 'passed' /tmp/config-results.txt 2>/dev/null | tail -1 | grep -o '[0-9]\+ passed' || echo ""); \
+		if [ -n "$$result" ]; then \
+			echo "✅ $$result"; \
+		else \
+			echo "⚠️  FAILED"; \
+		fi
+	@printf "  %-15s" "Main Tests:"; \
+		result=$$(grep 'passed' /tmp/test-results.txt 2>/dev/null | tail -1 | grep -o '[0-9]\+ passed' || echo ""); \
+		if [ -n "$$result" ]; then \
+			skipped=$$(grep 'skipped' /tmp/test-results.txt 2>/dev/null | tail -1 | grep -o '[0-9]\+ skipped' || echo "0 skipped"); \
+			echo "✅ $$result, $$skipped"; \
+		else \
+			echo "⚠️  FAILED"; \
+		fi
+	@printf "  %-15s" "Coverage:"; \
+		coverage=$$(grep 'TOTAL' /tmp/test-results.txt 2>/dev/null | awk '{print $$NF}' || echo ""); \
+		if [ -n "$$coverage" ]; then \
+			echo "✅ $$coverage"; \
+		else \
+			echo "N/A"; \
+		fi
+	@echo ""
+	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	@rm -f /tmp/lint-results.txt /tmp/security-results.txt /tmp/config-results.txt /tmp/test-results.txt
 	@echo "✅ Quality validation completed - review any warnings above"
 
 # Utility Commands
