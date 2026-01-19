@@ -162,28 +162,3 @@ def logout():
     # Force explicit redirect
     print("Blueprint: Attempting redirect to /login")
     return redirect('/login')
-
-@main_bp.route('/team')
-def team():
-    """Team page."""
-    return create_page('team.html', 'Team')
-
-@main_bp.route('/matches')
-def matches():
-    """Matches page."""
-    return create_page('matches.html', 'Matches')
-
-@main_bp.route('/training')
-def training():
-    """Training page."""
-    return create_page('training.html', 'Training')
-
-@main_bp.route('/settings')
-def settings():
-    """Settings page."""
-    return create_page('settings.html', 'Settings')
-
-@main_bp.route('/debug')
-def debug():
-    """Debug page."""
-    return create_page('debug.html', 'Debug')
