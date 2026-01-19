@@ -101,6 +101,13 @@ Run `make help` to see all available commands:
 
 For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
 
+## Documentation
+
+- **[README.md](README.md)** - This file: Project overview and local development setup
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide and operations procedures
+- **[TECHNICAL.md](TECHNICAL.md)** - Technical architecture and implementation details
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+
 ### Legacy Commands (Deprecated but Functional)
 
 The following scripts are still available but deprecated in favor of Make commands:
