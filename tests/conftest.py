@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures for HT Status tests."""
 
+import contextlib
 import gc
 import os
 
@@ -9,37 +10,31 @@ from app.factory import create_app, db
 from config import TestConfig
 
 
-def pytest_sessionstart(session):
+def pytest_sessionstart(session):  # noqa: ARG001
     """Called after the Session object has been created."""
     # Ensure clean start for resource tracking
     # Close any existing SQLite connections that might be lingering
-    try:
+    with contextlib.suppress(Exception):
         # Force cleanup of any existing connections
         import gc
         gc.collect()
-    except Exception:
-        pass
 
 
-def pytest_sessionfinish(session, exitstatus):
+def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001
     """Called after whole test run finished, right before returning the exit status to the system."""
     # Force complete cleanup to eliminate any remaining connections
     import gc
     import sqlite3
 
     # Ensure all SQLite connections are closed
-    try:
+    with contextlib.suppress(Exception):
         # Force garbage collection to trigger connection cleanup
         gc.collect()
         # Clear any remaining SQLite objects
         for obj in gc.get_objects():
             if isinstance(obj, sqlite3.Connection):
-                try:
+                with contextlib.suppress(Exception):
                     obj.close()
-                except Exception:
-                    pass
-    except Exception:
-        pass
 
     # Final garbage collection
     gc.collect()
@@ -60,23 +55,17 @@ def app():
         yield app
 
         # Complete cleanup to eliminate ResourceWarnings
-        try:
+        with contextlib.suppress(Exception):
             # Remove any lingering sessions
             db.session.remove()
-        except Exception:
-            pass
 
-        try:
+        with contextlib.suppress(Exception):
             # Drop all tables
             db.drop_all()
-        except Exception:
-            pass
 
-        try:
+        with contextlib.suppress(Exception):
             # Dispose of the engine and close all connections
             db.engine.dispose()
-        except Exception:
-            pass
 
         # Force garbage collection to clean up any remaining references
         gc.collect()
@@ -88,12 +77,9 @@ def cleanup_connections(app):
     yield  # Run the test
 
     # Clean up any connections that might be left open
-    with app.app_context():
-        try:
-            # Close any active sessions
-            db.session.close()
-        except Exception:
-            pass
+    with app.app_context(), contextlib.suppress(Exception):
+        # Close any active sessions
+        db.session.close()
 
 
 @pytest.fixture(scope='function')
@@ -119,22 +105,16 @@ def db_session(app):
             yield session
         finally:
             # Complete resource cleanup to eliminate ResourceWarnings
-            try:
+            with contextlib.suppress(Exception):
                 session.close()
-            except Exception:
-                pass
-            try:
+            with contextlib.suppress(Exception):
                 transaction.rollback()
-            except Exception:
-                pass
-            try:
+            with contextlib.suppress(Exception):
                 connection.close()
-            except Exception:
-                pass
 
 
 @pytest.fixture(scope='function')
-def authenticated_session(client, db_session):
+def authenticated_session(client, _db_session):
     """Create an authenticated session for testing routes that require login."""
     # Mock authentication data
     with client.session_transaction() as session:

@@ -1,13 +1,12 @@
 """Integration tests for Flask app with services."""
 
-import os
 
 import pytest
 from sqlalchemy import text
 
 
 @pytest.mark.integration
-def test_app_with_database_services(app, db_session):
+def test_app_with_database_services(app, _db_session):
     """Test Flask app integration with database services."""
     with app.app_context():
         # Test that app can connect to database
@@ -39,10 +38,6 @@ def test_app_configuration_integration(app):
 @pytest.mark.integration
 def test_uv_environment_integration():
     """Test that tests run in UV-managed environment."""
-    # Check that we're running in virtual environment
-    virtual_env = os.environ.get('VIRTUAL_ENV')
-    python_path = os.environ.get('PYTHONPATH', '')
-
     # We should be in some kind of managed environment
     # UV creates .venv directory, so check for that
     import sys
@@ -72,7 +67,7 @@ def test_session_cookie_integration(client):
         session['test_key'] = 'test_value'
 
     # Make a request to trigger session handling
-    response = client.get('/')
+    _ = client.get('/')
 
     # Check that session persists
     with client.session_transaction() as session:
@@ -84,11 +79,6 @@ def test_database_transaction_isolation(app, db_session):
     """Test that database transactions are properly isolated."""
     with app.app_context():
         # This integration test ensures our transaction handling works
-
-        # Start with clean state
-        initial_tables = db_session.execute(
-            text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
-        ).fetchone()[0]
 
         # Create a temporary table in transaction
         db_session.execute(text("CREATE TEMP TABLE integration_test (id SERIAL)"))

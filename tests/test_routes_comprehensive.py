@@ -1,5 +1,6 @@
 """Comprehensive route testing for HT Status application to achieve 70% coverage."""
 
+import contextlib
 import os
 
 import pytest
@@ -19,11 +20,9 @@ def app_with_routes():
         db.create_all()
         yield app
         # Clean up any pending transactions
-        try:
+        with contextlib.suppress(Exception):
             db.session.rollback()
             db.session.close()
-        except:
-            pass
         db.drop_all()
 
 
@@ -34,7 +33,7 @@ def routes_client(app_with_routes):
 
 
 @pytest.fixture(scope='function')
-def sample_user(app_with_routes):
+def sample_user(app_with_routes):  # noqa: ARG001
     """Create a sample user for testing."""
     # First, clean up any existing user with this ID
     existing_user = db.session.query(User).filter_by(ht_id=12345).first()

@@ -40,4 +40,4 @@ def test_database_connection():
         except Exception as e:
             # If connection fails, it's likely a configuration issue
             # but the test framework is working
-            assert False, f"Database connection failed: {e}"
+            raise AssertionError(f"Database connection failed: {e}") from None

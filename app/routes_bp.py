@@ -22,7 +22,7 @@ version = None
 timenow = None
 debug_level = None
 
-def initialize_routes(app, db_instance):
+def initialize_routes(app, _db_instance):
     """Initialize routes module with app and db instances."""
     print("DEBUG: initialize_routes - Start")
     global bootstrap, consumer_key, consumer_secret, versionstr, fullversion, version, timenow, debug_level

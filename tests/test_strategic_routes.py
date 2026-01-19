@@ -3,6 +3,7 @@ Strategic route testing to maximize coverage for TEST-003.
 This file targets improving routes_bp.py coverage from 51% to 80%+ while
 avoiding the database schema issues in the main application.
 """
+import contextlib
 import gc
 import os
 import sqlite3
@@ -32,12 +33,12 @@ def strategic_app():
     os.environ['FLASK_ENV'] = 'testing'
     app = None
     # Patch the problematic MatchPlay model creation
-    with patch('models.MatchPlay'):
+    with patch('models.MatchPlay'), \
+         patch('app.factory.db.create_all'):
         app = create_app(StrategicTestConfig, include_routes=True)
         with app.app_context():
             # Mock db.create_all to avoid schema issues
-            with patch('app.factory.db.create_all'):
-                yield app
+            yield app
 
     # Cleanup outside app context to ensure proper disposal
     if app:
@@ -67,33 +68,24 @@ def strategic_client(strategic_app):
 def cleanup_strategic_connections():
     """Automatically clean up strategic test connections."""
     # Clean up before test
-    try:
+    with contextlib.suppress(Exception):
         for obj in gc.get_objects():
             if isinstance(obj, sqlite3.Connection):
-                try:
+                with contextlib.suppress(Exception):
                     obj.close()
-                except Exception:
-                    pass
         gc.collect()
-    except Exception:
-        pass
 
     yield  # Run the test
 
     # Force cleanup after test
-    try:
+    with contextlib.suppress(Exception):
         # Find and close any SQLite connections
         for obj in gc.get_objects():
             if isinstance(obj, sqlite3.Connection):
-                try:
+                with contextlib.suppress(Exception):
                     obj.close()
-                except Exception:
-                    pass
         # Force garbage collection
         gc.collect()
-    except Exception:
-        pass
-        pass
 
 
 class TestBlueprintRoutesCoverage:
@@ -170,9 +162,9 @@ class TestBlueprintRoutesCoverage:
 
     def test_create_page_session_handling(self, strategic_app):
         """Test create_page session variable handling."""
-        with strategic_app.test_request_context():
-            with patch('app.routes_bp.render_template') as mock_render, \
-                 patch('app.routes_bp.session') as mock_session:
+        with strategic_app.test_request_context(), \
+             patch('app.routes_bp.render_template') as mock_render, \
+             patch('app.routes_bp.session') as mock_session:
 
                 mock_render.return_value = 'session_template'
 
@@ -355,8 +347,8 @@ class TestRequestContextHandling:
         with strategic_app.test_request_context('/test?param=value'):
             from app.routes_bp import create_page
 
-            with patch('app.routes_bp.render_template') as mock_render:
-                with patch('app.routes_bp.session', {'user': 'test'}):
+            with patch('app.routes_bp.render_template') as mock_render, \
+                 patch('app.routes_bp.session', {'user': 'test'}):
                     mock_render.return_value = 'context_template'
 
                     result = create_page('context.html', 'Context Test')

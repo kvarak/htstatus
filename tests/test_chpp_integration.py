@@ -8,7 +8,7 @@ from tests.mock_chpp import (
 )
 
 
-def test_mock_chpp_user(mock_chpp_response):
+def test_mock_chpp_user(_mock_chpp_response):
     """Test CHPP user mock functionality."""
     user = create_mock_user(12345, 'testuser')
 

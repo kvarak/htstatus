@@ -203,7 +203,7 @@ def test_chpp_integration_error_handling(app, mock_chpp_client):
         # This is more of a pattern test than actual route test
         try:
             mock_chpp_client.user()
-            assert False, "Should have raised exception"
+            raise AssertionError("Should have raised exception")
         except Exception as e:
             assert "API Error" in str(e)
 

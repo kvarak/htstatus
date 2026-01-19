@@ -153,8 +153,8 @@ class TestRouteHelperFunctions:
         mock_render.return_value = 'rendered_content'
 
         # Test with minimal session data within request context
-        with minimal_app.test_request_context():
-            with patch('app.routes_bp.session') as mock_session:
+        with minimal_app.test_request_context(), \
+             patch('app.routes_bp.session') as mock_session:
                 mock_session.__getitem__ = Mock(side_effect=lambda k: {'current_user': 'test'}[k])
                 mock_session.get = Mock(return_value=[])
 
@@ -195,7 +195,7 @@ class TestRouteErrorHandling:
         with patch('app.routes_bp.session', {'current_user': 'test'}):
             try:
                 create_page('nonexistent.html', 'Title')
-                assert False, "Should have raised exception"
+                raise AssertionError("Should have raised exception")
             except Exception as e:
                 assert "Template not found" in str(e)
 

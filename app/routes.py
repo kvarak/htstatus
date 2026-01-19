@@ -225,10 +225,7 @@ calccolumns = [
 
 
 def calculateManmark(player):
-    if player['experience'] > 0:
-        xp = math.log(player['experience']) * 4 / 3
-    else:
-        xp = 0
+    xp = math.log(player['experience']) * 4 / 3 if player['experience'] > 0 else 0
     loy = player['loyalty'] / 20
     formfactor = round(math.pow(((player['form'] - 0.5) / 7), 0.45), 2)
     defending = player['defender'] + xp + loy
@@ -252,10 +249,7 @@ def calculateContribution(position, player):
     contr = 0
 
     # XP adds to skills
-    if player['experience'] == 0:
-        xp = 0
-    else:
-        xp = math.log(player['experience']) * 4 / 3
+    xp = 0 if player['experience'] == 0 else math.log(player['experience']) * 4 / 3
 
     # Loyalty adds to skills (good enough approximation)
     loy = player['loyalty'] / 20
@@ -539,12 +533,11 @@ def debug_print(route, function, *args):
         towrite = route + " [" + function + "]: " + arg
         dprint(2, towrite)
     if debug_level >= 3:
-        file = open(logfile, "a")
-        now = time.strftime('%Y-%m-%d %H:%M:%S')
-        for arg in args:
-            towrite = now + " " + route + " [" + function + "]: " + arg + "\n"
-            file.write(towrite)
-        file.close()
+        with open(logfile, "a") as file:
+            now = time.strftime('%Y-%m-%d %H:%M:%S')
+            for arg in args:
+                towrite = now + " " + route + " [" + function + "]: " + arg + "\n"
+                file.write(towrite)
 
 # --------------------------------------------------------------------------------
 
@@ -601,10 +594,10 @@ def create_page(template, title, **kwargs):
         all_team_names = False
         role = False
 
-    f = open('app/static/changelog.txt')
-    changelog = f.readlines()
-    f = open('app/static/changelog-full.txt')
-    changelogfull = f.readlines()
+    with open('app/static/changelog.txt') as f:
+        changelog = f.readlines()
+    with open('app/static/changelog-full.txt') as f:
+        changelogfull = f.readlines()
 
     count_clicks(template)
 
@@ -689,15 +682,14 @@ def player_diff(playerid, daysago):
     for key, elem in latest:
         thediff[key] = elem
     for key, elem in oldest:
-        if key not in ignore_list:
-            if elem != thediff[key]:
-                retstr = [teamname]
-                retstr.append(oldest.first_name)
-                retstr.append(oldest.last_name)
-                retstr.append(key)
-                retstr.append(elem)
-                retstr.append(thediff[key])
-                ret.append(retstr)
+        if key not in ignore_list and elem != thediff[key]:
+            retstr = [teamname]
+            retstr.append(oldest.first_name)
+            retstr.append(oldest.last_name)
+            retstr.append(key)
+            retstr.append(elem)
+            retstr.append(thediff[key])
+            ret.append(retstr)
 
     return ret
 
@@ -763,15 +755,14 @@ def player_diff_v2(playerid, daysago):
     for key, elem in latest:
         thediff[key] = elem
     for key, elem in oldest:
-        if key not in ignore_list:
-            if elem != thediff[key]:
-                retstr = [teamname]
-                retstr.append(oldest.first_name)
-                retstr.append(oldest.last_name)
-                retstr.append(key)
-                retstr.append(elem)
-                retstr.append(thediff[key])
-                ret.append(retstr)
+        if key not in ignore_list and elem != thediff[key]:
+            retstr = [teamname]
+            retstr.append(oldest.first_name)
+            retstr.append(oldest.last_name)
+            retstr.append(key)
+            retstr.append(elem)
+            retstr.append(thediff[key])
+            ret.append(retstr)
 
     return ret
 
@@ -1583,10 +1574,7 @@ def admin():
             user = (db.session.query(User)
                     .filter_by(ht_id=userid)
                     .first())
-            if adminchecked:
-                updateto = "Admin"
-            else:
-                updateto = "User"
+            updateto = "Admin" if adminchecked else "User"
 
             dprint(2, updateto)
 
@@ -1678,10 +1666,7 @@ def player():
 
     teamid = request.values.get('id')
 
-    if teamid:
-        teamid = int(teamid)
-    else:
-        teamid = request.form.get('id')
+    teamid = int(teamid) if teamid else request.form.get('id')
 
     dprint(1, teamid)
 
@@ -1881,14 +1866,8 @@ def matches():
     teamid = request.values.get('id')
     matchid = request.values.get('m')
 
-    if teamid:
-        teamid = int(teamid)
-    else:
-        teamid = request.form.get('id')
-    if matchid:
-        matchid = int(matchid)
-    else:
-        matchid = request.form.get('m')
+    teamid = int(teamid) if teamid else request.form.get('id')
+    matchid = int(matchid) if matchid else request.form.get('m')
     all_teams = session['all_teams']
 
     error = ""
@@ -1936,10 +1915,7 @@ def stats():
 
     teamid = request.values.get('id')
 
-    if teamid:
-        teamid = int(teamid)
-    else:
-        teamid = request.form.get('id')
+    teamid = int(teamid) if teamid else request.form.get('id')
     all_teams = session['all_teams']
 
     error = ""
@@ -1971,10 +1947,7 @@ def training():
 
     teamid = request.values.get('id')
 
-    if teamid:
-        teamid = int(teamid)
-    else:
-        teamid = request.form.get('id')
+    teamid = int(teamid) if teamid else request.form.get('id')
     all_teams = session['all_teams']
 
     error = ""
@@ -2079,4 +2052,4 @@ def training():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
-        weeks=weeks)
+        title='Training')

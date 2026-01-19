@@ -3,10 +3,10 @@
 import os
 import platform
 
-print("Python version " + platform.python_version())
-
 # Use the factory pattern instead of direct Flask instantiation
 from app.factory import create_app
+
+print("Python version " + platform.python_version())
 
 # Set development environment
 os.environ.setdefault('FLASK_ENV', 'development')
