@@ -2,9 +2,9 @@
 
 ## Quick Navigation
 🔗 **Related**: [Progress](progress.md) • [Backlog](backlog.md) • [Plan](plan.md) • [Architecture](architecture.md)
-🎯 **Strategic Status**: P1-P3 Complete ✅ • 209/218 Tests Passing • 39 Tasks Complete • 100/100 Health
-✅ **Latest**: FEAT-002 Mobile-First PWA - Mobile accessibility and offline functionality (January 19, 2026)
-🔍 **Current Focus**: P4 Stability & Maintainability - Blueprint migration and type validation ready
+🎯 **Strategic Status**: P1-P3 Complete ✅ • 209/218 Tests Passing • 41 Tasks Complete • 100/100 Health
+✅ **Latest**: UI-003 Complete Training Page Restructure - Modern responsive training management interface (January 19, 2026)
+🔍 **Current Focus**: P4 Stability & Maintainability - Blueprint migration and type validation ready for execution
 
 *Preserving all 2.0 goals and vision, adapted to the new format.*
 
