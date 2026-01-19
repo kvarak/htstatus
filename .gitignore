@@ -10,7 +10,7 @@ config.py-e
 creds.json
 htplanner.log
 nohup.out
-push.sh
+# serverrun.sh - exists only on server, run there
 serverrun.sh
 
 # Virtual environments
