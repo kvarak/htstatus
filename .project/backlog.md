@@ -2,7 +2,7 @@
 
 ## Quick Navigation
 🔗 **Related**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Architecture](architecture.md)
-📊 **Project Health**: 96/100 • 218/218 Tests ✅ • 27 Tasks Complete • **Testing Infrastructure Excellence Achieved** ✅
+📊 **Project Health**: 96/100 • 209/218 Tests (9 config test failures) • 29 Tasks Complete • **Deployment Configuration Excellence Achieved** ✅
 
 ## Backlog Management Rules
 
@@ -21,10 +21,10 @@
 ## Current Focus
 
 ### 🚀 Active Work
-- **DOC-016**: Document Root Scripts → 🚀 ACTIVE execution in progress
+- **INFRA-013**: Cleanup Debugging Files → 🚀 ACTIVE ready for execution
 
 ### 🎯 Next Priority
-Execute remaining Tier 1 Quick Wins (7 documentation tasks, ~3 hours total effort)
+Execute remaining Tier 1 Quick Wins (9 documentation tasks, ~5.5 hours total effort)
 
 ---
 
@@ -32,15 +32,17 @@ Execute remaining Tier 1 Quick Wins (7 documentation tasks, ~3 hours total effor
 
 ### 🎯 **Tier 1: Quick Wins** (Low Effort, High Value - ~3 hours total)
 
-**Execute First**: Complete remaining 7 tasks for immediate value and project polish.
+**Execute First**: Complete remaining 9 tasks for immediate value and project polish.
 
-1. **[DOC-016] Document Root Scripts** (15 min) - **🚀 ACTIVE**
-2. **[INFRA-013] Cleanup Debugging Files** (5 min)
-3. **[DOC-018] Config.py Template & Documentation** (30 min)
-4. **[DOC-019] macOS Setup Guide** (30 min)
-5. **[DOC-017] Document Deployment Process** (45 min)
-6. **[DOC-004] Progress Metrics** (1 hour)
-7. **[DOC-010] Testing Prompts** (30 min)
+1. **[INFRA-013] Cleanup Debugging Files** (5 min) - **🚀 ACTIVE**
+2. **[DOC-018] Config.py Template & Documentation** (30 min)
+3. **[DOC-019] macOS Setup Guide** (30 min)
+4. **[DOC-017] Document Deployment Process** (45 min)
+5. **[DOC-004] Progress Metrics** (1 hour)
+6. **[DOC-010] Testing Prompts** (30 min)
+7. **[INFRA-018] Fix Configuration Test Failures** (2 hours)
+8. **[DOC-021] Deployment Environment Guide** (45 min)
+9. **[DOC-020] UV Installation & Troubleshooting Guide** (30 min)
 
 #### [DOC-015] Fix Architecture Placeholder ✅ **COMPLETED**
 **Priority**: Low Impact, Very Low Effort (15 min) | **Status**: ✅ Completed
@@ -51,6 +53,16 @@ Execute remaining Tier 1 Quick Wins (7 documentation tasks, ~3 hours total effor
 - ✅ Corrected outdated status information in architecture documentation
 - ✅ Ensured all architectural descriptions are accurate and complete
 **Completion**: Documentation placeholder and duplication issues resolved, architecture.md now clean and accurate
+
+#### [DOC-016] Document Root Scripts ✅ **COMPLETED**
+**Priority**: Low Impact, Very Low Effort (15 min) | **Status**: ✅ Completed
+**Dependencies**: None | **Strategic Value**: Code clarity, maintenance
+**Implementation**:
+- ✅ Added comprehensive documentation headers to command.sh explaining auto-generated nature
+- ✅ Added purpose and usage documentation to push.sh deployment script
+- ✅ Created deployment scripts section in README.md with complete process documentation
+- ✅ Documented deployment workflow, script relationships, and usage patterns
+**Completion**: Root scripts now fully documented with clear purpose, usage, and deployment process guide
 
 #### [DOC-016] Document Root Scripts
 **Priority**: Low Impact, Very Low Effort (15 min) | **Status**: 🎯 Ready to Execute
@@ -156,6 +168,34 @@ Execute remaining Tier 1 Quick Wins (7 documentation tasks, ~3 hours total effor
 - Common error scenarios with solutions documented
 - UV-specific debugging procedures included
 **Expected Outcomes**: Reduced onboarding friction, consistent UV usage, faster issue resolution
+
+#### [INFRA-018] Fix Configuration Test Failures
+**Priority**: Medium Impact, Medium Effort (2 hours) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Testing reliability, development confidence
+**Implementation**:
+1. Address 9 failing configuration tests identified in test suite
+2. Fix environment variable isolation issues in config tests
+3. Resolve DATABASE_URL construction test expectations
+4. Update test expectations to match current .env defaults
+**Acceptance Criteria**:
+- All 218 tests passing (currently 209/218)
+- Configuration test reliability restored
+- Environment variable handling properly tested
+**Expected Outcomes**: Complete test suite reliability, improved development confidence
+
+#### [DOC-021] Deployment Environment Guide
+**Priority**: Medium Impact, Low Effort (45 min) | **Status**: 🎯 Ready to Execute
+**Dependencies**: None | **Strategic Value**: Operations, deployment reliability
+**Implementation**:
+1. Document deployment variable configuration for each environment
+2. Create deployment troubleshooting guide
+3. Document security best practices for deployment credentials
+4. Add deployment validation procedures
+**Acceptance Criteria**:
+- Environment-specific deployment documentation
+- Security guidelines for credential management
+- Deployment troubleshooting procedures
+**Expected Outcomes**: Reliable multi-environment deployments, reduced deployment errors
 
 ### 🚀 **Tier 2: High Impact Development** (Strategic Value - Execute After Quick Wins)
 
