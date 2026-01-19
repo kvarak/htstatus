@@ -6,7 +6,11 @@ Test PostgreSQL database connectivity with detailed diagnostics.
 Created during INFRA-011 troubleshooting for authentication system restoration.
 
 Usage:
-    python scripts/database/test_db_connection.py
+    uv run python scripts/database/test_db_connection.py
+
+Environment:
+    This script requires the UV-managed Python environment.
+    Always use 'uv run' to ensure correct dependency resolution.
 
 Features:
     - Tests direct psycopg2 connection bypassing SQLAlchemy

@@ -1,5 +1,17 @@
-#!/usr/bin/env python
-"""Apply database migrations programmatically."""
+#!/usr/bin/env python3
+"""
+Apply database migrations programmatically.
+
+Usage:
+    uv run python scripts/apply_migrations.py
+
+Environment:
+    This script requires the UV-managed Python environment.
+    Always use 'uv run' to ensure correct dependency resolution.
+
+Note:
+    Prefer 'make db-upgrade' for standard migration operations.
+"""
 
 from dotenv import load_dotenv
 

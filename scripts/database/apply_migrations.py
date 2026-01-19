@@ -6,7 +6,11 @@ Apply database migrations safely with proper Flask application context.
 Created during INFRA-011 troubleshooting for authentication system restoration.
 
 Usage:
-    python scripts/database/apply_migrations.py
+    uv run python scripts/database/apply_migrations.py
+
+Environment:
+    This script requires the UV-managed Python environment.
+    Always use 'uv run' to ensure correct dependency resolution.
 
 Features:
     - Creates Flask app with routes disabled to avoid startup issues

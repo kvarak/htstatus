@@ -1,6 +1,13 @@
 """
 Database migration management using Flask-Migrate.
-Usage: flask db <command>
+
+Usage:
+    uv run python scripts/manage.py  # Direct execution (recommended)
+    flask db <command>               # Alternative via Flask CLI
+
+Environment:
+    This script requires the UV-managed Python environment.
+    Always use 'uv run' to ensure correct dependency resolution.
 """
 from dotenv import load_dotenv
 

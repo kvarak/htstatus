@@ -40,6 +40,27 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 
 HTStatus includes debugging utilities in the `scripts/` directory, created during troubleshooting and preserved for future development use.
 
+### Script Execution Policy
+
+**Environment Consistency**: All Python scripts in this project should be executed using UV:
+
+```bash
+# Correct - uses UV-managed environment
+uv run python scripts/[script_name].py
+
+# Incorrect - uses system Python (may have different dependencies)
+python scripts/[script_name].py
+python3 scripts/[script_name].py
+```
+
+**Why UV is Required**:
+- Ensures consistent dependency versions across environments
+- Prevents "works on my machine" issues
+- Matches production environment configuration
+- Automatically resolves project dependencies
+
+**Makefile Integration**: All Makefile targets automatically use UV (via `$(PYTHON)` variable), so commands like `make db-upgrade` are already UV-aware.
+
 ### Database Utilities (`scripts/database/`)
 
 **`apply_migrations.py`**: Safe database migration utility

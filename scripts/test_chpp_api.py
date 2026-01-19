@@ -5,7 +5,12 @@ CHPP API Connectivity Test Script
 Tests CHPP API connectivity independently of the main application
 to diagnose data fetching issues.
 
-Usage: python scripts/test_chpp_api.py
+Usage:
+    uv run python scripts/test_chpp_api.py
+
+Environment:
+    This script requires the UV-managed Python environment.
+    Always use 'uv run' to ensure correct dependency resolution.
 """
 
 import os

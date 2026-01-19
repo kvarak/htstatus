@@ -1,5 +1,14 @@
-#!/usr/bin/env python
-"""Create all database tables using SQLAlchemy."""
+#!/usr/bin/env python3
+"""
+Create all database tables using SQLAlchemy.
+
+Usage:
+    uv run python scripts/create_tables.py
+
+Environment:
+    This script requires the UV-managed Python environment.
+    Always use 'uv run' to ensure correct dependency resolution.
+"""
 
 from dotenv import load_dotenv
 

@@ -6,7 +6,7 @@ Simple database migration script for development and debugging.
 Created during INFRA-011 troubleshooting for authentication system restoration.
 
 Usage:
-    python scripts/migration/temp_migrate.py
+    uv run python scripts/migration/temp_migrate.py
 
 Features:
     - Quick and simple migration execution
