@@ -13,7 +13,7 @@
 2. Choose tasks marked 🎯 Ready to Execute with no blockers
 3. Update task status when starting (🚀 ACTIVE) and completing (✅ COMPLETED)
 4. Follow priority order: P1 Testing → P2 Deployment → P3 Functionality → P4 Stability → P5 DevOps → P6 Documentation
-5. Move completed tasks to backlog-done.md with completion notes and REMOVE them from here.
+5. Move completed tasks to history/backlog-done.md with completion notes and REMOVE them from here.
 
 **For Humans**:
 - Tasks organized by 6 priority levels based on project maturity and risk

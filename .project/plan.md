@@ -25,6 +25,7 @@
 
 ### File Structure Standards
 - **Development files**: All meta-structure in `.project/`
+- **Historical documentation**: Implementation guides, bug reviews, and retrospectives in `.project/history/`
 - **Separation of concerns**: Clear distinction between backend, frontend, and documentation
 
 ### Security & Maintenance Standards

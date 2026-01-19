@@ -35,6 +35,28 @@ HTStatus development follows a **structured, quality-gated methodology**:
 - **Review**: Validate previous work against requirements
 - **Update**: Update project status and planning documents
 
+## File Organization
+
+### .project Directory Structure
+
+**Active Documentation** (keep in `.project/`):
+- `README.md` - Development methodology guide
+- `architecture.md` - Current system architecture
+- `backlog.md` - Active task backlog
+- `goals.md` - Strategic goals and objectives
+- `plan.md` - Development plan and requirements
+- `progress.md` - Current progress tracking
+- `prompts.json` - AI workflow prompts
+
+**Historical Documentation** (move to `.project/history/`):
+- `backlog-done.md` - Completed tasks archive
+- Implementation guides (e.g., `PWA-IMPLEMENTATION.md`)
+- Bug investigation reports (e.g., `BUG-001-REVIEW.md`)
+- "How I implemented" retrospectives
+- Archived analysis documents
+
+**Rule**: Any documentation describing past implementation details, debugging processes, or historical context should be moved to `.project/history/` to keep the main directory focused on current development needs.
+
 ---
 
 *This methodology ensures maintainable, high-quality development for HTStatus.*
