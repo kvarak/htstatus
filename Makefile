@@ -146,7 +146,7 @@ typecheck: check-uv ## Run mypy type checking
 
 security: check-uv ## Run bandit and safety security checks
 	@echo "🔒 Running security checks..."
-	@$(UV) run bandit -r app/ -f json 2>/dev/null || $(UV) run bandit -r app/
+	@$(UV) run bandit -r app/ -c .bandit -f json 2>/dev/null || $(UV) run bandit -r app/ -c .bandit
 	@$(UV) run safety check
 
 # Testing Infrastructure

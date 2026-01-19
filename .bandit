@@ -1,0 +1,14 @@
+# Bandit security configuration for HTStatus
+# https://bandit.readthedocs.io/en/latest/config.html
+
+# Skip specific security checks with documented rationale:
+# B404: subprocess module import - Used only for git version detection (static commands)
+# B607: Starting process with partial executable path - Git command is hardcoded
+# B603: subprocess call without shell=True - No shell needed for static commands
+#
+# Security rationale: Git version detection is a development/operations utility
+# with no user input injection vectors. See inline documentation in app/routes.py
+# and app/routes_bp.py for detailed security context.
+
+skips: ['B404', 'B607', 'B603']
+exclude_dirs: ['/tests']

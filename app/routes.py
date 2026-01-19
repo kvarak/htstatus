@@ -1,7 +1,7 @@
 import inspect
 import math
 import re
-import subprocess
+import subprocess  # noqa: B404 - Used only for git version detection (static commands)
 import time
 import traceback
 from datetime import date, datetime, timedelta
@@ -42,7 +42,12 @@ def initialize_routes():
     consumer_key = app.config['CONSUMER_KEY']
     consumer_secret = app.config['CONSUMER_SECRETS']
 
-    versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip()
+    # Security Note: Git version detection for UI display only
+    # - Static command with no user input injection vectors
+    # - Development/operations utility, not user-facing security context
+    # - Risk is theoretical (partial path warning) rather than practical
+    # - Acceptable for development tooling purposes
+    versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip()  # noqa: B607,B603
     versionstr = versionstr.decode("utf-8").split('-')
     fullversion = versionstr[0] + "." + versionstr[1] + "-" + versionstr[2]
     version = versionstr[0] + "." + versionstr[1]

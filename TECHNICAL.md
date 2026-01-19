@@ -18,7 +18,11 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 - **Player/Match Data**: Synced from CHPP API, stored in Players, Match, MatchPlay tables
 - **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked
 - **CI/CD**: GitHub Actions for linting and basic CI
-- **Security**: .env for secrets, never committed; database migrations tested on copies of production structure
+- **Security**:
+  - .env for secrets, never committed; database migrations tested on copies of production structure
+  - Subprocess usage policy: Limited to development tooling only (git version detection)
+  - Static commands with no user input vectors; documented with security rationale
+  - Bandit configuration (.bandit) skips B404/B607/B603 for documented dev utilities
 
 ## File Structure
 - `/app/routes.py`: Main Flask app logic
