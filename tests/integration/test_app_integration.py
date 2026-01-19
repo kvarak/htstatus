@@ -6,7 +6,7 @@ from sqlalchemy import text
 
 
 @pytest.mark.integration
-def test_app_with_database_services(app, _db_session):
+def test_app_with_database_services(app, db_session):
     """Test Flask app integration with database services."""
     with app.app_context():
         # Test that app can connect to database

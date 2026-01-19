@@ -114,7 +114,7 @@ def db_session(app):
 
 
 @pytest.fixture(scope='function')
-def authenticated_session(client, _db_session):
+def authenticated_session(client, db_session):
     """Create an authenticated session for testing routes that require login."""
     # Mock authentication data
     with client.session_transaction() as session:

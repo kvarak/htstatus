@@ -1,9 +1,9 @@
 # HTStatus Development Backlog
 
-**Project Health**: 98/100 (218 tests total: 202 passing, 5 skipped, 11 fixture errors | 7 lint errors in scripts/ only | 0 security issues in app/)
+**Project Health**: 100/100 (218 tests total: 213 passing, 5 skipped, 0 fixture errors | 7 lint errors in scripts/ only | 0 security issues in app/)
 **Last Updated**: 2026-01-19
-**Active Task**: TEST-004 Fix Remaining Test Fixture Errors
-**Recent Completion**: SEC-002 Security Findings Addressed (0 security issues achieved)
+**Active Task**: INFRA-017 Script Environment Audit
+**Recent Completion**: TEST-004 Fix Test Fixture Errors (100% test success achieved)
 
 ## Management Rules
 
@@ -12,7 +12,7 @@
 2. Choose tasks marked 🎯 Ready to Execute with no blockers
 3. Update task status when starting (🚀 ACTIVE) and completing (✅ COMPLETED)
 4. Follow priority order: P1 Testing → P2 Deployment → P3 Functionality → P4 Stability → P5 DevOps → P6 Documentation
-5. Move completed tasks to backlog-done.md with completion notes
+5. Move completed tasks to backlog-done.md with completion notes and REMOVE them from here.
 
 **For Humans**:
 - Tasks organized by 6 priority levels based on project maturity and risk
@@ -27,7 +27,7 @@
 
 **Priority 1: Testing & App Reliability** (Guarantee it works)
 - ✅ [SEC-002] Address 6 Security Warnings - COMPLETED
-- 🎯 [TEST-004] Fix 11 Test Fixture Errors (2-3 hours) - Achieve 100% test success
+- ✅ [TEST-004] Fix 11 Test Fixture Errors (2-3 hours) - COMPLETED - 100% test success
 - 🎯 [INFRA-017] Script Environment Audit (1-2 hours) - UV consistency
 
 **Priority 2: Deployment & Operations** (Ship it safely)
@@ -79,36 +79,6 @@
 - ✅ No test regressions: 202 passed, 5 skipped, 11 errors (unchanged)
 
 **Completion Notes**: Used .bandit configuration (Option C) instead of inline noqa directives as it provides cleaner, centralized security policy documentation. All 6 warnings (B404, B607, B603) now properly documented and excluded with clear rationale.
-
----
-
-### [TEST-004] Fix Remaining Test Fixture Errors
-**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Impact**: Test reliability
-**Dependencies**: None | **Strategic Value**: Achieve 100% test success
-
-**Problem**: 11 test errors related to fixture initialization preventing 218/218 success:
-- Current: 202 passing, 5 skipped, 11 errors (92.7% success rate)
-- Target: 213 passing, 5 skipped, 0 errors (100% test reliability)
-
-**Investigation Plan**:
-1. Run failing tests individually with `-vv` for detailed error output
-2. Identify fixture dependency issues (app context, database, auth)
-3. Categorize errors: setup failures vs assertion failures vs teardown issues
-4. Fix root causes (likely: fixture scope, session management, or cleanup)
-
-**Common Fixture Issues**:
-- App context not properly created/cleaned up
-- Database transactions not rolled back
-- Session state bleeding between tests
-- Missing test dependencies or imports
-
-**Acceptance Criteria**:
-- All 218 tests account for (passing or intentionally skipped)
-- Zero test errors in `make test` output
-- `make test-all` completes successfully
-- No regression in existing passing tests
-
-**Expected Outcomes**: Complete test confidence, reliable CI/CD foundation, 100% test success rate
 
 ---
 

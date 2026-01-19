@@ -41,7 +41,7 @@ def client(test_app):
 
 
 @pytest.fixture(scope='function')
-def sample_user(_test_app):
+def sample_user(app):
     """Create a test user."""
     from datetime import datetime
     user = User(
