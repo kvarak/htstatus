@@ -19,7 +19,7 @@
         "## Potential Challenges",
         "## Testing and Validation",
         "## Conclusion",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -42,7 +42,7 @@
         "Document any deviations from the plan and reasons for those changes.",
         "Identify any new tasks or improvements discovered during implementation and add them to backlog.md if valuable.",
         "Do not git add or commit any changes.",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -66,7 +66,7 @@
         "Potential new tasks identified during the review should be added to backlog.md.",
         "Identify any additional improvements or tasks discovered during review and add them to backlog.md if valuable.",
         "Do not git add or commit any changes.",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -85,7 +85,7 @@
         "Check if any tasks in backlog.md can now move to active status.",
         "Update strategic progress in goals.md if major milestones achieved.",
         "Do not git add or commit any changes.",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -111,7 +111,7 @@
         "Stage the changes for commit.",
         "Create the commit with the written summary.",
         "Do not push commits to remote repository.",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -135,7 +135,7 @@
         "## Recommended Placement",
         "## Priority Assessment",
         "## Implementation Considerations",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -165,7 +165,7 @@
         "## Validation and Testing",
         "## Documentation Updates",
         "## Completion Summary",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -199,7 +199,7 @@
         "## Project Health Score",
         "## Prioritized Recommendations",
         "## Next Steps",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -229,7 +229,7 @@
         "## Implementation Steps",
         "## Next Task Recommendations",
         "## Validation and Compliance Check",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "I want the response to be short and to the point"
       ]
     },
     {
@@ -249,6 +249,7 @@
         "Generate 2-5 high-level, actionable opportunities with clear value propositions.",
         "Add suggestions to the 'Future Opportunities' section in plan.md (do not add to backlog).",
         "Do not git add or commit any changes.",
+        "I want the response to be short and to the point",
         "Include the following sections in your response:",
         "# Innovation Analysis",
         "## Current State Assessment",
@@ -256,8 +257,7 @@
         "## High-Impact Opportunity Identification",
         "## Value Proposition Analysis",
         "## Future Opportunities Added to plan.md",
-        "## Implementation Readiness Assessment",
-        "I want the summary at the end of the reponse to be short and to the point"
+        "## Implementation Readiness Assessment"
       ]
     }
   ]
