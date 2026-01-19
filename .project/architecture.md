@@ -50,7 +50,7 @@ HT Status is a Hattrick football team management application built with a dual f
 - **Main File**: `/app/routes.py` (1976 lines - primary application logic)
 - **Database**: `/models.py` - SQLAlchemy models
 - **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig/ProductionConfig classes
-- **Route Architecture**: Dual system with manual route registration and blueprint pattern in `/app/routes_bp.py` (complexity noted for future refactoring)
+- **Route Architecture**: Manual route registration system in `/app/routes.py` with systematic route ownership strategy established (BUG-001 resolution January 2026)
 
 #### Authentication & API Integration
 - **Hattrick OAuth**: CHPP (Community Hattrick Public Platform) integration using `pychpp` library
