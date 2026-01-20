@@ -2,12 +2,13 @@
 
 import re
 from datetime import date
+
 from dateutil.relativedelta import relativedelta
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
-from models import User, Group, PlayerSetting
-from app.routes_bp import create_page, dprint, diff_month
+from app.routes_bp import create_page, diff_month, dprint
+from models import Group, PlayerSetting, User
 
 # Create Blueprint for main routes
 main_bp = Blueprint('main', __name__)

@@ -1,11 +1,12 @@
 """Training routes blueprint for HT Status application."""
 
 from datetime import date, timedelta
+
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
+from app.routes_bp import create_page
 from models import Players
-from app.routes_bp import create_page, dprint, get_training
 
 # Create Blueprint for training routes
 training_bp = Blueprint('training', __name__)

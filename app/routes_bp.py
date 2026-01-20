@@ -6,7 +6,7 @@ import time
 
 from flask import Blueprint, current_app, render_template, session
 from flask_bootstrap import Bootstrap
-from sqlalchemy import desc, text
+from sqlalchemy import desc
 
 from models import User
 
@@ -88,7 +88,7 @@ def dprint(lvl, *args):
 
 def debug_print(route, function, *args):
     """Debug print function for route tracking."""
-    if debug_level and 2 <= debug_level:
+    if debug_level and debug_level >= 2:
         now = time.strftime('%Y-%m-%d %H:%M:%S')
         pstr = ""
         for a in args:
@@ -127,6 +127,7 @@ def get_training(players_data):
 def player_diff(playerid, daysago):
     """Calculate player skill changes over a period of days."""
     from datetime import datetime, timedelta
+
     from models import Players
 
     # Get current player data

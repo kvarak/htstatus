@@ -3,8 +3,8 @@
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
+from app.routes_bp import create_page
 from models import Match, MatchPlay
-from app.routes_bp import create_page, dprint
 
 # Create Blueprint for match and stats routes
 matches_bp = Blueprint('matches', __name__)

@@ -1,15 +1,15 @@
 """Team management routes blueprint for HT Status application."""
 
-import traceback
 import time
-import datetime
+import traceback
 from datetime import datetime as dt
-from flask import Blueprint, render_template, request, session
-from sqlalchemy import text
-from pychpp import CHPP
 
+from flask import Blueprint, render_template, session
+from pychpp import CHPP
+from sqlalchemy import text
+
+from app.routes_bp import create_page, debug_print, diff, dprint, player_diff
 from models import Players
-from app.routes_bp import create_page, dprint, debug_print, player_diff, diff
 
 # Create Blueprint for team routes
 team_bp = Blueprint('team', __name__)

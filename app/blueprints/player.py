@@ -1,11 +1,12 @@
 """Player management routes blueprint for HT Status application."""
 
 import math
+
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
-from models import Group, Players, PlayerSetting, MatchPlay, User
 from app.routes_bp import create_page, dprint, get_training
+from models import Group, MatchPlay, Players, PlayerSetting, User
 
 # Create Blueprint for player routes
 player_bp = Blueprint('player', __name__)

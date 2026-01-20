@@ -69,11 +69,11 @@ def setup_routes(app_instance, db_instance):
     init_routes_bp(app_instance, db_instance)
 
     # Import blueprint functions
-    from app.blueprints.auth import setup_auth_blueprint, login, logout
-    from app.blueprints.main import setup_main_blueprint, index, settings, admin
-    from app.blueprints.player import setup_player_blueprint, player
+    from app.blueprints.auth import login, logout, setup_auth_blueprint
+    from app.blueprints.main import admin, index, settings, setup_main_blueprint
+    from app.blueprints.matches import matches, setup_matches_blueprint, stats
+    from app.blueprints.player import player, setup_player_blueprint
     from app.blueprints.team import setup_team_blueprint, team, update
-    from app.blueprints.matches import setup_matches_blueprint, matches, stats
     from app.blueprints.training import setup_training_blueprint, training
 
     # Setup authentication blueprint

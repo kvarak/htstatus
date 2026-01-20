@@ -1,11 +1,11 @@
 """Authentication routes blueprint for HT Status application."""
 
-from flask import Blueprint, render_template, request, session, make_response
-from werkzeug.security import check_password_hash, generate_password_hash
+from flask import Blueprint, make_response, render_template, request, session
 from pychpp import CHPP
+from werkzeug.security import check_password_hash, generate_password_hash
 
+from app.routes_bp import create_page, debug_print, dprint
 from models import User
-from app.routes_bp import create_page, dprint, debug_print
 
 # Create Blueprint for authentication routes
 auth_bp = Blueprint('auth', __name__)
