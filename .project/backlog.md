@@ -1,9 +1,5 @@
 # HTStatus Development Backlog
 
-**Project Health**: 100/100 | **Tests**: 209 passing, 5 skipped | **Coverage**: 95%
-**Last Updated**: 2026-01-20
-**Next Priority**: P3 Core Functionality (FEAT-005) or P4 Stability
-
 ## Management Rules
 
 **For AI Agents**:
@@ -22,44 +18,33 @@
 
 ---
 
-## ⚡ Quick Wins (Under 1 Hour)
-
-| Task | Effort | Impact |
-|------|--------|--------|
-| [ORG-001](#org-001-consolidate-environment-templates) Consolidate Environment Templates | 15-20 min | P5 DevOps |
-| [DOC-019](#doc-019-macos-setup-guide) macOS Setup Guide | 30 min | P5 DevOps |
-| [DOC-020](#doc-020-uv-installation-guide) UV Installation Guide | 30 min | P5 DevOps |
-| [DOC-010](#doc-010-testing-prompts) Testing Prompts | 30 min | P5 DevOps |
-| [DOC-004](#doc-004-progress-metrics) Progress Metrics | 1 hour | P6 Docs |
-
----
-
 ## Current Focus
 
-**Priority 1: Testing & App Reliability** ✅ ALL COMPLETE
-- *See [history/backlog-done.md](history/backlog-done.md): BUG-001, SEC-002, TEST-004, INFRA-017*
+**Priority 1: Testing & App Reliability**
+- ✅ Currently Empty
 
-**Priority 2: Deployment & Operations** ✅ ALL COMPLETE
-- *See [history/backlog-done.md](history/backlog-done.md): DOC-017, INFRA-010*
+**Priority 2: Deployment & Operations**
+- ✅ Currently Empty
 
 **Priority 3: Core Functionality** (It does what it should)
-- *Completed: FEAT-002 (PWA), UI-003 (Training Page) - see [history/backlog-done.md](history/backlog-done.md)*
 - 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
 - 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
 - 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
 
-**Priority 4: Stability & Maintainability** (It stays working) - 🎯 NEXT PRIORITY
+**Priority 4: Stability & Maintainability** (It stays working)
+- ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
 - 🎯 [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization
 - 🎯 [INFRA-012] Migration Workflow (4-6 hours) - Database procedures
-- 🎯 [INFRA-008] Type Sync Validation (3-4 hours) - Prevent type drift
-- 🎯 [REFACTOR-001] Code Maintainability (20-24 hours) - Technical debt
-- 🎯 [INFRA-009] Dependency Strategy (3-4 hours) - Maintenance planning
+- 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt
+- 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
+- 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
 
 **Priority 5: DevOps & Developer Experience** (Make it easy)
 - 🎯 [ORG-001] Consolidate Environment Templates (15-20 min) - Remove duplication
 - 🎯 [DOC-019] macOS Setup Guide (30 min) - Platform support
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
+- 🎯 [INFRA-020] Fix GitHub Workflows (30 min) - CI reliability
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
@@ -78,10 +63,11 @@
 
 ---
 
-## Priority 1-2: Completed (Archived)
+## Priority 1: Testing & App Reliability
 
-*All P1 Testing & App Reliability and P2 Deployment & Operations tasks completed.*
-*Full details: [history/backlog-done.md](history/backlog-done.md)*
+---
+
+## Priority 2: Core Functionality
 
 ---
 
@@ -314,26 +300,50 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 ---
 
 ### [INFRA-008] Type Sync Validation
-**Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Impact**: Type safety
+**Status**: ✅ COMPLETED | **Effort**: 3-4 hours | **Impact**: Type safety
 **Dependencies**: None | **Strategic Value**: Prevent type drift between Python/TypeScript
 
+**Completion Summary**:
+- ✅ Created validation script comparing SQLAlchemy models to TypeScript interfaces
+- ✅ Added typesync Makefile target for manual validation
+- ✅ Integrated into test-all quality gate pipeline as Step 4/6
+- ✅ Documented type sync procedures and maintenance workflow
+- ✅ Script detects field presence, type compatibility, and nullability consistency
+- ✅ Clear reporting with 85 existing issues identified (mostly nullability mismatches)
+
+**Implementation Details**:
+- Script: `scripts/validate_types.py` with comprehensive type mapping
+- Target: `make typesync` for standalone validation
+- Documentation: `docs/type-sync.md` with procedures and troubleshooting
+- CI integration: Warning-level reporting (doesn't block pipeline)
+- Coverage: 6 models validated against 6 TypeScript interfaces
+
+**Expected Outcomes**: ✅ ACHIEVED - Improved type safety, reduced integration bugs, automated maintenance
+
+---
+
+### [REFACTOR-003] Type Sync Issues Resolution
+**Status**: 🔮 Future Task | **Effort**: 8-12 hours | **Impact**: Type safety improvement
+**Dependencies**: INFRA-008 Type Sync Validation (completed) | **Strategic Value**: Clean dual architecture, reduced technical debt
+
 **Implementation**:
-1. Create automated validation between SQLAlchemy models and TypeScript interfaces
-2. Build type generation or validation scripts
-3. Add CI checks to prevent type drift
-4. Document type synchronization procedures
+1. **Nullability Analysis** (4-6 hours): Review 83 nullability mismatches between SQLAlchemy and TypeScript
+2. **Type Field Resolution** (2-3 hours): Address User.password and User.player_columns type mismatches
+3. **Database Schema Assessment** (1-2 hours): Determine safe nullability changes vs TypeScript optional fields
+4. **Incremental Updates** (1-2 hours): Apply fixes in small batches with validation
 
 **Acceptance Criteria**:
-- Automated type validation pipeline
-- CI integration prevents type drift
-- Clear documentation for maintaining types
+- Reduced type sync issues from 85 to under 20
+- No breaking changes to existing functionality
+- All changes validated through existing test suite
+- Updated documentation reflecting changes
 
-**Expected Outcomes**: Improved type safety, reduced integration bugs, automated maintenance
+**Expected Outcomes**: Improved type consistency, reduced future integration bugs, cleaner dual architecture
 
 ---
 
 ### [REFACTOR-001] Code Maintainability
-**Status**: 🎯 Ready to Execute | **Effort**: 20-24 hours | **Impact**: Long-term maintainability
+**Status**: 🎯 Ready to Execute | **Effort**: 6-8 hours | **Impact**: Long-term maintainability
 **Dependencies**: Testing infrastructure (achieved) | **Strategic Value**: Development velocity, code quality
 
 **Implementation Phases**:
@@ -447,6 +457,26 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 - Testing standards clearly defined
 
 **Expected Outcomes**: Consistent testing practices, improved AI agent capabilities
+
+---
+
+### [INFRA-020] Fix GitHub Workflows
+**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Impact**: CI reliability
+**Dependencies**: None | **Strategic Value**: Automated quality gates, deployment consistency
+
+**Implementation**:
+1. Update GitHub workflow files to use `make test-all` instead of individual test commands
+2. Ensure CI pipeline uses the comprehensive 6-step quality gate process
+3. Verify all workflow triggers and conditions remain appropriate
+4. Test workflow execution in CI environment
+
+**Acceptance Criteria**:
+- GitHub workflows use `make test-all` command
+- CI pipeline runs complete quality gate validation
+- No regressions in workflow functionality
+- Proper status reporting maintained
+
+**Expected Outcomes**: Consistent CI validation, comprehensive quality gates in GitHub Actions, improved deployment confidence
 
 ---
 
