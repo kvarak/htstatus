@@ -2086,6 +2086,12 @@ def training():
                 # Show the change that resulted IN this skill level
                 display_changes = temp_data[i-1][2]  # Take changes from the previous (newer) row
             skill_changes[player_id].append((date, skills, display_changes))
+
+    return create_page(
+        template='training.html',
+        teamname=teamname,
+        error=error,
+        skills=tracecolumns,
         teamid=teamid,
         increases=increases,
         playernames=playernames,
