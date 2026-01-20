@@ -6,13 +6,13 @@
 1. ALWAYS read this entire backlog before selecting tasks
 2. Choose tasks marked 🎯 Ready to Execute with no blockers
 3. Update task status when starting (🚀 ACTIVE) and completing (✅ COMPLETED)
-4. Follow priority order: P1 Testing → P2 Deployment → P3 Functionality → P4 Stability → P5 DevOps → P6 Documentation → P7 Future
+4. Follow priority order: P1 Testing → P2 Deployment → P3 Stability → P4 Functionality → P5 DevOps → P6 Documentation → P7 Future
 5. Move completed tasks to history/backlog-done.md with completion notes and REMOVE them from here.
 
 **For Humans**:
 - Tasks organized by 7 priority levels based on project maturity and risk
 - P1 tasks ensure application reliability and testing confidence
-- P2-P3 tasks build core functionality and maintainability
+- P2-P3 tasks build stability and maintainability
 - P4-P6 tasks enhance operations, developer experience, and documentation
 - Choose based on available time, skills, and project needs
 
@@ -26,21 +26,22 @@
 **Priority 2: Deployment & Operations**
 - ✅ Currently Empty
 
-**Priority 3: Core Functionality** (It does what it should)
-- 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
-- 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
-- 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
-- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough
-
-**Priority 4: Stability & Maintainability** (It stays working) - 🚀 4/6 IN PROGRESS
+**Priority 3: Stability & Maintainability** (It stays working) - 🚀 4/6 IN PROGRESS
 - ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization ✅ COMPLETED 2026-01-20
 - ✅ [INFRA-012] Migration Workflow (4-6 hours) - Database procedures ✅ COMPLETED 2026-01-20
+- 🎯 [REFACTOR-006] Routes Code Consolidation (4-6 hours) - Eliminate routes.py/routes_bp.py duplication
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 - 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
 - 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs
 - 🎯 [REFACTOR-005] Production Code Linting Fix (15-30 min) - Fix 1 remaining production linting error
+
+**Priority 4: Core Functionality** (It does what it should)
+- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **NEXT IN LINE**
+- 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
+- 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
+- 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
 
 **Priority 5: DevOps & Developer Experience** (Make it easy)
 - 🎯 [ORG-001] Consolidate Environment Templates (15-20 min) - Remove duplication
@@ -52,6 +53,7 @@
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
+- 🎯 [DOC-022] Website UI Standardization (6-8 hours) - Unified design patterns and guidelines
 - 🎯 [DOC-011-API] API Documentation (4-6 hours) - Developer experience
 - 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
 - 🎯 [DOC-004] Progress Metrics (1 hour) - Project visibility
@@ -78,9 +80,9 @@
 
 ---
 
-## Priority 3: Core Functionality
+## Priority 3: Stability & Maintainability
 
-### [DOC-021] New Player Tutorial
+### [REFACTOR-002] Complete Blueprint Migration
 **Status**: 🎯 Ready to Execute | **Effort**: 3-5 hours | **Impact**: User onboarding and feature discovery
 **Dependencies**: Core UI features (completed) | **Strategic Value**: Reduced learning curve, improved user retention
 
@@ -140,6 +142,82 @@ New players need guided onboarding to understand HT Status features and workflow
 - Create reusable tutorial component/system for future features
 
 **Expected Outcomes**: Improved user onboarding, faster time-to-productivity, reduced support burden, better adoption of newly added features, increased user retention
+
+---
+
+### [DOC-022] Website UI Standardization
+**Status**: 🎯 Ready to Execute | **Effort**: 6-8 hours | **Impact**: UI consistency and developer productivity
+**Dependencies**: Existing web pages (completed), UI components (completed) | **Strategic Value**: Maintainability, user experience
+
+**Problem Statement**:
+Currently, web pages across the application lack consistent design patterns, styling, and layout conventions. This creates:
+- Inconsistent user experience across different sections
+- Maintenance challenges when updating UI components
+- Unclear guidelines for developing new pages
+- Difficulty for AI agents to maintain design consistency
+- Varying accessibility and responsive design implementations
+
+**Implementation**:
+1. **Page Audit & Analysis** (2-3 hours):
+   - Catalog all existing web pages (Flask templates and React components)
+   - Document current styling patterns, layouts, and components
+   - Identify inconsistencies in design, navigation, spacing, typography
+   - Review accessibility compliance across pages
+   - Assess responsive design implementation variations
+
+2. **UI Standards Documentation** (2-3 hours):
+   - Create comprehensive UI style guide with:
+     - Color palette and typography standards
+     - Component usage patterns and variants
+     - Layout grid system and spacing rules
+     - Navigation and interaction patterns
+     - Form design and validation standards
+     - Accessibility requirements and guidelines
+   - Document approved Bootstrap/TailwindCSS utility patterns
+   - Define responsive design breakpoints and mobile-first approach
+
+3. **Design Guidelines Integration** (1-2 hours):
+   - Add UI guidelines to prompts.json for AI agent reference
+   - Create reusable template snippets and component examples
+   - Document design validation checklist for new pages
+   - Establish review process for UI consistency
+
+4. **Implementation Standards** (1-2 hours):
+   - Standardize page headers, footers, and navigation patterns
+   - Define consistent loading states and error handling UI
+   - Establish form styling and validation display patterns
+   - Document chart and data visualization standards
+
+**Acceptance Criteria**:
+- Complete audit of all existing web pages documented
+- Comprehensive UI style guide created covering all design elements
+- Guidelines integrated into prompts.json for AI agent access
+- Reusable component patterns and templates documented
+- Design validation checklist established
+- Consistent navigation and layout patterns defined
+- Accessibility standards documented and verified
+- Mobile-responsive design standards established
+
+**Scope**:
+- **Includes**: All Flask templates, React components, styling patterns, accessibility guidelines
+- **Excludes**: Major redesigns or new features (focus on standardizing existing patterns)
+- **Focus**: Consistency, maintainability, and developer/AI agent guidance
+
+**Pages to Standardize**:
+- Authentication: login.html, logout.html
+- Main sections: main.html, team.html, player.html, training.html, matches.html, stats.html, settings.html
+- React components: All pages in src/pages/ and components in src/components/
+- Base templates: base.html, component layouts
+
+**Guidelines Categories**:
+- **Layout**: Grid systems, spacing, containers, responsive breakpoints
+- **Typography**: Headings hierarchy, body text, emphasis, code styling
+- **Colors**: Primary/secondary palettes, semantic colors, contrast ratios
+- **Components**: Buttons, forms, tables, cards, modals, alerts, navigation
+- **Accessibility**: ARIA labels, keyboard navigation, screen reader support
+- **Performance**: CSS organization, asset loading, optimization practices
+
+**Expected Outcomes**: Unified user experience, streamlined development process, improved maintainability, consistent AI agent output, enhanced accessibility compliance
 
 ---
 
@@ -329,9 +407,9 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 
 ---
 
-## Priority 4: Stability & Maintainability
+## Priority 4: Core Functionality
 
-### [REFACTOR-002] Complete Blueprint Migration
+### [DOC-021] New Player Tutorial
 **Status**: 🚀 IN PROGRESS (90% complete) | **Effort**: 6-8 hours | **Impact**: Code organization
 **Dependencies**: INFRA-011 (completed) | **Strategic Value**: Maintainability, scalability
 
@@ -1141,7 +1219,7 @@ Currently, HT Status displays content in English regardless of the user's langua
 ## Task Details: Security & Maintenance (Added from REFACTOR-002 Review)
 
 ### [SECURITY-001] Werkzeug Security Update
-**Status**: 🎯 Ready to Execute | **Effort**: 30-45 minutes | **Priority**: P4 Stability
+**Status**: 🎯 Ready to Execute | **Effort**: 30-45 minutes | **Priority**: P3 Stability
 **Dependencies**: None | **Strategic Value**: Security compliance, dependency maintenance
 
 **Problem Statement**:
@@ -1202,7 +1280,78 @@ Linting scan identified 38 errors in development scripts (production code is lin
 
 **Expected Outcomes**: Consistent code quality across entire project, improved maintainability
 
-## Priority 7: Potential Future Improvements
+---
+
+### [REFACTOR-006] Routes Code Consolidation
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Code organization and maintainability
+**Dependencies**: REFACTOR-002 Blueprint Migration (90% complete) | **Strategic Value**: Reduced technical debt, cleaner architecture
+
+**Problem Statement**:
+Both `app/routes.py` (2,336 lines) and `app/routes_bp.py` (325 lines) exist in the repository with overlapping functionality and utility functions. This creates:
+- Code duplication and maintenance burden
+- Developer confusion about which file to modify
+- Potential for inconsistent implementations
+- Unnecessary complexity in the codebase
+- Risk of functions getting out of sync
+
+**Current State Analysis**:
+- **routes.py**: Legacy monolithic file with all route handlers + utility functions (calculateContribution, team statistics, etc.)
+- **routes_bp.py**: Blueprint helper module with shared utilities (dprint, player_diff, create_page, etc.)
+- **Overlap**: Both files contain similar utility functions with potential inconsistencies
+- **Dependencies**: Blueprint modules import specific functions from routes.py
+- **Migration Status**: Blueprint migration 90% complete but both files remain active
+
+**Implementation**:
+1. **Code Audit & Mapping** (1-1.5 hours):
+   - Catalog all functions in both files and their usage
+   - Identify duplicate vs unique functions
+   - Map dependencies and imports across blueprint modules
+   - Determine which functions are actively used vs dead code
+   - Document current file responsibilities and relationships
+
+2. **Consolidation Strategy** (1-2 hours):
+   - Decide on target architecture (utils module vs blueprint-specific vs hybrid)
+   - Plan migration path for shared utility functions
+   - Design module structure for optimal organization
+   - Create mapping for where each function should reside
+   - Document rationale for organizational decisions
+
+3. **Code Consolidation** (2-2.5 hours):
+   - Move shared utilities to appropriate modules (utils.py or blueprint-specific)
+   - Eliminate duplicate function implementations
+   - Update imports across all blueprint modules
+   - Remove obsolete route stubs and dead code
+   - Ensure consistent function signatures and behavior
+
+4. **Testing & Validation** (0.5-1 hour):
+   - Run comprehensive test suite to verify no breaking changes
+   - Test all blueprint routes and utility function usage
+   - Validate imports resolve correctly
+   - Confirm application startup and basic functionality
+
+**Consolidation Strategy Options**:
+1. **Option A - Dedicated Utils Module**: Create `app/utils.py` for all shared utilities
+2. **Option B - Blueprint Integration**: Move functions to their primary usage blueprints
+3. **Option C - Hybrid Approach**: Keep routes.py for legacy utilities, eliminate routes_bp.py
+
+**Acceptance Criteria**:
+- Only one source of truth for each utility function
+- All shared functions consolidated in logical module structure
+- No duplicate implementations of utility functions
+- All blueprint imports updated and functional
+- Comprehensive test suite passes without failures
+- Clear documentation of module responsibilities
+- Reduced total lines of code through deduplication
+
+**Functions to Consolidate** (Preliminary):
+- **Shared Utilities**: dprint, debug_print, diff, diff_month, create_page, player_diff
+- **Legacy Functions**: calculateContribution, calculateManmark, team statistics functions
+- **Helper Functions**: get_training, count_clicks, downloadMatches
+- **Route Stubs**: Determine which are needed vs obsolete
+
+**Expected Outcomes**: Cleaner codebase architecture, reduced maintenance burden, eliminated developer confusion, improved code organization, foundation for future refactoring
+
+---
 
 ### [FEAT-009] Trophy Data Integration
 **Status**: 🔮 Future Task | **Effort**: 6-8 hours | **Priority**: P7 | **Impact**: User engagement
