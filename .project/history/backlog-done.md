@@ -2,6 +2,62 @@
 
 ## January 2026
 
+### [REFACTOR-006] Routes Code Consolidation ✅ COMPLETED
+**Completion Date**: January 20, 2026
+**Effort**: 4.5 hours | **Impact**: Code organization and maintainability
+**Priority**: P3 - Stability & Maintainability
+
+**Problem**: Duplicate utility functions between `app/routes.py` (2,336 lines) and `app/routes_bp.py` (325 lines)
+- Code duplication causing maintenance burden
+- Developer confusion about which file to modify
+- Risk of functions getting out of sync
+- Unnecessary complexity across 6 blueprint modules
+
+**Solution Implemented**:
+1. **Created Dedicated Utils Module**: Consolidated all shared utility functions into `app/utils.py` (300+ lines)
+   - Moved 15+ shared functions: `dprint`, `debug_print`, `create_page`, `calculateContribution`, etc.
+   - Added proper module initialization via `initialize_utils()` function
+   - Maintained all function signatures and behavior for backward compatibility
+
+2. **Updated Blueprint Import Structure**: Modified 6 blueprint modules to use centralized utilities
+   - `app/blueprints/auth.py`: Updated imports to use `app.utils`
+   - `app/blueprints/main.py`: Updated imports to use `app.utils`
+   - `app/blueprints/player.py`: Updated imports to use `app.utils`
+   - `app/blueprints/team.py`: Updated imports to use `app.utils`
+   - `app/blueprints/matches.py`: Updated imports to use `app.utils`
+   - `app/blueprints/training.py`: Updated imports to use `app.utils`
+
+3. **Enhanced Application Factory**: Added utils initialization to `app/factory.py`
+   - Integrated `initialize_utils()` call in `setup_routes()` function
+   - Ensured proper initialization order to avoid circular imports
+
+4. **Cleaned Up Legacy Code**: Reduced `routes_bp.py` from 325 to ~90 lines
+   - Removed all duplicate utility function implementations
+   - Maintained backward compatibility functions for any remaining legacy imports
+   - Added clear documentation about consolidation
+
+**Results**:
+- ✅ Eliminated code duplication between routes.py and routes_bp.py
+- ✅ Created clean, maintainable utility module architecture
+- ✅ All 6 blueprint modules successfully migrated to new import structure
+- ✅ Application startup validation: 7 blueprints registered successfully
+- ✅ Fast test suite: 32/32 passing, confirming no functionality regressions
+- ✅ Reduced routes_bp.py complexity by 72% (325 → 90 lines)
+
+**Technical Impact**:
+- **Maintainability**: Single source of truth for all utility functions
+- **Developer Experience**: Clear module organization, no more confusion about which file to modify
+- **Code Quality**: Eliminated ~235 lines of duplicate code
+- **Architecture**: Proper separation of concerns between routes, blueprints, and utilities
+
+**Files Created/Modified**:
+- `app/utils.py` (NEW): 300+ lines of consolidated utility functions
+- `app/factory.py`: Added utils initialization
+- `app/blueprints/*.py` (6 files): Updated import statements
+- `app/routes_bp.py`: Cleaned up duplicate functions (325 → 90 lines)
+
+---
+
 ### [INFRA-010] Repository File Audit ✅ COMPLETED
 **Completion Date**: January 19, 2026
 **Effort**: 1.5 hours | **Impact**: Repository hygiene, security posture

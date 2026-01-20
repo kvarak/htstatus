@@ -26,11 +26,14 @@
 **Priority 2: Deployment & Operations**
 - ✅ Currently Empty
 
-**Priority 3: Stability & Maintainability** (It stays working) - 🚀 4/6 IN PROGRESS
+**Priority 3: Stability & Maintainability** (It stays working) - 🚀 4/9 IN PROGRESS
 - ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization ✅ COMPLETED 2026-01-20
 - ✅ [INFRA-012] Migration Workflow (4-6 hours) - Database procedures ✅ COMPLETED 2026-01-20
-- 🎯 [REFACTOR-006] Routes Code Consolidation (4-6 hours) - Eliminate routes.py/routes_bp.py duplication
+- ✅ [REFACTOR-006] Routes Code Consolidation (4-6 hours) - Eliminate routes.py/routes_bp.py duplication ✅ COMPLETED 2026-01-20
+- 🚀 [REFACTOR-007] Complete Routes.py Removal (8-12 hours) - Finish blueprint migration by removing legacy monolith **ACTIVE NEXT PRIORITY**
+- 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules
+- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 - 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
@@ -1282,77 +1285,6 @@ Linting scan identified 38 errors in development scripts (production code is lin
 
 ---
 
-### [REFACTOR-006] Routes Code Consolidation
-**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Code organization and maintainability
-**Dependencies**: REFACTOR-002 Blueprint Migration (90% complete) | **Strategic Value**: Reduced technical debt, cleaner architecture
-
-**Problem Statement**:
-Both `app/routes.py` (2,336 lines) and `app/routes_bp.py` (325 lines) exist in the repository with overlapping functionality and utility functions. This creates:
-- Code duplication and maintenance burden
-- Developer confusion about which file to modify
-- Potential for inconsistent implementations
-- Unnecessary complexity in the codebase
-- Risk of functions getting out of sync
-
-**Current State Analysis**:
-- **routes.py**: Legacy monolithic file with all route handlers + utility functions (calculateContribution, team statistics, etc.)
-- **routes_bp.py**: Blueprint helper module with shared utilities (dprint, player_diff, create_page, etc.)
-- **Overlap**: Both files contain similar utility functions with potential inconsistencies
-- **Dependencies**: Blueprint modules import specific functions from routes.py
-- **Migration Status**: Blueprint migration 90% complete but both files remain active
-
-**Implementation**:
-1. **Code Audit & Mapping** (1-1.5 hours):
-   - Catalog all functions in both files and their usage
-   - Identify duplicate vs unique functions
-   - Map dependencies and imports across blueprint modules
-   - Determine which functions are actively used vs dead code
-   - Document current file responsibilities and relationships
-
-2. **Consolidation Strategy** (1-2 hours):
-   - Decide on target architecture (utils module vs blueprint-specific vs hybrid)
-   - Plan migration path for shared utility functions
-   - Design module structure for optimal organization
-   - Create mapping for where each function should reside
-   - Document rationale for organizational decisions
-
-3. **Code Consolidation** (2-2.5 hours):
-   - Move shared utilities to appropriate modules (utils.py or blueprint-specific)
-   - Eliminate duplicate function implementations
-   - Update imports across all blueprint modules
-   - Remove obsolete route stubs and dead code
-   - Ensure consistent function signatures and behavior
-
-4. **Testing & Validation** (0.5-1 hour):
-   - Run comprehensive test suite to verify no breaking changes
-   - Test all blueprint routes and utility function usage
-   - Validate imports resolve correctly
-   - Confirm application startup and basic functionality
-
-**Consolidation Strategy Options**:
-1. **Option A - Dedicated Utils Module**: Create `app/utils.py` for all shared utilities
-2. **Option B - Blueprint Integration**: Move functions to their primary usage blueprints
-3. **Option C - Hybrid Approach**: Keep routes.py for legacy utilities, eliminate routes_bp.py
-
-**Acceptance Criteria**:
-- Only one source of truth for each utility function
-- All shared functions consolidated in logical module structure
-- No duplicate implementations of utility functions
-- All blueprint imports updated and functional
-- Comprehensive test suite passes without failures
-- Clear documentation of module responsibilities
-- Reduced total lines of code through deduplication
-
-**Functions to Consolidate** (Preliminary):
-- **Shared Utilities**: dprint, debug_print, diff, diff_month, create_page, player_diff
-- **Legacy Functions**: calculateContribution, calculateManmark, team statistics functions
-- **Helper Functions**: get_training, count_clicks, downloadMatches
-- **Route Stubs**: Determine which are needed vs obsolete
-
-**Expected Outcomes**: Cleaner codebase architecture, reduced maintenance burden, eliminated developer confusion, improved code organization, foundation for future refactoring
-
----
-
 ### [FEAT-009] Trophy Data Integration
 **Status**: 🔮 Future Task | **Effort**: 6-8 hours | **Priority**: P7 | **Impact**: User engagement
 
@@ -1513,6 +1445,134 @@ The application currently depends on the third-party `pychpp` library for Hattri
 
 ## Task Details: New Tasks
 
+### [TEST-004] Blueprint Test Coverage
+**Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Priority**: P3 | **Impact**: Quality assurance and maintainability
+**Dependencies**: REFACTOR-006 Routes Code Consolidation (✅ completed) | **Strategic Value**: Validation of blueprint architecture
+
+**Problem Statement**:
+Recent blueprint migration (REFACTOR-002 and REFACTOR-006) created new code organization but test coverage dropped to 35% (target: 80%). The new blueprint modules need comprehensive test coverage to ensure:
+- Blueprint route functionality works correctly
+- Authentication and session handling is reliable
+- Error handling and edge cases are covered
+- Regression prevention for future changes
+
+**Current State**:
+- Fast test coverage: 35% (significantly below 80% target)
+- Blueprint modules with low coverage:
+  - app/blueprints/auth.py: 20% coverage
+  - app/blueprints/main.py: 12% coverage
+  - app/blueprints/matches.py: 19% coverage
+  - app/blueprints/player.py: 12% coverage
+  - app/blueprints/team.py: 11% coverage
+  - app/blueprints/training.py: 11% coverage
+
+**Implementation**:
+1. **Test Coverage Analysis** (0.5 hours):
+   - Run detailed coverage report for blueprint modules
+   - Identify critical code paths requiring tests
+   - Map existing test coverage and gaps
+   - Prioritize high-impact, low-coverage areas
+
+2. **Blueprint Route Testing** (1.5-2 hours):
+   - Test all blueprint route handlers with various authentication states
+   - Mock CHPP API responses for data-dependent routes
+   - Test session management and team selection functionality
+   - Verify template rendering with proper context variables
+
+3. **Error Handling and Edge Cases** (1-1.5 hours):
+   - Test unauthenticated access patterns
+   - Test invalid team IDs and malformed requests
+   - Test database connection issues and recovery
+   - Test CHPP API failure scenarios
+
+4. **Integration Testing** (0.5-1 hour):
+   - Test blueprint registration and initialization
+   - Test cross-blueprint functionality
+   - Verify utils module integration works correctly
+   - Test application startup with all blueprints
+
+**Acceptance Criteria**:
+- Blueprint module coverage increases to >70%
+- All blueprint routes have basic functionality tests
+- Authentication and session handling tested
+- Error scenarios properly covered
+- make test-fast achieves >80% overall coverage
+- No existing functionality regressions
+- Mock CHPP responses for isolated testing
+
+**Technical Approach**:
+- Extend existing test_blueprint_routes_focused.py
+- Use pytest fixtures for authentication setup
+- Mock CHPP API calls for deterministic testing
+- Leverage existing test infrastructure and patterns
+
+**Expected Outcomes**: Increased confidence in blueprint architecture, prevention of regressions, achievement of coverage targets
+
+---
+
+### [TEST-005] Utils Module Test Coverage
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P3 | **Impact**: Validation of utility function migration
+**Dependencies**: REFACTOR-006 Routes Code Consolidation (✅ completed) | **Strategic Value**: Confidence in shared utilities
+
+**Problem Statement**:
+The newly created app/utils.py module (300+ lines) contains critical shared utilities migrated from routes.py and routes_bp.py. Currently showing only 13% test coverage, these functions need validation to ensure:
+- Utility functions work correctly after migration
+- No regressions in shared functionality
+- Proper integration with blueprint modules
+- Edge cases and error conditions handled
+
+**Current State**:
+- app/utils.py: 13% coverage (151/151 statements, 125 missed)
+- Critical functions with no test coverage:
+  - calculateContribution(), calculateManmark() - core business logic
+  - player_diff(), get_training() - data processing
+  - create_page() - template rendering
+  - dprint(), debug_print() - debugging utilities
+
+**Implementation**:
+1. **Function Coverage Analysis** (0.5 hours):
+   - Analyze which utility functions are tested vs untested
+   - Identify high-risk functions needing immediate coverage
+   - Map function dependencies and integration points
+   - Review existing tests that might cover utility usage
+
+2. **Core Business Logic Testing** (1-1.5 hours):
+   - Test calculateContribution() with various positions and player skills
+   - Test calculateManmark() calculations and edge cases
+   - Test player skill calculation and rating functions
+   - Validate team statistics computation functions
+
+3. **Data Processing Function Testing** (0.5-1 hour):
+   - Test player_diff() with various time periods
+   - Test get_training() with different player data sets
+   - Test date utilities (diff_month, diff) with edge cases
+   - Test data filtering and transformation functions
+
+4. **Template and Utility Testing** (0.5-1 hour):
+   - Test create_page() with various template contexts
+   - Test debug print functions (dprint, debug_print)
+   - Test utility initialization (initialize_utils)
+   - Verify proper integration with Flask app context
+
+**Acceptance Criteria**:
+- Utils module coverage increases to >70%
+- All core business logic functions tested
+- Data processing functions have comprehensive tests
+- Template utilities tested with mock contexts
+- Debug utilities tested for proper output
+- No regressions in functionality
+- Integration with blueprints verified
+
+**Technical Approach**:
+- Create dedicated test_utils.py module
+- Mock Flask app context for template testing
+- Use sample player data for business logic tests
+- Mock database queries for data processing tests
+
+**Expected Outcomes**: Validated utility function reliability, increased confidence in shared code, prevention of silent failures
+
+---
+
 ### [REFACTOR-005] Production Code Linting Fix
 **Status**: 🎯 Ready to Execute | **Effort**: 15-30 min | **Priority**: P4 | **Impact**: Code quality gate
 
@@ -1543,4 +1603,71 @@ Quality gate shows 1 linting error in production code (out of 31 total). While 3
 
 ---
 
-*Backlog reorganized January 19, 2026 with priority framework: Testing → Functionality → Stability → Deployment → DevOps → Documentation. Total: 22 active tasks across 6 priority levels.*
+### [REFACTOR-007] Complete Routes.py Removal
+**Status**: 🚀 ACTIVE | **Effort**: 8-12 hours | **Priority**: P3 | **Impact**: Complete blueprint migration
+**Dependencies**: REFACTOR-002 (✅ completed), REFACTOR-006 (✅ completed) | **Strategic Value**: Eliminate legacy monolith, complete architectural modernization
+
+**Problem Statement**:
+The legacy `app/routes.py` file (2,335 lines) still exists as a monolithic route handler despite successful blueprint migration. This creates:
+- Architectural inconsistency with remaining legacy code alongside modern blueprints
+- Maintenance burden with duplicate functionality across files
+- Confusion about which file to modify for route changes
+- Risk of regression to monolithic patterns
+- Incomplete migration preventing full blueprint architecture benefits
+
+**Current State Analysis**:
+- **routes.py**: Legacy monolith (2,335 lines) with route handlers, utilities, and business logic
+- **Blueprint modules**: Modern architecture in `app/blueprints/` (6 modules, ~330 lines each)
+- **Utils consolidation**: REFACTOR-006 moved shared utilities to `app/utils.py`
+- **Status**: Ready for removal after successful utility consolidation
+
+**Implementation**:
+1. **Legacy Code Analysis** (2-3 hours):
+   - Audit remaining functionality in routes.py vs blueprint equivalents
+   - Identify any unique business logic not yet migrated
+   - Map route registrations and dependencies
+   - Document any Flask-specific patterns needing preservation
+   - Identify test dependencies on legacy routes
+
+2. **Final Migration Tasks** (3-4 hours):
+   - Move any remaining unique route handlers to appropriate blueprints
+   - Migrate any remaining business logic or utility functions to utils.py
+   - Update any imports or references pointing to routes.py
+   - Ensure all route registrations work through blueprint system
+   - Update factory.py to remove routes.py initialization
+
+3. **Testing and Validation** (2-3 hours):
+   - Comprehensive testing of all application functionality
+   - Verify all routes work through blueprint registration
+   - Test authentication, session handling, and CHPP integration
+   - Validate no functionality regressions
+   - Update tests that specifically reference routes.py
+
+4. **File Removal and Cleanup** (1-2 hours):
+   - Remove `app/routes.py` file completely
+   - Update imports and references in remaining files
+   - Clean up factory.py route initialization
+   - Update documentation to reflect blueprint-only architecture
+   - Remove any routes.py references from tests
+
+**Acceptance Criteria**:
+- `app/routes.py` file completely removed
+- All application functionality preserved through blueprints
+- No route handling functionality lost
+- All tests pass without routes.py dependencies
+- Factory.py uses blueprint-only initialization
+- Documentation updated to reflect blueprint architecture
+- No breaking changes to existing functionality
+- Clean application startup without legacy route references
+
+**Migration Strategy**:
+1. **Parallel Testing**: Verify blueprint equivalents work before removing legacy
+2. **Incremental Removal**: Remove sections gradually with validation
+3. **Rollback Plan**: Backup routes.py before deletion with restoration procedure
+4. **Test Coverage**: Recommend completing TEST-004/TEST-005 after this task for validation
+
+**Expected Outcomes**: Complete architectural modernization, eliminated technical debt, simplified codebase maintenance, consistent blueprint pattern throughout application
+
+---
+
+*Backlog updated January 20, 2026 with REFACTOR-007 prioritization and task status updates. P3 Stability & Maintainability progressing strategically with routes removal as next priority. Total: 23 active tasks across 6 priority levels.*
