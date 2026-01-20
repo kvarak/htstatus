@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck typesync security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
 
 # Variables
 PYTHON := uv run python
@@ -184,6 +184,10 @@ typecheck: check-uv ## Run mypy type checking
 	@echo "🔬 Running type checking..."
 	@$(UV) run mypy . --ignore-missing-imports
 
+typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
+	@echo "🔗 Validating type synchronization..."
+	@$(UV) run python scripts/validate_types.py
+
 security: check-uv ## Run bandit and safety security checks
 	@echo "🔒 Running security checks..."
 	@$(UV) run bandit -r app/ -c .bandit -f json 2>/dev/null || $(UV) run bandit -r app/ -c .bandit
@@ -228,30 +232,35 @@ test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file ch
 	@echo "👀 Running tests in watch mode..."
 	@$(UV) run pytest-watch tests/ -- -v --tb=short
 
-test-all: ## ✅ Run all quality gates (fileformat + lint + security + config + comprehensive tests)
+test-all: ## ✅ Run all quality gates (fileformat + lint + security + typesync + config + comprehensive tests)
 	@echo "🚀 Running complete quality gate validation..."
 	@echo ""
-	@echo "📋 Step 1/5: File Format Standards"
+	@echo "📋 Step 1/6: File Format Standards"
 	@echo "=================================="
 	@make fileformat 2>&1 | tee /tmp/fileformat-results.txt || true
 	@grep -q "File formatting checks passed" /tmp/fileformat-results.txt && echo "✅ File Format: PASSED" || echo "⚠️  File Format: Issues found (run 'make fileformat-fix')"
 	@echo ""
-	@echo "📋 Step 2/5: Code Quality (Linting)"
+	@echo "📋 Step 2/6: Code Quality (Linting)"
 	@echo "=================================="
 	@make lint 2>&1 | tee /tmp/lint-results.txt || true
 	@grep -q "^All checks passed" /tmp/lint-results.txt && echo "✅ Linting: PASSED" || (grep "errors" /tmp/lint-results.txt | tail -1 || echo "⚠️  Linting: Found issues")
 	@echo ""
-	@echo "📋 Step 3/5: Security Analysis"
+	@echo "📋 Step 3/6: Security Analysis"
 	@echo "============================="
 	@make security 2>&1 | tee /tmp/security-results.txt || true
 	@grep -q "No issues identified" /tmp/security-results.txt && echo "✅ Security: No issues found" || (grep "Issue:" /tmp/security-results.txt | wc -l | xargs -I {} echo "⚠️  Security: {} issues found")
 	@echo ""
-	@echo "📋 Step 4/5: Configuration Tests"
+	@echo "📋 Step 4/6: Type Synchronization"
+	@echo "=============================="
+	@make typesync 2>&1 | tee /tmp/typesync-results.txt || true
+	@grep -q "Type sync validation passed" /tmp/typesync-results.txt && echo "✅ Type Sync: PASSED" || (issues=$$(grep 'Found.*type sync issues' /tmp/typesync-results.txt 2>/dev/null | head -1 | grep -o '[0-9]\+' || echo "unknown"); if [ "$$issues" != "unknown" ]; then echo "⚠️  Type Sync: $$issues issues found"; else echo "⚠️  Type Sync: unknown issues"; fi)
+	@echo ""
+	@echo "📋 Step 5/6: Configuration Tests"
 	@echo "==============================="
 	@make test-config 2>&1 | tee /tmp/config-results.txt || true
 	@grep -q "passed" /tmp/config-results.txt && (grep "passed" /tmp/config-results.txt | tail -1 | sed 's/=//g' || echo "✅ Config: Tests passed") || echo "⚠️  Config: Tests failed (see INFRA-018)"
 	@echo ""
-	@echo "📋 Step 5/5: Comprehensive Test Suite"
+	@echo "📋 Step 6/6: Comprehensive Test Suite"
 	@echo "===================================="
 	@make test 2>&1 | tee /tmp/test-results.txt
 	@echo ""
@@ -283,6 +292,17 @@ test-all: ## ✅ Run all quality gates (fileformat + lint + security + config + 
 			echo "✅ 0 issues"; \
 		else \
 			echo "⚠️  $$count issues"; \
+		fi
+	@printf "  %-15s" "Type Sync:"; \
+		if grep -q 'Type sync validation passed' /tmp/typesync-results.txt 2>/dev/null; then \
+			echo "✅ PASSED"; \
+		else \
+			issues=$$(grep 'Found.*type sync issues' /tmp/typesync-results.txt 2>/dev/null | head -1 | grep -o '[0-9]\+' || echo "unknown"); \
+			if [ "$$issues" != "unknown" ]; then \
+				echo "⚠️  $$issues issues found"; \
+			else \
+				echo "⚠️  unknown issues"; \
+			fi; \
 		fi
 	@printf "  %-15s" "Config Tests:"; \
 		result=$$(grep 'passed' /tmp/config-results.txt 2>/dev/null | tail -1 | grep -o '[0-9]\+ passed' || echo ""); \
