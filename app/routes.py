@@ -2066,24 +2066,14 @@ def training():
 
         # Reverse the list to get newest first, then calculate changes
         for i, (date, skills) in enumerate(reversed(player_data)):
-            if i == 0:
-                # First entry (newest) has no comparison
+            if i == len(player_data) - 1:
+                # Last entry (oldest) has no comparison - it's the baseline
                 changes = [0] * 7
             else:
-                # Compare with previous entry (chronologically later, but previous in reversed list)
-                prev_date, prev_skills = list(reversed(player_data))[i-1]
-                # Since we're showing newest first, we want: current - chronologically_earlier
-                # But prev_skills is actually chronologically LATER than skills
-                # So we reverse: prev_skills - skills to get the right direction
-                changes = [prev_skills[j] - skills[j] for j in range(7)]
-            skill_changes[player_id].append((date, skills, changes))
-
-    return create_page(
-        template='training.html',
-        teamname=teamname,
-        error=error,
-        skills=tracecolumns,
-        teamid=teamid,
+                # Compare with next entry (chronologically earlier)
+                next_date, next_skills = list(reversed(player_data))[i+1]
+                # Show arrow on the NEWER value: current_skills - older_skills
+                changes = [skills[j] - next_skills[j] for j in range(7)]
         increases=increases,
         playernames=playernames,
         allplayerids=allplayerids,
