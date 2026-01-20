@@ -252,11 +252,11 @@
         {% for ht_id in allplayerids %}
         <div class="col-12" id="playerCard{{ ht_id }}" data-player-card style="display: none;">
           <!-- Skill Summary Cards -->
-          <div class="row g-3 mb-4">
+          <div class="row g-2 mb-4" style="justify-content: center;">
             {% if allplayers[ht_id] %}
               {% set latest = allplayers[ht_id][-1] %}
               {% set earliest = allplayers[ht_id][0] %}
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Keeper</small>
@@ -267,7 +267,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Defender</small>
@@ -278,7 +278,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Playmaker</small>
@@ -289,7 +289,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Winger</small>
@@ -300,7 +300,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Passing</small>
@@ -311,7 +311,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Scoring</small>
@@ -322,7 +322,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-sm-6 col-md-4 col-lg-3">
+              <div style="flex: 0 0 calc(100% / 8);">
                 <div class="card text-center">
                   <div class="card-body p-3">
                     <small class="text-muted d-block">Set Pieces</small>
