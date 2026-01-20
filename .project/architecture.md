@@ -154,6 +154,11 @@ htstatus-2.0/
 
 ### Key Architectural Notes
 - **Dual Frontend**: Legacy Flask templates + Modern React SPA coexist
+- **Type Sync Validation**: Automated consistency checking between SQLAlchemy models and TypeScript interfaces
+  - Validation script: `scripts/validate_types.py` (6 models vs 6 interfaces)
+  - Quality gate integration: Step 4/6 in `make test-all` pipeline
+  - Documentation: `docs/type-sync.md` for maintenance procedures
+  - Current baseline: 85 issues identified (83 nullability + 2 type/field mismatches)
 - **Routing Resolution**: Manual route registration implemented in factory.py (INFRA-011 completed)
   - Factory imports both Blueprint and legacy routes
   - Manual add_url_rule() registration for 12 legacy route functions
