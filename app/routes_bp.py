@@ -196,7 +196,11 @@ def get_training(players_data):
 
 
 def player_diff(playerid, daysago):
-    """Calculate player skill changes over a period of days."""
+    """Calculate player skill changes over a period of days.
+
+    Returns a list of skill changes in the format:
+    [teamname, first_name, last_name, skill_name, old_value, new_value]
+    """
     from datetime import datetime, timedelta
 
     from models import Players
@@ -219,26 +223,38 @@ def player_diff(playerid, daysago):
     if not playerdata_now or not playerdata_then:
         return None
 
-    playername = playerdata_now.first_name + " " + playerdata_now.last_name
+    # Get team name from session
+    all_teams = session.get('all_teams', [])
+    all_team_names = session.get('all_team_names', [])
 
-    changes = {
-        'id': playerid,
-        'name': playername,
-        'keeper': playerdata_now.keeper - playerdata_then.keeper,
-        'defender': playerdata_now.defender - playerdata_then.defender,
-        'playmaker': playerdata_now.playmaker - playerdata_then.playmaker,
-        'winger': playerdata_now.winger - playerdata_then.winger,
-        'passing': playerdata_now.passing - playerdata_then.passing,
-        'scorer': playerdata_now.scorer - playerdata_then.scorer,
-        'set_pieces': playerdata_now.set_pieces - playerdata_then.set_pieces,
-    }
+    teamname = ""
+    if playerdata_now.owner in all_teams:
+        team_index = all_teams.index(playerdata_now.owner)
+        teamname = all_team_names[team_index] if team_index < len(all_team_names) else ""
+
+    # Track changes for each skill
+    skills = ['keeper', 'defender', 'playmaker', 'winger', 'passing', 'scorer', 'set_pieces']
+    ret = []
+
+    for skill in skills:
+        old_val = getattr(playerdata_then, skill, 0)
+        new_val = getattr(playerdata_now, skill, 0)
+
+        if old_val != new_val:
+            ret.append([
+                teamname,
+                playerdata_now.first_name,
+                playerdata_now.last_name,
+                skill,
+                old_val,
+                new_val
+            ])
 
     # Return None if no changes
-    total_change = sum([v for k, v in changes.items() if k != 'id' and k != 'name'])
-    if total_change == 0:
+    if not ret:
         return None
 
-    return changes
+    return ret
 
 
 def create_page(template, title, **kwargs):
