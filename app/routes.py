@@ -1913,6 +1913,7 @@ def matches():
 
 # @app.route('/stats')  # Registered manually in factory.py
 def stats():
+    print("\n*** STATS ROUTE CALLED ***")
     if session.get('current_user') is None:
         return render_template(
             '_forward.html',
@@ -1921,6 +1922,7 @@ def stats():
     teamid = request.values.get('id')
 
     teamid = int(teamid) if teamid else request.form.get('id')
+    print(f"*** STATS FOR TEAM ID: {teamid} ***")
     all_teams = session['all_teams']
 
     error = ""
@@ -1933,12 +1935,255 @@ def stats():
     all_team_names = session['all_team_names']
     teamname = all_team_names[all_teams.index(teamid)]
 
+    # Get all current players for the team
+    current_players = (db.session.query(Players)
+                       .filter_by(owner=teamid)
+                       .order_by(Players.data_date.desc())
+                       .all())
+
+    # Filter to get the most recent data for each player
+    latest_players = {}
+    for player in current_players:
+        if player.ht_id not in latest_players:
+            latest_players[player.ht_id] = player
+
+    current_players_list = list(latest_players.values())
+
+    # Calculate team statistics
+    team_stats = calculate_team_statistics(current_players_list)
+
+    # Get top performers
+    top_scorers = get_top_scorers(current_players_list)
+    top_performers = get_top_performers(current_players_list)
+
+    # Get match statistics for the team
+    match_stats = get_team_match_statistics(teamid)
+
+    # Get trophy data from CHPP
+    trophies = []
+    try:
+        print(f"\n=== FETCHING TROPHY DATA FOR TEAM {teamid} ===")
+        chpp = CHPP(consumer_key,
+                    consumer_secret,
+                    session['access_key'],
+                    session['access_secret'])
+        team_details = chpp.team(ht_id=teamid)
+
+        print(f"Team details fetched: {team_details.name}")
+        print(f"Team has trophies attribute: {hasattr(team_details, 'trophies')}")
+
+        if hasattr(team_details, 'trophies'):
+            print(f"Trophies object: {team_details.trophies}")
+            print(f"Trophies type: {type(team_details.trophies)}")
+            print(f"Trophies length: {len(team_details.trophies) if team_details.trophies else 0}")
+            if team_details.trophies:
+                print(f"Processing {len(team_details.trophies)} trophies")
+                for i, trophy in enumerate(team_details.trophies):
+                    print(f"Trophy {i}: {vars(trophy)}")
+                    trophies.append({
+                        'type_id': getattr(trophy, 'type_id', None),
+                        'season': getattr(trophy, 'season', None),
+                        'league_level': getattr(trophy, 'league_level', None),
+                        'league_level_unit_name': getattr(trophy, 'league_level_unit_name', 'Unknown'),
+                        'gained_date': getattr(trophy, 'gained_date', None),
+                        'cup_league_level': getattr(trophy, 'cup_league_level', None)
+                    })
+            else:
+                print("Trophies list is empty or None")
+        else:
+            print("No trophies attribute found on team object")
+    except Exception as e:
+        print(f"Error fetching trophies: {e}")
+        import traceback
+        print(traceback.format_exc())
+        trophies = []
+
+    print(f"=== TROPHY FETCH COMPLETE: {len(trophies)} trophies found ===\n")
+
     return create_page(
         template='stats.html',
         error=error,
         teamname=teamname,
         teamid=teamid,
+        team_stats=team_stats,
+        top_scorers=top_scorers,
+        top_performers=top_performers,
+        match_stats=match_stats,
+        trophies=trophies,
         title='Stats')
+
+# --------------------------------------------------------------------------------
+
+def calculate_team_statistics(players):
+    """Calculate comprehensive team statistics from current players"""
+    if not players:
+        return {}
+
+    def safe_int(value):
+        """Safely convert value to int, handling None and strings"""
+        if value is None:
+            return 0
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return 0
+
+    def safe_float(value):
+        """Safely convert value to float, handling None and strings"""
+        if value is None:
+            return 0.0
+        try:
+            if isinstance(value, str):
+                # Handle comma-separated numbers and extract numeric part
+                import re
+                value_clean = value.replace(',', '')
+                # Extract just the numeric part (e.g., "25.234" -> 25.234)
+                match = re.search(r'\d+\.?\d*', value_clean)
+                if match:
+                    return float(match.group())
+            return float(value)
+        except (ValueError, TypeError):
+            return 0.0
+
+    total_players = len(players)
+    total_career_goals = sum(safe_int(p.career_goals) for p in players)
+    total_team_goals = sum(safe_int(p.current_team_goals) for p in players)
+    total_matches = sum(safe_int(p.current_team_matches) for p in players)
+    total_league_goals = sum(safe_int(p.league_goals) for p in players)
+    total_cup_goals = sum(safe_int(p.cup_goals) for p in players)
+    total_friendly_goals = sum(safe_int(p.friendly_goals) for p in players)
+
+    # Calculate average age
+    avg_age = sum(safe_float(p.age) for p in players) / total_players if total_players > 0 else 0
+
+    # Calculate average TSI (Total Skill Index)
+    avg_tsi = sum(safe_int(p.tsi) for p in players) / total_players if total_players > 0 else 0
+
+    # Calculate average salary
+    avg_salary = sum(safe_int(p.salary) for p in players) / total_players if total_players > 0 else 0
+
+    # Goals per match ratio
+    goals_per_match = total_team_goals / total_matches if total_matches > 0 else 0
+
+    return {
+        'total_players': total_players,
+        'total_career_goals': total_career_goals,
+        'total_team_goals': total_team_goals,
+        'total_matches': total_matches,
+        'total_league_goals': total_league_goals,
+        'total_cup_goals': total_cup_goals,
+        'total_friendly_goals': total_friendly_goals,
+        'avg_age': round(avg_age, 1),
+        'avg_tsi': f"{int(avg_tsi):,}",
+        'avg_wage': int(avg_salary),
+        'goals_per_match': round(goals_per_match, 2)
+    }
+
+def get_top_scorers(players, limit=5):
+    """Get top goal scorers from current players"""
+    def safe_int(value):
+        try:
+            return int(value) if value else 0
+        except (ValueError, TypeError):
+            return 0
+
+    scorers = [(f"{p.first_name} {p.last_name}", safe_int(p.current_team_goals), safe_int(p.current_team_matches))
+               for p in players if safe_int(p.current_team_goals) > 0]
+    scorers.sort(key=lambda x: x[1], reverse=True)
+    return scorers[:limit]
+
+def get_top_performers(players, limit=5):
+    """Get top performers based on TSI"""
+    def safe_int(value):
+        try:
+            return int(value) if value else 0
+        except (ValueError, TypeError):
+            return 0
+
+    def safe_float(value):
+        """Extract numeric value from age string"""
+        if value is None:
+            return 0.0
+        try:
+            if isinstance(value, str):
+                # Handle age strings like "25.234" by extracting numeric part
+                import re
+                value_clean = value.replace(',', '')
+                match = re.search(r'\d+\.?\d*', value_clean)
+                if match:
+                    return float(match.group())
+            return float(value)
+        except (ValueError, TypeError):
+            return 0.0
+
+    performers = [(f"{p.first_name} {p.last_name}", f"{safe_int(p.tsi):,}", round(safe_float(p.age), 1))
+                  for p in players if safe_int(p.tsi) > 0]
+    performers.sort(key=lambda x: int(x[1].replace(',', '')), reverse=True)
+    return performers[:limit]
+
+def get_team_match_statistics(teamid):
+    """Get team's match statistics from Match and MatchPlay tables"""
+    try:
+        # Get recent matches for the team
+        matches = (db.session.query(Match)
+                   .filter_by(home_team_id=teamid)
+                   .order_by(Match.datetime.desc())
+                   .limit(10)
+                   .all())
+
+        if not matches:
+            # Try as away team
+            matches = (db.session.query(Match)
+                       .filter_by(away_team_id=teamid)
+                       .order_by(Match.datetime.desc())
+                       .limit(10)
+                       .all())
+
+        wins = losses = draws = 0
+        goals_for = goals_against = 0
+
+        for match in matches:
+            if match.home_team_id == teamid:
+                goals_for += match.home_goals or 0
+                goals_against += match.away_goals or 0
+                if match.home_goals > match.away_goals:
+                    wins += 1
+                elif match.home_goals < match.away_goals:
+                    losses += 1
+                else:
+                    draws += 1
+            else:
+                goals_for += match.away_goals or 0
+                goals_against += match.home_goals or 0
+                if match.away_goals > match.home_goals:
+                    wins += 1
+                elif match.away_goals < match.home_goals:
+                    losses += 1
+                else:
+                    draws += 1
+
+        return {
+            'total_matches': len(matches),
+            'wins': wins,
+            'losses': losses,
+            'draws': draws,
+            'goals_for': goals_for,
+            'goals_against': goals_against,
+            'goal_difference': goals_for - goals_against,
+            'win_percentage': round(wins / len(matches) * 100, 1) if matches else 0
+        }
+    except Exception as e:
+        dprint(1, f"Error getting match statistics: {e}")
+        return {
+            'total_matches': 0,
+            'wins': 0,
+            'losses': 0,
+            'draws': 0,
+            'goals_for': 0,
+            'goals_against': 0,
+            'goal_difference': 0,
+            'win_percentage': 0
+        }
 
 # --------------------------------------------------------------------------------
 

@@ -1,111 +1,102 @@
 {% extends 'base.html' %}
 
 {% block scripts %}
-
 {{ super() }}
 
 <script>
+// Team Statistics Charts
+document.addEventListener('DOMContentLoaded', function() {
 
-  // Data
-  var data = {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [{
-      label: "PM",
-      backgroundColor: "rgba(255, 99, 132, 0.2)",
-      borderColor: "rgba(255, 99, 132)",
-      pointColor: "rgba(220,220,220,1)",
-      pointStrokeColor: "#fff",
-      pointHighlightFill: "#fff",
-      pointHighlightStroke: "rgba(220,220,220,1)",
-      data: [6, 6, 7, 7, 8, 8, 8]
-    }, {
-      label: "Wing",
-      backgroundColor: "rgba(54, 162, 235, 0.2)",
-      borderColor: "rgba(54, 162, 235)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
-      pointHighlightFill: "#fff",
-      pointHighlightStroke: "rgba(151,187,205,1)",
-      data: [2, 2, 3, 3, 4, 4, 5]
-    }, {
-      label: "PS",
-      backgroundColor: "rgba(255, 206, 86, 0.2)",
-      borderColor: "rgba(255, 206, 86)",
-      pointColor: "rgba(151,187,205,1)",
-      pointStrokeColor: "#fff",
-      pointHighlightFill: "#fff",
-      pointHighlightStroke: "rgba(151,187,205,1)",
-      data: [12, 12, 12, 13, 13, 13, 14]
-    }]
-  };
-
-  // Global + Custom Chart Config Options
-
-  var options = {
-    bezierCurve: false,
-    animation: true,
-    animationEasing: "easeOutQuart",
-    showScale: false,
-    tooltipEvents: ["mousemove", "touchstart", "touchmove"],
-    tooltipCornerRadius: 3,
-    pointDot : true,
-    pointDotRadius : 4,
-    datasetFill : true,
-    scaleShowLine : true,
-    animationEasing : "easeOutBounce",
-    animateRotate : true,
-    animateScale : true,
-  };
-
-  var ctx1 = document.getElementById('myLineChart');
-  var myLineChart = new Chart(ctx1, {
-    type: 'line',
-    data: data,
-    options: options
-  });
-
-</script>
-
-<script>
-  var ctx = document.getElementById('myChart');
-  var myChart = new Chart(ctx, {
-      type: 'bar',
+  // Goals Distribution Chart
+  var ctx1 = document.getElementById('goalsChart');
+  if (ctx1 && {{ team_stats.total_team_goals or 0 }} > 0) {
+    var goalsChart = new Chart(ctx1, {
+      type: 'doughnut',
       data: {
-          labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-          datasets: [{
-              label: '# of Votes',
-              data: [2, 19, 3, 5, 2, 3],
-              backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)'
-              ],
-              borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-              ],
-              borderWidth: 1
-          }]
+        labels: ['League Goals', 'Cup Goals', 'Friendly Goals'],
+        datasets: [{
+          data: [
+            {{ team_stats.total_league_goals or 0 }},
+            {{ team_stats.total_cup_goals or 0 }},
+            {{ team_stats.total_friendly_goals or 0 }}
+          ],
+          backgroundColor: [
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(255, 206, 86, 0.8)'
+          ],
+          borderColor: [
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(255, 206, 86, 1)'
+          ],
+          borderWidth: 2
+        }]
       },
       options: {
-          scales: {
-              yAxes: [{
-                  ticks: {
-                      beginAtZero: true
-                  }
-              }]
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Goals by Competition'
           }
+        }
       }
-  });
-</script>
+    });
+  }
 
+  // Match Results Chart
+  var ctx2 = document.getElementById('matchResultsChart');
+  if (ctx2 && {{ match_stats.total_matches or 0 }} > 0) {
+    var matchChart = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['Wins', 'Draws', 'Losses'],
+        datasets: [{
+          label: 'Matches',
+          data: [
+            {{ match_stats.wins or 0 }},
+            {{ match_stats.draws or 0 }},
+            {{ match_stats.losses or 0 }}
+          ],
+          backgroundColor: [
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(255, 99, 132, 0.8)'
+          ],
+          borderColor: [
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(255, 99, 132, 1)'
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Recent Match Results (Last 10)'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+  }
+
+});
+</script>
 
 {% endblock %}
 
@@ -117,8 +108,6 @@
       <div class="container">
         <h1 class="display-6">{{ title }}</h1>
         <p class="lead">{{ teamname }}</p>
-        <!-- <hr class="my-4">
-        <p><i>Under construction</i></p> -->
       </div>
     </div>
   </div>
@@ -129,49 +118,304 @@
   </div>
   {% endif %}
 
-  <div class="row">
-
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <p class="card-text">
-            <div class="card-body">
-              <h5 class="card-title">Player Playersson</h5>
-              <p class="text-sm13">
-
-                <canvas id="myLineChart" width="400" height="400"></canvas>
-
-              </p>
+  <!-- Current Competition Status -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>🏆 Current Competition Status</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Team Kits Section -->
+            <div class="col-md-12 mb-3">
+              <div class="card border-info">
+                <div class="card-body">
+                  <h6 class="card-title">👕 Team Kits & Logo</h6>
+                  <div class="row text-center">
+                    {% if competition_info and competition_info.logo_url %}
+                    <div class="col-md-4">
+                      <p><strong>Team Logo</strong></p>
+                      <img src="{{ competition_info.logo_url }}" alt="Team Logo" class="img-fluid" style="max-height: 80px;">
+                    </div>
+                    {% endif %}
+                    {% if competition_info and competition_info.dress_uri %}
+                    <div class="col-md-4">
+                      <p><strong>Home Kit</strong></p>
+                      <img src="{{ competition_info.dress_uri }}" alt="Home Kit" class="img-fluid" style="max-height: 120px;">
+                    </div>
+                    {% endif %}
+                    {% if competition_info and competition_info.dress_alternate_uri %}
+                    <div class="col-md-4">
+                      <p><strong>Away Kit</strong></p>
+                      <img src="{{ competition_info.dress_alternate_uri }}" alt="Away Kit" class="img-fluid" style="max-height: 120px;">
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
-          </p>
+
+            {% if competition_info and competition_info.league_name %}
+            <div class="col-md-6 mb-3">
+              <div class="card border-primary">
+                <div class="card-body">
+                  <h6 class="card-title">🏅 League Competition</h6>
+                  <p class="card-text">
+                    <strong>League:</strong> {{ competition_info.league_name }}<br>
+                    <strong>Level:</strong> {{ competition_info.league_level }}<br>
+                    <strong>Division:</strong> {{ competition_info.league_level_unit_name or 'N/A' }}<br>
+                  </p>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if competition_info and competition_info.cup_name %}
+            <div class="col-md-6 mb-3">
+              <div class="card border-success">
+                <div class="card-body">
+                  <h6 class="card-title">🏆 Cup Competition</h6>
+                  <p class="card-text">
+                    <strong>Cup:</strong> {{ competition_info.cup_name }}<br>
+                    <strong>Level:</strong> {{ competition_info.cup_level or 'N/A' }}<br>
+                    <strong>Still Active:</strong> {{ 'Yes' if competition_info.still_in_cup else 'No' }}<br>
+                    {% if competition_info.still_in_cup and competition_info.cup_match_rounds_left %}
+                    <strong>Rounds Left:</strong> {{ competition_info.cup_match_rounds_left }}<br>
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if competition_info and competition_info.power_rating %}
+            <div class="col-md-6 mb-3">
+              <div class="card border-warning">
+                <div class="card-body">
+                  <h6 class="card-title">📊 Power Rating</h6>
+                  <p class="card-text">
+                    <strong>Rating:</strong> {{ competition_info.power_rating }}<br>
+                    {% if competition_info.power_rating_global_ranking %}
+                    <strong>Global Rank:</strong> #{{ competition_info.power_rating_global_ranking }}<br>
+                    {% endif %}
+                    {% if competition_info.power_rating_league_ranking %}
+                    <strong>League Rank:</strong> #{{ competition_info.power_rating_league_ranking }}<br>
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Team Overview Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">{{ team_stats.total_players or 0 }}</h5>
+          <p class="card-text">Total Players</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">{{ team_stats.total_team_goals or 0 }}</h5>
+          <p class="card-text">Team Goals</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">{{ team_stats.avg_age or 0 }}</h5>
+          <p class="card-text">Average Age</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title">{{ team_stats.avg_tsi or 0 }}</h5>
+          <p class="card-text">Average TSI</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <canvas id="goalsChart" width="400" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <canvas id="matchResultsChart" width="400" height="300"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Performers Tables -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Top Scorers</h5>
+        </div>
+        <div class="card-body">
+          {% if top_scorers %}
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Goals</th>
+                <th>Matches</th>
+                <th>Goals/Match</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for player, goals, matches in top_scorers %}
+              <tr>
+                <td>{{ player }}</td>
+                <td>{{ goals }}</td>
+                <td>{{ matches }}</td>
+                <td>{{ "%.2f"|format(goals / matches if matches > 0 else 0) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="text-muted">No goal data available</p>
+          {% endif %}
         </div>
       </div>
     </div>
 
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <p class="card-text">
-            <div class="card-body">
-              <h5 class="card-title">head</h5>
-              <p class="text-sm13">
-
-                <canvas id="myChart" width="400" height="400"></canvas>
-
-
-              </p>
-            </div>
-          </p>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5>Top Performers (TSI)</h5>
+        </div>
+        <div class="card-body">
+          {% if top_performers %}
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>TSI</th>
+                <th>Age</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for player, tsi, age in top_performers %}
+              <tr>
+                <td>{{ player }}</td>
+                <td>{{ tsi }}</td>
+                <td>{{ age }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p class="text-muted">No player data available</p>
+          {% endif %}
         </div>
       </div>
     </div>
-
   </div>
 
-  <div class="row">
-    <div class="col-sm"><p></p>
+  <!-- Match Statistics -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>Match Statistics (Last 10 Games)</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-2">
+              <strong>{{ match_stats.total_matches or 0 }}</strong><br>
+              <small class="text-muted">Total Matches</small>
+            </div>
+            <div class="col-md-2">
+              <strong>{{ match_stats.wins or 0 }}</strong><br>
+              <small class="text-muted">Wins</small>
+            </div>
+            <div class="col-md-2">
+              <strong>{{ match_stats.draws or 0 }}</strong><br>
+              <small class="text-muted">Draws</small>
+            </div>
+            <div class="col-md-2">
+              <strong>{{ match_stats.losses or 0 }}</strong><br>
+              <small class="text-muted">Losses</small>
+            </div>
+            <div class="col-md-2">
+              <strong>{{ match_stats.goals_for or 0 }}</strong><br>
+              <small class="text-muted">Goals For</small>
+            </div>
+            <div class="col-md-2">
+              <strong>{{ match_stats.goal_difference or 0 }}</strong><br>
+              <small class="text-muted">Goal Diff</small>
+            </div>
+          </div>
+          {% if match_stats.total_matches > 0 %}
+          <div class="mt-3">
+            <div class="progress">
+              <div class="progress-bar bg-success" role="progressbar"
+                   style="width: {{ (match_stats.wins / match_stats.total_matches * 100) }}%">
+                Win Rate: {{ match_stats.win_percentage }}%
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Additional Team Stats -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>Additional Team Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <strong>{{ team_stats.total_career_goals or 0 }}</strong><br>
+              <small class="text-muted">Total Career Goals</small>
+            </div>
+            <div class="col-md-3">
+              <strong>{{ team_stats.total_matches or 0 }}</strong><br>
+              <small class="text-muted">Total Team Matches</small>
+            </div>
+            <div class="col-md-3">
+              <strong>{{ team_stats.goals_per_match or 0 }}</strong><br>
+              <small class="text-muted">Goals per Match</small>
+            </div>
+            <div class="col-md-3">
+              <strong>{{ team_stats.avg_wage or 0 }}</strong><br>
+              <small class="text-muted">Average Wage</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 </div>
 
