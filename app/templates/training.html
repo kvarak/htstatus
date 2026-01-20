@@ -370,7 +370,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% set prev_skills = none %}
+                    {% set prev_skills = None %}
                     {% for (dat, skills) in allplayers[ht_id]|reverse %}
                     <tr>
                       <td><small>{{ dat.strftime('%Y-%m-%d') }}</small></td>
