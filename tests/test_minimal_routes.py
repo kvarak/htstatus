@@ -8,8 +8,9 @@ from unittest.mock import Mock, patch
 import pytest
 from flask import Flask
 
+from app.blueprints.main import main_bp
 from app.factory import create_app
-from app.routes_bp import create_page, dprint, initialize_routes, main_bp
+from app.routes_bp import create_page, dprint, initialize_routes
 
 
 class MinimalTestConfig:
@@ -217,7 +218,7 @@ class TestModuleFunctionality:
 
     def test_module_level_imports(self):
         """Test that all necessary imports work at module level."""
-        from app.routes_bp import create_page, dprint, initialize_routes, main_bp
+        from app.routes_bp import create_page, dprint, initialize_routes
         assert all([
             main_bp is not None,
             callable(initialize_routes),

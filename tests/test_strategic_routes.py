@@ -97,11 +97,11 @@ class TestBlueprintRoutesCoverage:
             rules = list(strategic_app.url_map.iter_rules())
             route_endpoints = [rule.endpoint for rule in rules]
 
-            # Expected blueprint routes (login route is still in legacy routes)
+            # Expected blueprint routes
             expected = [
-                'main.index', 'main.logout', 'main.player',
-                'main.team', 'main.matches', 'main.training', 'main.update',
-                'main.settings', 'main.debug'
+                'main.index', 'auth.logout', 'player.player',
+                'team.team', 'matches.matches', 'training.training', 'team.update',
+                'main.settings', 'main.admin'
             ]
 
             for endpoint in expected:
@@ -231,7 +231,7 @@ class TestBlueprintRoutesCoverage:
 
     def test_blueprint_attributes_coverage(self):
         """Test blueprint object attributes comprehensively."""
-        from app.routes_bp import main_bp
+        from app.blueprints.main import main_bp
 
         # Test all accessible attributes
         assert main_bp.name == 'main'
@@ -293,7 +293,7 @@ class TestModuleImportCoverage:
 
     def test_blueprint_registration_import_coverage(self):
         """Test blueprint registration and related imports."""
-        from app.routes_bp import main_bp
+        from app.blueprints.main import main_bp
 
         # Test the main blueprint
         assert main_bp.name == 'main'

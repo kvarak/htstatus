@@ -7,6 +7,8 @@ class MockCHPPUser:
         self.user_id = user_id
         self.loginname = loginname
         self.supporter_tier = 'none'
+        self._SOURCE_FILE = 'managercompendium'  # Expected by team route
+        self._teams_ht_id = [54321]  # List of team IDs this user manages
 
     def __getitem__(self, key):
         """Allow dict-like access for backward compatibility."""
@@ -19,6 +21,7 @@ class MockCHPPTeam:
     def __init__(self, team_id=54321, team_name='Test Team'):
         self.team_id = team_id
         self.team_name = team_name
+        self.name = team_name  # Expected by team route
         self.short_team_name = team_name.split()[0]
         self.players = []
 

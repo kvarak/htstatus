@@ -2,12 +2,14 @@
 
 import contextlib
 import os
+from unittest.mock import patch
 
 import pytest
 
 from app.factory import create_app, db
 from config import TestConfig
 from models import Group, Players, User
+from tests.mock_chpp import create_mock_chpp_client
 
 
 @pytest.fixture(scope='function')
@@ -62,8 +64,8 @@ def authenticated_client(routes_client, sample_user):
         sess['current_user_id'] = sample_user.ht_id
         sess['all_teams'] = [sample_user.ht_id]
         sess['all_team_names'] = ['Test Team']
-        sess['access_token'] = 'mock_token'
-        sess['access_token_secret'] = 'mock_secret'
+        sess['access_key'] = 'mock_access_key'
+        sess['access_secret'] = 'mock_access_secret'
     return routes_client
 
 
@@ -324,8 +326,13 @@ class TestSessionHandling:
         response = routes_client.get('/')
         assert response.status_code == 200
 
-    def test_session_persistence(self, authenticated_client):
+    @patch('app.blueprints.team.CHPP')
+    def test_session_persistence(self, mock_chpp_class, authenticated_client):
         """Test session persistence across multiple requests."""
+        # Set up mock CHPP client
+        mock_chpp = create_mock_chpp_client()
+        mock_chpp_class.return_value = mock_chpp
+
         response1 = authenticated_client.get('/')
         assert response1.status_code == 200
 
@@ -347,8 +354,13 @@ class TestErrorHandling:
         response = routes_client.delete('/')
         assert response.status_code in [405, 404]  # Method not allowed or not found
 
-    def test_missing_database_data(self, authenticated_client):
+    @patch('app.blueprints.team.CHPP')
+    def test_missing_database_data(self, mock_chpp_class, authenticated_client):
         """Test routes when expected database data is missing."""
+        # Set up mock CHPP client
+        mock_chpp = create_mock_chpp_client()
+        mock_chpp_class.return_value = mock_chpp
+
         # All routes should handle missing data gracefully
         routes_to_test = ['/', '/team', '/player', '/matches', '/training', '/settings']
         for route in routes_to_test:

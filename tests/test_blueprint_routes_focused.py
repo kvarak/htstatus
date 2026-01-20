@@ -107,7 +107,7 @@ class TestBlueprintRoutes:
     def test_routes_bp_module_imports(self, test_app):
         """Test that routes_bp module can be properly imported and used."""
         with test_app.app_context():
-            from app.routes_bp import main_bp
+            from app.blueprints.main import main_bp
             assert main_bp is not None
             assert main_bp.name == 'main'
 
