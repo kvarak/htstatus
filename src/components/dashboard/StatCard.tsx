@@ -10,13 +10,13 @@ interface StatCardProps {
   description?: string
 }
 
-export default function StatCard({ 
-  title, 
-  value, 
-  change, 
-  changeType, 
-  icon: Icon, 
-  description 
+export default function StatCard({
+  title,
+  value,
+  change,
+  changeType,
+  icon: Icon,
+  description
 }: StatCardProps) {
   return (
     <Card>
@@ -28,8 +28,8 @@ export default function StatCard({
         <div className="text-2xl font-bold">{value}</div>
         {change !== undefined && (
           <div className={`text-xs flex items-center gap-1 ${
-            changeType === 'increase' ? 'text-success' : 
-            changeType === 'decrease' ? 'text-destructive' : 
+            changeType === 'increase' ? 'text-success' :
+            changeType === 'decrease' ? 'text-destructive' :
             'text-muted-foreground'
           }`}>
             {changeType === 'increase' && '+'}

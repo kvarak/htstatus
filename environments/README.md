@@ -5,7 +5,7 @@ This directory contains environment configuration templates for different deploy
 ## Environment Templates
 
 - **`.env.development.example`** - Development environment with helpful defaults
-- **`.env.staging.example`** - Staging environment with security enhancements  
+- **`.env.staging.example`** - Staging environment with security enhancements
 - **`.env.production.example`** - Production environment with strict security requirements
 - **`config.py.example`** - Legacy configuration file template
 

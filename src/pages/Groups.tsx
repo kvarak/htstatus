@@ -18,7 +18,7 @@ export default function Groups() {
     switch (groupId) {
       case 1: // Starters
         return players.filter(p => p.tsi > 7000);
-      case 2: // Substitutes  
+      case 2: // Substitutes
         return players.filter(p => p.tsi >= 6000 && p.tsi <= 7000);
       case 3: // Youth Prospects
         return players.filter(p => p.age_years < 23);
@@ -32,12 +32,12 @@ export default function Groups() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      
+
       <div className="flex">
         <aside className="hidden lg:block w-64 border-r bg-card shadow-sm">
           <Sidebar />
         </aside>
-        
+
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
@@ -122,12 +122,12 @@ export default function Groups() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {groups.map((group) => {
                 const playersInGroup = getPlayersInGroup(group.id);
-                
+
                 return (
                   <Card key={group.id} className="shadow-card hover:shadow-football transition-shadow">
-                    <CardHeader 
+                    <CardHeader
                       className="pb-4"
-                      style={{ 
+                      style={{
                         backgroundColor: group.bgcolor,
                         color: group.textcolor
                       }}
@@ -138,15 +138,15 @@ export default function Groups() {
                           {group.name}
                         </CardTitle>
                         <div className="flex items-center gap-2">
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0 hover:bg-white/20"
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            variant="ghost" 
+                          <Button
+                            variant="ghost"
                             size="sm"
                             className="h-8 w-8 p-0 hover:bg-white/20"
                           >
@@ -155,7 +155,7 @@ export default function Groups() {
                         </div>
                       </div>
                     </CardHeader>
-                    
+
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -174,7 +174,7 @@ export default function Groups() {
                           <h4 className="text-sm font-medium text-muted-foreground">Players:</h4>
                           <div className="space-y-2 max-h-48 overflow-y-auto">
                             {playersInGroup.map((player) => (
-                              <div 
+                              <div
                                 key={player.ht_id}
                                 className="flex items-center justify-between p-2 rounded-md border bg-background/50"
                               >

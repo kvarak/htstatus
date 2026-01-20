@@ -7,7 +7,7 @@ This directory contains configuration files for various tools and deployment env
 Environment-specific Docker Compose override files:
 
 - **`docker-compose.development.yml`** - Development with pgAdmin and sample data
-- **`docker-compose.staging.yml`** - Staging with resource limits and monitoring  
+- **`docker-compose.staging.yml`** - Staging with resource limits and monitoring
 - **`docker-compose.production.yml`** - Production reference (use managed services instead)
 
 ### Usage
@@ -16,7 +16,7 @@ Environment-specific Docker Compose override files:
 # Development
 docker-compose -f docker-compose.yml -f configs/docker-compose.development.yml up -d
 
-# Staging  
+# Staging
 docker-compose -f docker-compose.yml -f configs/docker-compose.staging.yml up -d
 
 # Or use Makefile commands

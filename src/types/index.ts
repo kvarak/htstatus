@@ -144,7 +144,7 @@ export interface TableColumn {
 // Match Types Constants
 export const MATCH_TYPES = {
   1: "League match",
-  2: "Qualification match", 
+  2: "Qualification match",
   3: "Cup match (standard league match)",
   4: "Friendly (normal rules)",
   5: "Friendly (cup rules)",
@@ -166,17 +166,17 @@ export const MATCH_TYPES = {
   106: "Youth international friendly match (Cup rules)"
 } as const;
 
-// Position Types Constants  
+// Position Types Constants
 export const POSITION_ROLES = {
   100: "Keeper",
   101: "Right back",
-  102: "Right central defender", 
+  102: "Right central defender",
   103: "Middle central defender",
   104: "Left central defender",
   105: "Left back",
   106: "Right winger",
   107: "Right inner midfield",
-  108: "Middle inner midfield", 
+  108: "Middle inner midfield",
   109: "Left inner midfield",
   110: "Left winger",
   111: "Right forward",

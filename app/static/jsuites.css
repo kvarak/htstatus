@@ -10,7 +10,7 @@
  */
 
 :root {
-    --button-color: #298BA8; 
+    --button-color: #298BA8;
     --active-color: #007aff;
 }
 
@@ -145,7 +145,7 @@
     0% { left: -100%; }
     100% { left: 0%; }
 }
-    
+
 @keyframes slide-left-out {
     0% { left: 0%; }
     100% { left: -100%; }
@@ -167,7 +167,7 @@
     0% { left: 100%; }
     100% { left: 0%; }
 }
-    
+
 @keyframes slide-right-out {
     0% { left: 0%; }
     100% { left: 100%; }
@@ -188,7 +188,7 @@
     0% { transform: translateY(-100%); }
     100% { -webkit-transform: translateY(0%); }
 }
-    
+
 @keyframes slide-top-out {
     0% { transform: translateY(0%); }
     100% { transform: translateY(-100%); }
@@ -209,7 +209,7 @@
     0% { transform: translateY(100%); }
     100% { -webkit-transform: translateY(0%); }
 }
-    
+
 @keyframes slide-bottom-out {
     0% { transform: translateY(0%); }
     100% { transform: translateY(100%); }
@@ -343,7 +343,7 @@
 
 .jcalendar-months td, .jcalendar-years td {
     height:24px;
-} 
+}
 
 .jcalendar-input {
     padding-right:18px;
@@ -554,7 +554,7 @@
     padding: 0px;
     z-index: 8000;
     display: none;
-    
+
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
      -khtml-user-select: none; /* Konqueror HTML */
@@ -1962,7 +1962,7 @@
     justify-content: flex-start;
     padding: 2px;
     border: 1px solid #ccc;
-} 
+}
 
 .jtags.jtags-empty:not(.jtags-focus)::before {
     position: absolute;
@@ -2129,7 +2129,7 @@
 
 .jtoolbar-mobile .jtoolbar-item {
     flex:1;
-} 
+}
 
 .jtoolbar .jtoolbar-divisor {
     width: 2px;

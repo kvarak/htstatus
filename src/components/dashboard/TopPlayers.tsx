@@ -33,7 +33,7 @@ export default function TopPlayers({ players }: TopPlayersProps) {
 
   const getBestSkill = (skills: Player["skills"]) => {
     const skillEntries = Object.entries(skills).filter(([key]) => key !== "keeper")
-    const bestSkill = skillEntries.reduce((best, current) => 
+    const bestSkill = skillEntries.reduce((best, current) =>
       current[1] > best[1] ? current : best
     )
     return {

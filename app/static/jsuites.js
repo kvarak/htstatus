@@ -26,7 +26,7 @@ var jSuites = function(options) {
 
 jSuites.ajax = (function(options, complete) {
     if (Array.isArray(options)) {
-        // Create multiple request controller 
+        // Create multiple request controller
         var multiple = {
             instance: [],
             complete: complete,
@@ -359,7 +359,7 @@ jSuites.calendar = (function(el, options) {
         // Restrictions
         validRange: null,
         // Starting weekday - 0 for sunday, 6 for saturday
-        startingDay: null, 
+        startingDay: null,
         // Date format
         format: 'DD/MM/YYYY',
         // Allow keyboard date entry
@@ -472,7 +472,7 @@ jSuites.calendar = (function(el, options) {
     var calendarTableContainer = document.createElement('div');
     calendarTableContainer.className = 'jcalendar-table';
     calendarContent.appendChild(calendarTableContainer);
-    
+
     // Previous button
     var calendarHeaderPrev = document.createElement('td');
     calendarHeaderPrev.setAttribute('colspan', '2');
@@ -518,7 +518,7 @@ jSuites.calendar = (function(el, options) {
     var calendarSelectHour = document.createElement('select');
     calendarSelectHour.className = 'jcalendar-select';
     calendarSelectHour.onchange = function() {
-        obj.date[3] = this.value; 
+        obj.date[3] = this.value;
 
         // Event
         if (typeof(obj.options.onupdate) == 'function') {
@@ -570,7 +570,7 @@ jSuites.calendar = (function(el, options) {
     calendarControlsUpdate.style.flexGrow = '10';
     calendarControlsUpdate.appendChild(calendarControlsUpdateButton);
     calendarControlsFooter.appendChild(calendarControlsTime);
-    
+
     // Only show the update button for input elements
     if (el.tagName == 'INPUT') {
         calendarControlsFooter.appendChild(calendarControlsUpdate);
@@ -644,7 +644,7 @@ jSuites.calendar = (function(el, options) {
                         if (window.innerHeight < rect.bottom + rectContent.height) {
                             calendarContainer.style.bottom = (1 * rect.height + rectContent.height + 2) + 'px';
                         } else {
-                            calendarContainer.style.top = 2 + 'px'; 
+                            calendarContainer.style.top = 2 + 'px';
                         }
                     }
                 }
@@ -910,7 +910,7 @@ jSuites.calendar = (function(el, options) {
         // Index of days
         var index = 0;
         var d = 0;
- 
+
         // Calendar table
         for (var j = 0; j < 6; j++) {
             // Reset cells container
@@ -995,7 +995,7 @@ jSuites.calendar = (function(el, options) {
         var months = obj.options.months;
 
         // Value
-        var value = obj.options.value; 
+        var value = obj.options.value;
 
         // Current date
         var date = new Date();
@@ -1072,7 +1072,7 @@ jSuites.calendar = (function(el, options) {
         updateActions();
     }
 
-    obj.getYears = function() { 
+    obj.getYears = function() {
         // Mode
         obj.options.mode = 'years';
 
@@ -2060,7 +2060,7 @@ jSuites.contextmenu = (function(el, options) {
             el.appendChild(itemContainer);
         }
     }
-    
+
     /**
      * Private function for create a new Item element
      * @param {type} item
@@ -2110,7 +2110,7 @@ jSuites.contextmenu = (function(el, options) {
                 el_submenu.classList.add('jcontextmenu');
                 // Focusable
                 el_submenu.setAttribute('tabindex', '900');
-                
+
                 // Append items
                 var submenu = item.submenu;
                 for (var i = 0; i < submenu.length; i++) {
@@ -2256,7 +2256,7 @@ jSuites.dropdown = (function(el, options) {
 
     // Create dropdown
     el.classList.add('jdropdown');
- 
+
     if (obj.options.type == 'searchbar') {
         el.classList.add('jdropdown-searchbar');
     } else if (obj.options.type == 'list') {
@@ -2300,7 +2300,7 @@ jSuites.dropdown = (function(el, options) {
             obj.options.onblur(el);
         }
     }
-    
+
     if (obj.options.newOptions == true) {
         obj.header.classList.add('jdropdown-add');
     }
@@ -2413,7 +2413,7 @@ jSuites.dropdown = (function(el, options) {
             var data = [];
             if (obj.options.data.length) {
                 for (var j = 0; j < obj.options.data.length; j++) {
-                    data.push(obj.options.data[j]); 
+                    data.push(obj.options.data[j]);
                 }
             }
             // Set data
@@ -2541,7 +2541,7 @@ jSuites.dropdown = (function(el, options) {
         if (data.text) {
             node.innerText = data.text;
         } else {
-            node.innerHTML = '&nbsp;'; 
+            node.innerHTML = '&nbsp;';
         }
 
         // Title
@@ -2741,7 +2741,7 @@ jSuites.dropdown = (function(el, options) {
                 }
                 obj.items[i].selected = null;
             }
-        } 
+        }
 
         // Reset
         obj.value = [];
@@ -2796,7 +2796,7 @@ jSuites.dropdown = (function(el, options) {
 
     obj.resetSelected = function() {
         obj.setValue(null);
-    } 
+    }
 
     obj.selectIndex = function(index) {
         // Make sure is a number
@@ -3553,7 +3553,7 @@ jSuites.editor = (function(el, options) {
     if (obj.options.value) {
         var value = obj.options.value;
     } else {
-        var value = el.innerHTML ? el.innerHTML : ''; 
+        var value = el.innerHTML ? el.innerHTML : '';
     }
 
     if (! value) {
@@ -3564,7 +3564,7 @@ jSuites.editor = (function(el, options) {
      * Onchange event controllers
      */
     var change = function(e) {
-        if (typeof(obj.options.onchange) == 'function') { 
+        if (typeof(obj.options.onchange) == 'function') {
             obj.options.onchange(el, obj, e);
         }
 
@@ -3614,10 +3614,10 @@ jSuites.editor = (function(el, options) {
                 range = sel.getRangeAt(0);
                 var selectedText = range.toString();
                 range.deleteContents();
-                range.insertNode(newNode); 
+                range.insertNode(newNode);
                 // move the cursor after element
                 range.setStartAfter(newNode);
-                range.setEndAfter(newNode); 
+                range.setEndAfter(newNode);
                 sel.removeAllRanges();
                 sel.addRange(range);
             }
@@ -3684,7 +3684,7 @@ jSuites.editor = (function(el, options) {
                 if (thumbsContainer) {
                     thumbsContainer.remove();
                 }
-                var text = container.innerText; 
+                var text = container.innerText;
                 var url = jSuites.editor.detectUrl(text);
 
                 if (url) {
@@ -4043,7 +4043,7 @@ jSuites.editor = (function(el, options) {
             } else {
                 editorAction = true;
             }
-        } else { 
+        } else {
             if (e.target.classList.contains('jsnippet')) {
                 close(e.target);
             } else if (e.target.parentNode.classList.contains('jsnippet')) {
@@ -4112,7 +4112,7 @@ jSuites.editor = (function(el, options) {
             editor.innerHTML = '<div><br></div>';
         }
 
-        if (typeof(obj.options.onkeyup) == 'function') { 
+        if (typeof(obj.options.onkeyup) == 'function') {
             obj.options.onkeyup(el, obj, e);
         }
     }
@@ -4124,7 +4124,7 @@ jSuites.editor = (function(el, options) {
             verifyEditor();
         }
 
-        if (typeof(obj.options.onkeydown) == 'function') { 
+        if (typeof(obj.options.onkeydown) == 'function') {
             obj.options.onkeydown(el, obj, e);
         }
     }
@@ -4229,7 +4229,7 @@ jSuites.editor = (function(el, options) {
             var html = (e.originalEvent || e).dataTransfer.getData('text/html');
             var text = (e.originalEvent || e).dataTransfer.getData('text/plain');
             var file = (e.originalEvent || e).dataTransfer.files;
-    
+
             if (file.length) {
                 obj.addFile(file);
             } else if (text) {
@@ -4357,7 +4357,7 @@ jSuites.editor.youtubeParser = function(url) {
     return (match && match[7].length == 11) ? match[7] : false;
 }
 
-jSuites.editor.getDefaultToolbar = function() { 
+jSuites.editor.getDefaultToolbar = function() {
     return [
         {
             content: 'undo',
@@ -4791,7 +4791,7 @@ jSuites.form = (function(el, options) {
 
                 if (data === false) {
                     console.log('Onbeforesave returned false');
-                    return; 
+                    return;
                 }
             }
 
@@ -4831,7 +4831,7 @@ jSuites.form = (function(el, options) {
         element.removeAttribute('title');
         // Get elements in the form
         var elements = el.querySelectorAll("input, select, textarea");
-        // Run all elements 
+        // Run all elements
         for (var i = 0; i < elements.length; i++) {
             if (elements[i].getAttribute('data-validation')) {
                 if (elements[i].classList.contains('error')) {
@@ -4870,7 +4870,7 @@ jSuites.form = (function(el, options) {
     obj.reset = function() {
         // Get elements in the form
         var elements = el.querySelectorAll("input, select, textarea");
-        // Run all elements 
+        // Run all elements
         for (var i = 0; i < elements.length; i++) {
             if (elements[i].tagName == 'INPUT' && elements[i].type == 'checkbox') {
                 elements[i].removeAttribute('checked');
@@ -4885,7 +4885,7 @@ jSuites.form = (function(el, options) {
         var test = [];
         // Get elements in the form
         var elements = el.querySelectorAll("input, select, textarea");
-        // Run all elements 
+        // Run all elements
         for (var i = 0; i < elements.length; i++) {
             // Required
             if (elements[i].getAttribute('data-validation')) {
@@ -5244,11 +5244,11 @@ jSuites.sha512 = (function(str) {
         var bin = [];
         var mask = (1 << charsize) - 1;
         var len = str.length * charsize;
-    
+
         for (var i = 0; i < len; i += charsize) {
             bin[i >> 5] |= (str.charCodeAt(i / charsize) & mask) << (32 - charsize - (i % 32));
         }
-    
+
         return bin;
     }
 
@@ -5662,7 +5662,7 @@ jSuites.image = (function(el, options) {
     });
 
     el.addEventListener('drop', function(e) {
-        e.preventDefault();  
+        e.preventDefault();
         e.stopPropagation();
 
 
@@ -5885,7 +5885,7 @@ jSuites.mask = (function() {
                     }
                 } else {
                     if (e.target.selectionStart < e.target.selectionEnd) {
-                        var currentValue = e.target.value.substring(0, e.target.selectionStart); 
+                        var currentValue = e.target.value.substring(0, e.target.selectionStart);
                     } else {
                         var currentValue = e.target.value;
                     }
@@ -5906,7 +5906,7 @@ jSuites.mask = (function() {
                 // Prevent default
                 e.preventDefault();
 
-                // New value 
+                // New value
                 var value = values.join('');
 
                 // Update value to the element
@@ -6063,7 +6063,7 @@ jSuites.mask = (function() {
                     } else {
                         values[index] += input;
                     }
-                    
+
                     if (values[index].length == pieces[index].length) {
                         index++;
                     }
@@ -6103,7 +6103,7 @@ jSuites.mask = (function() {
                             values[index] = t.join('');
                             if (values[index].substr(0,1) == separator) {
                                 values[index] = values[index].substr(1);
-                            } 
+                            }
                         }
                     }
                     return true;
@@ -6254,7 +6254,7 @@ jSuites.mask = (function() {
         }
     }
 
-    /** 
+    /**
      * Thanks for the collaboration
      */
     obj.fromKeyCode = function(e) {
@@ -6647,7 +6647,7 @@ jSuites.notification = (function(options) {
 
     obj.show = function() {
         document.body.appendChild(notification);
-        if (jSuites.getWindowWidth() > 800) { 
+        if (jSuites.getWindowWidth() > 800) {
             jSuites.animation.fadeIn(notification);
         } else {
             jSuites.animation.slideTop(notification, 1);
@@ -6655,7 +6655,7 @@ jSuites.notification = (function(options) {
     }
 
     obj.hide = function() {
-        if (jSuites.getWindowWidth() > 800) { 
+        if (jSuites.getWindowWidth() > 800) {
             jSuites.animation.fadeOut(notification, function() {
                 if (notification.parentNode) {
                     notification.parentNode.removeChild(notification);
@@ -7287,7 +7287,7 @@ jSuites.slider = (function(el, options) {
             obj.show(obj.currentImage.nextSibling);
         }
     }
-    
+
     obj.prev = function() {
         if (obj.currentImage.previousSibling) {
             obj.show(obj.currentImage.previousSibling);
@@ -8240,7 +8240,7 @@ jSuites.tags = (function(el, options) {
     /**
      * Add one element from the suggestions to the element
      * @param {object} item - Node element in the suggestions container
-     */ 
+     */
     obj.selectIndex = function(item) {
         // Reset terms
         searchTerms = '';
@@ -8804,7 +8804,7 @@ jSuites.toolbar = (function(el, options) {
             toolbarItem.classList.add('jtoolbar-item');
 
             if (items[i].width) {
-                toolbarItem.style.width = parseInt(items[i].width) + 'px'; 
+                toolbarItem.style.width = parseInt(items[i].width) + 'px';
             }
 
             if (items[i].k) {
@@ -8951,7 +8951,7 @@ jSuites.validations = {};
 
 jSuites.validations.email = function(data) {
     var reg = new RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
-    return data && reg.test(data) ? true : false; 
+    return data && reg.test(data) ? true : false;
 }
 
 jSuites.validations.length = function(data, element) {

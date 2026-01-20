@@ -27,7 +27,7 @@ const getSpecialtyName = (specialty: number): string => {
   const specialties: { [key: number]: string } = {
     0: "None",
     1: "Technical",
-    2: "Quick", 
+    2: "Quick",
     3: "Powerful",
     4: "Unpredictable",
     5: "Head specialist",
@@ -47,7 +47,7 @@ const getPositionFromSkills = (player: Player): string => {
     passing: player.passing,
     scorer: player.scorer
   };
-  
+
   if (skills.keeper >= 6) return "GK";
   if (skills.defender >= 6) return "DEF";
   if (skills.playmaker >= 6) return "MID";
@@ -68,9 +68,9 @@ export default function Players() {
     .filter(player => {
       const nameMatch = `${player.first_name} ${player.last_name}`.toLowerCase()
         .includes(searchTerm.toLowerCase());
-      
+
       if (positionFilter === "all") return nameMatch;
-      
+
       const position = getPositionFromSkills(player);
       return nameMatch && position === positionFilter;
     })
@@ -92,12 +92,12 @@ export default function Players() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      
+
       <div className="flex">
         <aside className="hidden lg:block w-64 border-r bg-card shadow-sm">
           <Sidebar />
         </aside>
-        
+
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}

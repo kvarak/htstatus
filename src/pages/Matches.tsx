@@ -13,7 +13,7 @@ export default function Matches() {
   const [matches] = useState(mockMatches);
 
   // Sort matches by date (most recent first)
-  const sortedMatches = [...matches].sort((a, b) => 
+  const sortedMatches = [...matches].sort((a, b) =>
     new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
   );
 
@@ -21,7 +21,7 @@ export default function Matches() {
     const isHome = match.home_team_id === user.ht_id;
     const teamGoals = isHome ? match.home_goals : match.away_goals;
     const opponentGoals = isHome ? match.away_goals : match.home_goals;
-    
+
     if (teamGoals > opponentGoals) return { result: 'W', color: 'bg-success' };
     if (teamGoals < opponentGoals) return { result: 'L', color: 'bg-destructive' };
     return { result: 'D', color: 'bg-warning' };
@@ -60,12 +60,12 @@ export default function Matches() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      
+
       <div className="flex">
         <aside className="hidden lg:block w-64 border-r bg-card shadow-sm">
           <Sidebar />
         </aside>
-        
+
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
@@ -189,7 +189,7 @@ export default function Matches() {
                           <div className={`w-8 h-8 rounded-full ${color} flex items-center justify-center text-white font-bold text-sm`}>
                             {result}
                           </div>
-                          
+
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
                               <h4 className="font-medium">
@@ -199,7 +199,7 @@ export default function Matches() {
                                 {MATCH_TYPES[match.matchtype as keyof typeof MATCH_TYPES] || "Unknown"}
                               </Badge>
                             </div>
-                            
+
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />

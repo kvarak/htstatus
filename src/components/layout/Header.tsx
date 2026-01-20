@@ -37,7 +37,7 @@ export default function Header({ user }: HeaderProps) {
             <div className="font-bold text-xl">HT Planner</div>
           </Link>
         </div>
-        
+
         <Button
           variant="ghost"
           className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
@@ -55,12 +55,12 @@ export default function Header({ user }: HeaderProps) {
               <span>{user.league_name}</span>
             </div>
           </div>
-          
+
           <nav className="flex items-center space-x-2">
             <Button variant="ghost" size="sm">
               <Bell className="h-4 w-4" />
             </Button>
-            
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">

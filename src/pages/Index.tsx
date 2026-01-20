@@ -5,11 +5,11 @@ import StatCard from "@/components/dashboard/StatCard";
 import RecentMatches from "@/components/dashboard/RecentMatches";
 import TopPlayers from "@/components/dashboard/TopPlayers";
 import { mockUser, mockMatches, mockPlayers } from "@/data/mockData";
-import { 
-  Users, 
-  Trophy, 
-  TrendingUp, 
-  Target, 
+import {
+  Users,
+  Trophy,
+  TrendingUp,
+  Target,
   Calendar,
   BarChart3,
   Star,
@@ -26,16 +26,16 @@ const Index = () => {
   const totalMatches = matches.length;
   const averageAge = Math.round(players.reduce((sum, p) => sum + p.age_years, 0) / players.length);
   const averageTSI = Math.round(players.reduce((sum, p) => sum + p.tsi, 0) / players.length);
-  
+
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      
+
       <div className="flex">
         <aside className="hidden lg:block w-64 border-r bg-card shadow-sm">
           <Sidebar />
         </aside>
-        
+
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header Section */}

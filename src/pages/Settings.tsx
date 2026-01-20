@@ -12,12 +12,12 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      
+
       <div className="flex">
         <aside className="hidden lg:block w-64 border-r bg-card shadow-sm">
           <Sidebar />
         </aside>
-        
+
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="text-center py-20">

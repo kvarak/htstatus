@@ -54,7 +54,7 @@ export default function Sidebar() {
               </Link>
             )
           })}
-          
+
           <div className="pt-4">
             <div className="px-3 py-2">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">

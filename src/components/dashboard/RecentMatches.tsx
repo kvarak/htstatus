@@ -28,18 +28,18 @@ export default function RecentMatches({ matches }: RecentMatchesProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {matches.map((match) => {
-          const result = match.is_home 
+          const result = match.is_home
             ? `${match.home_goals}-${match.away_goals}`
             : `${match.away_goals}-${match.home_goals}`
-          
+
           const opponent = match.is_home ? match.away_team : match.home_team
-          
-          const isWin = match.is_home 
+
+          const isWin = match.is_home
             ? match.home_goals > match.away_goals
             : match.away_goals > match.home_goals
-          
+
           const isDraw = match.home_goals === match.away_goals
-          
+
           return (
             <div
               key={match.id}

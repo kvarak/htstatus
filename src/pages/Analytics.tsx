@@ -57,12 +57,12 @@ export default function Analytics() {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} />
-      
+
       <div className="flex">
         <aside className="hidden lg:block w-64 border-r bg-card shadow-sm">
           <Sidebar />
         </aside>
-        
+
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             {/* Header */}
@@ -150,14 +150,14 @@ export default function Analytics() {
                         <Badge variant="outline" className="w-12 justify-center">
                           {position}
                         </Badge>
-                        <span className="text-sm font-medium">{position === 'GK' ? 'Goalkeepers' : 
+                        <span className="text-sm font-medium">{position === 'GK' ? 'Goalkeepers' :
                           position === 'DEF' ? 'Defenders' :
                           position === 'MID' ? 'Midfielders' :
                           position === 'WIN' ? 'Wingers' : 'Forwards'}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-muted rounded-full h-2 overflow-hidden">
-                          <div 
+                          <div
                             className="bg-primary h-full transition-all duration-500"
                             style={{ width: `${(count / totalPlayers) * 100}%` }}
                           />
@@ -190,7 +190,7 @@ export default function Analytics() {
                       </div>
                       <div className="flex items-center gap-2">
                         <div className="w-24 bg-muted rounded-full h-2 overflow-hidden">
-                          <div 
+                          <div
                             className={`${color} h-full transition-all duration-500`}
                             style={{ width: `${(ageGroups[key as keyof typeof ageGroups] / totalPlayers) * 100}%` }}
                           />
