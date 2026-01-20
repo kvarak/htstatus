@@ -6,11 +6,11 @@
 1. ALWAYS read this entire backlog before selecting tasks
 2. Choose tasks marked 🎯 Ready to Execute with no blockers
 3. Update task status when starting (🚀 ACTIVE) and completing (✅ COMPLETED)
-4. Follow priority order: P1 Testing → P2 Deployment → P3 Functionality → P4 Stability → P5 DevOps → P6 Documentation
+4. Follow priority order: P1 Testing → P2 Deployment → P3 Functionality → P4 Stability → P5 DevOps → P6 Documentation → P7 Future
 5. Move completed tasks to history/backlog-done.md with completion notes and REMOVE them from here.
 
 **For Humans**:
-- Tasks organized by 6 priority levels based on project maturity and risk
+- Tasks organized by 7 priority levels based on project maturity and risk
 - P1 tasks ensure application reliability and testing confidence
 - P2-P3 tasks build core functionality and maintainability
 - P4-P6 tasks enhance operations, developer experience, and documentation
@@ -62,6 +62,9 @@
 - 🎯 [UI-007] Update Report Icon Display (2-3 hours) - Change visualization
 - 🎯 [FEAT-004] Hattrick Language Localization (4-6 hours) - Multi-language support
 - 🔮 [RESEARCH-001] Additional Integrations - Future research
+
+**Priority 7: Potential Future Improvements**
+- 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
 
 ---
 
@@ -1196,6 +1199,96 @@ Linting scan identified 38 errors in development scripts (production code is lin
 - No new linting errors introduced
 
 **Expected Outcomes**: Consistent code quality across entire project, improved maintainability
+
+## Priority 7: Potential Future Improvements
+
+### [REFACTOR-004] Replace pyCHPP Dependency
+**Status**: 🔮 Research & Planning | **Effort**: 16-24 hours | **Priority**: P7 Future
+**Dependencies**: CHPP API documentation research, REFACTOR-001 completion | **Strategic Value**: Long-term dependency independence, custom optimization
+
+**Problem Statement**:
+The application currently depends on the third-party `pychpp` library for Hattrick CHPP API integration. This creates several maintenance and control issues:
+- External dependency maintenance burden and update compatibility
+- Limited control over API interaction patterns and error handling
+- Potential for library abandonment or breaking changes
+- Inability to optimize for HTStatus-specific use cases
+- Testing complexity with external library mocking
+
+**Research Phase** (Required before implementation):
+1. **CHPP API Documentation Analysis** (4-6 hours):
+   - Study official Hattrick CHPP API documentation and endpoints
+   - Document all currently used API calls and response formats
+   - Identify authentication flows (OAuth 1.0) and session management
+   - Map pychpp functionality to raw API calls
+
+2. **Reference Implementation Analysis** (2-3 hours):
+   - **lucianoq/hattrick** (Go): Clean OAuth 1.0 implementation with structured API calls
+     - Uses mrjones/oauth library for authentication
+     - XML parsing with Go structs and xml tags
+     - Modular file structure: `/chpp/` (data models), `/api/` (endpoints), `/parsed/` (XML handling)
+     - Clear separation: Raw API → Parsed XML → Typed objects
+   - **pychpp** (Python): Comprehensive Python framework with 57/57 CHPP files supported
+     - Two-layer architecture: XML models (`/xml/`) and Custom models (`/custom/`)
+     - OAuth authentication with request/access token flow
+     - HTProxyField pattern for selective data parsing
+     - Consistent interface: `chpp.user()`, `chpp.team(id)`, `chpp.player(id)`
+
+3. **Current Usage Audit** (2-3 hours):
+   - Catalog all pychpp usage across application (routes, auth, updates)
+   - Document expected data structures and transformation logic
+   - Identify error handling patterns and retry mechanisms
+   - Assess testing requirements and mock strategies
+
+4. **Architecture Design** (2-4 hours):
+   - Design custom CHPP client class structure based on reference implementations
+   - Plan OAuth 1.0 authentication pattern (similar to Go implementation)
+   - Design response parsing and data transformation (XML → Python objects)
+   - Plan backward compatibility during transition (identical interface to pychpp)
+
+**Implementation Phases** (Post-research):
+1. **Core CHPP Client** (4-6 hours):
+   - OAuth 1.0 authentication implementation (request_token → access_token flow)
+   - HTTP request handling with proper error handling and retry logic
+   - XML response parsing with lxml or xml.etree
+   - Base client class with standard CHPP API patterns
+
+2. **Data Models** (3-4 hours):
+   - User, team, player, match data structures matching pychpp interface
+   - XML to Python object mapping (similar to Go struct tags)
+   - Implement consistent object interface (user(), team(id), player(id))
+   - Add navigation between objects (team.players, player.team, etc.)
+
+3. **Integration & Migration** (4-6 hours):
+   - Replace pychpp calls throughout application with custom client
+   - Maintain identical interface for zero breaking changes
+   - Add improved error handling and logging
+   - Ensure session management and OAuth token handling
+
+4. **Testing & Validation** (3-4 hours):
+   - Comprehensive test coverage without external dependencies
+   - Mock CHPP responses for reliable testing
+   - Performance validation against pychpp
+   - Integration testing with real CHPP API
+
+**Acceptance Criteria**:
+- Custom CHPP client with identical interface to pychpp for seamless replacement
+- All current functionality maintained (authentication, data fetching, updates)
+- Improved error handling and logging for debugging
+- Comprehensive test coverage without external dependencies
+- Performance equal or superior to pychpp
+- Documentation for custom CHPP client usage and maintenance
+- OAuth 1.0 authentication flow properly implemented
+- XML parsing with proper data type conversion
+- Consistent object navigation patterns
+
+**Implementation Insights from Research**:
+- **Authentication**: Both implementations use OAuth 1.0 with request_token/access_token flow
+- **Architecture**: Clear separation between raw API, XML parsing, and typed objects
+- **Error Handling**: Proper CHPP error code parsing and custom exceptions
+- **Modularity**: File-per-API approach (lucianoq) vs unified client (pychpp)
+- **Data Models**: XML tags drive object structure with type conversion
+
+**Expected Outcomes**: Eliminated external dependency, improved control and maintainability, enhanced testing capability
 
 ---
 
