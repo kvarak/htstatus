@@ -370,17 +370,32 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for (dat, skills) in allplayers[ht_id] %}
+                    {% set prev_skills = none %}
+                    {% for (dat, skills) in allplayers[ht_id]|reverse %}
                     <tr>
                       <td><small>{{ dat.strftime('%Y-%m-%d') }}</small></td>
-                      <td class="text-end"><small>{{ skills[0] }}</small></td>
-                      <td class="text-end"><small>{{ skills[1] }}</small></td>
-                      <td class="text-end"><small>{{ skills[2] }}</small></td>
-                      <td class="text-end"><small>{{ skills[3] }}</small></td>
-                      <td class="text-end"><small>{{ skills[4] }}</small></td>
-                      <td class="text-end"><small>{{ skills[5] }}</small></td>
-                      <td class="text-end"><small>{{ skills[6] }}</small></td>
+                      {% for i in range(7) %}
+                        {% set val = skills[i] %}
+                        {% if prev_skills %}
+                          {% set change = val - prev_skills[i] %}
+                        {% else %}
+                          {% set change = 0 %}
+                        {% endif %}
+                        <td class="text-end">
+                          <small>
+                            {% if change > 0 %}
+                              <span style="color: #22c55e; font-weight: bold;">↑</span>
+                            {% elif change < 0 %}
+                              <span style="color: #ef4444; font-weight: bold;">↓</span>
+                            {% else %}
+                              <span style="color: #999;"> </span>
+                            {% endif %}
+                            {{ val }}
+                          </small>
+                        </td>
+                      {% endfor %}
                     </tr>
+                    {% set prev_skills = skills %}
                     {% endfor %}
                   </tbody>
                 </table>
