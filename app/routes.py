@@ -2064,28 +2064,17 @@ def training():
         skill_changes[player_id] = []
         player_data = allplayers[player_id]
 
-        # First pass: calculate changes with simple chronological logic
-        temp_data = []
+        # Simple approach: for each row, compare with the chronologically previous row
         for i, (date, skills) in enumerate(reversed(player_data)):
-            if i == 0:
-                # First entry (newest) has no previous comparison
+            if i == len(player_data) - 1:
+                # Oldest row has no previous to compare with
                 changes = [0] * 7
             else:
-                # Compare with previous entry (chronologically later)
-                prev_date, prev_skills = list(reversed(player_data))[i-1]
-                # Simple comparison: current - previous
-                changes = [skills[j] - prev_skills[j] for j in range(7)]
-            temp_data.append((date, skills, changes))
-
-        # Second pass: shift arrows to appear on the "result" row (the increased value)
-        for i, (date, skills, changes) in enumerate(temp_data):
-            if i == 0:
-                # Newest row shows no arrow (no future to compare to)
-                display_changes = [0] * 7
-            else:
-                # Show the change that resulted IN this skill level
-                display_changes = temp_data[i-1][2]  # Take changes from the previous (newer) row
-            skill_changes[player_id].append((date, skills, display_changes))
+                # Compare current skills with chronologically older skills
+                older_date, older_skills = list(reversed(player_data))[i+1]
+                # Positive change = improvement (show green ↑)
+                changes = [skills[j] - older_skills[j] for j in range(7)]
+            skill_changes[player_id].append((date, skills, changes))
 
     return create_page(
         template='training.html',
