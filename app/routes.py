@@ -2058,6 +2058,23 @@ def training():
                 prev_skills = skills
         allplayers[player_id] = deduped
 
+    # Calculate skill changes for arrows (newest first comparison)
+    skill_changes = {}
+    for player_id in allplayers:
+        skill_changes[player_id] = []
+        player_data = allplayers[player_id]
+
+        # Reverse the list to get newest first, then calculate changes
+        for i, (date, skills) in enumerate(reversed(player_data)):
+            if i == 0:
+                # First entry (newest) has no comparison
+                changes = [0] * 7
+            else:
+                # Compare with previous entry (chronologically later, but previous in reversed list)
+                prev_date, prev_skills = list(reversed(player_data))[i-1]
+                changes = [skills[j] - prev_skills[j] for j in range(7)]
+            skill_changes[player_id].append((date, skills, changes))
+
     return create_page(
         template='training.html',
         teamname=teamname,
@@ -2068,4 +2085,5 @@ def training():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
+        skill_changes=skill_changes,
         title='Training')
