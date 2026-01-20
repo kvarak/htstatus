@@ -30,6 +30,7 @@
 - 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
 - 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
 - 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
+- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough
 
 **Priority 4: Stability & Maintainability** (It stays working) - 🚀 4/6 IN PROGRESS
 - ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
@@ -39,6 +40,7 @@
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 - 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
 - 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs
+- 🎯 [REFACTOR-005] Production Code Linting Fix (15-30 min) - Fix 1 remaining production linting error
 
 **Priority 5: DevOps & Developer Experience** (Make it easy)
 - 🎯 [ORG-001] Consolidate Environment Templates (15-20 min) - Remove duplication
@@ -53,7 +55,6 @@
 - 🎯 [DOC-011-API] API Documentation (4-6 hours) - Developer experience
 - 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
 - 🎯 [DOC-004] Progress Metrics (1 hour) - Project visibility
-- 🎯 [DOC-021] New Player Tutorial (3-5 hours) - Onboarding walkthrough
 - 🎯 [FEAT-007] Team Series View (4-6 hours) - Historical performance tracking
 - 🎯 [FEAT-001] Data Visualization (12-15 hours) - Enhanced charts
 - 🎯 [UI-004] Bulk Player Group Editor (3-4 hours) - Workflow optimization
@@ -65,6 +66,7 @@
 
 **Priority 7: Potential Future Improvements**
 - 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
+- 🔮 [FEAT-009] Trophy Data Integration (6-8 hours) - Add historical trophy/achievement display when pyCHPP supports it
 
 ---
 
@@ -77,6 +79,69 @@
 ---
 
 ## Priority 3: Core Functionality
+
+### [DOC-021] New Player Tutorial
+**Status**: 🎯 Ready to Execute | **Effort**: 3-5 hours | **Impact**: User onboarding and feature discovery
+**Dependencies**: Core UI features (completed) | **Strategic Value**: Reduced learning curve, improved user retention
+
+**Problem Statement**:
+New players need guided onboarding to understand HT Status features and workflows. Returning players also benefit from tutorials about newly added features. Currently, users must explore the interface without guidance, leading to:
+- Longer initial learning curve
+- Missed features and capabilities
+- Support questions about basic functionality
+- Reduced feature adoption for advanced capabilities
+
+**Implementation**:
+1. **Interactive Tutorial Walkthrough** (1.5-2 hours):
+   - Create step-by-step guided tour of main features
+   - Highlight key pages: Team, Players, Training, Matches, Settings
+   - Add tooltips and highlights for UI elements
+   - Implement "skip" and "restart" functionality
+   - Persist tutorial completion state per user
+
+2. **Feature-Specific Guides** (1-1.5 hours):
+   - Player group management (just added as FEAT-006)
+   - Training data tracking and interpretation
+   - Match analysis features
+   - Settings customization options
+   - Data update and synchronization
+
+3. **What's New Alerts** (0.5-1 hour):
+   - Detect new features since user last login
+   - Display contextual "New Feature" badges
+   - Link to relevant tutorial sections for new features
+   - Allow dismissal and "show later" options
+
+4. **Tutorial Content** (1-1.5 hours):
+   - Write clear, concise instructional text
+   - Create or capture screenshots
+   - Document common workflows
+   - Include Hattrick-specific terminology explanations
+
+**Acceptance Criteria**:
+- Interactive tutorial available on first login or from help menu
+- All major features have tutorial coverage
+- Users can restart or skip tutorial anytime
+- New feature alerts display appropriately
+- Tutorial state persists across sessions
+- Tutorial content is clear and actionable
+- Mobile-responsive tutorial experience
+- Tutorial works in multiple supported languages (if FEAT-004 completed)
+
+**Scope**:
+- **Includes**: Guided tour, feature explanations, new feature alerts, contextual help
+- **Excludes**: Hattrick game rules education (out of scope), advanced strategy guides
+- **Focus**: HT Status feature functionality and workflows
+
+**Technical Approach**:
+- Use a tutorial library (e.g., Intro.js, Shepherd.js, or custom implementation)
+- Store tutorial state in user settings/preferences
+- Implement feature detection for new alerts
+- Create reusable tutorial component/system for future features
+
+**Expected Outcomes**: Improved user onboarding, faster time-to-productivity, reduced support burden, better adoption of newly added features, increased user retention
+
+---
 
 ### [FEAT-003] Formation Tester & Tactics Analyzer
 **Status**: 🔮 Research & Planning | **Effort**: 24-32 hours (estimated) | **Impact**: Tactical decision support
@@ -557,69 +622,6 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 - Progress reporting mechanism
 
 **Expected Outcomes**: Better project visibility, data-driven decisions, progress transparency
-
----
-
-### [DOC-021] New Player Tutorial
-**Status**: 🎯 Ready to Execute | **Effort**: 3-5 hours | **Impact**: User onboarding and feature discovery
-**Dependencies**: Core UI features (completed) | **Strategic Value**: Reduced learning curve, improved user retention
-
-**Problem Statement**:
-New players need guided onboarding to understand HT Status features and workflows. Returning players also benefit from tutorials about newly added features. Currently, users must explore the interface without guidance, leading to:
-- Longer initial learning curve
-- Missed features and capabilities
-- Support questions about basic functionality
-- Reduced feature adoption for advanced capabilities
-
-**Implementation**:
-1. **Interactive Tutorial Walkthrough** (1.5-2 hours):
-   - Create step-by-step guided tour of main features
-   - Highlight key pages: Team, Players, Training, Matches, Settings
-   - Add tooltips and highlights for UI elements
-   - Implement "skip" and "restart" functionality
-   - Persist tutorial completion state per user
-
-2. **Feature-Specific Guides** (1-1.5 hours):
-   - Player group management (just added as FEAT-006)
-   - Training data tracking and interpretation
-   - Match analysis features
-   - Settings customization options
-   - Data update and synchronization
-
-3. **What's New Alerts** (0.5-1 hour):
-   - Detect new features since user last login
-   - Display contextual "New Feature" badges
-   - Link to relevant tutorial sections for new features
-   - Allow dismissal and "show later" options
-
-4. **Tutorial Content** (1-1.5 hours):
-   - Write clear, concise instructional text
-   - Create or capture screenshots
-   - Document common workflows
-   - Include Hattrick-specific terminology explanations
-
-**Acceptance Criteria**:
-- Interactive tutorial available on first login or from help menu
-- All major features have tutorial coverage
-- Users can restart or skip tutorial anytime
-- New feature alerts display appropriately
-- Tutorial state persists across sessions
-- Tutorial content is clear and actionable
-- Mobile-responsive tutorial experience
-- Tutorial works in multiple supported languages (if FEAT-004 completed)
-
-**Scope**:
-- **Includes**: Guided tour, feature explanations, new feature alerts, contextual help
-- **Excludes**: Hattrick game rules education (out of scope), advanced strategy guides
-- **Focus**: HT Status feature functionality and workflows
-
-**Technical Approach**:
-- Use a tutorial library (e.g., Intro.js, Shepherd.js, or custom implementation)
-- Store tutorial state in user settings/preferences
-- Implement feature detection for new alerts
-- Create reusable tutorial component/system for future features
-
-**Expected Outcomes**: Improved user onboarding, faster time-to-productivity, reduced support burden, better adoption of newly added features, increased user retention
 
 ---
 
@@ -1202,6 +1204,39 @@ Linting scan identified 38 errors in development scripts (production code is lin
 
 ## Priority 7: Potential Future Improvements
 
+### [FEAT-009] Trophy Data Integration
+**Status**: 🔮 Future Task | **Effort**: 6-8 hours | **Priority**: P7 | **Impact**: User engagement
+
+**Problem Statement**:
+Stats page was designed to display team trophies and achievements, but current pyCHPP version doesn't expose trophy data through the API. Need to implement trophy display when library support becomes available or find alternative data source.
+
+**Current State**:
+- Stats page template has trophy display section ready
+- Competition status fallback implemented (jerseys, league, cup, power rating)
+- Debug investigation confirmed pyCHPP v0.x lacks trophy attribute
+- React Analytics page has trophy display capability
+
+**Acceptance Criteria**:
+- [ ] Research if newer pyCHPP versions support trophy data
+- [ ] Investigate alternative CHPP API endpoints for trophy/achievement data
+- [ ] Implement trophy data fetching when source identified
+- [ ] Connect to existing template trophy display section
+- [ ] Add historical achievement tracking
+- [ ] Test with teams that have trophy history
+
+**Implementation Notes**:
+- Check pyCHPP GitHub for updates or feature requests
+- May require direct CHPP XML file parsing if library unsupported
+- Consider storing trophy data in database for historical tracking
+- Template already structured for season, level, division, date display
+
+**Technical Context**:
+- Current implementation: app/blueprints/matches.py stats() route
+- Template: app/templates/stats.html
+- Competition info extraction working as reference pattern
+
+---
+
 ### [REFACTOR-004] Replace pyCHPP Dependency
 **Status**: 🔮 Research & Planning | **Effort**: 16-24 hours | **Priority**: P7 Future
 **Dependencies**: CHPP API documentation research, REFACTOR-001 completion | **Strategic Value**: Long-term dependency independence, custom optimization
@@ -1324,6 +1359,38 @@ The application currently depends on the third-party `pychpp` library for Hattri
 - ✅ [DOC-016] Root scripts documentation
 
 **Quality Achievement**: 98/100 health, 202/218 tests passing, 96% coverage, 0 security issues, production code lint-free
+
+---
+
+## Task Details: New Tasks
+
+### [REFACTOR-005] Production Code Linting Fix
+**Status**: 🎯 Ready to Execute | **Effort**: 15-30 min | **Priority**: P4 | **Impact**: Code quality gate
+
+**Problem Statement**:
+Quality gate shows 1 linting error in production code (out of 31 total). While 30 errors are acceptable in dev scripts, production code must be lint-free for quality standards.
+
+**Current State**:
+- `make test-all` shows: "31 errors (including 1 in production code)"
+- Tests passing: 213/218 (97.7%)
+- Security: 0 issues
+- Type sync: 85 baseline mismatches
+
+**Acceptance Criteria**:
+- [ ] Identify the 1 production code linting error
+- [ ] Fix the error following project coding standards
+- [ ] Verify fix with `make lint`
+- [ ] Confirm `make test-all` shows 0 production errors
+- [ ] No test regressions introduced
+
+**Implementation Notes**:
+- Run `make lint` to locate specific error
+- Common issues: import order, unused variables, line length
+- May be in app/ or models.py
+- Quick win for quality gate improvement
+
+**Related Tasks**:
+- [DEVOPS-001] Script Linting Cleanup addresses remaining 30 dev script errors
 
 ---
 
