@@ -370,20 +370,19 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% set prev_skills = None %}
                     {% for (dat, skills) in allplayers[ht_id]|reverse %}
                     <tr>
                       <td><small>{{ dat.strftime('%Y-%m-%d') }}</small></td>
                       {% for i in range(7) %}
                         {% set val = skills[i] %}
-                        {% if prev_skills %}
-                          {% set change = val - prev_skills[i] %}
+                        {% if loop.previtem %}
+                          {% set prev_val = loop.previtem[1][i] %}
+                          {% set change = val - prev_val %}
                         {% else %}
                           {% set change = 0 %}
                         {% endif %}
                         <td class="text-end">
                           <small>
-                            <!-- Debug: val={{ val }}, prev={{ prev_skills[i] if prev_skills else 'None' }}, change={{ change }} -->
                             {% if change < 0 %}
                               <span style="color: #22c55e; font-weight: bold;">↑</span>
                             {% elif change > 0 %}
@@ -396,7 +395,6 @@
                         </td>
                       {% endfor %}
                     </tr>
-                    {% set prev_skills = skills %}
                     {% endfor %}
                   </tbody>
                 </table>
