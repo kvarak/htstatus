@@ -193,7 +193,7 @@ def settings():
 
     group_data = (db.session.query(Group)
                   .filter_by(user_id=session['current_user_id'])
-                  .order_by(text("order"))
+                  .order_by(Group.order)
                   .all())
 
     # Add a default group
