@@ -381,7 +381,7 @@ class TestHelperFunctions:
 
             # Test create_page function with request context
             with app_with_routes.test_request_context():
-                from app.routes_bp import create_page
+                from app.utils import create_page
                 result = create_page('main.html', 'Test Title')
                 assert result is not None  # Should return rendered template
 

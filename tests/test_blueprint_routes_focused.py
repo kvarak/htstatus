@@ -138,7 +138,7 @@ class TestRouteHelpers:
     def test_debug_print_function(self, test_app):
         """Test debug_print helper function."""
         with test_app.app_context():
-            from app.routes_bp import dprint
+            from app.utils import dprint
             # Should be callable without errors
             dprint(1, 'test', 'test_function', 'arg1', 'arg2')
             assert True  # If no exception, function exists and works
