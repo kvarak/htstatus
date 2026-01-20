@@ -2072,18 +2072,7 @@ def training():
             else:
                 # Compare with previous entry (chronologically later, but previous in reversed list)
                 prev_date, prev_skills = list(reversed(player_data))[i-1]
-                changes = [skills[j] - prev_skills[j] for j in range(7)]
-            skill_changes[player_id].append((date, skills, changes))
-
-    return create_page(
-        template='training.html',
-        teamname=teamname,
-        error=error,
-        skills=tracecolumns,
-        teamid=teamid,
-        increases=increases,
-        playernames=playernames,
-        allplayerids=allplayerids,
-        allplayers=allplayers,
-        skill_changes=skill_changes,
-        title='Training')
+                # Since we're showing newest first, we want: current - chronologically_earlier
+                # But prev_skills is actually chronologically LATER than skills
+                # So we reverse: prev_skills - skills to get the right direction
+                changes = [prev_skills[j] - skills[j] for j in range(7)]
