@@ -6,6 +6,7 @@ import time
 
 from flask import Blueprint, current_app, render_template, session
 from flask_bootstrap import Bootstrap
+from sqlalchemy import desc, text
 
 from models import User
 
@@ -83,6 +84,90 @@ def dprint(lvl, *args):
         for a in args:
             pstr = pstr + str(a)
         print(now + " " + info.function + ":" + str(info.lineno) + " " + pstr)
+
+
+def debug_print(route, function, *args):
+    """Debug print function for route tracking."""
+    if debug_level and 2 <= debug_level:
+        now = time.strftime('%Y-%m-%d %H:%M:%S')
+        pstr = ""
+        for a in args:
+            pstr = pstr + str(a)
+        print(now + " [" + route + "] " + function + " " + pstr)
+
+
+def diff_month(d1, d2):
+    """Calculate months between two dates."""
+    return (d1.year - d2.year) * 12 + d1.month - d2.month
+
+
+def diff(first, second):
+    """Find elements in first list that are not in second list."""
+    return [item for item in first if item not in second]
+
+
+def get_training(players_data):
+    """Extract training and player name data from player records."""
+    allplayerids = []
+    allplayers = {}
+    playernames = {}
+    for entry in players_data:
+        allplayers[entry.ht_id] = []
+        if entry.number == 100:
+            playernames[entry.ht_id] = entry.first_name + " " + entry.last_name
+        else:
+            playernames[entry.ht_id] = str(entry.number) + ". " + \
+                entry.first_name + " " + entry.last_name
+        if entry.ht_id not in allplayerids:
+            allplayerids.append(entry.ht_id)
+
+    return (allplayerids, allplayers, playernames)
+
+
+def player_diff(playerid, daysago):
+    """Calculate player skill changes over a period of days."""
+    from datetime import datetime, timedelta
+    from models import Players
+
+    # Get current player data
+    now = datetime.now()
+    targetdate = now - timedelta(days=daysago)
+
+    playerdata_now = (db.session.query(Players)
+                      .filter_by(ht_id=playerid)
+                      .order_by(desc("data_date"))
+                      .first())
+
+    playerdata_then = (db.session.query(Players)
+                       .filter_by(ht_id=playerid)
+                       .filter(Players.data_date <= targetdate)
+                       .order_by(desc("data_date"))
+                       .first())
+
+    if not playerdata_now or not playerdata_then:
+        return None
+
+    playername = playerdata_now.first_name + " " + playerdata_now.last_name
+
+    changes = {
+        'id': playerid,
+        'name': playername,
+        'keeper': playerdata_now.keeper - playerdata_then.keeper,
+        'defender': playerdata_now.defender - playerdata_then.defender,
+        'playmaker': playerdata_now.playmaker - playerdata_then.playmaker,
+        'winger': playerdata_now.winger - playerdata_then.winger,
+        'passing': playerdata_now.passing - playerdata_then.passing,
+        'scorer': playerdata_now.scorer - playerdata_then.scorer,
+        'set_pieces': playerdata_now.set_pieces - playerdata_then.set_pieces,
+    }
+
+    # Return None if no changes
+    total_change = sum([v for k, v in changes.items() if k != 'id' and k != 'name'])
+    if total_change == 0:
+        return None
+
+    return changes
+
 
 def create_page(template, title, **kwargs):
     """Create page with standard template context."""

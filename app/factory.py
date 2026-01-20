@@ -58,39 +58,84 @@ def create_app(config_object=None, include_routes=True):
 
 def setup_routes(app_instance, db_instance):
     """Set up routes with the app and db instances using Blueprint pattern."""
-    # Import Blueprint routes and initialize
-    from app.routes_bp import initialize_routes, main_bp
-
-    # Initialize the routes module with app and db
-    initialize_routes(app_instance, db_instance)
-
-    # Register the Blueprint
-    app_instance.register_blueprint(main_bp)
-
-    # Import legacy routes module WITHOUT executing @app.route decorators
-    # We'll manually register the route functions instead
-
-    # Temporarily replace app.routes.app to prevent decorator failures during import
+    # Initialize legacy routes module for helper functions and constants
     import app.routes as routes_module
-
-    # Set app and db instances
     routes_module.app = app_instance
     routes_module.db = db_instance
-
-    # Call initialize_routes() to set up remaining module globals
     routes_module.initialize_routes()
+
+    # Import and initialize blueprint modules
+    from app.routes_bp import initialize_routes as init_routes_bp
+    init_routes_bp(app_instance, db_instance)
+
+    # Import blueprint functions
+    from app.blueprints.auth import setup_auth_blueprint, login, logout
+    from app.blueprints.main import setup_main_blueprint, index, settings, admin
+    from app.blueprints.player import setup_player_blueprint, player
+    from app.blueprints.team import setup_team_blueprint, team, update
+    from app.blueprints.matches import setup_matches_blueprint, matches, stats
+    from app.blueprints.training import setup_training_blueprint, training
+
+    # Setup authentication blueprint
+    setup_auth_blueprint(
+        app_instance,
+        db_instance,
+        app_instance.config.get('CONSUMER_KEY', 'dev_key'),
+        app_instance.config.get('CONSUMER_SECRETS', 'dev_secret')
+    )
+
+    # Setup main blueprint
+    setup_main_blueprint(
+        db_instance,
+        routes_module.defaultcolumns,
+        routes_module.allcolumns,
+        routes_module.default_group_order
+    )
+
+    # Setup player blueprint
+    setup_player_blueprint(
+        db_instance,
+        routes_module.defaultcolumns,
+        routes_module.calccolumns,
+        routes_module.tracecolumns,
+        routes_module.default_group_order
+    )
+
+    # Setup team blueprint
+    setup_team_blueprint(
+        app_instance,
+        db_instance,
+        app_instance.config.get('CONSUMER_KEY', 'dev_key'),
+        app_instance.config.get('CONSUMER_SECRETS', 'dev_secret'),
+        routes_module.version,
+        routes_module.fullversion
+    )
+
+    # Setup matches blueprint
+    setup_matches_blueprint(
+        db_instance,
+        routes_module.HTmatchtype,
+        routes_module.HTmatchrole,
+        routes_module.HTmatchbehaviour
+    )
+
+    # Setup training blueprint
+    setup_training_blueprint(
+        db_instance,
+        routes_module.tracecolumns
+    )
 
     # Manually register all route functions (bypassing failed decorators)
     # This is necessary because @app.route decorators failed during import when app=None
-    app_instance.add_url_rule('/', 'index', routes_module.index, methods=['GET'])
-    app_instance.add_url_rule('/index', 'index', routes_module.index, methods=['GET'])
-    app_instance.add_url_rule('/settings', 'settings', routes_module.settings, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/login', 'login', routes_module.login, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/logout', 'logout', routes_module.logout, methods=['GET'])
-    app_instance.add_url_rule('/update', 'update', routes_module.update, methods=['GET'])
-    app_instance.add_url_rule('/debug', 'admin', routes_module.admin, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/team', 'team', routes_module.team, methods=['GET'])
-    app_instance.add_url_rule('/player', 'player', routes_module.player, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/matches', 'matches', routes_module.matches, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/stats', 'stats', routes_module.stats, methods=['GET'])
-    app_instance.add_url_rule('/training', 'training', routes_module.training, methods=['GET'])
+    app_instance.add_url_rule('/', 'index', index, methods=['GET'])
+    app_instance.add_url_rule('/index', 'index', index, methods=['GET'])
+    app_instance.add_url_rule('/settings', 'settings', settings, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/login', 'login', login, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/logout', 'logout', logout, methods=['GET'])
+    app_instance.add_url_rule('/update', 'update', update, methods=['GET'])
+    app_instance.add_url_rule('/debug', 'admin', admin, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/team', 'team', team, methods=['GET'])
+    app_instance.add_url_rule('/player', 'player', player, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/matches', 'matches', matches, methods=['GET', 'POST'])
+    app_instance.add_url_rule('/stats', 'stats', stats, methods=['GET'])
+    app_instance.add_url_rule('/training', 'training', training, methods=['GET'])

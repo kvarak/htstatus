@@ -1059,7 +1059,7 @@ def settings():
 
     group_data = (db.session.query(Group)
                   .filter_by(user_id=session['current_user_id'])
-                  .order_by("order")
+                  .order_by(text("order"))
                   .all())
 
     # Add a default group
@@ -1497,8 +1497,8 @@ def update():
         # Of each of the players you ever have owned, get the last download
         players_data = (db.session.query(Players)
                         .filter_by(owner=teamid)
-                        .order_by("number")
-                        .order_by("data_date")
+                        .order_by(text("number"))
+                        .order_by(text("data_date"))
                         .all())
         players_indb = []
         for p in players_data:
@@ -1719,7 +1719,7 @@ def player():
 
     group_data = (db.session.query(Group)
                   .filter_by(user_id=session['current_user_id'])
-                  .order_by("order")
+                  .order_by(text("order"))
                   .all())
 
     into_groups = (db.session
@@ -1733,8 +1733,8 @@ def player():
     # Of each of the players you ever have owned, get the last download
     players_data = (db.session.query(Players)
                     .filter_by(owner=teamid)
-                    .order_by("data_date")
-                    .order_by("number")
+                    .order_by(text("data_date"))
+                    .order_by(text("number"))
                     .all())
 
     (allplayerids, allplayers, playernames) = get_training(players_data)
@@ -1968,8 +1968,8 @@ def training():
     # Get all players you have ever owned
     players_data = (db.session.query(Players)
                     .filter_by(owner=teamid)
-                    .order_by("data_date")
-                    .order_by("ht_id")
+                    .order_by(text("data_date"))
+                    .order_by(text("ht_id"))
                     .all())
 
     allplayerids = []
