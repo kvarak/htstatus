@@ -31,13 +31,14 @@
 - 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
 - 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
 
-**Priority 4: Stability & Maintainability** (It stays working) - 🚀 3/6 IN PROGRESS
+**Priority 4: Stability & Maintainability** (It stays working) - 🚀 4/6 IN PROGRESS
 - ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
-- 🚀 [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization 🚀 **95% COMPLETE** - 7 test assertions remaining (15-20 min)
+- ✅ [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization ✅ COMPLETED 2026-01-20
 - ✅ [INFRA-012] Migration Workflow (4-6 hours) - Database procedures ✅ COMPLETED 2026-01-20
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 - 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
+- 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs
 
 **Priority 5: DevOps & Developer Experience** (Make it easy)
 - 🎯 [ORG-001] Consolidate Environment Templates (15-20 min) - Remove duplication
@@ -45,6 +46,7 @@
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
 - 🎯 [INFRA-020] Fix GitHub Workflows (30 min) - CI reliability
+- 🎯 [DEVOPS-001] Script Linting Cleanup (1-2 hours) - Fix 38 linting errors in dev scripts
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
@@ -1128,6 +1130,72 @@ Currently, HT Status displays content in English regardless of the user's langua
 4. Third-party service integrations
 
 **Expected Outcomes**: Expanded feature set, increased user value, competitive advantages
+
+---
+
+## Task Details: Security & Maintenance (Added from REFACTOR-002 Review)
+
+### [SECURITY-001] Werkzeug Security Update
+**Status**: 🎯 Ready to Execute | **Effort**: 30-45 minutes | **Priority**: P4 Stability
+**Dependencies**: None | **Strategic Value**: Security compliance, dependency maintenance
+
+**Problem Statement**:
+Safety scan identified 4 CVE vulnerabilities in Werkzeug 2.3.8:
+- CVE-2024-49767: Resource exhaustion when parsing file data in forms
+- CVE-2024-49766: Path Traversal (CWE-22) on Windows systems with Python < 3.x
+- CVE-2025-66221: Denial of Service (DoS) due to improper handling of Windows special characters
+- CVE-2024-34069: Debugger vulnerability allowing unauthorized access
+
+**Implementation**:
+1. **Update Dependencies** (15-20 min):
+   - Update pyproject.toml to require `werkzeug>=3.1.4`
+   - Run `uv sync` to update lockfile
+   - Test application startup and basic functionality
+
+2. **Validation** (10-15 min):
+   - Run security scan to verify vulnerabilities resolved
+   - Execute test suite to ensure no breaking changes
+   - Update any deprecated Werkzeug API usage if needed
+
+**Acceptance Criteria**:
+- Werkzeug updated to 3.1.4 or later
+- All 4 CVE vulnerabilities resolved in safety scan
+- Test suite passes without Werkzeug-related failures
+- Application starts and functions normally
+
+**Expected Outcomes**: Eliminated security vulnerabilities, improved dependency health
+
+### [DEVOPS-001] Script Linting Cleanup
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P5 DevOps
+**Dependencies**: None | **Strategic Value**: Code quality consistency
+
+**Problem Statement**:
+Linting scan identified 38 errors in development scripts (production code is lint-free):
+- E402: Module level imports not at top of file (7 instances)
+- UP035: `typing.Dict` is deprecated, use `dict` instead (2 instances)
+- UP006: Use `dict` instead of `Dict` for type annotation (8 instances)
+- ARG001: Unused function arguments (5 instances)
+
+**Implementation**:
+1. **Import Order Fixes** (30-45 min):
+   - Move imports in scripts/apply_migrations.py, scripts/create_tables.py, scripts/manage.py to top
+   - Keep load_dotenv() calls before imports that require environment variables
+
+2. **Type Annotation Updates** (30-45 min):
+   - Replace `typing.Dict` and `typing.List` with `dict` and `list` in scripts/validate_types.py
+   - Update type hints to use modern Python 3.9+ syntax
+
+3. **Unused Parameter Cleanup** (15-30 min):
+   - Add underscore prefix to unused parameters or use `# noqa: ARG001` where appropriate
+   - Review if parameters can be removed entirely
+
+**Acceptance Criteria**:
+- All 38 linting errors resolved
+- Scripts maintain full functionality
+- Modern type annotation style consistently used
+- No new linting errors introduced
+
+**Expected Outcomes**: Consistent code quality across entire project, improved maintainability
 
 ---
 
