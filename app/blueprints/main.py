@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
-from app.routes_bp import create_page, diff_month, dprint
+from app.utils import create_page, diff_month, dprint
 from models import Group, PlayerSetting, User
 
 # Create Blueprint for main routes

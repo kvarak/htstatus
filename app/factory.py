@@ -64,6 +64,14 @@ def setup_routes(app_instance, db_instance):
     routes_module.db = db_instance
     routes_module.initialize_routes()
 
+    # Initialize utils module with app and db instances
+    from app.utils import initialize_utils
+    initialize_utils(
+        app_instance,
+        db_instance,
+        app_instance.config.get('DEBUG_LEVEL', 0)
+    )
+
     # Import and initialize blueprint modules
     from app.routes_bp import initialize_routes as init_routes_bp
     init_routes_bp(app_instance, db_instance)

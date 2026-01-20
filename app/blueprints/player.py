@@ -5,7 +5,7 @@ import math
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
-from app.routes_bp import create_page, dprint, get_training
+from app.utils import create_page, dprint, get_training
 from models import Group, MatchPlay, Players, PlayerSetting, User
 
 # Create Blueprint for player routes
@@ -159,7 +159,7 @@ def player():
         columns = defaultcolumns
 
     # Import calculateContribution from routes module for backward compatibility
-    from app.routes import calculateContribution, calculateManmark
+    from app.utils import calculateContribution, calculateManmark
 
     # Calculate contributions
     for _x, c in columns:

@@ -8,7 +8,7 @@ from flask import Blueprint, render_template, session
 from pychpp import CHPP
 from sqlalchemy import text
 
-from app.routes_bp import create_page, debug_print, diff, dprint, player_diff
+from app.utils import create_page, debug_print, diff, dprint, player_diff
 from models import Players
 
 # Create Blueprint for team routes

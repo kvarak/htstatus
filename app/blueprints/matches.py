@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
-from app.routes_bp import create_page
+from app.utils import create_page
 from models import Match, MatchPlay
 
 # Create Blueprint for match and stats routes
@@ -87,9 +87,7 @@ def stats():
     teamid = int(teamid) if teamid else request.form.get('id')
     all_teams = session['all_teams']
 
-    error = ""
     if teamid not in all_teams:
-        error = "Wrong teamid, try the links."
         return create_page(
             template='stats.html',
             title='Stats')
@@ -113,7 +111,7 @@ def stats():
     current_players_list = list(latest_players.values())
 
     # Calculate team statistics
-    from app.routes import (
+    from app.utils import (
         calculate_team_statistics,
         get_team_match_statistics,
         get_top_performers,

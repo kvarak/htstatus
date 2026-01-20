@@ -1,14 +1,10 @@
 """Flask routes converted to Blueprint pattern for HT Status application."""
 
-import inspect
 import subprocess  # noqa: B404 - Used only for git version detection (static commands)
 import time
 
-from flask import Blueprint, current_app, render_template, session
+from flask import Blueprint
 from flask_bootstrap import Bootstrap
-from sqlalchemy import desc
-
-from models import User
 
 # Create Blueprint for routes (helper blueprint, not registered directly)
 routes_bp = Blueprint('routes', __name__)
@@ -137,177 +133,13 @@ def __getattr__(name):
     """Dynamic attribute access for main_bp."""
     if name == 'main_bp':
         return get_main_bp()
+    # This function provides backward compatibility for any remaining direct imports
+    # All utility functions have been moved to app/utils.py
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
-# --------------------------------------------------------------------------------
-# Helper functions
-# --------------------------------------------------------------------------------
-
-def dprint(lvl, *args):
-    """Debug print function."""
-    if debug_level and lvl <= debug_level:
-        # 0 represents this line, 1 represents line at caller
-        callerframerecord = inspect.stack()[1]
-        frame = callerframerecord[0]
-        info = inspect.getframeinfo(frame)
-        now = time.strftime('%Y-%m-%d %H:%M:%S')
-        pstr = ""
-        for a in args:
-            pstr = pstr + str(a)
-        print(now + " " + info.function + ":" + str(info.lineno) + " " + pstr)
-
-
-def debug_print(route, function, *args):
-    """Debug print function for route tracking."""
-    if debug_level and debug_level >= 2:
-        now = time.strftime('%Y-%m-%d %H:%M:%S')
-        pstr = ""
-        for a in args:
-            pstr = pstr + str(a)
-        print(now + " [" + route + "] " + function + " " + pstr)
-
-
-def diff_month(d1, d2):
-    """Calculate months between two dates."""
-    return (d1.year - d2.year) * 12 + d1.month - d2.month
-
-
-def diff(first, second):
-    """Find elements in first list that are not in second list."""
-    return [item for item in first if item not in second]
-
-
-def get_training(players_data):
-    """Extract training and player name data from player records."""
-    allplayerids = []
-    allplayers = {}
-    playernames = {}
-    for entry in players_data:
-        allplayers[entry.ht_id] = []
-        if entry.number == 100:
-            playernames[entry.ht_id] = entry.first_name + " " + entry.last_name
-        else:
-            playernames[entry.ht_id] = str(entry.number) + ". " + \
-                entry.first_name + " " + entry.last_name
-        if entry.ht_id not in allplayerids:
-            allplayerids.append(entry.ht_id)
-
-    return (allplayerids, allplayers, playernames)
-
-
-def player_diff(playerid, daysago):
-    """Calculate player skill changes over a period of days.
-
-    Returns a list of skill changes in the format:
-    [teamname, first_name, last_name, skill_name, old_value, new_value]
-    """
-    from datetime import datetime, timedelta
-
-    from models import Players
-
-    # Get current player data
-    now = datetime.now()
-    targetdate = now - timedelta(days=daysago)
-
-    playerdata_now = (db.session.query(Players)
-                      .filter_by(ht_id=playerid)
-                      .order_by(desc("data_date"))
-                      .first())
-
-    playerdata_then = (db.session.query(Players)
-                       .filter_by(ht_id=playerid)
-                       .filter(Players.data_date <= targetdate)
-                       .order_by(desc("data_date"))
-                       .first())
-
-    if not playerdata_now or not playerdata_then:
-        return None
-
-    # Get team name from session
-    all_teams = session.get('all_teams', [])
-    all_team_names = session.get('all_team_names', [])
-
-    teamname = ""
-    if playerdata_now.owner in all_teams:
-        team_index = all_teams.index(playerdata_now.owner)
-        teamname = all_team_names[team_index] if team_index < len(all_team_names) else ""
-
-    # Track changes for each skill
-    skills = ['keeper', 'defender', 'playmaker', 'winger', 'passing', 'scorer', 'set_pieces']
-    ret = []
-
-    for skill in skills:
-        old_val = getattr(playerdata_then, skill, 0)
-        new_val = getattr(playerdata_now, skill, 0)
-
-        if old_val != new_val:
-            ret.append([
-                teamname,
-                playerdata_now.first_name,
-                playerdata_now.last_name,
-                skill,
-                old_val,
-                new_val
-            ])
-
-    # Return None if no changes
-    if not ret:
-        return None
-
-    return ret
-
-
-def create_page(template, title, **kwargs):
-    """Create page with standard template context."""
-    last_update = ""
-
-    # Get current app for config access
-    app = current_app
-
-    if 'current_user' in session:
-        current_user = session['current_user']
-        all_teams = session.get('all_teams', [])
-        all_team_names = session.get('all_team_names', [])
-        try:
-            user = (db.session.query(User)
-                    .filter_by(ht_id=session['current_user_id'])
-                    .first())
-            if user:
-                last_update = getattr(user, 'last_update', '')
-            role = False
-        except Exception:
-            role = False
-    else:
-        current_user = False
-        all_teams = False
-        all_team_names = False
-        role = False
-
-    # Handle changelog files safely
-    try:
-        with open('app/static/changelog.txt') as f:
-            changelog = f.readlines()
-        with open('app/static/changelog-full.txt') as f:
-            changelogfull = f.readlines()
-    except FileNotFoundError:
-        changelog = ["No changelog available"]
-        changelogfull = ["No changelog available"]
-
-    return render_template(
-        template,
-        title=title,
-        version=version or "2.0.0",
-        timenow=timenow or time.strftime('%Y-%m-%d %H:%M:%S'),
-        fullversion=fullversion or "2.0.0-dev",
-        apptitle=app.config.get('APP_NAME', 'HT Status'),
-        current_user=current_user,
-        all_teams=all_teams,
-        all_team_names=all_team_names,
-        role=role,
-        changelog=changelog,
-        changelogfull=changelogfull,
-        last_update=last_update,
-        **kwargs)
+# Note: All utility functions (dprint, debug_print, diff_month, diff, get_training,
+# player_diff, create_page) have been consolidated into app/utils.py
+# Blueprints should import from app.utils instead of app.routes_bp
 
 # --------------------------------------------------------------------------------
 # Routes - Now handled by individual blueprint modules

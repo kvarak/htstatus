@@ -5,7 +5,7 @@ from datetime import date, timedelta
 from flask import Blueprint, render_template, request, session
 from sqlalchemy import text
 
-from app.routes_bp import create_page
+from app.utils import create_page
 from models import Players
 
 # Create Blueprint for training routes

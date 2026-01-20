@@ -4,7 +4,7 @@ from flask import Blueprint, make_response, render_template, request, session
 from pychpp import CHPP
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.routes_bp import create_page, debug_print, dprint
+from app.utils import create_page, debug_print, dprint
 from models import User
 
 # Create Blueprint for authentication routes
@@ -173,7 +173,6 @@ def logout():
     dprint(1, f"Logging out user: {session.get('current_user', 'Unknown')}")
 
     # Clear session first
-    user_before = session.get('current_user', 'No user')
     session.clear()
 
     # Force explicit redirect
