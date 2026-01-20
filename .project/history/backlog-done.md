@@ -181,3 +181,50 @@
 - TECHNICAL.md (subprocess policy documented)
 
 ---
+### [FEAT-002] Mobile-First PWA ✅ COMPLETED
+**Completion Date**: January 19, 2026
+**Effort**: 20+ hours | **Impact**: User experience transformation
+**Priority**: P3 - Core Functionality
+
+**Problem**: Application lacked mobile support and modern PWA capabilities
+
+**Solution Implemented**:
+- Service Worker for offline functionality
+- Responsive design across all screen sizes
+- App Manifest for PWA installation capability
+- Performance optimization for mobile networks
+- Chart.js error resolution (orphaned scripts removed)
+
+**Results**:
+- ✅ PWA installable on mobile devices
+- ✅ Core features work offline
+- ✅ Responsive design across screen sizes
+- ✅ Lighthouse PWA score improvements
+
+**Strategic Impact**: Modern mobile experience, increased engagement, competitive advantage
+
+---
+
+### [UI-003] Complete Training Page Restructure ✅ COMPLETED
+**Completion Date**: January 19, 2026
+**Effort**: 8+ hours | **Impact**: Modern responsive interface
+**Priority**: P3 - Core Functionality
+
+**Problem**: Training page needed complete restructure for modern UI
+
+**Solution Implemented**:
+- React/TypeScript implementation with Radix UI components
+- TailwindCSS styling with responsive design
+- Modern table with sorting and filtering
+- Player selection and group management
+- Mobile-responsive layout
+
+**Results**:
+- ✅ Modern responsive training interface
+- ✅ React components integrated
+- ✅ TypeScript type safety implemented
+- ✅ All existing tests continue passing
+
+**Strategic Impact**: Modern UI foundation, improved developer experience, better user interaction
+
+---

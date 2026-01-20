@@ -208,6 +208,10 @@
       "what to do": [
         "Read all files in the .project folder for project requirements and standards.",
         "Read all root documentation files: README.md, TECHNICAL.md.",
+        "When you make changes to backlog.md, do small edits and preserve all existing task IDs. Do NOT try to make a perfect backlog in one go.",
+        "Check each task for relevance and remove any that are obsolete.",
+        "Remove all things that are completed or no longer relevant.",
+        "Group similar tasks into categories or themes for better organization.",
         "Analyze task dependencies and prerequisites to determine optimal execution order.",
         "Evaluate strategic alignment of each task with current project momentum.",
         "Assess task complexity, effort estimates, and blocking dependencies to refine prioritization.",
@@ -221,14 +225,6 @@
         "Make sure the backlog is simple to read and navigate for both humans and AI agents.",
         "Avoid duplication of tasks or information.",
         "Do not git add or commit any changes.",
-        "Include the following sections in your response:",
-        "# Project Management Enhancement",
-        "## Current Status Analysis",
-        "## Priority Assessment Framework",
-        "## Backlog Restructuring Plan",
-        "## Implementation Steps",
-        "## Next Task Recommendations",
-        "## Validation and Compliance Check",
         "I want the response to be short and to the point"
       ]
     },

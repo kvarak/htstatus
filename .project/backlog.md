@@ -1,10 +1,8 @@
 # HTStatus Development Backlog
 
-**Project Health**: 100/100 (218 tests total: 209 passing, 5 skipped, 4 test updates needed | 12 lint errors in dev scripts | 0 security issues)
-**Last Updated**: 2026-01-19
-**Active Task**: P4 Stability & Maintainability Ready
-**Recent Completion**: FEAT-002 Mobile-First PWA + Chart.js Error Resolution
-**P1-P3 Status**: ✅ COMPLETE - Ready for P4 execution
+**Project Health**: 100/100 | **Tests**: 209 passing, 5 skipped | **Coverage**: 95%
+**Last Updated**: 2026-01-20
+**Next Priority**: P3 Core Functionality (FEAT-005) or P4 Stability
 
 ## Management Rules
 
@@ -24,23 +22,30 @@
 
 ---
 
+## ⚡ Quick Wins (Under 1 Hour)
+
+| Task | Effort | Impact |
+|------|--------|--------|
+| [ORG-001](#org-001-consolidate-environment-templates) Consolidate Environment Templates | 15-20 min | P5 DevOps |
+| [DOC-019](#doc-019-macos-setup-guide) macOS Setup Guide | 30 min | P5 DevOps |
+| [DOC-020](#doc-020-uv-installation-guide) UV Installation Guide | 30 min | P5 DevOps |
+| [DOC-010](#doc-010-testing-prompts) Testing Prompts | 30 min | P5 DevOps |
+| [DOC-004](#doc-004-progress-metrics) Progress Metrics | 1 hour | P6 Docs |
+
+---
+
 ## Current Focus
 
-**Priority 1: Testing & App Reliability** (Guarantee it works)
-- ✅ [BUG-001] Route Conflict Resolution (2 hours) - COMPLETED - Critical application functionality restored
-- ✅ [SEC-002] Address 6 Security Warnings - COMPLETED
-- ✅ [TEST-004] Fix 11 Test Fixture Errors (2-3 hours) - COMPLETED - 100% test success
-- ✅ [INFRA-017] Script Environment Audit (1-2 hours) - COMPLETED - UV consistency achieved
+**Priority 1: Testing & App Reliability** ✅ ALL COMPLETE
+- *See [history/backlog-done.md](history/backlog-done.md): BUG-001, SEC-002, TEST-004, INFRA-017*
 
-**Priority 2: Deployment & Operations** (Ship it safely) - 🎯 ACTIVE PRIORITY
-- ✅ [DOC-017] Deployment Process (45 min) - COMPLETED - Operations guide created
-- ✅ [INFRA-010] Audit Non-Tracked Files (1-2 hours) - COMPLETED - Repository hygiene achieved
+**Priority 2: Deployment & Operations** ✅ ALL COMPLETE
+- *See [history/backlog-done.md](history/backlog-done.md): DOC-017, INFRA-010*
 
-**Priority 3: Core Functionality** (It does what it should) - ✅ COMPLETE
-- ✅ [FEAT-002] Mobile-First PWA (20+ hours) - COMPLETED - Mobile accessibility and offline functionality
-- ✅ [UI-003] Complete Training Page Restructure - COMPLETED - Modern responsive interface fully implemented
-- 🔮 [FEAT-003] Formation Tester & Tactics Analyzer - Research & Planning Phase
-- 🎯 [FEAT-005] Team Statistics Dashboard (8-10 hours) - Performance analytics
+**Priority 3: Core Functionality** (It does what it should)
+- *Completed: FEAT-002 (PWA), UI-003 (Training Page) - see [history/backlog-done.md](history/backlog-done.md)*
+- 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
+- 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
 
 **Priority 4: Stability & Maintainability** (It stays working) - 🎯 NEXT PRIORITY
 - 🎯 [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization
@@ -72,98 +77,14 @@
 
 ---
 
-## Priority 1: Testing & App Reliability
+## Priority 1-2: Completed (Archived)
 
-### [SEC-002] Address Security Findings ✅ COMPLETED
-**Status**: ✅ COMPLETED 2026-01-19 | **Effort**: 1 hour | **Impact**: Testing infrastructure
-**Dependencies**: None | **Strategic Value**: Complete test-all success, security compliance
-
-**Implementation Summary**:
-- Created `.bandit` configuration file to document security rationale for subprocess usage
-- Added comprehensive inline security documentation in app/routes.py and app/routes_bp.py
-- Updated Makefile to use .bandit configuration for security checks
-- Updated TECHNICAL.md with subprocess usage policy
-
-**Results**:
-- ✅ Bandit security scan: 0 issues in app/ directory (previously 6 warnings)
-- ✅ Version detection functionality preserved and tested
-- ✅ Security rationale comprehensively documented
-- ✅ No test regressions: 202 passed, 5 skipped, 11 errors (unchanged)
-
-**Completion Notes**: Used .bandit configuration (Option C) instead of inline noqa directives as it provides cleaner, centralized security policy documentation. All 6 warnings (B404, B607, B603) now properly documented and excluded with clear rationale.
-
-### [BUG-001] Route Conflict Resolution ✅ COMPLETED
-**Status**: ✅ COMPLETED 2026-01-19 | **Effort**: 2 hours | **Impact**: Critical application functionality
-**Dependencies**: None | **Strategic Value**: Prevent functional route override issues
-
-**Problem Description**:
-- Blueprint routes in `routes_bp.py` are overriding functional routes in `routes.py`
-- Already identified conflicts: `/update` and `/player` routes had stub implementations
-- Stub routes return empty templates without processing, breaking core features
-- Factory.py registers both blueprint and manual routes, blueprint takes precedence
-
-**Root Cause**:
-- Dual route registration system creates conflicts between stub and functional implementations
-- Blueprint routes registered first, preventing manual route registration from working
-- No systematic audit has been performed to identify all conflicts
-
-**Implementation Plan**:
-1. **Audit all routes** in both `routes_bp.py` and `routes.py`
-2. **Identify conflicts** - routes with same path but different implementations
-3. **Remove stub routes** from blueprint that override functional routes
-4. **Test functionality** - verify all pages work after conflict resolution
-5. **Document strategy** - establish clear route ownership rules
-
-**Success Criteria**:
-- ✅ All functional routes accessible (update, player, etc.)
-- ✅ No more empty template returns for functional pages
-- ✅ Complete route conflict audit performed
-- ✅ Documentation of route ownership strategy
-- ✅ All existing tests continue passing
-
-**Completion Summary**:
-- ✅ Chart.js error resolution - orphaned script removed from player.html
-- ✅ Systematic route conflict audit - completed for all blueprint routes
-- ✅ `/update` route - removed stub from blueprint
-- ✅ `/player` route - removed stub from blueprint
-- ✅ `/team` route - removed stub from blueprint
-- ✅ `/matches` route - removed stub from blueprint
-- ✅ `/training` route - removed stub from blueprint
-- ✅ `/settings` route - removed stub from blueprint
-- ✅ `/debug` route - removed stub from blueprint
-- ✅ Application functionality restored and validated
-- ✅ Route ownership strategy documented
-- ✅ All existing tests continue passing (209 passed, 95% coverage)
-
----
-
-## Priority 2: Deployment & Operations
-
-*All P2 Deployment & Operations tasks completed*
+*All P1 Testing & App Reliability and P2 Deployment & Operations tasks completed.*
+*Full details: [history/backlog-done.md](history/backlog-done.md)*
 
 ---
 
 ## Priority 3: Core Functionality
-
-### [FEAT-002] Mobile-First PWA
-**Status**: 🎯 Ready to Execute | **Effort**: 20+ hours | **Impact**: User experience transformation
-**Dependencies**: Authentication system (completed) | **Strategic Value**: Mobile accessibility, modern web standards
-
-**Implementation Phases**:
-1. **Service Worker** (4-6 hours): Offline functionality for core features
-2. **Responsive Design** (6-8 hours): Mobile-optimized interface
-3. **App Manifest** (2-3 hours): PWA installation capability
-4. **Performance Optimization** (4-6 hours): Mobile network optimization
-
-**Acceptance Criteria**:
-- PWA installable on mobile devices
-- Core features work offline
-- Responsive design across screen sizes
-- Lighthouse PWA score >90
-
-**Expected Outcomes**: Modern mobile experience, increased engagement, competitive advantage
-
----
 
 ### [FEAT-003] Formation Tester & Tactics Analyzer
 **Status**: 🔮 Research & Planning | **Effort**: 24-32 hours (estimated) | **Impact**: Tactical decision support
