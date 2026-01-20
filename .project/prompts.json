@@ -94,7 +94,7 @@
       "name": "commit",
       "title": "Create commits for changes since last commit following git guidelines",
       "what to do": [
-        "Analyze all changes made since the last commit.",
+        "Analyze all changes made since the last commit, make sure to check what files were modified, added, or deleted.",
         "Group related changes into logical units for separate commits if needed.",
         "Write commit summaries following git commit guidelines:",
         " - Separate subject from body with a blank line",
