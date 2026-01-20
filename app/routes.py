@@ -2075,7 +2075,8 @@ def training():
                 # Since we're showing newest first, we want: current - chronologically_earlier
                 # But prev_skills is actually chronologically LATER than skills
                 # So we reverse: prev_skills - skills to get the right direction
-                changes = [prev_skills[j] - skills[j] for j in range(7)]            skill_changes[player_id].append((date, skills, changes))
+                changes = [prev_skills[j] - skills[j] for j in range(7)]
+            skill_changes[player_id].append((date, skills, changes))
 
     return create_page(
         template='training.html',
