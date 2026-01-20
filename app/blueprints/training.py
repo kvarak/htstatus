@@ -23,6 +23,7 @@ def setup_training_blueprint(db_instance, trace_cols):
     tracecolumns = trace_cols
 
 
+@training_bp.route('/training')
 def training():
     """Display player training progression and skill development."""
     if session.get('current_user') is None:

@@ -26,6 +26,7 @@ def setup_auth_blueprint(app_instance, db_instance, ck, cs):
     consumer_secret = cs
 
 
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """Handle user login and Hattrick OAuth authentication."""
     # this comes from form
@@ -166,6 +167,7 @@ def login():
         title='Logged in')
 
 
+@auth_bp.route('/logout')
 def logout():
     """Handle user logout and session clearing."""
     dprint(1, f"Logging out user: {session.get('current_user', 'Unknown')}")

@@ -68,15 +68,21 @@ def setup_routes(app_instance, db_instance):
     from app.routes_bp import initialize_routes as init_routes_bp
     init_routes_bp(app_instance, db_instance)
 
-    # Import blueprint functions
-    from app.blueprints.auth import login, logout, setup_auth_blueprint
-    from app.blueprints.main import admin, index, settings, setup_main_blueprint
-    from app.blueprints.matches import matches, setup_matches_blueprint, stats
-    from app.blueprints.player import player, setup_player_blueprint
-    from app.blueprints.team import setup_team_blueprint, team, update
-    from app.blueprints.training import setup_training_blueprint, training
+    # Import blueprint functions and blueprints
+    from app.blueprints.auth import auth_bp, setup_auth_blueprint
+    from app.blueprints.main import (
+        main_bp,
+        setup_main_blueprint,
+    )
+    from app.blueprints.matches import (
+        matches_bp,
+        setup_matches_blueprint,
+    )
+    from app.blueprints.player import player_bp, setup_player_blueprint
+    from app.blueprints.team import setup_team_blueprint, team_bp
+    from app.blueprints.training import setup_training_blueprint, training_bp
 
-    # Setup authentication blueprint
+    # Setup blueprint dependencies
     setup_auth_blueprint(
         app_instance,
         db_instance,
@@ -84,7 +90,6 @@ def setup_routes(app_instance, db_instance):
         app_instance.config.get('CONSUMER_SECRETS', 'dev_secret')
     )
 
-    # Setup main blueprint
     setup_main_blueprint(
         db_instance,
         routes_module.defaultcolumns,
@@ -92,7 +97,6 @@ def setup_routes(app_instance, db_instance):
         routes_module.default_group_order
     )
 
-    # Setup player blueprint
     setup_player_blueprint(
         db_instance,
         routes_module.defaultcolumns,
@@ -101,7 +105,6 @@ def setup_routes(app_instance, db_instance):
         routes_module.default_group_order
     )
 
-    # Setup team blueprint
     setup_team_blueprint(
         app_instance,
         db_instance,
@@ -111,7 +114,6 @@ def setup_routes(app_instance, db_instance):
         routes_module.fullversion
     )
 
-    # Setup matches blueprint
     setup_matches_blueprint(
         db_instance,
         routes_module.HTmatchtype,
@@ -119,23 +121,15 @@ def setup_routes(app_instance, db_instance):
         routes_module.HTmatchbehaviour
     )
 
-    # Setup training blueprint
     setup_training_blueprint(
         db_instance,
         routes_module.tracecolumns
     )
 
-    # Manually register all route functions (bypassing failed decorators)
-    # This is necessary because @app.route decorators failed during import when app=None
-    app_instance.add_url_rule('/', 'index', index, methods=['GET'])
-    app_instance.add_url_rule('/index', 'index', index, methods=['GET'])
-    app_instance.add_url_rule('/settings', 'settings', settings, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/login', 'login', login, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/logout', 'logout', logout, methods=['GET'])
-    app_instance.add_url_rule('/update', 'update', update, methods=['GET'])
-    app_instance.add_url_rule('/debug', 'admin', admin, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/team', 'team', team, methods=['GET'])
-    app_instance.add_url_rule('/player', 'player', player, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/matches', 'matches', matches, methods=['GET', 'POST'])
-    app_instance.add_url_rule('/stats', 'stats', stats, methods=['GET'])
-    app_instance.add_url_rule('/training', 'training', training, methods=['GET'])
+    # Register blueprints with Flask
+    app_instance.register_blueprint(main_bp)
+    app_instance.register_blueprint(auth_bp)
+    app_instance.register_blueprint(player_bp)
+    app_instance.register_blueprint(team_bp)
+    app_instance.register_blueprint(matches_bp)
+    app_instance.register_blueprint(training_bp)

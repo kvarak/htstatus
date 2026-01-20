@@ -29,6 +29,8 @@ def setup_main_blueprint(db_instance, cols, all_cols, group_order=99):
     default_group_order = group_order
 
 
+@main_bp.route('/')
+@main_bp.route('/index')
 def index():
     """Display home page with user and team statistics."""
     allusers = db.session.query(User).all()
@@ -80,6 +82,7 @@ def index():
         updated=updated)
 
 
+@main_bp.route('/settings', methods=['GET', 'POST'])
 def settings():
     """Handle user settings for player groups and display columns."""
     error = ""
@@ -220,6 +223,7 @@ def settings():
         error=error)
 
 
+@main_bp.route('/debug', methods=['GET', 'POST'])
 def admin():
     """Admin dashboard for user management."""
     if session.get('current_user') is None:

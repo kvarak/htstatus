@@ -29,6 +29,7 @@ def setup_player_blueprint(db_instance, def_cols, calc_cols, trace_cols, group_o
     default_group_order = group_order
 
 
+@player_bp.route('/player', methods=['GET', 'POST'])
 def player():
     """Display player list with skill tracking and grouping."""
     if session.get('current_user') is None:

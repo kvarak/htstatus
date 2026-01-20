@@ -35,6 +35,7 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
     fullversion = fv
 
 
+@team_bp.route('/team')
 def team():
     """Display team information."""
     if session.get('current_user') is None:
@@ -63,6 +64,7 @@ def team():
         title='Team')
 
 
+@team_bp.route('/update')
 def update():
     """Update player data from Hattrick API."""
     dprint(1, "=== DATA UPDATE PROCESS STARTED ===")

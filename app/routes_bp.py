@@ -10,8 +10,8 @@ from sqlalchemy import desc
 
 from models import User
 
-# Create Blueprint for routes
-main_bp = Blueprint('main', __name__)
+# Create Blueprint for routes (helper blueprint, not registered directly)
+routes_bp = Blueprint('routes', __name__)
 
 # Initialize these after app is created
 bootstrap = None
@@ -64,9 +64,80 @@ def initialize_routes(app, _db_instance):
     print("DEBUG: initialize_routes - Complete")
     debug_level = app.config.get('DEBUG_LEVEL', 1)
 
+
 # Module constants
 default_group_order = 99
 logfile = "htplanner.log"
+
+
+# Add route function references for test compatibility
+def index():
+    """Index route function reference."""
+    from app.blueprints.main import index as main_index
+    return main_index()
+
+
+def player():
+    """Player route function reference."""
+    from app.blueprints.player import player as player_func
+    return player_func()
+
+
+def team():
+    """Team route function reference."""
+    from app.blueprints.team import team as team_func
+    return team_func()
+
+
+def settings():
+    """Settings route function reference."""
+    from app.blueprints.main import settings as settings_func
+    return settings_func()
+
+
+def logout():
+    """Logout route function reference."""
+    from app.blueprints.auth import logout as logout_func
+    return logout_func()
+
+
+def matches():
+    """Matches route function reference."""
+    from app.blueprints.matches import matches as matches_func
+    return matches_func()
+
+
+def training():
+    """Training route function reference."""
+    from app.blueprints.training import training as training_func
+    return training_func()
+
+
+def update():
+    """Update route function reference."""
+    from app.blueprints.team import update as update_func
+    return update_func()
+
+
+def debug():
+    """Debug/admin route function reference."""
+    from app.blueprints.main import admin as admin_func
+    return admin_func()
+
+
+# Blueprint reference for test compatibility - use function to avoid circular dependency
+def get_main_bp():
+    """Get main blueprint reference."""
+    from app.blueprints.main import main_bp
+    return main_bp
+
+
+# Create module-level variable for backward compatibility
+def __getattr__(name):
+    """Dynamic attribute access for main_bp."""
+    if name == 'main_bp':
+        return get_main_bp()
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
 # --------------------------------------------------------------------------------
 # Helper functions
@@ -223,28 +294,15 @@ def create_page(template, title, **kwargs):
         **kwargs)
 
 # --------------------------------------------------------------------------------
-# Routes
+# Routes - Now handled by individual blueprint modules
 # --------------------------------------------------------------------------------
 
-@main_bp.route('/')
-def index():
-    """Home page."""
-    return create_page('main.html', 'Home')
+# Note: All routes have been migrated to individual blueprint modules:
+# - Main routes: app.blueprints.main
+# - Auth routes: app.blueprints.auth
+# - Player routes: app.blueprints.player
+# - Team routes: app.blueprints.team
+# - Match routes: app.blueprints.matches
+# - Training routes: app.blueprints.training
 
-# Note: /login route is in routes.py (legacy) - Blueprint migration incomplete
-# TODO: Migrate full OAuth login logic to Blueprint pattern
-
-@main_bp.route('/logout')
-def logout():
-    """Logout page - Clear session and redirect to login."""
-    print("BLUEPRINT LOGOUT FUNCTION CALLED - DEBUGGING")  # Force console output
-    from flask import redirect, session
-
-    # Clear session first
-    user_before = session.get('current_user', 'No user')
-    session.clear()
-    print(f"Blueprint: Session cleared for user: {user_before}")
-
-    # Force explicit redirect
-    print("Blueprint: Attempting redirect to /login")
-    return redirect('/login')
+# All routes migrated to blueprint modules - no direct route definitions needed here

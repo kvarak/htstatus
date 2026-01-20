@@ -25,6 +25,7 @@ def setup_matches_blueprint(db_instance, match_types, match_roles, match_behavio
     HTmatchbehaviour = match_behaviours
 
 
+@matches_bp.route('/matches', methods=['GET', 'POST'])
 def matches():
     """Display team matches and match details."""
     if session.get('current_user') is None:
@@ -73,6 +74,7 @@ def matches():
         title='Matches')
 
 
+@matches_bp.route('/stats')
 def stats():
     """Display team statistics."""
     if session.get('current_user') is None:
