@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
 
 # Variables
 PYTHON := uv run python
@@ -140,6 +140,46 @@ format: check-uv ## Run black and ruff formatting
 	@$(UV) run ruff check . --fix --select I
 	@$(UV) run ruff format .
 
+fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
+	@echo "📝 Checking file formatting standards..."
+	@echo "   → Checking for newline at end of file..."
+	@git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | \
+	while read -r file; do \
+		if test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then \
+			echo "❌ Missing newline at EOF: $$file"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "   → Checking for trailing whitespace..."
+	@git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | \
+	while read -r file; do \
+		if grep -q '[[:space:]]$$' "$$file"; then \
+			echo "❌ Trailing whitespace found in: $$file"; \
+			exit 1; \
+		fi; \
+	done
+	@echo "✅ File formatting checks passed"
+
+fileformat-fix: ## Auto-fix file formatting issues (newline EOF, trailing whitespace)
+	@echo "🔧 Auto-fixing file formatting issues..."
+	@echo "   → Adding newlines at end of files..."
+	@git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | \
+	while read -r file; do \
+		if test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then \
+			echo "Adding newline to: $$file"; \
+			echo "" >> "$$file"; \
+		fi; \
+	done
+	@echo "   → Removing trailing whitespace..."
+	@git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | \
+	while read -r file; do \
+		if grep -q '[[:space:]]$$' "$$file"; then \
+			echo "Cleaned: $$file"; \
+			sed -i '' 's/[[:space:]]*$$//' "$$file"; \
+		fi; \
+	done
+	@echo "✅ File formatting auto-fix completed"
+
 typecheck: check-uv ## Run mypy type checking
 	@echo "🔬 Running type checking..."
 	@$(UV) run mypy . --ignore-missing-imports
@@ -188,25 +228,30 @@ test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file ch
 	@echo "👀 Running tests in watch mode..."
 	@$(UV) run pytest-watch tests/ -- -v --tb=short
 
-test-all: ## ✅ Run all quality gates (lint + security + config + comprehensive tests)
+test-all: ## ✅ Run all quality gates (fileformat + lint + security + config + comprehensive tests)
 	@echo "🚀 Running complete quality gate validation..."
 	@echo ""
-	@echo "📋 Step 1/4: Code Quality (Linting)"
+	@echo "📋 Step 1/5: File Format Standards"
+	@echo "=================================="
+	@make fileformat 2>&1 | tee /tmp/fileformat-results.txt || true
+	@grep -q "File formatting checks passed" /tmp/fileformat-results.txt && echo "✅ File Format: PASSED" || echo "⚠️  File Format: Issues found (run 'make fileformat-fix')"
+	@echo ""
+	@echo "📋 Step 2/5: Code Quality (Linting)"
 	@echo "=================================="
 	@make lint 2>&1 | tee /tmp/lint-results.txt || true
 	@grep -q "^All checks passed" /tmp/lint-results.txt && echo "✅ Linting: PASSED" || (grep "errors" /tmp/lint-results.txt | tail -1 || echo "⚠️  Linting: Found issues")
 	@echo ""
-	@echo "📋 Step 2/4: Security Analysis"
+	@echo "📋 Step 3/5: Security Analysis"
 	@echo "============================="
 	@make security 2>&1 | tee /tmp/security-results.txt || true
 	@grep -q "No issues identified" /tmp/security-results.txt && echo "✅ Security: No issues found" || (grep "Issue:" /tmp/security-results.txt | wc -l | xargs -I {} echo "⚠️  Security: {} issues found")
 	@echo ""
-	@echo "📋 Step 3/4: Configuration Tests"
+	@echo "📋 Step 4/5: Configuration Tests"
 	@echo "==============================="
 	@make test-config 2>&1 | tee /tmp/config-results.txt || true
 	@grep -q "passed" /tmp/config-results.txt && (grep "passed" /tmp/config-results.txt | tail -1 | sed 's/=//g' || echo "✅ Config: Tests passed") || echo "⚠️  Config: Tests failed (see INFRA-018)"
 	@echo ""
-	@echo "📋 Step 4/4: Comprehensive Test Suite"
+	@echo "📋 Step 5/5: Comprehensive Test Suite"
 	@echo "===================================="
 	@make test 2>&1 | tee /tmp/test-results.txt
 	@echo ""
@@ -214,6 +259,12 @@ test-all: ## ✅ Run all quality gates (lint + security + config + comprehensive
 	@echo "🎯 QUALITY GATE SUMMARY"
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo ""
+	@printf "  %-15s" "File Format:"; \
+		if grep -q 'File formatting checks passed' /tmp/fileformat-results.txt 2>/dev/null; then \
+			echo "✅ PASSED"; \
+		else \
+			echo "❌ FAILED (run 'make fileformat-fix')"; \
+		fi
 	@printf "  %-15s" "Linting:"; \
 		if grep -q 'All checks passed' /tmp/lint-results.txt 2>/dev/null; then \
 			echo "✅ PASSED (0 errors)"; \
@@ -257,7 +308,7 @@ test-all: ## ✅ Run all quality gates (lint + security + config + comprehensive
 		fi
 	@echo ""
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@rm -f /tmp/lint-results.txt /tmp/security-results.txt /tmp/config-results.txt /tmp/test-results.txt
+	@rm -f /tmp/fileformat-results.txt /tmp/lint-results.txt /tmp/security-results.txt /tmp/config-results.txt /tmp/test-results.txt
 	@echo "✅ Quality validation completed - review any warnings above"
 
 # Utility Commands
@@ -302,3 +353,4 @@ legacy-run: ## [DEPRECATED] Use 'make dev' instead
 legacy-changelog: ## [DEPRECATED] Use 'make changelog' instead
 	@echo "⚠️  WARNING: This command is deprecated. Use 'make changelog' instead."
 	@bash scripts/changelog.sh
+
