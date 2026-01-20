@@ -1,11 +1,11 @@
 import { useState } from "react";
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
-import { mockUser, mockPlayers, mockMatches } from "@/data/mockData";
+import { mockUser, mockPlayers, mockMatches, mockTrophies } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, TrendingUp, Users, Trophy, Target, Activity } from "lucide-react";
+import { BarChart3, TrendingUp, Users, Trophy, Target, Activity, Award } from "lucide-react";
 
 export default function Analytics() {
   const [user] = useState(mockUser);
@@ -14,7 +14,7 @@ export default function Analytics() {
 
   // Calculate analytics data
   const totalPlayers = players.length;
-  const avgAge = Math.round(players.reduce((sum, p) => sum + p.age_years, 0) / players.length);
+  const avgAge = (players.reduce((sum, p) => sum + p.age_years, 0) / players.length).toFixed(1);
   const avgTSI = Math.round(players.reduce((sum, p) => sum + p.tsi, 0) / players.length);
   const avgForm = (players.reduce((sum, p) => sum + p.form, 0) / players.length).toFixed(1);
 
@@ -83,7 +83,7 @@ export default function Analytics() {
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Card className="shadow-card">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
@@ -94,6 +94,18 @@ export default function Analytics() {
                 <CardContent>
                   <div className="text-2xl font-bold">{totalPlayers}</div>
                   <div className="text-xs text-muted-foreground">Active players</div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-card">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Average Age
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{avgAge}</div>
+                  <div className="text-xs text-muted-foreground">Years old</div>
                 </CardContent>
               </Card>
 
@@ -294,6 +306,35 @@ export default function Analytics() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Trophies & Achievements */}
+            <Card className="shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Award className="h-5 w-5 text-warning" />
+                  Trophies & Achievements
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {mockTrophies.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {mockTrophies.map((trophy) => (
+                      <div key={trophy.id} className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-950 dark:to-amber-950 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                        <Trophy className="h-8 w-8 text-yellow-600 dark:text-yellow-400 mb-2" />
+                        <h3 className="font-bold text-center text-foreground">{trophy.name}</h3>
+                        <p className="text-sm text-muted-foreground text-center">{trophy.division}</p>
+                        <p className="text-xs text-muted-foreground mt-2">Season {trophy.season} ({trophy.year})</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-2 opacity-50" />
+                    <p className="text-muted-foreground">No trophies yet. Keep working towards greatness!</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
