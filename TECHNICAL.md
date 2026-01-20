@@ -632,4 +632,78 @@ If issues persist after this checklist, consult the specific debugging sections 
 
 ---
 
+## Database Migration Best Practices
+
+### Alembic Configuration
+
+HTStatus uses Alembic for database schema management with the following configuration:
+
+**Location**: `/migrations/` directory with 30 existing migration files
+
+**Key Files**:
+- `alembic.ini` - Configuration file for Alembic
+- `env.py` - Environment setup (database connection handling)
+- `versions/` - Individual migration files numbered by Alembic revision
+
+### Migration Workflow
+
+**Create migrations**:
+```bash
+uv run alembic revision --autogenerate -m "description"
+```
+
+**Apply migrations**:
+```bash
+uv run alembic upgrade head
+```
+
+**Revert migrations**:
+```bash
+uv run alembic downgrade -1
+```
+
+**Check status**:
+```bash
+uv run alembic current
+```
+
+### Critical Constraints
+
+**Backward Compatibility**: Database changes must work with multiple HTStatus versions accessing the same database simultaneously.
+
+**Safe Patterns**:
+- ✅ Adding nullable columns (applications ignore new columns)
+- ✅ Adding indices (improves performance, backward compatible)
+- ✅ Adding constraints with default values
+- ❌ Removing columns in use by active versions
+- ❌ Making columns non-nullable without defaults
+- ❌ Renaming columns without deprecation period
+
+**Procedure**: See `/docs/migration-workflow.md` for comprehensive procedures and checklists.
+
+### Pre-Migration Validation
+
+Before applying any migration:
+
+1. **Review migration code** - Check upgrade() and downgrade() are symmetric
+2. **Test on copy** - Apply to backup of production database
+3. **Verify compatibility** - Confirm old and new code both work with schema
+4. **Run tests** - Execute full test suite against migrated database
+5. **Check data integrity** - Verify no data loss or corruption
+
+### Rollback Strategy
+
+All migrations must have reversible `downgrade()` functions:
+
+```python
+def downgrade():
+    """Revert schema changes."""
+    # Implementation must restore previous state
+    pass
+```
+
+**Rollback procedure**: See `/docs/migration-workflow.md` for emergency and planned rollback procedures.
+
+---
+
 *Update this file as technical implementation evolves. Ensure all major changes are documented here and referenced in plan.md and architecture.md as needed.*
