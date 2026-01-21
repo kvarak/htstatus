@@ -25,9 +25,9 @@
       "title": "Review previous development work",
       "what to do": [
         "Review last completed task and changes since last commit.",
-        "Validate with `make test-all`. Check docs updated and strategic alignment.",
+        "Validate with `make test-all`, use `uv run` for Python. Check docs updated and strategic alignment.",
         "Keep database backwards compatible.",
-        "Add new tasks to backlog.md if valuable."
+        "Add new tasks to backlog.md."
       ]
     },
     {
@@ -36,8 +36,10 @@
       "what to do": [
         "Review progress.md and backlog.md current state.",
         "Update both files with completed tasks and metrics.",
+        "Remove completed tasks (marked ✅) from backlog.md - move them to history/backlog-done.md with completion notes.",
         "Unblock dependencies, move ready tasks to active status.",
-        "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*), ensure they describe the current architecture and decisions. Remove or compress outdated historical information instead of keeping long change logs there."
+        "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*), ensure they describe the current architecture and decisions.",
+        "Remove or compress outdated historical information instead of keeping long change logs in the backlog.md and progress.md files."
       ]
     },
     {
