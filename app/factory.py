@@ -49,6 +49,20 @@ def create_app(config_object=None, include_routes=True):
 
     # Import models after db is initialized to avoid circular imports
 
+    # Add custom Jinja filters
+    @app.template_filter('format_age')
+    def format_age(age_string):
+        """Format age from '44 years and 55 days' to '44 y 55 d'"""
+        if not age_string:
+            return 'N/A'
+        import re
+        # Extract years and days from the age string
+        match = re.search(r'(\d+) years?.*?(\d+) days?', str(age_string))
+        if match:
+            years, days = match.groups()
+            return f"{years} y {days} d"
+        return str(age_string)
+
     # Set up routes only if requested (allows testing without complex routes)
     if include_routes:
         setup_routes(app, db)
@@ -58,12 +72,6 @@ def create_app(config_object=None, include_routes=True):
 
 def setup_routes(app_instance, db_instance):
     """Set up routes with the app and db instances using Blueprint pattern."""
-    # Initialize legacy routes module for helper functions and constants
-    import app.routes as routes_module
-    routes_module.app = app_instance
-    routes_module.db = db_instance
-    routes_module.initialize_routes()
-
     # Initialize utils module with app and db instances
     from app.utils import initialize_utils
     initialize_utils(
@@ -77,6 +85,9 @@ def setup_routes(app_instance, db_instance):
     init_routes_bp(app_instance, db_instance)
 
     # Import blueprint functions and blueprints
+    # Get version info
+    import subprocess
+
     from app.blueprints.auth import auth_bp, setup_auth_blueprint
     from app.blueprints.main import (
         main_bp,
@@ -90,6 +101,26 @@ def setup_routes(app_instance, db_instance):
     from app.blueprints.team import setup_team_blueprint, team_bp
     from app.blueprints.training import setup_training_blueprint, training_bp
 
+    # Import constants
+    from app.constants import (
+        ALL_COLUMNS,
+        CALC_COLUMNS,
+        DEFAULT_COLUMNS,
+        DEFAULT_GROUP_ORDER,
+        HT_MATCH_BEHAVIOUR,
+        HT_MATCH_ROLE,
+        HT_MATCH_TYPE,
+        TRACE_COLUMNS,
+    )
+    try:
+        versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
+        version = versionstr.split('-')[0] if '-' in versionstr else versionstr
+        fullversion = versionstr
+    except Exception:
+        versionstr = "2.0.0-dev"
+        version = "2.0.0"
+        fullversion = "2.0.0-dev"
+
     # Setup blueprint dependencies
     setup_auth_blueprint(
         app_instance,
@@ -100,17 +131,17 @@ def setup_routes(app_instance, db_instance):
 
     setup_main_blueprint(
         db_instance,
-        routes_module.defaultcolumns,
-        routes_module.allcolumns,
-        routes_module.default_group_order
+        DEFAULT_COLUMNS,
+        ALL_COLUMNS,
+        DEFAULT_GROUP_ORDER
     )
 
     setup_player_blueprint(
         db_instance,
-        routes_module.defaultcolumns,
-        routes_module.calccolumns,
-        routes_module.tracecolumns,
-        routes_module.default_group_order
+        DEFAULT_COLUMNS,
+        CALC_COLUMNS,
+        TRACE_COLUMNS,
+        DEFAULT_GROUP_ORDER
     )
 
     setup_team_blueprint(
@@ -118,20 +149,20 @@ def setup_routes(app_instance, db_instance):
         db_instance,
         app_instance.config.get('CONSUMER_KEY', 'dev_key'),
         app_instance.config.get('CONSUMER_SECRETS', 'dev_secret'),
-        routes_module.version,
-        routes_module.fullversion
+        version,
+        fullversion
     )
 
     setup_matches_blueprint(
         db_instance,
-        routes_module.HTmatchtype,
-        routes_module.HTmatchrole,
-        routes_module.HTmatchbehaviour
+        HT_MATCH_TYPE,
+        HT_MATCH_ROLE,
+        HT_MATCH_BEHAVIOUR
     )
 
     setup_training_blueprint(
         db_instance,
-        routes_module.tracecolumns
+        TRACE_COLUMNS
     )
 
     # Register blueprints with Flask

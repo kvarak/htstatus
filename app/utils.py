@@ -3,17 +3,15 @@
 import inspect
 from datetime import datetime
 
-from dateutil.relativedelta import relativedelta
-from flask import current_app, render_template
-from sqlalchemy import desc
+from flask import current_app, render_template, session
 
-from models import Match, Players
+from models import Match, MatchPlay
 
 # Global variables - will be initialized by initialize_utils()
 db = None
 debug_level = None
 
-def initialize_utils(app_instance, db_instance, debug_level_value):
+def initialize_utils(_app_instance, db_instance, debug_level_value):
     """Initialize utilities module with app and db instances."""
     # pylint: disable=unused-argument
     global db, debug_level
@@ -45,9 +43,19 @@ def diff_month(d1, d2):
     return (d1.year - d2.year) * 12 + d1.month - d2.month
 
 def diff(first, second):
-    """Calculate difference between two values with None handling."""
+    """Calculate difference between two values with None handling.
+
+    For lists/iterables, returns items in first but not in second.
+    For numeric values, returns arithmetic difference.
+    """
     if first is None or second is None:
         return None
+
+    # Handle list/set operations
+    if isinstance(first, (list, tuple, set)) and isinstance(second, (list, tuple, set)):
+        return list(set(first) - set(second))
+
+    # Handle numeric operations
     return first - second
 
 # =============================================================================
@@ -56,20 +64,48 @@ def diff(first, second):
 
 def create_page(template, title, **kwargs):
     """Create standardized page response with common template variables."""
-    # Get variables from routes module
-    import app.routes as routes_module
+    import subprocess
+    import time
+
+    from flask import current_app, session
+
+    # Get version info
+    try:
+        versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
+        version = versionstr.split('-')[0] if '-' in versionstr else versionstr
+        fullversion = versionstr
+    except Exception:
+        versionstr = "2.0.0-dev"
+        version = "2.0.0"
+        fullversion = "2.0.0-dev"
 
     # Standard template variables
     template_vars = {
-        'bootstrap': getattr(routes_module, 'bootstrap', None),
+        'bootstrap': None,  # Bootstrap handled by template
         'title': title,
-        'consumer_key': getattr(routes_module, 'consumer_key', ''),
-        'consumer_secret': getattr(routes_module, 'consumer_secret', ''),
-        'versionstr': getattr(routes_module, 'versionstr', ''),
-        'fullversion': getattr(routes_module, 'fullversion', ''),
-        'version': getattr(routes_module, 'version', ''),
-        'timenow': getattr(routes_module, 'timenow', ''),
+        'consumer_key': current_app.config.get('CONSUMER_KEY', ''),
+        'consumer_secret': current_app.config.get('CONSUMER_SECRETS', ''),
+        'versionstr': versionstr,
+        'fullversion': fullversion,
+        'version': version,
+        'timenow': time.strftime('%Y-%m-%d %H:%M:%S'),
     }
+
+    # Add session variables for logged-in users
+    if session.get('current_user'):
+        template_vars.update({
+            'current_user': session.get('current_user'),
+            'current_user_id': session.get('current_user_id'),
+            'all_teams': session.get('all_teams', []),
+            'all_team_names': session.get('all_team_names', []),
+            'team_id': session.get('team_id'),
+        })
+
+        # Check if user has admin role
+        from models import User
+        user = User.query.filter_by(ht_id=session.get('current_user_id')).first()
+        if user and user.role == 'Admin':
+            template_vars['role'] = 'Admin'
 
     # Add any additional template variables
     template_vars.update(kwargs)
@@ -83,40 +119,55 @@ def create_page(template, title, **kwargs):
 def get_training(players_data):
     """Process training data from player list."""
     if not players_data:
-        return {}
+        return [], {}, {}
 
-    # Deduplicate players (same as in routes_bp.py implementation)
-    seen_players = set()
-    unique_players = []
+    # Group players by ht_id and sort by date
+    player_timelines = {}
+    playernames = {}
+
     for player in players_data:
-        player_key = (player.ht_id, player.data_date)
-        if player_key not in seen_players:
-            seen_players.add(player_key)
-            unique_players.append(player)
+        ht_id = player.ht_id
+        if ht_id not in player_timelines:
+            player_timelines[ht_id] = []
+            playernames[ht_id] = f"{player.first_name} {player.last_name}"
 
-    training_data = {}
-    for player in unique_players:
-        training_data[player.ht_id] = {
-            'first_name': player.first_name,
-            'last_name': player.last_name,
-            'data_date': player.data_date.strftime('%Y-%m-%d') if player.data_date else 'N/A',
-            'age': player.age,
-            'skills': {
-                'keeper': player.keeper,
-                'defender': player.defender,
-                'playmaker': player.playmaker,
-                'winger': player.winger,
-                'passing': player.passing,
-                'scorer': player.scorer,
-                'set_pieces': player.set_pieces,
-            }
-        }
+        # Create skills array in the order expected by templates
+        skills = [
+            player.keeper or 0,
+            player.defender or 0,
+            player.playmaker or 0,
+            player.winger or 0,
+            player.passing or 0,
+            player.scorer or 0,
+            player.set_pieces or 0
+        ]
 
-    return training_data
+        date_str = player.data_date.strftime('%Y-%m-%d') if player.data_date else 'N/A'
+        player_timelines[ht_id].append((date_str, skills))
+
+    # Sort each player's timeline by date
+    for ht_id in player_timelines:
+        player_timelines[ht_id].sort(key=lambda x: x[0])
+
+    # Get list of all player IDs
+    allplayerids = list(player_timelines.keys())
+
+    # allplayers should contain the timeline data for each player
+    allplayers = player_timelines
+
+    return allplayerids, allplayers, playernames
+
 
 def player_diff(playerid, daysago):
     """Get player skill differences over time (returns list format for template compatibility)."""
     try:
+        from datetime import datetime
+
+        from dateutil.relativedelta import relativedelta
+        from sqlalchemy import desc
+
+        from models import Players
+
         # Query for player data from specified days ago
         cutoff_date = datetime.now() - relativedelta(days=daysago)
 
@@ -161,18 +212,28 @@ def player_diff(playerid, daysago):
 def calculateManmark(player):
     """Calculate manmark rating for a player."""
     try:
-        experience = player.experience or 0
+        # Handle both object attributes and dictionary keys
+        if hasattr(player, 'experience'):
+            experience = player.experience or 0
+            defender = player.defender or 0
+        else:
+            experience = player.get('experience', 0) or 0
+            defender = player.get('defender', 0) or 0
 
         # Convert experience to a 0-20 scale for calculations
         exp_rating = min(experience / 5.0, 20.0)  # Scale experience appropriately
 
         # Calculate man-mark as combination of defender skill and experience
-        defender = player.defender or 0
         manmark = (defender + exp_rating * 0.3) * 0.95  # Slight reduction from pure defender
 
         return round(max(0, manmark), 2)
     except Exception as e:
-        dprint(1, f"Error calculating manmark for player {player.ht_id}: {e}")
+        # Handle both object attributes and dictionary keys for error logging
+        if hasattr(player, 'ht_id'):
+            player_id = player.ht_id
+        else:
+            player_id = player.get('ht_id', 'unknown')
+        dprint(1, f"Error calculating manmark for player {player_id}: {e}")
         return 0.0
 
 def calculateContribution(position, player):
@@ -200,26 +261,51 @@ def calculateContribution(position, player):
 
         contribution = 0.0
         for skill, weight in skills_weights.items():
-            skill_value = getattr(player, skill, 0) or 0
+            # Handle both object attributes and dictionary keys
+            if hasattr(player, skill):
+                skill_value = getattr(player, skill, 0) or 0
+            else:
+                skill_value = player.get(skill, 0) or 0
             contribution += skill_value * weight
 
         # Apply experience and form multipliers
-        experience_mult = 1.0 + (min(player.experience or 0, 20) / 100.0)  # Up to 20% bonus
-        form_mult = 1.0 + ((player.form or 5) - 5) / 20.0  # -25% to +25% based on form
-        loyalty_mult = 1.0 + (min(player.loyalty or 0, 20) / 200.0)  # Up to 10% bonus
+        # Handle both object attributes and dictionary keys
+        if hasattr(player, 'experience'):
+            experience = player.experience or 0
+            form = player.form or 5
+            loyalty = player.loyalty or 0
+        else:
+            experience = player.get('experience', 0) or 0
+            form = player.get('form', 5) or 5
+            loyalty = player.get('loyalty', 0) or 0
+
+        experience_mult = 1.0 + (min(experience, 20) / 100.0)  # Up to 20% bonus
+        form_mult = 1.0 + (form - 5) / 20.0  # -25% to +25% based on form
+        loyalty_mult = 1.0 + (min(loyalty, 20) / 200.0)  # Up to 10% bonus
 
         final_contribution = contribution * experience_mult * form_mult * loyalty_mult
 
         return round(max(0, final_contribution), 2)
 
     except Exception as e:
-        dprint(1, f"Error calculating contribution for player {player.ht_id} at position {position}: {e}")
+        # Handle both object attributes and dictionary keys for error logging
+        if hasattr(player, 'ht_id'):
+            player_id = player.ht_id
+        else:
+            player_id = player.get('ht_id', 'unknown')
+        dprint(1, f"Error calculating contribution for player {player_id} at position {position}: {e}")
         return 0.0
 
 def calculate_team_statistics(players):
     """Calculate comprehensive team statistics from player list."""
+    print(f"\n=== DEBUG: calculate_team_statistics called with {len(players) if players else 0} players ===")
+
     if not players:
         return {}
+
+    # Debug first few players
+    for i, p in enumerate(players[:3]):
+        print(f"Player {i+1}: age_years={getattr(p, 'age_years', 'N/A')}, tsi={getattr(p, 'tsi', 'N/A')}, current_team_goals={getattr(p, 'current_team_goals', 'N/A')}, salary={getattr(p, 'salary', 'N/A')}")
 
     stats = {
         'total_players': len(players),
@@ -229,19 +315,65 @@ def calculate_team_statistics(players):
         'skill_averages': {}
     }
 
-    # Calculate averages
-    total_age = sum(player.age or 0 for player in players)
-    total_tsi = sum(player.tsi or 0 for player in players)
-    total_salary = sum(player.salary or 0 for player in players)
+    # Helper function to get player attribute value as numeric
+    def get_player_attr(player, attr):
+        # For SQLAlchemy objects, always use getattr
+        # For dictionaries, use .get() method
+        if hasattr(player, attr):
+            value = getattr(player, attr, 0)
+        elif hasattr(player, 'get'):
+            value = player.get(attr, 0)
+        else:
+            value = 0
 
-    stats['avg_age'] = round(total_age / len(players), 1)
-    stats['avg_tsi'] = round(total_tsi / len(players), 0)
+        # Convert to numeric, handling None, string, and other types
+        if value is None:
+            return 0
+        try:
+            # Try to convert to int first, then float if that fails
+            if isinstance(value, str):
+                # Handle empty strings
+                if not value.strip():
+                    return 0
+                # Try int first, then float
+                try:
+                    return int(value)
+                except ValueError:
+                    return float(value)
+            elif isinstance(value, (int, float)):
+                return value
+            else:
+                return 0
+        except (ValueError, TypeError):
+            return 0
+
+    # Calculate averages - handle age as years from age_years field
+    total_age = sum(get_player_attr(player, 'age_years') for player in players)  # Use age_years instead of age string
+    total_tsi = sum(get_player_attr(player, 'tsi') for player in players)
+    total_salary = sum(get_player_attr(player, 'salary') for player in players)
+    total_goals = sum(get_player_attr(player, 'current_team_goals') for player in players)
+
+    # Additional career statistics
+    total_career_goals = sum(get_player_attr(player, 'career_goals') for player in players)
+    total_matches = sum(get_player_attr(player, 'current_team_matches') for player in players)
+
+    print(f"DEBUG totals: age={total_age}, tsi={total_tsi}, salary={total_salary}, team_goals={total_goals}, career_goals={total_career_goals}, matches={total_matches}")
+
+    stats['avg_age'] = round(total_age / len(players), 1) if len(players) > 0 else 0
+    stats['avg_tsi'] = round(total_tsi / len(players), 0) if len(players) > 0 else 0
     stats['total_salary'] = total_salary
+    stats['total_team_goals'] = total_goals
+    stats['total_career_goals'] = total_career_goals
+    stats['total_matches'] = total_matches
+    stats['goals_per_match'] = round(total_goals / total_matches, 1) if total_matches > 0 else 0
+    stats['avg_wage'] = round(total_salary / len(players), 0) if len(players) > 0 else 0
+
+    print(f"DEBUG final stats: {stats}")
 
     # Calculate skill averages
     skills = ['keeper', 'defender', 'playmaker', 'winger', 'passing', 'scorer', 'set_pieces']
     for skill in skills:
-        skill_sum = sum(getattr(player, skill, 0) or 0 for player in players)
+        skill_sum = sum(get_player_attr(player, skill) for player in players)
         stats['skill_averages'][skill] = round(skill_sum / len(players), 1)
 
     return stats
@@ -249,27 +381,41 @@ def calculate_team_statistics(players):
 def get_top_scorers(players, limit=5):
     """Get top scoring players from the list."""
     # Filter players with goals and sort by goals scored
-    scorers = [p for p in players if getattr(p, 'goals', 0) and p.goals > 0]
-    scorers.sort(key=lambda x: x.goals or 0, reverse=True)
+    scorers = [p for p in players if getattr(p, 'current_team_goals', 0) and p.current_team_goals > 0]
+    scorers.sort(key=lambda x: getattr(x, 'current_team_goals', 0) or 0, reverse=True)
 
     return scorers[:limit]
 
 def get_top_performers(players, limit=5):
-    """Get top performing players based on average rating."""
-    # Filter players with rating data and sort by average rating
-    performers = [p for p in players if getattr(p, 'rating_average', 0) and p.rating_average > 0]
-    performers.sort(key=lambda x: x.rating_average or 0, reverse=True)
+    """Get top performing players based on TSI (since rating data may not be available)."""
+    # Filter players with TSI data and sort by TSI
+    performers = [p for p in players if getattr(p, 'tsi', 0) and p.tsi > 0]
+    performers.sort(key=lambda x: getattr(x, 'tsi', 0) or 0, reverse=True)
 
     return performers[:limit]
 
 def get_team_match_statistics(teamid):
     """Get comprehensive match statistics for a team."""
     try:
-        # Query match data for the team
-        matches = db.session.query(Match).filter_by(team_id=teamid).all()
+        # Query match data for the team (check both home and away)
+        from sqlalchemy import or_
+        matches = db.session.query(Match).filter(
+            or_(Match.home_team_id == teamid, Match.away_team_id == teamid)
+        ).all()
 
         if not matches:
-            return {}
+            # Return empty stats object
+            class EmptyStats:
+                def __init__(self):
+                    self.total_matches = 0
+                    self.wins = 0
+                    self.draws = 0
+                    self.losses = 0
+                    self.goals_for = 0
+                    self.goals_against = 0
+                    self.goal_difference = 0
+                    self.win_percentage = 0
+            return EmptyStats()
 
         stats = {
             'total_matches': len(matches),
@@ -281,30 +427,58 @@ def get_team_match_statistics(teamid):
         }
 
         for match in matches:
-            stats['goals_for'] += match.home_goals if match.is_home_match else match.away_goals
-            stats['goals_against'] += match.away_goals if match.is_home_match else match.home_goals
+            # Determine if team was playing at home or away
+            is_home_match = (match.home_team_id == teamid)
 
-            # Determine result
-            if match.is_home_match:
-                if match.home_goals > match.away_goals:
+            if is_home_match:
+                stats['goals_for'] += match.home_goals or 0
+                stats['goals_against'] += match.away_goals or 0
+
+                # Determine result for home team
+                if (match.home_goals or 0) > (match.away_goals or 0):
                     stats['wins'] += 1
-                elif match.home_goals == match.away_goals:
+                elif (match.home_goals or 0) == (match.away_goals or 0):
                     stats['draws'] += 1
                 else:
                     stats['losses'] += 1
             else:
-                if match.away_goals > match.home_goals:
+                stats['goals_for'] += match.away_goals or 0
+                stats['goals_against'] += match.home_goals or 0
+
+                # Determine result for away team
+                if (match.away_goals or 0) > (match.home_goals or 0):
                     stats['wins'] += 1
-                elif match.away_goals == match.home_goals:
+                elif (match.away_goals or 0) == (match.home_goals or 0):
                     stats['draws'] += 1
                 else:
                     stats['losses'] += 1
 
-        return stats
+        # Calculate derived stats
+        stats['goal_difference'] = stats['goals_for'] - stats['goals_against']
+        stats['win_percentage'] = round((stats['wins'] / stats['total_matches']) * 100, 1) if stats['total_matches'] > 0 else 0
+
+        # Convert to object with dot notation support
+        class MatchStats:
+            def __init__(self, data):
+                for key, value in data.items():
+                    setattr(self, key, value)
+
+        return MatchStats(stats)
 
     except Exception as e:
         dprint(1, f"Error getting match statistics for team {teamid}: {e}")
-        return {}
+        # Return empty stats on error
+        class EmptyStats:
+            def __init__(self):
+                self.total_matches = 0
+                self.wins = 0
+                self.draws = 0
+                self.losses = 0
+                self.goals_for = 0
+                self.goals_against = 0
+                self.goal_difference = 0
+                self.win_percentage = 0
+        return EmptyStats()
 
 # =============================================================================
 # Data Processing and Download Utilities
@@ -312,14 +486,84 @@ def get_team_match_statistics(teamid):
 
 def downloadMatches(teamid):
     """Download and process match data for a team."""
-    try:
-        # This is a complex function from routes.py - keeping the original implementation
-        # but importing it here for consolidation
-        from app.routes import downloadMatches as original_downloadMatches
-        return original_downloadMatches(teamid)
-    except ImportError:
-        dprint(1, "Warning: downloadMatches function needs to be migrated")
-        return []
+
+    from flask import current_app
+    from pychpp import CHPP
+
+    from models import Match
+
+    # Get CHPP credentials from app config
+    consumer_key = current_app.config.get('CONSUMER_KEY')
+    consumer_secret = current_app.config.get('CONSUMER_SECRETS')
+
+    chpp = CHPP(consumer_key,
+                consumer_secret,
+                session['access_key'],
+                session['access_secret'])
+
+    the_matches = chpp.matches_archive(ht_id=teamid, youth=False)
+
+    for match in the_matches:
+        dprint(2, "---------------")
+
+        # TODO: get more details about the match like below
+        # the_match = chpp.match(ht_id=match.ht_id)
+
+        thedate = datetime(
+            match.datetime.year,
+            match.datetime.month,
+            match.datetime.day,
+            match.datetime.hour,
+            match.datetime.minute)
+
+        dprint(2, "Adding match ", match.ht_id, " to database.")
+
+        dbmatch = (db.session.query(Match)
+                   .filter_by(ht_id=match.ht_id)
+                   .first())
+
+        if dbmatch:
+            dprint(1, "WARNING: This match already exists.")
+        else:
+            thismatch = {}
+            thismatch['ht_id'] = match.ht_id
+            thismatch['home_team_id'] = match.home_team_id
+            thismatch['home_team_name'] = match.home_team_name
+            thismatch['away_team_id'] = match.away_team_id
+            thismatch['away_team_name'] = match.away_team_name
+            thismatch['datetime'] = thedate
+            thismatch['matchtype'] = match.type
+            thismatch['context_id'] = match.context_id
+            thismatch['rule_id'] = match.rule_id
+            thismatch['cup_level'] = match.cup_level
+            thismatch['cup_level_index'] = match.cup_level_index
+            thismatch['home_goals'] = match.home_goals
+            thismatch['away_goals'] = match.away_goals
+
+            newmatch = Match(thismatch)
+            db.session.add(newmatch)
+            db.session.commit()
+
+            matchlineup = chpp.match_lineup(ht_id=match.ht_id,
+                                            team_id=teamid)
+            for p in matchlineup.lineup_players:
+                dprint(2, " - Adding ", p.first_name, " ",
+                       p.last_name, " to database")
+                thismatchlineup = {}
+                thismatchlineup['match_id'] = match.ht_id
+                thismatchlineup['player_id'] = p.ht_id
+                thismatchlineup['datetime'] = thedate
+                thismatchlineup['role_id'] = p.role_id
+                thismatchlineup['first_name'] = p.first_name
+                thismatchlineup['nick_name'] = p.nick_name
+                thismatchlineup['last_name'] = p.last_name
+                thismatchlineup['rating_stars'] = p.rating_stars
+                thismatchlineup['rating_stars_eom'] = p.rating_stars_eom
+                thismatchlineup['behaviour'] = p.behaviour
+
+                newmatchlineup = MatchPlay(thismatchlineup)
+                db.session.add(newmatchlineup)
+                db.session.commit()
 
 def count_clicks(page):
     """Count page clicks for analytics."""
