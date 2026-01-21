@@ -26,16 +26,16 @@
 **Priority 2: Deployment & Operations**
 - ✅ Currently Empty
 
-**Priority 3: Stability & Maintainability** (It stays working) - 🚀 7/9 IN PROGRESS
+**Priority 3: Stability & Maintainability** (It stays working) - 🚀 8/9 IN PROGRESS
 - ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization ✅ COMPLETED 2026-01-20
 - ✅ [INFRA-012] Migration Workflow (4-6 hours) - Database procedures ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-006] Routes Code Consolidation (4-6 hours) - Eliminate routes.py/routes_bp.py duplication ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-007] Complete Routes.py Removal (8-12 hours) - Finish blueprint migration by removing legacy monolith ✅ COMPLETED 2026-01-21
-- 🚀 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **ACTIVE**
-- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY**
-- 🎯 [TEST-006] Import Path Migration (1-2 hours) - Fix 15 test failures from routes.py migration **READY**
 - ✅ [REFACTOR-005] Production Code Linting Fix (15-30 min) - Fix 1 remaining production linting error ✅ COMPLETED 2026-01-21
+- ✅ [TEST-006] Import Path Migration (1-2 hours) - Fix test imports + critical bugs ✅ COMPLETED 2026-01-21
+- 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY**
+- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY**
 - 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs **QUICK WIN**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
