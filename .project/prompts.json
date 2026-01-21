@@ -37,7 +37,7 @@
         "Review progress.md and backlog.md current state.",
         "Update both files with completed tasks and metrics.",
         "Unblock dependencies, move ready tasks to active status.",
-        "Update architecture.md/goals.md if major changes made."
+        "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md), ensure they describe the current architecture and decisions. Remove or compress outdated historical information instead of keeping long change logs there."
       ]
     },
     {
@@ -73,8 +73,10 @@
       "title": "Repository analysis for documentation and backlog management",
       "what to do": [
         "Use list_dir and file_search to analyze repository structure.",
-        "Check documentation consistency (README.md, .project/*, TECHNICAL.md).",
-        "Identify gaps, outdated references, and backlog management needs.",
+        "Check documentation consistency (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md).",
+        "For architectural and technical docs, prioritize reflecting the current system state, not history. Remove or rewrite outdated sections instead of appending more history.",
+        "Flag any places where historical notes, old plans, or obsolete diagrams make the current architecture unclear. Create backlog items to address these clarity issues.",
+        "Identify gaps, outdated references, and backlog management needs. Create tasks for improvements.",
         "Structure: # Analysis ## Documentation Status ## Backlog Needs ## Issues ## Actions"
       ]
     },
