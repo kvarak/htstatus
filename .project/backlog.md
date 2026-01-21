@@ -21,6 +21,7 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
+- 🚨 [DOC-026] Documentation Architecture Overhaul (4-6 hours) - Establish comprehensive documentation standards and centralized rules system **NEW - HIGH PRIORITY**
 - 🚨 [TEST-007] Fix Test Fixture Architecture (2-3 hours) - Resolve pytest session/function scope conflicts causing database table failures **CRITICAL**
 
 **Priority 2: Deployment & Operations**
@@ -76,7 +77,79 @@
 
 ## Priority 1: Testing & App Reliability
 
+### [DOC-026] Documentation Architecture Overhaul
+**Status**: 🚨 NEW - High Priority | **Effort**: 4-6 hours | **Impact**: Developer experience, project maintainability, long-term quality
+**Dependencies**: None | **Strategic Value**: Comprehensive documentation strategy, consolidated rule management
+
+**Problem Statement**:
+The project's documentation is scattered across multiple locations with inconsistent formats and overlapping content. Rules, standards, and conventions are distributed throughout various files, making it difficult to:
+- Find the authoritative documentation for specific topics
+- Ensure consistency across different documentation types
+- Onboard new contributors efficiently
+- Maintain documentation quality and accuracy
+- Apply consistent standards across the project
+
+**Current Documentation Issues**:
+- Rules scattered in `.project/plan.md`, `.project/backlog.md`, and other files
+- No clear hierarchy of documentation types (user vs developer vs API)
+- Inconsistent formatting and organization patterns
+- Historical information mixed with current architectural state
+- Missing documentation governance framework
+
+**Implementation**:
+1. **Documentation Audit and Mapping** (1-1.5 hours):
+   - Catalog all existing `.md` files across the project
+   - Identify content types: user guides, developer docs, API docs, project management
+   - Map overlapping and duplicate content areas
+   - Assess current quality and accuracy levels
+   - Document current vs desired documentation structure
+
+2. **Create `.project/rules.md` Central Hub** (1.5-2 hours):
+   - Consolidate all development rules from `.project/plan.md`
+   - Move backlog management rules from `backlog.md`
+   - Add documentation standards and conventions
+   - Define file structure and organization rules
+   - Create cross-references to related documentation
+   - Establish rule categories: Quality, Documentation, File Structure, Security, AI Agents
+
+3. **Documentation Hierarchy Design** (1-1.5 hours):
+   - Define clear purposes for each documentation location:
+     - `/README.md`: User-facing setup and basic usage
+     - `/TECHNICAL.md`: Architecture, implementation details
+     - `/DEPLOYMENT.md`: Production deployment and operations
+     - `/.project/`: Project management, development workflow
+     - `/docs/`: Detailed guides, API documentation, tutorials
+   - Create documentation decision matrix (where does X content go?)
+   - Establish update responsibilities and ownership
+
+4. **Update Prompts Integration** (0.5-1 hour):
+   - Reference `.project/rules.md` in all relevant prompts
+   - Update prompts.json to use centralized rules
+   - Ensure AI agents consistently apply documentation standards
+   - Create documentation review checkpoints in development workflow
+
+5. **Implementation Guide Creation** (0.5-1 hour):
+   - Document the new documentation architecture
+   - Create migration plan for existing content
+   - Establish ongoing maintenance procedures
+   - Define quality gates for documentation updates
+
+**Acceptance Criteria**:
+- ✅ All development rules consolidated in `.project/rules.md`
+- ✅ Clear documentation hierarchy defined and documented
+- ✅ Prompts updated to reference centralized rules
+- ✅ Implementation guide created for future maintenance
+- ✅ No rule duplication across project files
+- ✅ Documentation types clearly defined with ownership
+
+**Related Tasks**:
+- Links to DOC-023, DOC-024, DOC-025 (cleaning existing docs)
+- Supports DOC-021 (tutorial documentation)
+- Enables future documentation standardization tasks
+
 ---
+
+### [TEST-007] Fix Test Fixture Architecture
 
 ## Priority 2: Core Functionality
 
