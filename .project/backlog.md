@@ -21,22 +21,15 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- ✅ Currently Empty
+- 🚨 [TEST-007] Fix Test Fixture Architecture (2-3 hours) - Resolve pytest session/function scope conflicts causing database table failures **CRITICAL**
 
 **Priority 2: Deployment & Operations**
 - ✅ Currently Empty
 
-**Priority 3: Stability & Maintainability** (It stays working) - 🚀 8/9 IN PROGRESS
-- ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
-- ✅ [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization ✅ COMPLETED 2026-01-20
-- ✅ [INFRA-012] Migration Workflow (4-6 hours) - Database procedures ✅ COMPLETED 2026-01-20
-- ✅ [REFACTOR-006] Routes Code Consolidation (4-6 hours) - Eliminate routes.py/routes_bp.py duplication ✅ COMPLETED 2026-01-20
-- ✅ [REFACTOR-007] Complete Routes.py Removal (8-12 hours) - Finish blueprint migration by removing legacy monolith ✅ COMPLETED 2026-01-21
-- ✅ [REFACTOR-005] Production Code Linting Fix (15-30 min) - Fix 1 remaining production linting error ✅ COMPLETED 2026-01-21
-- ✅ [TEST-006] Import Path Migration (1-2 hours) - Fix test imports + critical bugs ✅ COMPLETED 2026-01-21
-- 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY**
-- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY**
-- 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs **QUICK WIN**
+**Priority 3: Stability & Maintainability** (It stays working) - 75% Complete (7/9 major tasks completed)
+- 🚫 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **BLOCKED BY TEST-007**
+- 🚫 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **BLOCKED BY TEST-007**
+- 🚀 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs **ACTIVE - QUICK WIN**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 - 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
@@ -91,7 +84,7 @@
 
 ## Priority 3: Stability & Maintainability
 
-### [REFACTOR-002] Complete Blueprint Migration
+### [DOC-021] New Player Tutorial
 **Status**: 🎯 Ready to Execute | **Effort**: 3-5 hours | **Impact**: User onboarding and feature discovery
 **Dependencies**: Core UI features (completed) | **Strategic Value**: Reduced learning curve, improved user retention
 
@@ -450,48 +443,6 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 - ✅ Application functionality verified with 206/213 tests passing
 
 **Expected Outcomes**: Better code maintainability, easier feature development, Flask best practices, significantly improved code organization enabling future refactoring
-
----
-
-### [INFRA-012] Migration Workflow
-**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Database reliability
-**Dependencies**: None | **Strategic Value**: Safe database evolution
-
-**Implementation**:
-1. Document Alembic migration best practices
-2. Create automated migration validation procedures
-3. Implement rollback testing and procedures
-4. Add pre-migration backup automation
-
-**Acceptance Criteria**:
-- Complete migration procedures documented
-- Validation and rollback processes tested
-- Automated backup integration
-
-**Expected Outcomes**: Safe database evolution, reduced migration risks, operational confidence
-
----
-
-### [INFRA-008] Type Sync Validation
-**Status**: ✅ COMPLETED | **Effort**: 3-4 hours | **Impact**: Type safety
-**Dependencies**: None | **Strategic Value**: Prevent type drift between Python/TypeScript
-
-**Completion Summary**:
-- ✅ Created validation script comparing SQLAlchemy models to TypeScript interfaces
-- ✅ Added typesync Makefile target for manual validation
-- ✅ Integrated into test-all quality gate pipeline as Step 4/6
-- ✅ Documented type sync procedures and maintenance workflow
-- ✅ Script detects field presence, type compatibility, and nullability consistency
-- ✅ Clear reporting with 85 existing issues identified (mostly nullability mismatches)
-
-**Implementation Details**:
-- Script: `scripts/validate_types.py` with comprehensive type mapping
-- Target: `make typesync` for standalone validation
-- Documentation: `docs/type-sync.md` with procedures and troubleshooting
-- CI integration: Warning-level reporting (doesn't block pipeline)
-- Coverage: 6 models validated against 6 TypeScript interfaces
-
-**Expected Outcomes**: ✅ ACHIEVED - Improved type safety, reduced integration bugs, automated maintenance
 
 ---
 
@@ -1451,6 +1402,97 @@ The application currently depends on the third-party `pychpp` library for Hattri
 
 ## Task Details: New Tasks
 
+### [TEST-007] Fix Test Fixture Architecture
+**Status**: 🚨 CRITICAL | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Infrastructure stability, testing foundation
+**Dependencies**: None | **Strategic Value**: Testing reliability and CI/CD confidence
+
+**Problem Statement**:
+Critical infrastructure failure discovered during Quality Intelligence Platform review. Current pytest configuration has session/function scope conflicts causing widespread test failures:
+- 37 failed tests with "relation does not exist" errors
+- Individual tests pass when run in isolation (✅)
+- Full test suite fails due to database table creation conflicts (❌)
+- Session-scoped app fixture conflicts with function-scoped database operations
+- Blocking deployment readiness despite code quality improvements
+
+**Root Cause Analysis**:
+1. **Session Fixture Scope Issue**: `app` fixture (session-scoped) creates tables with `db.create_all()` but drops them with `db.drop_all()` on teardown
+2. **Function Fixture Conflicts**: `db_session` fixture (function-scoped) expects tables to exist for transaction rollback pattern
+3. **Race Conditions**: When tests run in parallel or with fixture scope mismatches, tables get dropped before other tests complete
+4. **Transaction Isolation**: Current pattern doesn't properly isolate test data between function-scoped tests
+
+**Implementation**:
+1. **Fixture Architecture Redesign** (1-1.5 hours):
+   - Change app fixture to function-scoped OR ensure proper table lifecycle management
+   - Implement proper database setup/teardown that doesn't interfere between tests
+   - Add database state validation before each test function
+   - Ensure consistent fixture dependency ordering
+
+2. **Database State Management** (0.5-1 hour):
+   - Implement proper table creation that survives session scope
+   - Add database state checks and automatic recovery
+   - Ensure transaction rollback pattern works consistently
+   - Add fixture cleanup that doesn't break parallel test execution
+
+3. **Test Configuration Validation** (0.5 hour):
+   - Verify pytest collection and execution order
+   - Test fixture interaction in different execution scenarios
+   - Add fixture debugging if needed for future troubleshooting
+   - Document proper fixture usage patterns
+
+**Acceptance Criteria**:
+- `make test-all` passes without database table errors
+- All 37 currently failing tests pass consistently
+- Tests can run individually and in full suite without conflicts
+- No "relation does not exist" errors during test execution
+- Database fixtures properly isolated between function-scoped tests
+- Test execution time remains reasonable (no significant performance regression)
+
+**Expected Outcomes**: Restored testing foundation, deployment confidence, stable CI/CD pipeline
+
+---
+
+### [INFRA-021] Quality Intelligence Platform Documentation
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Strategic milestone recognition, documentation accuracy
+**Dependencies**: Quality Intelligence Platform implementation (completed) | **Strategic Value**: Strategic communication, project visibility
+
+**Problem Statement**:
+The successful Quality Intelligence Platform implementation represents a major strategic achievement that needs proper documentation and recognition:
+- Contrarian "look-outside-the-box" approach transformed dual coverage report confusion into competitive advantage
+- 140+ line Makefile modularized into professional 21-line orchestration + 116-line quality assessment script
+- Multi-dimensional quality analysis provides deployment confidence scoring
+- Innovation documented in [.project/innovation-testing-intelligence.md](.project/innovation-testing-intelligence.md)
+- Progress.md needs updating to reflect this P3 completion and strategic milestone
+
+**Strategic Value**:
+- Demonstrates innovative problem-solving approach (transformation vs. removal)
+- Provides template for future "look-outside-the-box" opportunities
+- Establishes quality intelligence as competitive advantage
+- Shows progression from P3 stability towards advanced quality analysis
+
+**Implementation**:
+1. **Progress Documentation Update** (0.5-1 hour):
+   - Mark Quality Intelligence Platform as completed milestone in progress.md
+   - Update P3 Stability progress (9/9 tasks now complete with this + TEST-007)
+   - Add strategic analysis of contrarian approach success
+   - Document deployment confidence scoring capability
+
+2. **Strategic Milestone Recognition** (0.5-1 hour):
+   - Add Quality Intelligence Platform to major achievements section
+   - Document innovation methodology for future reference
+   - Update project metrics to reflect enhanced quality analysis
+   - Note transition from dual coverage confusion to strategic advantage
+
+**Acceptance Criteria**:
+- Progress.md accurately reflects Quality Intelligence Platform completion
+- P3 Stability section updated with final task completion status
+- Strategic milestone properly documented with implementation approach
+- Innovation methodology captured for future "look-outside-the-box" opportunities
+- Documentation clearly communicates the contrarian transformation approach
+
+**Expected Outcomes**: Accurate project documentation, strategic milestone recognition, innovation methodology template
+
+---
+
 ### [TEST-004] Blueprint Test Coverage
 **Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Priority**: P3 | **Impact**: Quality assurance and maintainability
 **Dependencies**: REFACTOR-006 Routes Code Consolidation (✅ completed) | **Strategic Value**: Validation of blueprint architecture
@@ -1576,162 +1618,6 @@ The newly created app/utils.py module (300+ lines) contains critical shared util
 - Mock database queries for data processing tests
 
 **Expected Outcomes**: Validated utility function reliability, increased confidence in shared code, prevention of silent failures
-
----
-
-### [TEST-006] Import Path Migration
-**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P3 | **Impact**: Test suite reliability
-**Dependencies**: REFACTOR-007 Complete Routes.py Removal (✅ completed) | **Strategic Value**: Full test coverage restoration
-
-**Problem Statement**:
-After completing REFACTOR-007 routes.py removal, 15 test files have import failures causing test suite degradation from 218 to 183 passing tests. Tests are attempting to import `create_page` and `dprint` functions from `app.routes_bp` module, but these functions have been moved to `app.utils` during the blueprint migration.
-
-**Current Impact**:
-- 15 test failures in comprehensive test suite
-- Functions moved: `create_page`, `dprint`, `render_template` references
-- Tests failing in: test_blueprint_routes_focused.py, test_minimal_routes.py, test_strategic_routes.py
-- Test coverage impact: Down from 218 to 183 passing tests
-- CI/CD reliability affected
-
-**Implementation**:
-1. **Import Path Analysis** (15 minutes):
-   - Identify all test files with failing imports
-   - Map old import paths to new locations in app.utils
-   - Review function signatures to ensure compatibility
-   - Check for any additional moved functions
-
-2. **Test Import Updates** (45-60 minutes):
-   - Update failing test imports: `from app.routes_bp import X` → `from app.utils import X`
-   - Fix mock patches: `app.routes_bp.render_template` → proper mock targets
-   - Update test function calls and mocking strategies
-   - Verify test isolation and proper mocking
-
-3. **Test Suite Validation** (15-30 minutes):
-   - Run failing tests individually to verify fixes
-   - Run full comprehensive test suite (make test-all)
-   - Ensure no new test failures introduced
-   - Verify test coverage remains stable
-
-4. **Documentation Update** (15 minutes):
-   - Update any test documentation referencing old import paths
-   - Add notes about function migration in relevant test files
-   - Update test coverage metrics in progress tracking
-
-**Files to Update**:
-- tests/test_blueprint_routes_focused.py (5 failures)
-- tests/test_minimal_routes.py (6 failures)
-- tests/test_strategic_routes.py (4 failures)
-- Any test mocking `app.routes_bp.render_template`
-
-**Acceptance Criteria**:
-- All 15 test failures resolved
-- Comprehensive test suite returns to 218/218 or better
-- No new test failures introduced
-- Test coverage maintained or improved
-- All import paths point to correct modules
-- Mock strategies properly target new function locations
-
-**Technical Approach**:
-- Use find/replace for systematic import updates
-- Update mock.patch decorators to target correct modules
-- Test changes incrementally to avoid introducing new issues
-- Run individual test files before full suite
-
-**Expected Outcomes**: Full test suite reliability restored, confidence in refactored architecture validated, CI/CD pipeline stability improved
-
----
-
-### [REFACTOR-005] Production Code Linting Fix
-**Status**: 🎯 Ready to Execute | **Effort**: 15-30 min | **Priority**: P4 | **Impact**: Code quality gate
-
-**Problem Statement**:
-Quality gate shows 1 linting error in production code (out of 31 total). While 30 errors are acceptable in dev scripts, production code must be lint-free for quality standards.
-
-**Current State**:
-- `make test-all` shows: "31 errors (including 1 in production code)"
-- Tests passing: 213/218 (97.7%)
-- Security: 0 issues
-- Type sync: 85 baseline mismatches
-
-**Acceptance Criteria**:
-- [ ] Identify the 1 production code linting error
-- [ ] Fix the error following project coding standards
-- [ ] Verify fix with `make lint`
-- [ ] Confirm `make test-all` shows 0 production errors
-- [ ] No test regressions introduced
-
-**Implementation Notes**:
-- Run `make lint` to locate specific error
-- Common issues: import order, unused variables, line length
-- May be in app/ or models.py
-- Quick win for quality gate improvement
-
----
-
-### [REFACTOR-007] Complete Routes.py Removal
-**Status**: 🚀 ACTIVE | **Effort**: 8-12 hours | **Priority**: P3 | **Impact**: Complete blueprint migration
-**Dependencies**: REFACTOR-002 (✅ completed), REFACTOR-006 (✅ completed) | **Strategic Value**: Eliminate legacy monolith, complete architectural modernization
-
-**Problem Statement**:
-The legacy `app/routes.py` file (2,335 lines) still exists as a monolithic route handler despite successful blueprint migration. This creates:
-- Architectural inconsistency with remaining legacy code alongside modern blueprints
-- Maintenance burden with duplicate functionality across files
-- Confusion about which file to modify for route changes
-- Risk of regression to monolithic patterns
-- Incomplete migration preventing full blueprint architecture benefits
-
-**Current State Analysis**:
-- **routes.py**: Legacy monolith (2,335 lines) with route handlers, utilities, and business logic
-- **Blueprint modules**: Modern architecture in `app/blueprints/` (6 modules, ~330 lines each)
-- **Utils consolidation**: REFACTOR-006 moved shared utilities to `app/utils.py`
-- **Status**: Ready for removal after successful utility consolidation
-
-**Implementation**:
-1. **Legacy Code Analysis** (2-3 hours):
-   - Audit remaining functionality in routes.py vs blueprint equivalents
-   - Identify any unique business logic not yet migrated
-   - Map route registrations and dependencies
-   - Document any Flask-specific patterns needing preservation
-   - Identify test dependencies on legacy routes
-
-2. **Final Migration Tasks** (3-4 hours):
-   - Move any remaining unique route handlers to appropriate blueprints
-   - Migrate any remaining business logic or utility functions to utils.py
-   - Update any imports or references pointing to routes.py
-   - Ensure all route registrations work through blueprint system
-   - Update factory.py to remove routes.py initialization
-
-3. **Testing and Validation** (2-3 hours):
-   - Comprehensive testing of all application functionality
-   - Verify all routes work through blueprint registration
-   - Test authentication, session handling, and CHPP integration
-   - Validate no functionality regressions
-   - Update tests that specifically reference routes.py
-
-4. **File Removal and Cleanup** (1-2 hours):
-   - Remove `app/routes.py` file completely
-   - Update imports and references in remaining files
-   - Clean up factory.py route initialization
-   - Update documentation to reflect blueprint-only architecture
-   - Remove any routes.py references from tests
-
-**Acceptance Criteria**:
-- `app/routes.py` file completely removed
-- All application functionality preserved through blueprints
-- No route handling functionality lost
-- All tests pass without routes.py dependencies
-- Factory.py uses blueprint-only initialization
-- Documentation updated to reflect blueprint architecture
-- No breaking changes to existing functionality
-- Clean application startup without legacy route references
-
-**Migration Strategy**:
-1. **Parallel Testing**: Verify blueprint equivalents work before removing legacy
-2. **Incremental Removal**: Remove sections gradually with validation
-3. **Rollback Plan**: Backup routes.py before deletion with restoration procedure
-4. **Test Coverage**: Recommend completing TEST-004/TEST-005 after this task for validation
-
-**Expected Outcomes**: Complete architectural modernization, eliminated technical debt, simplified codebase maintenance, consistent blueprint pattern throughout application
 
 ---
 
