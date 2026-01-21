@@ -2,58 +2,38 @@
 Comprehensive tests for player management blueprint to achieve 80+ coverage.
 Tests player display, group management, skill tracking and data operations.
 """
-import os
 from unittest.mock import patch
 
 import pytest
 
-from app.factory import create_app, db
-from config import TestConfig
+from app.factory import db
 from models import Group, Players, PlayerSetting, User
 
+# Removed player_app fixture - using shared app fixture from conftest.py instead
+# This prevents database table drops that contaminate other tests
 
 @pytest.fixture(scope='function')
-def player_app():
-    """Create application for player testing with transaction isolation."""
-    os.environ['FLASK_ENV'] = 'testing'
-    app = create_app(TestConfig, include_routes=True)
+def app_with_routes(app):
+    """Use shared app fixture but initialize routes for route tests."""
+    from app.routes_bp import initialize_routes
 
-    with app.app_context():
-        # Create tables using the same pattern as conftest.py
-        db.create_all()
+    # Only initialize routes once
+    if not hasattr(app, '_routes_initialized'):
+        with app.app_context():
+            initialize_routes(app)
+        app._routes_initialized = True
 
-        # Create connection and begin transaction for test isolation
-        from sqlalchemy.orm import sessionmaker
-        connection = db.engine.connect()
-        transaction = connection.begin()
-
-        # Configure session to use this connection
-        session_factory = sessionmaker(bind=connection)
-        scoped_session_test = db.scoped_session(session_factory)
-
-        # Store original session to restore later
-        original_session = db.session
-        db.session = scoped_session_test
-
-        yield app
-
-        # Cleanup: restore session and rollback transaction
-        db.session = original_session
-        scoped_session_test.remove()
-        transaction.rollback()
-        connection.close()
-        db.drop_all()
-        db.engine.dispose()
+    return app
 
 
 @pytest.fixture(scope='function')
-def client(player_app):
-    """Create test client."""
-    return player_app.test_client()
+def client(app_with_routes):
+    """Create test client with routes registered."""
+    return app_with_routes.test_client()
 
 
 @pytest.fixture(scope='function')
-def sample_user(player_app):
+def sample_user(app):
     """Create a sample user for testing."""
     user = User(
         ht_id=12345,
@@ -69,7 +49,7 @@ def sample_user(player_app):
 
 
 @pytest.fixture(scope='function')
-def sample_players(player_app, sample_user):
+def sample_players(app, sample_user):
     """Create sample players for testing."""
     from datetime import datetime
     players = []
@@ -332,9 +312,9 @@ class TestPlayerDataDisplay:
 class TestPlayerBlueprintSetup:
     """Test player blueprint setup and configuration."""
 
-    def test_setup_player_blueprint(self, player_app):
+    def test_setup_player_blueprint(self, app):
         """Test player blueprint setup function."""
-        with player_app.app_context():
+        with app.app_context():
             from app.blueprints.player import setup_player_blueprint
 
             def_cols = [('Name', 'name'), ('Age', 'age')]
@@ -351,13 +331,13 @@ class TestPlayerBlueprintSetup:
             assert player.tracecolumns == trace_cols
             assert player.default_group_order == 50
 
-    def test_blueprint_registration(self, player_app):
+    def test_blueprint_registration(self, app_with_routes):
         """Test player blueprint is registered properly."""
-        with player_app.app_context():
-            assert 'player' in player_app.blueprints
+        with app_with_routes.app_context():
+            assert 'player' in app_with_routes.blueprints
 
             # Check route is registered
-            routes = [rule.rule for rule in player_app.url_map.iter_rules()]
+            routes = [rule.rule for rule in app_with_routes.url_map.iter_rules()]
             assert '/player' in routes
 
 
