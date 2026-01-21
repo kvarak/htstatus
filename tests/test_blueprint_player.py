@@ -15,12 +15,12 @@ from models import Group, Players, PlayerSetting, User
 @pytest.fixture(scope='function')
 def app_with_routes(app):
     """Use shared app fixture but initialize routes for route tests."""
-    from app.routes_bp import initialize_routes
+    from app.factory import db, setup_routes
 
     # Only initialize routes once
     if not hasattr(app, '_routes_initialized'):
         with app.app_context():
-            initialize_routes(app)
+            setup_routes(app, db)
         app._routes_initialized = True
 
     return app
