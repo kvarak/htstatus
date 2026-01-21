@@ -81,23 +81,25 @@
 ## Priority 1: Testing & App Reliability
 
 ### [TEST-008] Residual Test Failures Resolution
-**Status**: 🎯 Ready to Execute | **Effort**: 2-4 hours | **Priority**: P1 | **Impact**: Full test suite reliability
+**Status**: 🚀 ACTIVE - In Progress | **Effort**: 2-4 hours | **Priority**: P1 | **Impact**: Full test suite reliability
 **Dependencies**: TEST-007 (completed) | **Strategic Value**: Complete testing foundation
 
+**Progress**: 219/251 tests passing (87.3%), up from 213/246 (86.6%)
+- ✅ Fixed 2 config value mismatches in test_minimal_routes.py
+- ✅ Fixed 4 test expectations in test_blueprint_player.py
+- ✅ Added error handling for invalid team ID in player route
+- 🚧 27 remaining failures to investigate
+
 **Problem Statement**:
-With TEST-007 transaction isolation now operational (213/246 tests passing), 33 residual test failures remain:
-- 14 failures in test_database.py: Session-scoped table creation conflicts with transaction isolation pattern
-- 10 failures in test_business_logic.py: Business logic validation edge cases
-- 4 failures in test_minimal_routes.py: Config value mismatches (CONSUMER_KEY, SECRET_KEY expectations)
-- 5 failures in test_blueprint_player.py: Player route edge case handling
+With TEST-007 transaction isolation now operational, 27 residual test failures remain.
+Original estimate was 33 failures, but actual count is 27 after fixes.
 
 **Implementation**:
-1. **Fix test_database.py** (1-1.5 hours): Redesign to use transaction-isolated fixtures or move table creation into function scope
-2. **Fix config mismatches** (0.5 hour): Update test assertions to match TestConfig values
-3. **Fix business logic tests** (0.5-1 hour): Review and fix edge case handling
-4. **Fix blueprint player tests** (0.5-1 hour): Address error handling and edge cases
+1. ✅ **Fix config mismatches** (30 min): Updated test assertions to match TestConfig values
+2. ✅ **Fix test expectations** (30 min): Corrected test_blueprint_player.py assertions
+3. 🚧 **Continue investigating** (1-2 hours): Analyze remaining 27 failures
 
-**Acceptance Criteria**: `make test-all` passes with 246/246 tests, zero failures
+**Acceptance Criteria**: `make test-all` passes with 251/251 tests, zero failures
 
 ---
 

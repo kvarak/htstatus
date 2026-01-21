@@ -43,7 +43,14 @@ def player():
 
     teamid = request.values.get('id')
 
-    teamid = int(teamid) if teamid else request.form.get('id')
+    try:
+        teamid = int(teamid) if teamid else request.form.get('id')
+    except (ValueError, TypeError):
+        error = "Invalid team ID format."
+        return create_page(
+            template='player.html',
+            title='Players',
+            error=error)
 
     dprint(1, teamid)
 

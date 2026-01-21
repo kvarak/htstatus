@@ -118,7 +118,7 @@ class TestBlueprintRegistration:
         """Test accessing app configuration."""
         with minimal_app.app_context():
             assert minimal_app.config['TESTING'] is True
-            assert minimal_app.config['SECRET_KEY'] == 'test-secret-key'
+            assert minimal_app.config['SECRET_KEY'] == 'test-secret-key-not-for-production'
 
 
 class TestRouteModuleImports:
@@ -213,7 +213,7 @@ class TestConfigurationHandling:
         with minimal_app.app_context():
             assert minimal_app.config['TESTING'] is True
             assert minimal_app.config['DEBUG_LEVEL'] == 0
-            assert minimal_app.config['CONSUMER_KEY'] == 'test-key'
+            assert minimal_app.config['CONSUMER_KEY'] == 'test-consumer-key'
 
 
 class TestRouteErrorHandling:
