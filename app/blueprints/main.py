@@ -4,7 +4,7 @@ import re
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, redirect, render_template, request, session, url_for
 from sqlalchemy import text
 
 from app.utils import create_page, diff_month, dprint
@@ -37,7 +37,7 @@ def index():
     time1m = date.today() - relativedelta(months=1)
     activeusers = db.session.query(User).filter(User.last_usage > time1m).all()
 
-    if ('current_user') not in session:
+    if 'current_user' not in session:
         return create_page(
             template='main.html',
             title='Home',
@@ -56,6 +56,12 @@ def index():
     thisuserdata = (db.session.query(User)
                     .filter_by(ht_id=session['current_user_id'])
                     .first())
+
+    if not thisuserdata:
+        # User not found in database, clear session and redirect to login
+        session.clear()
+        return redirect(url_for('auth.login'))
+
     thisuser = {
         'id': thisuserdata.ht_id,
         'name': thisuserdata.ht_user,
