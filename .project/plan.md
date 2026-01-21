@@ -60,6 +60,36 @@
 **Value**: Premium analytics subscriptions; competitive intelligence services; data-driven coaching insights.
 **Foundation**: Rich historical match and player data; existing performance calculations; React visualization framework ready for advanced charts.
 
+---
+
+## New Opportunities (January 21, 2026)
+
+*These opportunities emerged from contrarian thinking and interface/business model innovation, complementing the existing feature-expansion suggestions above.*
+
+### 🎯 Voice-First Tactical Assistant
+**Vision**: Transform HTStatus into a voice-controlled coaching companion. Managers dictate observations while watching matches, ask questions during commutes, receive audio summaries on demand. "Siri for Hattrick team management" - mobile-first through voice, not dashboards.
+**Why Novel**: Inverts interface paradigm - voice input/output primary, visuals secondary. Targets actual user behavior (mobile multitasking) not assumed behavior (desktop analytics). No Hattrick tool offers voice interface.
+**Value**: Accessibility revolution (blind managers), true mobile-native experience, time efficiency (insights while driving/cooking), lower barrier (speaking faster than clicking), first-mover advantage in voice UI.
+**Foundation**: PWA already built (service worker, offline), `create_page` utility for conversational templates, PostgreSQL queries ready for natural language translation, React can add voice components without touching Flask backend.
+**Implementation**: Speech-to-text (Whisper/Web Speech API), RAG over player/match database, text-to-speech summaries, lightweight voice transcript UI, 3-4 month MVP timeline.
+
+### 🔧 Developer API Marketplace - "Stripe for Hattrick Data"
+**Vision**: Open HTStatus's data infrastructure as premium API service for third-party developers. Instead of competing with community tools, become the infrastructure provider. Developers pay per API call for normalized, historical, enriched player/match data.
+**Why Novel**: Makes HTStatus a B2B platform, not just B2C tool. Turns competitors into customers. Creates platform moat through network effects (more devs → more data → more value). Revenue without building every requested feature.
+**Value**: Recurring API billing, developer ecosystem acceleration, API lock-in switching costs, data quality validation from multiple consumers, positions HTStatus as Hattrick data infrastructure standard.
+**Foundation**: Blueprint architecture perfect for API routes, SQLAlchemy models define schema, OAuth extends to API keys, PostgreSQL scales to API workload, type sync enables TypeScript SDK generation, 198/218 tests validate reliability.
+**Implementation**: RESTful API + GraphQL layer, API key auth, rate limiting, Stripe integration, Swagger docs, webhook system. Tiers: Hobbyist $9/mo (10K calls), Developer $49/mo (100K), Business $249/mo (1M), Enterprise custom. 2-3 month MVP timeline.
+**Strategic Priority**: Recommended first - lowest behavior change, creates moat, generates revenue, complements existing roadmap.
+
+### 🔄 Collaborative League Intelligence
+**Vision**: Transform from single-team tool to league-wide collaborative platform. Allied managers pool scouting data, share opponent insights, collectively analyze tactical trends. "Notion for football leagues" - multiplayer by default, focused on trust-based cooperatives (your league, your alliance).
+**Why Novel**: Laser-focused on small cooperatives vs broad social network. Inverts competitive assumption - in Hattrick, league domination through collective intelligence matters more than random competition. Creates natural viral loop: one manager → entire league adopts.
+**Value**: Network effects (new manager increases collective value), viral growth (1 user → 10-15 league members), high retention (league depends on you), no competitor offers true multiplayer collaboration, natural free→paid upsell path.
+**Foundation**: Multi-team architecture extends to multi-manager leagues, PostgreSQL foreign keys support league model, blueprints allow `leagues_bp` without touching existing code, OAuth for secure invites, React components reusable for league dashboards.
+**Implementation**: League workspace model (new `League` table), invite system (email/code links), shared opponent scouting database, collaborative discussions, privacy controls, league-wide analytics dashboards. Pricing: Solo free, League $4.99/manager/mo (≤15), volume discounts for larger. 4-6 month MVP timeline.
+
+*Generated January 21, 2026 - These opportunities leverage interface innovation (voice), business model innovation (B2B API), and distribution innovation (viral leagues) to complement existing feature-expansion strategies*
+
 *Generated January 19, 2026 - These opportunities leverage HTStatus's unique technical foundation, data assets, and position in the Hattrick ecosystem*
 
 ## Related Documentation
