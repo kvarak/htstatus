@@ -26,19 +26,20 @@
 **Priority 2: Deployment & Operations**
 - ✅ Currently Empty
 
-**Priority 3: Stability & Maintainability** (It stays working) - 🚀 4/9 IN PROGRESS
+**Priority 3: Stability & Maintainability** (It stays working) - 🚀 7/9 IN PROGRESS
 - ✅ [INFRA-008] Type Sync Validation (4-6 hours) - Prevent type drift ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-002] Complete Blueprint Migration (6-8 hours) - Code organization ✅ COMPLETED 2026-01-20
 - ✅ [INFRA-012] Migration Workflow (4-6 hours) - Database procedures ✅ COMPLETED 2026-01-20
 - ✅ [REFACTOR-006] Routes Code Consolidation (4-6 hours) - Eliminate routes.py/routes_bp.py duplication ✅ COMPLETED 2026-01-20
-- 🚀 [REFACTOR-007] Complete Routes.py Removal (8-12 hours) - Finish blueprint migration by removing legacy monolith **ACTIVE NEXT PRIORITY**
-- 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules
-- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions
+- ✅ [REFACTOR-007] Complete Routes.py Removal (8-12 hours) - Finish blueprint migration by removing legacy monolith ✅ COMPLETED 2026-01-21
+- 🚀 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **ACTIVE**
+- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY**
+- 🎯 [TEST-006] Import Path Migration (1-2 hours) - Fix 15 test failures from routes.py migration **READY**
+- ✅ [REFACTOR-005] Production Code Linting Fix (15-30 min) - Fix 1 remaining production linting error ✅ COMPLETED 2026-01-21
+- 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs **QUICK WIN**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 - 🔮 [REFACTOR-003] Type Sync Issues Resolution (8-12 hours) - Address 85 baseline type mismatches
-- 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs
-- 🎯 [REFACTOR-005] Production Code Linting Fix (15-30 min) - Fix 1 remaining production linting error
 
 **Priority 4: Core Functionality** (It does what it should)
 - 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **NEXT IN LINE**
@@ -1573,6 +1574,68 @@ The newly created app/utils.py module (300+ lines) contains critical shared util
 
 ---
 
+### [TEST-006] Import Path Migration
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P3 | **Impact**: Test suite reliability
+**Dependencies**: REFACTOR-007 Complete Routes.py Removal (✅ completed) | **Strategic Value**: Full test coverage restoration
+
+**Problem Statement**:
+After completing REFACTOR-007 routes.py removal, 15 test files have import failures causing test suite degradation from 218 to 183 passing tests. Tests are attempting to import `create_page` and `dprint` functions from `app.routes_bp` module, but these functions have been moved to `app.utils` during the blueprint migration.
+
+**Current Impact**:
+- 15 test failures in comprehensive test suite
+- Functions moved: `create_page`, `dprint`, `render_template` references
+- Tests failing in: test_blueprint_routes_focused.py, test_minimal_routes.py, test_strategic_routes.py
+- Test coverage impact: Down from 218 to 183 passing tests
+- CI/CD reliability affected
+
+**Implementation**:
+1. **Import Path Analysis** (15 minutes):
+   - Identify all test files with failing imports
+   - Map old import paths to new locations in app.utils
+   - Review function signatures to ensure compatibility
+   - Check for any additional moved functions
+
+2. **Test Import Updates** (45-60 minutes):
+   - Update failing test imports: `from app.routes_bp import X` → `from app.utils import X`
+   - Fix mock patches: `app.routes_bp.render_template` → proper mock targets
+   - Update test function calls and mocking strategies
+   - Verify test isolation and proper mocking
+
+3. **Test Suite Validation** (15-30 minutes):
+   - Run failing tests individually to verify fixes
+   - Run full comprehensive test suite (make test-all)
+   - Ensure no new test failures introduced
+   - Verify test coverage remains stable
+
+4. **Documentation Update** (15 minutes):
+   - Update any test documentation referencing old import paths
+   - Add notes about function migration in relevant test files
+   - Update test coverage metrics in progress tracking
+
+**Files to Update**:
+- tests/test_blueprint_routes_focused.py (5 failures)
+- tests/test_minimal_routes.py (6 failures)
+- tests/test_strategic_routes.py (4 failures)
+- Any test mocking `app.routes_bp.render_template`
+
+**Acceptance Criteria**:
+- All 15 test failures resolved
+- Comprehensive test suite returns to 218/218 or better
+- No new test failures introduced
+- Test coverage maintained or improved
+- All import paths point to correct modules
+- Mock strategies properly target new function locations
+
+**Technical Approach**:
+- Use find/replace for systematic import updates
+- Update mock.patch decorators to target correct modules
+- Test changes incrementally to avoid introducing new issues
+- Run individual test files before full suite
+
+**Expected Outcomes**: Full test suite reliability restored, confidence in refactored architecture validated, CI/CD pipeline stability improved
+
+---
+
 ### [REFACTOR-005] Production Code Linting Fix
 **Status**: 🎯 Ready to Execute | **Effort**: 15-30 min | **Priority**: P4 | **Impact**: Code quality gate
 
@@ -1597,9 +1660,6 @@ Quality gate shows 1 linting error in production code (out of 31 total). While 3
 - Common issues: import order, unused variables, line length
 - May be in app/ or models.py
 - Quick win for quality gate improvement
-
-**Related Tasks**:
-- [DEVOPS-001] Script Linting Cleanup addresses remaining 30 dev script errors
 
 ---
 

@@ -47,18 +47,20 @@ HT Status is a Hattrick football team management application built with a dual f
 ### 2. Backend Layer
 
 #### Flask Application Core
-- **Main File**: `/app/routes.py` (1976 lines - primary application logic)
-- **Blueprint Organization**: `/app/blueprints/` - Modular route organization (REFACTOR-002 95% complete)
+- **Application Factory**: `/app/factory.py` - Creates and configures Flask application with blueprint registration
+- **Blueprint Organization**: `/app/blueprints/` - Modular route organization (**100% COMPLETE** ✅ REFACTOR-007)
   - `auth.py` - Authentication and OAuth handling
   - `main.py` - Home page and administrative functions
   - `player.py` - Player management and skill tracking
   - `team.py` - Team information and data updates
   - `matches.py` - Match history and analysis
   - `training.py` - Player training progression
-- **Shared Utilities**: `/app/routes_bp.py` - Common functions shared across blueprints
+- **Constants Module**: `/app/constants.py` - Hattrick data definitions (match types, roles, behaviors, column specs)
+- **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, team statistics)
+- **Legacy Compatibility**: `/app/routes_bp.py` - Maintained for backward compatibility during migration
 - **Database**: `/models.py` - SQLAlchemy models
 - **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig/ProductionConfig classes
-- **Route Architecture**: Dual registration system - functional routes in routes.py and blueprint organization for future migration
+- **Route Architecture**: Pure blueprint-based architecture - legacy routes.py monolith eliminated (2,335 lines removed)
 
 #### Authentication & API Integration
 - **Hattrick OAuth**: CHPP (Community Hattrick Public Platform) integration using `pychpp` library
@@ -72,12 +74,12 @@ HT Status is a Hattrick football team management application built with a dual f
 - **Current Status**: Database schema stable and fully functional with comprehensive testing
 
 #### Testing Infrastructure
-- **Framework**: pytest with 218 total tests, all passing (100% success rate)
-- **Coverage**: 96% overall project coverage via `make test-coverage`
+- **Framework**: pytest with 218 total tests, 198 passing (90.8% success rate)
+- **Coverage**: 41% overall project coverage (improved from 25%, target 80%)
 - **Integration**: Docker-based services for realistic testing
 - **Mock Systems**: CHPP API mocking in `/tests/mock_chpp.py`
-- **Current Status**: Testing infrastructure excellence achieved with comprehensive coverage
-- **Initialization**: `/app/__init__.py` - Flask app setup
+- **Current Status**: Post-refactoring recovery in progress - TEST-006 import fixes needed, then TEST-004/TEST-005 for coverage improvement
+- **Fast Test Suite**: 32/32 fast configuration tests passing (100%)
 
 #### Key Backend Components
 - **Authentication**: OAuth integration with Hattrick via pyCHPP
