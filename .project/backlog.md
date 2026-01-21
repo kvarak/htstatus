@@ -74,6 +74,8 @@
 - 🔮 [RESEARCH-001] Additional Integrations - Future research
 
 **Priority 7: Potential Future Improvements**
+- 🔮 [FEAT-010] Collaborative League Intelligence (40-60 hours) - Multiplayer league-wide platform for shared scouting and collective tactical analysis
+- 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
 - 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
 - 🔮 [FEAT-009] Trophy Data Integration (6-8 hours) - Add historical trophy/achievement display when pyCHPP supports it
 
@@ -1871,4 +1873,101 @@ architecture.md File Structure section (around line 130) still references old fi
 
 ---
 
-*Backlog updated January 21, 2026 with documentation cleanup tasks following REFACTOR-007 completion and analyze-project review. P6 documentation tasks prioritized for accuracy and clarity. Total: 26 active tasks across 7 priority levels.*
+### [FEAT-010] Collaborative League Intelligence
+**Status**: 🔮 Future Research | **Effort**: 40-60 hours | **Priority**: P7 | **Impact**: Viral growth, network effects
+**Dependencies**: None (greenfield feature) | **Strategic Value**: Multiplayer platform transformation, natural viral loops
+
+**Problem Statement**:
+HTStatus currently operates as single-team management tool, but Hattrick's real competitive dynamics happen at league level. Managers in the same league could benefit from shared opponent intelligence, collective tactical analysis, and coordinated strategy - yet no tool enables this collaboration. This creates opportunity for:
+- Viral growth (one user converts entire league - 10-15x multiplier)
+- Network effects (each new manager increases collective data value)
+- High retention (switching costs when entire league depends on platform)
+- Natural monetization (free individual → paid league workspace)
+
+**Vision**:
+Transform HTStatus from single-team tool to league-wide collaborative platform where allied managers pool scouting data, share opponent insights, and collectively analyze tactical trends. "Notion for football leagues" - multiplayer by default, focused on trust-based cooperatives.
+
+**Key Features**:
+1. **League Workspaces**: Invite-based league instances with shared data
+2. **Collaborative Scouting**: Crowd-sourced opponent match observations and tactical patterns
+3. **Collective Analytics**: League-wide aggregate statistics and trend detection
+4. **Privacy Controls**: Granular control over what data is shared vs kept private
+5. **Tactical Discussions**: Lightweight comments and voting on formations/strategies
+
+**Technical Implementation**:
+- New `League` table in PostgreSQL with foreign keys to Users
+- Invite system (email invitations, league code join links)
+- Shared opponent scouting database (crowd-sourced match observations)
+- League-wide analytics dashboards (aggregate statistics)
+- Permission system (league admin, member, viewer roles)
+- React components for league dashboards and collaborative UI
+
+**Acceptance Criteria**:
+- [ ] League workspace creation and invitation system
+- [ ] Shared scouting database with privacy controls
+- [ ] League-wide aggregate analytics dashboard
+- [ ] Collaborative discussion threads on tactical decisions
+- [ ] Permission system (admin/member/viewer roles)
+- [ ] Viral invitation mechanics tested
+
+**Monetization Model**:
+- Solo: Free - Individual team management
+- League: $4.99/manager/mo - Up to 15 managers, shared scouting
+- Conference: $2.99/manager/mo - 16-30 managers, volume discount
+- Championship: Custom - 30+ managers, dedicated support
+
+**Expected Outcomes**: Viral growth through league adoption, high retention through network lock-in, natural upsell path from free to paid
+
+---
+
+### [FEAT-011] AI-Powered Training Optimization Engine
+**Status**: 🔮 Future Research | **Effort**: 60-80 hours | **Priority**: P7 | **Impact**: Differentiation through AI insights
+**Dependencies**: Significant historical player data, ML infrastructure | **Strategic Value**: Premium feature differentiation, data science moat
+
+**Problem Statement**:
+Managers currently make training decisions based on intuition and basic skill tracking, but HTStatus has rich historical time-series data on player development that could power predictive insights. Machine learning on this data could:
+- Predict optimal training schedules for specific player archetypes
+- Forecast skill progression trajectories based on age and current level
+- Identify training inefficiencies and suggest corrections
+- Provide data-driven recommendations instead of guesswork
+
+**Vision**:
+Machine learning engine analyzes historical skill progression data across all HTStatus users to predict optimal training schedules and player development trajectories. "Moneyball for Hattrick training" - data-driven decisions replace intuition.
+
+**Key Features**:
+1. **Training Schedule Optimizer**: ML recommends optimal training focus based on player age, current skills, target position
+2. **Progression Forecasting**: Predict skill levels 4-12 weeks ahead based on current training
+3. **Efficiency Analysis**: Identify players not progressing as expected and suggest interventions
+4. **Archetype Matching**: "Your defender profiles similar to top-performing defenders who trained X"
+5. **Counterfactual Analysis**: "If you'd trained passing instead of scoring, you'd be +0.5 levels ahead"
+
+**Technical Implementation**:
+- Time-series ML models (LSTM/Transformer) on player skill progression data
+- Feature engineering from existing player attributes (age, skills, training history)
+- Python ML stack (scikit-learn, PyTorch/TensorFlow, pandas)
+- Model training pipeline (offline batch processing)
+- API endpoint for inference (Flask route returning predictions)
+- React dashboard for ML insights visualization
+- A/B testing framework to validate prediction accuracy
+
+**Acceptance Criteria**:
+- [ ] ML model trained on historical player data with >70% accuracy
+- [ ] Training schedule recommendation API endpoint
+- [ ] Skill progression forecasting (4-12 week horizons)
+- [ ] React UI for ML insights visualization
+- [ ] Model retraining pipeline (weekly batch updates)
+- [ ] A/B test framework to validate real-world accuracy
+
+**Data Requirements**:
+- Minimum 6-12 months historical player data across multiple users
+- Player skill progression time-series (existing in Players table)
+- Training type metadata (may need to be added to data model)
+- Match performance correlation data (MatchPlay table)
+
+**Expected Outcomes**: Premium analytics differentiation, predictable revenue through AI insights subscriptions, potential expansion to other football management games
+
+---
+
+*Backlog updated January 21, 2026 with FEAT-010 Collaborative League Intelligence and FEAT-011 AI-Powered Training Optimization Engine added to P7 Future Improvements. Total: 28 active tasks across 7 priority levels.*
+
+```*Backlog updated January 21, 2026 with documentation cleanup tasks following REFACTOR-007 completion and analyze-project review. P6 documentation tasks prioritized for accuracy and clarity. Total: 26 active tasks across 7 priority levels.*
