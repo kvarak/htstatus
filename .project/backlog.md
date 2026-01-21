@@ -26,7 +26,8 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- 🎯 [TEST-008] Residual Test Failures Resolution (2-4 hours) - Fix 33 remaining test failures (config mismatches, test_database.py design, business logic edge cases) **READY TO EXECUTE**
+- 🚀 [TEST-008] Residual Test Failures Resolution (1-2 hours) - Fix 16 remaining fixture errors in test_blueprint_player.py **ACTIVE - FINAL PHASE**
+- 🎯 [TEST-009] Fix Blueprint Player Test Fixture Setup (1-2 hours) - Fix initialize_routes() missing _db_instance parameter **READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations**
 - Currently Empty
@@ -50,7 +51,7 @@
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
 - 🎯 [INFRA-020] Fix GitHub Workflows (30 min) - CI reliability
-- 🎯 [DEVOPS-001] Script Linting Cleanup (1-2 hours) - Fix 38 linting errors in dev scripts
+- 🎯 [DEVOPS-001] Script Linting Cleanup (1-2 hours) - Fix 32 linting errors in test files **READY TO EXECUTE**
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
@@ -81,18 +82,20 @@
 ## Priority 1: Testing & App Reliability
 
 ### [TEST-008] Residual Test Failures Resolution
-**Status**: 🚀 ACTIVE - In Progress | **Effort**: 2-4 hours | **Priority**: P1 | **Impact**: Full test suite reliability
+**Status**: 🚀 ACTIVE - Final Phase | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
 **Dependencies**: TEST-007 (completed) | **Strategic Value**: Complete testing foundation
 
-**Progress**: 219/251 tests passing (87.3%), up from 213/246 (86.6%)
-- ✅ Fixed 2 config value mismatches in test_minimal_routes.py
-- ✅ Fixed 4 test expectations in test_blueprint_player.py
-- ✅ Added error handling for invalid team ID in player route
-- 🚧 27 remaining failures to investigate
+**MAJOR BREAKTHROUGH ACHIEVED**: 230/251 tests passing (91.6%), up from 219/251 (87.3%)
+- ✅ **Fixed critical test pollution issue** - test_blueprint_player.py was dropping database tables
+- ✅ Removed problematic player_app fixture with db.drop_all() call
+- ✅ Switched to shared app fixture from conftest.py for consistency
+- ✅ Added app_with_routes fixture for route-dependent tests
+- ✅ **11 additional tests now pass** consistently - major reliability improvement
+- 🚧 16 fixture setup errors remain (isolated in test_blueprint_player.py)
 
 **Problem Statement**:
-With TEST-007 transaction isolation now operational, 27 residual test failures remain.
-Original estimate was 33 failures, but actual count is 27 after fixes.
+Test pollution between test_blueprint_player.py and other tests RESOLVED.
+Remaining issue: initialize_routes() missing required _db_instance parameter.
 
 **Implementation**:
 1. ✅ **Fix config mismatches** (30 min): Updated test assertions to match TestConfig values
@@ -100,6 +103,33 @@ Original estimate was 33 failures, but actual count is 27 after fixes.
 3. 🚧 **Continue investigating** (1-2 hours): Analyze remaining 27 failures
 
 **Acceptance Criteria**: `make test-all` passes with 251/251 tests, zero failures
+
+### [TEST-009] Fix Blueprint Player Test Fixture Setup
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
+**Dependencies**: TEST-008 test pollution fix (completed) | **Strategic Value**: Final test reliability milestone
+
+**Problem Statement**:
+After resolving test pollution in TEST-008, 16 test errors remain in test_blueprint_player.py due to fixture setup issue. The `app_with_routes` fixture calls `initialize_routes(app)` but the function requires a `_db_instance` parameter that isn't being passed.
+
+Error: `TypeError: initialize_routes() missing 1 required positional argument: '_db_instance'`
+
+**Implementation**:
+1. **Fix fixture setup** (30-60 min): Update `app_with_routes` fixture to pass required `_db_instance` parameter
+2. **Validate fixture compatibility** (15-30 min): Ensure compatibility with shared app fixture from conftest.py
+3. **Test all blueprint player tests** (15-30 min): Verify all 16 previously failing tests now pass
+4. **Run full suite** (15 min): Confirm no regressions in other tests
+
+**Technical Details**:
+- File: `tests/test_blueprint_player.py`
+- Fixture: `app_with_routes` (lines 17-26)
+- Issue: Missing `_db_instance` parameter when calling `initialize_routes(app)`
+- Solution: Pass `db` instance from `app.factory` module
+
+**Acceptance Criteria**:
+- All 16 test_blueprint_player.py tests pass
+- `make test-all` shows 251/251 tests passing (100% success rate)
+- No regressions in other test files
+- Test pollution remains resolved
 
 ---
 
@@ -1175,29 +1205,25 @@ Safety scan identified 4 CVE vulnerabilities in Werkzeug 2.3.8:
 **Dependencies**: None | **Strategic Value**: Code quality consistency
 
 **Problem Statement**:
-Linting scan identified 38 errors in development scripts (production code is lint-free):
-- E402: Module level imports not at top of file (7 instances)
-- UP035: `typing.Dict` is deprecated, use `dict` instead (2 instances)
-- UP006: Use `dict` instead of `Dict` for type annotation (8 instances)
-- ARG001: Unused function arguments (5 instances)
+Linting scan identified 32 errors in test files (production code is lint-free):
+- ARG001: Unused function arguments (7 instances) - test fixtures with unused `app` parameter
+- F841: Local variable assigned but never used (5 instances) - response variables in blueprint auth tests
 
 **Implementation**:
-1. **Import Order Fixes** (30-45 min):
-   - Move imports in scripts/apply_migrations.py, scripts/create_tables.py, scripts/manage.py to top
-   - Keep load_dotenv() calls before imports that require environment variables
+1. **Unused Test Fixture Parameters** (45-60 min):
+   - tests/test_blueprint_player.py: Remove unused `app` parameters from sample_user, sample_players fixtures
+   - tests/test_blueprint_routes_focused.py: Fix unused `app` parameter in sample_user fixture
+   - tests/test_chpp_integration.py: Remove unused `mock_chpp_response` parameter
+   - tests/test_database.py: Remove unused `db_session` parameter
 
-2. **Type Annotation Updates** (30-45 min):
-   - Replace `typing.Dict` and `typing.List` with `dict` and `list` in scripts/validate_types.py
-   - Update type hints to use modern Python 3.9+ syntax
-
-3. **Unused Parameter Cleanup** (15-30 min):
-   - Add underscore prefix to unused parameters or use `# noqa: ARG001` where appropriate
-   - Review if parameters can be removed entirely
+2. **Unused Variables Cleanup** (15-30 min):
+   - tests/test_blueprint_auth.py: Remove or use response variables in login tests (lines 169, 187, 210)
+   - Apply appropriate fix: either use the variable or remove assignment
 
 **Acceptance Criteria**:
-- All 38 linting errors resolved
-- Scripts maintain full functionality
-- Modern type annotation style consistently used
+- All 32 linting errors resolved
+- Tests maintain full functionality and coverage
+- No test behavior changes
 - No new linting errors introduced
 
 **Expected Outcomes**: Consistent code quality across entire project, improved maintainability

@@ -7,7 +7,9 @@
         "Read .project/rules.md for standards. Read .project/ docs, README.md, TECHNICAL.md for context.",
         "Use `make help` for commands. Use `uv run` for Python.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
-        "Structure: # Plan Next Task ## Analysis ## Solution ## Steps ## Challenges ## Testing"
+        "Structure: # Plan Next Task ## Analysis ## Solution ## Steps ## Challenges ## Testing",
+        "If the task is large, break it into smaller sub-tasks.",
+        "Do not add or commit code in this step."
       ]
     },
     {
@@ -19,7 +21,8 @@
         "Follow the plan. Validate with `make test-all` - no coverage loss or test failures.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
         "Update docs per documentation-guide.md (backlog.md, progress.md, etc.).",
-        "Note any new tasks for backlog.md."
+        "Note any new tasks for backlog.md.",
+        "Do not add or commit code in this step. However, if the task is large, break it into smaller sub-tasks and execute only one sub-task and keep the rest for the next time the execute task is run."
       ]
     },
     {
@@ -30,7 +33,8 @@
         "Validate with `make test-all`, use `uv run` for Python.",
         "Check docs updated per documentation-guide.md and strategic alignment per goals.md.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
-        "Add new tasks to backlog.md."
+        "Add new tasks to backlog.md.",
+        "Do not add or commit code in this step."
       ]
     },
     {
@@ -42,7 +46,8 @@
         "Remove completed tasks (marked ✅) from backlog.md - move them to history/backlog-done.md with completion notes.",
         "Unblock dependencies, move ready tasks to active status.",
         "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*), ensure they describe the current architecture and decisions.",
-        "Remove or compress outdated historical information instead of keeping long change logs in the backlog.md and progress.md files."
+        "Remove or compress outdated historical information instead of keeping long change logs in the backlog.md and progress.md files.",
+        "Do not add or commit code in this step."
       ]
     },
     {

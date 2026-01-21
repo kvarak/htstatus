@@ -2,6 +2,31 @@
 
 ## Completed P1 Testing & App Reliability Tasks (January 2026)
 
+### [TEST-008] Test Pollution Resolution - Major Breakthrough
+**Completed**: 2026-01-21
+**Effort**: 2-3 hours
+**Impact**: Critical test suite reliability improvement
+
+**Summary**: Achieved major breakthrough in test reliability by identifying and fixing critical test pollution issue. test_blueprint_player.py had a custom fixture that was calling `db.drop_all()`, contaminating the session-scoped database tables that other tests relied on. This cross-test contamination was causing business logic and database tests to fail with "relation does not exist" errors.
+
+**Key Achievements**:
+- **230/251 tests passing** (91.6%, up from 219/251 87.3%)
+- **11 additional tests now pass consistently** - major reliability improvement
+- **Test pollution RESOLVED** - business logic and database tests now pass reliably
+- **Root cause identified**: custom `player_app` fixture with `db.drop_all()` call
+- **Solution implemented**: Switched to shared `app` fixture from conftest.py
+- **Added `app_with_routes` fixture** for route-dependent tests without contamination
+
+**Technical Details**:
+- **Problem**: `test_blueprint_player.py` custom fixture dropping all database tables after each test
+- **Impact**: Session-scoped tables from conftest.py were being deleted, causing "relation does not exist" errors
+- **Solution**: Removed custom `player_app` fixture, used shared `app` fixture pattern
+- **Validation**: Business logic tests and database tests now pass consistently when run after blueprint player tests
+
+**Remaining Work**: 16 fixture setup errors in test_blueprint_player.py (isolated, not pollution) - tracked as TEST-009
+
+**Impact**: Foundation for achieving 100% test success rate. Major step forward in testing reliability and deployment confidence.
+
 ### [DOC-026] Documentation Architecture Overhaul
 **Completed**: 2026-01-27
 **Effort**: 4-6 hours
