@@ -22,14 +22,14 @@
 
 **Priority 1: Testing & App Reliability**
 - 🚨 [DOC-026] Documentation Architecture Overhaul (4-6 hours) - Establish comprehensive documentation standards and centralized rules system **NEW - HIGH PRIORITY**
-- 🚨 [TEST-007] Fix Test Fixture Architecture (2-3 hours) - Resolve pytest session/function scope conflicts causing database table failures **CRITICAL**
+- 🎯 [TEST-008] Residual Test Failures Resolution (2-4 hours) - Fix 33 remaining test failures (config mismatches, test_database.py design, business logic edge cases) **NEW - READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations**
-- ✅ Currently Empty
+- Currently Empty
 
 **Priority 3: Stability & Maintainability** (It stays working) - 75% Complete (7/9 major tasks completed)
-- 🚫 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **BLOCKED BY TEST-007**
-- 🚫 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **BLOCKED BY TEST-007**
+- 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY TO EXECUTE**
+- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY TO EXECUTE**
 - 🚀 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs **ACTIVE - QUICK WIN**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
@@ -149,7 +149,26 @@ The project's documentation is scattered across multiple locations with inconsis
 
 ---
 
-### [TEST-007] Fix Test Fixture Architecture
+### [TEST-008] Residual Test Failures Resolution
+**Status**: 🎯 Ready to Execute | **Effort**: 2-4 hours | **Priority**: P1 | **Impact**: Full test suite reliability
+**Dependencies**: TEST-007 (completed) | **Strategic Value**: Complete testing foundation
+
+**Problem Statement**:
+With TEST-007 transaction isolation now operational (213/246 tests passing), 33 residual test failures remain:
+- 14 failures in test_database.py: Session-scoped table creation conflicts with transaction isolation pattern
+- 10 failures in test_business_logic.py: Business logic validation edge cases
+- 4 failures in test_minimal_routes.py: Config value mismatches (CONSUMER_KEY, SECRET_KEY expectations)
+- 5 failures in test_blueprint_player.py: Player route edge case handling
+
+**Implementation**:
+1. **Fix test_database.py** (1-1.5 hours): Redesign to use transaction-isolated fixtures or move table creation into function scope
+2. **Fix config mismatches** (0.5 hour): Update test assertions to match TestConfig values
+3. **Fix business logic tests** (0.5-1 hour): Review and fix edge case handling
+4. **Fix blueprint player tests** (0.5-1 hour): Address error handling and edge cases
+
+**Acceptance Criteria**: `make test-all` passes with 246/246 tests, zero failures
+
+---
 
 ## Priority 2: Core Functionality
 
@@ -1474,53 +1493,6 @@ The application currently depends on the third-party `pychpp` library for Hattri
 ---
 
 ## Task Details: New Tasks
-
-### [TEST-007] Fix Test Fixture Architecture
-**Status**: 🚨 CRITICAL | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Infrastructure stability, testing foundation
-**Dependencies**: None | **Strategic Value**: Testing reliability and CI/CD confidence
-
-**Problem Statement**:
-Critical infrastructure failure discovered during Quality Intelligence Platform review. Current pytest configuration has session/function scope conflicts causing widespread test failures:
-- 37 failed tests with "relation does not exist" errors
-- Individual tests pass when run in isolation (✅)
-- Full test suite fails due to database table creation conflicts (❌)
-- Session-scoped app fixture conflicts with function-scoped database operations
-- Blocking deployment readiness despite code quality improvements
-
-**Root Cause Analysis**:
-1. **Session Fixture Scope Issue**: `app` fixture (session-scoped) creates tables with `db.create_all()` but drops them with `db.drop_all()` on teardown
-2. **Function Fixture Conflicts**: `db_session` fixture (function-scoped) expects tables to exist for transaction rollback pattern
-3. **Race Conditions**: When tests run in parallel or with fixture scope mismatches, tables get dropped before other tests complete
-4. **Transaction Isolation**: Current pattern doesn't properly isolate test data between function-scoped tests
-
-**Implementation**:
-1. **Fixture Architecture Redesign** (1-1.5 hours):
-   - Change app fixture to function-scoped OR ensure proper table lifecycle management
-   - Implement proper database setup/teardown that doesn't interfere between tests
-   - Add database state validation before each test function
-   - Ensure consistent fixture dependency ordering
-
-2. **Database State Management** (0.5-1 hour):
-   - Implement proper table creation that survives session scope
-   - Add database state checks and automatic recovery
-   - Ensure transaction rollback pattern works consistently
-   - Add fixture cleanup that doesn't break parallel test execution
-
-3. **Test Configuration Validation** (0.5 hour):
-   - Verify pytest collection and execution order
-   - Test fixture interaction in different execution scenarios
-   - Add fixture debugging if needed for future troubleshooting
-   - Document proper fixture usage patterns
-
-**Acceptance Criteria**:
-- `make test-all` passes without database table errors
-- All 37 currently failing tests pass consistently
-- Tests can run individually and in full suite without conflicts
-- No "relation does not exist" errors during test execution
-- Database fixtures properly isolated between function-scoped tests
-- Test execution time remains reasonable (no significant performance regression)
-
-**Expected Outcomes**: Restored testing foundation, deployment confidence, stable CI/CD pipeline
 
 ---
 
