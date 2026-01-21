@@ -93,12 +93,13 @@
       "name": "look-outside-the-box",
       "title": "Generate innovative opportunities",
       "what to do": [
-        "First, scan plan.md, progress.md, backlog.md, and 'Future Opportunities' in plan.md for existing suggestions. Note any similar ideas already proposed.",
-        "Think step-by-step like an innovative strategist: Analyze project docs, code structure, and current capabilities (via list_dir/file_search if needed).",
-        "To generate novel ideas, use these techniques: (1) Ask contrarian questions like 'What if we did the opposite?' or 'How could this fail spectacularly—and turn that into a strength?'; (2) Draw analogies from unrelated industries (e.g., 'How would Netflix/Amazon approach this?'); (3) Brainstorm 8-10 wild, unconventional ideas first, then refine to 2-5 high-impact ones.",
-        "For each opportunity, provide: clear value proposition, why it's novel (vs. existing suggestions), and how it expands the project.",
+        "First, scan plan.md, progress.md, backlog.md, and 'Future Opportunities' in plan.md for existing suggestions.",
+        "Think step-by-step like an innovative strategist: Analyze project docs, code structure, and current capabilities.",
+        "**Black Hat Challenge**: Play devil's advocate. Question 2-3 fundamental decisions (tech stack, architecture, goals). Ask: 'What if this core choice is wrong? What single change would collapse the project—and how could we pivot profitably?'",
+        "Use these techniques: (1) Contrarian questions ('What if we did the opposite?'); (2) Analogies from unrelated industries ('How would Netflix approach this?'); (3) Brainstorm 8-10 wild ideas first, then refine to 2-5 high-impact ones.",
+        "For each opportunity, provide: clear value proposition, why it's novel, and how it expands or pivots the project.",
         "Add only new, high-value suggestions to 'Future Opportunities' section in plan.md (not backlog).",
-        "Structure: # Innovation ## Step-by-Step Assessment (incl. review of prior suggestions) ## Wild Ideas Brainstorm ## Refined Opportunities ## Value Summary ## Added to plan.md"
+        "Structure: # Innovation ## Step-by-Step Assessment ## Black Hat Challenge ## Wild Ideas Brainstorm ## Refined Opportunities ## Value Summary ## Added to plan.md"
       ]
     }
   ]
