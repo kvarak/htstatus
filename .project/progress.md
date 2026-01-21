@@ -1,27 +1,50 @@
 # Project Progress
 
+> **Purpose**: Current development state, metrics, accomplishments, and immediate blockers for HTStatus
+> **Audience**: All stakeholders tracking project health and current work
+> **Update Frequency**: After completing tasks, reaching milestones, or when status/metrics change
+> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+
 ## Quick Navigation
-🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md)
+🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md) • [Rules](rules.md)
 📊 **Current State**: 50+ Tasks Complete • Quality Intelligence Platform ✅ • Critical Infrastructure Repair Required ⚠️
 
-> **Current Status**: Quality Intelligence Platform operational, TEST-007 completed with 213 passing tests, 33 residual test failures remain (January 21, 2026)
+> **Current Status**: Documentation architecture established, housekeeping completed, 213 tests passing (January 27, 2026)
 
 *This file tracks current development state and key metrics for HTStatus 2.0.*
 
 ## Current Development State
 
-**Infrastructure Status**: ✅ **IMPROVED** - TEST-007 transaction isolation working, remaining test failures are config/design issues
-**Testing Status**: 213 passing tests (up from 201), 33 failures (down from 37) - transaction isolation operational
+**Infrastructure Status**: ✅ **STRONG** - Documentation architecture established, transaction isolation working, migrations tracked
+**Testing Status**: 213 passing tests, 33 failures (config/design issues) - transaction isolation operational
 **Code Quality**: Production code lint-free ✅, 38 dev script linting errors remain
 **Security**: Zero CVE vulnerabilities in production code ✅
 **Architecture**: Modern Flask blueprint structure with Quality Intelligence Platform operational
 **Environment**: Consistent UV-managed environment across all development tools ✅
-**Completed Tasks**: 51 major milestones including Quality Intelligence Platform and TEST-007 transaction isolation
+**Documentation**: Centralized rules.md ✅, comprehensive documentation-guide.md ✅, purpose headers added ✅, streamlined to 150 lines
+**Completed Tasks**: 56 major milestones including DOC-026 Documentation Architecture, TEST-007 Transaction Isolation, and ORG-001 Environment Consolidation
 **Backlog Cleanup**: Completed tasks moved to history/backlog-done.md, backlog focused on actionable items
 **Ready Tasks**: 16 tasks across P3-P6 priority levels ready for execution
-**Current Active Work**: Residual test failures analysis and documentation cleanup priorities
+**Repository**: Clean 2.5MB of unnecessary files removed, migrations/ folder tracked (30 files)
+**Current Active Work**: TEST-008 residual test failures ready for execution
 
 ## Current Architecture & Strategic Position
+
+### ✅ Housekeeping Achievements (2026-01-27)
+**Impact**: Repository organization, developer experience, deployment reliability
+- **ORG-001 Environment Consolidation**: Removed duplicate `.env.example`, consolidated to `environments/.env.development.example`
+- **Documentation Improvements**: Added standards references to 4 .project/ files, streamlined rules.md from 260+ to 150 lines (42% reduction)
+- **File Cleanup**: Removed 2.5MB of unnecessary files (env/, htmlcov/, caches, htplanner.log)
+- **Migration Tracking**: Added migrations/ folder (30 files) to version control for deployment consistency
+- **Status**: Clean repository, improved documentation discoverability, deployment reliability enhanced
+
+### ✅ DOC-026 Documentation Architecture Overhaul
+**Completed**: 2026-01-27 | **Impact**: Developer experience, project maintainability
+- Consolidated all development rules into `.project/rules.md` (now streamlined to 150 lines)
+- Created comprehensive `.project/documentation-guide.md` with decision matrix
+- Updated all 6 major prompts to reference centralized documentation
+- Added purpose headers to 8 key documentation files
+- **Status**: Foundation established for DOC-023, DOC-024, DOC-025 cleanup tasks
 
 ### ✅ TEST-007 Transaction Isolation Achievement
 **Completed**: 2026-01-21 | **Impact**: Test infrastructure reliability
@@ -44,12 +67,14 @@
 - **Quality**: Production code lint-free, comprehensive constants extraction, enhanced utilities
 
 ### 📊 Project Development Metrics
-**Task Completion**: 51 major tasks completed including P1 TEST-007 and P3 stability milestones
+**Task Completion**: 56 major tasks completed including DOC-026, TEST-007, ORG-001, UI-003, and recent housekeeping
 **Code Quality**: Lint-free production code ✅, 38 dev script linting issues remain
 **Testing Coverage**: Comprehensive strategy operational with transaction isolation working (213/246 passing)
 **Security**: CVE-free production dependencies ✅, security scanning integrated
-**Infrastructure**: Quality Intelligence Platform operational, database migration procedures documented
-**Ready Tasks**: 16 actionable tasks across P3-P6 priority levels, 1 P3 security task active
+**Infrastructure**: Quality Intelligence Platform operational, database migration procedures documented, migrations tracked
+**Documentation**: Centralized rules.md streamlined to 150 lines ✅, decision matrix established ✅, standards references added
+**Repository**: Clean 2.5MB removed, migrations/ tracked (30 files), duplicate templates eliminated
+**Ready Tasks**: 16 actionable tasks across P3-P6 priority levels, TEST-008 ready for execution
 
 - **Safe Migration Patterns** ✅ **DOCUMENTED - OPERATIONAL SAFETY** ✅
   - **Approved Patterns**: Adding nullable columns, adding indices, adding default constraints
