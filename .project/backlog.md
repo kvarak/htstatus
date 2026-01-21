@@ -57,6 +57,9 @@
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
+- 🎯 [DOC-023] Clean TECHNICAL.md Obsolete Content (1-2 hours) - Remove outdated route architecture descriptions **HIGH PRIORITY**
+- 🎯 [DOC-024] Clean README.md Legacy Sections (1 hour) - Remove deprecated setup instructions
+- 🎯 [DOC-025] Update architecture.md File Structure (30 min) - Reflect current blueprint architecture
 - 🎯 [DOC-022] Website UI Standardization (6-8 hours) - Unified design patterns and guidelines
 - 🎯 [DOC-011-API] API Documentation (4-6 hours) - Developer experience
 - 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
@@ -1730,4 +1733,142 @@ The legacy `app/routes.py` file (2,335 lines) still exists as a monolithic route
 
 ---
 
-*Backlog updated January 20, 2026 with REFACTOR-007 prioritization and task status updates. P3 Stability & Maintainability progressing strategically with routes removal as next priority. Total: 23 active tasks across 6 priority levels.*
+### [DOC-023] Clean TECHNICAL.md Obsolete Content
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P6 | **Impact**: Documentation clarity
+**Dependencies**: REFACTOR-007 (✅ completed) | **Strategic Value**: Accurate technical documentation
+
+**Problem Statement**:
+TECHNICAL.md contains extensive outdated information about route architecture that contradicts the current system:
+- **Line 22**: "Dual registration system with functional routes in routes.py and blueprint organization in routes_bp.py" - routes.py no longer exists
+- **Lines 30-55**: Entire "Route Ownership Strategy" section describes BUG-001 resolution and "dual registration" - this is historical context, not current architecture
+- **Line 58**: "/app/routes.py: Main Flask app logic" - file no longer exists
+- Multiple references to "blueprint stubs", "functional routes", "route conflicts" - all resolved by REFACTOR-007
+
+**Current Impact**:
+- New developers receive incorrect architecture information
+- Documentation describes non-existent files and patterns
+- Historical troubleshooting information obscures current design
+- Wastes developer time following outdated guidance
+
+**Implementation**:
+1. **Remove Obsolete Route Architecture Section** (30 min):
+   - Delete or compress "Route Ownership Strategy" section (lines 30-55)
+   - If kept for history, move to a brief "Historical Note" subsection
+   - Update "Route Architecture" bullet to describe current blueprint-only design
+
+2. **Update File Structure Section** (15 min):
+   - Remove `/app/routes.py` reference (line 58)
+   - Add `/app/constants.py` - Hattrick data definitions
+   - Add `/app/factory.py` - Application factory with blueprint registration
+   - Update `/app/utils.py` description to reflect enhanced functionality
+
+3. **Clean Implementation Details** (30 min):
+   - Update "Route Architecture" in line 22 to reflect blueprint-only design
+   - Remove references to "dual registration", "route conflicts", "blueprint stubs"
+   - Add brief note: "Previously used monolithic routes.py (removed January 2026)"
+   - Focus content on current architecture, not migration history
+
+4. **Verify Consistency** (15 min):
+   - Cross-reference with architecture.md for consistency
+   - Ensure no broken internal links
+   - Validate all file paths are current
+
+**Acceptance Criteria**:
+- [ ] No references to routes.py as current file
+- [ ] Route architecture describes blueprint-only system
+- [ ] Historical context compressed to <5 lines or removed
+- [ ] File structure matches current codebase
+- [ ] Technical implementation section reflects REFACTOR-007 completion
+- [ ] Documentation focuses on "how it works now" not "how we got here"
+
+**Expected Outcomes**: Clear, accurate technical documentation that helps developers understand current architecture without wading through resolved historical issues
+
+---
+
+### [DOC-024] Clean README.md Legacy Sections
+**Status**: 🎯 Ready to Execute | **Effort**: 1 hour | **Priority**: P6 | **Impact**: New developer onboarding
+**Dependencies**: None | **Strategic Value**: Clear setup instructions
+
+**Problem Statement**:
+README.md contains significant legacy content that confuses new developers:
+- **Lines 315-385**: Entire "Migration from Legacy config.py" section with old setup instructions
+- **Lines 350-400**: Legacy SQLAlchemy and Postgres commands using deprecated manage.py
+- Mixing of "Modern Setup (UV + Docker Compose)" with "Legacy Setup (Deprecated)" creates confusion
+- Old pipreqs/pip workflow instructions alongside UV instructions
+
+**Current Impact**:
+- New developers unsure which setup path to follow
+- Legacy instructions no longer work with current codebase
+- Mixing old and new patterns reduces confidence in documentation
+- Extra reading burden to distinguish current vs historical
+
+**Implementation**:
+1. **Remove/Archive Legacy Setup Section** (20 min):
+   - Delete "Legacy Setup (Deprecated)" section entirely
+   - Remove pipreqs and pip install instructions
+   - Keep only UV-based dependency management
+
+2. **Clean Database Migration Instructions** (15 min):
+   - Remove old `python manage.py db` commands
+   - Keep only modern `make db-migrate` and `make db-upgrade` commands
+   - Remove "On problems" section with deprecated stamp commands
+
+3. **Simplify Configuration Section** (15 min):
+   - Remove or significantly compress "Migration from Legacy config.py"
+   - Focus on current setup: config.py.template or .env
+   - Keep instructions concise and current-focused
+
+4. **Verify Command Accuracy** (10 min):
+   - Test all remaining commands work with current setup
+   - Ensure no references to removed files or deprecated workflows
+   - Cross-reference with Makefile help output
+
+**Acceptance Criteria**:
+- [ ] No "Legacy" or "Deprecated" sections remain
+- [ ] All commands use UV or Make (no direct python/pip commands)
+- [ ] Configuration instructions focus on current templates
+- [ ] README length reduced by removing historical content
+- [ ] All setup steps validated as current
+
+**Expected Outcomes**: Streamlined README that confidently guides new developers through current setup without legacy distractions
+
+---
+
+### [DOC-025] Update architecture.md File Structure
+**Status**: 🎯 Ready to Execute | **Effort**: 30 min | **Priority**: P6 | **Impact**: Architecture documentation accuracy
+**Dependencies**: REFACTOR-007 (✅ completed) | **Strategic Value**: Accurate system documentation
+
+**Problem Statement**:
+architecture.md File Structure section (around line 130) still references old file organization:
+- References to routes.py in file tree
+- Missing app/constants.py in structure
+- Blueprint organization may not reflect current state after REFACTOR-007
+
+**Implementation**:
+1. **Update File Tree** (15 min):
+   - Remove routes.py from app/ directory listing
+   - Add constants.py to app/ directory
+   - Verify factory.py description matches current implementation
+   - Update routes_bp.py description (maintained for compatibility)
+
+2. **Verify Directory Structure** (10 min):
+   - Compare documented structure with actual filesystem
+   - Check all referenced files exist
+   - Ensure descriptions match current functionality
+
+3. **Add Brief Architecture Note** (5 min):
+   - Add note about REFACTOR-007 completion (January 2026)
+   - Brief mention of blueprint architecture completion
+   - Link to progress.md or goals.md for detailed history
+
+**Acceptance Criteria**:
+- [ ] File structure matches actual filesystem
+- [ ] All referenced files exist in codebase
+- [ ] Blueprint architecture completion noted
+- [ ] No references to removed routes.py
+
+**Expected Outcomes**: Accurate architecture documentation that matches current codebase structure
+
+---
+
+*Backlog updated January 21, 2026 with documentation cleanup tasks following REFACTOR-007 completion and analyze-project review. P6 documentation tasks prioritized for accuracy and clarity. Total: 26 active tasks across 7 priority levels.*

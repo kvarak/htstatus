@@ -37,7 +37,7 @@
         "Review progress.md and backlog.md current state.",
         "Update both files with completed tasks and metrics.",
         "Unblock dependencies, move ready tasks to active status.",
-        "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md), ensure they describe the current architecture and decisions. Remove or compress outdated historical information instead of keeping long change logs there."
+        "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*), ensure they describe the current architecture and decisions. Remove or compress outdated historical information instead of keeping long change logs there."
       ]
     },
     {
@@ -73,7 +73,7 @@
       "title": "Repository analysis for documentation and backlog management",
       "what to do": [
         "Use list_dir and file_search to analyze repository structure.",
-        "Check documentation consistency (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md).",
+        "Check documentation consistency (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*).",
         "For architectural and technical docs, prioritize reflecting the current system state, not history. Remove or rewrite outdated sections instead of appending more history.",
         "Flag any places where historical notes, old plans, or obsolete diagrams make the current architecture unclear. Create backlog items to address these clarity issues.",
         "Identify gaps, outdated references, and backlog management needs. Create tasks for improvements.",
@@ -93,10 +93,12 @@
       "name": "look-outside-the-box",
       "title": "Generate innovative opportunities",
       "what to do": [
-        "Analyze project docs, code, and current capabilities for expansion opportunities.",
-        "Generate 2-5 high-impact opportunities with clear value propositions.",
-        "Add suggestions to 'Future Opportunities' section in plan.md (not backlog).",
-        "Structure: # Innovation ## Assessment ## Opportunities ## Value ## Added to plan.md"
+        "First, scan plan.md, progress.md, backlog.md, and 'Future Opportunities' in plan.md for existing suggestions. Note any similar ideas already proposed.",
+        "Think step-by-step like an innovative strategist: Analyze project docs, code structure, and current capabilities (via list_dir/file_search if needed).",
+        "To generate novel ideas, use these techniques: (1) Ask contrarian questions like 'What if we did the opposite?' or 'How could this fail spectacularly—and turn that into a strength?'; (2) Draw analogies from unrelated industries (e.g., 'How would Netflix/Amazon approach this?'); (3) Brainstorm 8-10 wild, unconventional ideas first, then refine to 2-5 high-impact ones.",
+        "For each opportunity, provide: clear value proposition, why it's novel (vs. existing suggestions), and how it expands the project.",
+        "Add only new, high-value suggestions to 'Future Opportunities' section in plan.md (not backlog).",
+        "Structure: # Innovation ## Step-by-Step Assessment (incl. review of prior suggestions) ## Wild Ideas Brainstorm ## Refined Opportunities ## Value Summary ## Added to plan.md"
       ]
     }
   ]
