@@ -21,11 +21,15 @@ def app_with_routes():
     with app.app_context():
         db.create_all()
         yield app
-        # Clean up any pending transactions
+        # Aggressive cleanup to prevent hanging
         with contextlib.suppress(Exception):
-            db.session.rollback()
-            db.session.close()
-        db.drop_all()
+            db.session.remove()
+        with contextlib.suppress(Exception):
+            db.session.close_all()
+        with contextlib.suppress(Exception):
+            db.drop_all()
+        with contextlib.suppress(Exception):
+            db.engine.dispose()
 
 
 @pytest.fixture(scope='function')
