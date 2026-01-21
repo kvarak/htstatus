@@ -9,16 +9,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Goals Distribution Chart
   var ctx1 = document.getElementById('goalsChart');
-  if (ctx1 && {{ team_stats.total_team_goals or 0 }} > 0) {
+  if (ctx1) {
     var goalsChart = new Chart(ctx1, {
       type: 'doughnut',
       data: {
         labels: ['League Goals', 'Cup Goals', 'Friendly Goals'],
         datasets: [{
           data: [
-            {{ team_stats.total_league_goals or 0 }},
-            {{ team_stats.total_cup_goals or 0 }},
-            {{ team_stats.total_friendly_goals or 0 }}
+            {{ team_stats.total_team_goals or 0 }},
+            0,
+            0
           ],
           backgroundColor: [
             'rgba(54, 162, 235, 0.8)',
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Match Results Chart
   var ctx2 = document.getElementById('matchResultsChart');
-  if (ctx2 && {{ match_stats.total_matches or 0 }} > 0) {
+  if (ctx2) {
     var matchChart = new Chart(ctx2, {
       type: 'bar',
       data: {
@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="col-md-3">
       <div class="card text-center">
         <div class="card-body">
-          <h5 class="card-title">{{ team_stats.avg_age or 0 }}</h5>
+          <h5 class="card-title">{{ team_stats.avg_age|round(1) if team_stats.avg_age else 0 }} years</h5>
           <p class="card-text">Average Age</p>
         </div>
       </div>
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="col-md-3">
       <div class="card text-center">
         <div class="card-body">
-          <h5 class="card-title">{{ team_stats.avg_tsi or 0 }}</h5>
+          <h5 class="card-title">{{ "{:,}".format(team_stats.avg_tsi|int) if team_stats.avg_tsi else 0 }}</h5>
           <p class="card-text">Average TSI</p>
         </div>
       </div>
@@ -286,12 +286,12 @@ document.addEventListener('DOMContentLoaded', function() {
               </tr>
             </thead>
             <tbody>
-              {% for player, goals, matches in top_scorers %}
+              {% for player in top_scorers %}
               <tr>
-                <td>{{ player }}</td>
-                <td>{{ goals }}</td>
-                <td>{{ matches }}</td>
-                <td>{{ "%.2f"|format(goals / matches if matches > 0 else 0) }}</td>
+                <td>{{ player.first_name }} {{ player.nick_name }} {{ player.last_name }}</td>
+                <td>{{ player.current_team_goals or 0 }}</td>
+                <td>{{ player.current_team_matches or 0 }}</td>
+                <td>{{ "%.2f"|format((player.current_team_goals or 0) / (player.current_team_matches or 1)) }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -319,11 +319,11 @@ document.addEventListener('DOMContentLoaded', function() {
               </tr>
             </thead>
             <tbody>
-              {% for player, tsi, age in top_performers %}
+              {% for player in top_performers %}
               <tr>
-                <td>{{ player }}</td>
-                <td>{{ tsi }}</td>
-                <td>{{ age }}</td>
+                <td>{{ player.first_name }} {{ player.nick_name }} {{ player.last_name }}</td>
+                <td>{{ "{:,}".format(player.tsi|int) if player.tsi else 0 }}</td>
+                <td>{{ player.age|format_age }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
               <small class="text-muted">Goals per Match</small>
             </div>
             <div class="col-md-3">
-              <strong>{{ team_stats.avg_wage or 0 }}</strong><br>
+              <strong>{{ "{:,}".format(team_stats.avg_wage|int) if team_stats.avg_wage else 0 }}</strong><br>
               <small class="text-muted">Average Wage</small>
             </div>
           </div>
