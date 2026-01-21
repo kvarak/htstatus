@@ -47,7 +47,7 @@
       "title": "Create commits for changes since last commit following git guidelines",
       "what to do": [
         "Analyze changes since last commit. Group related changes logically.",
-        "Write factual commit messages: <50 char subject, imperative mood, no fluff.",
+        "Write factual commit messages: <50 char subject, body: imperative mood, no fluff, refer to issues if possible.",
         "Stage and commit. Don't push."
       ]
     },
