@@ -9,9 +9,10 @@ import pytest
 from flask import Flask
 
 from app.blueprints.main import main_bp
-from app.factory import create_app
+from app.factory import create_app, db
 from app.routes_bp import initialize_routes
 from app.utils import create_page, dprint
+from config import TestConfig
 
 
 class MinimalTestConfig:
@@ -28,10 +29,34 @@ class MinimalTestConfig:
 
 @pytest.fixture(scope='function')
 def minimal_app():
-    """Create minimal app without database setup."""
+    """Create minimal app with transaction isolation for database tests."""
     os.environ['FLASK_ENV'] = 'testing'
-    app = create_app(MinimalTestConfig, include_routes=False)  # Skip routes to avoid DB
-    return app
+    app = create_app(TestConfig, include_routes=False)  # Use TestConfig for database consistency
+
+    with app.app_context():
+        # Create tables using the same pattern as conftest.py
+        db.create_all()
+
+        # Create connection and begin transaction for test isolation
+        from sqlalchemy.orm import sessionmaker
+        connection = db.engine.connect()
+        transaction = connection.begin()
+
+        # Configure session to use this connection
+        session_factory = sessionmaker(bind=connection)
+        scoped_session_test = db.scoped_session(session_factory)
+
+        # Store original session to restore later
+        original_session = db.session
+        db.session = scoped_session_test
+
+        yield app
+
+        # Cleanup: restore session and rollback transaction
+        db.session = original_session
+        scoped_session_test.remove()
+        transaction.rollback()
+        connection.close()
 
 
 @pytest.fixture(scope='function')

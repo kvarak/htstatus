@@ -1,6 +1,5 @@
 """Comprehensive route testing for HT Status application to achieve 70% coverage."""
 
-import contextlib
 import os
 from unittest.mock import patch
 
@@ -14,22 +13,34 @@ from tests.mock_chpp import create_mock_chpp_client
 
 @pytest.fixture(scope='function')
 def app_with_routes():
-    """Create application for route testing with routes enabled."""
+    """Create application for route testing with routes enabled and transaction isolation."""
     os.environ['FLASK_ENV'] = 'testing'
     app = create_app(TestConfig, include_routes=True)
 
     with app.app_context():
+        # Create tables using the same pattern as conftest.py
         db.create_all()
+
+        # Create connection and begin transaction for test isolation
+        from sqlalchemy.orm import sessionmaker
+        connection = db.engine.connect()
+        transaction = connection.begin()
+
+        # Configure session to use this connection
+        session_factory = sessionmaker(bind=connection)
+        scoped_session_test = db.scoped_session(session_factory)
+
+        # Store original session to restore later
+        original_session = db.session
+        db.session = scoped_session_test
+
         yield app
-        # Aggressive cleanup to prevent hanging
-        with contextlib.suppress(Exception):
-            db.session.remove()
-        with contextlib.suppress(Exception):
-            db.session.close_all()
-        with contextlib.suppress(Exception):
-            db.drop_all()
-        with contextlib.suppress(Exception):
-            db.engine.dispose()
+
+        # Cleanup: restore session and rollback transaction
+        db.session = original_session
+        scoped_session_test.remove()
+        transaction.rollback()
+        connection.close()
 
 
 @pytest.fixture(scope='function')

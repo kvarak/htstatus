@@ -90,29 +90,41 @@ def client(app):
 
 @pytest.fixture(scope='function')
 def db_session(app):
-    """Create a database session for testing with transaction rollback."""
+    """Create a database session for testing with proper transaction isolation."""
     with app.app_context():
-        # Start a transaction that we can rollback
+        # Create a nested transaction (savepoint) for proper test isolation
         connection = db.engine.connect()
         transaction = connection.begin()
 
-        # Create new session bound to this connection
+        # Bind the session to the transaction
         from sqlalchemy.orm import sessionmaker
         Session = sessionmaker(bind=connection)
-        session = Session()
+        session_instance = Session()
+
+        # Override Flask-SQLAlchemy's session with our test session
+        old_session = db.session
+
+        # Create a new scoped session that uses our connection
+        from sqlalchemy.orm import scoped_session
+        test_session = scoped_session(sessionmaker(bind=connection))
+        db.session = test_session
 
         try:
-            yield session
+            yield test_session
         finally:
-            # Complete resource cleanup to eliminate ResourceWarnings
+            # Complete resource cleanup with proper isolation
             with contextlib.suppress(Exception):
-                session.close()
+                # Rollback all changes made during the test
+                test_session.remove()
             with contextlib.suppress(Exception):
+                # Rollback the transaction to ensure clean state
                 transaction.rollback()
             with contextlib.suppress(Exception):
+                # Close the connection
                 connection.close()
-
-
+            with contextlib.suppress(Exception):
+                # Restore original session
+                db.session = old_session
 @pytest.fixture(scope='function')
 def authenticated_session(client, db_session):
     """Create an authenticated session for testing routes that require login."""

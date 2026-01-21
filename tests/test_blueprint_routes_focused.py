@@ -25,13 +25,33 @@ class TestConfig:
 
 @pytest.fixture(scope='function')
 def test_app():
-    """Create application with blueprint routes."""
+    """Create application with blueprint routes and transaction isolation."""
     os.environ['FLASK_ENV'] = 'testing'
     app = create_app(TestConfig, include_routes=True)
     with app.app_context():
+        # Create tables using the same pattern as conftest.py
         db.create_all()
+
+        # Create connection and begin transaction for test isolation
+        from sqlalchemy.orm import sessionmaker
+        connection = db.engine.connect()
+        transaction = connection.begin()
+
+        # Configure session to use this connection
+        session_factory = sessionmaker(bind=connection)
+        scoped_session_test = db.scoped_session(session_factory)
+
+        # Store original session to restore later
+        original_session = db.session
+        db.session = scoped_session_test
+
         yield app
-        db.drop_all()
+
+        # Cleanup: restore session and rollback transaction
+        db.session = original_session
+        scoped_session_test.remove()
+        transaction.rollback()
+        connection.close()
 
 
 @pytest.fixture(scope='function')

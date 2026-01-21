@@ -15,17 +15,34 @@ from models import User
 
 @pytest.fixture(scope='function')
 def auth_app():
-    """Create application for authentication testing."""
+    """Create application for authentication testing with transaction isolation."""
     os.environ['FLASK_ENV'] = 'testing'
     app = create_app(TestConfig, include_routes=True)
 
     with app.app_context():
+        # Create tables using the same pattern as conftest.py
         db.create_all()
+
+        # Create connection and begin transaction for test isolation
+        from sqlalchemy.orm import sessionmaker
+        connection = db.engine.connect()
+        transaction = connection.begin()
+
+        # Configure session to use this connection
+        session_factory = sessionmaker(bind=connection)
+        scoped_session_test = db.scoped_session(session_factory)
+
+        # Store original session to restore later
+        original_session = db.session
+        db.session = scoped_session_test
+
         yield app
-        # Cleanup
-        db.session.remove()
-        db.drop_all()
-        db.engine.dispose()
+
+        # Cleanup: restore session and rollback transaction
+        db.session = original_session
+        scoped_session_test.remove()
+        transaction.rollback()
+        connection.close()
 
 
 @pytest.fixture(scope='function')
