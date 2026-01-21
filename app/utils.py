@@ -83,6 +83,7 @@ def create_page(template, title, **kwargs):
     template_vars = {
         'bootstrap': None,  # Bootstrap handled by template
         'title': title,
+        'apptitle': current_app.config.get('APP_NAME', 'HT Status'),
         'consumer_key': current_app.config.get('CONSUMER_KEY', ''),
         'consumer_secret': current_app.config.get('CONSUMER_SECRETS', ''),
         'versionstr': versionstr,
