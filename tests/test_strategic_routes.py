@@ -107,14 +107,14 @@ class TestBlueprintRoutesCoverage:
             for endpoint in expected:
                 assert endpoint in route_endpoints, f"Missing endpoint: {endpoint}"
 
-    @patch('app.routes_bp.session', {})
-    @patch('app.routes_bp.render_template')
+    @patch('app.utils.session', {})
+    @patch('app.utils.render_template')
     def test_create_page_comprehensive(self, mock_render, strategic_app):
         """Test create_page function comprehensively."""
         mock_render.return_value = 'rendered_template'
 
         with strategic_app.test_request_context():
-            from app.routes_bp import create_page
+            from app.utils import create_page
 
             # Test with minimal kwargs
             result = create_page('test.html', 'Test Title')
@@ -134,7 +134,7 @@ class TestBlueprintRoutesCoverage:
     def test_dprint_function_coverage(self, strategic_app):
         """Test dprint function with various debug levels."""
         with strategic_app.app_context():
-            from app.routes_bp import dprint
+            from app.utils import dprint
 
             # Test with different debug levels
             dprint(0, 'debug', 'low priority message')
@@ -162,35 +162,40 @@ class TestBlueprintRoutesCoverage:
 
     def test_create_page_session_handling(self, strategic_app):
         """Test create_page session variable handling."""
-        with strategic_app.test_request_context(), \
-             patch('app.routes_bp.render_template') as mock_render, \
-             patch('app.routes_bp.session') as mock_session:
+        with strategic_app.test_client() as client:
+            with client.session_transaction() as sess:
+                # Set up session data
+                sess['current_user'] = 'test_user'
+                sess['current_user_id'] = 123
+                sess['all_teams'] = ['team1', 'team2']
+                sess['all_team_names'] = ['Team One', 'Team Two']
+                sess['team_id'] = 'team1'
 
+            # Mock render_template and User query to avoid database access
+            with patch('app.utils.render_template') as mock_render, \
+                 patch('models.User') as mock_user_class:
                 mock_render.return_value = 'session_template'
+                # Mock User.query to return None (no user found)
+                mock_user_class.query.filter_by.return_value.first.return_value = None
 
-                # Mock session data - need to support both 'in' checks and get() calls
-                session_data = {
-                    'current_user': 'test_user',
-                    'current_user_id': 123,
-                    'all_teams': ['team1', 'team2'],
-                    'all_team_names': ['Team One', 'Team Two'],
-                    'some_other_key': 'other_value'
-                }
+                with strategic_app.test_request_context():
+                    # Setup session in request context
+                    from flask import session
+                    session['current_user'] = 'test_user'
+                    session['current_user_id'] = 123
+                    session['all_teams'] = ['team1', 'team2']
+                    session['all_team_names'] = ['Team One', 'Team Two']
+                    session['team_id'] = 'team1'
 
-                # Mock both __contains__ (for 'in' checks) and get() method
-                mock_session.__contains__.return_value = True
-                mock_session.__getitem__.side_effect = lambda key: session_data[key]
-                mock_session.get.side_effect = lambda key, default=None: session_data.get(key, default)
+                    from app.utils import create_page
+                    result = create_page('session_test.html', 'Session Test')
+                    assert result == 'session_template'
 
-                from app.routes_bp import create_page
-
-                result = create_page('session_test.html', 'Session Test')
-                assert result == 'session_template'
-
-                # Verify session.get was called for expected keys
-                expected_calls = ['all_teams', 'all_team_names']  # Only these use .get()
-                for call in expected_calls:
-                    mock_session.get.assert_any_call(call, [])
+                    # Verify render_template was called with session variables
+                    call_kwargs = mock_render.call_args[1]
+                    assert call_kwargs['current_user'] == 'test_user'
+                    assert call_kwargs['all_teams'] == ['team1', 'team2']
+                    assert call_kwargs['all_team_names'] == ['Team One', 'Team Two']
 
     def test_initialize_routes_function_comprehensive(self, strategic_app):
         """Test initialize_routes function comprehensively."""
@@ -250,14 +255,14 @@ class TestBlueprintRoutesCoverage:
             # Should handle gracefully
             assert response.status_code in [200, 302, 404, 405, 500]
 
-    @patch('app.routes_bp.session', {'current_user': 'test'})
-    @patch('app.routes_bp.render_template')
+    @patch('app.utils.session', {'current_user': 'test'})
+    @patch('app.utils.render_template')
     def test_template_rendering_edge_cases(self, mock_render, strategic_app):
         """Test template rendering edge cases."""
         mock_render.return_value = 'edge_case_template'
 
         with strategic_app.test_request_context():
-            from app.routes_bp import create_page
+            from app.utils import create_page
 
             # Test with None title
             result = create_page('test.html', None)
@@ -277,19 +282,26 @@ class TestModuleImportCoverage:
 
     def test_comprehensive_module_imports(self):
         """Test all imports and module-level definitions."""
-        # Import the module to trigger module-level code
+        # Import the modules to trigger module-level code
         import app.routes_bp as bp_module
+        import app.utils as utils_module
 
-        # Verify all expected functions exist
-        expected_functions = [
-            'initialize_routes', 'dprint', 'create_page',
+        # Verify routes_bp functions (stubs that redirect to blueprints)
+        expected_bp_functions = [
+            'initialize_routes',
             'index', 'logout', 'player', 'team',
             'matches', 'training', 'update', 'settings', 'debug'
         ]
 
-        for func_name in expected_functions:
+        for func_name in expected_bp_functions:
             assert hasattr(bp_module, func_name)
             assert callable(getattr(bp_module, func_name))
+
+        # Verify utils functions (helper functions)
+        expected_utils_functions = ['dprint', 'create_page']
+        for func_name in expected_utils_functions:
+            assert hasattr(utils_module, func_name)
+            assert callable(getattr(utils_module, func_name))
 
     def test_blueprint_registration_import_coverage(self):
         """Test blueprint registration and related imports."""
@@ -315,7 +327,7 @@ class TestDebugAndLogging:
     def test_dprint_debug_levels(self, strategic_app):
         """Test dprint with different debug levels against app config."""
         with strategic_app.app_context():
-            from app.routes_bp import dprint
+            from app.utils import dprint
 
             # Test with app debug level 1 (from config)
             # Messages at or below debug level should be processed
@@ -330,7 +342,7 @@ class TestDebugAndLogging:
         """Test logging integration if present."""
         with strategic_app.app_context():
             # Test that logging doesn't break functionality
-            from app.routes_bp import dprint
+            from app.utils import dprint
 
             # Large number of log messages
             for i in range(10):
@@ -345,10 +357,10 @@ class TestRequestContextHandling:
     def test_create_page_request_context_variables(self, strategic_app):
         """Test create_page access to request context variables."""
         with strategic_app.test_request_context('/test?param=value'):
-            from app.routes_bp import create_page
+            from app.utils import create_page
 
-            with patch('app.routes_bp.render_template') as mock_render, \
-                 patch('app.routes_bp.session', {'user': 'test'}):
+            with patch('app.utils.render_template') as mock_render, \
+                 patch('app.utils.session', {'user': 'test'}):
                     mock_render.return_value = 'context_template'
 
                     result = create_page('context.html', 'Context Test')
@@ -365,7 +377,7 @@ class TestRequestContextHandling:
             # App context should be available
             from flask import current_app
 
-            from app.routes_bp import dprint
+            from app.utils import dprint
             assert current_app == strategic_app
 
             # Functions should work in this context

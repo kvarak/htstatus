@@ -55,13 +55,13 @@ class TestBlueprintFunctions:
         dprint(1, 'test_route', 'test_function', 'arg1', 'arg2')
         assert True  # If no exception, function works
 
-    @patch('app.routes_bp.render_template')
+    @patch('app.utils.render_template')
     def test_create_page_function(self, mock_render):
         """Test create_page function with mocked dependencies."""
         mock_render.return_value = 'mocked_template'
 
         # Mock Flask session
-        with patch('app.routes_bp.session', {'current_user': 'testuser'}):
+        with patch('flask.session', {'current_user': 'testuser'}):
             result = create_page('test.html', 'Test Title')
             mock_render.assert_called_once()
             assert result == 'mocked_template'
@@ -102,10 +102,15 @@ class TestRouteModuleImports:
     def test_routes_bp_import(self):
         """Test that routes_bp module imports successfully."""
         import app.routes_bp as routes_bp
-        assert hasattr(routes_bp, 'main_bp')
+        import app.utils as utils
+
+        # Check routes_bp has its expected functions
+        assert hasattr(routes_bp, 'main_bp')  # Temporary backward compatibility
         assert hasattr(routes_bp, 'initialize_routes')
-        assert hasattr(routes_bp, 'create_page')
-        assert hasattr(routes_bp, 'dprint')
+
+        # Check utils has helper functions
+        assert hasattr(utils, 'create_page')
+        assert hasattr(utils, 'dprint')
 
     def test_factory_import(self):
         """Test that factory module imports successfully."""
@@ -148,7 +153,7 @@ class TestRouteHelperFunctions:
         dprint(3, 'route3', 'func3', 'arg1', 'arg2', 'arg3')
         assert True  # If no exceptions, all variants work
 
-    @patch('app.routes_bp.render_template')
+    @patch('app.utils.render_template')
     def test_create_page_with_session_data(self, mock_render, minimal_app):
         """Test create_page with various session configurations."""
         from unittest.mock import patch
@@ -156,7 +161,7 @@ class TestRouteHelperFunctions:
 
         # Test with minimal session data within request context
         with minimal_app.test_request_context(), \
-             patch('app.routes_bp.session') as mock_session:
+             patch('flask.session') as mock_session:
                 mock_session.__getitem__ = Mock(side_effect=lambda k: {'current_user': 'test'}[k])
                 mock_session.get = Mock(return_value=[])
 
@@ -189,12 +194,12 @@ class TestConfigurationHandling:
 class TestRouteErrorHandling:
     """Test error handling in route contexts."""
 
-    @patch('app.routes_bp.render_template')
+    @patch('app.utils.render_template')
     def test_create_page_with_template_error(self, mock_render):
         """Test create_page behavior when template rendering fails."""
         mock_render.side_effect = Exception("Template not found")
 
-        with patch('app.routes_bp.session', {'current_user': 'test'}):
+        with patch('flask.session', {'current_user': 'test'}):
             try:
                 create_page('nonexistent.html', 'Title')
                 raise AssertionError("Should have raised exception")

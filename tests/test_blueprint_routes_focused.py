@@ -100,7 +100,7 @@ class TestBlueprintRoutes:
 
             # Test create_page function with request context
             with test_app.test_request_context():
-                from app.routes_bp import create_page
+                from app.utils import create_page
                 result = create_page('main.html', 'Test Title')
                 assert result is not None  # Should return rendered template
 
@@ -241,7 +241,7 @@ class TestTemplateRendering:
                 sess['current_user'] = sample_user.username
 
             with test_app.test_request_context():
-                from app.routes_bp import create_page
+                from app.utils import create_page
                 try:
                     result = create_page('base.html', 'Test Page')
                     assert result is not None
