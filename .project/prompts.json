@@ -4,9 +4,9 @@
       "name": "plan",
       "title": "Plan the next development task",
       "what to do": [
-        "Read .project/ docs, README.md, TECHNICAL.md for context.",
+        "Read .project/rules.md for standards. Read .project/ docs, README.md, TECHNICAL.md for context.",
         "Use `make help` for commands. Use `uv run` for Python.",
-        "Keep database backwards compatible.",
+        "Follow quality gates in rules.md. Keep database backwards compatible.",
         "Structure: # Plan Next Task ## Analysis ## Solution ## Steps ## Challenges ## Testing"
       ]
     },
@@ -14,9 +14,11 @@
       "name": "execute",
       "title": "Execute the planned development task",
       "what to do": [
-        "Read .project/ docs for context. Use `uv run` for Python and `make help` for commands.",
+        "Read .project/rules.md for standards. Read .project/ docs for context.",
+        "Use `uv run` for Python and `make help` for commands.",
         "Follow the plan. Validate with `make test-all` - no coverage loss or test failures.",
-        "Keep database backwards compatible. Update docs (backlog.md, progress.md).",
+        "Follow quality gates in rules.md. Keep database backwards compatible.",
+        "Update docs per documentation-guide.md (backlog.md, progress.md, etc.).",
         "Note any new tasks for backlog.md."
       ]
     },
@@ -25,8 +27,9 @@
       "title": "Review previous development work",
       "what to do": [
         "Review last completed task and changes since last commit.",
-        "Validate with `make test-all`, use `uv run` for Python. Check docs updated and strategic alignment.",
-        "Keep database backwards compatible.",
+        "Validate with `make test-all`, use `uv run` for Python.",
+        "Check docs updated per documentation-guide.md and strategic alignment per goals.md.",
+        "Follow quality gates in rules.md. Keep database backwards compatible.",
         "Add new tasks to backlog.md."
       ]
     },
@@ -55,8 +58,8 @@
       "name": "add-to-backlog",
       "title": "Add a new task to the project backlog",
       "what to do": [
-        "Read .project/ docs for context.",
-        "Analyze task alignment with strategic goals and dependencies.",
+        "Read .project/rules.md for standards. Read .project/ docs for context.",
+        "Analyze task alignment with goals.md and dependencies.",
         "Add to backlog.md with priority and category recommendation."
       ]
     },
@@ -64,9 +67,11 @@
       "name": "execute-backlog-item",
       "title": "Plan and execute a specific backlog item",
       "what to do": [
-        "Focus on the specified backlog item. Read .project/ docs for context.",
+        "Focus on the specified backlog item. Read .project/rules.md for standards.",
+        "Read .project/ docs for context.",
         "Create implementation plan, execute step by step. Use `uv run` for Python.",
-        "Test against acceptance criteria. Update docs and mark completed in backlog.md.",
+        "Test against acceptance criteria per rules.md. Update docs per documentation-guide.md.",
+        "Mark completed in backlog.md.",
         "Structure: # Execution: [TASK-ID] ## Overview ## Plan ## Steps ## Validation ## Summary"
       ]
     },
@@ -75,7 +80,8 @@
       "title": "Repository analysis for documentation and backlog management",
       "what to do": [
         "Use list_dir and file_search to analyze repository structure.",
-        "Check documentation consistency (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*).",
+        "Check documentation consistency per documentation-guide.md decision matrix.",
+        "Review README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*.",
         "For architectural and technical docs, prioritize reflecting the current system state, not history. Remove or rewrite outdated sections instead of appending more history.",
         "Flag any places where historical notes, old plans, or obsolete diagrams make the current architecture unclear. Create backlog items to address these clarity issues.",
         "Identify gaps, outdated references, and backlog management needs. Create tasks for improvements.",

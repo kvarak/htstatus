@@ -1,5 +1,10 @@
 # HTStatus Development Backlog
 
+> **Purpose**: Prioritized active task tracking with 7-level priority system for HTStatus development
+> **Audience**: Developers and AI agents selecting and executing tasks
+> **Update Frequency**: Continuously - update status when starting/completing tasks, add new tasks as discovered
+> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+
 ## Management Rules
 
 **For AI Agents**:
@@ -21,8 +26,7 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- 🚨 [DOC-026] Documentation Architecture Overhaul (4-6 hours) - Establish comprehensive documentation standards and centralized rules system **NEW - HIGH PRIORITY**
-- 🎯 [TEST-008] Residual Test Failures Resolution (2-4 hours) - Fix 33 remaining test failures (config mismatches, test_database.py design, business logic edge cases) **NEW - READY TO EXECUTE**
+- 🎯 [TEST-008] Residual Test Failures Resolution (2-4 hours) - Fix 33 remaining test failures (config mismatches, test_database.py design, business logic edge cases) **READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations**
 - Currently Empty
@@ -42,7 +46,6 @@
 - 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
 
 **Priority 5: DevOps & Developer Experience** (Make it easy)
-- 🎯 [ORG-001] Consolidate Environment Templates (15-20 min) - Remove duplication
 - 🎯 [DOC-019] macOS Setup Guide (30 min) - Platform support
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
@@ -76,78 +79,6 @@
 ---
 
 ## Priority 1: Testing & App Reliability
-
-### [DOC-026] Documentation Architecture Overhaul
-**Status**: 🚨 NEW - High Priority | **Effort**: 4-6 hours | **Impact**: Developer experience, project maintainability, long-term quality
-**Dependencies**: None | **Strategic Value**: Comprehensive documentation strategy, consolidated rule management
-
-**Problem Statement**:
-The project's documentation is scattered across multiple locations with inconsistent formats and overlapping content. Rules, standards, and conventions are distributed throughout various files, making it difficult to:
-- Find the authoritative documentation for specific topics
-- Ensure consistency across different documentation types
-- Onboard new contributors efficiently
-- Maintain documentation quality and accuracy
-- Apply consistent standards across the project
-
-**Current Documentation Issues**:
-- Rules scattered in `.project/plan.md`, `.project/backlog.md`, and other files
-- No clear hierarchy of documentation types (user vs developer vs API)
-- Inconsistent formatting and organization patterns
-- Historical information mixed with current architectural state
-- Missing documentation governance framework
-
-**Implementation**:
-1. **Documentation Audit and Mapping** (1-1.5 hours):
-   - Catalog all existing `.md` files across the project
-   - Identify content types: user guides, developer docs, API docs, project management
-   - Map overlapping and duplicate content areas
-   - Assess current quality and accuracy levels
-   - Document current vs desired documentation structure
-
-2. **Create `.project/rules.md` Central Hub** (1.5-2 hours):
-   - Consolidate all development rules from `.project/plan.md`
-   - Move backlog management rules from `backlog.md`
-   - Add documentation standards and conventions
-   - Define file structure and organization rules
-   - Create cross-references to related documentation
-   - Establish rule categories: Quality, Documentation, File Structure, Security, AI Agents
-
-3. **Documentation Hierarchy Design** (1-1.5 hours):
-   - Define clear purposes for each documentation location:
-     - `/README.md`: User-facing setup and basic usage
-     - `/TECHNICAL.md`: Architecture, implementation details
-     - `/DEPLOYMENT.md`: Production deployment and operations
-     - `/.project/`: Project management, development workflow
-     - `/docs/`: Detailed guides, API documentation, tutorials
-   - Create documentation decision matrix (where does X content go?)
-   - Establish update responsibilities and ownership
-
-4. **Update Prompts Integration** (0.5-1 hour):
-   - Reference `.project/rules.md` in all relevant prompts
-   - Update prompts.json to use centralized rules
-   - Ensure AI agents consistently apply documentation standards
-   - Create documentation review checkpoints in development workflow
-
-5. **Implementation Guide Creation** (0.5-1 hour):
-   - Document the new documentation architecture
-   - Create migration plan for existing content
-   - Establish ongoing maintenance procedures
-   - Define quality gates for documentation updates
-
-**Acceptance Criteria**:
-- ✅ All development rules consolidated in `.project/rules.md`
-- ✅ Clear documentation hierarchy defined and documented
-- ✅ Prompts updated to reference centralized rules
-- ✅ Implementation guide created for future maintenance
-- ✅ No rule duplication across project files
-- ✅ Documentation types clearly defined with ownership
-
-**Related Tasks**:
-- Links to DOC-023, DOC-024, DOC-025 (cleaning existing docs)
-- Supports DOC-021 (tutorial documentation)
-- Enables future documentation standardization tasks
-
----
 
 ### [TEST-008] Residual Test Failures Resolution
 **Status**: 🎯 Ready to Execute | **Effort**: 2-4 hours | **Priority**: P1 | **Impact**: Full test suite reliability
@@ -598,27 +529,6 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 
 ## Priority 5: DevOps & Developer Experience
 
-### [ORG-001] Consolidate Environment Templates
-**Status**: 🎯 Ready to Execute | **Effort**: 15-20 minutes | **Impact**: Developer onboarding
-**Dependencies**: None | **Strategic Value**: Remove configuration confusion
-
-**Problem**: Root `.env.example` duplicates `environments/.env.development.example` causing setup confusion.
-
-**Implementation**:
-1. Remove redundant root `.env.example` file
-2. Verify no scripts reference root template location
-3. Confirm README setup instructions remain accurate
-4. Update .gitignore if needed
-
-**Acceptance Criteria**:
-- Root `.env.example` removed
-- No broken references in documentation or scripts
-- Setup workflow tested and working
-
-**Expected Outcomes**: Clearer configuration structure, reduced setup confusion, easier maintenance
-
----
-
 ### [DOC-019] macOS Setup Guide
 **Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Impact**: Platform support
 **Dependencies**: None | **Strategic Value**: Developer onboarding
@@ -840,48 +750,6 @@ Users need a way to view their team's historical performance across multiple sea
 - Data export capabilities
 
 **Expected Outcomes**: Enhanced user experience, better data insights, competitive differentiation
-
----
-
-### [UI-003] Complete Training Page Restructure
-**Status**: ✅ COMPLETED 2026-01-19 | **Effort**: 8-10 hours | **Impact**: User experience improvement
-**Dependencies**: None | **Strategic Value**: Enhanced training management interface
-
-**Completion Summary**:
-- ✅ React component fully typed and functional with Recharts visualization
-- ✅ Modern responsive design implemented across all device sizes
-- ✅ Improved data organization and filtering with search capabilities
-- ✅ Enhanced visual presentation with skill cards and progression charts
-- ✅ Performance optimized with React hooks (useMemo, useState) for deduplication
-- ✅ Flask template modernized with Bootstrap 5 and Chart.js v4.4.0
-- ✅ Dual implementation: React component for modern frontend + enhanced template for legacy backend
-- ✅ Backend-level deduplication in routes.py for reliable data cleaning
-
-**Acceptance Criteria Met**:
-- ✅ Modern, responsive design across all devices (mobile, tablet, desktop)
-- ✅ Improved data organization and filtering with player search
-- ✅ Enhanced visual presentation with skill cards and charts
-- ✅ Full accessibility compliance (WCAG 2.1 AA standards)
-- ✅ Performance optimized with memoization and efficient algorithms
-
-**Implementation Details**:
-- React component: `/src/components/training/TrainingPage.tsx` (336 lines, fully typed)
-- Page integration: `/src/pages/Training.tsx` with async data fetching
-- Flask template: `/app/templates/training.html` with modern styling
-- Backend deduplication: Added to `routes.py` training() function
-
-**Testing Validation**:
-- 209 tests passing (95% coverage maintained)
-- No regressions introduced
-- Pre-existing 4 test failures unrelated to changes
-- All acceptance criteria validated
-
-**Technical Details**:
-- Skill tracking: 7 core skills (keeper, defender, playmaker, winger, passing, scoring, set_pieces)
-- Data visualization: Recharts line charts with 7-skill progression tracking
-- Deduplication: Dual-level (React memoization + backend processing) for reliability
-- Backward compatibility: No database schema changes required
-- Styling: TailwindCSS + Radix UI components with responsive grid layout
 
 ---
 

@@ -1,5 +1,9 @@
 # HT Status Deployment Guide
 
+> **Purpose**: Production deployment procedures, configuration, and operations for HTStatus
+> **Audience**: DevOps engineers, system administrators, and deployment managers
+> **See Also**: [README.md](README.md) for development setup • [TECHNICAL.md](TECHNICAL.md) for architecture
+
 This guide covers production deployment of HT Status using Docker Compose or managed cloud services.
 
 ## Table of Contents

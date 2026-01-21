@@ -1,8 +1,13 @@
 # Plan
 
+> **Purpose**: Long-term roadmap, requirements, and future opportunities for HTStatus project
+> **Audience**: Developers and project maintainers planning strategic direction
+> **Update Frequency**: When project goals shift, requirements change, or new opportunities identified
+> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+
 ## Quick Navigation
 🔗 **Project Documentation**: [Architecture](architecture.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
-🚀 **Development**: [Prompts](prompts.json) • [Technical Docs](../TECHNICAL.md) • [README](../README.md)
+🚀 **Development**: [Prompts](prompts.json) • [Rules](rules.md) • [Technical Docs](../TECHNICAL.md) • [README](../README.md)
 
 ## Project Requirements
 

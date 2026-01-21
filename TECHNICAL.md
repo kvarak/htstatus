@@ -1,6 +1,8 @@
 # HTStatus Technical Documentation
 
-*This file provides technical implementation details for the HTStatus 2.0 project.*
+> **Purpose**: Technical architecture, implementation patterns, and design decisions for HTStatus
+> **Audience**: Developers understanding or modifying the system implementation
+> **See Also**: [README.md](README.md) for setup • [.project/architecture.md](.project/architecture.md) for structure • [.project/rules.md](.project/rules.md) for standards
 
 ## Architecture Overview
 

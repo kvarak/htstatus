@@ -1,8 +1,13 @@
 # HTStatus Architecture
 
+> **Purpose**: System structure, components, data flow, and technical architecture of HTStatus
+> **Audience**: Developers understanding or modifying the system structure
+> **Update Frequency**: When architecture changes, new components added, or data flow modified
+> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+
 ## Quick Navigation
 🔗 **Project Context**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
-🛠️ **Technical Details**: [Implementation Guide](../TECHNICAL.md) • [Setup Instructions](../README.md)
+🛠️ **Technical Details**: [Rules](rules.md) • [Implementation Guide](../TECHNICAL.md) • [Setup Instructions](../README.md)
 
 *This file preserves all 2.0 architecture documentation, adapted to the new format. Update as the project evolves.*
 

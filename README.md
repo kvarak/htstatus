@@ -1,5 +1,9 @@
 # HT Status
 
+> **Purpose**: User-focused setup, installation, and usage guide for HTStatus application
+> **Audience**: End users, new developers, and contributors getting started
+> **See Also**: [TECHNICAL.md](TECHNICAL.md) for architecture • [DEPLOYMENT.md](DEPLOYMENT.md) for production • [.project/](project/) for development
+
 ## Local Development with UV + Docker + Makefile
 
 This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency management, Docker Compose for services, and Make for standardized development commands.

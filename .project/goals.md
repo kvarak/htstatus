@@ -1,7 +1,11 @@
 # Strategic Goals Framework
 
+> **Purpose**: Strategic objectives, success criteria, and vision for HTStatus project
+> **Audience**: All stakeholders - developers, maintainers, and project leadership
+> **Update Frequency**: When strategic direction changes, milestones achieved, or objectives evolve
+
 ## Quick Navigation
-🔗 **Related**: [Progress](progress.md) • [Backlog](backlog.md) • [Plan](plan.md) • [Architecture](architecture.md)
+🔗 **Related**: [Progress](progress.md) • [Backlog](backlog.md) • [Plan](plan.md) • [Architecture](architecture.md) • [Rules](rules.md)
 🎯 **Strategic Status**: P1-P2 Complete ✅ • P3 Stability Progressing (7/9 complete) • 198/218 Tests Passing (90.8%) • 47 Tasks Complete • 100/100 Health
 ✅ **Latest**: REFACTOR-007 Complete Routes.py Removal - Blueprint architecture operational, git staging resolved (January 21, 2026)
 🔍 **Current Focus**: P3 Stability & Maintainability - TEST-006 import fixes (15 tests) → TEST-004/TEST-005 coverage improvement
