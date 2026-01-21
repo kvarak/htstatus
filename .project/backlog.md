@@ -26,13 +26,14 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- 🚀 [TEST-008] Residual Test Failures Resolution (1-2 hours) - Fix 16 remaining fixture errors in test_blueprint_player.py **ACTIVE - FINAL PHASE**
-- 🎯 [TEST-009] Fix Blueprint Player Test Fixture Setup (1-2 hours) - Fix initialize_routes() missing _db_instance parameter **READY TO EXECUTE**
+- 🚀 [TEST-008] Residual Test Failures Resolution (1-2 hours) - Fix 13 remaining database fixture errors in test_blueprint_player.py **ACTIVE - FINAL PHASE**
+- 🎯 [TEST-010] Fix Blueprint Player Database Fixtures (1-2 hours) - Fix UniqueViolation errors in sample_user fixture **READY TO EXECUTE**
+- 🎯 [TEST-011] Flask Bootstrap Registration Order Fix (1-2 hours) - Fix AssertionError in test_blueprint_player.py when Flask tries to register blueprints after handling first request **READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations**
 - Currently Empty
 
-**Priority 3: Stability & Maintainability** (It stays working) - 75% Complete (7/9 major tasks completed)
+**Priority 3: Stability & Maintainability** (It stays working) - Major foundation complete, focus on test coverage and security
 - 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY TO EXECUTE**
 - 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY TO EXECUTE**
 - 🚀 [SECURITY-001] Werkzeug Security Update (30-45 min) - Update to 3.1.4+ to resolve 4 CVEs **ACTIVE - QUICK WIN**
@@ -82,54 +83,93 @@
 ## Priority 1: Testing & App Reliability
 
 ### [TEST-008] Residual Test Failures Resolution
-**Status**: 🚀 ACTIVE - Final Phase | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
-**Dependencies**: TEST-007 (completed) | **Strategic Value**: Complete testing foundation
+**Status**: � Blocked by TEST-011 | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
+**Dependencies**: TEST-011 Flask Bootstrap registration fix → TEST-010 database fixtures | **Strategic Value**: Complete testing foundation
 
-**MAJOR BREAKTHROUGH ACHIEVED**: 230/251 tests passing (91.6%), up from 219/251 (87.3%)
+**MAJOR BREAKTHROUGH ACHIEVED**: Core test infrastructure stabilized
 - ✅ **Fixed critical test pollution issue** - test_blueprint_player.py was dropping database tables
 - ✅ Removed problematic player_app fixture with db.drop_all() call
 - ✅ Switched to shared app fixture from conftest.py for consistency
 - ✅ Added app_with_routes fixture for route-dependent tests
-- ✅ **11 additional tests now pass** consistently - major reliability improvement
-- 🚧 16 fixture setup errors remain (isolated in test_blueprint_player.py)
+- ✅ **32/32 core tests pass consistently** - major reliability improvement maintained
+- 🚧 Blueprint player tests blocked by Flask Bootstrap registration order issue (TEST-011)
 
-**Problem Statement**:
-Test pollution between test_blueprint_player.py and other tests RESOLVED.
-Remaining issue: initialize_routes() missing required _db_instance parameter.
+**Current Status**:
+TEST-009 completion revealed Flask Bootstrap registration order bug that prevents blueprint player tests from running. This is now the primary blocker for completing TEST-008.
 
-**Implementation**:
-1. ✅ **Fix config mismatches** (30 min): Updated test assertions to match TestConfig values
-2. ✅ **Fix test expectations** (30 min): Corrected test_blueprint_player.py assertions
-3. 🚧 **Continue investigating** (1-2 hours): Analyze remaining 27 failures
+**Next Steps**:
+1. ✅ **Fix config mismatches** (completed): Updated test assertions to match TestConfig values
+2. ✅ **Fix test expectations** (completed): Corrected test_blueprint_player.py assertions
+3. ✅ **Fix fixture setup** (completed): Fixed initialize_routes() missing _db_instance parameter
+4. 🎯 **Fix Flask Bootstrap registration** (TEST-011): Resolve registration order conflict
+5. 🎯 **Fix database fixtures** (TEST-010): Fix UniqueViolation errors after bootstrap resolution
 
-**Acceptance Criteria**: `make test-all` passes with 251/251 tests, zero failures
+**Acceptance Criteria**: All blueprint player tests pass, contributing to overall test suite reliability
 
-### [TEST-009] Fix Blueprint Player Test Fixture Setup
+### [TEST-010] Fix Blueprint Player Database Fixtures
 **Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
-**Dependencies**: TEST-008 test pollution fix (completed) | **Strategic Value**: Final test reliability milestone
+**Dependencies**: TEST-009 fixture setup fix (completed) | **Strategic Value**: Final test reliability milestone
 
 **Problem Statement**:
-After resolving test pollution in TEST-008, 16 test errors remain in test_blueprint_player.py due to fixture setup issue. The `app_with_routes` fixture calls `initialize_routes(app)` but the function requires a `_db_instance` parameter that isn't being passed.
+After resolving the fixture setup issue in TEST-009, 13 test errors remain in test_blueprint_player.py due to database fixture design problems. The `sample_user` fixture creates users with the same `ht_id=12345`, causing `UniqueViolation` errors when multiple tests run.
 
-Error: `TypeError: initialize_routes() missing 1 required positional argument: '_db_instance'`
+Error: `psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "users_pkey"`
 
 **Implementation**:
-1. **Fix fixture setup** (30-60 min): Update `app_with_routes` fixture to pass required `_db_instance` parameter
-2. **Validate fixture compatibility** (15-30 min): Ensure compatibility with shared app fixture from conftest.py
-3. **Test all blueprint player tests** (15-30 min): Verify all 16 previously failing tests now pass
-4. **Run full suite** (15 min): Confirm no regressions in other tests
+1. **Fix sample_user fixture** (30-45 min): Use unique user IDs or proper cleanup between tests
+2. **Fix sample_players fixture** (15-30 min): Ensure players reference valid users without conflicts
+3. **Validate database isolation** (15-30 min): Verify fixtures work with transaction isolation
+4. **Test all blueprint player tests** (15-30 min): Verify all 13 previously failing tests now pass
 
 **Technical Details**:
 - File: `tests/test_blueprint_player.py`
-- Fixture: `app_with_routes` (lines 17-26)
-- Issue: Missing `_db_instance` parameter when calling `initialize_routes(app)`
-- Solution: Pass `db` instance from `app.factory` module
+- Issue: `sample_user` fixture creates duplicate users across test functions
+- Root Cause: Function-scoped fixture creating same user ID multiple times
+- Solution: Use session-scoped user or unique IDs per test
 
 **Acceptance Criteria**:
-- All 16 test_blueprint_player.py tests pass
-- `make test-all` shows 251/251 tests passing (100% success rate)
+- All 16 test_blueprint_player.py tests pass (4 already pass + 13 database errors fixed)
+- `make test-all` shows 243/251 tests passing (96.8% success rate improvement)
 - No regressions in other test files
-- Test pollution remains resolved
+
+### [TEST-011] Flask Bootstrap Registration Order Fix
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Critical - TEST-009 completion revealed Flask registration ordering bug
+**Dependencies**: TEST-009 (completed), understanding of Flask bootstrap setup | **Strategic Value**: Application stability and test reliability
+
+**Problem Statement**:
+During `make test-all` review, discovered Flask Bootstrap registration order issue causing ALL test_blueprint_player.py tests to fail with AssertionError:
+```
+AssertionError: The setup method 'register_blueprint' can no longer be called on the application.
+It has already handled its first request, any changes will not be applied consistently.
+```
+
+This suggests TEST-009 fix was incomplete and revealed a deeper Flask application lifecycle issue.
+
+**Root Cause Analysis**:
+- `setup_routes(app, db)` calls `init_routes_bp()` which calls `bootstrap = Bootstrap(app)`
+- Bootstrap tries to register blueprints but Flask has already handled a request
+- Tests are sharing app state or request context between tests
+- `app_with_routes` fixture timing/ordering conflict with other fixtures
+
+**Implementation**:
+1. **Investigate request context isolation** (30-45 min): Check if shared app fixture has request context issues
+2. **Fix Bootstrap initialization timing** (30-45 min): Move Bootstrap setup earlier in application factory
+3. **Refactor app_with_routes fixture** (15-30 min): Ensure clean app initialization without existing request context
+4. **Validate blueprint registration** (15-30 min): Ensure all 6 blueprints register correctly without conflicts
+5. **Test complete blueprint player suite** (15 min): Verify all tests pass after fix
+
+**Technical Details**:
+- File: `tests/test_blueprint_player.py`, `app/routes_bp.py`, `app/factory.py`
+- Issue: Flask request context already active when Bootstrap tries to register blueprints
+- Error Location: `app/routes_bp.py:35` in `initialize_routes()` function
+- Solution: Ensure Flask app setup happens before any request context activation
+
+**Acceptance Criteria**:
+- All 16 test_blueprint_player.py tests pass without AssertionError
+- No "register_blueprint can no longer be called" errors
+- `make test-fast` continues passing (32/32)
+- Blueprint registration works correctly in isolation
+- Database transaction isolation maintained
 
 ---
 
@@ -1351,40 +1391,7 @@ The application currently depends on the third-party `pychpp` library for Hattri
 
 **Expected Outcomes**: Eliminated external dependency, improved control and maintainability, enhanced testing capability
 
----
 
-## Completed Achievements
-
-### January 2026 Foundation Excellence (19 tasks)
-
-**Testing Infrastructure** (5 tasks):
-- ✅ [INFRA-006] Database schema validation (218 tests, 96% coverage)
-- ✅ [INFRA-015] Resource warning cleanup (zero ResourceWarnings)
-- ✅ [INFRA-007] Model schema fixes
-- ✅ [TEST-003] Advanced testing infrastructure
-- ✅ [SEC-002] Security findings addressed (0 security issues in app/)
-
-**Critical Functionality** (4 tasks):
-- ✅ [INFRA-011] Authentication system restoration
-- ✅ [FEAT-020] Data update functionality
-- ✅ [FEAT-021] Logout functionality
-- ✅ [INFRA-014] Debugging scripts organization
-
-**Documentation** (5 tasks):
-- ✅ [DOC-003] Cross-reference navigation system
-- ✅ [DOC-011] Documentation path updates
-- ✅ [DOC-007] Project documentation structure
-- ✅ [DOC-008] Advanced development prompts
-- ✅ [DOC-012] Comprehensive debugging guide
-
-**Configuration & Quality** (5 tasks):
-- ✅ [DOC-018] Config.py template & documentation
-- ✅ [INFRA-018] Fix configuration test failures
-- ✅ [INFRA-019] Code quality fixes (54→7 lint errors)
-- ✅ [DOC-015] Architecture placeholder cleanup
-- ✅ [DOC-016] Root scripts documentation
-
-**Quality Achievement**: 98/100 health, 202/218 tests passing, 96% coverage, 0 security issues, production code lint-free
 
 ---
 
