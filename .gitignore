@@ -27,9 +27,6 @@ env
 .env.development
 .env.production
 
-# Database migrations (keep structure, ignore in development)
-migrations
-
 # UV artifacts
 .python-version
 uv.lock
