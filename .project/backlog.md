@@ -26,9 +26,6 @@
 
 ## Current Focus
 
-**Priority 0: Critical Bugs** (Blocking core functionality)
-- 🎯 [BUG-003] Player Groups Not Functioning (2-4 hours) - Groups visible in settings but not integrated **CRITICAL**
-
 **Priority 1: Testing & App Reliability**
 - 🎯 [TEST-012] Investigate and Fix 31 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
 - 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **HIGH PRIORITY**
@@ -223,56 +220,6 @@ This suggests TEST-009 fix was incomplete and revealed a deeper Flask applicatio
 - `make test-fast` continues passing (32/32)
 - Blueprint registration works correctly in isolation
 - Database transaction isolation maintained
-
----
-
-## Priority 0: Critical Bugs
-
-### [BUG-003] Player Groups Not Functioning (Visible in Settings Only)
-**Status**: 🎯 Ready to Execute | **Effort**: 2-4 hours | **Priority**: P0 | **Impact**: CRITICAL - feature not integrated
-**Dependencies**: BUG-001 player page fix may need coordination | **Strategic Value**: Player organization and workflow feature
-
-**Problem Statement**:
-Player groups are visible and configurable in the settings page but not actually being used anywhere else in the application. This feature exists but isn't integrated into player management workflows. Users can create groups but cannot:
-- Filter players by group
-- View players organized by groups
-- Use groups in training or match preparation
-- Leverage groups for tactical organization
-
-**Likely Causes**:
-1. Groups feature partially implemented but not integrated
-2. Player page doesn't display or filter by groups
-3. Database relationships working but UI integration missing
-4. After pychpp upgrade, group integration may have broken
-
-**Implementation**:
-1. **Audit group integration** (45-60 min):
-   - Check PlayerGroup and PlayerSetting models usage
-   - Review where groups should appear in UI
-   - Identify missing integration points
-   - Check for broken group-related queries
-
-2. **Implement group display** (60-90 min):
-   - Add group indicators to player list
-   - Add group filtering to player page
-   - Show player groups in player detail view
-   - Enable group-based organization
-
-3. **Integrate groups into workflows** (30-60 min):
-   - Add group filters to training page
-   - Enable group-based player selection
-   - Add group context to match preparation
-   - Test group operations end-to-end
-
-**Acceptance Criteria**:
-- Player groups display on player pages
-- Can filter players by group
-- Groups visible in player list and details
-- Groups usable in training and match workflows
-- Group settings page remains functional
-- Database operations maintain data integrity
-
-**Strategic Value**: Enables advanced player organization, a key feature for tactical planning and team management efficiency
 
 ---
 
