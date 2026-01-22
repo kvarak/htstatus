@@ -59,4 +59,4 @@ docker-compose.override.yml
 node_modules/
 dist/
 build/
-*.tsbuildinfo
+*.tsbuildinfopychpp

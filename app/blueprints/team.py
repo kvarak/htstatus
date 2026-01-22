@@ -236,7 +236,7 @@ def update():
             thisplayer['career_hattricks'] = p.career_hattricks
             thisplayer['league_goals'] = p.league_goals
             thisplayer['cup_goals'] = p.cup_goals
-            thisplayer['friendly_goals'] = p.friendly_goals
+            thisplayer['friendly_goals'] = p.friendlies_goals
             thisplayer['current_team_matches'] = p.matches_current_team
             thisplayer['current_team_goals'] = p.goals_current_team
             # thisplayer['national_team_id'] = p.national_team_id  # Not available in HTTeamPlayersItem
@@ -261,7 +261,7 @@ def update():
 
             thisplayer['owner'] = teamid
 
-            playernames[p.id] = p.first_name + " " + p.last_name
+            playernames[p.ht_id] = p.first_name + " " + p.last_name
 
             try:
                 dbplayer = db.session.query(Players).filter_by(
