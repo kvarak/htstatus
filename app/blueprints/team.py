@@ -150,18 +150,10 @@ def update():
                 all_team_names=session['all_team_names'])
 
         try:
-            team_players = the_team.players()
-            players_count = len(team_players)
-
-            # Debug: Save the players XML to check if it has skill data
-            if teamid == all_teams[0]:
-                try:
-                    import pathlib
-                    xml_path = pathlib.Path('/tmp')
-                    team_players._save_as_xml(xml_path, f'team_players_{teamid}.xml')
-                    dprint(1, f"DEBUG: Saved team players XML to /tmp/team_players_{teamid}.xml")
-                except Exception as e:
-                    dprint(1, f"DEBUG: Error saving team players XML: {e}")
+            dprint(1, f"Fetching players for team: {the_team.name}")
+            players_count = len(the_team.players)
+            dprint(1, f"Found {players_count} players in team")
+            dprint(2, the_team.players)
 
         except Exception as e:
             errorincode = traceback.format_exc()
@@ -185,62 +177,28 @@ def update():
                 all_team_names=session['all_team_names'])
 
         players_fromht = []
-        for p in team_players:
+        for p in the_team.players:
 
             thisplayer = {}
 
-            # Get player ID - HTTeamPlayersItem uses 'id' attribute
-            player_id = p.id
-
-            # Debug: Check what skill data is available from team.players() endpoint (HTTeamPlayersItem)
-            if player_id == team_players[0].id:
-                dprint(1, f"DEBUG: === Checking HTTeamPlayersItem (from team.players()) ===")
-                dprint(1, f"DEBUG: Player: {p.first_name} {p.last_name} (ID: {player_id})")
-                dprint(1, f"DEBUG: p.player_skills type: {type(p.player_skills)}")
-                dprint(1, f"DEBUG: p.player_skills.keeper: {p.player_skills.keeper}")
-                dprint(1, f"DEBUG: p.player_skills.defender: {p.player_skills.defender}")
-                dprint(1, f"DEBUG: p.player_skills.playmaker: {p.player_skills.playmaker}")
-                dprint(1, f"DEBUG: p.player_skills.stamina: {p.player_skills.stamina}")
-
-            dprint(1, f"DEBUG: Fetching player details for {p.first_name} {p.last_name} (ID: {player_id})")
-            the_player = chpp.player(player_id)
-
-            # Debug: Save raw XML for first player to inspect CHPP API response
-            if player_id == team_players[0].id:
-                try:
-                    import pathlib
-                    xml_path = pathlib.Path('/tmp')
-                    the_player._save_as_xml(xml_path, f'player_{player_id}.xml')
-                    dprint(1, f"DEBUG: Saved raw XML to /tmp/player_{player_id}.xml")
-
-                    # Also check if _data contains skill information
-                    from pychpp.models.ht_xml import HTXml
-                    xml_string = HTXml.to_string(the_player._data)
-                    if 'KeeperSkill' in xml_string:
-                        dprint(1, f"DEBUG: XML contains KeeperSkill tag")
-                    else:
-                        dprint(1, f"DEBUG: XML does NOT contain KeeperSkill tag!")
-                except Exception as e:
-                    dprint(1, f"DEBUG: Error saving XML: {e}")
-
-            dprint(1, f"DEBUG: Skills object: {the_player.skills}")
-            dprint(1, f"DEBUG: Keeper={the_player.skills.keeper}, Defender={the_player.skills.defender}, Playmaker={the_player.skills.playmaker}")
+            the_player = chpp.player(ht_id=p.ht_id)
 
             if the_player.transfer_details:
-                pass  # Transfer details exist but not used in logging
+                dprint(2,
+                       "transfer details --- ",
+                       the_player.transfer_details.deadline)
 
-            thisplayer['ht_id'] = p.id
+            thisplayer['ht_id'] = p.ht_id
             thisplayer['first_name'] = p.first_name
             thisplayer['nick_name'] = p.nick_name
             thisplayer['last_name'] = p.last_name
             thisplayer['number'] = p.number
             thisplayer['category_id'] = p.category_id
             thisplayer['owner_notes'] = p.owner_notes
-            thisplayer['age_years'] = p.age  # HTTeamPlayersItem uses 'age' for years
+            thisplayer['age_years'] = p.age_years
             thisplayer['age_days'] = p.age_days
             thisplayer['age'] = p.age
-            # thisplayer['next_birthday'] = p.next_birthday  # Not available in HTTeamPlayersItem
-            thisplayer['next_birthday'] = None  # Set default value since not available
+            thisplayer['next_birthday'] = p.next_birthday
 
             thedate = dt(
                 p.arrival_date.year,
@@ -254,10 +212,8 @@ def update():
             thisplayer['cards'] = p.cards
             thisplayer['injury_level'] = p.injury_level
             thisplayer['statement'] = p.statement
-            # thisplayer['language'] = p.language  # Not available in HTTeamPlayersItem
-            # thisplayer['language_id'] = p.language_id  # Not available in HTTeamPlayersItem
-            thisplayer['language'] = None  # Set default value since not available
-            thisplayer['language_id'] = None  # Set default value since not available
+            thisplayer['language'] = p.language
+            thisplayer['language_id'] = p.language_id
             thisplayer['agreeability'] = p.agreeability
             thisplayer['aggressiveness'] = p.aggressiveness
             thisplayer['honesty'] = p.honesty
@@ -265,50 +221,41 @@ def update():
             thisplayer['loyalty'] = p.loyalty
             thisplayer['aggressiveness'] = p.aggressiveness
             thisplayer['specialty'] = p.specialty
-            # thisplayer['native_country_id'] = p.native_country_id  # Not available in HTTeamPlayersItem
-            # thisplayer['native_league_id'] = p.native_league_id  # Not available in HTTeamPlayersItem
-            # thisplayer['native_league_name'] = p.native_league_name  # Not available in HTTeamPlayersItem
-            thisplayer['native_country_id'] = None  # Set default value since not available
-            thisplayer['native_league_id'] = None  # Set default value since not available
-            thisplayer['native_league_name'] = None  # Set default value since not available
+            thisplayer['native_country_id'] = p.native_country_id
+            thisplayer['native_league_id'] = p.native_league_id
+            thisplayer['native_league_name'] = p.native_league_name
             thisplayer['tsi'] = p.tsi
             thisplayer['salary'] = p.salary
             thisplayer['caps'] = p.caps
             thisplayer['caps_u20'] = p.caps_u20
             thisplayer['career_goals'] = p.career_goals
             thisplayer['career_hattricks'] = p.career_hattricks
-            thisplayer['league_goals'] = the_player.league_goals
-            thisplayer['cup_goals'] = the_player.cup_goals
-            thisplayer['friendly_goals'] = the_player.friendlies_goals
-            thisplayer['current_team_matches'] = the_player.matches_current_team
-            thisplayer['current_team_goals'] = the_player.goals_current_team
-            # thisplayer['national_team_id'] = p.national_team_id  # Not available in HTTeamPlayersItem
-            # thisplayer['national_team_name'] = p.national_team_name  # Not available in HTTeamPlayersItem
-            thisplayer['national_team_id'] = None  # Set default value since not available
-            thisplayer['national_team_name'] = None  # Set default value since not available
-            thisplayer['is_transfer_listed'] = the_player.transfer_listed
-            thisplayer['team_id'] = teamid  # Use the teamid from session since team_ht_id not available
+            thisplayer['league_goals'] = p.league_goals
+            thisplayer['cup_goals'] = p.cup_goals
+            thisplayer['friendly_goals'] = p.friendly_goals
+            thisplayer['current_team_matches'] = p.current_team_matches
+            thisplayer['current_team_goals'] = p.current_team_goals
+            thisplayer['national_team_id'] = p.national_team_id
+            thisplayer['national_team_name'] = p.national_team_name
+            thisplayer['is_transfer_listed'] = the_player.is_transfer_listed
+            thisplayer['team_id'] = p.team_ht_id
             thisplayer['mother_club_bonus'] = p.mother_club_bonus
             thisplayer['leadership'] = p.leadership
 
-            # Use the_player.skills instead of p.player_skills for accurate skill values
-            # HTTeamPlayersItem (p) may have None for skills, but PlayerDetails (the_player) has actual values
-            dprint(1, f"DEBUG: About to store skills - stamina={the_player.skills.stamina}, keeper={the_player.skills.keeper}")
-            thisplayer['stamina'] = the_player.skills.stamina or 0
-            thisplayer['keeper'] = the_player.skills.keeper or 0
-            thisplayer['defender'] = the_player.skills.defender or 0
-            thisplayer['playmaker'] = the_player.skills.playmaker or 0
-            thisplayer['winger'] = the_player.skills.winger or 0
-            thisplayer['passing'] = the_player.skills.passing or 0
-            thisplayer['scorer'] = the_player.skills.scorer or 0
-            thisplayer['set_pieces'] = the_player.skills.set_pieces or 0
-            dprint(1, f"DEBUG: Stored in thisplayer dict - keeper={thisplayer['keeper']}, defender={thisplayer['defender']}")
+            thisplayer['stamina'] = p.skills['stamina']
+            thisplayer['keeper'] = p.skills['keeper']
+            thisplayer['defender'] = p.skills['defender']
+            thisplayer['playmaker'] = p.skills['playmaker']
+            thisplayer['winger'] = p.skills['winger']
+            thisplayer['passing'] = p.skills['passing']
+            thisplayer['scorer'] = p.skills['scorer']
+            thisplayer['set_pieces'] = p.skills['set_pieces']
 
             thisplayer['data_date'] = time.strftime('%Y-%m-%d')
 
             thisplayer['owner'] = teamid
 
-            playernames[p.id] = p.first_name + " " + p.last_name
+            playernames[p.ht_id] = p.first_name + " " + p.last_name
 
             try:
                 dbplayer = db.session.query(Players).filter_by(

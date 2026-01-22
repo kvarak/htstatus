@@ -33,7 +33,7 @@ dependencies = [
     "sqlalchemy==2.0.32",
     "flask>=3.1.0,<4.0.0",
     "werkzeug>=3.1.4,<4.0.0",
-    "pychpp==0.5.10",
+    "pychpp==0.3.12",
     "psycopg2-binary>=2.9.0",
 ]
 
