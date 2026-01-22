@@ -1,4 +1,31 @@
 {
+  "ui_guidelines": {
+    "color_system": {
+      "primary": "hsl(120, 45%, 25%)",
+      "success": "hsl(120, 70%, 35%)",
+      "warning": "hsl(45, 90%, 55%)",
+      "destructive": "hsl(0, 84%, 60%)",
+      "background": "hsl(120, 8%, 97%)",
+      "muted": "hsl(120, 15%, 92%)",
+      "border": "hsl(120, 20%, 85%)"
+    },
+    "typography": {
+      "headings": "h1: 2.5rem/700, h2: 2rem/600, h3: 1.5rem/600, h4: 1.25rem/600",
+      "body": "1rem base, 0.875rem small, 0.75rem xs, 0.625rem tiny",
+      "line_height": "1.6 base, 1.5 headings"
+    },
+    "spacing": "0.25rem increments (1=4px, 4=16px, 6=24px, 8=32px)",
+    "components": {
+      "buttons": "rounded-md, font-medium, transition-colors, focus-visible:ring-2",
+      "cards": "bg-white, border, rounded-lg, shadow-sm, p-6",
+      "tables": "w-full, text-sm, sortable headers, hover:bg-muted/50",
+      "forms": "rounded-md border, focus:ring-2 ring-primary/20"
+    },
+    "framework_notes": {
+      "flask": "Use .btn-primary-custom, .table-custom, .card-custom classes",
+      "react": "Use existing button/table/card components, consistent with TailwindCSS utilities"
+    }
+  },
   "tasks": [
     {
       "name": "plan",
@@ -22,6 +49,9 @@
         "For CHPP/pychpp issues: Check pychpp/ folder (local git repo) - checkout matching version tag to verify API compatibility.",
         "Follow the plan. Validate with `make test-all` - no coverage loss or test failures.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
+        "For UI work: Follow ui_guidelines in this file. Use consistent colors, typography, spacing.",
+        "Flask: Use .btn-primary-custom, .table-custom, .card-custom classes for consistency.",
+        "React: Use existing components with TailwindCSS utilities, maintain football theme.",
         "Update docs per documentation-guide.md (backlog.md, progress.md, etc.).",
         "Note any new tasks for backlog.md.",
         "Do not add or commit code in this step. However, if the task is large, break it into smaller sub-tasks and execute only one sub-task and keep the rest for the next time the execute task is run."
