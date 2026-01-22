@@ -189,6 +189,11 @@ git fetch --all
 git reset --hard $DEPLOY_GIT_BRANCH
 git pull
 ./scripts/changelog.sh || ./changelog.sh
+
+# Clear Python bytecode cache to force reload of updated code
+find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+find . -type f -name "*.pyc" -delete 2>/dev/null || true
+
 touch app/routes.py
 SCRIPT
 
