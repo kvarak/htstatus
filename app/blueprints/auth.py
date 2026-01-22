@@ -376,6 +376,6 @@ def oauth_direct():
     if session.get('current_user'):
         dprint(1, "Clearing existing session for password migration flow")
         session.clear()
-        session.pop('current_user', None)
-        session.pop('access_key', None)
-        session.pop('access_secret', None)
+
+    # Start OAuth flow
+    return start_oauth_flow()
