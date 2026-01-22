@@ -11,11 +11,12 @@
 1. ALWAYS read this entire backlog before selecting tasks
 2. Choose tasks marked 🎯 Ready to Execute with no blockers
 3. Update task status when starting (🚀 ACTIVE) and completing (✅ COMPLETED)
-4. Follow priority order: P1 Testing → P2 Deployment → P3 Stability → P4 Functionality → P5 DevOps → P6 Documentation → P7 Future
+4. Follow priority order: P0 Critical Bugs → P1 Testing → P2 Deployment → P3 Stability → P4 Functionality → P5 DevOps → P6 Documentation → P7 Future
 5. Move completed tasks to history/backlog-done.md with completion notes and REMOVE them from here.
 
 **For Humans**:
-- Tasks organized by 7 priority levels based on project maturity and risk
+- Tasks organized by 8 priority levels based on project maturity and risk
+- P0 tasks are critical bugs blocking core functionality
 - P1 tasks ensure application reliability and testing confidence
 - P2-P3 tasks build stability and maintainability
 - P4-P6 tasks enhance operations, developer experience, and documentation
@@ -24,6 +25,12 @@
 ---
 
 ## Current Focus
+
+**Priority 0: Critical Bugs** (Blocking core functionality)
+- 🎯 [BUG-001] Fix Player Page Display Issues (2-3 hours) - Player list showing strange data after pychpp upgrade **CRITICAL**
+- 🎯 [BUG-002] Fix Training Page Display (2-3 hours) - Training tracking broken after pychpp upgrade **CRITICAL**
+- 🎯 [BUG-003] Player Groups Not Functioning (2-4 hours) - Groups visible in settings but not integrated **CRITICAL**
+- 🎯 [BUG-004] Debug Page Changes List Empty (1-2 hours) - Admin/developer debugging tool not working **CRITICAL**
 
 **Priority 1: Testing & App Reliability**
 - 🎯 [TEST-012] Investigate and Fix 33 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
@@ -219,7 +226,233 @@ This suggests TEST-009 fix was incomplete and revealed a deeper Flask applicatio
 
 ---
 
-## Priority 2: Core Functionality
+## Priority 0: Critical Bugs
+
+### [BUG-001] Fix Player Page Display Issues After pychpp 0.5.10 Upgrade
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P0 | **Impact**: CRITICAL - player list displaying incorrectly
+**Dependencies**: Recent pychpp 0.5.10 upgrade completed | **Strategic Value**: Critical user-facing functionality
+
+**Problem Statement**:
+After successful pychpp 0.5.10 upgrade and data import fixes, the player page list is displaying incorrectly. The /update route now works successfully, but the player list view shows strange data or formatting. This affects core user workflows for managing and viewing player information.
+
+**Likely Causes**:
+1. Template variable changes due to pychpp API differences
+2. Player attribute access patterns changed (e.g., .id vs .ht_id)
+3. Data structure changes from HTTeamPlayersItem vs HTPlayer objects
+4. Skill data formatting or None value handling issues
+
+**Implementation**:
+1. **Investigate player page rendering** (30-45 min):
+   - Check app/blueprints/player.py route handlers
+   - Review app/templates/player.html template variables
+   - Identify data structure mismatches
+   - Check for None value handling in display
+
+2. **Fix data access patterns** (45-60 min):
+   - Update template variable names if needed
+   - Fix attribute access (id vs ht_id consistency)
+   - Add None value fallbacks for display
+   - Test with actual player data from production
+
+3. **Validate display formatting** (30-45 min):
+   - Check skill value display
+   - Verify player statistics rendering
+   - Test player group display integration
+   - Ensure all player data fields show correctly
+
+**Acceptance Criteria**:
+- Player list displays all players correctly
+- Player details page shows complete information
+- No strange data or formatting issues
+- Player attributes display with proper fallbacks
+- All player statistics render correctly
+
+**Strategic Value**: Core user-facing functionality that directly impacts daily usage and player management workflows
+
+### [BUG-002] Fix Training Page Display After pychpp Upgrade
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P0 | **Impact**: CRITICAL - training tracking broken
+**Dependencies**: BUG-001 investigation may reveal related issues | **Strategic Value**: Essential for skill development tracking
+
+**Problem Statement**:
+Training page has display or functionality issues after pychpp 0.5.10 upgrade. Since the /update route now successfully imports player data with the new API, but the training page isn't working correctly, this likely involves:
+- Training data rendering issues
+- Historical skill comparison problems
+- Player skill progression display
+- Training effectiveness calculations
+
+**Likely Causes**:
+1. Skill data structure changes from pychpp 0.5.10
+2. Historical data comparison using old attribute names
+3. Training calculations expecting different data types
+4. Template variable mismatches
+
+**Implementation**:
+1. **Investigate training page rendering** (30-45 min):
+   - Check app/blueprints/training.py route handlers
+   - Review app/templates/training.html template
+   - Identify skill progression calculation issues
+   - Check historical data access patterns
+
+2. **Fix training data access** (45-60 min):
+   - Update skill attribute access patterns
+   - Fix historical comparison queries
+   - Add None value handling for skill data
+   - Test skill progression calculations
+
+3. **Validate training display** (30-45 min):
+   - Check skill change visualization
+   - Verify training effectiveness metrics
+   - Test with multiple training dates
+   - Ensure all training statistics render
+
+**Acceptance Criteria**:
+- Training page displays correctly
+- Historical skill comparisons work
+- Skill progression charts render
+- Training effectiveness calculations accurate
+- No data access errors
+
+**Strategic Value**: Critical for monitoring player development, a core use case for team management
+
+### [BUG-003] Player Groups Not Functioning (Visible in Settings Only)
+**Status**: 🎯 Ready to Execute | **Effort**: 2-4 hours | **Priority**: P0 | **Impact**: CRITICAL - feature not integrated
+**Dependencies**: BUG-001 player page fix may need coordination | **Strategic Value**: Player organization and workflow feature
+
+**Problem Statement**:
+Player groups are visible and configurable in the settings page but not actually being used anywhere else in the application. This feature exists but isn't integrated into player management workflows. Users can create groups but cannot:
+- Filter players by group
+- View players organized by groups
+- Use groups in training or match preparation
+- Leverage groups for tactical organization
+
+**Likely Causes**:
+1. Groups feature partially implemented but not integrated
+2. Player page doesn't display or filter by groups
+3. Database relationships working but UI integration missing
+4. After pychpp upgrade, group integration may have broken
+
+**Implementation**:
+1. **Audit group integration** (45-60 min):
+   - Check PlayerGroup and PlayerSetting models usage
+   - Review where groups should appear in UI
+   - Identify missing integration points
+   - Check for broken group-related queries
+
+2. **Implement group display** (60-90 min):
+   - Add group indicators to player list
+   - Add group filtering to player page
+   - Show player groups in player detail view
+   - Enable group-based organization
+
+3. **Integrate groups into workflows** (30-60 min):
+   - Add group filters to training page
+   - Enable group-based player selection
+   - Add group context to match preparation
+   - Test group operations end-to-end
+
+**Acceptance Criteria**:
+- Player groups display on player pages
+- Can filter players by group
+- Groups visible in player list and details
+- Groups usable in training and match workflows
+- Group settings page remains functional
+- Database operations maintain data integrity
+
+**Strategic Value**: Enables advanced player organization, a key feature for tactical planning and team management efficiency
+
+### [BUG-004] Debug Page Changes List Empty
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P0 | **Impact**: Developer/admin tool not working
+**Dependencies**: Recent pychpp 0.5.10 upgrade completed | **Strategic Value**: Administrative visibility and debugging
+
+**Problem Statement**:
+The debug page's changes list section is displaying empty, preventing administrators and developers from viewing recent player data changes. This affects administrative workflows for monitoring data updates and debugging player data import issues.
+
+**Likely Causes**:
+1. Template variable changes after pychpp upgrade
+2. Data query changes in debug route handler
+3. Database schema or query compatibility issues
+4. Changes calculation logic affected by pychpp API differences
+5. Template rendering issues with changes data structure
+
+**Implementation**:
+1. **Investigate debug page rendering** (20-30 min):
+   - Check app/blueprints/main.py debug route handler
+   - Review app/templates/debug.html template
+   - Verify changes data query and calculation
+   - Check for None value handling in changes logic
+
+2. **Fix changes data retrieval** (30-45 min):
+   - Update changes calculation logic if needed
+   - Fix database queries for changes data
+   - Add None value handling and fallbacks
+   - Test with actual recent player updates
+
+3. **Validate changes display** (10-15 min):
+   - Check changes list rendering
+   - Verify data formatting in template
+   - Test with multiple change types
+   - Ensure changes display correctly
+
+**Acceptance Criteria**:
+- Debug page displays recent changes correctly
+- Changes list shows player data modifications
+- All change types render properly
+- No template rendering errors
+- Administrative visibility restored
+
+**Strategic Value**: Essential for administrative monitoring and debugging data import issues, particularly after major upgrades
+
+---
+
+## Priority 1: Testing & App Reliability
+
+### [TEST-012] Investigate and Fix 33 Test Failures
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P1 | **Impact**: Deployment confidence
+**Dependencies**: None | **Strategic Value**: Complete test suite reliability for production deployment
+
+**Problem Statement**:
+Current test suite shows 213/246 tests passing (87%), with 33 failures across database tests (20), business logic tests (6), and route tests (3). These failures appear to be pre-existing issues not caused by recent authentication and player import work.
+
+**Failure Categories**:
+1. **Database Tests (20 failures)**: ProgrammingError exceptions in test_database.py
+   - Likely test environment database setup issues (conftest.py fixtures)
+   - May involve schema initialization or transaction isolation problems
+
+2. **Business Logic Tests (6 failures)**: User management and calculation tests in test_business_logic.py
+   - User activity patterns, role management, preferences
+   - Team statistics, form/performance correlations
+
+3. **Route Tests (3 failures)**: Session handling and error handling in test routes
+   - Session persistence issues
+   - Missing database data error handling
+
+**Implementation**:
+1. **Database Test Analysis** (1-2 hours):
+   - Review conftest.py fixtures and database setup
+   - Check schema initialization and transaction isolation
+   - Fix ProgrammingError root causes
+
+2. **Business Logic Test Fixes** (1-2 hours):
+   - Review user management test expectations
+   - Verify calculation logic against test assertions
+   - Update tests or fix business logic as appropriate
+
+3. **Route Test Resolution** (1-2 hours):
+   - Fix session handling in test environment
+   - Ensure proper error handling test setup
+   - Validate route behavior under various conditions
+
+**Acceptance Criteria**:
+- All 246 tests pass (100% success rate)
+- No regressions in currently passing tests
+- Test environment properly isolated and reproducible
+- Clear documentation of any test environment quirks
+
+**Strategic Value**: Achieving 100% test pass rate is critical for deployment confidence and enables focus on feature development rather than debugging
+
+---
+
+## Priority 2: Deployment & Operations
 
 ---
 
