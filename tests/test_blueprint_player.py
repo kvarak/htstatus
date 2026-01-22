@@ -2,6 +2,7 @@
 Comprehensive tests for player management blueprint to achieve 80+ coverage.
 Tests player display, group management, skill tracking and data operations.
 """
+import contextlib
 from unittest.mock import patch
 
 import pytest
@@ -13,17 +14,34 @@ from models import Group, Players, PlayerSetting, User
 # This prevents database table drops that contaminate other tests
 
 @pytest.fixture(scope='function')
-def app_with_routes(app):
-    """Use shared app fixture but initialize routes for route tests."""
-    from app.factory import db, setup_routes
+def app_with_routes():
+    """Create a fresh application with routes properly initialized."""
+    import os
 
-    # Only initialize routes once
-    if not hasattr(app, '_routes_initialized'):
-        with app.app_context():
-            setup_routes(app, db)
-        app._routes_initialized = True
+    from app.factory import create_app, db
+    from config import TestConfig
 
-    return app
+    # Set testing environment
+    os.environ['FLASK_ENV'] = 'testing'
+
+    # Create app with routes included from the beginning
+    app = create_app(TestConfig, include_routes=True)
+
+    with app.app_context():
+        # Create test database tables
+        db.create_all()
+        yield app
+
+        # Complete cleanup
+        with contextlib.suppress(Exception):
+            db.session.remove()
+        with contextlib.suppress(Exception):
+            db.drop_all()
+        with contextlib.suppress(Exception):
+            db.engine.dispose()
+
+        import gc
+        gc.collect()
 
 
 @pytest.fixture(scope='function')
