@@ -177,6 +177,7 @@ make help  # See all available commands
 - **Match Types**: League, cups, friendlies with IDs in `HTmatchtype` constants
 - **Authentication**: OAuth via pychpp, tokens stored in session
 - **Data Sync**: Live player data from CHPP API via `/update` route
+- **pychpp Reference**: Local git repository in `pychpp/` folder - checkout matching version tag to verify API compatibility and method signatures when debugging CHPP integration issues
 
 ### Database Architecture
 - **Multi-team**: `session['all_teams']` for user's teams

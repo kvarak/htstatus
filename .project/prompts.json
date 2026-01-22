@@ -6,6 +6,7 @@
       "what to do": [
         "Read .project/rules.md for standards. Read .project/ docs, README.md, TECHNICAL.md for context.",
         "Use `make help` for commands. Use `uv run` for Python.",
+        "For CHPP/pychpp issues: Check pychpp/ folder (local git repo) - checkout matching version tag to verify API compatibility.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
         "Structure: # Plan Next Task ## Analysis ## Solution ## Steps ## Challenges ## Testing",
         "If the task is large, break it into smaller sub-tasks.",
@@ -18,6 +19,7 @@
       "what to do": [
         "Read .project/rules.md for standards. Read .project/ docs for context.",
         "Use `uv run` for Python and `make help` for commands.",
+        "For CHPP/pychpp issues: Check pychpp/ folder (local git repo) - checkout matching version tag to verify API compatibility.",
         "Follow the plan. Validate with `make test-all` - no coverage loss or test failures.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
         "Update docs per documentation-guide.md (backlog.md, progress.md, etc.).",
