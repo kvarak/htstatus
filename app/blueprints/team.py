@@ -246,6 +246,14 @@ def update():
             dprint(1, f"DEBUG: p.skills = {p.skills if hasattr(p, 'skills') else 'NO ATTRIBUTE'}")
             dprint(1, f"DEBUG: the_player.skills = {the_player.skills if hasattr(the_player, 'skills') else 'NO ATTRIBUTE'}")
 
+            # Check what's inside an HTSkill object
+            if hasattr(p, 'skills') and p.skills:
+                keeper_skill = p.skills.get('keeper')
+                dprint(1, f"DEBUG: keeper_skill object = {keeper_skill}")
+                dprint(1, f"DEBUG: keeper_skill type = {type(keeper_skill)}")
+                dprint(1, f"DEBUG: keeper_skill dir = {[attr for attr in dir(keeper_skill) if not attr.startswith('_')]}")
+                dprint(1, f"DEBUG: keeper_skill.__dict__ = {keeper_skill.__dict__ if hasattr(keeper_skill, '__dict__') else 'NO __dict__'}")
+
             # Use the_player.skills instead of p.skills for pychpp 0.3.12
             skills_source = the_player.skills if hasattr(the_player, 'skills') and the_player.skills else p.skills
 
