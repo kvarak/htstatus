@@ -181,7 +181,10 @@ def update():
 
             # Get player ID - HTTeamPlayersItem uses 'id' attribute
             player_id = p.id
+            dprint(1, f"DEBUG: Fetching player details for {p.first_name} {p.last_name} (ID: {player_id})")
             the_player = chpp.player(player_id)
+            dprint(1, f"DEBUG: Player fetched. Skills object: {the_player.skills}")
+            dprint(1, f"DEBUG: Keeper={the_player.skills.keeper}, Defender={the_player.skills.defender}, Playmaker={the_player.skills.playmaker}")
 
             if the_player.transfer_details:
                 pass  # Transfer details exist but not used in logging
@@ -250,6 +253,7 @@ def update():
 
             # Use the_player.skills instead of p.player_skills for accurate skill values
             # HTTeamPlayersItem (p) may have None for skills, but PlayerDetails (the_player) has actual values
+            dprint(1, f"DEBUG: About to store skills - stamina={the_player.skills.stamina}, keeper={the_player.skills.keeper}")
             thisplayer['stamina'] = the_player.skills.stamina or 0
             thisplayer['keeper'] = the_player.skills.keeper or 0
             thisplayer['defender'] = the_player.skills.defender or 0
@@ -258,6 +262,7 @@ def update():
             thisplayer['passing'] = the_player.skills.passing or 0
             thisplayer['scorer'] = the_player.skills.scorer or 0
             thisplayer['set_pieces'] = the_player.skills.set_pieces or 0
+            dprint(1, f"DEBUG: Stored in thisplayer dict - keeper={thisplayer['keeper']}, defender={thisplayer['defender']}")
 
             thisplayer['data_date'] = time.strftime('%Y-%m-%d')
 
