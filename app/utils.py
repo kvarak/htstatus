@@ -503,7 +503,7 @@ def downloadMatches(teamid):
                 session['access_key'],
                 session['access_secret'])
 
-    the_matches = chpp.matches_archive(ht_id=teamid, youth=False)
+    the_matches = chpp.matches_archive(id_=teamid, is_youth=False)
 
     for match in the_matches:
         dprint(2, "---------------")
@@ -546,7 +546,7 @@ def downloadMatches(teamid):
             db.session.add(newmatch)
             db.session.commit()
 
-            matchlineup = chpp.match_lineup(ht_id=match.ht_id,
+            matchlineup = chpp.match_lineup(match_id=match.ht_id,
                                             team_id=teamid)
             for p in matchlineup.lineup_players:
                 dprint(2, " - Adding ", p.first_name, " ",

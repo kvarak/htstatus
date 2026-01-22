@@ -144,7 +144,7 @@ def login():
                     all_teams = current_user._teams_ht_id
                     all_team_names = []
                     for id in all_teams:
-                        all_team_names.append(chpp.team(ht_id=id).name)
+                        all_team_names.append(chpp.team(id_=id).name)
                     session['all_teams'] = all_teams
                     session['all_team_names'] = all_team_names
                     session['team_id'] = all_teams[0]
@@ -326,7 +326,7 @@ def handle_oauth_callback(oauth_verifier):
 
             for id in all_teams:
                 try:
-                    team_name = chpp.team(ht_id=id).name
+                    team_name = chpp.team(id_=id).name
                     all_team_names.append(team_name)
                 except Exception as team_error:
                     dprint(1, f"Could not get team name for {id}: {team_error}")

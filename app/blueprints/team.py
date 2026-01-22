@@ -54,7 +54,7 @@ def team():
     teams = []
     for teamid in all_teams:
         dprint(1, teamid)
-        this_team = chpp.team(ht_id=teamid)
+        this_team = chpp.team(id_=teamid)
         dprint(2, vars(this_team))
         teams.append(this_team.name)
 
@@ -133,7 +133,7 @@ def update():
     for teamid in all_teams:
 
         try:
-            the_team = chpp.team(ht_id=teamid)
+            the_team = chpp.team(id_=teamid)
             dprint(1, f"Team data fetched successfully: {the_team.name}")
 
         except Exception as e:
@@ -181,7 +181,7 @@ def update():
 
             # Get player ID - HTTeamPlayersItem uses 'id' attribute
             player_id = p.id
-            the_player = chpp.player(ht_id=player_id)
+            the_player = chpp.player(player_id)
 
             if the_player.transfer_details:
                 pass  # Transfer details exist but not used in logging
