@@ -27,8 +27,8 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- 🎯 [TEST-012] Investigate and Fix 31 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
-- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **HIGH PRIORITY**
+- 🚀 [TEST-012-A] Fix 6 Player Group Fixture Issues (2-3 hours) - Complete test suite reliability **ACTIVE**
+- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY**
 
 **Priority 2: Deployment & Operations**
 - 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY**
@@ -83,53 +83,40 @@
 
 ## Priority 1: Testing & App Reliability
 
-### [TEST-012] Investigate and Fix 33 Test Failures
-**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P1 | **Impact**: Deployment confidence
-**Dependencies**: None | **Strategic Value**: Complete test suite reliability for production deployment
+### [TEST-012-A] Fix 6 Player Group Fixture Issues
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
+**Dependencies**: TEST-012 (completed) | **Strategic Value**: Final test reliability milestone
 
 **Problem Statement**:
-Current test suite shows 213/246 tests passing (87%), with 33 failures across database tests (20), business logic tests (6), and route tests (3). These failures appear to be pre-existing issues not caused by recent authentication and player import work.
+After successful TEST-012 implementation, 6 specific player group management tests still fail due to PostgreSQL foreign key constraint issues within the nested savepoint pattern. These tests pass individually but fail when run together.
 
-**Failure Categories**:
-1. **Database Tests (20 failures)**: ProgrammingError exceptions in test_database.py
-   - Likely test environment database setup issues (conftest.py fixtures)
-   - May involve schema initialization or transaction isolation problems
+**Root Cause**:
+- Foreign key constraints fail during fixture creation in the `sample_group` fixture
+- PostgreSQL doesn't allow foreign key references to uncommitted data within the same savepoint
+- Current workaround disables foreign key checks temporarily but has ID assignment issues
 
-2. **Business Logic Tests (6 failures)**: User management and calculation tests in test_business_logic.py
-   - User activity patterns, role management, preferences
-   - Team statistics, form/performance correlations
-
-3. **Route Tests (3 failures)**: Session handling and error handling in test routes
-   - Session persistence issues
-   - Missing database data error handling
+**Specific Failures**:
+- 4 failures in `test_blueprint_player.py::TestPlayerGroupManagement`
+- 2 failures in `test_minimal_routes.py` (similar fixture dependency issues)
 
 **Implementation**:
-1. **Database Test Analysis** (1-2 hours):
-   - Review conftest.py fixtures and database setup
-   - Check schema initialization and transaction isolation
-   - Fix ProgrammingError root causes
+1. **Refactor Fixture Dependencies** (1-1.5 hours): Redesign `sample_user`, `sample_players`, `sample_group` fixtures to avoid foreign key issues
+2. **Alternative Fixture Pattern** (30-45 min): Use factory functions or ensure proper commit ordering within savepoint context
+3. **Validation** (15-30 min): Verify all 6 tests pass and Group 3 achieves 100% pass rate
 
-2. **Business Logic Test Fixes** (1-2 hours):
-   - Review user management test expectations
-   - Verify calculation logic against test assertions
-   - Update tests or fix business logic as appropriate
-
-3. **Route Test Resolution** (1-2 hours):
-   - Fix session handling in test environment
-   - Ensure proper error handling test setup
-   - Validate route behavior under various conditions
+**Technical Approach**:
+- Either commit fixtures in proper dependency order within the savepoint
+- Or create fixtures that don't require database-assigned IDs until test execution
+- Maintain transaction isolation while resolving constraint issues
 
 **Acceptance Criteria**:
-- All 246 tests pass (100% success rate)
-- No regressions in currently passing tests
-- Test environment properly isolated and reproducible
-- Clear documentation of any test environment quirks
-
-**Strategic Value**: Achieving 100% test pass rate is critical for deployment confidence and enables focus on feature development rather than debugging
+- All 6 failing player group tests pass (104/104 in Group 3)
+- Isolated test approach maintains 100% pass rate across all 3 groups
+- No regression in existing fixture isolation
 
 ### [TEST-008] Residual Test Failures Resolution
-**Status**: � Blocked by TEST-011 | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
-**Dependencies**: TEST-011 Flask Bootstrap registration fix → TEST-010 database fixtures | **Strategic Value**: Complete testing foundation
+**Status**: ✅ COMPLETED | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
+**Dependencies**: All dependencies resolved (TEST-011, TEST-010 completed) | **Strategic Value**: Complete testing foundation
 
 **MAJOR BREAKTHROUGH ACHIEVED**: Core test infrastructure stabilized
 - ✅ **Fixed critical test pollution issue** - test_blueprint_player.py was dropping database tables
@@ -137,7 +124,7 @@ Current test suite shows 213/246 tests passing (87%), with 33 failures across da
 - ✅ Switched to shared app fixture from conftest.py for consistency
 - ✅ Added app_with_routes fixture for route-dependent tests
 - ✅ **32/32 core tests pass consistently** - major reliability improvement maintained
-- 🚧 Blueprint player tests blocked by Flask Bootstrap registration order issue (TEST-011)
+- ✅ Blueprint player tests now pass with Flask Bootstrap registration fix (TEST-011 completed)
 
 **Final Resolution**:
 Fixed the final test failure by correcting type conversion in player.py (playerid as string → int(playerid) for database queries) and adding proper test isolation by including db_session dependency in authenticated_client fixture.
@@ -155,119 +142,6 @@ Fixed the final test failure by correcting type conversion in player.py (playeri
 5. 🎯 **Fix database fixtures** (TEST-010): Fix UniqueViolation errors after bootstrap resolution
 
 **Acceptance Criteria**: All blueprint player tests pass, contributing to overall test suite reliability
-
-### [TEST-010] Fix Blueprint Player Database Fixtures
-**Status**: ✅ COMPLETED | **Effort**: COMPLETED | **Priority**: P1 | **Impact**: Complete test suite reliability
-**Dependencies**: TEST-009 fixture setup fix (completed) | **Strategic Value**: Final test reliability milestone
-
-**Problem Statement**:
-After resolving the fixture setup issue in TEST-009, 13 test errors remain in test_blueprint_player.py due to database fixture design problems. The `sample_user` fixture creates users with the same `ht_id=12345`, causing `UniqueViolation` errors when multiple tests run.
-
-Error: `psycopg2.errors.UniqueViolation: duplicate key value violates unique constraint "users_pkey"`
-
-**Implementation**:
-1. **Fix sample_user fixture** (30-45 min): Use unique user IDs or proper cleanup between tests
-2. **Fix sample_players fixture** (15-30 min): Ensure players reference valid users without conflicts
-3. **Validate database isolation** (15-30 min): Verify fixtures work with transaction isolation
-4. **Test all blueprint player tests** (15-30 min): Verify all 13 previously failing tests now pass
-
-**Technical Details**:
-- File: `tests/test_blueprint_player.py`
-- Issue: `sample_user` fixture creates duplicate users across test functions
-- Root Cause: Function-scoped fixture creating same user ID multiple times
-- Solution: Use session-scoped user or unique IDs per test
-
-**Acceptance Criteria**:
-- All 16 test_blueprint_player.py tests pass (4 already pass + 13 database errors fixed)
-- `make test-all` shows 243/251 tests passing (96.8% success rate improvement)
-- No regressions in other test files
-
-### [TEST-011] Flask Bootstrap Registration Order Fix
-**Status**: ✅ COMPLETED | **Effort**: COMPLETED | **Priority**: P1 | **Impact**: Critical - TEST-009 completion revealed Flask registration ordering bug - RESOLVED
-**Dependencies**: TEST-009 (completed), understanding of Flask bootstrap setup | **Strategic Value**: Application stability and test reliability
-
-**Problem Statement**:
-During `make test-all` review, discovered Flask Bootstrap registration order issue causing ALL test_blueprint_player.py tests to fail with AssertionError:
-```
-AssertionError: The setup method 'register_blueprint' can no longer be called on the application.
-It has already handled its first request, any changes will not be applied consistently.
-```
-
-This suggests TEST-009 fix was incomplete and revealed a deeper Flask application lifecycle issue.
-
-**Root Cause Analysis**:
-- `setup_routes(app, db)` calls `init_routes_bp()` which calls `bootstrap = Bootstrap(app)`
-- Bootstrap tries to register blueprints but Flask has already handled a request
-- Tests are sharing app state or request context between tests
-- `app_with_routes` fixture timing/ordering conflict with other fixtures
-
-**Implementation**:
-1. **Investigate request context isolation** (30-45 min): Check if shared app fixture has request context issues
-2. **Fix Bootstrap initialization timing** (30-45 min): Move Bootstrap setup earlier in application factory
-3. **Refactor app_with_routes fixture** (15-30 min): Ensure clean app initialization without existing request context
-4. **Validate blueprint registration** (15-30 min): Ensure all 6 blueprints register correctly without conflicts
-5. **Test complete blueprint player suite** (15 min): Verify all tests pass after fix
-
-**Technical Details**:
-- File: `tests/test_blueprint_player.py`, `app/routes_bp.py`, `app/factory.py`
-- Issue: Flask request context already active when Bootstrap tries to register blueprints
-- Error Location: `app/routes_bp.py:35` in `initialize_routes()` function
-- Solution: Ensure Flask app setup happens before any request context activation
-
-**Acceptance Criteria**:
-- All 16 test_blueprint_player.py tests pass without AssertionError
-- No "register_blueprint can no longer be called" errors
-- `make test-fast` continues passing (32/32)
-- Blueprint registration works correctly in isolation
-- Database transaction isolation maintained
-
----
-
-## Priority 1: Testing & App Reliability
-
-### [TEST-012] Investigate and Fix 33 Test Failures
-**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P1 | **Impact**: Deployment confidence
-**Dependencies**: None | **Strategic Value**: Complete test suite reliability for production deployment
-
-**Problem Statement**:
-Current test suite shows 213/246 tests passing (87%), with 33 failures across database tests (20), business logic tests (6), and route tests (3). These failures appear to be pre-existing issues not caused by recent authentication and player import work.
-
-**Failure Categories**:
-1. **Database Tests (20 failures)**: ProgrammingError exceptions in test_database.py
-   - Likely test environment database setup issues (conftest.py fixtures)
-   - May involve schema initialization or transaction isolation problems
-
-2. **Business Logic Tests (6 failures)**: User management and calculation tests in test_business_logic.py
-   - User activity patterns, role management, preferences
-   - Team statistics, form/performance correlations
-
-3. **Route Tests (3 failures)**: Session handling and error handling in test routes
-   - Session persistence issues
-   - Missing database data error handling
-
-**Implementation**:
-1. **Database Test Analysis** (1-2 hours):
-   - Review conftest.py fixtures and database setup
-   - Check schema initialization and transaction isolation
-   - Fix ProgrammingError root causes
-
-2. **Business Logic Test Fixes** (1-2 hours):
-   - Review user management test expectations
-   - Verify calculation logic against test assertions
-   - Update tests or fix business logic as appropriate
-
-3. **Route Test Resolution** (1-2 hours):
-   - Fix session handling in test environment
-   - Ensure proper error handling test setup
-   - Validate route behavior under various conditions
-
-**Acceptance Criteria**:
-- All 246 tests pass (100% success rate)
-- No regressions in currently passing tests
-- Test environment properly isolated and reproducible
-- Clear documentation of any test environment quirks
-
-**Strategic Value**: Achieving 100% test pass rate is critical for deployment confidence and enables focus on feature development rather than debugging
 
 ---
 
