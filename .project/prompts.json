@@ -29,7 +29,8 @@
       "name": "review",
       "title": "Review previous development work",
       "what to do": [
-        "Review last completed task and changes since last commit.",
+        "Review not only the last task, but all the changes since the last commit.",
+        "Read .project/rules.md for standards. Read .project/ docs for context.",
         "Validate with `make test-all`, use `uv run` for Python.",
         "Check docs updated per documentation-guide.md and strategic alignment per goals.md.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
