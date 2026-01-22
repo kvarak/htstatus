@@ -248,14 +248,16 @@ def update():
             thisplayer['mother_club_bonus'] = p.mother_club_bonus
             thisplayer['leadership'] = p.leadership
 
-            thisplayer['stamina'] = p.player_skills.stamina or 0
-            thisplayer['keeper'] = p.player_skills.keeper or 0
-            thisplayer['defender'] = p.player_skills.defender or 0
-            thisplayer['playmaker'] = p.player_skills.playmaker or 0
-            thisplayer['winger'] = p.player_skills.winger or 0
-            thisplayer['passing'] = p.player_skills.passing or 0
-            thisplayer['scorer'] = p.player_skills.scorer or 0
-            thisplayer['set_pieces'] = p.player_skills.set_pieces or 0
+            # Use the_player.skills instead of p.player_skills for accurate skill values
+            # HTTeamPlayersItem (p) may have None for skills, but PlayerDetails (the_player) has actual values
+            thisplayer['stamina'] = the_player.skills.stamina or 0
+            thisplayer['keeper'] = the_player.skills.keeper or 0
+            thisplayer['defender'] = the_player.skills.defender or 0
+            thisplayer['playmaker'] = the_player.skills.playmaker or 0
+            thisplayer['winger'] = the_player.skills.winger or 0
+            thisplayer['passing'] = the_player.skills.passing or 0
+            thisplayer['scorer'] = the_player.skills.scorer or 0
+            thisplayer['set_pieces'] = the_player.skills.set_pieces or 0
 
             thisplayer['data_date'] = time.strftime('%Y-%m-%d')
 
