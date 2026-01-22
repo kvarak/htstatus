@@ -37,6 +37,7 @@
 - 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **HIGH PRIORITY**
 
 **Priority 2: Deployment & Operations**
+- 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY**
 - 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
 
 **Priority 3: Stability & Maintainability** (It stays working) - Major foundation complete, focus on test coverage and security
@@ -451,6 +452,102 @@ Current test suite shows 213/246 tests passing (87%), with 33 failures across da
 ---
 
 ## Priority 2: Deployment & Operations
+
+### [INFRA-021] Environment Parity Enforcement
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P2 | **Impact**: Prevent production bugs from environment drift
+**Dependencies**: None | **Strategic Value**: Production reliability through dev/test/prod consistency
+
+**Problem Statement**:
+Currently development, testing, and production environments may use different Python versions and dependency configurations, creating risk of "works on my machine" bugs reaching production:
+
+**Current Issues**:
+- Development: Python 3.14.2 (uv run python)
+- Production: Unclear Python version (DEPLOYMENT.md says "3.9+")
+- No .python-version file to pin Python across environments
+- pyproject.toml specifies ">=3.9" (wide range allows drift)
+- Docker configurations don't specify Python base image versions
+- No Dockerfile to ensure consistent Python runtime in containers
+- UV dependency resolution may differ between Python versions
+
+**Impact**:
+- Subtle bugs from Python version differences (3.9 vs 3.14 behavior changes)
+- Dependency resolution differences cause production failures
+- Testing doesn't validate production environment
+- "Works in dev" failures in production waste debugging time
+- Deployment confidence reduced without environment parity
+
+**Implementation**:
+1. **Production Environment Audit** (30-45 min):
+   - SSH to production server: `ssh glader.local`
+   - Check current Python version: `python --version` or `python3 --version`
+   - Check installed packages: `pip list` or check virtual environment
+   - Check if UV is installed: `uv --version`
+   - Document current production configuration in task notes
+   - Check application runtime environment (systemd service, Docker, direct)
+   - Identify any production-specific configurations or workarounds
+
+2. **Python Version Pinning** (1-2 hours):
+   - Create .python-version file pinning to specific version (e.g., 3.11.8)
+   - Update pyproject.toml requires-python to narrow range (e.g., ">=3.11,<3.12")
+   - Document Python version choice rationale (stability, feature support)
+   - Update DEPLOYMENT.md with specific Python version requirement
+
+3. **Docker Environment Standardization** (2-3 hours):
+   - Create Dockerfile with pinned Python base image (python:3.11.8-slim)
+   - Add multi-stage build for production optimization
+   - Ensure UV installs exact dependency versions from uv.lock
+   - Test Docker build matches local development environment
+   - Update docker-compose.yml to use Dockerfile instead of service configs
+
+4. **Production Debugging Documentation** (45-60 min):
+   - Document SSH access to glader.local in DEPLOYMENT.md
+   - Add production debugging guide with common commands:
+     - Check application status: systemd commands or Docker status
+     - View logs: log file locations and tail commands
+     - Check Python environment: version, packages, paths
+     - Monitor resources: memory, CPU, disk usage
+     - Test database connectivity from production
+     - Check CHPP API connectivity and credentials
+   - Document how to safely restart production application
+   - Add troubleshooting section for common production issues
+   - Document rollback procedures
+
+5. **Documentation & Validation** (1 hour):
+   - Update README.md with Python version requirements
+   - Document environment parity strategy in TECHNICAL.md
+   - Add "make verify-env" command to check Python version matches
+   - Create CI check to validate Python version consistency
+
+**Technical Details**:
+- Recommended Python version: 3.11.x (stable, long-term support, good performance)
+- Rationale: 3.14 too new (released late 2025), 3.9 too old (EOL Oct 2025), 3.11 optimal balance
+- Docker base: python:3.11.8-slim-bookworm (Debian, security updates, minimal)
+- UV lock file already pins exact versions - ensure respected across environments
+
+**Acceptance Criteria**:
+- [ ] Production environment audit completed (glader.local Python version documented)
+- [ ] Production debugging guide added to DEPLOYMENT.md
+- [ ] SSH access and common debugging commands documented
+- [ ] .python-version file created with specific version (3.11.8)
+- [ ] pyproject.toml requires-python updated to narrow range
+- [ ] Dockerfile created with pinned Python base image
+- [ ] docker-compose.yml uses Dockerfile for app service
+- [ ] README.md and DEPLOYMENT.md updated with Python version
+- [ ] TECHNICAL.md documents environment parity strategy
+- [ ] CI validates Python version matches .python-version
+- [ ] Local dev, testing, and Docker use same Python version
+- [ ] UV lock file dependency resolution consistent across environments
+
+**Validation Steps**:
+1. SSH to glader.local and verify production Python version documented
+2. Verify `python --version` matches .python-version in dev
+3. Build Docker image and verify Python version inside container
+4. Run test suite in Docker container - must pass with same results as local
+5. SSH to glader.local after deployment and verify Python version matches
+6. Test production debugging procedures from documentation
+7. Confirm no dependency resolution differences between environments
+
+**Expected Outcomes**: Elimination of environment drift bugs, confident deployments, "works everywhere" reliability, reduced debugging time from environment differences
 
 ---
 
