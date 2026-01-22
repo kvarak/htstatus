@@ -202,9 +202,28 @@ SCRIPT
   cat >> command.sh << 'SCRIPT'
 pip3 install uv
 python3 -m uv sync
-python3 -m uv run python3 scripts/manage.py db migrate
-python3 -m uv run python3 scripts/manage.py db upgrade
+
+echo ""
+echo "=== Running Database Migrations ==="
+echo "Checking for pending migrations..."
+FLASK_APP=run.py python3 -m uv run flask db upgrade
+if [ $? -eq 0 ]; then
+  echo "✓ Database migrations completed successfully"
+else
+  echo "✗ Database migrations failed!"
+  exit 1
+fi
+
+echo ""
+echo "=== Restarting Service ==="
 sudo systemctl restart htstatus
+if [ $? -eq 0 ]; then
+  echo "✓ Service restarted successfully"
+  sudo systemctl status htstatus --no-pager -l | head -10
+else
+  echo "✗ Service restart failed!"
+  exit 1
+fi
 SCRIPT
 }
 
