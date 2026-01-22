@@ -183,6 +183,13 @@ def update():
 
             the_player = chpp.player(ht_id=p.ht_id)
 
+            # Debug: Check the_player attributes for skill data
+            dprint(1, f"DEBUG: the_player attributes = {[attr for attr in dir(the_player) if 'skill' in attr.lower()]}")
+            if hasattr(the_player, 'keeper_skill'):
+                dprint(1, f"DEBUG: the_player.keeper_skill = {the_player.keeper_skill}")
+            if hasattr(the_player, 'player_skills'):
+                dprint(1, f"DEBUG: the_player.player_skills = {the_player.player_skills}")
+
             if the_player.transfer_details:
                 dprint(2,
                        "transfer details --- ",
