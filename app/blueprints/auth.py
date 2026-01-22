@@ -133,6 +133,12 @@ def login():
                                existing_user.access_key, existing_user.access_secret)
                     current_user = chpp.user()
 
+                    # DEBUG: Check what team data is available
+                    dprint(1, f"DEBUG: current_user attributes = {[x for x in dir(current_user) if not x.startswith('_')]}")
+                    dprint(1, f"DEBUG: current_user._teams_ht_id = {current_user._teams_ht_id if hasattr(current_user, '_teams_ht_id') else 'NO ATTRIBUTE'}")
+                    if hasattr(current_user, 'teams'):
+                        dprint(1, f"DEBUG: current_user.teams = {current_user.teams}")
+
                     # OAuth tokens still valid - log them in and offer password reset
                     session['access_key'] = existing_user.access_key
                     session['access_secret'] = existing_user.access_secret
