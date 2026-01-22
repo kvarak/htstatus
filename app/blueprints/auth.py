@@ -342,10 +342,7 @@ def handle_oauth_callback(oauth_verifier):
             session['all_team_names'] = [f"Team {current_user.ht_id}"]
             session['team_id'] = current_user.ht_id
 
-
-            template='login.html',
-            title='Login / Signup',
-            error='OAuth authentication failed. Please try again.')
+        return redirect('/')
 
 @auth_bp.route('/logout')
 def logout():
