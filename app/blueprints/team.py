@@ -181,7 +181,7 @@ def update():
 
             # Get player ID - pychpp 0.5.10 uses 'ht_id' attribute
             player_id = p.ht_id
-            the_player = chpp.player(player_id)
+            the_player = chpp.player(ht_id=player_id)
 
             if the_player.transfer_details:
                 pass  # Transfer details exist but not used in logging
