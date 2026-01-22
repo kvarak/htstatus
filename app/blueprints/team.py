@@ -249,14 +249,26 @@ def update():
             # Use the_player.skills instead of p.skills for pychpp 0.3.12
             skills_source = the_player.skills if hasattr(the_player, 'skills') and the_player.skills else p.skills
 
-            thisplayer['stamina'] = skills_source['stamina'] if skills_source and 'stamina' in skills_source else 0
-            thisplayer['keeper'] = skills_source['keeper'] if skills_source and 'keeper' in skills_source else 0
-            thisplayer['defender'] = skills_source['defender'] if skills_source and 'defender' in skills_source else 0
-            thisplayer['playmaker'] = skills_source['playmaker'] if skills_source and 'playmaker' in skills_source else 0
-            thisplayer['winger'] = skills_source['winger'] if skills_source and 'winger' in skills_source else 0
-            thisplayer['passing'] = skills_source['passing'] if skills_source and 'passing' in skills_source else 0
-            thisplayer['scorer'] = skills_source['scorer'] if skills_source and 'scorer' in skills_source else 0
-            thisplayer['set_pieces'] = skills_source['set_pieces'] if skills_source and 'set_pieces' in skills_source else 0
+            # Helper function to safely extract int from skill value
+            def safe_skill_int(skill_val):
+                if skill_val is None:
+                    return 0
+                if isinstance(skill_val, int):
+                    return skill_val
+                try:
+                    result = int(skill_val)
+                    return result if result is not None else 0
+                except (TypeError, ValueError):
+                    return 0
+
+            thisplayer['stamina'] = safe_skill_int(skills_source.get('stamina') if skills_source else None)
+            thisplayer['keeper'] = safe_skill_int(skills_source.get('keeper') if skills_source else None)
+            thisplayer['defender'] = safe_skill_int(skills_source.get('defender') if skills_source else None)
+            thisplayer['playmaker'] = safe_skill_int(skills_source.get('playmaker') if skills_source else None)
+            thisplayer['winger'] = safe_skill_int(skills_source.get('winger') if skills_source else None)
+            thisplayer['passing'] = safe_skill_int(skills_source.get('passing') if skills_source else None)
+            thisplayer['scorer'] = safe_skill_int(skills_source.get('scorer') if skills_source else None)
+            thisplayer['set_pieces'] = safe_skill_int(skills_source.get('set_pieces') if skills_source else None)
 
             thisplayer['data_date'] = time.strftime('%Y-%m-%d')
 
