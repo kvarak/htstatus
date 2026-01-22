@@ -236,7 +236,7 @@ def update():
             thisplayer['career_hattricks'] = p.career_hattricks
             thisplayer['league_goals'] = p.league_goals
             thisplayer['cup_goals'] = p.cup_goals
-            thisplayer['friendly_goals'] = p.friendlies_goals
+            thisplayer['friendly_goals'] = p.friendly_goals
             thisplayer['current_team_matches'] = p.matches_current_team
             thisplayer['current_team_goals'] = p.goals_current_team
             # thisplayer['national_team_id'] = p.national_team_id  # Not available in HTTeamPlayersItem
