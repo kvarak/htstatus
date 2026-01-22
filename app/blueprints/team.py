@@ -248,14 +248,14 @@ def update():
             thisplayer['mother_club_bonus'] = p.mother_club_bonus
             thisplayer['leadership'] = p.leadership
 
-            thisplayer['stamina'] = p.player_skills.stamina
-            thisplayer['keeper'] = p.player_skills.keeper
-            thisplayer['defender'] = p.player_skills.defender
-            thisplayer['playmaker'] = p.player_skills.playmaker
-            thisplayer['winger'] = p.player_skills.winger
-            thisplayer['passing'] = p.player_skills.passing
-            thisplayer['scorer'] = p.player_skills.scorer
-            thisplayer['set_pieces'] = p.player_skills.set_pieces
+            thisplayer['stamina'] = p.player_skills.stamina or 0
+            thisplayer['keeper'] = p.player_skills.keeper or 0
+            thisplayer['defender'] = p.player_skills.defender or 0
+            thisplayer['playmaker'] = p.player_skills.playmaker or 0
+            thisplayer['winger'] = p.player_skills.winger or 0
+            thisplayer['passing'] = p.player_skills.passing or 0
+            thisplayer['scorer'] = p.player_skills.scorer or 0
+            thisplayer['set_pieces'] = p.player_skills.set_pieces or 0
 
             thisplayer['data_date'] = time.strftime('%Y-%m-%d')
 
