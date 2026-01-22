@@ -49,7 +49,6 @@ def team():
                 session['access_secret'])
 
     current_user = chpp.user()
-    debug_print("team", "chpp.user", current_user.SOURCE_FILE)
     all_teams = current_user._teams_ht_id
 
     teams = []
@@ -135,7 +134,6 @@ def update():
 
         try:
             the_team = chpp.team(ht_id=teamid)
-            debug_print("update", "chpp.team", the_team.SOURCE_FILE)
             dprint(1, f"Team data fetched successfully: {the_team.name}")
 
         except Exception as e:
