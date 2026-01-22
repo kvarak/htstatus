@@ -18,7 +18,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'password_field_increase_werkzeug_3x'
-down_revision = None
+down_revision = '7e8a973e62ed'
 branch_labels = None
 depends_on = None
 
