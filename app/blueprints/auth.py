@@ -344,6 +344,14 @@ def handle_oauth_callback(oauth_verifier):
 
         return redirect('/')
 
+    except Exception as e:
+        dprint(1, f"OAuth callback error: {e}")
+        return create_page(
+            template='login.html',
+            title='Login / Signup',
+            error='OAuth authentication failed. Please try again.')
+
+
 @auth_bp.route('/logout')
 def logout():
     """Handle user logout and session clearing."""
