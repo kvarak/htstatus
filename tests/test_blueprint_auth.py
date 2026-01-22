@@ -58,7 +58,7 @@ def sample_user(auth_app):
         ht_id=12345,
         ht_user='testuser',
         username='testuser',
-        password=generate_password_hash('testpass123', method='sha256'),
+        password=generate_password_hash('testpass123'),
         access_key='test_access_key',
         access_secret='test_access_secret'
     )
@@ -74,7 +74,7 @@ def user_without_tokens(auth_app):
         ht_id=67890,
         ht_user='notoken',
         username='notoken',
-        password=generate_password_hash('notoken123', method='sha256'),
+        password=generate_password_hash('notoken123'),
         access_key=None,
         access_secret=None
     )
@@ -239,7 +239,7 @@ class TestAuthBlueprintOAuthFlow:
         with auth_app.test_request_context(), auth_app.test_client() as client:
             with client.session_transaction() as sess:
                 sess['username'] = 'newuser'
-                sess['password'] = generate_password_hash('newpass123', method='sha256')
+                sess['password'] = generate_password_hash('newpass123')
 
             # Mock CHPP OAuth completion
             mock_chpp = Mock()

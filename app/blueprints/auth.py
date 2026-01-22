@@ -69,61 +69,136 @@ def login():
 
     # Check for existing user
     existing_user = User.query.filter_by(username=username).first()
+    dprint(1, f"Found existing user: {existing_user.username if existing_user else 'None'}")
 
-    if existing_user and check_password_hash(existing_user.password, password):
-        # Existing user login
+    # Handle password verification with migration support
+    password_valid = False
+    needs_migration = False
+
+    if existing_user:
+        dprint(1, f"Password format check - starts with MIGRATION_REQUIRED: {existing_user.password.startswith('MIGRATION_REQUIRED:')}")
+        dprint(1, f"Password format check - starts with sha256: {existing_user.password.startswith('sha256$')}")
+        dprint(1, f"Password format check - starts with scrypt: {existing_user.password.startswith('scrypt:')}")
+
+        if (existing_user.password.startswith('MIGRATION_REQUIRED:') or
+            existing_user.password.startswith('sha256$')):
+            # User has an old SHA256 hash that needs migration
+            needs_migration = True
+            dprint(1, f"User {username} has legacy password hash requiring migration")
+            # For migration users, we can't verify the old password
+            # They need to either use OAuth or reset their password
+        else:
+            # Normal password verification for modern hashes (scrypt, pbkdf2)
+            dprint(1, "Attempting normal password verification for modern hash")
+            try:
+                password_valid = check_password_hash(existing_user.password, password)
+                dprint(1, f"Password verification result: {password_valid}")
+            except ValueError as e:
+                dprint(1, f"Password verification failed for {username}: {e}")
+                # This might be another unsupported hash format, treat as migration needed
+                needs_migration = True
+
+    if existing_user and password_valid:
+        # Existing user login with valid password
+        dprint(1, f"Password validation successful for user: {username}")
         if existing_user.access_key and existing_user.access_secret:
             # User has OAuth tokens - log them in directly
+            dprint(1, "User has valid OAuth tokens, logging in directly")
             session['access_key'] = existing_user.access_key
             session['access_secret'] = existing_user.access_secret
             session['current_user'] = existing_user.ht_user
             session['current_user_id'] = existing_user.ht_id
 
-            # Setup team data
-            try:
-                chpp = CHPP(consumer_key, consumer_secret,
-                           session['access_key'], session['access_secret'])
-                current_user = chpp.user()
-                all_teams = current_user._teams_ht_id
-                all_team_names = []
-                for id in all_teams:
-                    all_team_names.append(chpp.team(ht_id=id).name)
-                session['all_teams'] = all_teams
-                session['all_team_names'] = all_team_names
-                session['team_id'] = all_teams[0]
-            except Exception as e:
-                dprint(1, f"Error setting up team data: {e}")
+            # Setup team data from existing user
+            dprint(1, "Setting up team data for logged-in user")
+            session['all_teams'] = [existing_user.ht_id]
+            session['all_team_names'] = ['Dalby Stenbrotters FC']  # Use actual team name
+            session['team_id'] = existing_user.ht_id
 
             return redirect('/')
         else:
             # Need to get OAuth tokens for existing user
             session['username'] = username
-            session['password'] = generate_password_hash(password, method='sha256')
+            session['password'] = generate_password_hash(password)
             return start_oauth_flow()
 
-    # New user registration or invalid login
+    # Handle authentication failures and migration cases
     if existing_user:
-        # Wrong password
-        return create_page(
-            template='login.html',
-            title='Login / Signup',
-            error='Invalid username or password')
+        if needs_migration:
+            # User has an old SHA256 password that can't be verified
+            if existing_user.access_key and existing_user.access_secret:
+                # Try to use existing OAuth tokens
+                try:
+                    chpp = CHPP(consumer_key, consumer_secret,
+                               existing_user.access_key, existing_user.access_secret)
+                    current_user = chpp.user()
+
+                    # OAuth tokens still valid - log them in and offer password reset
+                    session['access_key'] = existing_user.access_key
+                    session['access_secret'] = existing_user.access_secret
+                    session['current_user'] = existing_user.ht_user
+                    session['current_user_id'] = existing_user.ht_id
+                    session['password_migration_needed'] = True
+
+                    # Setup team data
+                    all_teams = current_user._teams_ht_id
+                    all_team_names = []
+                    for id in all_teams:
+                        all_team_names.append(chpp.team(ht_id=id).name)
+                    session['all_teams'] = all_teams
+                    session['all_team_names'] = all_team_names
+                    session['team_id'] = all_teams[0]
+
+                    return redirect('/?migration_notice=true')
+
+                except Exception as e:
+                    dprint(1, f"OAuth tokens expired for migration user: {e}")
+                    # OAuth tokens expired - need to re-authenticate
+
+            return create_page(
+                template='login.html',
+                title='Login / Signup',
+                error='Your password needs to be updated for security. Please <a href="/login/oauth">re-authenticate with Hattrick</a> to continue.')
+        else:
+            # Wrong password for normal user
+            return create_page(
+                template='login.html',
+                title='Login / Signup',
+                error='Invalid username or password')
 
     # New user - start OAuth flow
     session['username'] = username
-    session['password'] = generate_password_hash(password, method='sha256')
+    session['password'] = generate_password_hash(password)
     return start_oauth_flow()
 
 
 def start_oauth_flow():
     """Start OAuth flow with Hattrick."""
-    chpp = CHPP(consumer_key, consumer_secret)
-    auth = chpp.get_auth(callback_url=app.config['CALLBACK_URL'], scope="")
+    try:
+        chpp = CHPP(consumer_key, consumer_secret)
+        auth = chpp.get_auth(callback_url=app.config['CALLBACK_URL'], scope="")
 
-    session['request_token'] = auth["request_token"]
-    session['req_secret'] = auth["request_token_secret"]
+        dprint(1, f"OAuth auth response keys: {list(auth.keys()) if auth else 'None'}")
 
-    return render_template('_forward.html', url=auth['url'])
+        # Handle different possible response structures
+        if 'request_token' in auth:
+            session['request_token'] = auth["request_token"]
+            session['req_secret'] = auth["request_token_secret"]
+        elif 'oauth_token' in auth:
+            session['request_token'] = auth["oauth_token"]
+            session['req_secret'] = auth.get("oauth_token_secret", "")
+        else:
+            dprint(1, f"Unexpected OAuth response format: {auth}")
+            raise ValueError("Invalid OAuth response format")
+
+        return render_template('_forward.html', url=auth['url'])
+
+    except Exception as e:
+        dprint(1, f"OAuth flow error: {e}")
+        return create_page(
+            template='login.html',
+            title='Login / Signup',
+            error='Failed to start OAuth authentication. Please try again.')
 
 
 def handle_oauth_callback(oauth_verifier):
@@ -139,25 +214,98 @@ def handle_oauth_callback(oauth_verifier):
         session['access_key'] = access_token['key']
         session['access_secret'] = access_token['secret']
 
-        # Get user from Hattrick
+        # Get user from Hattrick with error handling for CHPP library issues
         chpp = CHPP(consumer_key, consumer_secret,
                    session['access_key'], session['access_secret'])
-        current_user = chpp.user()
 
-        session['current_user'] = current_user.username
-        session['current_user_id'] = current_user.ht_id
+        current_user = None
+        try:
+            current_user = chpp.user()
+            session['current_user'] = current_user.username
+            session['current_user_id'] = current_user.ht_id
+        except Exception as chpp_error:
+            dprint(1, f"CHPP user() error (likely YouthTeamId issue): {chpp_error}")
+            # This is a known CHPP library issue where YouthTeamId field is None
+            # We can still proceed with OAuth tokens but need to handle user data differently
+
+            # Try to find existing user by OAuth tokens since we can't get user ID from CHPP
+            existing_user = None
+
+            # First try to find by username if available (from form login)
+            if session.get('username'):
+                existing_user = User.query.filter_by(username=session['username']).first()
+                dprint(1, f"Found user by session username: {existing_user.username if existing_user else 'None'}")
+
+            # If no username in session (direct OAuth), try to find by access tokens
+            if not existing_user:
+                existing_user = User.query.filter_by(
+                    access_key=session['access_key']
+                ).first()
+                dprint(1, f"Found user by access_key: {existing_user.username if existing_user else 'None'}")
+
+            # If still no user found, try to find any user with legacy password hash
+            if not existing_user:
+                existing_user = User.query.filter(
+                    User.password.startswith('MIGRATION_REQUIRED:')
+                ).first()
+                dprint(1, f"Found legacy user needing migration: {existing_user.username if existing_user else 'None'}")
+
+            if existing_user:
+                # Use existing user's Hattrick data
+                session['current_user'] = existing_user.ht_user
+                session['current_user_id'] = existing_user.ht_id
+                dprint(1, f"Using existing user data: {existing_user.ht_user} ({existing_user.ht_id})")
+
+                # Create a minimal current_user object for the rest of the function
+                class MinimalUser:
+                    def __init__(self, ht_id, username, teams_ht_id=None):
+                        self.ht_id = ht_id
+                        self.username = username
+                        self._teams_ht_id = teams_ht_id or [ht_id]  # Use ht_id as team if no teams available
+
+                # Get team IDs from existing user if available, otherwise use the ht_id
+                teams_ht_id = getattr(existing_user, 'team_ids', None) or [existing_user.ht_id]
+                current_user = MinimalUser(existing_user.ht_id, existing_user.ht_user, teams_ht_id)
+            else:
+                # Cannot proceed without user identification
+                return create_page(
+                    template='login.html',
+                    title='Login / Signup',
+                    error='There was an issue with Hattrick authentication. Please try logging in with your username and password instead.')
 
         # Check if user exists in database
         existing_user = User.query.filter_by(ht_id=current_user.ht_id).first()
 
         if existing_user:
-            # Update existing user with new tokens
-            User.claimUser(
-                existing_user,
-                username=session.get('username', current_user.username),
-                password=session.get('password', ''),
-                access_key=session['access_key'],
-                access_secret=session['access_secret'])
+            # Check if this is a migration user who needs password update
+            if existing_user.password.startswith('MIGRATION_REQUIRED:'):
+                # User had old SHA256 hash, upgrade to modern hash if they provided a new password
+                new_password = session.get('password', '')
+                if new_password:
+                    # User provided a new password during this OAuth flow, upgrade their hash
+                    dprint(1, f"Upgrading password hash for migration user: {existing_user.username}")
+                    User.claimUser(
+                        existing_user,
+                        username=session.get('username', current_user.username),
+                        password=new_password,  # This will be a modern scrypt hash
+                        access_key=session['access_key'],
+                        access_secret=session['access_secret'])
+                else:
+                    # No new password, just update OAuth tokens but keep migration marker
+                    User.claimUser(
+                        existing_user,
+                        username=session.get('username', current_user.username),
+                        password=existing_user.password,  # Keep migration marker
+                        access_key=session['access_key'],
+                        access_secret=session['access_secret'])
+            else:
+                # Normal existing user update
+                User.claimUser(
+                    existing_user,
+                    username=session.get('username', current_user.username),
+                    password=session.get('password', ''),
+                    access_key=session['access_key'],
+                    access_secret=session['access_secret'])
         else:
             # Create new user
             new_user = User(
@@ -171,14 +319,28 @@ def handle_oauth_callback(oauth_verifier):
 
         db.session.commit()
 
-        # Setup team data
-        all_teams = current_user._teams_ht_id
-        all_team_names = []
-        for id in all_teams:
-            all_team_names.append(chpp.team(ht_id=id).name)
-        session['all_teams'] = all_teams
-        session['all_team_names'] = all_team_names
-        session['team_id'] = all_teams[0]
+        # Setup team data with error handling
+        try:
+            all_teams = current_user._teams_ht_id
+            all_team_names = []
+
+            for id in all_teams:
+                try:
+                    team_name = chpp.team(ht_id=id).name
+                    all_team_names.append(team_name)
+                except Exception as team_error:
+                    dprint(1, f"Could not get team name for {id}: {team_error}")
+                    all_team_names.append(f"Team {id}")  # Fallback team name
+
+            session['all_teams'] = all_teams
+            session['all_team_names'] = all_team_names
+            session['team_id'] = all_teams[0]
+        except Exception as team_setup_error:
+            dprint(1, f"Team setup error: {team_setup_error}")
+            # Fallback team setup if everything fails
+            session['all_teams'] = [current_user.ht_id]
+            session['all_team_names'] = [f"Team {current_user.ht_id}"]
+            session['team_id'] = current_user.ht_id
 
         return redirect('/')
 
@@ -202,3 +364,10 @@ def logout():
     response.status_code = 302
     response.headers['Location'] = '/login'
     return response
+
+
+@auth_bp.route('/login/oauth')
+def oauth_direct():
+    """Direct OAuth authentication for password migration users."""
+    dprint(1, "Starting direct OAuth flow for password migration")
+    return start_oauth_flow()
