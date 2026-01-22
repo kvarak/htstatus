@@ -242,8 +242,15 @@ def update():
             thisplayer['mother_club_bonus'] = p.mother_club_bonus
             thisplayer['leadership'] = p.leadership
 
-            thisplayer['stamina'] = p.skills['stamina']
-            thisplayer['keeper'] = p.skills['keeper']
+            # Debug: Check which object has skills
+            dprint(1, f"DEBUG: p.skills = {p.skills if hasattr(p, 'skills') else 'NO ATTRIBUTE'}")
+            dprint(1, f"DEBUG: the_player.skills = {the_player.skills if hasattr(the_player, 'skills') else 'NO ATTRIBUTE'}")
+
+            # Use the_player.skills instead of p.skills for pychpp 0.3.12
+            skills_source = the_player.skills if hasattr(the_player, 'skills') and the_player.skills else p.skills
+
+            thisplayer['stamina'] = skills_source['stamina'] if skills_source and 'stamina' in skills_source else 0
+            thisplayer['keeper'] = skills_source['keeper'] if skills_source and 'keeper' in skills_source else 0
             thisplayer['defender'] = p.skills['defender']
             thisplayer['playmaker'] = p.skills['playmaker']
             thisplayer['winger'] = p.skills['winger']
