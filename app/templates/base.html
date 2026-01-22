@@ -379,6 +379,18 @@ window.addEventListener('beforeinstallprompt', (e) => {
   📱 Install App
 </button>
 
+<!-- Password Migration Notice -->
+{% if session.get('password_migration_needed') %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin: 20px;">
+  <h5 class="alert-heading">⚠️ Password Update Required</h5>
+  <p>Your password uses an outdated security format and needs to be updated.</p>
+  <p>Please go to <a href="/settings" class="alert-link">Settings</a> to change your password to a more secure format.</p>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endif %}
+
 <div class="container">
   <div class="row">
     <div class="col-sm"><p></p>
