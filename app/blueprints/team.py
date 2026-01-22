@@ -94,7 +94,7 @@ def update():
         dprint(1, "Testing CHPP API connectivity...")
         try:
             test_user = chpp.user()
-            dprint(1, f"API connectivity test successful, user ID: {test_user.ht_id}")
+            dprint(1, f"API connectivity test successful, user ID: {test_user.id}")
         except Exception as chpp_user_error:
             if "YouthTeamId" in str(chpp_user_error):
                 dprint(1, f"YouthTeamId error encountered, continuing with limited functionality: {chpp_user_error}")
@@ -261,7 +261,7 @@ def update():
 
             thisplayer['owner'] = teamid
 
-            playernames[p.ht_id] = p.first_name + " " + p.last_name
+            playernames[p.id] = p.first_name + " " + p.last_name
 
             try:
                 dbplayer = db.session.query(Players).filter_by(
