@@ -185,7 +185,7 @@ def update():
             the_player = chpp.player(player_id)
 
             # Debug: Save raw XML for first player to inspect CHPP API response
-            if player_id == players[0].id:
+            if player_id == team_players[0].id:
                 try:
                     import pathlib
                     xml_path = pathlib.Path('/tmp')
