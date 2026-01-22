@@ -35,6 +35,7 @@
 - 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
 
 **Priority 3: Stability & Maintainability** (It stays working) - Major foundation complete, focus on test coverage and security
+- 🎯 [UI-008] Implement UI Guidelines Across Existing Pages (8-12 hours) - Apply unified design system to Flask templates and React components **NEXT IN LINE**
 - 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY TO EXECUTE**
 - 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY TO EXECUTE**
 - 🔄 [TYPESYNC-001] Fix 85 Type Sync Drift Issues (6-8 hours) - Resolve nullability and type mismatches between SQLAlchemy models and TypeScript interfaces **HIGH PRIORITY**
@@ -42,7 +43,7 @@
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 
 **Priority 4: Core Functionality** (It does what it should)
-- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **NEXT IN LINE**
+- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
 - 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
 - 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
 - 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
@@ -59,7 +60,6 @@
 - 🎯 [DOC-023] Clean TECHNICAL.md Obsolete Content (1-2 hours) - Remove outdated route architecture descriptions **HIGH PRIORITY**
 - 🎯 [DOC-024] Clean README.md Legacy Sections (1 hour) - Remove deprecated setup instructions
 - 🎯 [DOC-025] Update architecture.md File Structure (30 min) - Reflect current blueprint architecture
-- 🎯 [DOC-022] Website UI Standardization (6-8 hours) - Unified design patterns and guidelines
 - 🎯 [DOC-011-API] API Documentation (4-6 hours) - Developer experience
 - 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
 - 🎯 [DOC-004] Progress Metrics (1 hour) - Project visibility
@@ -310,79 +310,89 @@ New players need guided onboarding to understand HT Status features and workflow
 
 ---
 
-### [DOC-022] Website UI Standardization
-**Status**: 🎯 Ready to Execute | **Effort**: 6-8 hours | **Impact**: UI consistency and developer productivity
-**Dependencies**: Existing web pages (completed), UI components (completed) | **Strategic Value**: Maintainability, user experience
+### [UI-008] Implement UI Guidelines Across Existing Pages
+**Status**: 🎯 Ready to Execute | **Effort**: 8-12 hours | **Impact**: User experience consistency and visual unification
+**Dependencies**: DOC-022 (completed) | **Strategic Value**: Deliver unified user experience across dual frontend architecture
 
 **Problem Statement**:
-Currently, web pages across the application lack consistent design patterns, styling, and layout conventions. This creates:
-- Inconsistent user experience across different sections
-- Maintenance challenges when updating UI components
-- Unclear guidelines for developing new pages
-- Difficulty for AI agents to maintain design consistency
-- Varying accessibility and responsive design implementations
+DOC-022 created comprehensive UI guidelines, but existing Flask templates and React components still use inconsistent styling patterns. Users experience jarring visual differences when navigating between different sections of the application. To deliver the promised unified user experience, existing pages must be refactored to follow the established design system.
+
+**Current Inconsistencies**:
+- Flask templates use Bootstrap 4.5 default styling vs unified football theme
+- Button styles vary across pages (default Bootstrap vs custom implementations)
+- Card components use different spacing and visual hierarchy
+- Table styling inconsistent between data views
+- Color usage doesn't follow established primary green palette
+- Typography sizing varies from standardized scale
 
 **Implementation**:
-1. **Page Audit & Analysis** (2-3 hours):
-   - Catalog all existing web pages (Flask templates and React components)
-   - Document current styling patterns, layouts, and components
-   - Identify inconsistencies in design, navigation, spacing, typography
-   - Review accessibility compliance across pages
-   - Assess responsive design implementation variations
+1. **Flask Template Refactoring** (4-6 hours):
+   - Apply custom CSS classes to existing templates: `.btn-primary-custom`, `.card-custom`, `.table-custom`
+   - Update `base.html` with unified CSS classes from implementation standards
+   - Refactor main.html, team.html, player.html, training.html, matches.html, stats.html, settings.html
+   - Replace Bootstrap default colors with football green theme
+   - Standardize typography using unified scale (h1: 2.5rem, h2: 2rem, etc.)
+   - Implement consistent spacing using 0.25rem increments
 
-2. **UI Standards Documentation** (2-3 hours):
-   - Create comprehensive UI style guide with:
-     - Color palette and typography standards
-     - Component usage patterns and variants
-     - Layout grid system and spacing rules
-     - Navigation and interaction patterns
-     - Form design and validation standards
-     - Accessibility requirements and guidelines
-   - Document approved Bootstrap/TailwindCSS utility patterns
-   - Define responsive design breakpoints and mobile-first approach
+2. **React Component Alignment** (2-3 hours):
+   - Review existing React components for compliance with style guide
+   - Update button variants to use football theme consistently
+   - Ensure card components follow unified spacing patterns
+   - Verify table components match Flask styling patterns
+   - Apply consistent color tokens throughout React pages
 
-3. **Design Guidelines Integration** (1-2 hours):
-   - Add UI guidelines to prompts.json for AI agent reference
-   - Create reusable template snippets and component examples
-   - Document design validation checklist for new pages
-   - Establish review process for UI consistency
+3. **Cross-Framework Validation** (1-2 hours):
+   - Compare Flask and React pages side-by-side for visual consistency
+   - Test responsive design across different screen sizes
+   - Validate color contrast and accessibility standards
+   - Ensure navigation patterns feel consistent across both systems
 
-4. **Implementation Standards** (1-2 hours):
-   - Standardize page headers, footers, and navigation patterns
-   - Define consistent loading states and error handling UI
-   - Establish form styling and validation display patterns
-   - Document chart and data visualization standards
+4. **Documentation Updates** (0.5-1 hour):
+   - Update UI documentation with any refinements discovered during implementation
+   - Document any edge cases or special considerations
+   - Create before/after screenshots for reference
 
 **Acceptance Criteria**:
-- Complete audit of all existing web pages documented
-- Comprehensive UI style guide created covering all design elements
-- Guidelines integrated into prompts.json for AI agent access
-- Reusable component patterns and templates documented
-- Design validation checklist established
-- Consistent navigation and layout patterns defined
-- Accessibility standards documented and verified
-- Mobile-responsive design standards established
+- All Flask templates use unified CSS classes (.btn-primary-custom, .card-custom, .table-custom)
+- React components maintain visual consistency with Flask pages
+- Football green color theme applied consistently across all pages
+- Typography follows standardized scale (h1: 2.5rem, h2: 2rem, body: 1rem)
+- Spacing uses consistent 0.25rem increments throughout
+- No jarring visual differences when navigating between Flask and React sections
+- All changes validated through cross-browser testing
+- Responsive design maintains consistency across screen sizes
+- Accessibility standards (WCAG 2.1 AA) maintained or improved
 
-**Scope**:
-- **Includes**: All Flask templates, React components, styling patterns, accessibility guidelines
-- **Excludes**: Major redesigns or new features (focus on standardizing existing patterns)
-- **Focus**: Consistency, maintainability, and developer/AI agent guidance
+**Pages to Update**:
+**Flask Templates**:
+- `main.html` - Dashboard/home page
+- `team.html` - Team overview
+- `player.html` - Player management
+- `training.html` - Training progress
+- `matches.html` - Match history
+- `stats.html` - Team statistics
+- `settings.html` - User configuration
+- `login.html`, `logout.html` - Authentication pages
 
-**Pages to Standardize**:
-- Authentication: login.html, logout.html
-- Main sections: main.html, team.html, player.html, training.html, matches.html, stats.html, settings.html
-- React components: All pages in src/pages/ and components in src/components/
-- Base templates: base.html, component layouts
+**React Components**:
+- All pages in `src/pages/` (Players.tsx, Training.tsx, Matches.tsx, etc.)
+- Shared components in `src/components/`
+- Layout components (Header.tsx, Sidebar.tsx)
 
-**Guidelines Categories**:
-- **Layout**: Grid systems, spacing, containers, responsive breakpoints
-- **Typography**: Headings hierarchy, body text, emphasis, code styling
-- **Colors**: Primary/secondary palettes, semantic colors, contrast ratios
-- **Components**: Buttons, forms, tables, cards, modals, alerts, navigation
-- **Accessibility**: ARIA labels, keyboard navigation, screen reader support
-- **Performance**: CSS organization, asset loading, optimization practices
+**Technical Approach**:
+- Follow implementation standards from `.project/ui-implementation-standards.md`
+- Use design templates from `.project/ui-design-guidelines.md`
+- Validate against checklist in design guidelines
+- Maintain backward compatibility for existing functionality
+- Test changes incrementally to avoid breaking functionality
 
-**Expected Outcomes**: Unified user experience, streamlined development process, improved maintainability, consistent AI agent output, enhanced accessibility compliance
+**Risk Mitigation**:
+- Implement changes incrementally, testing each template individually
+- Maintain Git commits for easy rollback if issues arise
+- Validate all user workflows still function correctly
+- Test with existing user data to ensure no data display issues
+
+**Expected Outcomes**: Unified visual experience across all HTStatus pages, elimination of jarring transitions between Flask and React sections, improved user satisfaction, consistent brand presentation, enhanced accessibility compliance, foundation for future UI development
 
 ---
 
