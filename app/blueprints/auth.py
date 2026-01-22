@@ -109,11 +109,32 @@ def login():
             session['current_user'] = existing_user.ht_user
             session['current_user_id'] = existing_user.ht_id
 
-            # Setup team data from existing user
+            # Setup team data from Hattrick API using OAuth tokens
             dprint(1, "Setting up team data for logged-in user")
-            session['all_teams'] = [existing_user.ht_id]
-            session['all_team_names'] = ['Dalby Stenbrotters FC']  # Use actual team name
-            session['team_id'] = existing_user.ht_id
+            try:
+                chpp = CHPP(consumer_key, consumer_secret,
+                           existing_user.access_key, existing_user.access_secret)
+                current_user = chpp.user()
+                all_teams = current_user._teams_ht_id
+                all_team_names = []
+                for team_id in all_teams:
+                    try:
+                        team_name = chpp.team(ht_id=team_id).name
+                        all_team_names.append(team_name)
+                    except Exception as e:
+                        dprint(1, f"Could not fetch team name for {team_id}: {e}")
+                        all_team_names.append(f"Team {team_id}")
+
+                session['all_teams'] = all_teams
+                session['all_team_names'] = all_team_names
+                session['team_id'] = all_teams[0]
+                dprint(1, f"Team setup complete: {all_teams}")
+            except Exception as e:
+                dprint(1, f"Error fetching teams from Hattrick: {e}")
+                # Fallback to stored user ID (this is wrong but prevents crash)
+                session['all_teams'] = [existing_user.ht_id]
+                session['all_team_names'] = ['Team']
+                session['team_id'] = existing_user.ht_id
 
             return redirect('/')
         else:
