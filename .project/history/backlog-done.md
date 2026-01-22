@@ -1,5 +1,39 @@
 # HTStatus Development - Completed Tasks
 
+## Completed P0 Critical Bugs (January 2026)
+
+### [BUG-001] Fix Player Page Display Issues After Library Downgrades
+**Completed**: 2026-01-22
+**Effort**: ~8 hours (57 commits debugging journey)
+**Impact**: CRITICAL - restored player list functionality
+
+**Summary**: Resolved player display issues through comprehensive debugging journey spanning 57 commits. Root cause identified as using user ID instead of team ID for player data fetching. Successfully restored player list functionality with correct team ID retrieval from Hattrick CHPP API.
+
+**Technical Journey**:
+- **Initial Problem**: After library upgrades (pychpp 0.5.10, Flask 3.1.2, werkzeug 3.1.5), players displayed incorrectly
+- **Investigation**: 57 commits of debugging including:
+  - Library downgrades (pychpp 0.5.10→0.3.12, Flask 3.1.2→2.3.3, werkzeug 3.1.5→2.3.8)
+  - XML inspection and skill parsing analysis
+  - Template attribute vs dictionary access investigation
+  - Extensive debug logging for data structure analysis
+- **Root Cause**: `session['all_teams'] = [existing_user.ht_id]` used user ID 182085 instead of team ID
+- **Solution**: Changed to `session['all_teams'] = current_user._teams_ht_id` to fetch real team IDs from CHPP API
+- **Outcome**: Team 9838 data now displays correctly with full skill values
+
+**Code Changes**:
+- Fixed team ID fetching logic in [app/blueprints/auth.py:105-135](app/blueprints/auth.py#L105-L135)
+- Updated login route to use `current_user._teams_ht_id` from HTUser object
+- Preserved OAuth authentication flow and session management
+- User confirmed: "ok, now my players are showing up properly, phew!"
+
+**Remaining Work**: Debug code cleanup tracked in CLEANUP-001 (B108 security issue, temp file usage, debug logging)
+
+**Strategic Value**: Restored core user-facing functionality, unblocked BUG-002/003/004 investigation, validated library downgrade decision
+
+**Lessons Learned**: Distinguish between Hattrick user ID and team ID - users can own multiple teams, must fetch team IDs from API
+
+---
+
 ## Completed P2 Security & Operations Tasks (January 2026)
 
 ### [DB-001] Password Migration Database Update

@@ -9,30 +9,54 @@
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md) • [Rules](rules.md)
 📊 **Current State**: 80+ Tasks Complete • Quality Intelligence Platform ✅ • P1 Testing Complete ✅
 
-> **Current Status**: P1 Testing reliability achieved - 49/49 critical tests passing (32 core + 17 blueprint player), Flask Bootstrap issue resolved (January 22, 2026)
+> **Current Status**: BUG-001 Player Display Resolved - 57-commit debugging journey completed, Quality Intelligence Platform enhanced with security split (January 22, 2026)
 
 *This file tracks current development state and key metrics for HTStatus 2.0.*
 
 ## Current Development State
 
-**Infrastructure Status**: ✅ **STRONG** - Documentation architecture established, Quality Intelligence Platform operational, migrations tracked
-**Testing Status**: ⚠️ **PARTIAL** - 213/246 tests passing (87%), 33 database/business logic tests failing (pre-existing issues)
-**Code Quality**: Production code lint-free ✅, 32 test linting warnings remain
+**Infrastructure Status**: ✅ **STRONG** - Documentation architecture established, Quality Intelligence Platform with security split operational
+**Testing Status**: ⚠️ **PARTIAL** - 215/246 tests passing (87%), 31 database/business logic tests failing (pre-existing issues)
+**Code Quality**: Production code lint-free ✅, 33 test linting warnings remain, 1 Bandit code security issue (B108 - debug code)
 
-✅ **Latest**: FEAT-002 Player Data Import Complete - Full CHPP API integration with authentication migration, 23 players successfully imported (January 22, 2026)
-🔍 **Current Focus**: Test reliability → CHPP config stability → Type sync drift resolution
-**Security**: Zero CVE vulnerabilities maintained ✅ (Werkzeug 2.3.8→3.1.5 security upgrade complete)
-**Architecture**: Modern Flask blueprint structure with Quality Intelligence Platform operational
+✅ **Latest**: BUG-001 Player Display Fixed - 57-commit debugging journey resolved via team ID fix (January 22, 2026)
+🔍 **Current Focus**: Debug code cleanup (CLEANUP-001) → BUG-002/003/004 fixes → Test reliability
+**Security**: ✅ CVE: 0 vulnerabilities, ⚠️ Code Security: 1 issue (B108 temp file - tracked in CLEANUP-001)
+**Quality Intelligence**: Enhanced to distinguish CVE vulnerabilities vs Bandit code security issues ✅
+**Architecture**: Modern Flask blueprint structure, pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8 (stable after downgrades)
 **Environment**: Consistent UV-managed environment across all development tools ✅
-**Documentation**: Centralized rules.md ✅, comprehensive documentation-guide.md ✅, purpose headers added ✅, streamlined to 150 lines
-**Completed Tasks**: 78+ major milestones including January 2026 Foundation Excellence (19 tasks), Player Data Import Pipeline, and comprehensive authentication migration
-**Backlog Status**: 3 new P2 tasks completed, moved to history, 33 test failures need investigation
-**Ready Tasks**: 30+ tasks across P2-P6 priority levels ready for execution
-**Current Blockers**: 85 type sync drift issues (TYPESYNC-001), blueprint test coverage gaps (TEST-004), CHPP config test reliability (INFRA-018)
+**Documentation**: Centralized rules.md ✅, comprehensive documentation-guide.md ✅, purpose headers added ✅
+**Completed Tasks**: 80+ major milestones including BUG-001 resolution, Quality Intelligence security split
+**Backlog Status**: BUG-001 moved to history ✅, CLEANUP-001 added for debug code removal, 3 P0 bugs remain
+**Ready Tasks**: 31+ tasks across P0-P6 priority levels ready for execution
+**Current Blockers**: 85 type sync drift issues (TYPESYNC-001), 31 test failures (TEST-012), debug code cleanup needed (CLEANUP-001)
 **Repository**: Clean 2.5MB of unnecessary files removed, migrations/ folder tracked (30 files)
-**Current Active Work**: TEST-008 final 13 database fixture errors, TEST-010 ready for execution
+**Current Active Work**: CLEANUP-001 debug code removal (B108 security issue)
 
 ## Current Architecture & Strategic Position
+
+### ✅ BUG-001 Player Display Issue Resolution (2026-01-22)
+**Impact**: CRITICAL - Restored core player list functionality after 57-commit debugging journey
+- **Root Cause**: Team data fetched using user ID (182085) instead of team ID - users can own multiple teams
+- **Solution**: Changed `session['all_teams'] = [existing_user.ht_id]` to `session['all_teams'] = current_user._teams_ht_id`
+- **Investigation Journey**: 57 commits spanning library downgrades, XML inspection, template debugging, skill parsing analysis
+- **Library Decisions**: Downgraded to stable versions (pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8) after issues with 0.5.10/3.1+
+- **User Validation**: "ok, now my players are showing up properly, phew!" - team 9838 data displays correctly
+- **Remaining Work**: CLEANUP-001 to remove debug code (B108 security issue, temp files, debug logging)
+- **Status**: Player display fully functional, unblocked BUG-002/003/004 investigation
+
+### ✅ Quality Intelligence Platform Security Enhancement (2026-01-22)
+**Impact**: Improved security reporting clarity - separates CVE vulnerabilities from code security issues
+- **Problem**: Original reporting showed "0 VULNERABILITIES" despite B108 Bandit code issue (misleading)
+- **Solution**: Split security metric into two distinct categories:
+  - **CVE Vulnerabilities**: Dependency security issues from Safety scan (currently 0)
+  - **Code Security**: Code-level issues from Bandit scan (currently 1 - B108 temp file)
+- **Technical Changes**:
+  - Updated Makefile security target to run Bandit and Safety separately with JSON output
+  - Enhanced quality-intelligence.sh to parse and report both metrics independently
+  - Added separate temp files (/tmp/bandit-results.json, /tmp/safety-results.json)
+- **Reporting**: Quality gates now clearly distinguish "CVE Vulnerabilities: ✅ NONE" from "Code Security: ⚠️ 1 ISSUE(S)"
+- **Status**: Eliminates confusion about security status, improves transparency
 
 ### ✅ FEAT-002 Player Data Import Pipeline (2026-01-22)
 **Impact**: Core functionality unlock - complete CHPP API integration for player roster management

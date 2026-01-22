@@ -27,10 +27,10 @@
 ## Current Focus
 
 **Priority 0: Critical Bugs** (Blocking core functionality)
-- 🎯 [BUG-001] Fix Player Page Display Issues (2-3 hours) - Player list showing strange data after pychpp upgrade **CRITICAL**
 - 🎯 [BUG-002] Fix Training Page Display (2-3 hours) - Training tracking broken after pychpp upgrade **CRITICAL**
 - 🎯 [BUG-003] Player Groups Not Functioning (2-4 hours) - Groups visible in settings but not integrated **CRITICAL**
 - 🎯 [BUG-004] Debug Page Changes List Empty (1-2 hours) - Admin/developer debugging tool not working **CRITICAL**
+- 🎯 [CLEANUP-001] Remove Debug Code from BUG-001 Investigation (30-45 min) - Remove temp file usage (B108) and debug logging **READY**
 
 **Priority 1: Testing & App Reliability**
 - 🎯 [TEST-012] Investigate and Fix 33 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
@@ -77,6 +77,7 @@
 - 🔮 [RESEARCH-001] Additional Integrations - Future research
 
 **Priority 7: Potential Future Improvements**
+- 🔮 [UPGRADE-001] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ + werkzeug 3.1+ (2-3 hours) - Re-attempt library upgrades now that team ID bug is fixed
 - 🔮 [FEAT-010] Collaborative League Intelligence (40-60 hours) - Multiplayer league-wide platform for shared scouting and collective tactical analysis
 - 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
 - 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
@@ -228,52 +229,42 @@ This suggests TEST-009 fix was incomplete and revealed a deeper Flask applicatio
 
 ## Priority 0: Critical Bugs
 
-### [BUG-001] Fix Player Page Display Issues After pychpp 0.5.10 Upgrade
-**Status**: 🚀 IN PROGRESS | **Effort**: 2-3 hours | **Priority**: P0 | **Impact**: CRITICAL - player list displaying incorrectly
-**Dependencies**: Recent pychpp 0.5.10 upgrade completed | **Strategic Value**: Critical user-facing functionality
-
-**Progress Update** (In Progress):
-- ✅ **Root Cause Identified**: Template using attribute syntax (`p.ht_id`, `p.number`) on dictionary data
-- ✅ **Fix Applied**: Converted all attribute access to dictionary access (`p['ht_id']`, `p['number']`) in player.html template
-- ✅ **Template Syntax Verified**: Jinja2 template compiles without errors
-- 🚧 **Testing**: Manual testing and integration tests pending
+### [CLEANUP-001] Remove Debug Code from BUG-001 Investigation
+**Status**: 🎯 Ready to Execute | **Effort**: 30-45 min | **Priority**: P0 | **Impact**: Security - B108 code security issue
+**Dependencies**: BUG-001 completed (✅) | **Strategic Value**: Code quality and security
 
 **Problem Statement**:
-After successful pychpp 0.5.10 upgrade and data import fixes, the player page list is displaying incorrectly. The /update route now works successfully, but the player list view shows strange data or formatting. This affects core user workflows for managing and viewing player information.
+During BUG-001 investigation (57-commit debugging journey), temporary debug code was added to inspect team XML data and trace skill parsing. This debug code contains a security issue (B108 - hardcoded temp file path) and should be removed now that the root cause has been resolved.
 
-**Likely Causes**:
-1. Template variable changes due to pychpp API differences
-2. Player attribute access patterns changed (e.g., .id vs .ht_id)
-3. Data structure changes from HTTeamPlayersItem vs HTPlayer objects
-4. Skill data formatting or None value handling issues
+**Debug Code Locations**:
+1. **app/blueprints/team.py:159** - `team_xml_path = "/tmp/team_182085_source.xml"` (B108 security issue)
+2. **app/blueprints/team.py:262-270** - Extensive debug logging for skill inspection
+3. **app/blueprints/auth.py:136** - Debug output "Debug: all_teams set to..."
 
 **Implementation**:
-1. **Investigate player page rendering** (30-45 min):
-   - Check app/blueprints/player.py route handlers
-   - Review app/templates/player.html template variables
-   - Identify data structure mismatches
-   - Check for None value handling in display
+1. **Remove temp file usage** (15 min):
+   - Remove hardcoded /tmp/ path at team.py:159
+   - Remove XML file writing logic
+   - Verify no other temp file references remain
 
-2. **Fix data access patterns** (45-60 min):
-   - Update template variable names if needed
-   - Fix attribute access (id vs ht_id consistency)
-   - Add None value fallbacks for display
-   - Test with actual player data from production
+2. **Clean up debug logging** (15 min):
+   - Remove debug print statements from team.py
+   - Remove debug output from auth.py
+   - Preserve error handling and critical logging
 
-3. **Validate display formatting** (30-45 min):
-   - Check skill value display
-   - Verify player statistics rendering
-   - Test player group display integration
-   - Ensure all player data fields show correctly
+3. **Verify security scan** (5-10 min):
+   - Run `make security` to confirm B108 issue resolved
+   - Ensure CVE vulnerabilities remain at 0
+   - Validate quality gates pass
 
 **Acceptance Criteria**:
-- Player list displays all players correctly
-- Player details page shows complete information
-- No strange data or formatting issues
-- Player attributes display with proper fallbacks
-- All player statistics render correctly
+- B108 security issue resolved (`make security` shows 0 code security issues)
+- All debug logging removed from production code
+- Error handling preserved
+- No functional regressions
+- Quality gates pass
 
-**Strategic Value**: Core user-facing functionality that directly impacts daily usage and player management workflows
+**Strategic Value**: Maintains code security and quality standards, completes BUG-001 cleanup
 
 ### [BUG-002] Fix Training Page Display After pychpp Upgrade
 **Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P0 | **Impact**: CRITICAL - training tracking broken
@@ -1552,6 +1543,68 @@ Linting scan identified 32 errors in test files (production code is lint-free):
 - No new linting errors introduced
 
 **Expected Outcomes**: Consistent code quality across entire project, improved maintainability
+
+---
+
+### [UPGRADE-001] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ + werkzeug 3.1+
+**Status**: 🔮 Future Task | **Effort**: 2-3 hours | **Priority**: P7 | **Impact**: Access to latest library features and bug fixes
+**Dependencies**: BUG-001 team ID fix (completed) | **Strategic Value**: Stay current with library ecosystem
+
+**Problem Statement**:
+During BUG-001 investigation, we downgraded from pychpp 0.5.10 → 0.3.12, Flask 3.1.2 → 2.3.3, and werkzeug 3.1.5 → 2.3.8 because player skills were displaying as 0. However, the root cause was a logic bug in auth.py (using user ID 182085 instead of team ID 9838), not library incompatibility. Now that the team ID bug is fixed, the newer library versions should work correctly.
+
+**Why Consider Re-upgrading**:
+- pychpp 0.5.10 has newer features and bug fixes compared to 0.3.12
+- Flask 3.1+ provides security updates and modern features
+- werkzeug 3.1+ has performance improvements and bug fixes
+- Staying on older versions accumulates technical debt
+- The downgrade may have been unnecessary (bug existed in both versions)
+
+**Why It's P7 (Low Priority)**:
+- Current versions (0.3.12, 2.3.3, 2.3.8) are working correctly
+- "If it ain't broke, don't fix it" principle applies
+- Re-upgrade introduces risk of new compatibility issues
+- Limited immediate benefit since functionality is stable
+- Other P0-P6 tasks provide more value
+
+**Implementation** (if attempted):
+1. **Backup Current State** (15 min):
+   - Create git branch for upgrade attempt
+   - Document current working versions
+   - Note any version-specific workarounds in code
+
+2. **Upgrade Libraries** (30 min):
+   - Update pyproject.toml: pychpp==0.5.10, flask>=3.1.0, werkzeug>=3.1.4
+   - Run `uv sync` to update dependencies
+   - Check for dependency conflicts
+
+3. **Test Compatibility** (45-60 min):
+   - Run full test suite: `make test-all`
+   - Test player data import: /update route
+   - Verify all skills display correctly (team 9838)
+   - Test OAuth and password login flows
+   - Check all routes still work
+
+4. **Fix Any Issues** (30-45 min):
+   - Address API changes in pychpp 0.5.10
+   - Fix any Flask/werkzeug compatibility issues
+   - Update code if API patterns changed
+   - Re-test after fixes
+
+**Acceptance Criteria**:
+- All tests pass (100% success rate maintained)
+- Player skills display correctly for all teams
+- OAuth and password authentication work
+- No regressions in existing functionality
+- All routes accessible and functional
+- Data import from CHPP API works correctly
+
+**Rollback Plan**:
+- If issues arise, revert to current versions: 0.3.12, 2.3.3, 2.3.8
+- Current configuration is proven stable
+- No pressure to complete upgrade
+
+**Expected Outcomes**: Access to latest library features, improved security posture, reduced technical debt accumulation, OR confirmation that current versions are best choice for stability
 
 ---
 
