@@ -152,7 +152,7 @@ def update():
         try:
             team_players = the_team.players()
             players_count = len(team_players)
-            
+
             # Debug: Save the players XML to check if it has skill data
             if teamid == all_teams[0]:
                 try:
