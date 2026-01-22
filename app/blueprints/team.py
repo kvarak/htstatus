@@ -94,7 +94,7 @@ def update():
         dprint(1, "Testing CHPP API connectivity...")
         try:
             test_user = chpp.user()
-            dprint(1, f"API connectivity test successful, user ID: {test_user.id}")
+            dprint(1, f"API connectivity test successful, user ID: {test_user.ht_id}")
         except Exception as chpp_user_error:
             if "YouthTeamId" in str(chpp_user_error):
                 dprint(1, f"YouthTeamId error encountered, continuing with limited functionality: {chpp_user_error}")
