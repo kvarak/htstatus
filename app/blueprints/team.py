@@ -150,7 +150,7 @@ def update():
                 all_team_names=session['all_team_names'])
 
         try:
-            team_players = the_team.players()
+            team_players = the_team.players
             players_count = len(team_players)
 
         except Exception as e:
