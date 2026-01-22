@@ -179,14 +179,14 @@ def update():
 
             thisplayer = {}
 
-            # Get player ID - pychpp 0.5.10 uses 'ht_id' attribute
-            player_id = p.ht_id
+            # Get player ID - HTTeamPlayersItem uses 'id' attribute
+            player_id = p.id
             the_player = chpp.player(ht_id=player_id)
 
             if the_player.transfer_details:
                 pass  # Transfer details exist but not used in logging
 
-            thisplayer['ht_id'] = p.ht_id
+            thisplayer['ht_id'] = p.id
             thisplayer['first_name'] = p.first_name
             thisplayer['nick_name'] = p.nick_name
             thisplayer['last_name'] = p.last_name
