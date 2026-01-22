@@ -200,15 +200,20 @@ SCRIPT
   fi
 
   cat >> command.sh << 'SCRIPT'
-pip3 install uv
-python3 -m uv sync
+# Ensure uv is available
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v uv &> /dev/null; then
+    pip3 install --user uv
+fi
+
+uv sync
 
 echo ""
 echo "=== Running Database Migrations ==="
 echo "Checking for pending migrations..."
 
 # Run migrations and capture output
-FLASK_APP=run.py python3 -m uv run flask db upgrade 2>&1 | tee /tmp/migration_output.txt
+FLASK_APP=run.py uv run flask db upgrade 2>&1 | tee /tmp/migration_output.txt
 MIGRATION_EXIT_CODE=${PIPESTATUS[0]}
 
 # Check if there were actual migrations applied
