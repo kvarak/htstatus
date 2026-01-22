@@ -251,12 +251,12 @@ def update():
 
             thisplayer['stamina'] = skills_source['stamina'] if skills_source and 'stamina' in skills_source else 0
             thisplayer['keeper'] = skills_source['keeper'] if skills_source and 'keeper' in skills_source else 0
-            thisplayer['defender'] = p.skills['defender']
-            thisplayer['playmaker'] = p.skills['playmaker']
-            thisplayer['winger'] = p.skills['winger']
-            thisplayer['passing'] = p.skills['passing']
-            thisplayer['scorer'] = p.skills['scorer']
-            thisplayer['set_pieces'] = p.skills['set_pieces']
+            thisplayer['defender'] = skills_source['defender'] if skills_source and 'defender' in skills_source else 0
+            thisplayer['playmaker'] = skills_source['playmaker'] if skills_source and 'playmaker' in skills_source else 0
+            thisplayer['winger'] = skills_source['winger'] if skills_source and 'winger' in skills_source else 0
+            thisplayer['passing'] = skills_source['passing'] if skills_source and 'passing' in skills_source else 0
+            thisplayer['scorer'] = skills_source['scorer'] if skills_source and 'scorer' in skills_source else 0
+            thisplayer['set_pieces'] = skills_source['set_pieces'] if skills_source and 'set_pieces' in skills_source else 0
 
             thisplayer['data_date'] = time.strftime('%Y-%m-%d')
 
