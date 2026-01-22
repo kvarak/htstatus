@@ -155,6 +155,14 @@ def update():
             dprint(1, f"Found {players_count} players in team")
             dprint(2, the_team.players)
 
+            # DEBUG: Save team players XML to check if skills are there
+            import os
+            team_xml_path = f"/tmp/team_182085_source.xml"
+            if hasattr(the_team, '_xml_data'):
+                with open(team_xml_path, 'w') as f:
+                    f.write(str(the_team._xml_data))
+                dprint(1, f"DEBUG: Saved team XML to {team_xml_path}")
+
         except Exception as e:
             errorincode = traceback.format_exc()
             dprint(1, f"ERROR: Failed to access players for team {teamid}: {str(e)}")
