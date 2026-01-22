@@ -34,6 +34,7 @@
 
 **Priority 1: Testing & App Reliability**
 - 🎯 [TEST-012] Investigate and Fix 33 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
+- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **HIGH PRIORITY**
 
 **Priority 2: Deployment & Operations**
 - 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
@@ -2042,6 +2043,49 @@ architecture.md File Structure section (around line 130) still references old fi
 - [ ] No references to removed routes.py
 
 **Expected Outcomes**: Accurate architecture documentation that matches current codebase structure
+
+---
+
+### [DOC-026] Clean backlog.md Historical References
+**Status**: 🎯 Ready to Execute | **Effort**: 30 min | **Priority**: P6 | **Impact**: Documentation clarity
+**Dependencies**: REFACTOR-007 (✅ completed) | **Strategic Value**: Remove confusing historical context
+
+**Problem Statement**:
+backlog.md contains scattered references to resolved historical issues (BUG-001, route conflicts) that confuse current development focus:
+- Line 206: Reference to `app_with_routes` fixture timing/ordering conflicts
+- Lines 1916-1919: Multiple references to "dual registration", "blueprint stubs", "route conflicts"
+- Line 1941: Repeated references to resolved architectural issues
+- These describe historical debugging context, not current development concerns
+
+**Current Impact**:
+- Developers reading backlog get confused about current system state
+- Historical troubleshooting notes appear as active concerns
+- Documentation reads as "still migrating" when migration is complete
+- Obscures actual current priorities
+
+**Implementation**:
+1. **Mark Historical Context** (15 min):
+   - Add "Historical Note:" prefix to lines referencing BUG-001 resolution
+   - Move detailed historical context to brief footnotes
+   - Consider moving extensive history to .project/history/ with reference links
+
+2. **Update Current Focus Section** (10 min):
+   - Ensure Current Focus describes actual current work
+   - Remove any references to "dual registration" or "route conflicts"
+   - Focus on forward-looking tasks (BUG-002/003/004, CLEANUP-001)
+
+3. **Clean Task Descriptions** (5 min):
+   - Review all P0-P3 task descriptions
+   - Remove historical troubleshooting references
+   - Keep focus on "what to do" not "what was wrong"
+
+**Acceptance Criteria**:
+- [ ] No references to "dual registration" or "route conflicts" as current issues
+- [ ] Historical context clearly marked as past resolution, not current concern
+- [ ] Current Focus section describes forward-looking work only
+- [ ] Task descriptions focus on implementation, not historical debugging
+
+**Expected Outcomes**: Clear backlog that focuses on current and future work without confusing historical debugging notes
 
 ---
 

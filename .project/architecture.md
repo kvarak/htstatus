@@ -144,9 +144,11 @@ htstatus-2.0/
 ├── .project/           # Project management (backlog, plan, goals, architecture, progress)
 ├── app/               # Flask backend application
 │   ├── __init__.py
-│   ├── factory.py     # Application factory pattern
-│   ├── routes.py      # Legacy routes (1,993 lines) - contains OAuth logic
-│   ├── routes_bp.py   # Blueprint routes (stub migration, incomplete)
+│   ├── factory.py     # Application factory pattern with blueprint registration
+│   ├── constants.py   # Hattrick data definitions (166 lines)
+│   ├── utils.py       # Shared utility functions
+│   ├── routes_bp.py   # Legacy compatibility shim (minimal)
+│   ├── blueprints/    # Feature-based route modules (auth, main, player, team, matches, training)
 │   ├── static/        # Static assets (CSS, JS, images)
 │   └── templates/     # Jinja2 HTML templates
 ├── src/               # React frontend application
@@ -174,13 +176,14 @@ htstatus-2.0/
   - Quality gate integration: Step 4/6 in `make test-all` pipeline
   - Documentation: `docs/type-sync.md` for maintenance procedures
   - Current baseline: 85 issues identified (83 nullability + 2 type/field mismatches)
-- **Routing Resolution**: Manual route registration implemented in factory.py (INFRA-011 completed)
-  - Factory imports both Blueprint and legacy routes
-  - Manual add_url_rule() registration for 12 legacy route functions
-  - Commented @app.route decorators to prevent import failures
-  - All 21 routes now properly accessible and functional
-  - Requires completion or hybrid approach
-- **Testing Foundation**: 218 passing tests enable confident refactoring
+- **Blueprint Architecture**: Modern Flask blueprint pattern with 6 feature-based blueprints (REFACTOR-007 completed January 2026)
+  - Factory pattern in `app/factory.py` handles initialization and registration
+  - Each blueprint has `setup_*_blueprint()` function for dependency injection
+  - Constants extracted to `app/constants.py` (166 lines)
+  - Shared utilities in `app/utils.py` for cross-blueprint functions
+  - Clean separation of concerns by feature domain
+- **Library Versions**: pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8 (stable after BUG-001 resolution, downgrades may be re-evaluated)
+- **Testing Foundation**: 215/246 tests passing (87%) enable confident refactoring
 - **Multi-environment**: Development, staging, test, production configs ready
 
 ## Related Documentation

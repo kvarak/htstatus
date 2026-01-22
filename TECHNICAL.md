@@ -21,7 +21,7 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 - **Player/Match Data**: Synced from CHPP API, stored in Players, Match, MatchPlay tables
 - **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked
 - **CI/CD**: GitHub Actions for linting and basic CI
-- **Route Architecture**: Dual registration system with functional routes in routes.py and blueprint organization in routes_bp.py
+- **Route Architecture**: Modern Flask blueprint architecture with 6 blueprints (auth, main, player, team, matches, training) registered in factory.py
 - **PWA Implementation**: Service Worker with cache-first strategy for static assets, network-first for dynamic content, offline functionality for core routes
 - **Mobile Optimization**: Responsive CSS, touch-friendly navigation, installable PWA with app manifest
 - **Security**:
@@ -30,37 +30,34 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
   - Static commands with no user input vectors; documented with security rationale
   - Bandit configuration (.bandit) skips B404/B607/B603 for documented dev utilities
 
-### Route Ownership Strategy
+### Blueprint Architecture
 
-**Problem Resolved**: BUG-001 identified conflicts between blueprint stub routes and functional routes causing application pages to return empty templates instead of processed data.
+**Current Implementation** (as of REFACTOR-007, January 2026):
 
-**Route Registration System**:
-- **Functional Routes** (routes.py): Contains actual business logic for data processing and rendering
-- **Blueprint Routes** (routes_bp.py): Organizational structure for route grouping and future migration
+HTStatus uses a modern Flask blueprint architecture with clean separation of concerns:
+- **6 Blueprints**: auth, main, player, team, matches, training - each handling specific feature domains
+- **Factory Pattern**: `app/factory.py` initializes app with `create_app()` and registers blueprints via `setup_routes()`
+- **Constants Extraction**: `app/constants.py` defines Hattrick data (match types, roles, behaviors, column specs)
+- **Shared Utilities**: `app/utils.py` provides common functions (create_page, dprint, statistics calculations)
+- **Dependency Injection**: Each blueprint has a `setup_*_blueprint()` function receiving required dependencies
 
-**Ownership Rules**:
-1. **Functional routes have precedence**: When both exist, functional route implementations should be preserved
-2. **Remove conflicting stubs**: Blueprint routes that only return empty templates should be removed
-3. **Blueprint routes should be minimal**: Only include routes that provide unique functionality or proper bluepr framework organization
+**Architecture Benefits**:
+- Clear separation of concerns by feature domain
+- No circular dependencies through factory pattern
+- Testable blueprints with isolated dependencies
+- Easy to extend with new blueprints
 
-**Resolved Route Conflicts**:
-- ✅ `/login` - Functional route preserved (OAuth implementation)
-- ✅ `/logout` - Blueprint route preserved (simple session clearing)
-- ✅ `/update` - Removed blueprint stub, functional route restored
-- ✅ `/player` - Removed blueprint stub, functional route restored
-- ✅ `/team` - Removed blueprint stub, functional route restored
-- ✅ `/matches` - Removed blueprint stub, functional route restored
-- ✅ `/training` - Removed blueprint stub, functional route restored
-- ✅ `/settings` - Removed blueprint stub, functional route restored
-- ✅ `/debug` - Removed blueprint stub, functional route (admin) restored
-
-**Future Blueprint Migration**: When migrating routes to blueprints, move the functional implementation rather than creating stubs that override working code.
+> **Historical Note**: Previously used monolithic `routes.py` (2,335 lines, removed January 2026). See [.project/history/backlog-done.md](.project/history/backlog-done.md) for migration details.
 
 ## File Structure
-- `/app/routes.py`: Main Flask app logic
-- `/models.py`: SQLAlchemy models
-- `/src/`: React frontend
-- `/app/templates/`: Jinja2 templates
+- `/app/factory.py`: Application factory with blueprint registration
+- `/app/blueprints/`: Feature-based route modules (auth, main, player, team, matches, training)
+- `/app/constants.py`: Hattrick data definitions (match types, roles, behaviors)
+- `/app/utils.py`: Shared utility functions (create_page, dprint, statistics)
+- `/app/routes_bp.py`: Legacy compatibility shim (minimal, maintained for backwards compatibility)
+- `/models.py`: SQLAlchemy database models
+- `/src/`: React frontend (modern SPA)
+- `/app/templates/`: Jinja2 templates (legacy Flask frontend)
 - `/scripts/`: Development utilities and debugging tools
 - `/environments/`: Environment configuration templates
 - `/configs/`: Docker Compose configurations and build tools
