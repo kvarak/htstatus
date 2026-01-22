@@ -183,7 +183,19 @@ def update():
             player_id = p.id
             dprint(1, f"DEBUG: Fetching player details for {p.first_name} {p.last_name} (ID: {player_id})")
             the_player = chpp.player(player_id)
-            dprint(1, f"DEBUG: Player fetched. Skills object: {the_player.skills}")
+
+            # Debug: Check if we can access raw XML or attributes
+            dprint(1, f"DEBUG: Player object type: {type(the_player)}")
+            dprint(1, f"DEBUG: Player object dir: {[attr for attr in dir(the_player) if 'skill' in attr.lower() or 'xml' in attr.lower()]}")
+
+            # Try to access  the_player's attributes differently
+            if hasattr(the_player, '_xml'):
+                dprint(1, f"DEBUG: Has _xml attribute")
+            if hasattr(the_player, 'xml'):
+                dprint(1, f"DEBUG: Has xml attribute: {str(the_player.xml)[:200]}")
+
+            dprint(1, f"DEBUG: Skills object: {the_player.skills}")
+            dprint(1, f"DEBUG: Skills type: {type(the_player.skills)}")
             dprint(1, f"DEBUG: Keeper={the_player.skills.keeper}, Defender={the_player.skills.defender}, Playmaker={the_player.skills.playmaker}")
 
             if the_player.transfer_details:
