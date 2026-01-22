@@ -6,15 +6,17 @@ import platform
 # Use the factory pattern instead of direct Flask instantiation
 from app.factory import create_app
 
-print("Python version " + platform.python_version())
-
 # Set development environment
 os.environ.setdefault('FLASK_ENV', 'development')
 
 # Create app using factory pattern
+# For Flask-Migrate and other CLI tools, app needs to be at module level
 app = create_app()
 
+# Only print version when actually running the server, not when imported
 if __name__ == '__main__':
+    print("Python version " + platform.python_version())
+
     # Use environment variables for host and port configuration
     host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
     port = int(os.environ.get('FLASK_RUN_PORT', '5000'))
