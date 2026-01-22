@@ -152,6 +152,16 @@ def update():
         try:
             team_players = the_team.players()
             players_count = len(team_players)
+            
+            # Debug: Save the players XML to check if it has skill data
+            if teamid == all_teams[0]:
+                try:
+                    import pathlib
+                    xml_path = pathlib.Path('/tmp')
+                    team_players._save_as_xml(xml_path, f'team_players_{teamid}.xml')
+                    dprint(1, f"DEBUG: Saved team players XML to /tmp/team_players_{teamid}.xml")
+                except Exception as e:
+                    dprint(1, f"DEBUG: Error saving team players XML: {e}")
 
         except Exception as e:
             errorincode = traceback.format_exc()
@@ -181,6 +191,17 @@ def update():
 
             # Get player ID - HTTeamPlayersItem uses 'id' attribute
             player_id = p.id
+
+            # Debug: Check what skill data is available from team.players() endpoint (HTTeamPlayersItem)
+            if player_id == team_players[0].id:
+                dprint(1, f"DEBUG: === Checking HTTeamPlayersItem (from team.players()) ===")
+                dprint(1, f"DEBUG: Player: {p.first_name} {p.last_name} (ID: {player_id})")
+                dprint(1, f"DEBUG: p.player_skills type: {type(p.player_skills)}")
+                dprint(1, f"DEBUG: p.player_skills.keeper: {p.player_skills.keeper}")
+                dprint(1, f"DEBUG: p.player_skills.defender: {p.player_skills.defender}")
+                dprint(1, f"DEBUG: p.player_skills.playmaker: {p.player_skills.playmaker}")
+                dprint(1, f"DEBUG: p.player_skills.stamina: {p.player_skills.stamina}")
+
             dprint(1, f"DEBUG: Fetching player details for {p.first_name} {p.last_name} (ID: {player_id})")
             the_player = chpp.player(player_id)
 
