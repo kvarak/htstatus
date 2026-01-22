@@ -342,11 +342,7 @@ def handle_oauth_callback(oauth_verifier):
             session['all_team_names'] = [f"Team {current_user.ht_id}"]
             session['team_id'] = current_user.ht_id
 
-        return redirect('/')
 
-    except Exception as e:
-        dprint(1, f"OAuth callback error: {e}")
-        return create_page(
             template='login.html',
             title='Login / Signup',
             error='OAuth authentication failed. Please try again.')
@@ -370,4 +366,11 @@ def logout():
 def oauth_direct():
     """Direct OAuth authentication for password migration users."""
     dprint(1, "Starting direct OAuth flow for password migration")
-    return start_oauth_flow()
+
+    # Clear existing session to force fresh authentication
+    if session.get('current_user'):
+        dprint(1, "Clearing existing session for password migration flow")
+        session.clear()
+        session.pop('current_user', None)
+        session.pop('access_key', None)
+        session.pop('access_secret', None)
