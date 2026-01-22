@@ -155,13 +155,6 @@ def update():
             dprint(1, f"Found {players_count} players in team")
             dprint(2, the_team.players)
 
-            # DEBUG: Save team players XML to check if skills are there
-            team_xml_path = "/tmp/team_182085_source.xml"
-            if hasattr(the_team, '_xml_data'):
-                with open(team_xml_path, 'w') as f:
-                    f.write(str(the_team._xml_data))
-                dprint(1, f"DEBUG: Saved team XML to {team_xml_path}")
-
         except Exception as e:
             errorincode = traceback.format_exc()
             dprint(1, f"ERROR: Failed to access players for team {teamid}: {str(e)}")
@@ -189,13 +182,6 @@ def update():
             thisplayer = {}
 
             the_player = chpp.player(ht_id=p.ht_id)
-
-            # Debug: Check the_player attributes for skill data
-            dprint(1, f"DEBUG: the_player attributes = {[attr for attr in dir(the_player) if 'skill' in attr.lower()]}")
-            if hasattr(the_player, 'keeper_skill'):
-                dprint(1, f"DEBUG: the_player.keeper_skill = {the_player.keeper_skill}")
-            if hasattr(the_player, 'player_skills'):
-                dprint(1, f"DEBUG: the_player.player_skills = {the_player.player_skills}")
 
             if the_player.transfer_details:
                 dprint(2,
@@ -257,17 +243,6 @@ def update():
             thisplayer['leadership'] = p.leadership
 
             # Debug: Check which object has skills
-            dprint(1, f"DEBUG: p.skills = {p.skills if hasattr(p, 'skills') else 'NO ATTRIBUTE'}")
-            dprint(1, f"DEBUG: the_player.skills = {the_player.skills if hasattr(the_player, 'skills') else 'NO ATTRIBUTE'}")
-
-            # Check what's inside an HTSkill object
-            if hasattr(p, 'skills') and p.skills:
-                keeper_skill = p.skills.get('keeper')
-                dprint(1, f"DEBUG: keeper_skill object = {keeper_skill}")
-                dprint(1, f"DEBUG: keeper_skill type = {type(keeper_skill)}")
-                dprint(1, f"DEBUG: keeper_skill dir = {[attr for attr in dir(keeper_skill) if not attr.startswith('_')]}")
-                dprint(1, f"DEBUG: keeper_skill.__dict__ = {keeper_skill.__dict__ if hasattr(keeper_skill, '__dict__') else 'NO __dict__'}")
-
             # Use the_player.skills instead of p.skills for pychpp 0.3.12
             skills_source = the_player.skills if hasattr(the_player, 'skills') and the_player.skills else p.skills
 

@@ -118,9 +118,7 @@ def stats():
         get_top_performers,
         get_top_scorers,
     )
-    print(f"\n=== STATS ROUTE DEBUG: About to call calculate_team_statistics with {len(current_players_list)} players ===")
     team_stats = calculate_team_statistics(current_players_list)
-    print(f"=== STATS ROUTE DEBUG: Got team_stats result: {team_stats} ===\n")
 
     # Get top performers
     top_scorers = get_top_scorers(current_players_list)
