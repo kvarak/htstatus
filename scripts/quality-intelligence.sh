@@ -47,25 +47,42 @@ else
     fi
 fi
 
-# Security
-printf "  %-20s" "Security:"
-if grep -q "No known security vulnerabilities reported" /tmp/security-results.txt 2>/dev/null; then
-    echo "✅ SECURE (0 vulnerabilities)"
-elif grep -q "No issues identified" /tmp/security-results.txt 2>/dev/null; then
-    echo "✅ SECURE (0 vulnerabilities)"
-else
-    # Try to extract vulnerability count from safety scan JSON output
-    vuln_count=$(grep '"results": \[' /tmp/security-results.txt 2>/dev/null | sed 's/.*"results": \[\([^\]]*\)\].*/\1/' | grep -o ',' | wc -l 2>/dev/null || echo "0")
-    # Fallback to old format issue count
-    if [ "$vuln_count" = "0" ]; then
-        issues=$(grep "Issue:" /tmp/security-results.txt 2>/dev/null | wc -l | xargs || echo "unknown")
-        if [ "$issues" = "0" ] || [ "$issues" = "unknown" ]; then
-            echo "✅ SECURE (0 vulnerabilities)"
-        else
-            echo "⚠️  $issues ISSUES (run 'make security' to review)"
-        fi
+# Security (split into CVE vulnerabilities and code security issues)
+printf "  %-20s" "CVE Vulnerabilities:"
+if [ -f "/tmp/safety-results.json" ]; then
+    cve_count=$(jq -r '.scan_results.vulnerabilities | length' /tmp/safety-results.json 2>/dev/null || echo "unknown")
+    if [ "$cve_count" = "0" ]; then
+        echo "✅ NONE (dependencies secure)"
+    elif [ "$cve_count" = "unknown" ]; then
+        echo "⚠️  UNKNOWN (run 'make security')"
     else
-        echo "⚠️  $vuln_count VULNERABILITIES (run 'make security' to review)"
+        echo "⚠️  $cve_count FOUND (run 'make security')"
+    fi
+else
+    # Fallback to old text-based parsing
+    if grep -q "No known security vulnerabilities reported" /tmp/security-results.txt 2>/dev/null || grep -q "No CVE vulnerabilities" /tmp/security-results.txt 2>/dev/null; then
+        echo "✅ NONE (dependencies secure)"
+    else
+        echo "⚠️  UNKNOWN (run 'make security')"
+    fi
+fi
+
+printf "  %-20s" "Code Security:"
+if [ -f "/tmp/bandit-results.json" ]; then
+    bandit_issues=$(jq -r '.metrics._totals."SEVERITY.MEDIUM" + .metrics._totals."SEVERITY.HIGH"' /tmp/bandit-results.json 2>/dev/null || echo "unknown")
+    if [ "$bandit_issues" = "0" ]; then
+        echo "✅ CLEAN (no Bandit issues)"
+    elif [ "$bandit_issues" = "unknown" ]; then
+        echo "⚠️  UNKNOWN (run 'make security')"
+    else
+        echo "⚠️  $bandit_issues ISSUE(S) (run 'make security')"
+    fi
+else
+    # Fallback to text-based parsing
+    if grep -q "No code security issues found" /tmp/security-results.txt 2>/dev/null; then
+        echo "✅ CLEAN (no Bandit issues)"
+    else
+        echo "⚠️  UNKNOWN (run 'make security')"
     fi
 fi
 
@@ -166,6 +183,6 @@ fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Cleanup temp files after analysis
-rm -f /tmp/fileformat-results.txt /tmp/lint-results.txt /tmp/security-results.txt /tmp/typesync-results.txt /tmp/config-results.txt /tmp/test-results.txt
+rm -f /tmp/fileformat-results.txt /tmp/lint-results.txt /tmp/security-results.txt /tmp/bandit-results.json /tmp/bandit-results.txt /tmp/safety-results.json /tmp/typesync-results.txt /tmp/config-results.txt /tmp/test-results.txt
 
 echo "✅ Quality Intelligence Platform analysis complete"

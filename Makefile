@@ -190,8 +190,20 @@ typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
 
 security: check-uv ## Run bandit and safety security checks
 	@echo "🔒 Running security checks..."
-	@$(UV) run bandit -r app/ -c .bandit -f json 2>/dev/null || $(UV) run bandit -r app/ -c .bandit
-	@$(UV) run safety scan --output json --disable-optional-telemetry 2>/dev/null | jq -r 'if .scan_results.vulnerabilities | length == 0 then "✅ No known security vulnerabilities reported." else "⚠️  " + (.scan_results.vulnerabilities | length | tostring) + " vulnerabilities found. Run safety scan for details." end' 2>/dev/null || $(UV) run safety scan
+	@echo ""
+	@echo "📋 Bandit Code Security Analysis:"
+	@$(UV) run bandit -r app/ -c .bandit -f json 2>/dev/null > /tmp/bandit-results.json || $(UV) run bandit -r app/ -c .bandit > /tmp/bandit-results.txt || true
+	@if [ -f /tmp/bandit-results.json ]; then \
+		bandit_issues=$$(jq -r '.metrics._totals."SEVERITY.MEDIUM" + .metrics._totals."SEVERITY.HIGH"' /tmp/bandit-results.json 2>/dev/null || echo "0"); \
+		if [ "$$bandit_issues" = "0" ]; then \
+			echo "✅ No code security issues found"; \
+		else \
+			echo "⚠️  $$bandit_issues code security issue(s) found (run 'make security' for details)"; \
+		fi; \
+	fi
+	@echo ""
+	@echo "📋 Safety CVE Vulnerability Analysis:"
+	@$(UV) run safety scan --output json --disable-optional-telemetry 2>/dev/null | tee /tmp/safety-results.json | jq -r 'if .scan_results.vulnerabilities | length == 0 then "✅ No CVE vulnerabilities in dependencies" else "⚠️  " + (.scan_results.vulnerabilities | length | tostring) + " CVE vulnerability/vulnerabilities found in dependencies" end' 2>/dev/null || $(UV) run safety scan
 
 # Testing Infrastructure
 test: services ## 🧪 Run comprehensive test suite (primary target for development)
