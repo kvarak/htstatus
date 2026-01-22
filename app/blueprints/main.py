@@ -1,14 +1,14 @@
 """Main and admin routes blueprint for HT Status application."""
 
 import re
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask import Blueprint, redirect, render_template, request, session, url_for
 from sqlalchemy import text
 
-from app.utils import create_page, diff_month, dprint
-from models import Group, PlayerSetting, User
+from app.utils import create_page, diff_month, dprint, player_diff
+from models import Group, Players, PlayerSetting, User
 
 # Create Blueprint for main routes
 main_bp = Blueprint('main', __name__)
@@ -304,8 +304,58 @@ def admin():
             'active_time': active_time}
         users.append(thisuser)
 
+    # Get recent player changes for administrative visibility
+    changelogfull = []
+    try:
+        # Get all players updated in the last 7 days across all users
+        cutoff_date = datetime.now() - timedelta(days=7)
+
+        recent_players = (db.session.query(Players)
+                         .filter(Players.data_date >= cutoff_date)
+                         .order_by(text('data_date desc'))
+                         .limit(100)  # Limit to most recent 100 player updates for performance
+                         .all())
+
+        # Track which players we've already processed to avoid duplicates
+        processed_players = set()
+
+        for player in recent_players:
+            if player.ht_id not in processed_players:
+                processed_players.add(player.ht_id)
+
+                # Get changes for this player over the last 7 days
+                changes = player_diff(player.ht_id, 7)
+
+                if changes:
+                    # Format each change as a readable string
+                    for change in changes:
+                        # change format: [team_name, first_name, last_name, skill, old_value, new_value]
+                        team_name = change[0]
+                        player_name = f"{change[1]} {change[2]}"
+                        skill = change[3]
+                        old_val = change[4]
+                        new_val = change[5]
+
+                        # Format with color indication
+                        if new_val > old_val:
+                            arrow = "↑"
+                            color = "green"
+                        else:
+                            arrow = "↓"
+                            color = "red"
+
+                        change_str = f'<font color="{color}">{team_name}: {player_name} - {skill}: {old_val} → {new_val} {arrow}</font>'
+                        changelogfull.append(change_str)
+
+        dprint(2, f"Found {len(changelogfull)} player changes in last 7 days")
+
+    except Exception as e:
+        dprint(1, f"Error calculating player changes: {e}")
+        changelogfull = []
+
     return create_page(
         template='debug.html',
         title='Debug',
         users=users,
+        changelogfull=changelogfull,
         error=error)
