@@ -27,13 +27,10 @@
 ## Current Focus
 
 **Priority 0: Critical Bugs** (Blocking core functionality)
-- 🎯 [BUG-002] Fix Training Page Display (2-3 hours) - Training tracking broken after pychpp upgrade **CRITICAL**
 - 🎯 [BUG-003] Player Groups Not Functioning (2-4 hours) - Groups visible in settings but not integrated **CRITICAL**
-- 🎯 [BUG-004] Debug Page Changes List Empty (1-2 hours) - Admin/developer debugging tool not working **CRITICAL**
-- 🎯 [CLEANUP-001] Remove Debug Code from BUG-001 Investigation (30-45 min) - Remove temp file usage (B108) and debug logging **READY**
 
 **Priority 1: Testing & App Reliability**
-- 🎯 [TEST-012] Investigate and Fix 33 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
+- 🎯 [TEST-012] Investigate and Fix 31 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
 - 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **HIGH PRIORITY**
 
 **Priority 2: Deployment & Operations**
@@ -231,88 +228,6 @@ This suggests TEST-009 fix was incomplete and revealed a deeper Flask applicatio
 
 ## Priority 0: Critical Bugs
 
-### [CLEANUP-001] Remove Debug Code from BUG-001 Investigation
-**Status**: 🎯 Ready to Execute | **Effort**: 30-45 min | **Priority**: P0 | **Impact**: Security - B108 code security issue
-**Dependencies**: BUG-001 completed (✅) | **Strategic Value**: Code quality and security
-
-**Problem Statement**:
-During BUG-001 investigation (57-commit debugging journey), temporary debug code was added to inspect team XML data and trace skill parsing. This debug code contains a security issue (B108 - hardcoded temp file path) and should be removed now that the root cause has been resolved.
-
-**Debug Code Locations**:
-1. **app/blueprints/team.py:159** - `team_xml_path = "/tmp/team_182085_source.xml"` (B108 security issue)
-2. **app/blueprints/team.py:262-270** - Extensive debug logging for skill inspection
-3. **app/blueprints/auth.py:136** - Debug output "Debug: all_teams set to..."
-
-**Implementation**:
-1. **Remove temp file usage** (15 min):
-   - Remove hardcoded /tmp/ path at team.py:159
-   - Remove XML file writing logic
-   - Verify no other temp file references remain
-
-2. **Clean up debug logging** (15 min):
-   - Remove debug print statements from team.py
-   - Remove debug output from auth.py
-   - Preserve error handling and critical logging
-
-3. **Verify security scan** (5-10 min):
-   - Run `make security` to confirm B108 issue resolved
-   - Ensure CVE vulnerabilities remain at 0
-   - Validate quality gates pass
-
-**Acceptance Criteria**:
-- B108 security issue resolved (`make security` shows 0 code security issues)
-- All debug logging removed from production code
-- Error handling preserved
-- No functional regressions
-- Quality gates pass
-
-**Strategic Value**: Maintains code security and quality standards, completes BUG-001 cleanup
-
-### [BUG-002] Fix Training Page Display After pychpp Upgrade
-**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P0 | **Impact**: CRITICAL - training tracking broken
-**Dependencies**: BUG-001 investigation may reveal related issues | **Strategic Value**: Essential for skill development tracking
-
-**Problem Statement**:
-Training page has display or functionality issues after pychpp 0.5.10 upgrade. Since the /update route now successfully imports player data with the new API, but the training page isn't working correctly, this likely involves:
-- Training data rendering issues
-- Historical skill comparison problems
-- Player skill progression display
-- Training effectiveness calculations
-
-**Likely Causes**:
-1. Skill data structure changes from pychpp 0.5.10
-2. Historical data comparison using old attribute names
-3. Training calculations expecting different data types
-4. Template variable mismatches
-
-**Implementation**:
-1. **Investigate training page rendering** (30-45 min):
-   - Check app/blueprints/training.py route handlers
-   - Review app/templates/training.html template
-   - Identify skill progression calculation issues
-   - Check historical data access patterns
-
-2. **Fix training data access** (45-60 min):
-   - Update skill attribute access patterns
-   - Fix historical comparison queries
-   - Add None value handling for skill data
-   - Test skill progression calculations
-
-3. **Validate training display** (30-45 min):
-   - Check skill change visualization
-   - Verify training effectiveness metrics
-   - Test with multiple training dates
-   - Ensure all training statistics render
-
-**Acceptance Criteria**:
-- Training page displays correctly
-- Historical skill comparisons work
-- Skill progression charts render
-- Training effectiveness calculations accurate
-- No data access errors
-
-**Strategic Value**: Critical for monitoring player development, a core use case for team management
-
 ### [BUG-003] Player Groups Not Functioning (Visible in Settings Only)
 **Status**: 🎯 Ready to Execute | **Effort**: 2-4 hours | **Priority**: P0 | **Impact**: CRITICAL - feature not integrated
 **Dependencies**: BUG-001 player page fix may need coordination | **Strategic Value**: Player organization and workflow feature
@@ -358,48 +273,6 @@ Player groups are visible and configurable in the settings page but not actually
 - Database operations maintain data integrity
 
 **Strategic Value**: Enables advanced player organization, a key feature for tactical planning and team management efficiency
-
-### [BUG-004] Debug Page Changes List Empty
-**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P0 | **Impact**: Developer/admin tool not working
-**Dependencies**: Recent pychpp 0.5.10 upgrade completed | **Strategic Value**: Administrative visibility and debugging
-
-**Problem Statement**:
-The debug page's changes list section is displaying empty, preventing administrators and developers from viewing recent player data changes. This affects administrative workflows for monitoring data updates and debugging player data import issues.
-
-**Likely Causes**:
-1. Template variable changes after pychpp upgrade
-2. Data query changes in debug route handler
-3. Database schema or query compatibility issues
-4. Changes calculation logic affected by pychpp API differences
-5. Template rendering issues with changes data structure
-
-**Implementation**:
-1. **Investigate debug page rendering** (20-30 min):
-   - Check app/blueprints/main.py debug route handler
-   - Review app/templates/debug.html template
-   - Verify changes data query and calculation
-   - Check for None value handling in changes logic
-
-2. **Fix changes data retrieval** (30-45 min):
-   - Update changes calculation logic if needed
-   - Fix database queries for changes data
-   - Add None value handling and fallbacks
-   - Test with actual recent player updates
-
-3. **Validate changes display** (10-15 min):
-   - Check changes list rendering
-   - Verify data formatting in template
-   - Test with multiple change types
-   - Ensure changes display correctly
-
-**Acceptance Criteria**:
-- Debug page displays recent changes correctly
-- Changes list shows player data modifications
-- All change types render properly
-- No template rendering errors
-- Administrative visibility restored
-
-**Strategic Value**: Essential for administrative monitoring and debugging data import issues, particularly after major upgrades
 
 ---
 

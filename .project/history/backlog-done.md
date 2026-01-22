@@ -2,6 +2,99 @@
 
 ## Completed P0 Critical Bugs (January 2026)
 
+### [BUG-002] Fix Training Page Display After pychpp Upgrade
+**Completed**: 2026-01-22
+**Effort**: 0 hours (resolved by library stabilization)
+**Impact**: CRITICAL - Training tracking functionality restored
+
+**Summary**: Training page functionality was restored as a side effect of resolving BUG-001 and stabilizing the pychpp library ecosystem. After downgrading to pychpp 0.3.12, Flask 2.3.3, and werkzeug 2.3.8, the training page began functioning correctly without requiring specific code changes.
+
+**Root Cause**: Training page issues were caused by the same pychpp 0.5.10 library incompatibilities that affected the player display page in BUG-001. The library downgrades resolved data access and skill attribute issues across all player-related pages.
+
+**Resolution**: No specific code changes required. The training page resumed normal operation after:
+- Downgrading pychpp from 0.5.10 to 0.3.12
+- Downgrading Flask from 3.1.2 to 2.3.3
+- Downgrading werkzeug from 3.1.5 to 2.3.8
+- Fixing team ID retrieval logic in BUG-001
+
+**Validation**: User confirmed "it works" - training page displays player skill progression correctly
+
+**Strategic Value**: Training tracking is essential for monitoring player development and making training decisions. This functionality is now stable and operational.
+
+**Lessons Learned**: Library ecosystem stability is critical - fixing root library compatibility issues can resolve multiple downstream problems. Testing should validate all player data access patterns when library versions change.
+
+---
+
+### [BUG-004] Fix Debug Page Changes List Empty
+**Completed**: 2026-01-22
+**Effort**: 1 hour
+**Impact**: CRITICAL - Restored administrative visibility into player data changes
+
+**Summary**: Fixed debug page's empty changes list by adding player change calculation logic to the admin route handler. The template was expecting `changelogfull` variable that was never provided by the route.
+
+**Root Cause**: Debug route handler in [app/blueprints/main.py](app/blueprints/main.py) was missing logic to calculate and pass player changes data to the template. The "Changes" card section in [app/templates/debug.html](app/templates/debug.html) was displaying empty because no data was being provided.
+
+**Technical Implementation**:
+- **Added Changes Calculation**: Integrated `player_diff()` function from [app/utils.py](app/utils.py) into debug route
+- **Query Optimization**: Limited to 100 most recent player updates from last 7 days for performance
+- **Formatted Output**: Created HTML-formatted strings with color-coded arrows (green ↑ for improvements, red ↓ for declines)
+- **Error Handling**: Wrapped changes calculation in try-except to prevent page crashes if data unavailable
+
+**Files Modified**:
+- `app/blueprints/main.py`: Added imports (datetime, timedelta, player_diff, Players model), implemented changes calculation logic (35 lines), passed `changelogfull` to template
+
+**Technical Details**:
+```python
+# Query recent players (last 7 days, limit 100)
+# Calculate changes using player_diff(player_id, 7)
+# Format: "Team: Player Name - Skill: old → new ↑/↓"
+# Pass to template as changelogfull parameter
+```
+
+**Validation**:
+- ✅ All 32 fast tests pass (no regressions)
+- ✅ Security scan clean (0 CVE, 0 code security issues)
+- ✅ Linting clean (ruff check passed)
+- ✅ Debug page loads without errors
+- ✅ Changes display correctly when player data exists
+
+**Quality Gates**: All passing (tests, security, linting)
+
+**Strategic Value**: Restores administrative debugging capability, enables monitoring of player data import processes, provides audit trail for recent skill changes
+
+**Lessons Learned**: Always ensure route handlers provide all variables expected by templates; leverage existing utility functions (player_diff) to avoid code duplication
+
+---
+
+### [CLEANUP-001] Remove Debug Code from BUG-001 Investigation
+**Completed**: 2026-01-22
+**Effort**: 45 minutes
+**Impact**: CRITICAL - Resolved B108 security issue, improved code quality
+
+**Summary**: Removed all debug code and temporary file usage added during BUG-001 investigation. Eliminated B108 security warning (hardcoded /tmp/ path) and cleaned up verbose debugging statements across 3 blueprint files.
+
+**Technical Changes**:
+- **Security Fix**: Removed hardcoded `/tmp/team_182085_source.xml` path from [app/blueprints/team.py](app/blueprints/team.py) (B108 issue)
+- **Debug Code Removal**: Deleted 9 DEBUG statements across auth.py, team.py, matches.py
+- **Code Quality**: Improved maintainability by removing verbose object inspection code
+- **Validation**: All 32 fast tests pass, security scan shows 0 issues
+
+**Files Modified**:
+- `app/blueprints/team.py`: Removed XML temp file code (lines 155-163), skill inspection debugging (lines 260-270), player attribute inspection (lines 187-191)
+- `app/blueprints/auth.py`: Removed current_user attribute inspection debugging (lines 157-161)
+- `app/blueprints/matches.py`: Removed print statement debugging for stats route (lines 121-123)
+
+**Security Impact**:
+- Before: ⚠️ 1 code security issue (B108 - hardcoded temp file path)
+- After: ✅ No code security issues found
+- CVE status: ✅ No vulnerabilities in dependencies (unchanged)
+
+**Quality Gates**: Security scan passing, lint status unchanged (33 pre-existing test warnings), fast tests passing (32/32)
+
+**Lessons Learned**: Remove debug code immediately after bug resolution, track cleanup as separate task if needed for thoroughness
+
+---
+
 ### [BUG-001] Fix Player Page Display Issues After Library Downgrades
 **Completed**: 2026-01-22
 **Effort**: ~8 hours (57 commits debugging journey)
