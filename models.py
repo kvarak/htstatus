@@ -129,7 +129,7 @@ class User(db.Model):
     ht_id = db.Column(db.Integer, primary_key=True, unique=True)
     ht_user = db.Column(db.String(100), unique=True)
     username = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
+    password = db.Column(db.String(255))  # Increased from 100 to 255 for modern hashing
     access_key = db.Column(db.String(100))
     access_secret = db.Column(db.String(100))
     c_login = db.Column(db.Integer, default=1)
