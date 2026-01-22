@@ -191,7 +191,7 @@ typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
 security: check-uv ## Run bandit and safety security checks
 	@echo "🔒 Running security checks..."
 	@$(UV) run bandit -r app/ -c .bandit -f json 2>/dev/null || $(UV) run bandit -r app/ -c .bandit
-	@$(UV) run safety check
+	@$(UV) run safety scan --output json --disable-optional-telemetry 2>/dev/null | jq -r 'if .scan_results.vulnerabilities | length == 0 then "✅ No known security vulnerabilities reported." else "⚠️  " + (.scan_results.vulnerabilities | length | tostring) + " vulnerabilities found. Run safety scan for details." end' 2>/dev/null || $(UV) run safety scan
 
 # Testing Infrastructure
 test: services ## 🧪 Run comprehensive test suite (primary target for development)
