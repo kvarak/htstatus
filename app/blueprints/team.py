@@ -234,11 +234,11 @@ def update():
             thisplayer['caps_u20'] = p.caps_u20
             thisplayer['career_goals'] = p.career_goals
             thisplayer['career_hattricks'] = p.career_hattricks
-            thisplayer['league_goals'] = p.league_goals
-            thisplayer['cup_goals'] = p.cup_goals
-            thisplayer['friendly_goals'] = p.friendlies_goals
-            thisplayer['current_team_matches'] = p.matches_current_team
-            thisplayer['current_team_goals'] = p.goals_current_team
+            thisplayer['league_goals'] = the_player.league_goals
+            thisplayer['cup_goals'] = the_player.cup_goals
+            thisplayer['friendly_goals'] = the_player.friendlies_goals
+            thisplayer['current_team_matches'] = the_player.matches_current_team
+            thisplayer['current_team_goals'] = the_player.goals_current_team
             # thisplayer['national_team_id'] = p.national_team_id  # Not available in HTTeamPlayersItem
             # thisplayer['national_team_name'] = p.national_team_name  # Not available in HTTeamPlayersItem
             thisplayer['national_team_id'] = None  # Set default value since not available
