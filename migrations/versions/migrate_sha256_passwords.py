@@ -1,7 +1,7 @@
 """Migrate SHA256 password hashes to Werkzeug 3.x compatibility
 
-Revision ID: migrate_sha256_passwords
-Revises: password_field_increase_werkzeug_3x
+Revision ID: migrate_sha256_pwd
+Revises: pwd_field_werkzeug3x
 Create Date: 2026-01-22 10:45:00
 
 This migration addresses the critical backward compatibility issue where existing users
@@ -25,8 +25,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'migrate_sha256_passwords'
-down_revision = 'password_field_increase_werkzeug_3x'
+revision = 'migrate_sha256_pwd'
+down_revision = 'pwd_field_werkzeug3x'
 branch_labels = None
 depends_on = None
 

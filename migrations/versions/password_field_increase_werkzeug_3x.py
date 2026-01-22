@@ -1,7 +1,7 @@
 """Increase password field length for Werkzeug 3.x compatibility
 
-Revision ID: password_field_increase_werkzeug_3x
-Revises:
+Revision ID: pwd_field_werkzeug3x
+Revises: 7e8a973e62ed
 Create Date: 2026-01-22 10:40:00
 
 This migration increases the password field length from VARCHAR(100) to VARCHAR(255)
@@ -17,7 +17,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'password_field_increase_werkzeug_3x'
+revision = 'pwd_field_werkzeug3x'
 down_revision = '7e8a973e62ed'
 branch_labels = None
 depends_on = None
