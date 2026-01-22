@@ -146,7 +146,7 @@ def stats():
         import pychpp
         print(f"pyCHPP version: {getattr(pychpp, '__version__', 'Unknown')}")
 
-        team_details = chpp.team(id_=teamid)
+        team_details = chpp.team(ht_id=teamid)
         print(f"Team details fetched: {team_details.name}")
 
         # Extract available competition information

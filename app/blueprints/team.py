@@ -54,7 +54,7 @@ def team():
     teams = []
     for teamid in all_teams:
         dprint(1, teamid)
-        this_team = chpp.team(id_=teamid)
+        this_team = chpp.team(ht_id=teamid)
         dprint(2, vars(this_team))
         teams.append(this_team.name)
 
@@ -133,7 +133,7 @@ def update():
     for teamid in all_teams:
 
         try:
-            the_team = chpp.team(id_=teamid)
+            the_team = chpp.team(ht_id=teamid)
             dprint(1, f"Team data fetched successfully: {the_team.name}")
 
         except Exception as e:
