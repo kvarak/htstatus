@@ -10,6 +10,13 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Capture test results from stdin if provided
+if [ -t 0 ]; then
+    test_results=""
+else
+    test_results=$(cat)
+fi
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🎯 HTStatus Quality Intelligence Report"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -42,14 +49,23 @@ fi
 
 # Security
 printf "  %-20s" "Security:"
-if grep -q "No issues identified" /tmp/security-results.txt 2>/dev/null; then
+if grep -q "No known security vulnerabilities reported" /tmp/security-results.txt 2>/dev/null; then
+    echo "✅ SECURE (0 vulnerabilities)"
+elif grep -q "No issues identified" /tmp/security-results.txt 2>/dev/null; then
     echo "✅ SECURE (0 vulnerabilities)"
 else
-    issues=$(grep "Issue:" /tmp/security-results.txt 2>/dev/null | wc -l | xargs || echo "unknown")
-    if [ "$issues" = "0" ]; then
-        echo "✅ SECURE (0 vulnerabilities)"
+    # Try to extract vulnerability count from safety scan JSON output
+    vuln_count=$(grep '"results": \[' /tmp/security-results.txt 2>/dev/null | sed 's/.*"results": \[\([^\]]*\)\].*/\1/' | grep -o ',' | wc -l 2>/dev/null || echo "0")
+    # Fallback to old format issue count
+    if [ "$vuln_count" = "0" ]; then
+        issues=$(grep "Issue:" /tmp/security-results.txt 2>/dev/null | wc -l | xargs || echo "unknown")
+        if [ "$issues" = "0" ] || [ "$issues" = "unknown" ]; then
+            echo "✅ SECURE (0 vulnerabilities)"
+        else
+            echo "⚠️  $issues ISSUES (run 'make security' to review)"
+        fi
     else
-        echo "⚠️  $issues ISSUES (run 'make security' to review)"
+        echo "⚠️  $vuln_count VULNERABILITIES (run 'make security' to review)"
     fi
 fi
 
@@ -69,9 +85,18 @@ echo "🧪 TESTING INTELLIGENCE ANALYSIS:"
 
 # Configuration Reliability
 printf "  %-20s" "Config Reliability:"
-if grep -q "passed.*failed.*skipped" /tmp/config-results.txt 2>/dev/null; then
-    config_cov=$(grep -o '[0-9]*%' /tmp/config-results.txt | tail -1 || echo "unknown%")
-    config_tests=$(grep -o '[0-9]* passed' /tmp/config-results.txt | head -1 | grep -o '[0-9]*' || echo "?")
+# Check for config test results in temp file first, then stdin
+if [ -f "/tmp/config-results.txt" ]; then
+    if grep -q "[0-9]\+ passed, [0-9]\+ skipped" /tmp/config-results.txt 2>/dev/null; then
+        config_cov=$(grep -o 'TOTAL.*[0-9]\+%' /tmp/config-results.txt | tail -1 | grep -o '[0-9]\+%' || echo "unknown%")
+        config_tests=$(grep -o '[0-9]\+ passed' /tmp/config-results.txt | tail -1 | grep -o '[0-9]\+' || echo "config")
+        echo "✅ ROBUST ($config_cov coverage, $config_tests validations)"
+    else
+        echo "❌ FAILING (check config test setup)"
+    fi
+elif echo "$test_results" | grep -q "test_config" && echo "$test_results" | grep -q "[0-9]\+ passed, [0-9]\+ skipped"; then
+    config_cov=$(echo "$test_results" | grep -o 'TOTAL.*[0-9]\+%' | tail -1 | grep -o '[0-9]\+%' || echo "unknown%")
+    config_tests=$(echo "$test_results" | grep -o '[0-9]\+ passed' | tail -1 | grep -o '[0-9]\+' || echo "config")
     echo "✅ ROBUST ($config_cov coverage, $config_tests validations)"
 else
     echo "❌ FAILING (check config test setup)"
@@ -79,14 +104,26 @@ fi
 
 # Application Logic
 printf "  %-20s" "Application Logic:"
-if grep -q "FAILED" /tmp/test-results.txt 2>/dev/null; then
-    app_cov=$(grep -o 'TOTAL.*[0-9]*%' /tmp/test-results.txt | tail -1 | grep -o '[0-9]*%' || echo "??%")
-    passed=$(grep -o '[0-9]* passed' /tmp/test-results.txt | head -1 | grep -o '[0-9]*' || echo "?")
-    failed=$(grep -o '[0-9]* failed' /tmp/test-results.txt | head -1 | grep -o '[0-9]*' || echo "?")
+# Check for application test results in temp file first, then stdin
+if [ -f "/tmp/test-results.txt" ]; then
+    if grep -q "FAILED" /tmp/test-results.txt 2>/dev/null; then
+        app_cov=$(grep -o 'TOTAL.*[0-9]*%' /tmp/test-results.txt | tail -1 | grep -o '[0-9]*%' || echo "??%")
+        passed=$(grep -o '[0-9]* passed' /tmp/test-results.txt | head -1 | grep -o '[0-9]*' || echo "?")
+        failed=$(grep -o '[0-9]* failed' /tmp/test-results.txt | head -1 | grep -o '[0-9]*' || echo "?")
+        echo "⚠️  $app_cov ($passed passed, $failed failed - review failures)"
+    else
+        app_cov=$(grep -o 'TOTAL.*[0-9]*%' /tmp/test-results.txt | tail -1 | grep -o '[0-9]*%' || echo "??%")
+        passed=$(grep -o '[0-9]* passed' /tmp/test-results.txt | head -1 | grep -o '[0-9]*' || echo "all")
+        echo "✅ SOLID ($app_cov coverage, $passed tests passing)"
+    fi
+elif echo "$test_results" | grep -q "FAILED"; then
+    app_cov=$(echo "$test_results" | grep -o 'TOTAL.*[0-9]*%' | tail -1 | grep -o '[0-9]*%' || echo "??%")
+    passed=$(echo "$test_results" | grep -o '[0-9]* passed' | head -1 | grep -o '[0-9]*' || echo "?")
+    failed=$(echo "$test_results" | grep -o '[0-9]* failed' | head -1 | grep -o '[0-9]*' || echo "?")
     echo "⚠️  $app_cov ($passed passed, $failed failed - review failures)"
 else
-    app_cov=$(grep -o 'TOTAL.*[0-9]*%' /tmp/test-results.txt | tail -1 | grep -o '[0-9]*%' || echo "??%")
-    passed=$(grep -o '[0-9]* passed' /tmp/test-results.txt | head -1 | grep -o '[0-9]*' || echo "all")
+    app_cov=$(echo "$test_results" | grep -o 'TOTAL.*[0-9]*%' | tail -1 | grep -o '[0-9]*%' || echo "??%")
+    passed=$(echo "$test_results" | grep -o '[0-9]* passed' | head -1 | grep -o '[0-9]*' || echo "all")
     echo "✅ SOLID ($app_cov coverage, $passed tests passing)"
 fi
 
@@ -101,8 +138,22 @@ echo "  • Both metrics provide different quality dimensions for deployment con
 echo ""
 
 # Deployment Confidence Assessment
-config_ok=$(grep -q "passed.*failed.*skipped" /tmp/config-results.txt && echo "1" || echo "0")
-app_ok=$(grep -q "FAILED" /tmp/test-results.txt && echo "0" || echo "1")
+config_ok=0
+app_ok=0
+
+# Check config results
+if [ -f "/tmp/config-results.txt" ]; then
+    if grep -q "[0-9]* passed, [0-9]* skipped" /tmp/config-results.txt 2>/dev/null; then
+        config_ok=1
+    fi
+fi
+
+# Check app results
+if [ -f "/tmp/test-results.txt" ]; then
+    if ! grep -q "FAILED" /tmp/test-results.txt 2>/dev/null; then
+        app_ok=1
+    fi
+fi
 
 if [ "$config_ok" = "1" ] && [ "$app_ok" = "1" ]; then
     echo -e "🎯 DEPLOYMENT CONFIDENCE: ${GREEN}HIGH ✅${NC} (all quality gates passed)"
@@ -114,7 +165,7 @@ fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Cleanup temp files
+# Cleanup temp files after analysis
 rm -f /tmp/fileformat-results.txt /tmp/lint-results.txt /tmp/security-results.txt /tmp/typesync-results.txt /tmp/config-results.txt /tmp/test-results.txt
 
 echo "✅ Quality Intelligence Platform analysis complete"
