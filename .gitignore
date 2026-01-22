@@ -60,3 +60,6 @@ node_modules/
 dist/
 build/
 *.tsbuildinfopychpp
+
+# pyCHPP reference code
+pychpp/
