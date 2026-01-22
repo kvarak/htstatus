@@ -12,14 +12,14 @@ Example:
     uv run python scripts/debug_player_skills.py 480742036
 """
 
-import sys
 import os
+import sys
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from pychpp import CHPP
 from config import Config
+from pychpp import CHPP
 
 
 def debug_player_skills(player_id: int):

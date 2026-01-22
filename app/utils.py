@@ -490,9 +490,9 @@ def downloadMatches(teamid):
     """Download and process match data for a team."""
 
     from flask import current_app
-    from pychpp import CHPP
 
     from models import Match
+    from pychpp import CHPP
 
     # Get CHPP credentials from app config
     consumer_key = current_app.config.get('CONSUMER_KEY')

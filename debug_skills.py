@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Debug script to check player skills from CHPP API"""
 
-import sys
 from app.factory import create_app
-from pychpp import CHPP
 
 # Create Flask app to load config
 app = create_app()

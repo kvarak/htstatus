@@ -135,6 +135,7 @@ def stats():
     try:
         print(f"\n=== FETCHING COMPETITION DATA FOR TEAM {teamid} ===")
         from flask import current_app as app
+
         from pychpp import CHPP
 
         chpp = CHPP(app.config['CONSUMER_KEY'],

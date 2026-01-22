@@ -5,11 +5,11 @@ import traceback
 from datetime import datetime as dt
 
 from flask import Blueprint, render_template, session
-from pychpp import CHPP
 from sqlalchemy import text
 
 from app.utils import create_page, diff, dprint, player_diff
 from models import Players
+from pychpp import CHPP
 
 # Create Blueprint for team routes
 team_bp = Blueprint('team', __name__)
@@ -156,8 +156,7 @@ def update():
             dprint(2, the_team.players)
 
             # DEBUG: Save team players XML to check if skills are there
-            import os
-            team_xml_path = f"/tmp/team_182085_source.xml"
+            team_xml_path = "/tmp/team_182085_source.xml"
             if hasattr(the_team, '_xml_data'):
                 with open(team_xml_path, 'w') as f:
                     f.write(str(the_team._xml_data))
