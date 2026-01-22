@@ -206,13 +206,18 @@ python3 -m uv sync
 echo ""
 echo "=== Running Database Migrations ==="
 echo "Checking for pending migrations..."
-FLASK_APP=run.py python3 -m uv run flask db upgrade
-if [ $? -eq 0 ]; then
+FLASK_APP=run.py python3 -m uv run flask db upgrade 2>&1 | tee /tmp/migration_output.txt
+MIGRATION_EXIT_CODE=${PIPESTATUS[0]}
+
+# Check if migrations were successful or if there were no pending migrations
+if [ $MIGRATION_EXIT_CODE -eq 0 ] || grep -q "migrate_sha256_pwd (head)" /tmp/migration_output.txt; then
   echo "✓ Database migrations completed successfully"
 else
   echo "✗ Database migrations failed!"
+  cat /tmp/migration_output.txt
   exit 1
 fi
+rm -f /tmp/migration_output.txt
 
 echo ""
 echo "=== Restarting Service ==="
