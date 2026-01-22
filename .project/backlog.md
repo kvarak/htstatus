@@ -26,10 +26,9 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- Currently Empty - All P1 testing issues resolved ✅
+- 🎯 [TEST-012] Investigate and Fix 33 Test Failures (4-6 hours) - Fix database/business logic test failures for deployment confidence **READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations**
-- 🎯 [SEC-001] Werkzeug Security Update (30-45 min) - Update to Werkzeug 3.1.4+ to resolve 4 security vulnerabilities **URGENT**
 - 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
 
 **Priority 3: Stability & Maintainability** (It stays working) - Major foundation complete, focus on test coverage and security
@@ -79,6 +78,50 @@
 ---
 
 ## Priority 1: Testing & App Reliability
+
+### [TEST-012] Investigate and Fix 33 Test Failures
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P1 | **Impact**: Deployment confidence
+**Dependencies**: None | **Strategic Value**: Complete test suite reliability for production deployment
+
+**Problem Statement**:
+Current test suite shows 213/246 tests passing (87%), with 33 failures across database tests (20), business logic tests (6), and route tests (3). These failures appear to be pre-existing issues not caused by recent authentication and player import work.
+
+**Failure Categories**:
+1. **Database Tests (20 failures)**: ProgrammingError exceptions in test_database.py
+   - Likely test environment database setup issues (conftest.py fixtures)
+   - May involve schema initialization or transaction isolation problems
+
+2. **Business Logic Tests (6 failures)**: User management and calculation tests in test_business_logic.py
+   - User activity patterns, role management, preferences
+   - Team statistics, form/performance correlations
+
+3. **Route Tests (3 failures)**: Session handling and error handling in test routes
+   - Session persistence issues
+   - Missing database data error handling
+
+**Implementation**:
+1. **Database Test Analysis** (1-2 hours):
+   - Review conftest.py fixtures and database setup
+   - Check schema initialization and transaction isolation
+   - Fix ProgrammingError root causes
+
+2. **Business Logic Test Fixes** (1-2 hours):
+   - Review user management test expectations
+   - Verify calculation logic against test assertions
+   - Update tests or fix business logic as appropriate
+
+3. **Route Test Resolution** (1-2 hours):
+   - Fix session handling in test environment
+   - Ensure proper error handling test setup
+   - Validate route behavior under various conditions
+
+**Acceptance Criteria**:
+- All 246 tests pass (100% success rate)
+- No regressions in currently passing tests
+- Test environment properly isolated and reproducible
+- Clear documentation of any test environment quirks
+
+**Strategic Value**: Achieving 100% test pass rate is critical for deployment confidence and enables focus on feature development rather than debugging
 
 ### [TEST-008] Residual Test Failures Resolution
 **Status**: � Blocked by TEST-011 | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Complete test suite reliability

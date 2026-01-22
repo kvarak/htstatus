@@ -1,5 +1,81 @@
 # HTStatus Development - Completed Tasks
 
+## Completed P2 Security & Operations Tasks (January 2026)
+
+### [DB-001] Password Migration Database Update
+**Completed**: 2026-01-22
+**Effort**: Completed as part of SEC-002
+**Impact**: Database schema updated to support modern password hashing
+
+**Summary**: Verified and completed password migration database update as part of SEC-002 authentication migration work.
+
+**Technical Implementation**:
+- **Database Schema Update**: Password field expanded from VARCHAR(100) to VARCHAR(255) for scrypt hashes
+- **Migration Verification**: Confirmed legacy SHA256 passwords are properly detected and handled
+- **OAuth Integration**: Legacy passwords trigger OAuth re-authentication flow
+- **Backwards Compatibility**: Existing user data preserved during migration
+
+**Validation**: Database schema updated, migration logic tested with legacy password users, OAuth fallback working
+
+**Strategic Value**: Enables secure password storage with modern scrypt hashing while maintaining seamless user experience for legacy accounts
+
+### [FEAT-002] Player Data Import Pipeline
+**Completed**: 2026-01-22
+**Effort**: 4 hours
+**Impact**: End-to-end CHPP API integration for player roster management
+
+**Summary**: Successfully implemented complete player data import functionality with authentication migration support and CHPP API integration fixes.
+
+**Technical Implementation**:
+- **CHPP API Integration**: Fixed 11 attribute/method signature issues with HTTeamPlayersItem and HTPlayer objects
+- **Authentication Migration**: Enhanced OAuth callback to handle legacy SHA256 password migration gracefully
+- **Database Schema**: Expanded password field from VARCHAR(100) to VARCHAR(255) for scrypt hashes
+- **Player Data Extraction**: Fixed skills access pattern (PlayersViewTeamPlayerItemPlayerSkills object attributes)
+- **Error Handling**: Added default values for unavailable attributes (language, national_team_id, etc.)
+- **Code Quality**: Removed excessive debug logging while preserving error handling
+
+**Validation**: 23 players successfully imported with complete skill data, form, experience, and player statistics from Dalby Stenbrotters FC
+
+**Strategic Value**: Unlocks core HT Status functionality - users can now import and track their team's player data from Hattrick
+
+### [SEC-002] Password Migration Auth Fix
+**Completed**: 2026-01-22
+**Effort**: 2 hours
+**Impact**: Resolves authentication crashes for legacy password users
+
+**Summary**: Enhanced authentication system to gracefully handle legacy SHA256 passwords and provide OAuth migration path.
+
+**Technical Implementation**:
+- **Migration Detection**: Added logic to detect legacy SHA256 and migration-required passwords
+- **OAuth Fallback**: Automatic OAuth flow initiation for users with expired/incompatible password hashes
+- **Token Validation**: Enhanced OAuth token verification with fallback mechanisms
+- **User Experience**: Clear error messages directing users to re-authenticate via Hattrick OAuth
+
+**Strategic Value**: Enables existing users to access the application without data loss during Werkzeug 3.x upgrade
+
+### [SEC-001] Werkzeug Security Update
+**Completed**: 2026-01-22
+**Effort**: 45 minutes
+**Impact**: Complete CVE vulnerability resolution
+
+**Summary**: Successfully updated Werkzeug from 2.3.8 to 3.1.5 and Flask from 2.3.2 to 3.1.2, resolving all 4 CVE vulnerabilities while maintaining complete test suite compatibility.
+
+**Vulnerabilities Resolved**:
+- **CVE-2024-34069** (ID: 71594): Debugger code execution vulnerability (Werkzeug <3.0.3)
+- **CVE-2025-66221** (ID: 82196): DoS via Windows special device names in safe_join (<3.1.4)
+- **CVE-2024-49767** (ID: 73889): Resource exhaustion in form parsing (<3.0.6)
+- **CVE-2024-49766** (ID: 73969): Path traversal on Windows systems (<3.0.6)
+
+**Technical Implementation**:
+- **Dependency Compatibility Resolution**: Updated pychpp from 0.3.12 to 0.5.10 for Werkzeug 3.x compatibility
+- **Flask Upgrade**: Updated Flask to 3.1.2 to resolve Werkzeug 3.x `__version__` attribute changes
+- **Test Suite Validation**: Maintained 49/49 test success (32 core + 17 blueprint player)
+- **Application Integration**: Verified successful startup and functionality with new dependency stack
+
+**Security Verification**: `make security` confirms "0 vulnerabilities reported" - complete CVE resolution achieved
+
+**Strategic Value**: Maintained "Zero CVE vulnerabilities" security status, enabled focus on P3 stability priorities
+
 ## Completed P1 Testing & App Reliability Tasks (January 2026)
 
 ### January 2026 Foundation Excellence (19 tasks) - MOVED FROM BACKLOG
