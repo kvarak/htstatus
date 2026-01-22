@@ -90,34 +90,54 @@ def client(app):
 
 @pytest.fixture(scope='function')
 def db_session(app):
-    """Create a database session for testing with proper transaction isolation."""
+    """Create a database session for testing with proper transaction isolation.
+
+    Uses nested savepoint pattern to ensure test isolation even when route
+    handlers commit transactions. This prevents test pollution where earlier
+    tests contaminate database state for later tests.
+    """
     with app.app_context():
-        # Create a nested transaction (savepoint) for proper test isolation
+        # Get a connection from the engine
         connection = db.engine.connect()
+        # Start outer transaction
         transaction = connection.begin()
 
-        # Bind the session to the transaction
-        from sqlalchemy.orm import sessionmaker
-        Session = sessionmaker(bind=connection)
-        session_instance = Session()
-
-        # Override Flask-SQLAlchemy's session with our test session
+        # Store original session for restoration
         old_session = db.session
 
-        # Create a new scoped session that uses our connection
-        from sqlalchemy.orm import scoped_session
-        test_session = scoped_session(sessionmaker(bind=connection))
-        db.session = test_session
+        # Create a scoped session (required by Flask-SQLAlchemy) bound to our connection
+        from sqlalchemy.orm import scoped_session, sessionmaker
+        session_factory = sessionmaker(bind=connection)
+        session = scoped_session(session_factory)
+
+        # Replace Flask-SQLAlchemy's session with our test session
+        db.session = session
+
+        # Create a nested savepoint (SAVEPOINT) for test isolation
+        # This survives commits that happen during route execution
+        nested = connection.begin_nested()
+
+        # Set up event listener to automatically recreate savepoint after commits
+        # This ensures each test gets a clean slate even if routes commit
+        from sqlalchemy import event
+
+        @event.listens_for(session, "after_transaction_end")
+        def restart_savepoint(session, transaction):
+            """Recreate savepoint after transaction ends."""
+            if transaction.nested and not transaction._parent.nested:
+                connection.begin_nested()
 
         try:
-            yield test_session
+            yield session
         finally:
-            # Complete resource cleanup with proper isolation
+            # Clean up: remove session, rollback transaction, close connection
             with contextlib.suppress(Exception):
-                # Rollback all changes made during the test
-                test_session.remove()
+                session.remove()
             with contextlib.suppress(Exception):
-                # Rollback the transaction to ensure clean state
+                # Remove event listener to prevent memory leaks
+                event.remove(session, "after_transaction_end", restart_savepoint)
+            with contextlib.suppress(Exception):
+                # Rollback the outer transaction (discards all changes)
                 transaction.rollback()
             with contextlib.suppress(Exception):
                 # Close the connection

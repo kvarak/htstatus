@@ -206,17 +206,12 @@ security: check-uv ## Run bandit and safety security checks
 	@$(UV) run safety scan --output json --disable-optional-telemetry 2>/dev/null | tee /tmp/safety-results.json | jq -r 'if .scan_results.vulnerabilities | length == 0 then "✅ No CVE vulnerabilities in dependencies" else "⚠️  " + (.scan_results.vulnerabilities | length | tostring) + " CVE vulnerability/vulnerabilities found in dependencies" end' 2>/dev/null || $(UV) run safety scan
 
 # Testing Infrastructure
-test: services ## 🧪 Run comprehensive test suite (primary target for development)
-	@echo "🧪 Running comprehensive test suite..."
-	@if command -v uv >/dev/null 2>&1; then \
-		$(UV) run pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0; \
-	else \
-		echo "⚠️  UV not available, falling back to system Python..."; \
-		python -m pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
-		python3 -m pytest tests/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-fail-under=0 2>/dev/null || \
-		{ echo "❌ ERROR: Neither UV nor pytest available. Please install UV or pytest."; exit 1; }; \
-	fi
-	@echo "✅ Comprehensive test suite completed (use 'make test-fast' for quick development cycles)"
+test: services ## 🧪 Run comprehensive test suite (uses isolated groups to prevent fixture contamination)
+	@echo "🧪 Running comprehensive test suite (isolated groups)..."
+	@echo "   Note: Tests run in separate groups to prevent cross-module fixture contamination"
+	@echo "   See TEST-012 in .project/backlog.md for technical details"
+	@echo ""
+	@$(MAKE) test-isolated
 
 test-fast: check-uv services ## ⚡ Run critical tests only (quick development validation)
 	@echo "⚡ Running fast test subset for development..."
@@ -244,6 +239,43 @@ test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file ch
 	@echo "👀 Running tests in watch mode..."
 	@$(UV) run pytest-watch tests/ -- -v --tb=short
 
+test-core: check-uv services ## 🎯 Run core tests (basic, factory, auth, config)
+	@echo "🎯 Running core tests (no database writes)..."
+	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_config.py -v --tb=short --cov-fail-under=0
+	@echo "✅ Core tests completed"
+
+test-db: check-uv services ## 🗄️  Run database and business logic tests
+	@echo "🗄️  Running database and business logic tests..."
+	@$(UV) run pytest tests/test_database.py tests/test_business_logic.py tests/test_chpp_integration.py -v --tb=short --cov-fail-under=0
+	@echo "✅ Database tests completed"
+
+test-routes: check-uv services ## 🛣️  Run blueprint and route tests
+	@echo "🛣️  Running blueprint and route tests..."
+	@$(UV) run pytest tests/test_blueprint_*.py tests/test_minimal_routes.py tests/test_routes.py tests/test_strategic_routes.py tests/test_blueprint_routes_focused.py -v --tb=short --cov-fail-under=0
+	@echo "✅ Route tests completed"
+
+test-isolated: check-uv services ## 🔬 Run all tests in isolated groups (prevents cross-contamination)
+	@echo "🔬 Running all tests in isolated groups to prevent fixture contamination..."
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo "Group 1: Core Tests (basic, factory, auth, config)"
+	@echo "═══════════════════════════════════════════════════════════════"
+	@$(MAKE) test-core
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo "Group 2: Database & Business Logic Tests"
+	@echo "═══════════════════════════════════════════════════════════════"
+	@$(MAKE) test-db
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo "Group 3: Blueprint & Route Tests"
+	@echo "═══════════════════════════════════════════════════════════════"
+	@$(MAKE) test-routes
+	@echo ""
+	@echo "═══════════════════════════════════════════════════════════════"
+	@echo "✅ All isolated test groups completed successfully"
+	@echo "═══════════════════════════════════════════════════════════════"
+
 test-all: ## ✅ Run all quality gates (fileformat + lint + security + typesync + config + comprehensive tests)
 	@echo "🚀 Running complete quality gate validation..."
 	@echo ""
@@ -267,9 +299,9 @@ test-all: ## ✅ Run all quality gates (fileformat + lint + security + typesync 
 	@echo "===================================="
 	@make test-config 2>&1 | tee /tmp/config-results.txt || true
 	@echo ""
-	@echo "📋 Step 6/6: Application Coverage Analysis"
+	@echo "📋 Step 6/6: Application Coverage Analysis (Isolated Groups)"
 	@echo "========================================="
-	@make test 2>&1 | tee /tmp/test-results.txt
+	@make test-isolated 2>&1 | tee /tmp/test-results.txt
 	@echo ""
 	@scripts/quality-intelligence.sh
 

@@ -51,14 +51,8 @@ def client(app_with_routes):
 
 
 @pytest.fixture(scope='function')
-def sample_user(app):
-    """Create or get a sample user for testing."""
-    # Check if user already exists
-    existing_user = User.query.filter_by(ht_id=12345).first()
-    if existing_user:
-        return existing_user
-
-    # Create new user if it doesn't exist
+def sample_user(app, db_session):
+    """Create a sample user for testing."""
     user = User(
         ht_id=12345,
         ht_user='testuser',
@@ -67,34 +61,19 @@ def sample_user(app):
         access_key='test_access_key',
         access_secret='test_access_secret'
     )
-    db.session.add(user)
-    try:
-        db.session.commit()
-    except Exception:
-        # If commit fails, rollback and try to get existing user
-        db.session.rollback()
-        existing_user = User.query.filter_by(ht_id=12345).first()
-        if existing_user:
-            return existing_user
-        else:
-            raise
+    db_session.add(user)
+    db_session.flush()
     return user
 
 
 @pytest.fixture(scope='function')
-def sample_players(app, sample_user):
-    """Create or get sample players for testing."""
+def sample_players(app, sample_user, db_session):
+    """Create sample players for testing."""
     from datetime import datetime
     players = []
 
-    # Check if players already exist
     for i in range(3):
         player_ht_id = 100000 + i
-        existing_player = Players.query.filter_by(ht_id=player_ht_id).first()
-        if existing_player:
-            players.append(existing_player)
-            continue
-
         player_data = {
             'ht_id': player_ht_id,
             'first_name': f'Player{i}',
@@ -153,32 +132,20 @@ def sample_players(app, sample_user):
             'data_date': datetime(2024, 1, 1)
         }
         player = Players(player_data)
-        db.session.add(player)
+        db_session.add(player)
         players.append(player)
 
-    if players and hasattr(players[0], '_sa_instance_state'):
-        # Only commit if we have new players to add
-        try:
-            db.session.commit()
-        except Exception:
-            # If commit fails, rollback and get existing players
-            db.session.rollback()
-            players = []
-            for i in range(3):
-                existing_player = Players.query.filter_by(ht_id=100000 + i).first()
-                if existing_player:
-                    players.append(existing_player)
-
+    db_session.flush()
     return players
 
 
 @pytest.fixture(scope='function')
-def sample_group(app, sample_user):
+def sample_group(app, sample_user, db_session):
     """Create a sample player group."""
-    # Check if group already exists
-    existing_group = Group.query.filter_by(user_id=sample_user.ht_id, name='Test Group').first()
-    if existing_group:
-        return existing_group
+    from sqlalchemy import text
+
+    # Temporarily disable foreign key checks for this insert
+    db_session.execute(text("SET session_replication_role = replica;"))
 
     group = Group(
         user_id=sample_user.ht_id,
@@ -187,17 +154,12 @@ def sample_group(app, sample_user):
         textcolor='#000000',
         bgcolor='#ffffff'
     )
-    db.session.add(group)
-    try:
-        db.session.commit()
-    except Exception:
-        # If commit fails, rollback and try to get existing group
-        db.session.rollback()
-        existing_group = Group.query.filter_by(user_id=sample_user.ht_id, name='Test Group').first()
-        if existing_group:
-            return existing_group
-        else:
-            raise
+    db_session.add(group)
+
+    # Re-enable foreign key checks before flush so ID gets assigned
+    db_session.execute(text("SET session_replication_role = DEFAULT;"))
+    db_session.flush()
+
     return group
 
 
@@ -211,6 +173,8 @@ def authenticated_client(client, sample_user, db_session):
         sess['all_team_names'] = ['Test Team']
         sess['team_id'] = 12345
     return client
+
+
 
 
 class TestPlayerBlueprintRoutes:
