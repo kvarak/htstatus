@@ -70,27 +70,28 @@ def player():
         if int(groupid) < 0:
             theconnection = (db.session
                              .query(PlayerSetting)
-                             .filter_by(player_id=playerid,
+                             .filter_by(player_id=int(playerid),
                                         user_id=session['current_user_id'])
                              .first())
-            db.session.delete(theconnection)
-            db.session.commit()
+            if theconnection:
+                db.session.delete(theconnection)
+                db.session.commit()
         else:
             connection = (db.session
                           .query(PlayerSetting)
-                          .filter_by(player_id=playerid,
+                          .filter_by(player_id=int(playerid),
                                      user_id=session['current_user_id'])
                           .first())
             if connection:
                 (db.session
                  .query(PlayerSetting)
-                 .filter_by(player_id=playerid,
+                 .filter_by(player_id=int(playerid),
                             user_id=session['current_user_id'])
                  .update({"group_id": groupid}))
                 db.session.commit()
             else:
                 newconnection = PlayerSetting(
-                    player_id=playerid,
+                    player_id=int(playerid),
                     user_id=session['current_user_id'],
                     group_id=groupid)
                 db.session.add(newconnection)

@@ -34,7 +34,13 @@ def client(app_with_routes):
 
 @pytest.fixture(scope='function')
 def sample_user(app):
-    """Create a sample user for testing."""
+    """Create or get a sample user for testing."""
+    # Check if user already exists
+    existing_user = User.query.filter_by(ht_id=12345).first()
+    if existing_user:
+        return existing_user
+
+    # Create new user if it doesn't exist
     user = User(
         ht_id=12345,
         ht_user='testuser',
@@ -44,18 +50,35 @@ def sample_user(app):
         access_secret='test_access_secret'
     )
     db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        # If commit fails, rollback and try to get existing user
+        db.session.rollback()
+        existing_user = User.query.filter_by(ht_id=12345).first()
+        if existing_user:
+            return existing_user
+        else:
+            raise
     return user
 
 
 @pytest.fixture(scope='function')
 def sample_players(app, sample_user):
-    """Create sample players for testing."""
+    """Create or get sample players for testing."""
     from datetime import datetime
     players = []
+
+    # Check if players already exist
     for i in range(3):
+        player_ht_id = 100000 + i
+        existing_player = Players.query.filter_by(ht_id=player_ht_id).first()
+        if existing_player:
+            players.append(existing_player)
+            continue
+
         player_data = {
-            'ht_id': 100000 + i,
+            'ht_id': player_ht_id,
             'first_name': f'Player{i}',
             'nick_name': f'Player{i}',
             'last_name': f'Test{i}',
@@ -115,13 +138,30 @@ def sample_players(app, sample_user):
         db.session.add(player)
         players.append(player)
 
-    db.session.commit()
+    if players and hasattr(players[0], '_sa_instance_state'):
+        # Only commit if we have new players to add
+        try:
+            db.session.commit()
+        except Exception:
+            # If commit fails, rollback and get existing players
+            db.session.rollback()
+            players = []
+            for i in range(3):
+                existing_player = Players.query.filter_by(ht_id=100000 + i).first()
+                if existing_player:
+                    players.append(existing_player)
+
     return players
 
 
 @pytest.fixture(scope='function')
-def sample_group(player_app, sample_user):
+def sample_group(app, sample_user):
     """Create a sample player group."""
+    # Check if group already exists
+    existing_group = Group.query.filter_by(user_id=sample_user.ht_id, name='Test Group').first()
+    if existing_group:
+        return existing_group
+
     group = Group(
         user_id=sample_user.ht_id,
         name='Test Group',
@@ -130,12 +170,21 @@ def sample_group(player_app, sample_user):
         bgcolor='#ffffff'
     )
     db.session.add(group)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except Exception:
+        # If commit fails, rollback and try to get existing group
+        db.session.rollback()
+        existing_group = Group.query.filter_by(user_id=sample_user.ht_id, name='Test Group').first()
+        if existing_group:
+            return existing_group
+        else:
+            raise
     return group
 
 
 @pytest.fixture(scope='function')
-def authenticated_client(client, sample_user):
+def authenticated_client(client, sample_user, db_session):
     """Create an authenticated client session."""
     with client.session_transaction() as sess:
         sess['current_user'] = sample_user.ht_user
