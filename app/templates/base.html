@@ -380,7 +380,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 </button>
 
 <!-- Password Migration Notice -->
-{% if session.get('password_migration_needed') %}
+{% if password_migration_needed %}
 <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin: 20px;">
   <h5 class="alert-heading">⚠️ Password Update Required</h5>
   <p>Your password uses an outdated security format and needs to be updated.</p>

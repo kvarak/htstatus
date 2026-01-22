@@ -100,6 +100,7 @@ def create_page(template, title, **kwargs):
             'all_teams': session.get('all_teams', []),
             'all_team_names': session.get('all_team_names', []),
             'team_id': session.get('team_id'),
+            'password_migration_needed': session.get('password_migration_needed', False),
         })
 
         # Check if user has admin role
