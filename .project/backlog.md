@@ -44,6 +44,9 @@
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 
 **Priority 4: Core Functionality** (It does what it should)
+- 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **READY**
+- 🎯 [UI-010] Apply UI Guidelines to Core Pages (4-6 hours) - Players, training, stats, settings page consistency **READY**
+- 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **READY**
 - 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
 - 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
 - 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
@@ -545,7 +548,131 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 
 ## Priority 4: Core Functionality
 
-### [DOC-021] New Player Tutorial
+### [BUG-006] Fix Players Page "Last Updated" Display
+**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P4 | **Impact**: User experience clarity
+**Dependencies**: None | **Strategic Value**: Information completeness
+
+**Problem Statement**:
+The players page displays "Last updated" text without showing the actual date or timestamp, leaving users without visibility into data freshness.
+
+**Implementation**:
+1. **Identify Data Source** (10 min):
+   - Check if last update timestamp exists in session or database
+   - Locate where "Last updated" text is rendered in template
+   - Determine appropriate timestamp format for display
+
+2. **Template Update** (15 min):
+   - Add timestamp variable to template context
+   - Format timestamp for user-friendly display (e.g., "January 24, 2026 at 2:30 PM")
+   - Handle cases where timestamp might be missing
+
+3. **Validation** (5 min):
+   - Test display with and without available timestamp
+   - Verify formatting across different screen sizes
+   - Ensure consistent styling with UI guidelines
+
+**Acceptance Criteria**:
+- "Last updated" shows actual date and time when data available
+- Graceful handling when timestamp unavailable
+- Consistent formatting with application UI standards
+- Mobile-responsive display maintained
+
+**Expected Outcomes**: Users have clear visibility into when their data was last synchronized with Hattrick.
+
+---
+
+### [UI-010] Apply UI Guidelines to Core Pages
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P4 | **Impact**: Visual consistency across application
+**Dependencies**: DOC-022 UI Guidelines (completed), UI-008 (recommended) | **Strategic Value**: Unified user experience
+
+**Problem Statement**:
+Core application pages (players, training, stats, settings) don't consistently follow the established UI guidelines from DOC-022, creating visual inconsistencies for users navigating between sections.
+
+**Implementation**:
+1. **Players Page UI Update** (1-1.5 hours):
+   - Apply .btn-primary-custom, .card-custom, .table-custom classes
+   - Implement football green color theme consistently
+   - Update typography to follow standardized scale
+   - Ensure responsive grid layout compliance
+
+2. **Training Page UI Update** (1-1.5 hours):
+   - Apply unified button and card styling
+   - Standardize progress indicators and charts
+   - Implement consistent spacing (0.25rem increments)
+   - Update form styling to match guidelines
+
+3. **Stats Page UI Update** (1-1.5 hours):
+   - Apply table styling consistency
+   - Update chart colors to football theme
+   - Implement unified card layout for statistics
+   - Ensure responsive design compliance
+
+4. **Settings Page UI Update** (0.5-1 hour):
+   - Apply form styling standards
+   - Update button variants consistently
+   - Implement unified layout spacing
+   - Ensure mobile-responsive form design
+
+**Acceptance Criteria**:
+- All four pages use unified CSS classes from UI guidelines
+- Football green color theme applied consistently
+- Typography follows standardized scale throughout
+- Responsive design maintained across all screen sizes
+- No visual jarring when navigating between pages
+- Accessibility standards maintained (WCAG 2.1 AA)
+
+**Scope**:
+- **Includes**: Visual styling, layout consistency, responsive design
+- **Excludes**: Functional changes, new features, data structure modifications
+- **Focus**: UI guidelines compliance and visual unification
+
+**Expected Outcomes**: Consistent, professional user experience across all core application pages with unified visual language.
+
+---
+
+### [BUG-007] Fix Debug Page Issues
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P4 | **Impact**: Development and troubleshooting capability
+**Dependencies**: None | **Strategic Value**: Development experience
+
+**Problem Statement**:
+Debug page has multiple issues affecting development workflow:
+1. Not visible on development server (make dev) but appears on production
+2. Doesn't display changelog under changes section
+
+**Implementation**:
+1. **Debug Page Visibility Issue** (30-45 min):
+   - Check route registration in blueprints for debug page
+   - Verify environment-based conditional logic
+   - Test debug page access in development mode
+   - Ensure proper authentication/authorization checks
+
+2. **Changelog Display Issue** (30-45 min):
+   - Investigate changelog data source and processing
+   - Check template rendering logic for changes section
+   - Verify changelog file generation and access
+   - Test changelog display across different data states
+
+3. **Environment Consistency** (15-30 min):
+   - Ensure debug functionality works consistently across environments
+   - Document any environment-specific behavior requirements
+   - Test debug page functionality in both dev and production modes
+
+**Acceptance Criteria**:
+- Debug page accessible in development server (make dev)
+- Changelog displays properly under changes section
+- Consistent behavior between development and production
+- All debug information displays correctly
+- No regressions in existing debug functionality
+
+**Technical Investigation Areas**:
+- Blueprint route registration patterns
+- Environment variable handling
+- Changelog generation and file access
+- Template data context and rendering
+
+**Expected Outcomes**: Reliable debug page functionality supporting development workflow with proper changelog visibility.
+
+---
 **Status**: 🚀 IN PROGRESS (90% complete) | **Effort**: 6-8 hours | **Impact**: Code organization
 **Dependencies**: INFRA-011 (completed) | **Strategic Value**: Maintainability, scalability
 
@@ -1946,4 +2073,4 @@ Machine learning engine analyzes historical skill progression data across all HT
 
 ---
 
-*Backlog updated January 24, 2026 with timeline modernization completion and formal update process execution. Timeline redesign moved to history with 4-column responsive UI and unified code architecture achievement. Total: 26+ active tasks across 7 priority levels.*
+*Backlog updated January 24, 2026 with new P4 Core Functionality tasks: BUG-006 Players page timestamp display, UI-010 UI guidelines application, BUG-007 Debug page issues. Timeline modernization completion documented. Total: 29+ active tasks across 7 priority levels.*
