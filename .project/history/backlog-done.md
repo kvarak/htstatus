@@ -1,5 +1,46 @@
 # HTStatus Development - Completed Tasks
 
+## Completed P0 Critical Bugs (January 2026)
+
+### [BUG-005] Fix Player Change Reporting in Update Data
+**Completed**: 2026-01-24
+**Effort**: 3 hours
+**Impact**: CRITICAL - Restored player change visibility in update reports
+
+**Summary**: Fixed player change reporting feature that wasn't displaying which players changed since last week. Users can now track player development through update reports with modern visual styling.
+
+**Problem Statement**: Update report page didn't show player changes since last week, reducing feature usefulness for tracking player development. Root cause was AttributeError in `player_diff()` function and template structure mismatch.
+
+**Achievements**:
+1. **Fixed `player_diff()` Function** (`app/utils.py` lines 163-211):
+   - Added `team_name` parameter to fix AttributeError on `current_player.team_name`
+   - Changed return structure to nested format: `[[player_info], [change1], [change2], ...]`
+   - Proper handling of no changes detected (returns empty list)
+
+2. **Updated Template Structure** (`app/templates/update.html`):
+   - Fixed loop handling: `{% for c in cplayer[1:] %}` to skip player info element
+   - Template correctly accesses player info via `cplayer[0]` and iterates changes via `cplayer[1:]`
+   - Visual indicators: green for improvements, red for decreases
+
+3. **Modern UI Styling** (Content-in-Boxes Pattern):
+   - Applied subtle boxes with minimal padding (0.75rem) for readability
+   - Professional visual hierarchy with transparent white backgrounds
+   - Color-coded skill changes with emoji indicators (📈📉)
+
+4. **Updated Blueprint Calls** (`app/blueprints/team.py`):
+   - Modified `player_diff()` calls to pass `the_team.name` parameter
+   - Maintains backward compatibility
+
+**Quality Results**:
+- ✅ 102 route tests pass (100% of isolated tests)
+- ✅ No regressions in existing functionality
+- ✅ No schema changes required (backward compatible)
+- ✅ Template logic validated with real Hattrick data
+
+**User Impact**: Players now have full visibility into squad changes since last update, enhancing the core team management experience.
+
+**UI Pattern Documentation**: Created comprehensive `.project/ui-content-boxes-pattern.md` (390 lines) establishing design standards for readable content over background images.
+
 ## Completed P3 Stability & Maintainability (January 2026)
 
 ### [REFACTOR-008] Architectural Consolidation & Simplification

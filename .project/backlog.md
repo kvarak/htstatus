@@ -27,7 +27,7 @@
 ## Current Focus
 
 **Priority 1: Testing & App Reliability**
-- 🚀 [TEST-012-A] Fix 6 Player Group Fixture Issues (2-3 hours) - Complete test suite reliability **ACTIVE**
+- � [TEST-012-A] Fix 6 Player Group Fixture Issues (2-3 hours) - Complete test suite reliability **NEEDS VALIDATION** - Factory improvements implemented, verify fixes
 - 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY**
 
 **Priority 2: Deployment & Operations**
@@ -36,6 +36,7 @@
 
 **Priority 3: Stability & Maintainability** (It stays working) - Major foundation complete, focus on test coverage and security
 - 🎯 [UI-008] Implement UI Guidelines Across Existing Pages (8-12 hours) - Apply unified design system to Flask templates and React components **NEXT IN LINE**
+- 🎯 [UI-009] Document Content-in-Boxes Pattern References (1-2 hours) - Link new ui-content-boxes-pattern.md from ui-design-guidelines.md, update prompts.json with pattern reference **NEW**
 - 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY TO EXECUTE**
 - 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY TO EXECUTE**
 - 🔄 [TYPESYNC-001] Fix 85 Type Sync Drift Issues (6-8 hours) - Resolve nullability and type mismatches between SQLAlchemy models and TypeScript interfaces **HIGH PRIORITY**
@@ -84,14 +85,20 @@
 ## Priority 1: Testing & App Reliability
 
 ### [TEST-012-A] Fix 6 Player Group Fixture Issues
-**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Complete test suite reliability
+**Status**: 🔄 Needs Validation | **Effort**: 1-2 hours (reduced) | **Priority**: P1 | **Impact**: Complete test suite reliability
 **Dependencies**: TEST-012 (completed) | **Strategic Value**: Final test reliability milestone
 
 **Problem**: 6 specific player group management tests fail due to PostgreSQL foreign key constraint issues within nested savepoint pattern. Tests pass individually but fail when run together.
 
 **Root Cause**: Foreign key constraints fail during fixture creation in PostgreSQL - constraints don't allow foreign key references to uncommitted data within the same savepoint.
 
-**Solution**: Refactor fixture dependencies to use factory functions that avoid foreign key issues while maintaining transaction isolation.
+**Recent Progress** (2026-01-23): Code quality improvements implemented factory pattern enhancements:
+- Updated `app/test_factories.py` to return primitive IDs instead of ORM objects
+- Functions like `create_test_players()` now return `list[int]` (player HT IDs) instead of `List[Players]`
+- `create_test_group()` returns `int` (group ID) instead of `Group` object
+- Enhanced `setup_authenticated_session()` to handle both User objects and primitive IDs
+
+**Remaining Work**: Validation that factory improvements resolve the 6 failing player group tests
 
 **Acceptance Criteria**: All 6 failing tests pass (104/104 in Group 3), isolated test approach maintains 100% pass rate across all groups.
 

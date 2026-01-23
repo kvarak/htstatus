@@ -37,6 +37,7 @@
         "Follow quality gates in rules.md. Keep database backwards compatible.",
         "Structure: # Plan Next Task ## Analysis ## Solution ## Steps ## Challenges ## Testing",
         "If the task is large, break it into smaller sub-tasks.",
+        "Simplify, reduce complexity, avoid over-engineering when planning, but take a holistic view of the system.",
         "Do not add or commit code in this step."
       ]
     },
@@ -48,13 +49,17 @@
         "Use `uv run` for Python and `make help` for commands.",
         "For CHPP/pychpp issues: Check pychpp/ folder (local git repo) - checkout matching version tag to verify API compatibility.",
         "Follow the plan. Validate with `make test-all` - no coverage loss or test failures.",
+        "Simplify, reduce complexity, avoid over-engineering when executing, but take a holistic view of the system.",
+        "If you see waste or bad things, fix them.",
+        "If you spot duplication that can be refactored safely, do so.",
         "Follow quality gates in rules.md. Keep database backwards compatible.",
         "For UI work: Follow ui_guidelines in this file. Use consistent colors, typography, spacing.",
         "Flask: Use .btn-primary-custom, .table-custom, .card-custom classes for consistency.",
         "React: Use existing components with TailwindCSS utilities, maintain football theme.",
         "Update docs per documentation-guide.md (backlog.md, progress.md, etc.).",
         "Note any new tasks for backlog.md.",
-        "Do not add or commit code in this step. However, if the task is large, break it into smaller sub-tasks and execute only one sub-task and keep the rest for the next time the execute task is run."
+        "Do not add or commit code in this step.",
+        "If the task is large, break it into smaller sub-tasks and execute only one sub-task and keep the rest for the next time the execute task is run."
       ]
     },
     {
