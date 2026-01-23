@@ -60,6 +60,9 @@ HT Status is a Hattrick football team management application built with a dual f
   - `team.py` - Team information and data updates
   - `matches.py` - Match history and analysis
   - `training.py` - Player training progression
+- **Authentication Utilities**: `/app/auth_utils.py` - Unified authentication patterns with @require_authentication decorator (**NEW** ✅ REFACTOR-008)
+- **Error Handling**: `/app/error_handlers.py` - Standardized error handling with HTStatusError exception hierarchy (**NEW** ✅ REFACTOR-008)
+- **Test Utilities**: `/app/test_factories.py` - Simplified fixture creation for testing infrastructure (**NEW** ✅ REFACTOR-008)
 - **Constants Module**: `/app/constants.py` - Hattrick data definitions (match types, roles, behaviors, column specs)
 - **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, team statistics)
 - **Legacy Compatibility**: `/app/routes_bp.py` - Maintained for backward compatibility during migration
