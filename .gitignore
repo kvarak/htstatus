@@ -63,3 +63,4 @@ build/
 
 # pyCHPP reference code
 pychpp/
+production_db_dump.sql
