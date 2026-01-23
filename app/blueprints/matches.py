@@ -1,8 +1,9 @@
 """Matches and stats routes blueprint for HT Status application."""
 
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, request, session
 from sqlalchemy import text
 
+from app.auth_utils import require_authentication
 from app.utils import create_page
 from models import Match, MatchPlay
 
@@ -26,12 +27,9 @@ def setup_matches_blueprint(db_instance, match_types, match_roles, match_behavio
 
 
 @matches_bp.route('/matches', methods=['GET', 'POST'])
+@require_authentication
 def matches():
     """Display team matches and match details."""
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/login')
 
     teamid = request.values.get('id')
     matchid = request.values.get('m')
@@ -75,13 +73,9 @@ def matches():
 
 
 @matches_bp.route('/stats')
+@require_authentication
 def stats():
     """Display team statistics."""
-
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/login')
 
     teamid = request.values.get('id')
 

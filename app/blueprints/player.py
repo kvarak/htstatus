@@ -2,9 +2,21 @@
 
 import math
 
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, request, session
 from sqlalchemy import text
 
+from app.auth_utils import (
+    get_current_user_id,
+    get_team_info,
+    get_user_teams,
+    require_authentication,
+)
+from app.error_handlers import (
+    TeamAccessError,
+    ValidationError,
+    handle_error,
+    validate_team_id,
+)
 from app.utils import create_page, dprint, get_training
 from models import Group, MatchPlay, Players, PlayerSetting, User
 
@@ -30,13 +42,9 @@ def setup_player_blueprint(db_instance, def_cols, calc_cols, trace_cols, group_o
 
 
 @player_bp.route('/player', methods=['GET', 'POST'])
+@require_authentication
 def player():
     """Display player list with skill tracking and grouping."""
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/login')
-
     updategroup = request.form.get('updategroup')
     playerid = request.form.get('playerid')
     groupid = request.form.get('groupid')
@@ -44,34 +52,26 @@ def player():
     teamid = request.values.get('id')
 
     try:
-        teamid = int(teamid) if teamid else request.form.get('id')
-    except (ValueError, TypeError):
-        error = "Invalid team ID format."
-        return create_page(
-            template='player.html',
-            title='Players',
-            error=error)
+        teamid = validate_team_id(teamid if teamid else request.form.get('id'))
+    except ValidationError as e:
+        return handle_error(e)
 
     dprint(1, teamid)
 
-    all_teams = session['all_teams']
+    # Validate team access using consolidated function
+    all_teams, all_team_names = get_user_teams()
+    is_valid, teamname, error_msg = get_team_info(teamid, (all_teams, all_team_names))
 
-    if teamid not in all_teams:
-        error = "Wrong teamid, try the links."
-        return create_page(
-            template='player.html',
-            title='Players',
-            error=error)
-
-    all_team_names = session['all_team_names']
-    teamname = all_team_names[all_teams.index(teamid)]
+    if not is_valid:
+        return handle_error(TeamAccessError(error_msg))
 
     if updategroup and playerid and groupid:
+        current_user_id = get_current_user_id()
         if int(groupid) < 0:
             theconnection = (db.session
                              .query(PlayerSetting)
                              .filter_by(player_id=int(playerid),
-                                        user_id=session['current_user_id'])
+                                        user_id=current_user_id)
                              .first())
             if theconnection:
                 db.session.delete(theconnection)
@@ -80,19 +80,19 @@ def player():
             connection = (db.session
                           .query(PlayerSetting)
                           .filter_by(player_id=int(playerid),
-                                     user_id=session['current_user_id'])
+                                     user_id=current_user_id)
                           .first())
             if connection:
                 (db.session
                  .query(PlayerSetting)
                  .filter_by(player_id=int(playerid),
-                            user_id=session['current_user_id'])
+                            user_id=current_user_id)
                  .update({"group_id": groupid}))
                 db.session.commit()
             else:
                 newconnection = PlayerSetting(
                     player_id=int(playerid),
-                    user_id=session['current_user_id'],
+                    user_id=current_user_id,
                     group_id=groupid)
                 db.session.add(newconnection)
                 db.session.commit()

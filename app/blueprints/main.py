@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from flask import Blueprint, redirect, render_template, request, session, url_for
 from sqlalchemy import text
 
+from app.auth_utils import get_current_user_id, require_authentication
 from app.utils import create_page, diff_month, dprint, player_diff
 from models import Group, Players, PlayerSetting, User
 
@@ -53,8 +54,9 @@ def index():
 
     dprint(2, updated)
 
+    current_user_id = get_current_user_id()
     thisuserdata = (db.session.query(User)
-                    .filter_by(ht_id=session['current_user_id'])
+                    .filter_by(ht_id=current_user_id)
                     .first())
 
     if not thisuserdata:
@@ -89,13 +91,10 @@ def index():
 
 
 @main_bp.route('/settings', methods=['GET', 'POST'])
+@require_authentication
 def settings():
     """Handle user settings for player groups and display columns."""
     error = ""
-    if ('current_user') not in session:
-        return render_template(
-            '_forward.html',
-            url='/')
 
     groupname = request.form.get('groupname')
     grouporder = request.form.get('grouporder')
@@ -111,7 +110,7 @@ def settings():
         bgcolor = "#FFFFFF"
 
     user = (db.session.query(User)
-            .filter_by(ht_id=session['current_user_id'])
+            .filter_by(ht_id=get_current_user_id())
             .first())
     columns = User.getColumns(user)
     if len(columns) == 0:
@@ -143,7 +142,7 @@ def settings():
     if addgroup:
         if groupname and grouporder:
             newgroup = Group(
-                user_id=session['current_user_id'],
+                user_id=get_current_user_id(),
                 name=groupname,
                 order=grouporder,
                 textcolor=textcolor,
@@ -181,7 +180,7 @@ def settings():
             # remove all connected players
             connections = (db.session.query(PlayerSetting)
                            .filter_by(group_id=groupid,
-                                      user_id=session['current_user_id'])
+                                      user_id=get_current_user_id())
                            .all())
             dprint(2, connections)
 
@@ -189,7 +188,7 @@ def settings():
                 connection = (db.session
                               .query(PlayerSetting)
                               .filter_by(player_id=playersetting.player_id,
-                                         user_id=session['current_user_id'])
+                                         user_id=get_current_user_id())
                               .first())
                 db.session.delete(connection)
                 db.session.commit()
@@ -202,7 +201,7 @@ def settings():
             db.session.commit()
 
     group_data = (db.session.query(Group)
-                  .filter_by(user_id=session['current_user_id'])
+                  .filter_by(user_id=get_current_user_id())
                   .order_by(Group.order)
                   .all())
 
@@ -230,18 +229,15 @@ def settings():
 
 
 @main_bp.route('/debug', methods=['GET', 'POST'])
+@require_authentication
 def admin():
     """Admin dashboard for user management."""
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/')
 
     error = ""
 
     try:
         user = (db.session.query(User)
-                .filter_by(ht_id=session['current_user_id'])
+                .filter_by(ht_id=get_current_user_id())
                 .first())
         role = User.getRole(user)
         if role != "Admin":

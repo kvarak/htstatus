@@ -7,6 +7,7 @@ from datetime import datetime as dt
 from flask import Blueprint, render_template, session
 from sqlalchemy import text
 
+from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
 from app.utils import create_page, diff, dprint, player_diff
 from models import Players
 from pychpp import CHPP
@@ -36,13 +37,9 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
 
 
 @team_bp.route('/team')
+@require_authentication
 def team():
     """Display team information."""
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/login')
-
     chpp = CHPP(consumer_key,
                 consumer_secret,
                 session['access_key'],
@@ -64,22 +61,20 @@ def team():
 
 
 @team_bp.route('/update')
+@require_authentication
 def update():
     """Update player data from Hattrick API."""
     dprint(1, "=== DATA UPDATE PROCESS STARTED ===")
 
-    if session.get('current_user') is None:
-        dprint(1, "ERROR: No current_user in session, redirecting to login")
-        return render_template(
-            '_forward.html',
-            url='/login')
+    # Session state validation using standardized functions
+    current_user_id = get_current_user_id()
+    all_teams, all_team_names = get_user_teams()
 
-    # Session state validation
-    dprint(1, f"Current user: {session.get('current_user')}")
+    dprint(1, f"Current user ID: {current_user_id}")
     dprint(1, f"Access key available: {bool(session.get('access_key'))}")
     dprint(1, f"Access secret available: {bool(session.get('access_secret'))}")
-    dprint(1, f"All teams: {session.get('all_teams')}")
-    dprint(1, f"Team names: {session.get('all_team_names')}")
+    dprint(1, f"All teams: {all_teams}")
+    dprint(1, f"Team names: {all_team_names}")
 
     try:
         # Initialize CHPP with enhanced error handling

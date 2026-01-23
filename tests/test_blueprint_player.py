@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from app.factory import db
+from app.test_factories import create_test_user, create_test_players, create_test_group, setup_authenticated_session
 from models import Group, Players, PlayerSetting, User
 
 # Removed player_app fixture - using shared app fixture from conftest.py instead
@@ -209,14 +210,22 @@ class TestPlayerBlueprintRoutes:
 class TestPlayerGroupManagement:
     """Test player group assignment and management."""
 
-    def test_update_player_group_assignment(self, authenticated_client, sample_players, sample_group):
-        """Test assigning player to group."""
-        player = sample_players[0]
-        response = authenticated_client.post('/player', data={
+    def test_update_player_group_assignment(self, client, db_session):
+        """Test assigning player to group using factory approach."""
+        # Create test data with proper dependencies
+        user = create_test_user(db_session, ht_id=12345)
+        players = create_test_players(db_session, user, count=3)
+        group = create_test_group(db_session, user, name='Test Group')
+
+        # Setup authenticated client
+        setup_authenticated_session(client, user.ht_id, user.ht_user)
+
+        player = players[0]
+        response = client.post('/player', data={
             'id': '12345',
             'updategroup': 'true',
             'playerid': str(player.ht_id),
-            'groupid': str(sample_group.id)
+            'groupid': str(group.id)
         })
 
         assert response.status_code == 200
@@ -227,20 +236,28 @@ class TestPlayerGroupManagement:
             user_id=12345
         ).first()
         assert setting is not None
-        assert setting.group_id == sample_group.id
+        assert setting.group_id == group.id
 
-    def test_remove_player_from_group(self, authenticated_client, sample_players, sample_group):
-        """Test removing player from group."""
-        player = sample_players[0]
+    def test_remove_player_from_group(self, client, db_session):
+        """Test removing player from group using factory approach."""
+        # Create test data with proper dependencies
+        user = create_test_user(db_session, ht_id=12345)
+        players = create_test_players(db_session, user, count=3)
+        group = create_test_group(db_session, user, name='Test Group')
+
+        # Setup authenticated client
+        authenticated_client = setup_authenticated_session(client, user)
+
+        player = players[0]
 
         # First assign player to group
         setting = PlayerSetting(
             player_id=player.ht_id,
-            user_id=12345,
-            group_id=sample_group.id
+            user_id=user.ht_id,
+            group_id=group.id
         )
-        db.session.add(setting)
-        db.session.commit()
+        db_session.add(setting)
+        db_session.commit()
 
         # Then remove from group (groupid = -1)
         response = authenticated_client.post('/player', data={
@@ -255,33 +272,31 @@ class TestPlayerGroupManagement:
         # Verify PlayerSetting was deleted
         setting = PlayerSetting.query.filter_by(
             player_id=player.ht_id,
-            user_id=12345
+            user_id=user.ht_id
         ).first()
         assert setting is None
 
-    def test_update_existing_player_group(self, authenticated_client, sample_players, sample_group):
-        """Test updating existing player group assignment."""
-        player = sample_players[0]
+    def test_update_existing_player_group(self, client, db_session):
+        """Test updating existing player group assignment using factory approach."""
+        # Create test data with proper dependencies
+        user = create_test_user(db_session, ht_id=12345)
+        players = create_test_players(db_session, user, count=3)
+        group1 = create_test_group(db_session, user, name='Group 1')
+        group2 = create_test_group(db_session, user, name='Group 2')
 
-        # Create another group
-        group2 = Group(
-            user_id=12345,
-            name='Group 2',
-            order=2,
-            textcolor='#000000',
-            bgcolor='#ffffff'
-        )
-        db.session.add(group2)
-        db.session.commit()
+        # Setup authenticated client
+        authenticated_client = setup_authenticated_session(client, user)
+
+        player = players[0]
 
         # First assign to group 1
         setting = PlayerSetting(
             player_id=player.ht_id,
-            user_id=12345,
-            group_id=sample_group.id
+            user_id=user.ht_id,
+            group_id=group1.id
         )
-        db.session.add(setting)
-        db.session.commit()
+        db_session.add(setting)
+        db_session.commit()
 
         # Update to group 2
         response = authenticated_client.post('/player', data={
@@ -296,7 +311,7 @@ class TestPlayerGroupManagement:
         # Verify assignment was updated
         setting = PlayerSetting.query.filter_by(
             player_id=player.ht_id,
-            user_id=12345
+            user_id=user.ht_id
         ).first()
         assert setting.group_id == group2.id
 
@@ -323,12 +338,18 @@ class TestPlayerDataDisplay:
         # Verify player data is displayed
         assert b'Player' in response.data or response.status_code == 200
 
-    def test_player_columns_configuration(self, authenticated_client, sample_players):
+    def test_player_columns_configuration(self, client, db_session):
         """Test player display respects column configuration."""
-        # Get user and set custom columns
-        user = User.query.filter_by(ht_id=12345).first()
-        user.columns = '["Name", "Age", "TSI"]'  # Custom column configuration
-        db.session.commit()
+        # Create test data with proper dependencies
+        user = create_test_user(db_session, ht_id=12345)
+        players = create_test_players(db_session, user, count=3)
+
+        # Setup authenticated client
+        authenticated_client = setup_authenticated_session(client, user)
+
+        # Set custom columns
+        user.player_columns = '["Name", "Age", "TSI"]'  # Custom column configuration
+        db_session.commit()
 
         response = authenticated_client.get('/player?id=12345')
         assert response.status_code == 200

@@ -2,9 +2,10 @@
 
 from datetime import date, timedelta
 
-from flask import Blueprint, render_template, request, session
+from flask import Blueprint, request, session
 from sqlalchemy import text
 
+from app.auth_utils import require_authentication
 from app.utils import create_page
 from models import Players
 
@@ -24,12 +25,9 @@ def setup_training_blueprint(db_instance, trace_cols):
 
 
 @training_bp.route('/training')
+@require_authentication
 def training():
     """Display player training progression and skill development."""
-    if session.get('current_user') is None:
-        return render_template(
-            '_forward.html',
-            url='/login')
 
     teamid = request.values.get('id')
 
