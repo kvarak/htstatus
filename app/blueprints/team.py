@@ -8,7 +8,7 @@ from flask import Blueprint, render_template, session
 from sqlalchemy import text
 
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
-from app.utils import create_page, diff, dprint, player_diff
+from app.utils import create_page, diff, dprint, get_player_changes
 from models import Players
 from pychpp import CHPP
 
@@ -300,13 +300,27 @@ def update():
 
             players_fromht.append(thisplayer['ht_id'])
 
-            thischanges = player_diff(thisplayer['ht_id'], 1, the_team.name)
-            if thischanges:
-                changesplayers_day.append(thischanges)
+        # Collect changes for 4-week timeline - simplified
+        timeline_changes = {}
 
-            thischanges = player_diff(thisplayer['ht_id'], 7, the_team.name)
-            if thischanges:
-                changesplayers_week.append(thischanges)
+        for week_num in range(1, 5):  # Weeks 1-4
+            week_start_days = week_num * 7       # Start of week (older)
+            week_end_days = (week_num - 1) * 7   # End of week (newer)
+
+            timeline_changes[f'week_{week_num}'] = {
+                'week_label': f"Week {week_num}",
+                'is_current': week_num == 1,
+                'days_ago_start': week_start_days,
+                'days_ago_end': week_end_days,
+                'changes': []
+            }
+
+            # Get all changes for all players in this week period
+            for player_id in players_fromht:
+                player_changes = get_player_changes(player_id, week_start_days, week_end_days, the_team.name)
+
+                for change in player_changes:
+                    timeline_changes[f'week_{week_num}']['changes'].append(change)
 
         updated[teamid].append('/player?id=' + str(teamid))
         updated[teamid].append('players')
@@ -342,10 +356,9 @@ def update():
             db.session.commit()
 
     return create_page(
-        template='update.html',
-        title='Update Complete',
+        template='update_timeline.html',
+        title='Update Complete - Timeline View',
         updated=updated,
-        changes_day=changesplayers_day,
-        changes_week=changesplayers_week,
+        timeline_changes=timeline_changes,
         left_players=left_players,
         new_players=new_players)

@@ -183,10 +183,12 @@ def player_diff(playerid, daysago, team_name="Unknown Team"):
         # Query for player data from specified days ago
         cutoff_date = datetime.now() - relativedelta(days=daysago)
 
+        # Get the most recent record before or on the cutoff date
         old_player = db.session.query(Players).filter_by(ht_id=playerid)\
             .filter(Players.data_date <= cutoff_date)\
             .order_by(desc(Players.data_date)).first()
 
+        # Get the most recent record overall
         current_player = db.session.query(Players).filter_by(ht_id=playerid)\
             .order_by(desc(Players.data_date)).first()
 
@@ -228,6 +230,157 @@ def player_diff(playerid, daysago, team_name="Unknown Team"):
     except Exception as e:
         dprint(1, f"Error in player_diff: {e}")
         return []
+
+
+def player_daily_changes(playerid, days_ago, team_name="Unknown Team"):
+    """Get player skill changes between two consecutive days (for timeline view).
+
+    This function compares skills between today-days_ago and today-(days_ago+1)
+    to show only changes that occurred on that specific day.
+
+    Args:
+        playerid: Hattrick player ID
+        days_ago: Number of days back to check (0 = today vs yesterday)
+        team_name: Team name for display
+
+    Returns: List with same format as player_diff, but only for day-specific changes
+    """
+    try:
+        from datetime import datetime, timedelta
+
+        from sqlalchemy import Date, cast, desc
+
+        from models import Players
+
+        # Calculate target dates
+        target_date = (datetime.now() - timedelta(days=days_ago)).date()
+
+        # Get the most recent record for target date
+        target_player = db.session.query(Players).filter_by(ht_id=playerid)\
+            .filter(cast(Players.data_date, Date) == target_date)\
+            .order_by(desc(Players.data_date)).first()
+
+        # Get the most recent record BEFORE target date (not necessarily previous day)
+        prev_player = db.session.query(Players).filter_by(ht_id=playerid)\
+            .filter(cast(Players.data_date, Date) < target_date)\
+            .order_by(desc(Players.data_date)).first()
+
+        if not target_player or not prev_player:
+            return []
+
+        # Calculate differences for each skill
+        skills = ['keeper', 'defender', 'playmaker', 'winger', 'passing', 'scorer', 'set_pieces']
+        differences = []
+
+        for skill in skills:
+            old_val = getattr(prev_player, skill, 0) or 0
+            new_val = getattr(target_player, skill, 0) or 0
+
+            if old_val != new_val:
+                differences.append([
+                    team_name,
+                    target_player.first_name or "Unknown",
+                    target_player.last_name or "Player",
+                    skill.capitalize(),
+                    old_val,
+                    new_val
+                ])
+
+        # If no differences found, return empty list
+        if not differences:
+            return []
+
+        # Return nested structure: [[player_info], [changes...]]
+        return [
+            [
+                team_name,
+                target_player.first_name or "Unknown",
+                target_player.last_name or "Player"
+            ]
+        ] + differences
+
+    except Exception as e:
+        dprint(1, f"Error in player_daily_changes: {e}")
+        return []
+
+
+def get_player_changes(player_id, start_days_ago, end_days_ago, team_name=""):
+    """Universal function to get ANY player changes between two time periods.
+
+    Args:
+        player_id: Hattrick player ID
+        start_days_ago: Start of period (older date, higher number)
+        end_days_ago: End of period (newer date, lower number)
+        team_name: Team name for display
+
+    Returns:
+        List of changes: [player_name, attribute, old_value, new_value, change_type]
+    """
+    try:
+        from datetime import datetime, timedelta
+
+        from sqlalchemy import Date, cast, desc
+
+        from models import Players
+
+        # Calculate dates
+        start_date = (datetime.now() - timedelta(days=start_days_ago)).date()
+        end_date = (datetime.now() - timedelta(days=end_days_ago)).date()
+
+        # Get records at start and end of period
+        old_record = db.session.query(Players).filter_by(ht_id=player_id)\
+            .filter(cast(Players.data_date, Date) <= start_date)\
+            .order_by(desc(Players.data_date)).first()
+
+        new_record = db.session.query(Players).filter_by(ht_id=player_id)\
+            .filter(cast(Players.data_date, Date) <= end_date)\
+            .order_by(desc(Players.data_date)).first()
+
+        if not old_record or not new_record or old_record.data_date == new_record.data_date:
+            return []
+
+        # Attributes to check for changes
+        check_attrs = {
+            # Skills
+            'keeper': 'skill', 'defender': 'skill', 'playmaker': 'skill',
+            'winger': 'skill', 'passing': 'skill', 'scorer': 'skill', 'set_pieces': 'skill',
+            # Other important attributes
+            'experience': 'other', 'salary': 'money',
+            'age_years': 'age', 'loyalty': 'other'
+        }
+
+        # List not to check for, as reference:
+        # 'id', 'data_date', 'ht_id', 'first_name', 'last_name',
+        # 'owner', 'age_days', 'age', 'next_birthday'
+        # 'stamina': 'other', 'form': 'other', 'tsi': 'money',
+
+        changes = []
+        player_name = f"{new_record.first_name or ''} {new_record.last_name or ''}".strip()
+
+        for attr, change_type in check_attrs.items():
+            old_val = getattr(old_record, attr, None) or 0
+            new_val = getattr(new_record, attr, None) or 0
+
+            if old_val != new_val:
+                # Clean up attribute name
+                attr_name = attr.replace('_', ' ').title()
+                if attr == 'tsi': attr_name = 'TSI'
+                elif attr == 'set_pieces': attr_name = 'Set Pieces'
+
+                changes.append([
+                    player_name,
+                    attr_name,
+                    old_val,
+                    new_val,
+                    change_type
+                ])
+
+        return changes
+
+    except Exception as e:
+        dprint(1, f"Error in get_player_changes: {e}")
+        return []
+
 
 # =============================================================================
 # Team Statistics and Analysis Functions
