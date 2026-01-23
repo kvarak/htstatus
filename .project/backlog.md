@@ -61,6 +61,10 @@
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
+- 🎯 [SIMPLIFY-001] Consolidate UI Documentation (1-2 hours) - Merge 5 UI files into 2 comprehensive guides **READY**
+- 🎯 [SIMPLIFY-002] Remove Legacy Configuration Files (30 min) - Clean up unused configs and duplicates **READY**
+- 🎯 [SIMPLIFY-003] Consolidate Environment Templates (30 min) - Reduce from 3 to 2 environment variants **READY**
+- 🎯 [SIMPLIFY-004] Consolidate README Files (1 hour) - Merge scattered setup instructions **READY**
 - 🎯 [DOC-023] Clean TECHNICAL.md Obsolete Content (1-2 hours) - Remove outdated route architecture descriptions **HIGH PRIORITY**
 - 🎯 [DOC-024] Clean README.md Legacy Sections (1 hour) - Remove deprecated setup instructions
 - 🎯 [DOC-025] Update architecture.md File Structure (30 min) - Reflect current blueprint architecture
@@ -1797,7 +1801,128 @@ The newly created app/utils.py module (300+ lines) contains critical shared util
 
 ---
 
-### [DOC-023] Clean TECHNICAL.md Obsolete Content
+### [SIMPLIFY-001] Consolidate UI Documentation
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P6 | **Impact**: Documentation simplification
+**Dependencies**: None | **Strategic Value**: Reduced complexity, improved maintainability
+
+**Problem Statement**:
+5 separate UI documentation files create unnecessary complexity and duplication. Current files overlap significantly and make it difficult to find authoritative design guidance.
+
+**Implementation**:
+1. **Create Consolidated ui-guidelines.md** (45-60 min):
+   - Merge content from ui-style-guide.md, ui-design-guidelines.md, ui-implementation-standards.md
+   - Structure: Design System → Implementation → Validation Checklist
+   - Keep only essential information, remove redundancy
+
+2. **Create ui-patterns.md for Specific Patterns** (15-30 min):
+   - Move ui-content-boxes-pattern.md content here
+   - Structure for future pattern additions
+   - Reference from main guidelines
+
+3. **Archive Historical Analysis** (15 min):
+   - Move ui-audit-analysis.md to .project/history/
+   - Update any references in other files
+
+**Acceptance Criteria**:
+- 5 UI files reduced to 2 comprehensive guides
+- No information lost, just better organized
+- All cross-references updated
+- prompts.json updated with new file references
+
+**Expected Outcomes**: Simpler documentation structure, easier to maintain and reference
+
+---
+
+### [SIMPLIFY-002] Remove Legacy Configuration Files
+**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P6 | **Impact**: Reduced repository clutter
+**Dependencies**: None | **Strategic Value**: Clean repository, reduced confusion
+
+**Problem Statement**:
+Legacy configuration files create confusion about current tooling and add unnecessary repository bloat.
+
+**Implementation**:
+1. **Remove Unused Files** (15 min):
+   - Delete configs/.flake8 (project uses ruff now)
+   - Delete configs/requirements.txt (project uses UV + pyproject.toml)
+   - Delete configs/index.html if confirmed unused
+
+2. **Update Documentation** (15 min):
+   - Remove references to deleted files in configs/README.md
+   - Update setup instructions to reflect current tooling
+
+**Acceptance Criteria**:
+- Legacy configuration files removed
+- No broken references in documentation
+- Repository size reduced
+- Current tooling clearly documented
+
+**Expected Outcomes**: Cleaner repository, reduced confusion about current vs legacy tooling
+
+---
+
+### [SIMPLIFY-003] Consolidate Environment Templates
+**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P6 | **Impact**: Reduced decision complexity
+**Dependencies**: None | **Strategic Value**: Simplified environment setup
+
+**Problem Statement**:
+3 environment templates + duplicate config.py examples create decision paralysis and maintenance overhead.
+
+**Implementation**:
+1. **Merge Staging into Production** (15 min):
+   - Review .env.staging.example differences
+   - Merge unique staging configurations into .env.production.example
+   - Remove .env.staging.example
+
+2. **Remove Duplicate Config Template** (10 min):
+   - Choose between config.py.template vs environments/config.py.example
+   - Remove the redundant one
+   - Update documentation references
+
+3. **Update Documentation** (5 min):
+   - Update environments/README.md
+   - Simplify setup instructions
+
+**Acceptance Criteria**:
+- 2 environment templates instead of 3
+- 1 config.py template instead of 2
+- Documentation updated consistently
+- No setup functionality lost
+
+**Expected Outcomes**: Simpler environment setup, reduced maintenance overhead
+
+---
+
+### [SIMPLIFY-004] Consolidate README Files
+**Status**: 🎯 Ready to Execute | **Effort**: 1 hour | **Priority**: P6 | **Impact**: Documentation consistency
+**Dependencies**: None | **Strategic Value**: Single source of truth for setup
+
+**Problem Statement**:
+5 README files with overlapping content create confusion about where to find setup instructions and project information.
+
+**Implementation**:
+1. **Merge Subdirectory READMEs** (30 min):
+   - Integrate configs/README.md content into main README or DEPLOYMENT.md
+   - Integrate environments/README.md content into main README
+   - Integrate scripts/README.md content into main README or TECHNICAL.md
+
+2. **Handle Development Methodology** (20 min):
+   - Evaluate .project/README.md content
+   - Merge relevant content into documentation-guide.md or main README
+   - Remove redundant development workflow descriptions
+
+3. **Update Cross-References** (10 min):
+   - Find and update any links to removed README files
+   - Ensure navigation remains functional
+
+**Acceptance Criteria**:
+- Single authoritative README.md for project setup
+- Subdirectory content integrated appropriately
+- No broken links or references
+- Information remains accessible
+
+**Expected Outcomes**: Clear information hierarchy, reduced documentation maintenance, better user experience
+
+
 **Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P6 | **Impact**: Documentation clarity
 **Dependencies**: REFACTOR-007 (✅ completed) | **Strategic Value**: Accurate technical documentation
 
