@@ -160,8 +160,18 @@ def get_training(players_data):
     return allplayerids, allplayers, playernames
 
 
-def player_diff(playerid, daysago):
-    """Get player skill differences over time (returns list format for template compatibility)."""
+def player_diff(playerid, daysago, team_name="Unknown Team"):
+    """Get player skill differences over time (returns nested format for template compatibility).
+
+    Args:
+        playerid: Hattrick player ID
+        daysago: Number of days back to compare
+        team_name: Team name for display (default: "Unknown Team")
+
+    Returns a list with structure: [[player_info], [change1], [change2], ...]
+    where player_info = [team_name, first_name, last_name]
+    and each change = [team_name, first_name, last_name, skill, old_val, new_val]
+    """
     try:
         from datetime import datetime
 
@@ -193,7 +203,7 @@ def player_diff(playerid, daysago):
 
             if old_val != new_val:
                 differences.append([
-                    current_player.team_name or "Unknown Team",
+                    team_name,
                     current_player.first_name or "Unknown",
                     current_player.last_name or "Player",
                     skill.capitalize(),
@@ -201,7 +211,19 @@ def player_diff(playerid, daysago):
                     new_val
                 ])
 
-        return differences
+        # If no differences found, return empty list
+        if not differences:
+            return []
+
+        # Return nested structure: [[player_info], [changes...]]
+        # This matches the template's expectation: cplayer[0] for player info, cplayer[1:] for changes
+        return [
+            [
+                team_name,
+                current_player.first_name or "Unknown",
+                current_player.last_name or "Player"
+            ]
+        ] + differences
 
     except Exception as e:
         dprint(1, f"Error in player_diff: {e}")

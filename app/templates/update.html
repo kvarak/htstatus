@@ -1,153 +1,303 @@
 {% extends 'base.html' %}
 
 {% block scripts %}
-
 {{ super() }}
+<style>
+  .update-content {
+    padding: 1rem 0;
+  }
 
-<!-- <script type="text/javascript">
-  $(document).ready(function(){
-      $("#exampleModal").modal('show');
-  });
-</script> -->
+  .page-title-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
 
+  .page-title-box .breadcrumb-item {
+    color: hsl(120, 45%, 25%);
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .status-message {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+  }
+
+  .status-success {
+    color: hsl(120, 70%, 35%);
+  }
+
+  .status-error {
+    color: hsl(0, 84%, 60%);
+  }
+
+  .status-warning {
+    color: hsl(45, 90%, 55%);
+  }
+
+  .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: hsl(120, 45%, 25%);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0.75rem;
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+  }
+
+  .section-subtitle {
+    font-size: 0.8rem;
+    color: hsl(120, 15%, 50%);
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.90);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid hsl(120, 15%, 90%);
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+    margin: 0 0 0.75rem 0;
+  }
+
+  .changes-box {
+    background: hsl(120, 8%, 97%);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .updated-teams-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .updated-teams-box p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .updated-teams-box p:last-child {
+    margin-bottom: 0;
+  }
+
+  .changes-container {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .changes-container-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: hsl(120, 45%, 25%);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid hsl(120, 20%, 85%);
+  }
+
+  .changes-section {
+    margin-bottom: 1rem;
+  }
+
+  .changes-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .changes-section-label {
+    font-size: 0.85rem;
+    color: hsl(120, 15%, 50%);
+    font-style: italic;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid hsl(120, 15%, 90%);
+  }
+
+  .player-entry {
+    padding: 0.5rem 0;
+    border-left: 2px solid hsl(120, 45%, 25%);
+    padding-left: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .player-name {
+    font-weight: 600;
+    color: hsl(120, 45%, 25%);
+    font-size: 0.95rem;
+  }
+
+  .skill-item {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    padding-left: 1rem;
+  }
+
+  .skill-up {
+    color: hsl(120, 70%, 35%);
+  }
+
+  .skill-down {
+    color: hsl(0, 84%, 60%);
+  }
+
+  .team-link {
+    color: hsl(120, 45%, 25%);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  .team-link:hover {
+    text-decoration: underline;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid hsl(120, 20%, 85%);
+    margin: 1rem 0;
+  }
+
+  .empty-state {
+    color: hsl(120, 15%, 50%);
+    font-style: italic;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    background: hsl(120, 8%, 97%);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    text-align: center;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
 
-<!-- Modal -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        Modal body text goes here.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+<div class="update-content">
+  <div class="container">
+    <!-- Breadcrumb/Title -->
+    <div class="page-title-box">
+      <nav aria-label="breadcrumb" class="mb-0">
+        <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 0;">
+          <li class="breadcrumb-item active">{{ title }}</li>
         </ol>
       </nav>
     </div>
-  </div>
 
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    <h5>{{ error }}</h5>
-    <p>{{ timenow }}</p>
-    <p>{{ fullversion }}</p>
-    <p><span style="white-space: pre-line">{{ errorinfo }}</span></p>
-  </div>
-  {% else %}
-    <div class="alert alert-success" role="alert">
-      Data downloaded!
-    </div>
-  {% endif %}
-
-  {% if left_players %}
-    {% for pl in left_players %}
-    <div class="alert alert-warning" role="alert">
-      {{ pl[1] }} is no longer in {{ pl[0] }}
-    </div>
-    {% endfor %}
-  {% endif %}
-
-  {% if new_players %}
-    {% for pl in new_players %}
-    <div class="alert alert-success" role="alert">
-      <p>{{ pl[1] }} is now playing for {{ pl[0] }}</p>
-    </div>
-    {% endfor %}
-  {% endif %}
-
-  <div class="row">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <p class="card-text">
-            <div class="card-body">
-            {% if not(error) %}
-              {% if updated %}
-                {% for key, value in updated.items() %}
-                <p>{{ value[0] }}: <a href="{{ value[1] }}">{{ value[2] }}</a></p>
-                {% endfor %}
-                <hr class="my-4">
-                <p>Changes since yesterday.</p>
-                <p class="text-sm11"><i>(Or since the previous update)</i></p>
-                <p class="text-sm11">
-                  {% for cplayer in changes_day %}
-                    {{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }} -
-                    {% for c in cplayer %}
-
-                      {% if c[5] > c[4] %}
-                        {% set color = "green" %}
-                      {% else %}
-                        {% set color = "red" %}
-                      {% endif %}
-
-                      {% if c[3] == "injury_level" %}
-
-                        {% if c[5] > c[4] %}
-                          <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ c[5] }}
-                        {% endif %}
-
-                      {% elif c[3] == "cards" %}
-
-                        {% if c[5] == 3 %}
-                          <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                        {% endif %}
-
-                      {% else %}
-                        <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
-                      {% endif %}
-
-                    {% endfor %}
-                    </br>
-                  {% endfor %}
-                </p>
-                <hr class="my-4">
-                <p>Changes since one week ago.</p>
-                <p class="text-sm11"><i>(Or at least a week ago)</i></p>
-                <p class="text-sm11">
-                  {% for cplayer in changes_week %}
-                    {{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }} -
-                    {% for c in cplayer %}
-                      {% if c[5] > c[4] %}
-                        {% set color = "green" %}
-                      {% else %}
-                        {% set color = "red" %}
-                      {% endif %}
-                      <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
-                    {% endfor %}
-                    </br>
-                  {% endfor %}
-                </p>
-                {% endif %}
-            {% endif %}
-            </div>
-          </p>
-        </div>
+    <!-- Status Messages -->
+    {% if error %}
+      <div class="status-message status-error">
+        <strong>{{ error }}</strong>
+        <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">{{ timenow }} • {{ fullversion }}</p>
       </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
+    {% else %}
+      <div class="status-message status-success">
+        ✓ Data downloaded successfully
+      </div>
+    {% endif %}
+
+    <!-- Players Left -->
+    {% if left_players %}
+      {% for pl in left_players %}
+        <div class="status-message status-warning">
+          ⚠ {{ pl[1] }} is no longer in {{ pl[0] }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- New Players -->
+    {% if new_players %}
+      {% for pl in new_players %}
+        <div class="status-message status-success">
+          ✓ {{ pl[1] }} is now playing for {{ pl[0] }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Changes Report -->
+    {% if not(error) %}
+      {% if updated %}
+        <!-- Updated Teams -->
+        <div class="updated-teams-box">
+          {% for key, value in updated.items() %}
+            <p style="margin: 0.5rem 0; font-size: 0.9rem;">
+              <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ value[0] }}:</span>
+              <a href="{{ value[1] }}" class="team-link">{{ value[2] }}</a>
+            </p>
+          {% endfor %}
+        </div>
+
+        <hr class="divider">
+
+        <!-- Changes Container -->
+        {% if changes_week or changes_day %}
+          <div class="changes-container">
+            <div class="changes-container-title">Changes</div>
+
+            <!-- Changes Since Yesterday -->
+            {% if changes_day %}
+              <div class="changes-section">
+                <div class="changes-section-label">Since yesterday (or previous update)</div>
+                <div class="changes-box">
+                  {% for cplayer in changes_day %}
+                    <div class="player-entry">
+                      <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
+                      {% for c in cplayer[1:] %}
+                        <div class="skill-item">
+                          {% if c[5] > c[4] %}
+                            <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                          {% else %}
+                            <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Changes Since One Week Ago -->
+            {% if changes_week %}
+              <div class="changes-section">
+                <div class="changes-section-label">Since a week ago (or earlier)</div>
+                <div class="changes-box">
+                  {% for cplayer in changes_week %}
+                    <div class="player-entry">
+                      <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
+                      {% for c in cplayer[1:] %}
+                        <div class="skill-item">
+                          {% if c[5] > c[4] %}
+                            <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                          {% else %}
+                            <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% else %}
+              {% if not changes_day %}
+                <div class="empty-state">No player changes recorded</div>
+              {% endif %}
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endif %}
+    {% endif %}
   </div>
 </div>
 

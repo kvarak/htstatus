@@ -300,11 +300,11 @@ def update():
 
             players_fromht.append(thisplayer['ht_id'])
 
-            thischanges = player_diff(thisplayer['ht_id'], 1)
+            thischanges = player_diff(thisplayer['ht_id'], 1, the_team.name)
             if thischanges:
                 changesplayers_day.append(thischanges)
 
-            thischanges = player_diff(thisplayer['ht_id'], 7)
+            thischanges = player_diff(thisplayer['ht_id'], 7, the_team.name)
             if thischanges:
                 changesplayers_week.append(thischanges)
 
