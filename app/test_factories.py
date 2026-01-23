@@ -1,7 +1,8 @@
 """Simplified fixture utilities for testing."""
 
-from datetime import datetime, date
-from models import User, Players, Group
+from datetime import date, datetime
+
+from models import Group, Players, User
 
 
 def create_test_user(db_session, ht_id=12345):
@@ -24,8 +25,8 @@ def create_test_user(db_session, ht_id=12345):
 
 
 def create_test_players(db_session, user, count=3):
-    """Create test players for a user."""
-    players = []
+    """Create test players for a user and return their HT IDs."""
+    player_ht_ids = []
     for i in range(count):
         player_data = {
             'ht_id': 10000 + i,
@@ -81,16 +82,20 @@ def create_test_players(db_session, user, count=3):
             'owner': user.ht_id,
             'old_owner': None,
             'mother_club_bonus': False,
-            'leadership': 1
+            'leadership': 1,
+            'data_date': date.today()  # Required field for Players model
         }
+        player_ht_ids.append(player_data['ht_id'])  # Store ID before creating object
         player = Players(player_data)
-    for player in players:
-        db_session.refresh(player)
-    return players
+        db_session.add(player)
 
+    # Commit to make visible to Flask routes
+    db_session.commit()
+
+    return player_ht_ids
 
 def create_test_group(db_session, user, name='Test Group'):
-    """Create a test player group for a user."""
+    """Create a test player group for a user and return its ID."""
     group = Group(
         user_id=user.ht_id,
         name=name,
@@ -100,20 +105,29 @@ def create_test_group(db_session, user, name='Test Group'):
     )
 
     db_session.add(group)
+    db_session.flush()  # Get the ID
+    group_id = group.id  # Store ID before commit
     db_session.commit()
-    db_session.refresh(group)
-    return group
+
+    return group_id
 
 
-def setup_authenticated_session(client, user_ht_id, user_ht_user=None):
+def setup_authenticated_session(client, user_or_id, user_ht_user=None):
     """Set up an authenticated session for testing."""
-    if user_ht_user is None:
-        user_ht_user = f'testuser{user_ht_id}'
+    # Handle both User object and direct ID patterns
+    if hasattr(user_or_id, 'ht_id'):
+        # User object passed
+        user_ht_id = user_or_id.ht_id
+        user_ht_user = user_ht_user or user_or_id.ht_user
+    else:
+        # Direct ID passed (legacy pattern)
+        user_ht_id = user_or_id
+        user_ht_user = user_ht_user or f'testuser{user_ht_id}'
 
     with client.session_transaction() as sess:
         sess['current_user'] = user_ht_user
         sess['current_user_id'] = user_ht_id
-        sess['all_teams'] = [user_ht_id]  # Use the user's ht_id consistently
+        sess['all_teams'] = [user_ht_id]  # Use only primitive data types
         sess['all_team_names'] = ['Test Team']
         sess['team_id'] = 12345
     return client

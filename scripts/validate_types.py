@@ -9,7 +9,7 @@ SQLAlchemy models in models.py to prevent type drift.
 import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Type mapping between SQLAlchemy and TypeScript
 TYPE_MAPPING = {
@@ -23,7 +23,7 @@ TYPE_MAPPING = {
     'PickleType': 'any',  # player_columns is serialized data
 }
 
-def extract_model_fields(models_path: Path) -> Dict[str, Dict[str, Any]]:
+def extract_model_fields(models_path: Path) -> dict[str, dict[str, Any]]:
     """Extract field definitions from SQLAlchemy models."""
     models = {}
 
@@ -70,7 +70,7 @@ def extract_model_fields(models_path: Path) -> Dict[str, Dict[str, Any]]:
 
     return models
 
-def extract_typescript_interfaces(types_path: Path) -> Dict[str, Dict[str, Any]]:
+def extract_typescript_interfaces(types_path: Path) -> dict[str, dict[str, Any]]:
     """Extract interface definitions from TypeScript file."""
     interfaces = {}
 
@@ -103,8 +103,8 @@ def extract_typescript_interfaces(types_path: Path) -> Dict[str, Dict[str, Any]]
 
     return interfaces
 
-def validate_type_sync(models: Dict[str, Dict[str, Any]],
-                      interfaces: Dict[str, Dict[str, Any]]) -> List[str]:
+def validate_type_sync(models: dict[str, dict[str, Any]],
+                      interfaces: dict[str, dict[str, Any]]) -> list[str]:
     """Validate that TypeScript interfaces match SQLAlchemy models."""
     errors = []
 

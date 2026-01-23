@@ -86,8 +86,8 @@ def validate_team_id(team_id_str):
         if team_id <= 0:
             raise ValidationError("Team ID must be positive", field_name='team_id')
         return team_id
-    except (ValueError, TypeError):
-        raise ValidationError("Invalid team ID format", field_name='team_id')
+    except (ValueError, TypeError) as err:
+        raise ValidationError("Invalid team ID format", field_name='team_id') from err
 
 
 def validate_player_id(player_id_str):
@@ -110,5 +110,5 @@ def validate_player_id(player_id_str):
         if player_id <= 0:
             raise ValidationError("Player ID must be positive", field_name='player_id')
         return player_id
-    except (ValueError, TypeError):
-        raise ValidationError("Invalid player ID format", field_name='player_id')
+    except (ValueError, TypeError) as err:
+        raise ValidationError("Invalid player ID format", field_name='player_id') from err

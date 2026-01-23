@@ -52,7 +52,7 @@ def client(auth_app):
 
 
 @pytest.fixture(scope='function')
-def sample_user(auth_app):
+def sample_user(auth_app):  # noqa: ARG001
     """Create a sample user for testing."""
     user = User(
         ht_id=12345,
@@ -68,7 +68,7 @@ def sample_user(auth_app):
 
 
 @pytest.fixture(scope='function')
-def user_without_tokens(auth_app):
+def user_without_tokens(auth_app):  # noqa: ARG001
     """Create user without OAuth tokens."""
     user = User(
         ht_id=67890,
@@ -165,7 +165,7 @@ class TestAuthBlueprintLoginRoutes:
         from flask import redirect
         mock_start_oauth.return_value = redirect('/login')
 
-        response = client.post('/login', data={
+        client.post('/login', data={
             'username': 'notoken',
             'password': 'notoken123'
         })
@@ -184,7 +184,7 @@ class TestAuthBlueprintLoginRoutes:
         from flask import redirect
         mock_start_oauth.return_value = redirect('/login')
 
-        response = client.post('/login', data={
+        client.post('/login', data={
             'username': 'newuser',
             'password': 'newpass123'
         })
@@ -207,7 +207,7 @@ class TestAuthBlueprintOAuthFlow:
         from flask import redirect
         mock_handle_callback.return_value = redirect('/')
 
-        response = client.get('/login?oauth_verifier=test_verifier')
+        client.get('/login?oauth_verifier=test_verifier')
 
         mock_handle_callback.assert_called_once_with('test_verifier')
 

@@ -28,11 +28,11 @@ Author: HTStatus Development Team
 Created: January 13, 2026 (INFRA-011 authentication fix)
 """
 
+from flask_migrate import upgrade
+
 from app.factory import create_app
 
 app = create_app()
 app.app_context().push()
-from flask_migrate import upgrade
-
 upgrade()
 print("Database migrations completed successfully!")

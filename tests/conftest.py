@@ -115,14 +115,14 @@ def db_session(app):
 
         # Create a nested savepoint (SAVEPOINT) for test isolation
         # This survives commits that happen during route execution
-        nested = connection.begin_nested()
+        connection.begin_nested()
 
         # Set up event listener to automatically recreate savepoint after commits
         # This ensures each test gets a clean slate even if routes commit
         from sqlalchemy import event
 
         @event.listens_for(session, "after_transaction_end")
-        def restart_savepoint(session, transaction):
+        def restart_savepoint(_session, transaction):
             """Recreate savepoint after transaction ends."""
             if transaction.nested and not transaction._parent.nested:
                 connection.begin_nested()
@@ -146,7 +146,7 @@ def db_session(app):
                 # Restore original session
                 db.session = old_session
 @pytest.fixture(scope='function')
-def authenticated_session(client, db_session):
+def authenticated_session(client, db_session):  # noqa: ARG001
     """Create an authenticated session for testing routes that require login."""
     # Mock authentication data
     with client.session_transaction() as session:

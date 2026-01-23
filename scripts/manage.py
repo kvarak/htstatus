@@ -10,12 +10,11 @@ Environment:
     Always use 'uv run' to ensure correct dependency resolution.
 """
 from dotenv import load_dotenv
-
-load_dotenv()  # Load environment variables before anything else
-
 from flask_migrate import Migrate
 
 from app.factory import create_app, db
+
+load_dotenv()  # Load environment variables before anything else
 
 # Create app instance
 app = create_app()

@@ -8,7 +8,12 @@ from unittest.mock import patch
 import pytest
 
 from app.factory import db
-from app.test_factories import create_test_user, create_test_players, create_test_group, setup_authenticated_session
+from app.test_factories import (
+    create_test_group,
+    create_test_players,
+    create_test_user,
+    setup_authenticated_session,
+)
 from models import Group, Players, PlayerSetting, User
 
 # Removed player_app fixture - using shared app fixture from conftest.py instead
@@ -52,7 +57,7 @@ def client(app_with_routes):
 
 
 @pytest.fixture(scope='function')
-def sample_user(app, db_session):
+def sample_user(app, db_session):  # noqa: ARG001
     """Create a sample user for testing."""
     user = User(
         ht_id=12345,
@@ -68,7 +73,7 @@ def sample_user(app, db_session):
 
 
 @pytest.fixture(scope='function')
-def sample_players(app, sample_user, db_session):
+def sample_players(app, sample_user, db_session):  # noqa: ARG001
     """Create sample players for testing."""
     from datetime import datetime
     players = []
@@ -141,7 +146,7 @@ def sample_players(app, sample_user, db_session):
 
 
 @pytest.fixture(scope='function')
-def sample_group(app, sample_user, db_session):
+def sample_group(app, sample_user, db_session):  # noqa: ARG001
     """Create a sample player group."""
     from sqlalchemy import text
 
@@ -165,7 +170,7 @@ def sample_group(app, sample_user, db_session):
 
 
 @pytest.fixture(scope='function')
-def authenticated_client(client, sample_user, db_session):
+def authenticated_client(client, sample_user, db_session):  # noqa: ARG001
     """Create an authenticated client session."""
     with client.session_transaction() as sess:
         sess['current_user'] = sample_user.ht_user
@@ -214,47 +219,47 @@ class TestPlayerGroupManagement:
         """Test assigning player to group using factory approach."""
         # Create test data with proper dependencies
         user = create_test_user(db_session, ht_id=12345)
-        players = create_test_players(db_session, user, count=3)
-        group = create_test_group(db_session, user, name='Test Group')
+        player_ht_ids = create_test_players(db_session, user, count=3)
+        group_id = create_test_group(db_session, user, name='Test Group')
 
         # Setup authenticated client
         setup_authenticated_session(client, user.ht_id, user.ht_user)
 
-        player = players[0]
+        player_ht_id = player_ht_ids[0]
         response = client.post('/player', data={
             'id': '12345',
             'updategroup': 'true',
-            'playerid': str(player.ht_id),
-            'groupid': str(group.id)
+            'playerid': str(player_ht_id),
+            'groupid': str(group_id)
         })
 
         assert response.status_code == 200
 
         # Verify PlayerSetting was created
         setting = PlayerSetting.query.filter_by(
-            player_id=player.ht_id,
+            player_id=player_ht_id,
             user_id=12345
         ).first()
         assert setting is not None
-        assert setting.group_id == group.id
+        assert setting.group_id == group_id
 
     def test_remove_player_from_group(self, client, db_session):
         """Test removing player from group using factory approach."""
         # Create test data with proper dependencies
         user = create_test_user(db_session, ht_id=12345)
-        players = create_test_players(db_session, user, count=3)
-        group = create_test_group(db_session, user, name='Test Group')
+        player_ht_ids = create_test_players(db_session, user, count=3)
+        group_id = create_test_group(db_session, user, name='Test Group')
 
         # Setup authenticated client
         authenticated_client = setup_authenticated_session(client, user)
 
-        player = players[0]
+        player_ht_id = player_ht_ids[0]
 
         # First assign player to group
         setting = PlayerSetting(
-            player_id=player.ht_id,
+            player_id=player_ht_id,
             user_id=user.ht_id,
-            group_id=group.id
+            group_id=group_id
         )
         db_session.add(setting)
         db_session.commit()
@@ -263,7 +268,7 @@ class TestPlayerGroupManagement:
         response = authenticated_client.post('/player', data={
             'id': '12345',
             'updategroup': 'true',
-            'playerid': str(player.ht_id),
+            'playerid': str(player_ht_id),
             'groupid': '-1'
         })
 
@@ -271,7 +276,7 @@ class TestPlayerGroupManagement:
 
         # Verify PlayerSetting was deleted
         setting = PlayerSetting.query.filter_by(
-            player_id=player.ht_id,
+            player_id=player_ht_id,
             user_id=user.ht_id
         ).first()
         assert setting is None
@@ -280,20 +285,20 @@ class TestPlayerGroupManagement:
         """Test updating existing player group assignment using factory approach."""
         # Create test data with proper dependencies
         user = create_test_user(db_session, ht_id=12345)
-        players = create_test_players(db_session, user, count=3)
-        group1 = create_test_group(db_session, user, name='Group 1')
-        group2 = create_test_group(db_session, user, name='Group 2')
+        player_ht_ids = create_test_players(db_session, user, count=3)
+        group1_id = create_test_group(db_session, user, name='Group 1')
+        group2_id = create_test_group(db_session, user, name='Group 2')
 
         # Setup authenticated client
         authenticated_client = setup_authenticated_session(client, user)
 
-        player = players[0]
+        player_ht_id = player_ht_ids[0]
 
         # First assign to group 1
         setting = PlayerSetting(
-            player_id=player.ht_id,
+            player_id=player_ht_id,
             user_id=user.ht_id,
-            group_id=group1.id
+            group_id=group1_id
         )
         db_session.add(setting)
         db_session.commit()
@@ -302,18 +307,18 @@ class TestPlayerGroupManagement:
         response = authenticated_client.post('/player', data={
             'id': '12345',
             'updategroup': 'true',
-            'playerid': str(player.ht_id),
-            'groupid': str(group2.id)
+            'playerid': str(player_ht_id),
+            'groupid': str(group2_id)
         })
 
         assert response.status_code == 200
 
         # Verify assignment was updated
         setting = PlayerSetting.query.filter_by(
-            player_id=player.ht_id,
+            player_id=player_ht_id,
             user_id=user.ht_id
         ).first()
-        assert setting.group_id == group2.id
+        assert setting.group_id == group2_id
 
 
 class TestPlayerDataDisplay:
@@ -342,7 +347,7 @@ class TestPlayerDataDisplay:
         """Test player display respects column configuration."""
         # Create test data with proper dependencies
         user = create_test_user(db_session, ht_id=12345)
-        players = create_test_players(db_session, user, count=3)
+        create_test_players(db_session, user, count=3)
 
         # Setup authenticated client
         authenticated_client = setup_authenticated_session(client, user)

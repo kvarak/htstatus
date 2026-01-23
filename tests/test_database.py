@@ -16,7 +16,7 @@ def test_database_connection(app, db_session):
         assert result.fetchone()[0] == 1
 
 
-def test_database_tables_created(app, db_session):
+def test_database_tables_created(app, db_session):  # noqa: ARG001
     """Test that all required tables are created."""
     with app.app_context():
         # Check that tables exist in the database

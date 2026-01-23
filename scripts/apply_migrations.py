@@ -13,14 +13,13 @@ Note:
     Prefer 'make db-upgrade' for standard migration operations.
 """
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from alembic import command
 from alembic.config import Config as AlembicConfig
+from dotenv import load_dotenv
 
 from app.factory import create_app
+
+load_dotenv()
 
 # Create Flask app
 app = create_app()

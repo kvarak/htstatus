@@ -12,9 +12,9 @@ Environment:
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
 from app.factory import create_app, db
+
+load_dotenv()
 
 # Create Flask app
 app = create_app()
