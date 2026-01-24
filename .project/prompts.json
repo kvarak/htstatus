@@ -70,7 +70,7 @@
         "Update with completed tasks. Move completed (✅) to history/backlog-done.md.",
         "Eliminate redundant tasks. Merge overlapping work.",
         "Unblock dependencies. Update docs to reflect current state.",
-        "Aggressively remove outdated content.",
+        "Aggressively remove complete and outdated content.",
         "Do not commit code."
       ]
     },
