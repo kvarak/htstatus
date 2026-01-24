@@ -80,7 +80,8 @@
       "what to do": [
         "Analyze changes and additions since last commit. Group related changes logically.",
         "Write factual commit messages: <50 char subject, body: imperative mood, no fluff, refer to issues if possible.",
-        "Stage and commit. Don't push."
+        "Stage and commit. Don't push.",
+        "git status should be clean after."
       ]
     },
     {
