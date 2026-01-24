@@ -304,7 +304,7 @@ def player_daily_changes(playerid, days_ago, team_name="Unknown Team"):
         return []
 
 
-def get_player_changes(player_id, start_days_ago, end_days_ago, team_name=""):
+def get_player_changes(player_id, start_days_ago, end_days_ago):
     """Universal function to get ANY player changes between two time periods.
 
     Args:
@@ -345,14 +345,16 @@ def get_player_changes(player_id, start_days_ago, end_days_ago, team_name=""):
             'keeper': 'skill', 'defender': 'skill', 'playmaker': 'skill',
             'winger': 'skill', 'passing': 'skill', 'scorer': 'skill', 'set_pieces': 'skill',
             # Other important attributes
-            'experience': 'other', 'salary': 'money',
-            'age_years': 'age', 'loyalty': 'other'
+            'experience': 'other',
+            'age_years': 'age',
+            # Cards and injuries - critical player status changes
+            'cards': 'cards', 'injury_level': 'injury',
         }
 
         # List not to check for, as reference:
         # 'id', 'data_date', 'ht_id', 'first_name', 'last_name',
-        # 'owner', 'age_days', 'age', 'next_birthday'
-        # 'stamina': 'other', 'form': 'other', 'tsi': 'money',
+        # 'owner', 'age_days', 'age', 'next_birthday', 'loyalty': 'other',
+        # 'stamina': 'other', 'form': 'other', 'tsi': 'money', 'salary': 'money',
 
         changes = []
         player_name = f"{new_record.first_name or ''} {new_record.last_name or ''}".strip()
@@ -364,8 +366,10 @@ def get_player_changes(player_id, start_days_ago, end_days_ago, team_name=""):
             if old_val != new_val:
                 # Clean up attribute name
                 attr_name = attr.replace('_', ' ').title()
-                if attr == 'tsi': attr_name = 'TSI'
-                elif attr == 'set_pieces': attr_name = 'Set Pieces'
+                if attr == 'tsi':
+                    attr_name = 'TSI'
+                elif attr == 'set_pieces':
+                    attr_name = 'Set Pieces'
 
                 changes.append([
                     player_name,

@@ -398,6 +398,34 @@
                               {% else %}
                                 <span class="skill-down">📉 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
                               {% endif %}
+                            {% elif change[4] == 'cards' %}
+                              {% if change[3] == 3 %}
+                                <span class="skill-down"><img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Red card received</span>
+                              {% elif change[3] == 2 %}
+                                <span class="other-change"><img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> 2 yellow cards</span>
+                              {% elif change[3] == 1 %}
+                                <span class="other-change"><img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Yellow card</span>
+                              {% elif change[3] == 0 and change[2] > 0 %}
+                                <span class="skill-up">✓ Cards cleared</span>
+                              {% else %}
+                                <span class="other-change">🟨 Cards: {{ change[2] }} → {{ change[3] }}</span>
+                              {% endif %}
+                            {% elif change[4] == 'injury' %}
+                              {% set old_level = change[2] %}
+                              {% set new_level = change[3] %}
+                              {% if new_level > 0 %}
+                                <span class="skill-down"><img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Injured ({{ new_level }} weeks)</span>
+                              {% elif new_level == 0 %}
+                                {% if old_level > 0 %}
+                                  <span class="skill-up"><img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Injury improved to bruised</span>
+                                {% elif old_level == -1 %}
+                                  <span class="skill-down"><img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Got bruised</span>
+                                {% endif %}
+                              {% elif new_level == -1 %}
+                                {% if old_level >= 0 %}
+                                  <span class="skill-up">✓ Fully healed</span>
+                                {% endif %}
+                              {% endif %}
                             {% elif change[4] == 'money' %}
                               <span class="money-change">💰 {{ change[1] }}: {{ "{:,}".format(change[2]) }} → {{ "{:,}".format(change[3]) }}</span>
                             {% elif change[4] == 'age' %}
