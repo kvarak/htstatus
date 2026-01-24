@@ -27,27 +27,28 @@
 ## Current Focus
 
 **Priority 0: Critical Bugs** (Functionality regressions)
-- No active P0 critical bugs - excellent stability
+- No active P0 critical bugs - excellent stability ✅ ALL P0 BUGS RESOLVED
 
 **Priority 1: Testing & App Reliability**
-- � [TEST-012-A] Fix 6 Player Group Fixture Issues (2-3 hours) - Complete test suite reliability **NEEDS VALIDATION** - Factory improvements implemented, verify fixes
+- 🎯 [TEST-014] Fix Database Schema Test Setup (45-60 min) - Resolve "users table missing" errors blocking 2/104 route tests **HIGH PRIORITY SIMPLIFICATION**
 - 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY**
+- 🎯 [INFRA-022] Unify Coverage Reporting (30-45 min) - Eliminate confusion between 22%, 44%, and other reported test coverage percentages **SIMPLIFICATION**
 
 **Priority 2: Deployment & Operations**
 - 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY**
 - 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
 
-**Priority 3: Stability & Maintainability** (It stays working) - Timeline modernization complete ✅, focus on test coverage and UI implementation
-- 🎯 [SIMPLIFY-001] Consolidate UI Documentation (1-2 hours) - Merge 4 large UI files (2,083 lines total) into 2 comprehensive guides **HIGH PRIORITY CONSOLIDATION**
+**Priority 3: Stability & Maintainability** (It stays working) - Timeline modernization complete ✅, focus on UI implementation and test reliability
 - 🎯 [UI-008] Implement UI Guidelines Across Existing Pages (8-12 hours) - Apply unified design system to Flask templates and React components **NEXT IN LINE**
 - 🎯 [UI-009] Document Content-in-Boxes Pattern References (1-2 hours) - Link new ui-content-boxes-pattern.md from ui-design-guidelines.md, update prompts.json with pattern reference **NEW**
-- 🎯 [TEST-004-005] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE** **CONSOLIDATED**
-- 🔄 [TYPESYNC-001] Fix 85 Type Sync Drift Issues (6-8 hours) - Resolve nullability and type mismatches between SQLAlchemy models and TypeScript interfaces **HIGH PRIORITY**
+- 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE** **CONSOLIDATED**
+- 🔄 [REFACTOR-002] Fix 85 Type Sync Drift Issues (6-8 hours) - Resolve nullability and type mismatches between SQLAlchemy models and TypeScript interfaces **HIGH PRIORITY**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 
 **Priority 4: Core Functionality** (It does what it should)
 - 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **READY**
+- 🎯 [FEAT-009] Display Player Group Names in Update Timeline (1-2 hours) - Show group names after player names when players belong to user groups **NEW**
 - 🎯 [UI-010] Apply UI Guidelines to Core Pages (4-6 hours) - Players, training, stats, settings page consistency **READY**
 - 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **READY**
 - 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
@@ -60,18 +61,17 @@
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
 - 🎯 [INFRA-020] Fix GitHub Workflows (30 min) - CI reliability
-- 🎯 [DEVOPS-001] Script Linting Cleanup (1-2 hours) - Fix 32 linting errors in test files **READY TO EXECUTE**
+- 🎯 [INFRA-023] Script Linting Cleanup (1-2 hours) - Fix 32 linting errors in test files **READY TO EXECUTE**
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
-- 🎯 [SIMPLIFY-001] Consolidate UI Documentation (1-2 hours) - Merge 5 UI files into 2 comprehensive guides **READY**
-- 🎯 [SIMPLIFY-002] Remove Legacy Configuration Files (30 min) - Clean up unused configs and duplicates **READY**
-- 🎯 [SIMPLIFY-003] Consolidate Environment Templates (30 min) - Reduce from 3 to 2 environment variants **READY**
-- 🎯 [SIMPLIFY-004] Consolidate README Files (1 hour) - Merge scattered setup instructions **READY**
+- 🎯 [DOC-026] Remove Legacy Configuration Files (30 min) - Clean up unused configs and duplicates **READY**
+- 🎯 [DOC-027] Consolidate Environment Templates (30 min) - Reduce from 3 to 2 environment variants **READY**
+- 🎯 [DOC-028] Consolidate README Files (1 hour) - Merge scattered setup instructions **READY**
 - 🎯 [DOC-023] Clean TECHNICAL.md Obsolete Content (1-2 hours) - Remove outdated route architecture descriptions **HIGH PRIORITY**
 - 🎯 [DOC-024] Clean README.md Legacy Sections (1 hour) - Remove deprecated setup instructions
 - 🎯 [DOC-025] Update architecture.md File Structure (30 min) - Reflect current blueprint architecture
-- 🎯 [DOC-011-API] API Documentation (4-6 hours) - Developer experience
+- 🎯 [DOC-011] API Documentation (4-6 hours) - Developer experience
 - 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
 - 🎯 [DOC-004] Progress Metrics (1 hour) - Project visibility
 - 🎯 [FEAT-007] Team Series View (4-6 hours) - Historical performance tracking
@@ -81,14 +81,14 @@
 - 🎯 [UI-006] Transfer Bid Display (2-3 hours) - Market visibility
 - 🎯 [UI-007] Update Report Icon Display (2-3 hours) - Change visualization
 - 🎯 [FEAT-004] Hattrick Language Localization (4-6 hours) - Multi-language support
-- 🔮 [RESEARCH-001] Additional Integrations - Future research
+- 🔮 [FEAT-013] Additional Integrations - Future research
 
 **Priority 7: Potential Future Improvements**
-- 🔮 [UPGRADE-001] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ + werkzeug 3.1+ (2-3 hours) - Re-attempt library upgrades now that team ID bug is fixed
+- 🔮 [INFRA-024] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ + werkzeug 3.1+ (2-3 hours) - Re-attempt library upgrades now that team ID bug is fixed
 - 🔮 [FEAT-010] Collaborative League Intelligence (40-60 hours) - Multiplayer league-wide platform for shared scouting and collective tactical analysis
 - 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
 - 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
-- 🔮 [FEAT-009] Trophy Data Integration (6-8 hours) - Add historical trophy/achievement display when pyCHPP supports it
+- 🔮 [FEAT-012] Trophy Data Integration (6-8 hours) - Add historical trophy/achievement display when pyCHPP supports it
 
 ---
 
@@ -100,23 +100,70 @@
 
 ## Priority 1: Testing & App Reliability
 
-### [TEST-012-A] Fix 6 Player Group Fixture Issues
-**Status**: 🔄 Needs Validation | **Effort**: 1-2 hours (reduced) | **Priority**: P1 | **Impact**: Complete test suite reliability
-**Dependencies**: TEST-012 (completed) | **Strategic Value**: Final test reliability milestone
+### [TEST-014] Fix Database Schema Test Setup
+**Status**: 🎯 Ready to Execute | **Effort**: 45-60 min | **Priority**: P1 | **Impact**: Resolve 2/104 test failures blocking accurate assessment
+**Dependencies**: None | **Strategic Value**: Simplification over complexity - fix root cause vs workarounds
 
-**Problem**: 6 specific player group management tests fail due to PostgreSQL foreign key constraint issues within nested savepoint pattern. Tests pass individually but fail when run together.
+**Problem Statement**:
+2 tests fail due to "users table missing" in test environment (sqlalchemy.exc.ProgrammingError: relation "users" does not exist). This masks the fact that player group fixture improvements (TEST-012-A) were 100% successful and suggests test infrastructure complexity rather than application issues.
 
-**Root Cause**: Foreign key constraints fail during fixture creation in PostgreSQL - constraints don't allow foreign key references to uncommitted data within the same savepoint.
+**Root Cause Analysis**:
+- Factory pattern improvements successfully resolved player group fixture issues
+- Remaining 2 failures are test database schema setup problems, not application code issues
+- Current 3-group isolation may be over-engineered if root issue is missing test fixtures
+- Review prompt identified this as potential simplification opportunity
 
-**Recent Progress** (2026-01-23): Code quality improvements implemented factory pattern enhancements:
-- Updated `app/test_factories.py` to return primitive IDs instead of ORM objects
-- Functions like `create_test_players()` now return `list[int]` (player HT IDs) instead of `List[Players]`
-- `create_test_group()` returns `int` (group ID) instead of `Group` object
-- Enhanced `setup_authenticated_session()` to handle both User objects and primitive IDs
+**Simple Implementation**:
+1. **Investigate Database Setup** (15-20 min):
+   - Check conftest.py database initialization
+   - Verify test database migration application
+   - Compare working vs failing test database states
+   - Identify simplest schema setup fix
 
-**Remaining Work**: Validation that factory improvements resolve the 6 failing player group tests
+2. **Apply Minimal Fix** (15-30 min):
+   - Add missing table creation or migration application
+   - Test with single failing test first
+   - Validate fix doesn't break existing tests
 
-**Acceptance Criteria**: All 6 failing tests pass (104/104 in Group 3), isolated test approach maintains 100% pass rate across all groups.
+3. **Validate Simplification** (10 min):
+   - Run full test suite to confirm 191/193 → 193/193 success rate
+   - Assess if 3-group isolation still necessary
+
+**Acceptance Criteria**:
+- 2 failing tests resolved with minimal changes
+- No regressions in existing test infrastructure
+- 100% test success rate (193/193) achieved
+- Simplified test approach if complex isolation proves unnecessary
+
+**Expected Outcomes**: Accurate test health assessment, potential simplification of over-engineered test isolation
+
+### [INFRA-022] Unify Coverage Reporting
+**Status**: 🎯 Ready to Execute | **Effort**: 30-45 min | **Priority**: P1 | **Impact**: Clear deployment confidence metrics
+**Dependencies**: None | **Strategic Value**: Eliminate confusion, clearer quality assessment
+
+**Problem Statement**:
+Multiple coverage percentages (22%, 44%, etc.) create confusion about actual test quality and deployment confidence. Quality Intelligence Platform reports varying metrics depending on test group, making it difficult to assess actual application health.
+
+**Implementation**:
+1. **Standardize Coverage Metrics** (20-30 min):
+   - Define single authoritative coverage calculation
+   - Update Quality Intelligence Platform to report unified metric
+   - Document coverage scope and exclusions clearly
+
+2. **Update Reporting** (10-15 min):
+   - Modify progress.md and goals.md with consistent metrics
+   - Ensure all documentation references same coverage calculation
+
+**Acceptance Criteria**:
+- Single, consistent coverage percentage across all reports
+- Clear documentation of coverage scope
+- Quality Intelligence Platform unified reporting
+
+**Expected Outcomes**: Clear deployment confidence decision-making, reduced metric confusion
+
+### [TEST-013] Add CHPP Integration Testing
+**Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Priority**: P1 | **Impact**: Prevent team ID vs user ID bugs
+**Dependencies**: TEST-INFRA-SIMPLE (recommended) | **Strategic Value**: Integration reliability
 
 ---
 
@@ -594,6 +641,64 @@ The players page displays "Last updated" text without showing the actual date or
 
 ---
 
+### [FEAT-009] Display Player Group Names in Update Timeline
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P4 | **Impact**: Enhanced player identification in updates
+**Dependencies**: None | **Strategic Value**: Improved user experience for players in custom groups
+
+**Problem Statement**:
+When viewing the update timeline, players are displayed by name only. Users who have organized their players into custom groups (e.g., "Ytterback", "Formation 1", "Reserves") cannot easily identify which group a player belongs to when viewing skill changes and updates.
+
+**User Request Example**:
+```
+Current:
+Jalal Allaoui
+📈 Winger: 4 → 5
+
+Desired:
+Jalal Allaoui (Ytterback)
+📈 Winger: 4 → 5
+```
+
+**Database Structure**:
+- `PlayerSetting` table links `player_id` to `group_id` for a given `user_id`
+- `Group` table contains group `name`, `textcolor`, `bgcolor` for display
+- Relationship: player_id → PlayerSetting → Group.name
+
+**Implementation**:
+1. **Update get_player_changes() Function** (30-45 min):
+   - Add group name lookup to player change detection logic
+   - Query PlayerSetting and Group tables to find player's group name
+   - Include group name in change data structure for template use
+   - Handle players without group assignments gracefully
+
+2. **Enhance Template Display Logic** (30-45 min):
+   - Update `update_timeline.html` to display group names after player names
+   - Format as "Player Name (Group Name)" when group exists
+   - Maintain existing styling while adding group information
+   - Consider group text color for visual consistency
+
+3. **Testing & Validation** (15-30 min):
+   - Test with players assigned to different groups
+   - Test with players not assigned to any group
+   - Verify display works with various group name lengths
+   - Ensure responsive design maintained
+
+**Acceptance Criteria**:
+- Players with group assignments show "Player Name (Group Name)"
+- Players without groups show "Player Name" (no change)
+- Group names display consistently throughout timeline
+- No impact on timeline loading performance
+- Visual styling remains consistent with UI guidelines
+
+**Technical Notes**:
+- Requires JOIN between Players → PlayerSetting → Group tables
+- Consider caching group lookups for performance if needed
+- Group colors could be used for future enhancement
+
+**Expected Outcomes**: Users can easily identify which tactical group or formation players belong to when reviewing skill changes and updates.
+
+---
+
 ### [UI-010] Apply UI Guidelines to Core Pages
 **Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P4 | **Impact**: Visual consistency across application
 **Dependencies**: DOC-022 UI Guidelines (completed), UI-008 (recommended) | **Strategic Value**: Unified user experience
@@ -859,7 +964,7 @@ Debug page has multiple issues affecting development workflow:
 
 ## Priority 6: Documentation & Polish
 
-### [DOC-011-API] API Documentation
+### [DOC-011] API Documentation
 **Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Developer experience
 **Dependencies**: None | **Strategic Value**: API adoption, integration support
 
@@ -1752,42 +1857,6 @@ Recent blueprint migration created new code organization but test coverage dropp
 **Expected Outcomes**: Increased confidence in blueprint architecture and utility functions, prevention of regressions, achievement of coverage targets, validated shared code reliability
 
 **Note**: This task consolidates TEST-004 (Blueprint Coverage) and TEST-005 (Utils Coverage) as they share common testing infrastructure and can be executed efficiently together.
-
----
-
-### [SIMPLIFY-001] Consolidate UI Documentation
-**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P6 | **Impact**: Documentation simplification
-**Dependencies**: None | **Strategic Value**: Reduced complexity, improved maintainability
-
-**Problem Statement**:
-4 large UI documentation files (2,083 total lines) create unnecessary complexity and duplication. Current files overlap significantly and make it difficult to find authoritative design guidance:
-- ui-implementation-standards.md (640 lines)
-- ui-style-guide.md (610 lines)
-- ui-design-guidelines.md (444 lines)
-- ui-content-boxes-pattern.md (389 lines)
-
-**Implementation**:
-1. **Create Consolidated ui-guidelines.md** (45-60 min):
-   - Merge content from ui-style-guide.md, ui-design-guidelines.md, ui-implementation-standards.md
-   - Structure: Design System → Implementation → Validation Checklist
-   - Keep only essential information, remove redundancy
-
-2. **Create ui-patterns.md for Specific Patterns** (15-30 min):
-   - Move ui-content-boxes-pattern.md content here
-   - Structure for future pattern additions
-   - Reference from main guidelines
-
-3. **Archive Historical Analysis** (15 min):
-   - Move ui-audit-analysis.md to .project/history/
-   - Update any references in other files
-
-**Acceptance Criteria**:
-- 5 UI files reduced to 2 comprehensive guides
-- No information lost, just better organized
-- All cross-references updated
-- prompts.json updated with new file references
-
-**Expected Outcomes**: Simpler documentation structure, easier to maintain and reference
 
 ---
 
