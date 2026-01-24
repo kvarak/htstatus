@@ -317,7 +317,7 @@ def update():
 
             # Get all changes for all players in this week period
             for player_id in players_fromht:
-                player_changes = get_player_changes(player_id, week_start_days, week_end_days, the_team.name)
+                player_changes = get_player_changes(player_id, week_start_days, week_end_days)
 
                 for change in player_changes:
                     timeline_changes[f'week_{week_num}']['changes'].append(change)
