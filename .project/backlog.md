@@ -29,10 +29,8 @@
 **Priority 0: Critical Bugs** (Functionality regressions)
 - No active P0 critical bugs - excellent stability ✅ ALL P0 BUGS RESOLVED
 
-**Priority 1: Testing & App Reliability** - ✅ ALL P1 TASKS COMPLETE
-- ✅ [TEST-014] Fix Database Schema Test Setup (COMPLETED) - Resolved "users table missing" errors, achieved 100% test success rate (193/193) through application context fixes **SIMPLIFICATION SUCCESS** → Moved to [history/backlog-done.md](history/backlog-done.md)
-- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY** (Optional - core testing complete)
-- 🎯 [INFRA-022] Unify Coverage Reporting (30-45 min) - Eliminate confusion between 22%, 44%, and other reported test coverage percentages **SIMPLIFICATION** **NEXT**
+**Priority 1: Testing & App Reliability** - 🎯 ONE REMAINING TASK
+- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations** - 🎯 CURRENT FOCUS
 - 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY** **NEXT IN LINE**
@@ -89,7 +87,7 @@
 ## ✅ All Priority Levels Summary
 
 **P0**: ✅ All critical bugs resolved - No active functionality regressions
-**P1**: ✅ All testing & reliability tasks complete - 100% test success rate achieved
+**P1**: 🎯 One remaining task - TEST-013 CHPP Integration Testing (3-4 hours) **READY TO EXECUTE**
 **P2**: 🎯 CURRENT FOCUS - Deployment & Operations (INFRA-021 Environment Parity next)
 **P3**: 🎯 Ready - UI Standardization consolidation and type sync resolution
 **P4**: Ready - Core functionality improvements and bug fixes
@@ -99,72 +97,11 @@
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-1. **[INFRA-022] Unify Coverage Reporting** (30-45 min) - P1 - Eliminate confusion between 22%, 44% coverage metrics
-2. **[INFRA-021] Environment Parity Enforcement** (4-6 hours) - P2 - Pin Python versions across dev/test/prod
-3. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-4. **[DOC-029] Comprehensive Documentation Cleanup** (2-3 hours) - P6 - Remove legacy/obsolete content
+1. **[INFRA-021] Environment Parity Enforcement** (4-6 hours) - P2 - Pin Python versions across dev/test/prod **NEXT PRIORITY**
+2. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
+3. **[DOC-029] Comprehensive Documentation Cleanup** (2-3 hours) - P6 - Remove legacy/obsolete content
 
-**Next Action**: INFRA-022 (30-45 min) to complete P1 milestone, then INFRA-021 for P2 focus.
-   - Update pyproject.toml requires-python to narrow range (e.g., ">=3.11,<3.12")
-   - Document Python version choice rationale (stability, feature support)
-   - Update DEPLOYMENT.md with specific Python version requirement
-
-3. **Docker Environment Standardization** (2-3 hours):
-   - Create Dockerfile with pinned Python base image (python:3.11.8-slim)
-   - Add multi-stage build for production optimization
-   - Ensure UV installs exact dependency versions from uv.lock
-   - Test Docker build matches local development environment
-   - Update docker-compose.yml to use Dockerfile instead of service configs
-
-4. **Production Debugging Documentation** (45-60 min):
-   - Document SSH access to glader.local in DEPLOYMENT.md
-   - Add production debugging guide with common commands:
-     - Check application status: systemd commands or Docker status
-     - View logs: log file locations and tail commands
-     - Check Python environment: version, packages, paths
-     - Monitor resources: memory, CPU, disk usage
-     - Test database connectivity from production
-     - Check CHPP API connectivity and credentials
-   - Document how to safely restart production application
-   - Add troubleshooting section for common production issues
-   - Document rollback procedures
-
-5. **Documentation & Validation** (1 hour):
-   - Update README.md with Python version requirements
-   - Document environment parity strategy in TECHNICAL.md
-   - Add "make verify-env" command to check Python version matches
-   - Create CI check to validate Python version consistency
-
-**Technical Details**:
-- Recommended Python version: 3.11.x (stable, long-term support, good performance)
-- Rationale: 3.14 too new (released late 2025), 3.9 too old (EOL Oct 2025), 3.11 optimal balance
-- Docker base: python:3.11.8-slim-bookworm (Debian, security updates, minimal)
-- UV lock file already pins exact versions - ensure respected across environments
-
-**Acceptance Criteria**:
-- [ ] Production environment audit completed (glader.local Python version documented)
-- [ ] Production debugging guide added to DEPLOYMENT.md
-- [ ] SSH access and common debugging commands documented
-- [ ] .python-version file created with specific version (3.11.8)
-- [ ] pyproject.toml requires-python updated to narrow range
-- [ ] Dockerfile created with pinned Python base image
-- [ ] docker-compose.yml uses Dockerfile for app service
-- [ ] README.md and DEPLOYMENT.md updated with Python version
-- [ ] TECHNICAL.md documents environment parity strategy
-- [ ] CI validates Python version matches .python-version
-- [ ] Local dev, testing, and Docker use same Python version
-- [ ] UV lock file dependency resolution consistent across environments
-
-**Validation Steps**:
-1. SSH to glader.local and verify production Python version documented
-2. Verify `python --version` matches .python-version in dev
-3. Build Docker image and verify Python version inside container
-4. Run test suite in Docker container - must pass with same results as local
-5. SSH to glader.local after deployment and verify Python version matches
-6. Test production debugging procedures from documentation
-7. Confirm no dependency resolution differences between environments
-
-**Expected Outcomes**: Elimination of environment drift bugs, confident deployments, "works everywhere" reliability, reduced debugging time from environment differences
+**Next Action**: INFRA-021 (4-6 hours) for P2 Deployment & Operations focus.
 
 ---
 
