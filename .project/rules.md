@@ -23,6 +23,17 @@
 
 ## Documentation Standards
 
+### Task ID Format
+**CRITICAL**: All task IDs must follow [CATEGORY]-[NUMBER] format using existing categories:
+- **TEST-**: Testing infrastructure, fixtures, coverage
+- **INFRA-**: Infrastructure, deployment, operations, CI/CD
+- **UI-**: User interface, design system, frontend
+- **REFACTOR-**: Code cleanup, architecture improvements
+- **BUG-**: Bug fixes and functionality regressions
+- **FEAT-**: New features and functionality
+- **DOC-**: Documentation, guides, cleanup
+**Never invent new categories** - use existing numbering sequence for category
+
 ### Project Documentation Structure
 
 **Development Metadata** (`.project/`)
