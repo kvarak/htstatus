@@ -9,6 +9,13 @@ PIP := uv pip
 UV := uv
 DOCKER_COMPOSE := docker-compose
 
+# Common service startup function (consolidation)
+define start_services
+	@echo "🐳 Starting Docker Compose services..."
+	@$(DOCKER_COMPOSE) up -d postgres redis 2>&1 | tee -a /tmp/docker-services.log
+	@echo "✅ Services started (PostgreSQL, Redis)"
+endef
+
 # Check if UV is available, provide helpful error message if not
 check-uv:
 	@command -v uv >/dev/null 2>&1 || { \
@@ -65,29 +72,27 @@ dev: check-uv services ## Start development server (equivalent to run.sh)
 
 stop: ## Stop dev server and Docker Compose services
 	@echo "🛑 Stopping HT Status development services..."
-	@$(DOCKER_COMPOSE) stop >/dev/null 2>&1 || docker compose stop >/dev/null 2>&1 || true
-	@pkill -f "python.*run.py" >/dev/null 2>&1 || true
-	@pkill -f "flask run" >/dev/null 2>&1 || true
+	@$(DOCKER_COMPOSE) stop 2>&1 | tee -a /tmp/docker-stop.log || docker compose stop 2>&1 | tee -a /tmp/docker-stop.log || true
+	@pkill -f "python.*run.py" 2>&1 | tee -a /tmp/flask-stop.log || true
+	@pkill -f "flask run" 2>&1 | tee -a /tmp/flask-stop.log || true
 	@echo "✅ Services stopped (Flask, Docker Compose)"
 
 services: ## Start Docker Compose services only
-	@echo "🐳 Starting Docker Compose services..."
-	@$(DOCKER_COMPOSE) up -d postgres redis
-	@echo "✅ Services started (PostgreSQL, Redis)"
+	$(call start_services)
 
 services-dev: ## Start services with development configuration
 	@echo "🐳 Starting Docker Compose services (development)..."
-	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.development.yml up -d
+	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.development.yml up -d 2>&1 | tee -a /tmp/docker-dev.log
 	@echo "✅ Services started (PostgreSQL, Redis, pgAdmin)"
 
 services-staging: ## Start services with staging configuration
 	@echo "🐳 Starting Docker Compose services (staging)..."
-	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.staging.yml up -d
+	@$(DOCKER_COMPOSE) -f docker-compose.yml -f configs/docker-compose.staging.yml up -d 2>&1 | tee -a /tmp/docker-staging.log
 	@echo "✅ Services started (PostgreSQL, Redis) with staging configuration"
 
 services-stop: ## Stop all Docker Compose services
 	@echo "🛑 Stopping Docker Compose services..."
-	@$(DOCKER_COMPOSE) down >/dev/null 2>&1 || docker compose down >/dev/null 2>&1 || true
+	@$(DOCKER_COMPOSE) down 2>&1 | tee -a /tmp/docker-down.log || docker compose down 2>&1 | tee -a /tmp/docker-down.log || true
 	@echo "✅ Services stopped"
 
 config-validate: check-uv ## Validate configuration for current environment
@@ -127,13 +132,13 @@ update: check-uv ## Update dependencies and sync environment
 
 shell: check-uv ## Open Python shell in UV environment
 	@echo "🐍 Opening Python shell..."
-	@$(PYTHON) -c "import IPython; IPython.start_ipython()" 2>/dev/null || $(PYTHON)
+	@$(PYTHON) -c "import IPython; IPython.start_ipython()" 2>&1 | tee /tmp/ipython-start.log || $(PYTHON)
 
 # Code Quality Commands
 lint: check-uv ## Run ruff linting
 	@echo "🔍 Running ruff linting..."
-	@$(UV) run ruff check . > /tmp/ruff-output.txt 2>&1; \
-	if [ $$? -eq 0 ]; then \
+	@$(UV) run ruff check . 2>&1 | tee /tmp/ruff-output.txt; \
+	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
 		echo "All checks passed!"; \
 		echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"0 errors\",\"details\":\"excellent code quality\"}"; \
 	else \
@@ -213,8 +218,8 @@ typecheck: check-uv ## Run mypy type checking
 
 typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
 	@echo "🔗 Validating type synchronization..."
-	@$(UV) run python scripts/validate_types.py > /tmp/typesync-output.txt 2>&1; \
-	if [ $$? -eq 0 ]; then \
+	@$(UV) run python scripts/validate_types.py 2>&1 | tee /tmp/typesync-output.txt; \
+	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
 		echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"synchronized\",\"details\":\"Flask ↔ React types match\"}"; \
 	else \
 		issue_count=$$(grep 'Found.*type sync issues' /tmp/typesync-output.txt | head -1 | grep -o '[0-9]\+' || echo "unknown"); \
@@ -226,7 +231,7 @@ security: check-uv ## Run bandit and safety security checks
 	@echo "🔒 Running security checks..."
 	@echo ""
 	@echo "📋 Bandit Code Security Analysis:"
-	@$(UV) run bandit -r app/ -c .bandit -f json 2>/dev/null > /tmp/bandit-results.json || $(UV) run bandit -r app/ -c .bandit > /tmp/bandit-results.txt || true
+	@$(UV) run bandit -r app/ -c .bandit -f json 2>&1 | tee /tmp/bandit-results.json || $(UV) run bandit -r app/ -c .bandit 2>&1 | tee /tmp/bandit-results.txt || true
 	@bandit_status="CLEAN"; \
 	if [ -f /tmp/bandit-results.json ]; then \
 		bandit_issues=$$(jq -r '.metrics._totals."SEVERITY.MEDIUM" + .metrics._totals."SEVERITY.HIGH"' /tmp/bandit-results.json 2>/dev/null || echo "0"); \
