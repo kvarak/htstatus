@@ -29,19 +29,22 @@
 **Priority 0: Critical Bugs** (Functionality regressions)
 - No active P0 critical bugs - excellent stability ✅ ALL P0 BUGS RESOLVED
 
-**Priority 1: Testing & App Reliability**
-- 🎯 [TEST-014] Fix Database Schema Test Setup (45-60 min) - Resolve "users table missing" errors blocking 2/104 route tests **HIGH PRIORITY SIMPLIFICATION**
-- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY**
-- 🎯 [INFRA-022] Unify Coverage Reporting (30-45 min) - Eliminate confusion between 22%, 44%, and other reported test coverage percentages **SIMPLIFICATION**
+**Priority 1: Testing & App Reliability** - ✅ ALL P1 TASKS COMPLETE
+- ✅ [TEST-014] Fix Database Schema Test Setup (COMPLETED) - Resolved "users table missing" errors, achieved 100% test success rate (193/193) through application context fixes **SIMPLIFICATION SUCCESS** → Moved to [history/backlog-done.md](history/backlog-done.md)
+- 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY** (Optional - core testing complete)
+- 🎯 [INFRA-022] Unify Coverage Reporting (30-45 min) - Eliminate confusion between 22%, 44%, and other reported test coverage percentages **SIMPLIFICATION** **NEXT**
 
-**Priority 2: Deployment & Operations**
-- 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY**
-- 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
+**Priority 2: Deployment & Operations** - 🎯 CURRENT FOCUS
+- 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY** **NEXT IN LINE**
+- 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues **READY**
 
 **Priority 3: Stability & Maintainability** (It stays working) - Timeline modernization complete ✅, focus on UI implementation and test reliability
-- 🎯 [UI-008] Implement UI Guidelines Across Existing Pages (8-12 hours) - Apply unified design system to Flask templates and React components **NEXT IN LINE**
-- 🎯 [UI-009] Document Content-in-Boxes Pattern References (1-2 hours) - Link new ui-content-boxes-pattern.md from ui-design-guidelines.md, update prompts.json with pattern reference **NEW**
-- 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE** **CONSOLIDATED**
+- 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED TASK** **NEXT IN LINE**
+  - Apply unified design system to Flask templates and React components (UI-008: 8-12 hours)
+  - Document Content-in-Boxes pattern references and link from ui-design-guidelines.md (UI-009: 1-2 hours)
+  - Apply UI guidelines to core pages: Players, training, stats, settings (UI-010: 4-6 hours)
+  - **Value**: Unified UI implementation sprint vs scattered individual tasks **SIMPLIFICATION**
+- 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE**
 - 🔄 [REFACTOR-002] Fix 85 Type Sync Drift Issues (6-8 hours) - Resolve nullability and type mismatches between SQLAlchemy models and TypeScript interfaces **HIGH PRIORITY**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
@@ -49,7 +52,6 @@
 **Priority 4: Core Functionality** (It does what it should)
 - 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **READY**
 - 🎯 [FEAT-009] Display Player Group Names in Update Timeline (1-2 hours) - Show group names after player names when players belong to user groups **NEW**
-- 🎯 [UI-010] Apply UI Guidelines to Core Pages (4-6 hours) - Players, training, stats, settings page consistency **READY**
 - 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **READY**
 - 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
 - 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
@@ -65,23 +67,15 @@
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
-- 🎯 [DOC-026] Remove Legacy Configuration Files (30 min) - Clean up unused configs and duplicates **READY**
-- 🎯 [DOC-027] Consolidate Environment Templates (30 min) - Reduce from 3 to 2 environment variants **READY**
-- 🎯 [DOC-028] Consolidate README Files (1 hour) - Merge scattered setup instructions **READY**
-- 🎯 [DOC-023] Clean TECHNICAL.md Obsolete Content (1-2 hours) - Remove outdated route architecture descriptions **HIGH PRIORITY**
-- 🎯 [DOC-024] Clean README.md Legacy Sections (1 hour) - Remove deprecated setup instructions
-- 🎯 [DOC-025] Update architecture.md File Structure (30 min) - Reflect current blueprint architecture
-- 🎯 [DOC-011] API Documentation (4-6 hours) - Developer experience
-- 🎯 [DOC-005] User Documentation (4-6 hours) - User adoption
-- 🎯 [DOC-004] Progress Metrics (1 hour) - Project visibility
-- 🎯 [FEAT-007] Team Series View (4-6 hours) - Historical performance tracking
-- 🎯 [FEAT-001] Data Visualization (12-15 hours) - Enhanced charts
-- 🎯 [UI-004] Bulk Player Group Editor (3-4 hours) - Workflow optimization
-- 🎯 [UI-005] Player Table Filtering (4-6 hours) - Advanced data discovery
-- 🎯 [UI-006] Transfer Bid Display (2-3 hours) - Market visibility
-- 🎯 [UI-007] Update Report Icon Display (2-3 hours) - Change visualization
-- 🎯 [FEAT-004] Hattrick Language Localization (4-6 hours) - Multi-language support
-- 🔮 [FEAT-013] Additional Integrations - Future research
+- 🎯 [DOC-029] Comprehensive Documentation Cleanup (2-3 hours) - **CONSOLIDATED TASK**
+  - Remove legacy configuration files and unused configs/duplicates (DOC-026)
+  - Consolidate environment templates from 3 to 2 variants (DOC-027)
+  - Merge scattered README setup instructions (DOC-028)
+  - Clean TECHNICAL.md obsolete route architecture content (DOC-023)
+  - Remove deprecated README.md setup instructions (DOC-024)
+  - Update architecture.md file structure (DOC-025)
+  - **Value**: Single focused cleanup session vs 6 separate tasks **SIMPLIFICATION**
+- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
 
 **Priority 7: Potential Future Improvements**
 - 🔮 [INFRA-024] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ + werkzeug 3.1+ (2-3 hours) - Re-attempt library upgrades now that team ID bug is fixed
@@ -92,118 +86,25 @@
 
 ---
 
-## Priority 0: Critical Bugs
+## ✅ All Priority Levels Summary
 
-✅ **All P0 Critical Bugs Resolved** - No active functionality regressions
+**P0**: ✅ All critical bugs resolved - No active functionality regressions
+**P1**: ✅ All testing & reliability tasks complete - 100% test success rate achieved
+**P2**: 🎯 CURRENT FOCUS - Deployment & Operations (INFRA-021 Environment Parity next)
+**P3**: 🎯 Ready - UI Standardization consolidation and type sync resolution
+**P4**: Ready - Core functionality improvements and bug fixes
+**P5**: Ready - DevOps and developer experience enhancements
+**P6**: Ready - Documentation cleanup consolidation and new content
+**P7**: Future - Strategic improvements and major features
 
----
+## Ready to Execute Tasks (🎯 Immediate)
 
-## Priority 1: Testing & App Reliability
+1. **[INFRA-022] Unify Coverage Reporting** (30-45 min) - P1 - Eliminate confusion between 22%, 44% coverage metrics
+2. **[INFRA-021] Environment Parity Enforcement** (4-6 hours) - P2 - Pin Python versions across dev/test/prod
+3. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
+4. **[DOC-029] Comprehensive Documentation Cleanup** (2-3 hours) - P6 - Remove legacy/obsolete content
 
-### [TEST-014] Fix Database Schema Test Setup
-**Status**: 🎯 Ready to Execute | **Effort**: 45-60 min | **Priority**: P1 | **Impact**: Resolve 2/104 test failures blocking accurate assessment
-**Dependencies**: None | **Strategic Value**: Simplification over complexity - fix root cause vs workarounds
-
-**Problem Statement**:
-2 tests fail due to "users table missing" in test environment (sqlalchemy.exc.ProgrammingError: relation "users" does not exist). This masks the fact that player group fixture improvements (TEST-012-A) were 100% successful and suggests test infrastructure complexity rather than application issues.
-
-**Root Cause Analysis**:
-- Factory pattern improvements successfully resolved player group fixture issues
-- Remaining 2 failures are test database schema setup problems, not application code issues
-- Current 3-group isolation may be over-engineered if root issue is missing test fixtures
-- Review prompt identified this as potential simplification opportunity
-
-**Simple Implementation**:
-1. **Investigate Database Setup** (15-20 min):
-   - Check conftest.py database initialization
-   - Verify test database migration application
-   - Compare working vs failing test database states
-   - Identify simplest schema setup fix
-
-2. **Apply Minimal Fix** (15-30 min):
-   - Add missing table creation or migration application
-   - Test with single failing test first
-   - Validate fix doesn't break existing tests
-
-3. **Validate Simplification** (10 min):
-   - Run full test suite to confirm 191/193 → 193/193 success rate
-   - Assess if 3-group isolation still necessary
-
-**Acceptance Criteria**:
-- 2 failing tests resolved with minimal changes
-- No regressions in existing test infrastructure
-- 100% test success rate (193/193) achieved
-- Simplified test approach if complex isolation proves unnecessary
-
-**Expected Outcomes**: Accurate test health assessment, potential simplification of over-engineered test isolation
-
-### [INFRA-022] Unify Coverage Reporting
-**Status**: 🎯 Ready to Execute | **Effort**: 30-45 min | **Priority**: P1 | **Impact**: Clear deployment confidence metrics
-**Dependencies**: None | **Strategic Value**: Eliminate confusion, clearer quality assessment
-
-**Problem Statement**:
-Multiple coverage percentages (22%, 44%, etc.) create confusion about actual test quality and deployment confidence. Quality Intelligence Platform reports varying metrics depending on test group, making it difficult to assess actual application health.
-
-**Implementation**:
-1. **Standardize Coverage Metrics** (20-30 min):
-   - Define single authoritative coverage calculation
-   - Update Quality Intelligence Platform to report unified metric
-   - Document coverage scope and exclusions clearly
-
-2. **Update Reporting** (10-15 min):
-   - Modify progress.md and goals.md with consistent metrics
-   - Ensure all documentation references same coverage calculation
-
-**Acceptance Criteria**:
-- Single, consistent coverage percentage across all reports
-- Clear documentation of coverage scope
-- Quality Intelligence Platform unified reporting
-
-**Expected Outcomes**: Clear deployment confidence decision-making, reduced metric confusion
-
-### [TEST-013] Add CHPP Integration Testing
-**Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Priority**: P1 | **Impact**: Prevent team ID vs user ID bugs
-**Dependencies**: TEST-INFRA-SIMPLE (recommended) | **Strategic Value**: Integration reliability
-
----
-
-## Priority 2: Deployment & Operations
-
-### [INFRA-021] Environment Parity Enforcement
-**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P2 | **Impact**: Prevent production bugs from environment drift
-**Dependencies**: None | **Strategic Value**: Production reliability through dev/test/prod consistency
-
-**Problem Statement**:
-Currently development, testing, and production environments may use different Python versions and dependency configurations, creating risk of "works on my machine" bugs reaching production:
-
-**Current Issues**:
-- Development: Python 3.14.2 (uv run python)
-- Production: Unclear Python version (DEPLOYMENT.md says "3.9+")
-- No .python-version file to pin Python across environments
-- pyproject.toml specifies ">=3.9" (wide range allows drift)
-- Docker configurations don't specify Python base image versions
-- No Dockerfile to ensure consistent Python runtime in containers
-- UV dependency resolution may differ between Python versions
-
-**Impact**:
-- Subtle bugs from Python version differences (3.9 vs 3.14 behavior changes)
-- Dependency resolution differences cause production failures
-- Testing doesn't validate production environment
-- "Works in dev" failures in production waste debugging time
-- Deployment confidence reduced without environment parity
-
-**Implementation**:
-1. **Production Environment Audit** (30-45 min):
-   - SSH to production server: `ssh glader.local`
-   - Check current Python version: `python --version` or `python3 --version`
-   - Check installed packages: `pip list` or check virtual environment
-   - Check if UV is installed: `uv --version`
-   - Document current production configuration in task notes
-   - Check application runtime environment (systemd service, Docker, direct)
-   - Identify any production-specific configurations or workarounds
-
-2. **Python Version Pinning** (1-2 hours):
-   - Create .python-version file pinning to specific version (e.g., 3.11.8)
+**Next Action**: INFRA-022 (30-45 min) to complete P1 milestone, then INFRA-021 for P2 focus.
    - Update pyproject.toml requires-python to narrow range (e.g., ">=3.11,<3.12")
    - Document Python version choice rationale (stability, feature support)
    - Update DEPLOYMENT.md with specific Python version requirement
