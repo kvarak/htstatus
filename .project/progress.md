@@ -7,9 +7,9 @@
 
 ## Quick Navigation
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md) • [Rules](rules.md)
-📊 **Current State**: 98+ Tasks Complete • Timeline Modernization ✅ • Player Timeline 4-Column UI ✅ • Code Simplification ✅ • BUG-005 Fixed ✅ • Content-in-Boxes UI Pattern ✅ • Quality Intelligence Platform ✅ • P1 Testing 97% Complete ✅ • UI Standardization ✅ • Code Quality Excellence ✅
+📊 **Current State**: 99+ Tasks Complete • Timeline Modernization ✅ • Player Timeline 4-Column UI ✅ • Code Simplification ✅ • All P0 Bugs Fixed ✅ • Content-in-Boxes UI Pattern ✅ • Quality Intelligence Platform ✅ • P1 Testing 97% Complete ✅ • UI Standardization ✅ • Code Quality Excellence ✅
 
-> **Current Status**: Timeline Modernization Complete - Player skill change timeline redesigned to modern 4-column responsive layout with unified code architecture. Formal development process execution and documentation updates underway (January 24, 2026)
+> **Current Status**: Timeline Modernization & P0 Bug Resolution Complete - All critical functionality restored, player skill change timeline redesigned, card/injury icon display fixed. Focus shifting to test coverage completion and UI standardization (January 24, 2026)
 
 *This file tracks current development state and key metrics for HTStatus 2.0.*
 
@@ -19,19 +19,19 @@
 **Testing Status**: ✅ **MAJOR PROGRESS** - 32/32 fast tests pass (100%), 251 total tests available, 102 route tests pass (correct test isolation), code quality improvements enhance test factory reliability
 **Code Quality**: ✅ **EXCELLENT** - All linting checks pass (0 errors), modern Python type annotations implemented, proper exception chaining added, test infrastructure improved
 
-✅ **Latest**: Timeline Modernization COMPLETE: Redesigned player skill change timeline to modern 4-column responsive layout, consolidated 3 utility functions into unified `get_player_changes()`, applied compact visual styling. Database investigation confirmed team data accuracy (team 9838). Project cleanup removed 15+ debug files. (January 24, 2026)
-🔍 **Current Focus**: TEST-012-A fixture validation → TEST-013 CHPP integration → UI-008 implementation
+✅ **Latest**: All P0 Critical Bugs RESOLVED: BUG-008 card/injury icon display fixed, BUG-005 player change reporting restored. Timeline modernization complete with 4-column responsive layout. Scout cleanup applied throughout codebase. Zero functionality regressions remaining. (January 24, 2026)
+🔍 **Current Focus**: TEST-012-A fixture validation → TEST-013 CHPP integration → UI-008 implementation → Type sync resolution
 **Security**: ✅ CVE: 0 vulnerabilities, ✅ Code Security: 0 issues (B108 resolved via CLEANUP-001)
 **Quality Intelligence**: Enhanced to distinguish CVE vulnerabilities vs Bandit code security issues ✅
 **Architecture**: Modern Flask blueprint structure, pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8 (stable after downgrades)
 **Environment**: Consistent UV-managed environment across all development tools ✅
 **Documentation**: Centralized rules.md ✅, comprehensive documentation-guide.md ✅, purpose headers added ✅
-**Completed Tasks**: 96+ major milestones including all P0 bugs (BUG-001-005, CLEANUP-001), P1 testing infrastructure (TEST-008-012), and code quality excellence
-**Backlog Status**: 12+ P0/P1 tasks completed and moved to history ✅, BUG-005 COMPLETED, TEST-013 ready to execute
+**Completed Tasks**: 99+ major milestones including ALL P0 bugs (BUG-001-008 complete), P1 testing infrastructure (TEST-008-012), and code quality excellence
+**Backlog Status**: 13+ P0/P1 tasks completed and moved to history ✅ - ALL critical bugs resolved, TEST-013 ready to execute
 **Ready Tasks**: 25+ tasks across P1-P6 priority levels ready for execution
 **Current Blockers**: 85 type sync drift issues (TYPESYNC-001), TEST-012-A needs validation after factory improvements
 **Repository**: Clean 2.5MB of unnecessary files removed, migrations/ folder tracked (30 files)
-**Current Active Work**: Timeline Modernization COMPLETE - Project documentation updates and formal process execution underway, TEST-012-A factory improvements need validation, TEST-013 ready for execution, UI-008 ready for execution
+**Current Active Work**: ALL P0 Critical Bugs COMPLETE ✅ - Focus shifted to P1 testing completion (TEST-012-A validation, TEST-013 execution), UI standardization (UI-008), and type sync resolution (TYPESYNC-001)
 
 ## Current Architecture & Strategic Position
 
@@ -50,6 +50,32 @@
 - **Factory Pattern Enhancement**: Test factories now return primitive data types (IDs) instead of ORM objects to solve session detachment issues
 - **Developer Experience**: Clean linting output improves development flow, modern type annotations aid IDE support
 - **Status**: Foundation strengthened for reliable future development with zero technical debt in code standards
+
+### ✅ BUG-008 Player Card/Injury Icon Display Regression Fixed (2026-01-24)
+**Impact**: CRITICAL - Restored visual feedback for player status changes in update timeline
+- **Problem**: Player card and injury changes were displaying as text instead of icons in update reports
+- **Root Cause**: Missing 'cards' and 'injury_level' attributes in `get_player_changes()` function tracking
+- **Solution Implemented**:
+  1. **Enhanced Change Detection** (`app/utils.py`):
+     - Added 'cards': 'cards' and 'injury_level': 'injury' to tracked attributes
+     - Unified change detection architecture with existing skill tracking
+     - Removed unused `team_name` parameter for cleaner function signature
+  2. **Updated Timeline Template** (`app/templates/update_timeline.html`):
+     - Added comprehensive card change display with proper icon handling
+     - Injury state display with meaningful health status messages
+     - Icon paths: `/static/ico-red.png`, `/static/ico-injury.png`, etc.
+     - Fallback text for accessibility and debugging
+  3. **Scout Cleanup Applied**:
+     - Fixed lint errors (unused variables) in `app/blueprints/team.py`
+     - Added missing EOF newline for file format standards
+     - Cleaned up nearby code issues during implementation
+- **Quality Results**:
+  - ✅ All linting checks pass (0 errors)
+  - ✅ File format standards met
+  - ✅ Icon display functional with proper visual feedback
+  - ✅ Injury states show clear health progression
+- **User Impact**: Critical visual feedback restored for player status changes
+- **Status**: ALL P0 Critical Bugs now RESOLVED
 
 ### ✅ BUG-005 Player Change Reporting Fixed (2026-01-24)
 **Impact**: CRITICAL - Restored player change visibility in update reports for tracking player development

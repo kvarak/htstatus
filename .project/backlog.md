@@ -26,6 +26,9 @@
 
 ## Current Focus
 
+**Priority 0: Critical Bugs** (Functionality regressions)
+- No active P0 critical bugs - excellent stability
+
 **Priority 1: Testing & App Reliability**
 - � [TEST-012-A] Fix 6 Player Group Fixture Issues (2-3 hours) - Complete test suite reliability **NEEDS VALIDATION** - Factory improvements implemented, verify fixes
 - 🎯 [TEST-013] Add CHPP Integration Testing (3-4 hours) - Prevent team ID vs user ID bugs, test multi-team scenarios **READY**
@@ -35,10 +38,10 @@
 - 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues
 
 **Priority 3: Stability & Maintainability** (It stays working) - Timeline modernization complete ✅, focus on test coverage and UI implementation
+- 🎯 [SIMPLIFY-001] Consolidate UI Documentation (1-2 hours) - Merge 4 large UI files (2,083 lines total) into 2 comprehensive guides **HIGH PRIORITY CONSOLIDATION**
 - 🎯 [UI-008] Implement UI Guidelines Across Existing Pages (8-12 hours) - Apply unified design system to Flask templates and React components **NEXT IN LINE**
 - 🎯 [UI-009] Document Content-in-Boxes Pattern References (1-2 hours) - Link new ui-content-boxes-pattern.md from ui-design-guidelines.md, update prompts.json with pattern reference **NEW**
-- 🎯 [TEST-004] Blueprint Test Coverage (3-4 hours) - Achieve 80% coverage for blueprint modules **READY TO EXECUTE**
-- 🎯 [TEST-005] Utils Module Test Coverage (2-3 hours) - Validate migrated utility functions **READY TO EXECUTE**
+- 🎯 [TEST-004-005] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE** **CONSOLIDATED**
 - 🔄 [TYPESYNC-001] Fix 85 Type Sync Drift Issues (6-8 hours) - Resolve nullability and type mismatches between SQLAlchemy models and TypeScript interfaces **HIGH PRIORITY**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
@@ -86,6 +89,12 @@
 - 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
 - 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
 - 🔮 [FEAT-009] Trophy Data Integration (6-8 hours) - Add historical trophy/achievement display when pyCHPP supports it
+
+---
+
+## Priority 0: Critical Bugs
+
+✅ **All P0 Critical Bugs Resolved** - No active functionality regressions
 
 ---
 
@@ -1673,12 +1682,12 @@ The successful Quality Intelligence Platform implementation represents a major s
 
 ---
 
-### [TEST-004] Blueprint Test Coverage
-**Status**: 🎯 Ready to Execute | **Effort**: 3-4 hours | **Priority**: P3 | **Impact**: Quality assurance and maintainability
-**Dependencies**: REFACTOR-006 Routes Code Consolidation (✅ completed) | **Strategic Value**: Validation of blueprint architecture
+### [TEST-004-005] Blueprint & Utils Test Coverage
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P3 | **Impact**: Foundation reliability validation
+**Dependencies**: None (blueprint migration complete) | **Strategic Value**: Validation of blueprint architecture and shared utilities
 
 **Problem Statement**:
-Recent blueprint migration (REFACTOR-002 and REFACTOR-006) created new code organization but test coverage dropped to 35% (target: 80%). The new blueprint modules need comprehensive test coverage to ensure:
+Recent blueprint migration created new code organization but test coverage dropped to 35% (target: 80%). The new blueprint modules and migrated utilities need comprehensive test coverage to ensure:
 - Blueprint route functionality works correctly
 - Authentication and session handling is reliable
 - Error handling and edge cases are covered
@@ -1718,10 +1727,13 @@ Recent blueprint migration (REFACTOR-002 and REFACTOR-006) created new code orga
    - Test cross-blueprint functionality
    - Verify utils module integration works correctly
    - Test application startup with all blueprints
+   - Test shared utility functions (calculateContribution, player_diff, create_page)
 
 **Acceptance Criteria**:
 - Blueprint module coverage increases to >70%
+- Utils module coverage increases to >70%
 - All blueprint routes have basic functionality tests
+- Critical utility functions comprehensively tested
 - Authentication and session handling tested
 - Error scenarios properly covered
 - make test-fast achieves >80% overall coverage
@@ -1729,75 +1741,17 @@ Recent blueprint migration (REFACTOR-002 and REFACTOR-006) created new code orga
 - Mock CHPP responses for isolated testing
 
 **Technical Approach**:
-- Extend existing test_blueprint_routes_focused.py
+- Extend existing test_blueprint_routes_focused.py for blueprints
+- Create dedicated test_utils.py module for utilities
+- Mock Flask app context for template testing
 - Use pytest fixtures for authentication setup
 - Mock CHPP API calls for deterministic testing
+- Use sample player data for business logic tests
 - Leverage existing test infrastructure and patterns
 
-**Expected Outcomes**: Increased confidence in blueprint architecture, prevention of regressions, achievement of coverage targets
+**Expected Outcomes**: Increased confidence in blueprint architecture and utility functions, prevention of regressions, achievement of coverage targets, validated shared code reliability
 
----
-
-### [TEST-005] Utils Module Test Coverage
-**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P3 | **Impact**: Validation of utility function migration
-**Dependencies**: REFACTOR-006 Routes Code Consolidation (✅ completed) | **Strategic Value**: Confidence in shared utilities
-
-**Problem Statement**:
-The newly created app/utils.py module (300+ lines) contains critical shared utilities migrated from routes.py and routes_bp.py. Currently showing only 13% test coverage, these functions need validation to ensure:
-- Utility functions work correctly after migration
-- No regressions in shared functionality
-- Proper integration with blueprint modules
-- Edge cases and error conditions handled
-
-**Current State**:
-- app/utils.py: 13% coverage (151/151 statements, 125 missed)
-- Critical functions with no test coverage:
-  - calculateContribution(), calculateManmark() - core business logic
-  - player_diff(), get_training() - data processing
-  - create_page() - template rendering
-  - dprint(), debug_print() - debugging utilities
-
-**Implementation**:
-1. **Function Coverage Analysis** (0.5 hours):
-   - Analyze which utility functions are tested vs untested
-   - Identify high-risk functions needing immediate coverage
-   - Map function dependencies and integration points
-   - Review existing tests that might cover utility usage
-
-2. **Core Business Logic Testing** (1-1.5 hours):
-   - Test calculateContribution() with various positions and player skills
-   - Test calculateManmark() calculations and edge cases
-   - Test player skill calculation and rating functions
-   - Validate team statistics computation functions
-
-3. **Data Processing Function Testing** (0.5-1 hour):
-   - Test player_diff() with various time periods
-   - Test get_training() with different player data sets
-   - Test date utilities (diff_month, diff) with edge cases
-   - Test data filtering and transformation functions
-
-4. **Template and Utility Testing** (0.5-1 hour):
-   - Test create_page() with various template contexts
-   - Test debug print functions (dprint, debug_print)
-   - Test utility initialization (initialize_utils)
-   - Verify proper integration with Flask app context
-
-**Acceptance Criteria**:
-- Utils module coverage increases to >70%
-- All core business logic functions tested
-- Data processing functions have comprehensive tests
-- Template utilities tested with mock contexts
-- Debug utilities tested for proper output
-- No regressions in functionality
-- Integration with blueprints verified
-
-**Technical Approach**:
-- Create dedicated test_utils.py module
-- Mock Flask app context for template testing
-- Use sample player data for business logic tests
-- Mock database queries for data processing tests
-
-**Expected Outcomes**: Validated utility function reliability, increased confidence in shared code, prevention of silent failures
+**Note**: This task consolidates TEST-004 (Blueprint Coverage) and TEST-005 (Utils Coverage) as they share common testing infrastructure and can be executed efficiently together.
 
 ---
 
@@ -1806,7 +1760,11 @@ The newly created app/utils.py module (300+ lines) contains critical shared util
 **Dependencies**: None | **Strategic Value**: Reduced complexity, improved maintainability
 
 **Problem Statement**:
-5 separate UI documentation files create unnecessary complexity and duplication. Current files overlap significantly and make it difficult to find authoritative design guidance.
+4 large UI documentation files (2,083 total lines) create unnecessary complexity and duplication. Current files overlap significantly and make it difficult to find authoritative design guidance:
+- ui-implementation-standards.md (640 lines)
+- ui-style-guide.md (610 lines)
+- ui-design-guidelines.md (444 lines)
+- ui-content-boxes-pattern.md (389 lines)
 
 **Implementation**:
 1. **Create Consolidated ui-guidelines.md** (45-60 min):

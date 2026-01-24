@@ -2,6 +2,40 @@
 
 ## Completed P0 Critical Bugs (January 2026)
 
+### [BUG-008] Fix Player Card/Injury Icon Display Regression
+**Completed**: 2026-01-24
+**Effort**: 1 hour
+**Impact**: CRITICAL - Restored card/injury icon visualization in update reports
+
+**Summary**: Fixed regression where player card and injury changes were showing as text instead of icons in update timeline reports. Users can now quickly identify critical player status changes through proper visual feedback.
+
+**Problem Statement**: Player card (yellow/red) and injury/bandaid changes were no longer displaying as icons in update reports. Visual feedback for player status changes was missing, degrading user experience for identifying important changes.
+
+**Achievements**:
+1. **Enhanced `get_player_changes()` Function** (`app/utils.py`):
+   - Added 'cards': 'cards' and 'injury_level': 'injury' to tracked attributes
+   - Unified change detection architecture for consistent data structure
+   - Fixed function signature to remove unused `team_name` parameter
+
+2. **Updated Timeline Template** (`app/templates/update_timeline.html`):
+   - Added comprehensive card change display logic with proper icon handling
+   - Injury state display with meaningful health status messages
+   - Proper icon paths: `/static/ico-red.png`, `/static/ico-injury.png`, etc.
+   - Fallback text for accessibility and debugging
+
+3. **Scout Cleanup Applied**:
+   - Fixed lint errors (unused variables) in `app/blueprints/team.py`
+   - Added missing EOF newline for file format standards
+   - Cleaned up nearby code issues during implementation
+
+**Quality Results**:
+- ✅ All linting checks pass (0 errors)
+- ✅ File format standards met
+- ✅ Icon display functional with proper visual feedback
+- ✅ Injury states show clear health progression
+
+**User Impact**: Restored critical visual feedback for player status changes, improving the core team management experience with immediate recognition of cards and injuries.
+
 ### [BUG-005] Fix Player Change Reporting in Update Data
 **Completed**: 2026-01-24
 **Effort**: 3 hours
