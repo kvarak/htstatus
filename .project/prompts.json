@@ -31,65 +31,47 @@
       "name": "plan",
       "title": "Plan the next development task",
       "what to do": [
-        "Read .project/rules.md for standards. Read .project/ docs, README.md, TECHNICAL.md for context.",
-        "Use `make help` for commands. Use `uv run` for Python.",
-        "For CHPP/pychpp issues: Check pychpp/ folder (local git repo) - checkout matching version tag to verify API compatibility.",
-        "Follow quality gates in rules.md. Keep database backwards compatible.",
-        "Take a holistic view: Look for opportunities to consolidate, eliminate duplication, and reduce waste.",
-        "Structure: # Plan Next Task ## Analysis ## Solution ## Steps ## Challenges ## Testing",
-        "If the task is large, break it into smaller sub-tasks.",
-        "Simplify, reduce complexity, avoid over-engineering when planning. Challenge whether the task can be simplified further.",
-        "Do not add or commit code in this step."
+        "Read .project/rules.md, .project/ docs for context. Use `make help` and `uv run`.",
+        "Take holistic view: consolidate, eliminate duplication, reduce waste.",
+        "Structure: # Plan ## Analysis ## Solution ## Steps ## Testing",
+        "Break large tasks into sub-tasks. Simplify ruthlessly.",
+        "Do not code in this step."
       ]
     },
     {
       "name": "execute",
       "title": "Execute the planned development task",
       "what to do": [
-        "Read .project/rules.md for standards. Read .project/ docs for context.",
-        "Use `uv run` for Python and `make help` for commands.",
-        "For CHPP/pychpp issues: Check pychpp/ folder (local git repo) - checkout matching version tag to verify API compatibility.",
-        "Follow the plan. Validate with `make test-all` - no coverage loss or test failures.",
-        "Take a holistic view: actively look for opportunities to simplify, consolidate, and eliminate waste.",
-        "If you see duplication, over-engineering, or unnecessary complexity, refactor to simplify.",
-        "Challenge existing solutions - can they be simplified without losing functionality?",
-        "Follow quality gates in rules.md. Keep database backwards compatible.",
-        "For UI work: Follow ui_guidelines in this file. Use consistent colors, typography, spacing.",
-        "Flask: Use .btn-primary-custom, .table-custom, .card-custom classes for consistency.",
-        "React: Use existing components with TailwindCSS utilities, maintain football theme.",
-        "Update docs per documentation-guide.md (backlog.md, progress.md, etc.).",
-        "Note any new tasks for backlog.md.",
-        "Do not add or commit code in this step.",
-        "If the task is large, break it into smaller sub-tasks and execute only one sub-task and keep the rest for the next time the execute task is run."
+        "Read .project/rules.md, .project/ docs. Use `uv run` and `make help`.",
+        "Follow plan. Scout mindset: fix lint errors, cleanup nearby code, remove waste while working.",
+        "Actively simplify: consolidate, eliminate duplication, reduce complexity.",
+        "Test: `make test-all` - no coverage loss or failures.",
+        "UI: Use ui_guidelines colors/typography. Flask: .btn-primary-custom classes. React: existing components.",
+        "Update docs. Note new tasks for backlog. Break large tasks into sub-tasks.",
+        "Do not commit code."
       ]
     },
     {
       "name": "review",
       "title": "Review previous development work with simplification focus",
       "what to do": [
-        "Review not only the last task, but all the changes since the last commit.",
-        "Read .project/rules.md for standards. Read .project/ docs for context.",
-        "Take a holistic view: identify any introduced complexity, duplication, or waste.",
-        "Validate with `make test-all`, use `uv run` for Python.",
-        "Check docs updated per documentation-guide.md and strategic alignment per goals.md.",
-        "Look for consolidation opportunities - can the changes be simplified further?",
-        "Follow quality gates in rules.md. Keep database backwards compatible.",
-        "Add new tasks to backlog.md, focusing on simplification and waste reduction.",
-        "Do not add or commit code in this step."
+        "Review all changes since last commit. Read .project/rules.md, .project/ docs.",
+        "Holistic view: identify complexity, duplication, waste introduced.",
+        "Test: `make test-all`. Check docs alignment with goals.md.",
+        "Consolidation opportunities? Add simplification tasks to backlog.",
+        "Do not commit code."
       ]
     },
     {
       "name": "update",
       "title": "Update project status and planning",
       "what to do": [
-        "Review progress.md and backlog.md current state with a holistic view for simplification.",
-        "Update both files with completed tasks and metrics. Look for opportunities to consolidate similar tasks.",
-        "Remove completed tasks (marked ✅) from backlog.md - move them to history/backlog-done.md with completion notes.",
-        "Eliminate redundant or obsolete tasks. Merge overlapping work to reduce complexity.",
-        "Unblock dependencies, move ready tasks to active status.",
-        "When updating docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*), ensure they describe the current architecture and decisions.",
-        "Aggressively remove or compress outdated information and redundant content to reduce cognitive load.",
-        "Do not add or commit code in this step."
+        "Review progress.md, backlog.md. Holistic view for consolidation.",
+        "Update with completed tasks. Move completed (✅) to history/backlog-done.md.",
+        "Eliminate redundant tasks. Merge overlapping work.",
+        "Unblock dependencies. Update docs to reflect current state.",
+        "Aggressively remove outdated content.",
+        "Do not commit code."
       ]
     },
     {
@@ -105,25 +87,20 @@
       "name": "add-to-backlog",
       "title": "Add a new task to the project backlog with simplification focus",
       "what to do": [
-        "Read .project/rules.md for standards. Read .project/ docs for context.",
-        "Take a holistic view: check if this task duplicates existing work or can be consolidated.",
-        "Analyze task alignment with goals.md and dependencies. Challenge if task can be simplified.",
-        "Look for opportunities to merge with existing tasks to reduce backlog complexity.",
-        "Add to backlog.md with priority and category recommendation. Both in the Current Focus and Detailed Backlog sections."
+        "Read .project/rules.md, .project/ docs. Check for duplicate work.",
+        "Challenge: can this be simplified or merged with existing tasks?",
+        "Add to backlog.md Current Focus and Detailed sections."
       ]
     },
     {
       "name": "execute-backlog-item",
       "title": "Plan and execute a specific backlog item with simplification focus",
       "what to do": [
-        "Focus on the specified backlog item. Read .project/rules.md for standards.",
-        "Read .project/ docs for context. Take a holistic view to identify simplification opportunities.",
-        "Before executing, challenge if the task can be simplified or consolidated with other work.",
-        "Create implementation plan, execute step by step. Use `uv run` for Python.",
-        "Look for opportunities to eliminate duplication and reduce complexity during execution.",
-        "Test against acceptance criteria per rules.md. Update docs per documentation-guide.md.",
-        "Mark completed in backlog.md.",
-        "Structure: # Execution: [TASK-ID] ## Overview ## Plan ## Steps ## Validation ## Summary"
+        "Read .project/rules.md, .project/ docs. Challenge if task can be simplified.",
+        "Scout mindset: fix lint errors, cleanup nearby code while executing.",
+        "Execute with `uv run`. Test against acceptance criteria.",
+        "Update docs. Mark completed in backlog.",
+        "Structure: # Execution: [TASK-ID] ## Plan ## Steps ## Summary"
       ]
     },
     {
@@ -142,26 +119,22 @@
       "name": "organize-backlog",
       "title": "Organize and clean up project backlog with simplification focus",
       "what to do": [
-        "Read .project/ docs for context. Take a holistic view of the backlog for simplification opportunities.",
-        "Identify and consolidate duplicate or overlapping tasks - merge similar work to reduce complexity.",
-        "Remove obsolete tasks, eliminate waste, and challenge whether complex tasks can be simplified.",
-        "Look for patterns: Can multiple small tasks be combined? Can over-engineered solutions be simplified?",
-        "Fix dependencies and priorities with focus on reducing cognitive load and decision complexity.",
-        "Keep rules at top, details at bottom, use markdown links for navigation."
+        "Read .project/ docs. Holistic view for consolidation opportunities.",
+        "Consolidate duplicate tasks. Remove obsolete. Simplify complex tasks.",
+        "Look for patterns: combine small tasks, simplify over-engineered solutions.",
+        "Fix dependencies/priorities to reduce cognitive load."
       ]
     },
     {
       "name": "look-outside-the-box",
       "title": "Generate innovative opportunities",
       "what to do": [
-        "First, scan plan.md, progress.md, backlog.md, and 'Future Opportunities' in plan.md for existing suggestions.",
-        "Think step-by-step like an innovative strategist: Analyze project docs, code structure, and current capabilities.",
-        "**Simplification Challenge**: Question complexity - what if we eliminated 50% of features? What's the simplest viable approach?",
-        "**Black Hat Challenge**: Play devil's advocate. Question 2-3 fundamental decisions (tech stack, architecture, goals). Ask: 'What if this core choice is wrong? What single change would collapse the project—and how could we pivot profitably?'",
-        "Use these techniques: (1) Contrarian questions ('What if we did the opposite?'); (2) Analogies from unrelated industries ('How would Netflix approach this?'); (3) Brainstorm 8-10 wild ideas first, then refine to 2-5 high-impact ones; (4) Radical simplification ('What's the absolute minimum viable approach?').",
-        "For each opportunity, provide: clear value proposition, why it's novel, and how it expands or pivots the project.",
-        "Add only new, high-value suggestions to 'Future Opportunities' section in plan.md (not backlog).",
-        "Structure: # Innovation ## Step-by-Step Assessment ## Black Hat Challenge ## Wild Ideas Brainstorm ## Refined Opportunities ## Value Summary ## Added to plan.md"
+        "Scan plan.md, progress.md, backlog.md for existing suggestions.",
+        "Simplification Challenge: What if we eliminated 50% of features?",
+        "Black Hat: Question 2-3 fundamental decisions. What could collapse the project?",
+        "Techniques: Contrarian questions, industry analogies, radical simplification.",
+        "Add high-value suggestions to plan.md Future Opportunities.",
+        "Structure: # Innovation ## Assessment ## Challenges ## Opportunities"
       ]
     }
   ]
