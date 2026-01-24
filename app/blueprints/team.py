@@ -115,8 +115,8 @@ def update():
     all_team_names = session['all_team_names']
 
     updated = {}
-    changesplayers_day = []
-    changesplayers_week = []
+    # changesplayers_day = []  # TODO: Unused - remove if not needed
+    # changesplayers_week = []  # TODO: Unused - remove if not needed
 
     for i in range(len(all_teams)):
         updated[all_teams[i]] = [all_team_names[i]]
