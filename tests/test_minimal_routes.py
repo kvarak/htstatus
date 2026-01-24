@@ -81,12 +81,12 @@ class TestBlueprintFunctions:
         assert True  # If no exception, function works
 
     @patch('app.utils.render_template')
-    def test_create_page_function(self, mock_render):
+    def test_create_page_function(self, mock_render, minimal_app):
         """Test create_page function with mocked dependencies."""
         mock_render.return_value = 'mocked_template'
 
-        # Mock Flask session
-        with patch('flask.session', {'current_user': 'testuser'}):
+        # Use proper application context with database setup
+        with minimal_app.app_context(), patch('flask.session', {'current_user': 'testuser'}):
             result = create_page('test.html', 'Test Title')
             mock_render.assert_called_once()
             assert result == 'mocked_template'
@@ -220,11 +220,12 @@ class TestRouteErrorHandling:
     """Test error handling in route contexts."""
 
     @patch('app.utils.render_template')
-    def test_create_page_with_template_error(self, mock_render):
+    def test_create_page_with_template_error(self, mock_render, minimal_app):
         """Test create_page behavior when template rendering fails."""
         mock_render.side_effect = Exception("Template not found")
 
-        with patch('flask.session', {'current_user': 'test'}):
+        # Use proper application context with database setup
+        with minimal_app.app_context(), patch('flask.session', {'current_user': 'test'}):
             try:
                 create_page('nonexistent.html', 'Title')
                 raise AssertionError("Should have raised exception")
