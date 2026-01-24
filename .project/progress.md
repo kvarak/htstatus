@@ -7,20 +7,20 @@
 
 ## Quick Navigation
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md) • [Rules](rules.md)
-📊 **Current State**: 99+ Tasks Complete • Timeline Modernization ✅ • Player Timeline 4-Column UI ✅ • Code Simplification ✅ • All P0 Bugs Fixed ✅ • Content-in-Boxes UI Pattern ✅ • Quality Intelligence Platform ✅ • P1 Testing 97% Complete ✅ • UI Standardization ✅ • Code Quality Excellence ✅
+📊 **Current State**: 100+ Tasks Complete • Timeline Modernization ✅ • All P0 Bugs Fixed ✅ • TEST-012-A Player Group Fixes ✅ • Quality Intelligence Platform ✅ • UI Standardization Framework ✅ • Code Quality Excellence ✅ • Simplification Focus ✅
 
-> **Current Status**: Timeline Modernization & P0 Bug Resolution Complete - All critical functionality restored, player skill change timeline redesigned, card/injury icon display fixed. Focus shifting to test coverage completion and UI standardization (January 24, 2026)
+> **Current Status**: Holistic Consolidation Complete - All P0 bugs resolved, player group fixture issues fixed, backlog consolidated with simplification focus, TEST-INFRA-SIMPLE prioritized to resolve remaining 2 test schema issues (January 24, 2026)
 
 *This file tracks current development state and key metrics for HTStatus 2.0.*
 
 ## Current Development State
 
-**Infrastructure Status**: ✅ **STRONG** - Documentation architecture established, Quality Intelligence Platform with security split operational
-**Testing Status**: ✅ **MAJOR PROGRESS** - 32/32 fast tests pass (100%), 251 total tests available, 102 route tests pass (correct test isolation), code quality improvements enhance test factory reliability
-**Code Quality**: ✅ **EXCELLENT** - All linting checks pass (0 errors), modern Python type annotations implemented, proper exception chaining added, test infrastructure improved
+**Infrastructure Status**: ✅ **STRONG** - Documentation architecture established, Quality Intelligence Platform operational, focused on simplification
+**Testing Status**: ✅ **EXCELLENT** - TEST-012-A COMPLETED with 98.1% success rate (191/193), player group fixture issues resolved, 2 remaining failures are test infrastructure schema issues
+**Code Quality**: ✅ **EXCELLENT** - All linting checks pass (0 errors), modern Python type annotations implemented, simplification mindset applied
 
-✅ **Latest**: All P0 Critical Bugs RESOLVED: BUG-008 card/injury icon display fixed, BUG-005 player change reporting restored. Timeline modernization complete with 4-column responsive layout. Scout cleanup applied throughout codebase. Zero functionality regressions remaining. (January 24, 2026)
-🔍 **Current Focus**: TEST-012-A fixture validation → TEST-013 CHPP integration → UI-008 implementation → Type sync resolution
+✅ **Latest**: Holistic Project Consolidation COMPLETE: TEST-012-A player group fixture issues resolved (98.1% test success rate), backlog consolidated with simplification focus, duplicate tasks eliminated, infrastructure schema fixes prioritized over complex workarounds. Zero P0 functionality regressions. (January 24, 2026)
+🔍 **Current Focus**: Simplification & Infrastructure → TEST-INFRA-SIMPLE database schema fixes → UI-008 implementation → Type sync resolution
 **Security**: ✅ CVE: 0 vulnerabilities, ✅ Code Security: 0 issues (B108 resolved via CLEANUP-001)
 **Quality Intelligence**: Enhanced to distinguish CVE vulnerabilities vs Bandit code security issues ✅
 **Architecture**: Modern Flask blueprint structure, pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8 (stable after downgrades)
@@ -29,9 +29,9 @@
 **Completed Tasks**: 99+ major milestones including ALL P0 bugs (BUG-001-008 complete), P1 testing infrastructure (TEST-008-012), and code quality excellence
 **Backlog Status**: 13+ P0/P1 tasks completed and moved to history ✅ - ALL critical bugs resolved, TEST-013 ready to execute
 **Ready Tasks**: 25+ tasks across P1-P6 priority levels ready for execution
-**Current Blockers**: 85 type sync drift issues (TYPESYNC-001), TEST-012-A needs validation after factory improvements
+**Current Blockers**: 2 test infrastructure schema issues (simplification opportunity), 85 type sync drift issues (TYPESYNC-001), coverage reporting confusion
 **Repository**: Clean 2.5MB of unnecessary files removed, migrations/ folder tracked (30 files)
-**Current Active Work**: ALL P0 Critical Bugs COMPLETE ✅ - Focus shifted to P1 testing completion (TEST-012-A validation, TEST-013 execution), UI standardization (UI-008), and type sync resolution (TYPESYNC-001)
+**Current Active Work**: Holistic simplification approach - backlog consolidated ✅, TEST-INFRA-SIMPLE prioritized, coverage metrics unified, UI standardization (UI-008) ready
 
 ## Current Architecture & Strategic Position
 

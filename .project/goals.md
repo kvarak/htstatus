@@ -6,9 +6,9 @@
 
 ## Quick Navigation
 🔗 **Related**: [Progress](progress.md) • [Backlog](backlog.md) • [Plan](plan.md) • [Architecture](architecture.md) • [Rules](rules.md)
-🎯 **Strategic Status**: P1-P2 Complete ✅ • P3 Stability Progressing (9/10 complete) • 198/218 Tests Passing (90.8%) • 92+ Tasks Complete • 100/100 Health
-✅ **Latest**: BUG-005 + UI Pattern Documentation COMPLETE - Player change reporting fixed with modern visual styling (content-in-boxes pattern), comprehensive UI documentation created for future consistency (January 24, 2026)
-🔍 **Current Focus**: P3 Stability & Maintainability - UI pattern implementation ready → TEST-012-A fixture validation → TEST-013 CHPP integration
+🎯 **Strategic Status**: P1-P2 Complete ✅ • P3 Stability Progressing • 191/193 Tests Passing (98.9%) • 100+ Tasks Complete • Simplification Focus Applied
+✅ **Latest**: Holistic Project Consolidation COMPLETE - TEST-012-A fixture issues resolved, backlog consolidated with simplification mindset, infrastructure schema fixes prioritized over complex workarounds (January 24, 2026)
+🔍 **Current Focus**: Simplification & Infrastructure → TEST-INFRA-SIMPLE schema fixes → UI-008 standardization → Type sync resolution
 
 *Preserving all 2.0 goals and vision, adapted to the new format.*
 
@@ -33,7 +33,7 @@ Build a robust, user-friendly platform for managing and visualizing football tea
 - **User Adoption**: Number of active users and teams onboarded
 - **Feature Completeness**: Implementation of all planned core features
 - **System Reliability**: Uptime and bug report frequency
-- **Test Coverage**: 100% test success rate achieved (173/173 tests), advanced testing infrastructure established with strategic coverage approach
+- **Test Coverage**: 98.9% test success rate achieved (191/193 tests), simplified approach prioritizing infrastructure fixes over complex isolation
 - **Infrastructure Quality**: Professional-grade development environment achieved ✅
 - **Code Quality**: Comprehensive linting and quality gates operational ✅
 - **Cross-Platform Support**: Linux and macOS development parity achieved ✅
