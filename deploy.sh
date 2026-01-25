@@ -84,9 +84,9 @@ DEPLOYMENT_STEPS=(
   "file:Touch routes:touch app/routes.py"
   "secret:Update SECRET_KEY:(conditional)"
   "dep:Install uv:pip3 install uv"
-  "dep:Sync dependencies:python3 -m uv sync"
-  "db:Generate migrations:python3 -m uv run python3 scripts/manage.py db migrate"
-  "db:Apply migrations:python3 -m uv run python3 scripts/manage.py db upgrade"
+  "dep:Sync dependencies:uv sync"
+  "db:Generate migrations:uv run python scripts/manage.py db migrate"
+  "db:Apply migrations:uv run flask db upgrade"
   "service:Restart service:sudo systemctl restart htstatus"
 )
 
@@ -131,7 +131,7 @@ command -v python3 >/dev/null 2>&1 || { echo "ERROR: python3 not found"; exit 1;
 python3 --version
 echo "✓ Python environment available"
 
-# [5/7] Package manager - validates: pip3 install uv, python3 -m uv sync
+# [5/7] Package manager - validates: pip3 install uv, uv sync
 echo ""
 echo "[5/7] Checking uv package manager..."
 if command -v uv >/dev/null 2>&1; then
@@ -144,7 +144,7 @@ fi
 # [6/7] Database migration scripts - validates: db migrate, db upgrade
 echo ""
 echo "[6/7] Testing database migration..."
-python3 -m uv sync --dry-run 2>&1 || echo "! Dependencies would be synced"
+uv sync --dry-run 2>&1 || echo "! Dependencies would be synced"
 if [ -f "scripts/manage.py" ]; then
   echo "✓ Migration script exists"
 else

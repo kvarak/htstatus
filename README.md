@@ -413,12 +413,6 @@ pip3 install psycopg2-binary
 pip3 install python-dateutil
 ```
 
-### Manage requirements (Legacy)
-```
-pipreqs . --force
-pip install -r requirements.txt
-```
-
 ## Start
 
 ### With UV + Docker Compose (Recommended)

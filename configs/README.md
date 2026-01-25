@@ -28,7 +28,6 @@ make services-staging # Staging services
 
 - **`.flake8`** - Flake8 linter configuration (legacy, now using ruff)
 - **`index.html`** - Static HTML template/placeholder
-- **`requirements.txt`** - Legacy Python requirements (now using pyproject.toml + UV)
 
 ## Notes
 

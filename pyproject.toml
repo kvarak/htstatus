@@ -7,7 +7,7 @@ authors = [
 ]
 readme = "README.md"
 license = {text = "MIT"}
-requires-python = ">=3.9"
+requires-python = ">=3.9,<4.0"
 keywords = ["hattrick", "football", "flask", "react", "chpp"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -18,6 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Games/Entertainment",
     "Framework :: Flask",
 ]
