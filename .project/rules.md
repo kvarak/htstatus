@@ -4,6 +4,15 @@
 
 ## Core Development Standards
 
+### Architectural Simplification Principles
+**Hierarchy**: Holistic view >> Reduce complexity >> Reduce waste >> Consolidate & eliminate duplication
+
+- **Reduce complexity**: Maintain single responsibility per module/script, clear interfaces, avoid monolithic structures
+- **Reduce waste**: Remove unused code, eliminate redundant logic within components, clean up obsolete patterns
+- **Consolidate duplication**: Merge identical patterns/functions/logic, **NOT** merge distinct tools with different purposes
+- **Separation of concerns**: Keep tools/modules focused on single responsibilities (e.g., qi-json.sh for JSON generation, pytest-qi-parser.sh for format conversion, quality-intelligence.sh for reporting)
+- **Anti-pattern**: Merging well-separated tools into monoliths (like old routes.py) increases complexity
+
 ### Quality Gates
 - **Testing**: Run `make test-all` before marking tasks complete (no coverage loss or new failures)
 - **Linting**: Run `make lint` before committing (address critical issues)

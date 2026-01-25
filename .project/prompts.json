@@ -33,7 +33,7 @@
       "what to do": [
         "Read .project/rules.md, .project/ docs for context. Use `make help` and `uv run`.",
         "Take holistic view: consolidate, eliminate duplication, reduce waste.",
-        "Scout mindset: Do not be afrard to take a step back and fix fix more than in the task",
+        "Scout mindset: Do not be afraid to take a step back and fix fix more than in the task",
         "Structure: # Plan ## Analysis ## Solution ## Steps ## Testing",
         "Break large tasks into sub-tasks. Simplify ruthlessly.",
         "Do not code in this step."
@@ -57,9 +57,11 @@
       "title": "Review previous development work with simplification focus",
       "what to do": [
         "Review all changes since last commit. Read .project/rules.md, .project/ docs.",
-        "Holistic view: identify complexity, duplication, waste introduced.",
+        "Apply simplification hierarchy: Holistic view >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
+        "Identify: complexity (monoliths, unclear responsibilities), waste (unused code, redundant logic), inappropriate consolidation (merging distinct tools).",
+        "Respect separation of concerns: Don't merge tools with different purposes (e.g., qi-json.sh, pytest-qi-parser.sh, quality-intelligence.sh each have distinct roles).",
         "Test: `make test-all`. Check docs alignment with goals.md.",
-        "Consolidation opportunities? Add simplification tasks to backlog.",
+        "Add appropriate simplification tasks to backlog: eliminate waste, reduce complexity within components, consolidate identical patterns.",
         "Do not commit code."
       ]
     },
