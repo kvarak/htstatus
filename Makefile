@@ -137,17 +137,18 @@ shell: check-uv ## Open Python shell in UV environment
 # Code Quality Commands
 lint: check-uv ## Run ruff linting
 	@echo "🔍 Running ruff linting..."
+	@mkdir -p out/tests && rm -f out/tests/$@.json
 	@$(UV) run ruff check . 2>&1 | tee /tmp/ruff-output.txt; \
 	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
 		echo "All checks passed!"; \
-		echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"0 errors\",\"details\":\"excellent code quality\"}"; \
+		scripts/qi-json.sh out/tests/lint.json "Code Quality" "make lint" PASSED 0 0 "0 errors" "excellent code quality"; \
 	else \
 		error_count=$$(grep -c "error" /tmp/ruff-output.txt || echo "0"); \
 		app_errors=$$(grep -E '^(app/|models\.py|config\.py)' /tmp/ruff-output.txt | wc -l | tr -d ' '); \
 		if [ "$$app_errors" = "0" ] 2>/dev/null; then \
-			echo "QI_RESULT:{\"status\":\"ISSUES\",\"metric\":\"$$error_count errors\",\"details\":\"dev scripts only\"}"; \
+			scripts/qi-json.sh out/tests/lint.json "Code Quality" "make lint" ISSUES $$error_count 0 "$$error_count errors" "dev scripts only"; \
 		else \
-			echo "QI_RESULT:{\"status\":\"ISSUES\",\"metric\":\"$$error_count errors\",\"details\":\"$$app_errors in production code\"}"; \
+			scripts/qi-json.sh out/tests/lint.json "Code Quality" "make lint" ISSUES 0 $$error_count "$$error_count errors" "$$app_errors in production code"; \
 		fi; \
 		exit 1; \
 	fi
@@ -159,6 +160,7 @@ format: check-uv ## Run black and ruff formatting
 	@$(UV) run ruff format .
 
 fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
+	@mkdir -p out/tests && rm -f out/tests/$@.json
 	@echo "📝 Checking file formatting standards..."
 	@echo "   → Checking for newline at end of file..."
 	@failed=false; \
@@ -171,7 +173,7 @@ fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 		fi; \
 	done; \
 	if [ "$$failed" = "true" ]; then \
-		echo "QI_RESULT:{\"status\":\"FAILED\",\"metric\":\"$$failed_count files\",\"details\":\"missing newline at end of file\"}"; \
+		scripts/qi-json.sh out/tests/$@.json "File Format" "make fileformat" FAILED 0 $$failed_count "$$failed_count files" "missing newline at end of file"; \
 		exit 1; \
 	fi
 	@echo "   → Checking for trailing whitespace..."
@@ -185,12 +187,12 @@ fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 		fi; \
 	done; \
 	if [ "$$failed" = "true" ]; then \
-		echo "QI_RESULT:{\"status\":\"FAILED\",\"metric\":\"$$failed_count files\",\"details\":\"files have trailing whitespace\"}"; \
+		scripts/qi-json.sh out/tests/$@.json "File Format" "make fileformat" FAILED 0 $$failed_count "$$failed_count files" "files have trailing whitespace"; \
 		exit 1; \
 	fi
 	@total_files=$$(git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | wc -l | tr -d ' '); \
 	echo "✅ File formatting checks passed"; \
-	echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"$$total_files files\",\"details\":\"consistent formatting\"}"
+	scripts/qi-json.sh out/tests/$@.json "File Format" "make fileformat" PASSED 0 0 "$$total_files files" "consistent formatting"
 
 fileformat-fix: ## Auto-fix file formatting issues (newline EOF, trailing whitespace)
 	@echo "🔧 Auto-fixing file formatting issues..."
@@ -217,17 +219,19 @@ typecheck: check-uv ## Run mypy type checking
 	@$(UV) run mypy . --ignore-missing-imports
 
 typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
+	@mkdir -p out/tests && rm -f out/tests/$@.json
 	@echo "🔗 Validating type synchronization..."
 	@$(UV) run python scripts/validate_types.py 2>&1 | tee /tmp/typesync-output.txt; \
 	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
-		echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"synchronized\",\"details\":\"Flask ↔ React types match\"}"; \
+		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" PASSED 0 0 "synchronized" "Flask ↔ React types match"; \
 	else \
 		issue_count=$$(grep 'Found.*type sync issues' /tmp/typesync-output.txt | head -1 | grep -o '[0-9]\+' || echo "unknown"); \
-		echo "QI_RESULT:{\"status\":\"ISSUES\",\"metric\":\"$$issue_count drift issues\",\"details\":\"run 'make typesync' to fix\"}"; \
+		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" FAILED 0 1 "$$issue_count drift issues" "run 'make typesync' to fix"; \
 		exit 1; \
 	fi
 
 security: check-uv ## Run bandit and safety security checks
+	@mkdir -p out/tests && rm -f out/tests/$@.json
 	@echo "🔒 Running security checks..."
 	@echo ""
 	@echo "📋 Bandit Code Security Analysis:"
@@ -257,115 +261,84 @@ security: check-uv ## Run bandit and safety security checks
 		echo "⚠️  Safety scan failed, falling back to basic scan"; \
 		$(UV) run safety scan; \
 	fi; \
-	echo "QI_RESULT:{\"status\":\"PASSED\",\"cve\":\"$$cve_status\",\"bandit\":\"$$bandit_status\",\"details\":\"security analysis complete\"}"
-
-# Testing Infrastructure
-test: services ## 🧪 Run comprehensive test suite (uses isolated groups to prevent fixture contamination)
-	@echo "🧪 Running comprehensive test suite (isolated groups)..."
-	@echo "   Note: Tests run in separate groups to prevent cross-module fixture contamination"
-	@echo "   See TEST-012 in .project/backlog.md for technical details"
-	@echo ""
-	@$(MAKE) test-isolated
+	scripts/qi-json.sh out/tests/$@.json "Security Analysis" "make security" PASSED 0 0 "security analysis complete" "comprehensive security validation" cve="$$cve_status" bandit="$$bandit_status"
 
 test-fast: check-uv services ## ⚡ Run critical tests only (quick development validation)
 	@echo "⚡ Running fast test subset for development..."
-	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_database.py -v --tb=short
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_database.py -v --tb=short  --json-report --json-report-file=out/tests/$@.json
 	@echo "✅ Fast tests completed - run 'make test' for comprehensive validation"
 
 test-config: check-uv ## 🔧 Run configuration tests specifically
 	@echo "🔧 Running configuration tests..."
-	@echo "   Note: These tests may fail if you have real CHPP credentials in .env"
-	@echo "   See INFRA-018 in backlog.md for resolution details"
-	@$(UV) run pytest tests/test_config.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov=config --cov-report=term-missing 2>&1 | tee /tmp/config-test-output.txt; \
-	if grep -q "FAILED" /tmp/config-test-output.txt; then \
-		echo "QI_RESULT:{\"status\":\"FAILED\",\"metric\":\"config tests\",\"details\":\"check credentials setup\"}"; \
-	else \
-		config_cov=$$(grep -o 'TOTAL.*[0-9]*%' /tmp/config-test-output.txt | tail -1 | grep -o '[0-9]*%' || echo "22%"); \
-		config_tests=$$(grep -o '[0-9]* passed' /tmp/config-test-output.txt | tail -1 | grep -o '[0-9]*' || echo "config"); \
-		echo "✅ Configuration tests completed"; \
-		echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"$$config_cov infra coverage\",\"tests\":\"$$config_tests validations\",\"details\":\"robust infrastructure\"}"; \
-	fi
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/test_config.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov=config --cov-report=term-missing --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
+	@echo "✅ Configuration tests completed"
 
 test-integration: check-uv services ## 🔗 Run integration tests with Docker services
 	@echo "🔗 Running integration tests..."
-	@$(UV) run pytest tests/integration/ -v --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/integration/ $${PYTEST_VERBOSE-"-v"}  --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --json-report --json-report-file=out/tests/$@.json
 	@echo "✅ Integration tests completed"
 
 test-coverage: check-uv services ## 📊 Run tests with detailed HTML coverage reporting
 	@echo "📊 Running tests with detailed coverage analysis..."
-	@$(UV) run pytest tests/ --cov=app --cov=models --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=90
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --cov=app --cov=models --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=90 --json-report --json-report-file=out/tests/$@.json
 	@echo "📋 Detailed coverage report generated in htmlcov/"
 
 test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file changes)
 	@echo "👀 Running tests in watch mode..."
-	@$(UV) run pytest-watch tests/ -- -v --tb=short
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest-watch tests/ -- $${PYTEST_VERBOSE-"-v"} --tb=short  --json-report --json-report-file=out/tests/$@.json
 
 test-core: check-uv services ## 🎯 Run core tests (basic, factory, auth, config)
 	@echo "🎯 Running core tests (no database writes)..."
-	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_config.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_config.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
 	@echo "✅ Core tests completed"
 
 test-db: check-uv services ## 🗄️  Run database and business logic tests
 	@echo "🗄️  Running database and business logic tests..."
-	@$(UV) run pytest tests/test_database.py tests/test_business_logic.py tests/test_chpp_integration.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/test_database.py tests/test_business_logic.py tests/test_chpp_integration.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
 	@echo "✅ Database tests completed"
 
 test-routes: check-uv services ## 🛣️  Run blueprint and route tests
 	@echo "🛣️  Running blueprint and route tests..."
-	@$(UV) run pytest tests/test_blueprint_*.py tests/test_minimal_routes.py tests/test_routes.py tests/test_strategic_routes.py tests/test_blueprint_routes_focused.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run pytest tests/test_blueprint_*.py tests/test_minimal_routes.py tests/test_routes.py tests/test_strategic_routes.py tests/test_blueprint_routes_focused.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
 	@echo "✅ Route tests completed"
 
-test-isolated: check-uv services ## 🔬 Run all tests in isolated groups (prevents cross-contamination)
-	@echo "🔬 Running all tests in isolated groups to prevent fixture contamination..."
-	@echo ""
-	@echo "═══════════════════════════════════════════════════════════════"
-	@echo "Group 1: Core Tests (basic, factory, auth, config)"
-	@echo "═══════════════════════════════════════════════════════════════"
-	@$(MAKE) test-core
-	@echo ""
-	@echo "═══════════════════════════════════════════════════════════════"
-	@echo "Group 2: Database & Business Logic Tests"
-	@echo "═══════════════════════════════════════════════════════════════"
-	@$(MAKE) test-db
-	@echo ""
-	@echo "═══════════════════════════════════════════════════════════════"
-	@echo "Group 3: Blueprint & Route Tests"
-	@echo "═══════════════════════════════════════════════════════════════"
-	@$(MAKE) test-routes
-	@echo ""
-	@echo "═══════════════════════════════════════════════════════════════"
-	@echo "✅ All isolated test groups completed successfully"
-	@echo "═══════════════════════════════════════════════════════════════"
-	@echo "QI_RESULT:{\"status\":\"PASSED\",\"metric\":\"isolated groups\",\"details\":\"comprehensive test suite solid\"}"
 
-test-all: ## ✅ Run all quality gates (fileformat + lint + security + typesync + config + comprehensive tests)
-	@echo "🚀 Running complete quality gate validation..."
-	@echo ""
-	@echo "📋 Step 1/6: File Format Standards"
-	@echo "=================================="
-	@make fileformat 2>&1 | tee /tmp/fileformat-results.txt || true
-	@echo ""
-	@echo "📋 Step 2/6: Code Quality (Linting)"
-	@echo "=================================="
-	@make lint 2>&1 | tee /tmp/lint-results.txt || true
-	@echo ""
-	@echo "📋 Step 3/6: Security Analysis"
-	@echo "============================="
-	@make security 2>&1 | tee /tmp/security-results.txt || true
-	@echo ""
-	@echo "📋 Step 4/6: Type Synchronization"
-	@echo "=============================="
-	@make typesync 2>&1 | tee /tmp/typesync-results.txt || true
-	@echo ""
-	@echo "📋 Step 5/6: Configuration Validation"
-	@echo "===================================="
-	@PYTEST_VERBOSE="" make test-config 2>&1 | tee /tmp/config-results.txt || true
-	@echo ""
-	@echo "📋 Step 6/6: Application Coverage Analysis (Isolated Groups)"
-	@echo "========================================="
-	@PYTEST_VERBOSE="" make test-isolated 2>&1 | tee /tmp/test-results.txt
-	@echo ""
-	@scripts/quality-intelligence.sh
+GATES = fileformat lint security typesync test-config test-core test-db test-routes test-coverage
+
+test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesync, tests)
+	@echo "🚀 Running complete quality gate validation (expected: $(words $(GATES)))..."
+	@mkdir -p out/tests && rm -f out/tests/*.json
+	@count=0; \
+	for gate in $(GATES); do \
+		echo "Running $$gate..."; \
+		PYTEST_VERBOSE="" $(MAKE) $$gate || true; \
+		count=$${count}+1; \
+	done; \
+	scripts/quality-intelligence.sh --expected-results $(words $(GATES))
+
+# test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesync, tests)
+# 	@echo "🚀 Running complete quality gate validation..."
+# 	@mkdir -p out/tests && rm -f out/tests/*.json
+# 	@PYTEST_VERBOSE="" $(MAKE) fileformat || true
+# 	@PYTEST_VERBOSE="" $(MAKE) lint || true
+# 	@PYTEST_VERBOSE="" $(MAKE) security || true
+# 	@PYTEST_VERBOSE="" $(MAKE) typesync || true
+# 	@PYTEST_VERBOSE="" $(MAKE) test-config || true
+# 	@PYTEST_VERBOSE="" $(MAKE) test-core || true
+# 	@PYTEST_VERBOSE="" $(MAKE) test-db || true
+# 	@PYTEST_VERBOSE="" $(MAKE) test-routes || true
+# 	@PYTEST_VERBOSE="" $(MAKE) test-coverage || true
+# 	@echo "✅ Complete quality gate validation finished"
+# 	@echo "📊 Generating Quality Intelligence report..."
+# 	@scripts/quality-intelligence.sh --expected-results 9
 
 # Utility Commands
 clean: ## Clean up temporary files, caches
@@ -394,11 +367,11 @@ changelog: ## Generate changelog (from scripts/changelog.sh)
 # Database Commands
 db-migrate: check-uv ## Run database migrations
 	@echo "🗄️  Creating database migration..."
-	@$(PYTHON) manage.py db migrate
+	@$(PYTHON) scripts/manage.py db migrate
 
 db-upgrade: check-uv services ## Apply database upgrades
 	@echo "🗄️  Applying database upgrades..."
-	@$(PYTHON) manage.py db upgrade
+	@$(PYTHON) scripts/manage.py db upgrade
 
 # Legacy Support (deprecated but functional)
 .PHONY: legacy-run legacy-changelog

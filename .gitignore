@@ -39,6 +39,7 @@ htmlcov/
 coverage.xml
 *.cover
 .tox/
+out/
 
 # Development tools
 .mypy_cache/
