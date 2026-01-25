@@ -33,8 +33,7 @@
 - ✅ ALL TESTING INFRASTRUCTURE COMPLETE - Zero active P1 tasks, 100% test success rate (193/193), comprehensive reliability achieved
 
 **Priority 2: Deployment & Operations** - 🎯 CURRENT FOCUS
-- 🎯 [INFRA-021] Environment Parity Enforcement (4-6 hours) - Pin Python versions and dependencies across dev/test/prod **HIGH PRIORITY** **P2 FOCUS**
-- 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues **READY**
+- 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues **CURRENT P2 FOCUS**
 
 **Priority 3: Stability & Maintainability** (It stays working) - Timeline modernization complete ✅, focus on UI implementation and test reliability
 - 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED TASK** **P3 PRIORITY**
@@ -67,7 +66,7 @@
 
 **Priority 6: Documentation & Polish** (Make it complete)
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (2-3 hours) - **CONSOLIDATED TASK**
-  - Remove legacy configuration files and unused configs/duplicates (DOC-026)
+  - Remove legacy configuration files and unused configs/duplicates (DOC-026) - ✅ requirements.txt COMPLETE, .flake8 remaining
   - Consolidate environment templates from 3 to 2 variants (DOC-027)
   - Merge scattered README setup instructions (DOC-028)
   - Clean TECHNICAL.md obsolete route architecture content (DOC-023)
@@ -88,7 +87,7 @@
 
 **P0**: ✅ All critical bugs resolved - No active functionality regressions
 **P1**: ✅ ALL COMPLETE - Testing & App Reliability milestone achieved, 100% test success rate
-**P2**: 🎯 CURRENT FOCUS - Deployment & Operations (INFRA-021 Environment Parity next)
+**P2**: 🎯 CURRENT FOCUS - Deployment & Operations (INFRA-018 Config Test next, INFRA-021 Environment Parity ✅ COMPLETE)
 **P3**: 🎯 Ready - UI Standardization consolidation and type sync resolution
 **P4**: Ready - Core functionality improvements and bug fixes
 **P5**: Ready - DevOps and developer experience enhancements
@@ -97,13 +96,12 @@
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-1. **[INFRA-021] Environment Parity Enforcement** (4-6 hours) - P2 - Pin Python versions across dev/test/prod **CURRENT P2 FOCUS**
-2. **[INFRA-018] CHPP Config Test Reliability** (45-60 min) - P2 - Fix configuration test environment isolation
-3. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-4. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
-5. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprints
+1. **[INFRA-018] CHPP Config Test Reliability** (45-60 min) - P2 - Fix configuration test environment isolation **CURRENT P2 FOCUS**
+2. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
+3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
+4. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprints
 
-**Next Action**: INFRA-021 (4-6 hours) to achieve P2 Deployment & Operations milestone.
+**Next Action**: INFRA-018 (45-60 min) to complete P2 Deployment & Operations milestone.
 
 ---
 
@@ -1697,33 +1695,6 @@ Recent blueprint migration created new code organization but test coverage dropp
 **Expected Outcomes**: Increased confidence in blueprint architecture and utility functions, prevention of regressions, achievement of coverage targets, validated shared code reliability
 
 **Note**: This task consolidates TEST-004 (Blueprint Coverage) and TEST-005 (Utils Coverage) as they share common testing infrastructure and can be executed efficiently together.
-
----
-
-### [SIMPLIFY-002] Remove Legacy Configuration Files
-**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P6 | **Impact**: Reduced repository clutter
-**Dependencies**: None | **Strategic Value**: Clean repository, reduced confusion
-
-**Problem Statement**:
-Legacy configuration files create confusion about current tooling and add unnecessary repository bloat.
-
-**Implementation**:
-1. **Remove Unused Files** (15 min):
-   - Delete configs/.flake8 (project uses ruff now)
-   - Delete configs/requirements.txt (project uses UV + pyproject.toml)
-   - Delete configs/index.html if confirmed unused
-
-2. **Update Documentation** (15 min):
-   - Remove references to deleted files in configs/README.md
-   - Update setup instructions to reflect current tooling
-
-**Acceptance Criteria**:
-- Legacy configuration files removed
-- No broken references in documentation
-- Repository size reduced
-- Current tooling clearly documented
-
-**Expected Outcomes**: Cleaner repository, reduced confusion about current vs legacy tooling
 
 ---
 

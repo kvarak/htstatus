@@ -33,6 +33,7 @@
       "what to do": [
         "Read .project/rules.md, .project/ docs for context. Use `make help` and `uv run`.",
         "Take holistic view: consolidate, eliminate duplication, reduce waste.",
+        "Scout mindset: Do not be afrard to take a step back and fix fix more than in the task",
         "Structure: # Plan ## Analysis ## Solution ## Steps ## Testing",
         "Break large tasks into sub-tasks. Simplify ruthlessly.",
         "Do not code in this step."
@@ -43,7 +44,7 @@
       "title": "Execute the planned development task",
       "what to do": [
         "Read .project/rules.md, .project/ docs. Use `uv run` and `make help`.",
-        "Follow plan. Scout mindset: fix lint errors, cleanup nearby code, remove waste while working.",
+        "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working.",
         "Actively simplify: consolidate, eliminate duplication, reduce complexity.",
         "Test: `make test-all` - no coverage loss or failures.",
         "UI: Use ui_guidelines colors/typography. Flask: .btn-primary-custom classes. React: existing components.",
