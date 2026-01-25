@@ -29,20 +29,23 @@
 **Priority 0: Critical Bugs** (Functionality regressions)
 - No active P0 critical bugs - excellent stability ✅ ALL P0 BUGS RESOLVED
 
-**Priority 1: Testing & App Reliability** - ✅ ALL P1 TASKS COMPLETE
-- ✅ ALL TESTING INFRASTRUCTURE COMPLETE - Zero active P1 tasks, 100% test success rate (193/193), comprehensive reliability achieved
+**Priority 1: Testing & App Reliability** - ⚠️ BLOCKED BY P3 ISSUES
+- ⚠️ Testing infrastructure partially complete, 7/9 quality gates passing, 25 database test failures blocking full reliability (TEST-016)
 
-**Priority 2: Deployment & Operations** - 🎯 CURRENT FOCUS
-- 🎯 [INFRA-018] CHPP Config Test Reliability (45-60 min) - Fix configuration test environment isolation issues **CURRENT P2 FOCUS**
+**Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE
+- ✅ [INFRA-018] CHPP Config Test Reliability - **COMPLETED** - Environment isolation issues resolved through test simplification ✅ (January 25, 2026)
+- ✅ [INFRA-021] Environment Parity Enforcement - **COMPLETED** - Python version standardization, legacy file cleanup, deployment consistency ✅ (January 24, 2026)
 
-**Priority 3: Stability & Maintainability** (It stays working) - Timeline modernization complete ✅, focus on UI implementation and test reliability
-- 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED TASK** **P3 PRIORITY**
+**Priority 3: Stability & Maintainability** (It stays working) - 🎯 CURRENT FOCUS
+- 🎯 [TEST-016] Fix Database Test Infrastructure (1-2 hours) - **NEW P3 CRITICAL** - Fix PostgreSQL test database table creation causing 25 test failures **BLOCKING**
+- 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - **ELEVATED FROM P7** - Fix 4 CVE vulnerabilities in dependencies **NEW P3 PRIORITY**
+- 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **HIGH PRIORITY SIMPLIFICATION**
+- 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED TASK**
   - Apply unified design system to Flask templates and React components (UI-008: 8-12 hours)
   - Document Content-in-Boxes pattern references and link from ui-design-guidelines.md (UI-009: 1-2 hours)
   - Apply UI guidelines to core pages: Players, training, stats, settings (UI-010: 4-6 hours)
   - **Value**: Unified UI implementation sprint vs scattered individual tasks **SIMPLIFICATION**
 - 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE**
-- 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript, consolidate nullability patterns, resolve mismatches **HIGH PRIORITY SIMPLIFICATION**
 - 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
@@ -75,7 +78,7 @@
   - **Value**: Single focused cleanup session vs 6 separate tasks **SIMPLIFICATION**
 
 **Priority 7: Potential Future Improvements**
-- 🔮 [INFRA-024] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ + werkzeug 3.1+ (2-3 hours) - Re-attempt library upgrades now that team ID bug is fixed
+- 🔮 [INFRA-024] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ (2-3 hours) - Re-attempt library upgrades (Note: werkzeug 3.1+ covered by SECURITY-001)
 - 🔮 [FEAT-010] Collaborative League Intelligence (40-60 hours) - Multiplayer league-wide platform for shared scouting and collective tactical analysis
 - 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
 - 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
@@ -86,9 +89,9 @@
 ## ✅ All Priority Levels Summary
 
 **P0**: ✅ All critical bugs resolved - No active functionality regressions
-**P1**: ✅ ALL COMPLETE - Testing & App Reliability milestone achieved, 100% test success rate
-**P2**: 🎯 CURRENT FOCUS - Deployment & Operations (INFRA-018 Config Test next, INFRA-021 Environment Parity ✅ COMPLETE)
-**P3**: 🎯 Ready - UI Standardization consolidation and type sync resolution
+**P1**: ⚠️ BLOCKED - Testing infrastructure incomplete due to P3 database issues (TEST-016)
+**P2**: ✅ MILESTONE COMPLETE - Deployment & Operations infrastructure stable (INFRA-018 ✅ COMPLETE, INFRA-021 ✅ COMPLETE)
+**P3**: 🎯 CURRENT FOCUS - Critical database issues (TEST-016), security updates (SECURITY-001), type sync resolution
 **P4**: Ready - Core functionality improvements and bug fixes
 **P5**: Ready - DevOps and developer experience enhancements
 **P6**: Ready - Documentation cleanup consolidation and new content
@@ -96,12 +99,12 @@
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-1. **[INFRA-018] CHPP Config Test Reliability** (45-60 min) - P2 - Fix configuration test environment isolation **CURRENT P2 FOCUS**
-2. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
-4. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprints
+1. **[TEST-016] Fix Database Test Infrastructure** (1-2 hours) - P3 - Fix PostgreSQL test table creation **BLOCKING 25 TESTS**
+2. **[SECURITY-001] Werkzeug Security Update** (30-45 min) - P3 - Fix 4 CVE vulnerabilities **NEW P3 PRIORITY**
+3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues **HIGH PRIORITY**
+4. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
 
-**Next Action**: INFRA-018 (45-60 min) to complete P2 Deployment & Operations milestone.
+**Next Action**: TEST-016 (1-2 hours) to restore testing confidence, then SECURITY-001 for CVE fixes.
 
 ---
 
