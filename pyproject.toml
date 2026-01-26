@@ -33,9 +33,10 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "sqlalchemy==2.0.32",
     "flask>=2.3.0,<4.0.0",
-    "werkzeug>=2.2.2,<4.0.0",
-    "pychpp==0.3.12",
+    "werkzeug>=3.1.5,<4.0.0",
+    "pychpp==0.5.10",
     "psycopg2-binary>=2.9.0",
+    "urllib3>=2.6.3",
 ]
 
 [project.optional-dependencies]

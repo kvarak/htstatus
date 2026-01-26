@@ -234,11 +234,9 @@ typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
 		exit 1; \
 	fi
 
-security: check-uv ## Run bandit and safety security checks
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@echo "🔒 Running security checks..."
-	@echo ""
-	@echo "📋 Bandit Code Security Analysis:"
+security-bandit: check-uv ## Run bandit code security analysis
+	@mkdir -p out/tests
+	@echo "🔒 Running bandit code security analysis..."
 	@$(UV) run bandit -r app/ -c .bandit -f json 2>&1 | tee /tmp/bandit-results.json || $(UV) run bandit -r app/ -c .bandit 2>&1 | tee /tmp/bandit-results.txt || true
 	@bandit_status="CLEAN"; \
 	if [ -f /tmp/bandit-results.json ]; then \
@@ -247,25 +245,42 @@ security: check-uv ## Run bandit and safety security checks
 			echo "✅ No code security issues found"; \
 			bandit_status="CLEAN"; \
 		else \
-			echo "⚠️  $$bandit_issues code security issue(s) found (run 'make security' for details)"; \
+			echo "⚠️  $$bandit_issues code security issue(s) found (run 'make security-bandit' for details)"; \
 			bandit_status="$$bandit_issues ISSUE(S)"; \
 		fi; \
 	fi; \
-	echo ""; \
-	echo "📋 Safety CVE Vulnerability Analysis:"; \
-	cve_status="NONE"; \
-	if $(UV) run safety scan --output json --disable-optional-telemetry 2>/dev/null | tee /tmp/safety-results.json | jq -r 'if .scan_results.vulnerabilities | length == 0 then "✅ No CVE vulnerabilities in dependencies" else "⚠️  " + (.scan_results.vulnerabilities | length | tostring) + " CVE vulnerability/vulnerabilities found in dependencies" end' 2>/dev/null; then \
-		cve_count=$$(jq -r '.scan_results.vulnerabilities | length' /tmp/safety-results.json 2>/dev/null || echo "0"); \
-		if [ "$$cve_count" = "0" ]; then \
-			cve_status="NONE"; \
-		else \
-			cve_status="$$cve_count FOUND"; \
-		fi; \
+	scripts/qi-json.sh out/tests/security-bandit.json "Bandit Code Analysis" "make security-bandit" PASSED 0 0 "bandit analysis complete" "code security validation" bandit="$$bandit_status"
+
+security-deps: check-uv ## Run safety dependency vulnerability analysis
+	@mkdir -p out/tests
+	@echo "🔒 Running dependency vulnerability analysis..."
+	@if $(UV) run safety scan --short-report 2>&1 | tee /tmp/safety-results.txt; then \
+		safety_exit_code=0; \
 	else \
-		echo "⚠️  Safety scan failed, falling back to basic scan"; \
-		$(UV) run safety scan; \
+		safety_exit_code=$$?; \
 	fi; \
-	scripts/qi-json.sh out/tests/$@.json "Security Analysis" "make security" PASSED 0 0 "security analysis complete" "comprehensive security validation" cve="$$cve_status" bandit="$$bandit_status"
+	total_cves=$$(grep -o "[0-9]* vulnerabilities found" /tmp/safety-results.txt | tail -1 | grep -o "[0-9]*" || echo "0"); \
+	ignored_cves=$$(grep -o "[0-9]* ignored due to policy" /tmp/safety-results.txt | head -1 | grep -o "[0-9]*" || echo "0"); \
+	active_cves=$$(( total_cves - ignored_cves )); \
+	cve_status="NONE"; \
+	deps_result="PASSED"; \
+	if [ "$$total_cves" = "0" ]; then \
+		echo "✅ No CVE vulnerabilities in dependencies"; \
+		cve_status="NONE"; \
+	elif [ "$$active_cves" = "0" ] && [ "$$total_cves" != "0" ]; then \
+		echo "⚠️  $$total_cves CVE vulnerability(s) found but all ignored by policy"; \
+		cve_status="$$total_cves IGNORED"; \
+		deps_result="ISSUES"; \
+	elif [ "$$ignored_cves" != "0" ]; then \
+		echo "❌ $$active_cves active CVE vulnerability(s) found ($$ignored_cves ignored)"; \
+		cve_status="$$active_cves ACTIVE, $$ignored_cves IGNORED"; \
+		deps_result="FAILED"; \
+	else \
+		echo "❌ $$total_cves CVE vulnerability(s) found"; \
+		cve_status="$$total_cves FOUND"; \
+		deps_result="FAILED"; \
+	fi; \
+	scripts/qi-json.sh out/tests/security-deps.json "Dependency Analysis" "make security-deps" $$deps_result $$ignored_cves $$active_cves "dependency analysis complete" "CVE vulnerability validation" cve="$$cve_status"
 
 test-single: check-uv services ## 🧪 Run a single test file (usage: make test-single FILE=tests/test_database.py)
 	@test -n "$(FILE)" || { echo "❌ Usage: make test-single FILE=tests/test_something.py"; exit 1; }
@@ -321,7 +336,7 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 		exit 1; \
 	fi
 
-GATES = fileformat lint security typesync test-coverage-files
+GATES = fileformat lint security-bandit security-deps typesync test-coverage-files
 
 test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesync, tests)
 	@echo "🚀 Running complete quality gate validation"
