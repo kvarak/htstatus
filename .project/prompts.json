@@ -44,8 +44,8 @@
       "title": "Execute the planned development task",
       "what to do": [
         "Read .project/rules.md, .project/ docs. Use `uv run` and `make help`.",
-        "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working.",
-        "Actively simplify: consolidate, eliminate duplication, reduce complexity.",
+        "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working, don't settle for the same code coverage but strive to improve it.",
+        "Apply simplification hierarchy: Holistic view >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Test: `make test-all` - no coverage loss or failures.",
         "UI: Use ui_guidelines colors/typography. Flask: .btn-primary-custom classes. React: existing components.",
         "Update docs. Note new tasks for backlog. Break large tasks into sub-tasks.",
@@ -74,6 +74,7 @@
         "Eliminate redundant tasks. Merge overlapping work.",
         "Unblock dependencies. Update docs to reflect current state.",
         "Aggressively remove complete and outdated content.",
+        "Important: Search for completed tasks and delete them from the backlog. The backlog should be clean from historical tasks.",
         "Do not commit code."
       ]
     },
