@@ -28,7 +28,12 @@
 
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 
-**Priority 1: Testing & App Reliability** - ✅ EXCELLENT - Testing infrastructure complete, 19/22 quality gates passing (86% success), coverage contexts operational
+**Priority 1: Testing & App Reliability** - 🎯 ACTIVE - Custom CHPP client development in progress (3 incremental tasks: 2 complete, 1 pending)
+- ✅ [TEST-016] CHPP API Research & Documentation (3.5 hours) - **COMPLETE Jan 26, 2026** Research findings, XML capture script, reference implementation analysis
+- ✅ [REFACTOR-016] Design & Implement Custom CHPP Client (2 hours) - **COMPLETE Jan 26, 2026** Module structure created (7 files), OAuth/parsers/models/client implemented, architecture documented
+- 🎯 [TEST-017] Custom CHPP Client Test Suite (2-3 hours) - **NEXT TASK** Unit tests for OAuth, parsers, models, integration tests **READY TO EXECUTE**
+- 🎯 [INFRA-025] Deploy Custom CHPP with Feature Flag (1-2 hours) - Add USE_CUSTOM_CHPP flag, side-by-side validation **DEPENDENCIES: TEST-017**
+- 🎯 [INFRA-026] Finalize Custom CHPP Migration (1 hour) - Remove pychpp dependency, cleanup, production deployment **DEPENDENCIES: INFRA-025**
 
 **Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE
 
@@ -91,23 +96,360 @@
 ## ✅ All Priority Levels Summary
 
 **P0**: ✅ COMPLETE - All critical bugs resolved, no active functionality regressions
-**P1**: ✅ COMPLETE - Testing infrastructure operational (19/22 quality gates passing)
+**P1**: 🎯 ACTIVE - Custom CHPP client development (3 tasks: 2 complete → TEST-017 next), testing infrastructure operational (19/24 gates)
 **P2**: ✅ MILESTONE COMPLETE - Deployment & Operations infrastructure stable (INFRA-018 ✅ COMPLETE, INFRA-021 ✅ COMPLETE)
 **P3**: 🎯 CURRENT FOCUS - Type sync resolution (85 failures), security updates (SECURITY-001), blueprint auth test fix
 **P4**: Ready - Core functionality improvements and bug fixes
 **P5**: Ready - DevOps and developer experience enhancements
 **P6**: Ready - Documentation cleanup consolidation and new content
-**P7**: Future - Strategic improvements and major features
+**P7**: Future - Strategic improvements and major features (REFACTOR-004 parent task archived, replaced by P1 increments)
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-1. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns **NEW PRIORITY**
-2. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling **NEW**
-3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues **HIGH PRIORITY**
+**Priority 1: Custom CHPP Client Development** (3 incremental tasks, 6-8 hours total):
+1. **[TEST-016] CHPP API Research** ✅ COMPLETE (3.5 hours) - OAuth flow documented, XML schemas analyzed, pychpp patterns extracted
+2. **[REFACTOR-016] Design & Implement CHPP Client** ✅ COMPLETE (2 hours) - 7 modules created (auth, parsers, models, client, exceptions, constants, __init__), architecture documented
+3. **[TEST-017] CHPP Test Suite** (2-3 hours) - P1 - Comprehensive validation **START HERE - NEXT TASK**
+4. **[INFRA-025] Deploy with Feature Flag** (1-2 hours) - P1 - Safe rollout
+5. **[INFRA-026] Finalize Migration** (1 hour) - P1 - Remove pychpp dependency
+
+**Priority 3: Stability Tasks** (Alternative to P1 CHPP work):
+1. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns
+2. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling
+3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
 4. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
 5. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
 
-**Next Action**: REFACTOR-012 CHPP utilities consolidation (2-3 hours) to reduce duplication, then TEST-014 to restore 100% test pass rate.
+**Next Action**: Choose between P1 custom CHPP development (TEST-016 research phase) or P3 stability work (REFACTOR-012 consolidation). P1 tasks are incremental and independently releasable.
+
+---
+
+## Priority 1: Testing & App Reliability - Custom CHPP Client Development
+- Unit tests passing with >90% coverage
+- No actual CHPP API calls in unit tests (mocked)
+- Code follows project standards (ruff, mypy)
+
+**Releasability**: Can be merged without affecting existing pychpp usage. Sets foundation for REFACTOR-020 integration.
+
+**Expected Outcomes**: Working OAuth implementation, validated authentication flow, foundation for authenticated CHPP requests
+
+---
+
+### [REFACTOR-018] Implement Custom CHPP XML Parsers
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Data transformation foundation
+**Dependencies**: REFACTOR-016 (Architecture Design) | **Strategic Value**: YouthTeamId fix, clean data extraction
+
+**Problem Statement**:
+Implement XML parsing logic as second independent component. This transforms CHPP XML responses into Python data structures and fixes the YouthTeamId bug at source.
+
+**Implementation**:
+1. **Create Parser Module** (1.5-2 hours):
+   - Implement `app/chpp/parsers.py` with parsing functions
+   - Function: `parse_user(xml_root)` → extracts ht_id, username, team_ids (handles missing YouthTeamId gracefully)
+   - Function: `parse_team(xml_root)` → extracts team_id, name, short_name
+   - Function: `parse_players(xml_root)` → extracts player list with all 7 skills + metadata
+   - Use `xml.etree.ElementTree` for XPath queries
+   - Helper: `safe_find_text(node, xpath, default=None)` for optional fields
+   - Add data type conversions (string → int, bool, datetime)
+
+2. **YouthTeamId Fix Implementation** (15 min):
+   - Make YouthTeamId field optional in `parse_user()`
+   - Pattern: `youth_team_id = safe_find_text(root, ".//YouthTeamId", default=None)`
+   - Remove need for try/except workarounds in application code
+
+3. **Unit Tests with Real XML** (45 min-1 hour):
+   - Create `tests/test_chpp_parsers.py`
+   - Use XML samples from TEST-016 research in `app/chpp/test_data/`
+   - Test `parse_user()` with and without YouthTeamId
+   - Test `parse_team()` with various team data
+   - Test `parse_players()` with full player dataset
+   - Test edge cases: missing fields, null values, malformed XML
+
+**Deliverables**:
+- `app/chpp/parsers.py` with parsing functions
+- `tests/test_chpp_parsers.py` with real XML fixtures
+- YouthTeamId bug fix validated
+
+**Acceptance Criteria**:
+- All 3 parser functions implemented (user, team, players)
+- YouthTeamId handled as optional field (no exceptions)
+- Data type conversions working correctly
+- Edge cases handled gracefully (missing/null values)
+- Unit tests passing with >90% coverage
+- Tests use real XML samples from research phase
+- No external API calls required for testing
+- Code follows project standards
+
+**Releasability**: Can be merged independently. Parsers don't affect existing pychpp usage until integrated in REFACTOR-020.
+
+**Expected Outcomes**: Robust XML parsing, YouthTeamId bug eliminated, validated data transformation, foundation for REFACTOR-019 data models
+
+---
+
+### [REFACTOR-019] Implement Custom CHPP Data Models
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Interface compatibility
+**Dependencies**: REFACTOR-018 (XML Parsers) | **Strategic Value**: Zero breaking changes, pychpp interface match
+
+**Problem Statement**:
+Implement data model classes that exactly match pychpp interface, ensuring drop-in replacement compatibility. These models wrap parsed data and provide the same attributes and methods as pychpp objects.
+
+**Implementation**:
+1. **Create Model Classes** (1-1.5 hours):
+   - Implement `app/chpp/models.py` with data classes
+   - Class: `CHPPUser` with attributes: `ht_id`, `username`, `_teams_ht_id`, `_SOURCE_FILE`
+   - Class: `CHPPTeam` with attributes: `team_id`, `name`, `short_team_name`, `_players`, method: `players()`
+   - Class: `CHPPPlayer` with all skill attributes: `keeper`, `defender`, `playmaker`, `winger`, `passing`, `scorer`, `set_pieces`, plus `experience`, `form`, `stamina`, `loyalty`
+   - Add `__getitem__` for dict-like access (backward compatibility)
+   - Use dataclasses or simple classes matching pychpp patterns
+
+2. **Integration with Parsers** (15-30 min):
+   - Update parser functions to return model instances
+   - `parse_user()` returns `CHPPUser` object
+   - `parse_team()` returns `CHPPTeam` object
+   - `parse_players()` returns list of `CHPPPlayer` objects
+
+3. **Unit Tests** (15-30 min):
+   - Create `tests/test_chpp_models.py`
+   - Test model instantiation with parsed data
+   - Test attribute access patterns
+   - Test dict-like access (`player['scorer']` works)
+   - Test `team.players()` method returns list
+   - Validate interface matches pychpp exactly
+
+**Deliverables**:
+- `app/chpp/models.py` with 3 data model classes
+- `tests/test_chpp_models.py` with interface validation
+- Updated parsers returning model instances
+
+**Acceptance Criteria**:
+- All 3 model classes implemented matching pychpp interface
+- Attribute names identical to pychpp (ht_id, _teams_ht_id, etc.)
+- Dict-like access supported for backward compatibility
+- `team.players()` method works identically to pychpp
+- Unit tests passing validating interface match
+- No breaking changes from pychpp interface
+- Code follows project standards
+
+**Releasability**: Can be merged independently. Models tested separately before REFACTOR-020 integration.
+
+**Expected Outcomes**: Interface-compatible models, zero breaking changes guaranteed, foundation for REFACTOR-020 client integration
+
+---
+
+### [REFACTOR-020] Integrate Custom CHPP Client
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Complete custom CHPP implementation
+**Dependencies**: REFACTOR-017 (OAuth), REFACTOR-019 (Models) | **Strategic Value**: Full custom client, pychpp replacement ready
+
+**Problem Statement**:
+Integrate OAuth (REFACTOR-017), parsers (REFACTOR-018), and models (REFACTOR-019) into unified CHPP client class matching pychpp interface exactly. This completes the custom implementation.
+
+**Implementation**:
+1. **Create CHPP Client Class** (1.5-2 hours):
+   - Implement `app/chpp/client.py` with main `CHPP` class
+   - Method: `__init__(consumer_key, consumer_secret, access_key=None, access_secret=None)` → stores credentials, initializes OAuth session
+   - Method: `get_auth(callback_url, scope="")` → calls auth.get_request_token(), returns formatted dict
+   - Method: `get_access_token(request_token, request_secret, verifier)` → calls auth.get_access_token(), returns {key, secret}
+   - Method: `request(file, version, **params)` → makes authenticated CHPP API request, returns parsed XML ElementTree
+   - Method: `user()` → calls request("managercompendium", "1.6"), parses with parse_user(), returns CHPPUser
+   - Method: `team(ht_id)` → calls request("teamdetails", version), parses with parse_team(), returns CHPPTeam
+   - Add error handling wrapping all calls with CHPPAPIError
+
+2. **Public API Export** (15 min):
+   - Update `app/chpp/__init__.py`:
+   - Export `CHPP` class
+   - Export exceptions: `CHPPAuthError`, `CHPPAPIError`
+   - Add `__version__ = "1.0.0"`
+
+3. **Integration Tests** (30-45 min):
+   - Create `tests/test_chpp_client_integration.py`
+   - Test full OAuth flow (mocked)
+   - Test `user()` returns CHPPUser with correct data
+   - Test `team()` returns CHPPTeam with correct data
+   - Test error handling (network failures, auth failures)
+   - Validate interface matches pychpp exactly
+
+**Deliverables**:
+- `app/chpp/client.py` with unified CHPP class
+- `app/chpp/__init__.py` exporting public API
+- `tests/test_chpp_client_integration.py` validating full client
+
+### [TEST-017] Custom CHPP Client Test Suite
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P1 | **Impact**: Quality assurance, regression prevention
+**Dependencies**: REFACTOR-016 (Complete) | **Strategic Value**: Confidence for production deployment, comprehensive validation
+
+**Problem Statement**:
+Validate custom CHPP client against all requirements: unit tests for components, integration tests with mocked API, compatibility tests against existing test suite, optional real API validation.
+
+**Implementation**:
+1. **Comprehensive Unit Test Review** (30-45 min):
+   - Verify all component tests for app/chpp/ module
+   - Ensure >90% coverage for `app/chpp/` module
+   - Add missing edge case tests
+   - Validate error handling coverage
+
+2. **Compatibility Testing** (1-1.5 hours):
+   - Update `tests/mock_chpp.py` to support custom CHPP client
+   - Create `MockCustomCHPP` class if needed
+   - Run existing test suite with custom client imported (without feature flag)
+   - Verify test_blueprint_auth.py passes unchanged
+   - Verify test_blueprint_team.py passes unchanged
+   - Verify test_chpp_integration.py passes unchanged
+   - Fix any interface mismatches discovered
+
+3. **Real API Integration Tests** (30-45 min):
+   - Create `tests/test_chpp_real_api.py` (gated by env var)
+   - Test OAuth flow with real Hattrick CHPP API
+   - Test `user()` with real API (validate data structure)
+   - Test `team()` with real API
+   - Compare responses with pychpp (data equivalence validation)
+   - Only runs when `TEST_REAL_CHPP_API=true`
+
+**Deliverables**:
+- Complete test suite for `app/chpp/` module
+- Updated `tests/mock_chpp.py` supporting custom client
+- Real API integration tests (optional, gated)
+- Test coverage report showing >90% for custom client
+
+**Acceptance Criteria**:
+- All unit tests passing for auth, parsers, models, client
+- Test coverage >90% for `app/chpp/` module
+- Existing test suite passes with custom client
+- No behavioral differences detected vs pychpp
+- Real API tests pass when enabled (validates against production)
+- Mock strategy proven simpler than pychpp mocking
+- All tests follow project standards
+- `make test-all` passes completely
+
+**Releasability**: Validates custom client ready for production deployment via INFRA-025 feature flag.
+
+**Expected Outcomes**: High confidence in custom CHPP client quality, regression prevention, validated pychpp replacement
+
+---
+
+### [INFRA-025] Deploy Custom CHPP with Feature Flag
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Safe production rollout
+**Dependencies**: TEST-017 (Test Suite) | **Strategic Value**: Risk mitigation, instant rollback capability
+
+**Problem Statement**:
+Deploy custom CHPP client to production with feature flag enabling side-by-side validation and instant rollback if issues arise. This de-risks the migration by allowing gradual validation.
+
+**Implementation**:
+1. **Feature Flag Setup** (30 min):
+   - Add to `config.py`: `USE_CUSTOM_CHPP = os.getenv('USE_CUSTOM_CHPP', 'false').lower() == 'true'`
+   - Update `app/blueprints/auth.py`:
+     ```python
+     if app.config.get('USE_CUSTOM_CHPP'):
+         from app.chpp import CHPP
+     else:
+         from pychpp import CHPP
+     ```
+   - Update `app/blueprints/team.py` (same pattern)
+   - Update any other files importing pychpp
+
+2. **Development Validation** (30-45 min):
+   - Set `USE_CUSTOM_CHPP=true` in local `.env`
+   - Run `make dev` and test full application flow
+   - Test OAuth login with custom client
+   - Test `/update` route (player data fetch)
+   - Test team switching functionality
+   - Compare behavior with pychpp (set USE_CUSTOM_CHPP=false)
+   - Monitor logs for errors or warnings
+
+3. **Staging Deployment** (15-30 min):
+   - Deploy to staging with `USE_CUSTOM_CHPP=false` (default)
+   - Verify staging works with pychpp
+   - Toggle to `USE_CUSTOM_CHPP=true`
+   - Run full regression test suite
+   - Monitor application logs and error rates
+   - Test with multiple user accounts
+
+**Deliverables**:
+- Feature flag implemented in config and all import locations
+- Documentation in TECHNICAL.md explaining feature flag usage
+- Validated deployment to staging
+- Rollback procedure documented
+
+**Acceptance Criteria**:
+- Feature flag working correctly (toggles between pychpp and custom client)
+- All routes functional with `USE_CUSTOM_CHPP=true`
+- OAuth flow works identically to pychpp
+- Player data updates work correctly
+- No errors in logs during testing
+- Performance comparable to pychpp
+- Staging deployment successful
+- Rollback tested (toggle flag back to false)
+- `make test-all` passes with both flag settings
+
+**Releasability**: Deploys custom CHPP to production (disabled by default), ready for gradual rollout and final migration in INFRA-026.
+
+**Expected Outcomes**: Safe production deployment, validated functionality, confidence for final migration, instant rollback available if needed
+
+---
+
+### [INFRA-026] Finalize Custom CHPP Migration
+**Status**: 🎯 Ready to Execute | **Effort**: 1 hour | **Priority**: P1 | **Impact**: Dependency elimination, migration complete
+**Dependencies**: INFRA-025 (Feature Flag Deployment), 1-2 weeks production monitoring | **Strategic Value**: Long-term independence, custom optimization capability
+
+**Problem Statement**:
+After successful validation in production with feature flag (1-2 weeks monitoring), finalize migration by removing pychpp dependency and feature flag, completing the transition to custom CHPP client.
+
+**Implementation**:
+1. **Production Validation** (outside this task - 1-2 weeks):
+   - Monitor production with `USE_CUSTOM_CHPP=true` for 1-2 weeks
+   - Track error rates, performance metrics, user reports
+   - Validate OAuth success rates match pychpp baseline
+   - Confirm no YouthTeamId workaround needed
+   - Decision point: Proceed with finalization if metrics good
+
+2. **Remove Feature Flag** (15-20 min):
+   - Remove `USE_CUSTOM_CHPP` config variable
+   - Remove conditional imports from auth.py, team.py
+   - Hardcode custom CHPP import: `from app.chpp import CHPP`
+   - Clean up any flag-related comments
+
+3. **Remove pychpp Dependency** (10 min):
+   - Remove `pychpp==0.5.10` from `pyproject.toml` dependencies
+   - Run `uv sync` to update lockfile
+   - Keep `requests-oauthlib` (still used by custom client)
+   - Verify no stray pychpp references: `grep -r "from pychpp\|import pychpp"`
+
+4. **Documentation Updates** (20-30 min):
+   - Update TECHNICAL.md: Remove pychpp references, document custom CHPP client
+   - Update `.github/copilot-instructions.md`: Change to custom client patterns
+   - Update `app/chpp/README.md` if needed
+   - Remove YouthTeamId workaround notes from code comments
+   - Update architecture docs
+
+5. **Final Validation** (10 min):
+   - Run `make test-all` one final time
+   - Verify all 19/22+ quality gates still passing
+   - Deploy to production
+   - Monitor for 24 hours post-deployment
+
+**Deliverables**:
+- Feature flag and conditional imports removed
+- pychpp dependency removed from pyproject.toml
+- Documentation updated throughout
+- Git commit: "Complete migration to custom CHPP client"
+
+**Acceptance Criteria**:
+- No pychpp imports remaining in codebase
+- pychpp removed from dependencies
+- Feature flag logic removed
+- All routes using custom CHPP client only
+- Documentation updated (TECHNICAL.md, copilot-instructions.md)
+- `make test-all` passes (19/22+ gates)
+- Production deployment successful
+- No regressions detected post-deployment
+- YouthTeamId bug confirmed fixed (no workarounds)
+
+**Rollback Plan** (if needed):
+- Revert commit restores pychpp
+- Add back to pyproject.toml, run `uv sync`
+- Restore conditional imports with flag
+- Should only be needed if critical issues found
+
+**Expected Outcomes**: Complete migration to custom CHPP client, pychpp dependency eliminated, long-term independence achieved, YouthTeamId bug permanently fixed
 
 ---
 
@@ -1806,11 +2148,24 @@ Stats page was designed to display team trophies and achievements, but current p
 
 ---
 
-### [REFACTOR-004] Replace pyCHPP Dependency
-**Status**: 🔮 Research & Planning | **Effort**: 16-24 hours | **Priority**: P7 Future
-**Dependencies**: CHPP API documentation research, REFACTOR-001 completion | **Strategic Value**: Long-term dependency independence, custom optimization
+### [REFACTOR-004] Replace pyCHPP Dependency (ARCHIVED - Replaced by P1 Incremental Tasks)
+**Status**: 📦 ARCHIVED - Superseded by 9 incremental P1 tasks | **Effort**: 16-24 hours total | **Priority**: P7 → P1 (Promoted)
+**Dependencies**: See P1 task chain (TEST-016 → INFRA-026) | **Strategic Value**: Long-term dependency independence, custom optimization
 
-**Problem Statement**:
+**⚠️ NOTE**: This parent task has been broken down into 9 smaller, releasable increments in Priority 1:
+1. **TEST-016**: CHPP API Research & Documentation (3-4 hours)
+2. **REFACTOR-016**: Design Custom CHPP Client Architecture (2-3 hours)
+3. **REFACTOR-017**: Implement Custom CHPP OAuth Flow (2-3 hours)
+4. **REFACTOR-018**: Implement Custom CHPP XML Parsers (2-3 hours)
+5. **REFACTOR-019**: Implement Custom CHPP Data Models (1-2 hours)
+6. **REFACTOR-020**: Integrate Custom CHPP Client (2-3 hours)
+7. **TEST-017**: Custom CHPP Client Test Suite (2-3 hours)
+8. **INFRA-025**: Deploy Custom CHPP with Feature Flag (1-2 hours)
+9. **INFRA-026**: Finalize Custom CHPP Migration (1 hour)
+
+**Execute P1 tasks instead of this archived task.** See detailed plan in `.project/plans/refactor-004-replace-pychpp.md`.
+
+**Original Problem Statement**:
 The application currently depends on the third-party `pychpp` library for Hattrick CHPP API integration. This creates several maintenance and control issues:
 - External dependency maintenance burden and update compatibility
 - Limited control over API interaction patterns and error handling

@@ -76,6 +76,7 @@
         "Unblock dependencies. Update docs to reflect current state.",
         "Aggressively remove complete and outdated content.",
         "Important: Search for completed tasks and delete them from the backlog. The backlog should be clean from historical tasks.",
+        "All plans in .project/plans/ that are completed should be removed from there as well.",
         "Do not commit code."
       ]
     },
