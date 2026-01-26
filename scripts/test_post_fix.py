@@ -32,7 +32,7 @@ def test_post_method():
         print("  export CHPP_ACCESS_SECRET='your_secret'")
         return False
 
-    print(f"\n✓ Found OAuth tokens")
+    print("\n✓ Found OAuth tokens")
 
     # Test with custom CHPP
     try:
