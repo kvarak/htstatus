@@ -27,6 +27,7 @@ def setup_training_blueprint(db_instance, trace_cols):
 @require_authentication
 def training():
     """Display player training progression and skill development."""
+    from models import Players  # Import here to avoid circular dependencies
 
     teamid = request.values.get("id")
 
