@@ -70,6 +70,14 @@ def initialize_routes(app, _db_instance):
     print("DEBUG: initialize_routes - Complete")
     debug_level = app.config.get("DEBUG_LEVEL", 1)
 
+    # Display feature flag status
+    use_custom_chpp = app.config.get("USE_CUSTOM_CHPP", False)
+    chpp_status = "✅ Using Custom CHPP Client (app.chpp)" if use_custom_chpp else "✅ Using pychpp Client"
+    print(f"\n{'='*60}")
+    print(f"Feature Flag Status:")
+    print(f"  {chpp_status}")
+    print(f"{'='*60}\n")
+
 
 # Module constants
 default_group_order = 99

@@ -1,11 +1,17 @@
 """Authentication routes blueprint for HT Status application."""
 
-from flask import Blueprint, make_response, redirect, render_template, request, session
-from sqlalchemy import text
+from flask import (
+    Blueprint,
+    current_app,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    session,
+)
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.utils import create_page, dprint
-from pychpp import CHPP
 
 # Create Blueprint for authentication routes
 auth_bp = Blueprint("auth", __name__)
@@ -15,6 +21,15 @@ app = None
 db = None
 consumer_key = None
 consumer_secret = None
+
+
+def get_chpp_client():
+    """Get CHPP client based on feature flag configuration."""
+    if current_app.config.get('USE_CUSTOM_CHPP'):
+        from app.chpp import CHPP
+    else:
+        from pychpp import CHPP
+    return CHPP
 
 
 def setup_auth_blueprint(app_instance, db_instance, ck, cs):
@@ -123,6 +138,7 @@ def login():
             # Setup team data from Hattrick API using OAuth tokens
             dprint(1, "Setting up team data for logged-in user")
             try:
+                CHPP = get_chpp_client()
                 chpp = CHPP(
                     consumer_key,
                     consumer_secret,
@@ -153,7 +169,7 @@ def login():
                             dprint(1, f"XML error type: {type(xml_error)}")
                             import traceback
                             dprint(1, f"XML error traceback: {traceback.format_exc()}")
-                            raise Exception("Cannot get team IDs from CHPP - authentication failed")
+                            raise Exception("Cannot get team IDs from CHPP - authentication failed") from None
                     else:
                         raise user_error
 
@@ -195,6 +211,7 @@ def login():
             if existing_user.access_key and existing_user.access_secret:
                 # Try to use existing OAuth tokens
                 try:
+                    CHPP = get_chpp_client()
                     chpp = CHPP(
                         consumer_key,
                         consumer_secret,
@@ -262,6 +279,7 @@ def login():
 def start_oauth_flow():
     """Start OAuth flow with Hattrick."""
     try:
+        CHPP = get_chpp_client()
         chpp = CHPP(consumer_key, consumer_secret)
         auth = chpp.get_auth(callback_url=app.config["CALLBACK_URL"], scope="")
 
@@ -295,6 +313,7 @@ def handle_oauth_callback(oauth_verifier):
 
     try:
         # Get access tokens
+        CHPP = get_chpp_client()
         chpp = CHPP(consumer_key, consumer_secret)
         access_token = chpp.get_access_token(
             request_token=session["request_token"],
@@ -306,6 +325,7 @@ def handle_oauth_callback(oauth_verifier):
         session["access_secret"] = access_token["secret"]
 
         # Get user from Hattrick with error handling for CHPP library issues
+        CHPP = get_chpp_client()
         chpp = CHPP(
             consumer_key,
             consumer_secret,

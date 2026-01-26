@@ -134,7 +134,11 @@ def stats():
         print(f"\n=== FETCHING COMPETITION DATA FOR TEAM {teamid} ===")
         from flask import current_app as app
 
-        from pychpp import CHPP
+        # Get CHPP client based on feature flag
+        if app.config.get('USE_CUSTOM_CHPP'):
+            from app.chpp import CHPP
+        else:
+            from pychpp import CHPP
 
         chpp = CHPP(
             app.config["CONSUMER_KEY"],
@@ -143,10 +147,12 @@ def stats():
             session["access_secret"],
         )
 
-        # Check pyCHPP version
-        import pychpp
-
-        print(f"pyCHPP version: {getattr(pychpp, '__version__', 'Unknown')}")
+        # Check pyCHPP version (only for pychpp client)
+        if not app.config.get('USE_CUSTOM_CHPP'):
+            import pychpp
+            print(f"pyCHPP version: {getattr(pychpp, '__version__', 'Unknown')}")
+        else:
+            print("Using custom CHPP client")
 
         team_details = chpp.team(ht_id=teamid)
         print(f"Team details fetched: {team_details.name}")

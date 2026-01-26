@@ -790,7 +790,12 @@ def downloadMatches(teamid):
     from flask import current_app
 
     from models import Match
-    from pychpp import CHPP
+
+    # Get CHPP client based on feature flag
+    if current_app.config.get('USE_CUSTOM_CHPP'):
+        from app.chpp import CHPP
+    else:
+        from pychpp import CHPP
 
     # Get CHPP credentials from app config
     consumer_key = current_app.config.get("CONSUMER_KEY")

@@ -4,12 +4,10 @@ import time
 import traceback
 from datetime import datetime as dt
 
-from flask import Blueprint, render_template, session
-from sqlalchemy import text
+from flask import Blueprint, current_app, render_template, session
 
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
 from app.utils import create_page, diff, dprint, get_player_changes
-from pychpp import CHPP
 
 # Create Blueprint for team routes
 team_bp = Blueprint("team", __name__)
@@ -22,6 +20,15 @@ consumer_secret = None
 version = None
 timenow = None
 fullversion = None
+
+
+def get_chpp_client():
+    """Get CHPP client based on feature flag configuration."""
+    if current_app.config.get('USE_CUSTOM_CHPP'):
+        from app.chpp import CHPP
+    else:
+        from pychpp import CHPP
+    return CHPP
 
 
 def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
@@ -39,6 +46,7 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
 @require_authentication
 def team():
     """Display team information."""
+    CHPP = get_chpp_client()
     chpp = CHPP(
         consumer_key, consumer_secret, session["access_key"], session["access_secret"]
     )
@@ -77,6 +85,7 @@ def update():
     try:
         # Initialize CHPP with enhanced error handling
         dprint(1, "Initializing CHPP client...")
+        CHPP = get_chpp_client()
         chpp = CHPP(
             consumer_key,
             consumer_secret,
