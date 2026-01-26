@@ -61,6 +61,7 @@
 - 🎯 [BUG-008] Fix sorttable.js TypeError (30-45 min) - Fix `node.getAttribute is not a function` error preventing table sorting on update page **NEW**
 - 🎯 [BUG-009] Fix Player Changes Calculation Error (1-2 hours) - Resolve "list index out of range" error in main.py preventing player change display **NEW**
 - 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **READY**
+- 🎯 [FEAT-013] Error Monitoring System (4-6 hours) - Database-backed error tracking with debug page dashboard **NEW**
 - 🎯 [FEAT-009] Display Player Group Names in Update Timeline (1-2 hours) - Show group names after player names when players belong to user groups **NEW**
 - 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **READY**
 - 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
@@ -458,6 +459,97 @@ Users need a way to prepare tactically for upcoming matches by analyzing their o
 ---
 
 ## Priority 4: Core Functionality
+
+### [FEAT-013] Error Monitoring System
+**Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Priority**: P4 | **Impact**: Production debugging and user support
+**Dependencies**: None | **Strategic Value**: Proactive issue detection, improved user support, reduced troubleshooting time
+
+**Problem Statement**:
+When users encounter errors or crashes in the application, there is currently no centralized system to capture, store, and analyze these issues. This makes it difficult to:
+- Diagnose problems reported by users
+- Identify patterns in errors across different users
+- Proactively detect issues before users report them
+- Track error frequency and severity
+- Debug production issues without direct access to user environments
+
+A database-backed error monitoring system would allow administrators to:
+- View all errors/crashes from any user in a centralized dashboard
+- Filter and search errors by user, timestamp, error type, severity
+- Analyze error patterns and frequency trends
+- Prioritize bug fixes based on actual user impact
+- Support users more effectively with detailed error context
+
+**Implementation**:
+1. **Database Model** (1-1.5 hours):
+   - Create `ErrorLog` table with fields: id, user_id, timestamp, error_type, message, stack_trace, url, user_agent, severity, status (new/acknowledged/resolved)
+   - Add indexes for efficient querying (user_id, timestamp, error_type)
+   - Create migration file with `uv run python scripts/database/apply_migrations.py`
+   - Support for categorizing errors: exception, crash, warning, info
+
+2. **Error Capture Middleware** (1-1.5 hours):
+   - Create Flask error handler middleware to catch all unhandled exceptions
+   - Extract error details: type, message, stack trace, request context
+   - Store error in database with user context if authenticated
+   - Support manual error logging via utility function for specific error tracking
+   - Implement rate limiting to prevent database flooding from repeated errors
+
+3. **Debug Page Dashboard** (1.5-2 hours):
+   - Add new "Error Monitoring" section to existing debug page
+   - Display recent errors in sortable/filterable table: timestamp, user, error type, message, status
+   - Show error statistics: total errors, errors by type, errors by user, trend chart
+   - Add detail view for individual errors with full stack trace and context
+   - Implement pagination for large error sets
+   - Add status update capability (acknowledge/resolve errors)
+
+4. **Admin Features** (0.5-1 hour):
+   - Add error count badge to debug page navigation (show unacknowledged errors)
+   - Create API endpoint for retrieving error data
+   - Add filtering by date range, user, error type, severity
+   - Export capability (CSV/JSON) for external analysis
+
+**Acceptance Criteria**:
+- ErrorLog database table created with proper indexes
+- All unhandled exceptions automatically logged to database
+- Error logs include user context, stack trace, request details
+- Debug page displays error monitoring dashboard
+- Error list is sortable and filterable
+- Individual error detail view shows full context
+- Admin can mark errors as acknowledged/resolved
+- Error statistics and trends displayed
+- No performance impact on normal application operations
+- Rate limiting prevents database flooding
+- Works for both authenticated and anonymous users
+
+**Data to Capture**:
+- **Error Context**: Type, message, stack trace, timestamp
+- **User Context**: User ID (if logged in), session data
+- **Request Context**: URL, HTTP method, user agent, IP address (anonymized)
+- **Severity**: Critical (crashes), Error (exceptions), Warning, Info
+- **Status**: New, Acknowledged, Resolved, Ignored
+
+**Debug Page Display**:
+- **Summary Cards**: Total errors (last 24h), Unacknowledged errors, Error rate trend
+- **Error Table**: Columns: Timestamp, User, Type, Message (truncated), Severity, Status, Actions
+- **Filters**: Date range, User ID, Error type, Severity, Status
+- **Detail Modal**: Full error with stack trace, request details, user context
+- **Actions**: Acknowledge, Resolve, Ignore, View similar errors
+
+**Privacy Considerations**:
+- Do not log sensitive data (passwords, API keys, tokens) in error messages
+- Anonymize IP addresses (store first 3 octets only)
+- Allow users to opt-out of detailed error tracking in settings
+- Implement automatic cleanup of old error logs (>90 days)
+
+**Technical Approach**:
+- Use Flask's `@app.errorhandler` decorator for exception catching
+- SQLAlchemy model for ErrorLog table
+- Async logging to prevent blocking request handling
+- Integration with existing debug page template
+- Chart.js for error trend visualization
+
+**Expected Outcomes**: Improved production debugging capability, faster issue resolution, proactive error detection, better user support with detailed error context, data-driven bug prioritization
+
+---
 
 ### [BUG-006] Fix Players Page "Last Updated" Display
 **Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P4 | **Impact**: User experience clarity
