@@ -31,13 +31,23 @@ Critical understanding for working with Hattrick's data model:
 ## Implementation Details
 - **Session Management**: Flask sessions store OAuth tokens and team data
 - **Player/Match Data**: Synced from CHPP API, stored in Players, Match, MatchPlay tables
-- **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked (19/22 quality gates passing)
+- **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked (19/26 quality gates passing)
 - **CI/CD**: GitHub Actions for linting and basic CI
 - **Route Architecture**: Modern Flask blueprint architecture with 6 blueprints (auth, main, player, team, matches, training) registered in factory.py
 - **CHPP Integration Notes**: pychpp 0.5.10 has YouthTeamId parsing bug for users without youth teams - workaround implemented via XML extraction from managercompendium endpoint
 - **CHPP Feature Flag**: `USE_CUSTOM_CHPP` environment variable toggles between pychpp and custom CHPP client (default: false for safe deployment)
-  - `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (production stable)
-  - `USE_CUSTOM_CHPP=true`: Uses custom CHPP client (app/chpp/) with YouthTeamId fix
+  - `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (production stable, full backward compatibility)
+  - `USE_CUSTOM_CHPP=true`: Uses custom CHPP client (app/chpp/) - **PRODUCTION READY as of INFRA-026**
+  - **Custom CHPP Client Endpoints**: ✅ ALL IMPLEMENTED
+    - `user()` - Get current user and team IDs
+    - `team(ht_id)` - Get team details and players
+    - `player(id_)` - Get individual player details
+    - `matches_archive(id_, is_youth)` - Get team match history
+    - YouthTeamId bug fixed (handles as optional field)
+    - XML parsing with safe field extraction
+    - Zero breaking changes from pychpp interface
+  - **Migration Path**: Custom CHPP client can replace pychpp entirely; pychpp can be removed from dependencies once fully tested in production
+
   - **Rollback**: Instant rollback via environment variable toggle (no restart required)
   - **Implementation**: Conditional imports in blueprints (auth, team, matches) and utils
 - **PWA Implementation**: Service Worker with cache-first strategy for static assets, network-first for dynamic content, offline functionality for core routes

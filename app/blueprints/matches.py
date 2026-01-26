@@ -4,6 +4,7 @@ from flask import Blueprint, request, session
 from sqlalchemy import text
 
 from app.auth_utils import require_authentication
+from app.chpp_utils import get_chpp_client
 from app.model_registry import get_match_model, get_match_play_model
 from app.utils import create_page
 
@@ -135,10 +136,7 @@ def stats():
         from flask import current_app as app
 
         # Get CHPP client based on feature flag
-        if app.config.get('USE_CUSTOM_CHPP'):
-            from app.chpp import CHPP
-        else:
-            from pychpp import CHPP
+        CHPP = get_chpp_client()
 
         chpp = CHPP(
             app.config["CONSUMER_KEY"],

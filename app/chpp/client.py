@@ -20,7 +20,7 @@ from app.chpp.constants import (
     RETRY_TOTAL,
 )
 from app.chpp.exceptions import CHPPAPIError, CHPPAuthError
-from app.chpp.models import CHPPTeam, CHPPUser
+from app.chpp.models import CHPPMatch, CHPPPlayer, CHPPTeam, CHPPUser
 from app.chpp.parsers import parse_players, parse_team, parse_user
 
 
@@ -300,3 +300,52 @@ class CHPP:
         team._players = players
 
         return team
+    def player(self, id_: int) -> "CHPPPlayer":
+        """Get individual player details.
+
+        Fetches player data from player endpoint.
+
+        Args:
+            id_: Hattrick player ID
+
+        Returns:
+            CHPPPlayer with all player attributes
+
+        Raises:
+            CHPPAuthError: If not authenticated
+            CHPPAPIError: If CHPP API returns error (e.g., unknown player ID)
+
+        Example:
+            >>> player = chpp.player(id_=480742036)
+            >>> print(player.first_name, player.scorer)
+        """
+        from app.chpp.parsers import parse_player
+
+        root = self.request("player", "2.4", playerId=id_)
+        return parse_player(root)
+
+    def matches_archive(self, id_: int, is_youth: bool = False) -> list["CHPPMatch"]:
+        """Get match history for a team.
+
+        Fetches match archive from matches endpoint.
+
+        Args:
+            id_: Hattrick team ID
+            is_youth: Whether to fetch youth team matches (default: False)
+
+        Returns:
+            List of CHPPMatch objects representing team's match history
+
+        Raises:
+            CHPPAuthError: If not authenticated
+            CHPPAPIError: If CHPP API returns error (e.g., unknown team ID)
+
+        Example:
+            >>> matches = chpp.matches_archive(id_=123456)
+            >>> for match in matches:
+            ...     print(f"{match.home_team_name} {match.home_goals}-{match.away_goals}")
+        """
+        from app.chpp.parsers import parse_matches
+
+        root = self.request("matches", "2.6", teamId=id_, isYouthTeam=is_youth)
+        return parse_matches(root)

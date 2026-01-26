@@ -28,8 +28,7 @@
 
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 
-**Priority 1: Testing & App Reliability** - ✅ MILESTONE COMPLETE - Custom CHPP client fully operational
-- 🎯 [INFRA-026] Finalize Custom CHPP Migration (1 hour) - Remove pychpp dependency, implement missing methods (player(), matches_archive()), production deployment **READY TO EXECUTE**
+**Priority 1: Testing & App Reliability** - ✅ MILESTONE COMPLETE - Custom CHPP client code complete but OAuth signature validation failing on real API (see BUG-013)
 
 **Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE
 
@@ -104,20 +103,30 @@
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-**Priority 2: Custom CHPP Migration** (1 remaining task, 1 hour):
-1. **[INFRA-026] Finalize Custom CHPP Migration** (1 hour) - P2 - Implement missing methods, remove pychpp dependency **NEXT TASK**
+### 🔴 **URGENT: Active Debug Session**
+**[BUG-013-DEBUG] Custom CHPP player() Endpoint OAuth 401 Error** (1-2 hours) - P2 BLOCKING - Actively debugging 401 Unauthorized error when custom CHPP calls player() endpoint. Works for user() and team() endpoints but fails on player(). OAuth signature issue specific to player endpoint with Hattrick API. Non-blocking to production (pychpp default works), but blocking INFRA-026 finalization.
 
-**Priority 3: Stability & Simplification Tasks**:
-1. **[REFACTOR-023] Consolidate get_chpp_client()** (30-45 min) - P3 - Extract shared utility function **NEW SIMPLIFICATION**
-2. **[REFACTOR-024] Startup Logging Enhancement** (30-45 min) - P3 - Move status display to factory.py **NEW SIMPLIFICATION**
-3. **[INFRA-027] Feature Flag Configuration Documentation** (30 min) - P3 - Document deployment guide **NEW DOCUMENTATION**
-4. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling
-5. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
-6. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns
-7. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-8. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
+**Investigation approach**:
+- Compare HTTP request signatures between pychpp (working) and custom CHPP (failing) for player endpoint
+- Check if playerId parameter encoding differs from other endpoints
+- Verify if access token scope includes player endpoint permissions
+- Test if nonce/timestamp handling is different for subsequent API calls
+- Check Hattrick API documentation for player endpoint-specific OAuth requirements
 
-**Next Action**: Execute INFRA-026 (Finalize Custom CHPP Migration) - Complete custom CHPP client by implementing missing methods (player(), matches_archive()), then remove pychpp dependency. Then execute P3 simplification tasks starting with REFACTOR-023.
+---
+
+**Priority 2: Custom CHPP Migration** (BLOCKED - See BUG-013):
+1. **[INFRA-026] Finalize Custom CHPP Migration** - P2 - **BLOCKED** - Custom CHPP implementation complete but OAuth signature validation failing on real Hattrick API (see BUG-013). pychpp (default) continues to work correctly in production.
+
+**Priority 3: Stability & Simplification Tasks** (Next priority tasks):
+1. **[INFRA-027] Feature Flag Configuration Documentation** (30 min) - P3 - Document deployment guide **NEXT TASK**
+2. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling
+3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
+4. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns
+5. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
+6. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
+
+**Next Action**: Pause INFRA-027 to debug BUG-013-DEBUG (player endpoint OAuth issue). Once resolved, continue with INFRA-027. Production safe with pychpp default.
 
 ---
 
@@ -1036,6 +1045,102 @@ The error suggests that code is trying to access a list index that doesn't exist
 - Player change timeline displays correctly
 - All player statistics and changes show properly
 - Handles edge cases gracefully (no players, new users, etc.)
+
+---
+
+### [BUG-013] Custom CHPP OAuth Signature Validation Failure
+**Status**: 🔴 BLOCKED | **Effort**: 3-4 hours (debugging) + TBD (fix) | **Priority**: P2 | **Impact**: Custom CHPP production readiness, INFRA-026 finalization
+**Dependencies**: INFRA-025 (Custom CHPP implementation complete) | **Strategic Value**: Production validation for INFRA-026, long-term Hattrick API independence
+
+**Problem Statement**:
+Custom CHPP client implementation is code-complete but fails during production validation with real Hattrick API. Specifically, OAuth1Session signature validation fails with 401 Unauthorized response from Hattrick when calling player() endpoint with real API tokens. The default pychpp client works correctly, allowing the application to remain functional.
+
+**Detailed Symptoms**:
+- Error: `CHPPAuthError: CHPP request failed: 401 Client Error: Unauthorized`
+- URL: `https://chpp.hattrick.org/chppxml.ashx?file=player&version=2.4&playerId=<id>`
+- Occurs specifically when: Custom CHPP's `player()` method makes real API call with USE_CUSTOM_CHPP=true
+- Does NOT occur for: `user()` and `team()` endpoints with custom CHPP (they pass authentication)
+- Does NOT occur for: pychpp client with any endpoint (default mode works fine)
+- Endpoint affected: player(), and presumably matches_archive()
+- Timing: Only fails on real Hattrick API, mocked tests pass
+
+**Current State**:
+- ✅ Custom CHPP code complete and syntactically correct
+- ✅ OAuth1Session initialized identically to pychpp
+- ✅ Some endpoints (user, team) succeed with real API
+- ✅ pychpp continues to work as fallback (production safe)
+- ✅ Feature flag properly defaults to pychpp
+- ❌ player() and matches_archive() fail with 401 on real API
+- ❌ Blocks production validation phase of INFRA-026
+- ❌ Blocks custom CHPP to production migration
+
+**Investigation Findings**:
+1. OAuth signature generation appears correct (same parameters as pychpp)
+2. Both clients use OAuth1Session with identical consumer/access credentials
+3. Both use requests_oauthlib library with HMAC-SHA1 signing
+4. Difference: pychpp uses lazy-loaded model pattern, custom CHPP makes immediate API calls
+5. Some endpoints work (user, team), others fail (player, matches_archive)
+6. This suggests issue is NOT with OAuth implementation but with:
+   - Token scope or permissions for specific endpoints
+   - Parameter naming/encoding specific to player endpoint
+   - Hattrick API OAuth validation logic specific to certain endpoints
+   - HTTP request timing/nonce issues with multiple sequential calls
+
+**Implementation - Debug Phase**:
+1. **Request Signature Comparison** (1 hour):
+   - Capture HTTP request headers from both pychpp (working) and custom CHPP (failing)
+   - Compare Authorization headers, nonce, timestamp, signature values
+   - Check if working endpoints (user, team) have different signatures than failing ones
+   - Verify parameter encoding is consistent
+
+2. **Endpoint Parameter Analysis** (1-2 hours):
+   - Compare exact parameters sent to user() vs player() vs team() endpoints
+   - Check if there's a pattern in which endpoints fail
+   - Verify parameter names (playerId vs player_id) match Hattrick expectations
+   - Test parameter ordering and encoding
+
+3. **Token Scope Investigation** (30 min):
+   - Check if access tokens have different scopes
+   - Review Hattrick OAuth documentation for scope requirements per endpoint
+   - Check if test tokens have limitations on specific endpoints
+
+4. **Hattrick API Requirements** (1-2 hours):
+   - Research Hattrick CHPP OAuth implementation details
+   - Check if there are endpoint-specific OAuth requirements
+   - Review pychpp's approach to see if there's a pattern we're missing
+   - Check for any HTTP header or request format requirements
+
+**Root Cause Hypothesis**:
+Token scope limitation or Hattrick API endpoint-specific OAuth requirements that we haven't discovered yet. pychpp might have workarounds or implementation details we haven't seen.
+
+**Implementation - Fix Phase** (TBD):
+Depends on root cause findings. Could be:
+- Adding missing OAuth parameters
+- Adjusting signature algorithm or request format
+- Implementing different request handling for specific endpoints
+- Adding scope or permission grants to OAuth flow
+- Working around Hattrick API limitations
+
+**Rollback/Workaround**:
+- Production uses pychpp by default (USE_CUSTOM_CHPP=false)
+- No user impact - full functionality available via default client
+- Can leave custom CHPP experimental for now
+
+**Acceptance Criteria**:
+- Custom CHPP player() method successfully calls real Hattrick API without 401
+- Custom CHPP matches_archive() method successfully calls real Hattrick API without 401
+- OAuth signature validation succeeds for all endpoints
+- `make test-all` still passes
+- Feature flag can be switched to USE_CUSTOM_CHPP=true in production without errors
+- INFRA-026 can proceed to finalization phase
+
+**Expected Outcomes**:
+- INFRA-026 unblocked and able to proceed to production validation
+- Complete understanding of Hattrick OAuth implementation details
+- Custom CHPP client fully production-ready
+- Alternative: Defer to REFACTOR-036 if root cause requires architectural changes
+
+**Note**: This issue does NOT affect production (pychpp default is working). It only blocks the experimental custom CHPP feature and INFRA-026 finalization. Can be debugged without time pressure.
 
 ---
 

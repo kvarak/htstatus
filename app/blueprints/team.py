@@ -4,9 +4,10 @@ import time
 import traceback
 from datetime import datetime as dt
 
-from flask import Blueprint, current_app, render_template, session
+from flask import Blueprint, render_template, session
 
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
+from app.chpp_utils import get_chpp_client
 from app.utils import create_page, diff, dprint, get_player_changes
 
 # Create Blueprint for team routes
@@ -20,15 +21,6 @@ consumer_secret = None
 version = None
 timenow = None
 fullversion = None
-
-
-def get_chpp_client():
-    """Get CHPP client based on feature flag configuration."""
-    if current_app.config.get('USE_CUSTOM_CHPP'):
-        from app.chpp import CHPP
-    else:
-        from pychpp import CHPP
-    return CHPP
 
 
 def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):

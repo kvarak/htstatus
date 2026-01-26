@@ -147,6 +147,52 @@ class CHPPPlayer:
     transfer_listed: bool = False
     _SOURCE_FILE: str = "players"
 
+    @property
+    def id(self) -> int:
+        """Alias for player_id to match pychpp interface."""
+        return self.player_id
+
     def __getitem__(self, key: str) -> Any:
         """Support dict-like access: player['scorer']."""
+        return getattr(self, key)
+
+
+@dataclass
+class CHPPMatch:
+    """Match data from matches endpoint.
+
+    Attributes:
+        ht_id: Hattrick match ID
+        datetime: Match date and time
+        home_team_id: Home team ID
+        home_team_name: Home team name
+        away_team_id: Away team ID
+        away_team_name: Away team name
+        home_goals: Goals scored by home team
+        away_goals: Goals scored by away team
+        matchtype: Match type ID (league, cup, friendly, etc.)
+        context_id: Context ID (league/cup ID)
+        rule_id: Rule ID (region/rule set)
+        cup_level: Cup level if cup match
+        cup_level_index: Cup level index if cup match
+        _SOURCE_FILE: CHPP file name (for compatibility)
+    """
+
+    ht_id: int
+    datetime: str | None
+    home_team_id: int
+    home_team_name: str
+    away_team_id: int
+    away_team_name: str
+    home_goals: int | None = None
+    away_goals: int | None = None
+    matchtype: int | None = None
+    context_id: int | None = None
+    rule_id: int | None = None
+    cup_level: int | None = None
+    cup_level_index: int | None = None
+    _SOURCE_FILE: str = "matches"
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access: match['ht_id']."""
         return getattr(self, key)

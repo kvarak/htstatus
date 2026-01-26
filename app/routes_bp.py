@@ -22,7 +22,6 @@ debug_level = None
 
 def initialize_routes(app, _db_instance):
     """Initialize routes module with app and db instances."""
-    print("DEBUG: initialize_routes - Start")
     global \
         bootstrap, \
         consumer_key, \
@@ -34,18 +33,15 @@ def initialize_routes(app, _db_instance):
         debug_level
 
     # Get db from current app context
-    print("DEBUG: initialize_routes - Getting db")
     from app.factory import db as factory_db
 
     global db
     db = factory_db
 
     # Initialize Flask-Bootstrap
-    print("DEBUG: initialize_routes - Initializing Bootstrap")
     bootstrap = Bootstrap(app)
 
     # Set consumer_key and consumer_secret provided for your app by Hattrick
-    print("DEBUG: initialize_routes - Setting CHPP credentials")
     consumer_key = app.config.get("CONSUMER_KEY", "dev_key")
     consumer_secret = app.config.get("CONSUMER_SECRETS", "dev_secret")
 
@@ -67,16 +63,7 @@ def initialize_routes(app, _db_instance):
         version = "2.0.0"
 
     timenow = time.strftime("%Y-%m-%d %H:%M:%S")
-    print("DEBUG: initialize_routes - Complete")
     debug_level = app.config.get("DEBUG_LEVEL", 1)
-
-    # Display feature flag status
-    use_custom_chpp = app.config.get("USE_CUSTOM_CHPP", False)
-    chpp_status = "✅ Using Custom CHPP Client (app.chpp)" if use_custom_chpp else "✅ Using pychpp Client"
-    print(f"\n{'='*60}")
-    print(f"Feature Flag Status:")
-    print(f"  {chpp_status}")
-    print(f"{'='*60}\n")
 
 
 # Module constants

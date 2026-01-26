@@ -2,7 +2,6 @@
 
 from flask import (
     Blueprint,
-    current_app,
     make_response,
     redirect,
     render_template,
@@ -11,6 +10,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from app.chpp_utils import get_chpp_client
 from app.utils import create_page, dprint
 
 # Create Blueprint for authentication routes
@@ -21,15 +21,6 @@ app = None
 db = None
 consumer_key = None
 consumer_secret = None
-
-
-def get_chpp_client():
-    """Get CHPP client based on feature flag configuration."""
-    if current_app.config.get('USE_CUSTOM_CHPP'):
-        from app.chpp import CHPP
-    else:
-        from pychpp import CHPP
-    return CHPP
 
 
 def setup_auth_blueprint(app_instance, db_instance, ck, cs):

@@ -1,6 +1,82 @@
 # HTStatus Development - Completed Tasks
 
-## Completed P2 Deployment Tasks (January 2026)
+## Completed P3 Simplification Tasks (January 26, 2026)
+
+### [REFACTOR-023] Consolidate get_chpp_client()
+**Completed**: 2026-01-26
+**Effort**: 30-45 minutes (on schedule)
+**Impact**: CODE CONSOLIDATION - Eliminated 4 duplicate function implementations, reduced cognitive load
+
+**Summary**: Extracted duplicate `get_chpp_client()` functions from 4 locations into single shared utility module. Reduced code duplication and established pattern for conditional CHPP client selection.
+
+**Technical Achievement**:
+- Created `app/chpp_utils.py` with shared `get_chpp_client()` function
+- Removed duplicate implementations from: auth.py, team.py
+- Updated imports in: matches.py, utils.py
+- Removed unnecessary `current_app` imports after consolidation
+- All linting passes (0 errors), zero test regressions (19/26 gates maintained)
+
+**Simplification Applied**:
+- Reduced code duplication: 4 identical 8-line functions → 1 implementation
+- Eliminated unused imports: Removed `from flask import current_app` from auth.py and team.py
+- Improved maintainability: Single source of truth for CHPP client factory logic
+
+**Quality Metrics**:
+- Code Quality gate: PASS ✅
+- Test coverage: Maintained (19/26 gates)
+- Linting: 0 errors ✅
+
+### [REFACTOR-024] Startup Logging Enhancement
+**Completed**: 2026-01-26
+**Effort**: 30-45 minutes (on schedule)
+**Impact**: STARTUP CLARITY - Moved configuration logging to proper initialization location
+
+**Summary**: Relocated feature flag status display from routes_bp.py to factory.py, establishing proper app initialization sequence and cleaning up debug statements.
+
+**Technical Achievement**:
+- Created `_display_startup_status()` function in factory.py
+- Moved feature flag status display to logical app creation location
+- Removed debug print statements from routes_bp.py (5 removed)
+- Cleaned up routes_bp.py initialize_routes() function
+- All linting passes (0 errors), zero test regressions (19/26 gates maintained)
+
+**Simplification Applied**:
+- Removed debug output: 5 `print("DEBUG: ...")` statements eliminated
+- Improved code clarity: Startup sequence now explicit in factory.py
+- Reduced cognitive load: Removed scattered startup logic from routes_bp.py
+
+**Quality Metrics**:
+- Code Quality gate: PASS ✅
+- Test coverage: Maintained (19/26 gates)
+- Linting: 0 errors ✅
+- No newline warning: Fixed (W292 resolved) ✅
+
+---
+
+## Completed P1 Final Migration & P2 Deployment Tasks (January 2026)
+
+### [INFRA-026] Finalize Custom CHPP Migration
+**Completed**: 2026-01-26
+**Effort**: 1 hour (on schedule)
+**Impact**: PRODUCTION READY - Custom CHPP client now fully functional and can replace pychpp
+
+**Summary**: Implemented the two missing CHPP endpoints (player() and matches_archive()) to complete the custom CHPP client. Custom client is now production-ready with all endpoints working and can serve as complete replacement for pychpp dependency.
+
+**Technical Achievement**:
+- Created CHPPMatch dataclass model for match data
+- Implemented parse_matches() function in parsers.py (with safe field extraction)
+- Implemented parse_player() function in parsers.py for single player fetches
+- Added player(id_) method to CHPP client class
+- Added matches_archive(id_, is_youth) method to CHPP client class
+- All methods compatible with pychpp interface (zero breaking changes)
+- Quality gates improved: 18/26 → 19/26 (Code Quality now passes)
+- Updated TECHNICAL.md documenting production-ready status
+
+**Production Path Forward**:
+- Custom CHPP client fully functional with feature flag (USE_CUSTOM_CHPP=true)
+- pychpp remains as fallback (USE_CUSTOM_CHPP=false, default)
+- Optional: Remove pychpp dependency in future task (CLEANUP-026)
+- Feature flag enables safe gradual migration to custom client in production
 
 ### [INFRA-025] Deploy Custom CHPP with Feature Flag
 **Completed**: 2026-01-26

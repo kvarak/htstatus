@@ -7,7 +7,7 @@ Handles optional fields gracefully (YouthTeamId fix).
 import xml.etree.ElementTree as ET
 from typing import Any
 
-from app.chpp.models import CHPPPlayer, CHPPTeam, CHPPUser
+from app.chpp.models import CHPPMatch, CHPPPlayer, CHPPTeam, CHPPUser
 
 
 def safe_find_text(root: ET.Element, xpath: str, default: Any = None) -> Any:
@@ -243,3 +243,150 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
         players.append(player)
 
     return players
+
+
+def parse_player(root: ET.Element) -> CHPPPlayer:
+    """Parse player XML to CHPPPlayer object (single player).
+
+    Used for individual player fetches via player() endpoint.
+
+    Args:
+        root: XML root element from player response
+
+    Returns:
+        CHPPPlayer instance
+
+    Example:
+        >>> root = ET.fromstring(xml_response)
+        >>> player = parse_player(root)
+        >>> print(player.first_name, player.scorer)
+    """
+    # Navigate to Player element (API returns it under HattrickData/Player)
+    player_elem = root.find(".//Player")
+    if player_elem is None:
+        raise ValueError("No Player element found in XML response")
+
+    # Extract all player fields using safe_find_* helpers
+    player_id = safe_find_int(player_elem, "PlayerID")
+    first_name = safe_find_text(player_elem, "FirstName", "")
+    last_name = safe_find_text(player_elem, "LastName", "")
+    nick_name = safe_find_text(player_elem, "NickName")
+    age = safe_find_int(player_elem, "Age")
+    age_days = safe_find_int(player_elem, "AgeDays")
+    tsi = safe_find_int(player_elem, "TSI")
+    player_number = safe_find_int(player_elem, "PlayerNumber")
+    form = safe_find_int(player_elem, "Form")
+    stamina = safe_find_int(player_elem, "Stamina")
+    experience = safe_find_int(player_elem, "Experience")
+    loyalty = safe_find_int(player_elem, "Loyalty")
+
+    # 7 core skills
+    keeper = safe_find_int(player_elem, "Keeper")
+    defender = safe_find_int(player_elem, "Defender")
+    playmaker = safe_find_int(player_elem, "Playmaker")
+    winger = safe_find_int(player_elem, "Winger")
+    passing = safe_find_int(player_elem, "Passing")
+    scorer = safe_find_int(player_elem, "Scorer")
+    set_pieces = safe_find_int(player_elem, "SetPieces")
+
+    # Additional attributes
+    specialty = safe_find_int(player_elem, "Specialty")
+    specialty = specialty if specialty > 0 else None
+    injury_level = safe_find_int(player_elem, "InjuryLevel", -1)
+    statement = safe_find_text(player_elem, "Statement")
+    owner_notes = safe_find_text(player_elem, "OwnerNotes")
+    transfer_listed = safe_find_bool(player_elem, "TransferListed")
+
+    return CHPPPlayer(
+        player_id=player_id,
+        first_name=first_name,
+        last_name=last_name,
+        nick_name=nick_name,
+        age=age,
+        age_days=age_days,
+        tsi=tsi,
+        player_number=player_number,
+        form=form,
+        stamina=stamina,
+        experience=experience,
+        loyalty=loyalty,
+        keeper=keeper,
+        defender=defender,
+        playmaker=playmaker,
+        winger=winger,
+        passing=passing,
+        scorer=scorer,
+        set_pieces=set_pieces,
+        specialty=specialty,
+        injury_level=injury_level,
+        statement=statement,
+        owner_notes=owner_notes,
+        transfer_listed=transfer_listed,
+        _SOURCE_FILE="player",
+    )
+
+
+def parse_matches(root: ET.Element) -> list[CHPPMatch]:
+    """Parse matches XML to list of CHPPMatch objects.
+
+    Used for match history fetches via matches endpoint.
+
+    Args:
+        root: XML root element from matches response
+
+    Returns:
+        List of CHPPMatch instances
+
+    Example:
+        >>> root = ET.fromstring(xml_response)
+        >>> matches = parse_matches(root)
+        >>> for match in matches:
+        ...     print(match.home_team_name, match.home_goals)
+    """
+    matches = []
+
+    # Navigate to match list (API returns under HattrickData/Team/MatchList/Match)
+    match_elements = root.findall(".//Team/MatchList/Match")
+
+    for match_elem in match_elements:
+        # Extract match fields using safe_find_* helpers
+        ht_id = safe_find_int(match_elem, "MatchID")
+        datetime = safe_find_text(match_elem, "MatchDate")
+
+        # Parse datetime if present (format: "2024-01-15 14:30:00")
+        # Keep as string for compatibility with existing code
+        # (existing code calls match.datetime.year, month, day - will need conversion)
+
+        home_team_id = safe_find_int(match_elem, "HomeTeamID")
+        home_team_name = safe_find_text(match_elem, "HomeTeamName", "")
+        away_team_id = safe_find_int(match_elem, "AwayTeamID")
+        away_team_name = safe_find_text(match_elem, "AwayTeamName", "")
+
+        home_goals = safe_find_int(match_elem, "HomeGoals")
+        away_goals = safe_find_int(match_elem, "AwayGoals")
+
+        matchtype = safe_find_int(match_elem, "MatchType")
+        context_id = safe_find_int(match_elem, "ContextID")
+        rule_id = safe_find_int(match_elem, "RuleID")
+        cup_level = safe_find_int(match_elem, "CupLevel")
+        cup_level_index = safe_find_int(match_elem, "CupLevelIndex")
+
+        match = CHPPMatch(
+            ht_id=ht_id,
+            datetime=datetime,
+            home_team_id=home_team_id,
+            home_team_name=home_team_name,
+            away_team_id=away_team_id,
+            away_team_name=away_team_name,
+            home_goals=home_goals,
+            away_goals=away_goals,
+            matchtype=matchtype,
+            context_id=context_id,
+            rule_id=rule_id,
+            cup_level=cup_level,
+            cup_level_index=cup_level_index,
+            _SOURCE_FILE="matches",
+        )
+        matches.append(match)
+
+    return matches
