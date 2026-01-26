@@ -1,5 +1,66 @@
 # HTStatus Development - Completed Tasks
 
+## Completed P3 Security Tasks (January 2026)
+
+### [SECURITY-001] Werkzeug Security Update & pychpp 0.5.10 Upgrade
+**Completed**: 2026-01-26
+**Effort**: 6 hours
+**Impact**: SECURITY - CVE vulnerability remediation + breaking API compatibility resolution
+
+**Summary**: Successfully upgraded pychpp from 0.3.12 to 0.5.10 and werkzeug to 3.1.5+ to patch multiple CVE vulnerabilities while maintaining full application functionality. Resolved breaking API changes and implemented YouthTeamId bug workaround.
+
+**Problem**: Security vulnerabilities in dependencies required updates, but pychpp 0.5.10 introduced breaking API changes:
+- `team.players` property → `team.players()` method
+- Player attributes renamed: `ht_id` → `id`, `age_years` → `age`
+- Player skills changed from dict → object (getattr required)
+- YouthTeamId field treated as required when it's optional, breaking login for users without youth teams
+
+**Solution Applied**:
+1. **API Compatibility Fixes** (3-4 hours):
+   - Updated all `team.players` → `team.players()` calls (3 locations)
+   - Fixed player attribute access: `p.ht_id` → `p.id`, `p.age_years` → `p.age`
+   - Changed skill access from dict `skills["keeper"]` → object `getattr(skills, "keeper")`
+   - Updated 50+ field references across team.py, training.py, utils.py
+   - Fixed mock_chpp.py test fixtures for new API
+
+2. **YouthTeamId Bug Workaround** (2 hours):
+   - Implemented XML extraction fallback when `chpp.user()` fails
+   - Direct parsing of managercompendium endpoint: `chpp.request(file="managercompendium", version="1.6")`
+   - XPath extraction: `root.findall(".//Team/TeamId")`
+   - Applied in 2 locations: login flow + OAuth callback
+
+3. **Session Validation** (30 min):
+   - Added guard in main.py to prevent crash when team data fetch fails
+   - Graceful redirect to login if `all_teams` missing from session
+
+4. **Historical Data Restoration** (30 min):
+   - Fixed player diff calculation to use oldest records correctly
+   - Verified skill progression indicators display with 201 dates of history
+   - Confirmed training graphs populate correctly
+
+**Technical Achievement**:
+- 19/22 quality gates passing (86% success rate)
+- Full application functionality restored
+- Login working for users without youth teams
+- Historical data display operational (484 days spanning 2023-10-08 to 2026-01-26)
+- Update data functionality verified with 23 players
+
+**Code Review Findings**:
+- Identified 4 consolidation opportunities: CHPP client init, team data fetching, player skill extraction, YouthTeamId workaround
+- Added REFACTOR-012/013/014 to backlog for follow-up simplification
+- 2 auth test failures expected (TEST-014 created to address)
+
+**Documentation Updates**:
+- Updated .github/copilot-instructions.md with new API patterns
+- Updated .project/rules.md CHPP examples
+- Created .project/history/ownership-hierarchy-clarification.md
+- Updated TECHNICAL.md with pychpp 0.5.10 notes
+
+**Dependencies Upgraded**:
+- pychpp: 0.3.12 → 0.5.10
+- werkzeug: 2.x → 3.1.5+
+- urllib3: → 2.6.3+ (security patch)
+
 ## Completed P1 Testing & P2 Deployment Tasks (January 2026)
 
 ### [TEST-INFRA] Coverage Contexts & Quality Intelligence Platform

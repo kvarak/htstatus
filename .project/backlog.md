@@ -28,25 +28,38 @@
 
 **Priority 0: Critical Bugs** (Functionality regressions)
 - No active P0 critical bugs - excellent stability ✅ ALL P0 BUGS RESOLVED
+- 📝 **CRITICAL ARCHITECTURE NOTE**: Hattrick ownership hierarchy clarified:
+  - User ID (e.g., 182085 "kvarak") owns teams
+  - Team ID (e.g., 9838 "Dalby Stenbrotters") owns players
+  - Players.owner field = Team ID (correct in historical data)
+  - session['current_user_id'] = User ID
+  - session['all_teams'] = list of Team IDs
+  - **ISSUE**: Auth fallback code may use user ID as team ID if `_teams_ht_id` fails
+  - **IMPACT**: URL `/player?id=USER_ID` fails to find players owned by TEAM_ID
 
 **Priority 1: Testing & App Reliability** - ✅ EXCELLENT - Testing infrastructure complete, 19/22 quality gates passing (86% success), coverage contexts operational
 
 **Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE
 
 **Priority 3: Stability & Maintainability** (It stays working) - 🎯 CURRENT FOCUS
-- 🎯 [SECURITY-001] Werkzeug Security Update (30-45 min) - **ELEVATED FROM P7** - Fix 4 CVE vulnerabilities in dependencies **NEW P3 PRIORITY**
+- 🎯 [REFACTOR-012] Extract CHPP Client Utilities (2-3 hours) - **NEW** Consolidate CHPP initialization and team data fetching patterns **SIMPLIFICATION**
 - 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **HIGH PRIORITY SIMPLIFICATION**
 - 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED TASK**
   - Apply unified design system to Flask templates and React components (UI-008: 8-12 hours)
   - Document Content-in-Boxes pattern references and link from ui-design-guidelines.md (UI-009: 1-2 hours)
   - Apply UI guidelines to core pages: Players, training, stats, settings (UI-010: 4-6 hours)
   - **Value**: Unified UI implementation sprint vs scattered individual tasks **SIMPLIFICATION**
+- 🎯 [TEST-014] Fix Auth Blueprint Tests (1-2 hours) - **NEW** Update tests for YouthTeamId handling and session validation **READY TO EXECUTE**
 - 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE**
+- 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **READY TO EXECUTE**
+- 🎯 [REFACTOR-014] Extract YouthTeamId Workaround (1 hour) - **NEW** Create chpp_utils.get_user_teams() to centralize workaround **SIMPLIFICATION**
 - 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 
 **Priority 4: Core Functionality** (It does what it should)
+- 🎯 [BUG-008] Fix sorttable.js TypeError (30-45 min) - Fix `node.getAttribute is not a function` error preventing table sorting on update page **NEW**
+- 🎯 [BUG-009] Fix Player Changes Calculation Error (1-2 hours) - Resolve "list index out of range" error in main.py preventing player change display **NEW**
 - 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **READY**
 - 🎯 [FEAT-009] Display Player Group Names in Update Timeline (1-2 hours) - Show group names after player names when players belong to user groups **NEW**
 - 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **READY**
@@ -95,12 +108,13 @@
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-1. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues **HIGH PRIORITY**
-2. **[SECURITY-001] Werkzeug Security Update** (30-45 min) - P3 - Fix 4 CVE vulnerabilities **NEW P3 PRIORITY**
-3. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-4. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
+1. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns **NEW PRIORITY**
+2. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling **NEW**
+3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues **HIGH PRIORITY**
+4. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
+5. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
 
-**Next Action**: REFACTOR-002 Type System Consolidation (6-8 hours) to resolve 85 type drift issues, then SECURITY-001 Werkzeug CVE fixes.
+**Next Action**: REFACTOR-012 CHPP utilities consolidation (2-3 hours) to reduce duplication, then TEST-014 to restore 100% test pass rate.
 
 ---
 
@@ -533,6 +547,72 @@ Jalal Allaoui (Ytterback)
 - Group colors could be used for future enhancement
 
 **Expected Outcomes**: Users can easily identify which tactical group or formation players belong to when reviewing skill changes and updates.
+
+---
+
+### [BUG-008] Fix sorttable.js TypeError
+**Status**: 🎯 Ready to Execute | **Effort**: 30-45 min | **Priority**: P4 | **Impact**: User experience and data interaction
+**Dependencies**: None | **Strategic Value**: Core functionality restoration
+
+**Problem Statement**:
+JavaScript error `Uncaught TypeError: node.getAttribute is not a function` occurs in sorttable.js line 212, preventing table sorting functionality on the update data page. The error occurs in the getInnerText function when it tries to call getAttribute on a node that doesn't have this method (likely a text node instead of an element node).
+
+**Error Details**:
+```
+Uncaught TypeError: node.getAttribute is not a function
+    getInnerText http://localhost:5010/static/sorttable.js:212
+    getInnerText http://localhost:5010/static/sorttable.js:237
+    guessType http://localhost:5010/static/sorttable.js:171
+    makeSortable http://localhost:5010/static/sorttable.js:87
+    init http://localhost:5010/static/sorttable.js:36
+```
+
+**Root Cause**:
+The sorttable.js library is attempting to process table cells that may contain text nodes directly, or the table structure has changed after the pychpp 0.5.10 upgrade modifications, causing the sorting script to encounter unexpected node types.
+
+**Implementation**:
+1. Add null/type checking before calling `getAttribute()` in getInnerText function
+2. Verify that table structure in update.html template is correct
+3. Test table sorting functionality after fix
+
+**Acceptance Criteria**:
+- No JavaScript errors in console when loading update page
+- Table sorting works correctly on all columns
+- No regressions in table display or functionality
+
+---
+
+### [BUG-009] Fix Player Changes Calculation Error
+**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P4 | **Impact**: User experience and data display
+**Dependencies**: None | **Strategic Value**: Core functionality restoration
+
+**Problem Statement**:
+Error `[main.py] Error calculating player changes: list index out of range` occurs when displaying the home page, preventing player skill change timeline from displaying correctly. This error appears after the pychpp 0.5.10 upgrade.
+
+**Error Context**:
+- Occurs in main.py when trying to calculate player changes for display
+- Related to accessing list indices that may not exist
+- Likely caused by changes in data structure after pychpp upgrade
+- May be related to how player data or team names are stored/accessed
+
+**Root Cause Investigation**:
+The error suggests that code is trying to access a list index that doesn't exist, possibly:
+1. Accessing team names by index when list is empty or shorter than expected
+2. Player data structure changes from pychpp 0.5.10 affecting list access patterns
+3. Session data structure inconsistencies after API changes
+
+**Implementation**:
+1. Locate the specific code in main.py that calculates player changes
+2. Add bounds checking before accessing list indices
+3. Verify data structure assumptions are still valid after pychpp upgrade
+4. Handle edge cases (empty lists, None values)
+5. Test with various player data scenarios
+
+**Acceptance Criteria**:
+- No errors in logs when loading home page
+- Player change timeline displays correctly
+- All player statistics and changes show properly
+- Handles edge cases gracefully (no players, new users, etc.)
 
 ---
 

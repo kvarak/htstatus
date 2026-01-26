@@ -34,7 +34,7 @@ This ensures you are aware of all project requirements, standards, and current p
 chpp = CHPP(consumer_key, consumer_secret, session['access_key'], session['access_secret'])
 current_user = chpp.user()
 team = chpp.team(ht_id=teamid)
-players = team.players  # Live data from Hattrick
+players = team.players()  # Live data from Hattrick
 ```
 
 ### Database Architecture Specifics

@@ -12,16 +12,17 @@ HTStatus 2.0 is a Hattrick team management application with a dual frontend arch
 - **Backend**: Python (Flask), SQLAlchemy ORM
 - **Frontend**: React (Vite, TypeScript, TailwindCSS, Radix UI), Jinja2 templates (legacy)
 - **Database**: PostgreSQL
-- **API Integration**: pychpp (OAuth, CHPP API)
+- **API Integration**: pychpp 0.5.10 (OAuth, CHPP API) - upgraded January 2026 for security patches
 - **Dev Tools**: Makefile, Docker Compose, UV (Python deps), pytest, ruff, mypy
 - **PWA Features**: Service Worker, App Manifest, responsive design, offline functionality
 
 ## Implementation Details
 - **Session Management**: Flask sessions store OAuth tokens and team data
 - **Player/Match Data**: Synced from CHPP API, stored in Players, Match, MatchPlay tables
-- **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked
+- **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked (19/22 quality gates passing)
 - **CI/CD**: GitHub Actions for linting and basic CI
 - **Route Architecture**: Modern Flask blueprint architecture with 6 blueprints (auth, main, player, team, matches, training) registered in factory.py
+- **CHPP Integration Notes**: pychpp 0.5.10 has YouthTeamId parsing bug for users without youth teams - workaround implemented via XML extraction from managercompendium endpoint
 - **PWA Implementation**: Service Worker with cache-first strategy for static assets, network-first for dynamic content, offline functionality for core routes
 - **Mobile Optimization**: Responsive CSS, touch-friendly navigation, installable PWA with app manifest
 - **Security**:

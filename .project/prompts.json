@@ -72,6 +72,7 @@
         "Review progress.md, backlog.md. Holistic view for consolidation.",
         "Update with completed tasks. Move completed (✅) to history/backlog-done.md.",
         "Eliminate redundant tasks. Merge overlapping work.",
+        "Make sure 'make help' reflects current state.",
         "Unblock dependencies. Update docs to reflect current state.",
         "Aggressively remove complete and outdated content.",
         "Important: Search for completed tasks and delete them from the backlog. The backlog should be clean from historical tasks.",

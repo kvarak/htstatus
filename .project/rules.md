@@ -87,7 +87,7 @@
 chpp = CHPP(consumer_key, consumer_secret, session['access_key'], session['access_secret'])
 current_user = chpp.user()
 team = chpp.team(ht_id=teamid)
-players = team.players  # Live data from Hattrick
+players = team.players()  # Live data from Hattrick
 ```
 
 ### File Organization Rules
@@ -197,7 +197,7 @@ make help  # See all available commands
 - **Match Types**: League, cups, friendlies with IDs in `HTmatchtype` constants
 - **Authentication**: OAuth via pychpp, tokens stored in session
 - **Data Sync**: Live player data from CHPP API via `/update` route
-- **pychpp Reference**: Local git repository in `pychpp/` folder - checkout matching version tag to verify API compatibility and method signatures when debugging CHPP integration issues
+- **pychpp Reference**: Local git repository in `/Users/kvarak/repos/kvarak/pychpp` folder - checkout matching version tag to verify API compatibility and method signatures when debugging CHPP integration issues
 
 ### Database Architecture
 - **Multi-team**: `session['all_teams']` for user's teams
