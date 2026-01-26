@@ -8,6 +8,18 @@
 
 HTStatus 2.0 is a Hattrick team management application with a dual frontend architecture (legacy Flask and modern React) and a PostgreSQL backend. It integrates with the Hattrick CHPP API for live football data.
 
+### Hattrick Ownership Hierarchy
+
+Critical understanding for working with Hattrick's data model:
+
+- **User ID** (e.g., 182085 "kvarak") owns teams
+- **Team ID** (e.g., 9838 "Dalby Stenbrotters") owns players
+- `Players.owner` field = Team ID (correct in historical data)
+- `session['current_user_id']` = User ID
+- `session['all_teams']` = list of Team IDs owned by user
+
+**Important**: Auth fallback code must not use User ID as Team ID when `_teams_ht_id` fails, as URL patterns like `/player?id=USER_ID` will fail to find players owned by TEAM_ID.
+
 ## Key Technologies
 - **Backend**: Python (Flask), SQLAlchemy ORM
 - **Frontend**: React (Vite, TypeScript, TailwindCSS, Radix UI), Jinja2 templates (legacy)

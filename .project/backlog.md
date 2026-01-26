@@ -26,16 +26,7 @@
 
 ## Current Focus
 
-**Priority 0: Critical Bugs** (Functionality regressions)
-- No active P0 critical bugs - excellent stability ✅ ALL P0 BUGS RESOLVED
-- 📝 **CRITICAL ARCHITECTURE NOTE**: Hattrick ownership hierarchy clarified:
-  - User ID (e.g., 182085 "kvarak") owns teams
-  - Team ID (e.g., 9838 "Dalby Stenbrotters") owns players
-  - Players.owner field = Team ID (correct in historical data)
-  - session['current_user_id'] = User ID
-  - session['all_teams'] = list of Team IDs
-  - **ISSUE**: Auth fallback code may use user ID as team ID if `_teams_ht_id` fails
-  - **IMPACT**: URL `/player?id=USER_ID` fails to find players owned by TEAM_ID
+**Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 
 **Priority 1: Testing & App Reliability** - ✅ EXCELLENT - Testing infrastructure complete, 19/22 quality gates passing (86% success), coverage contexts operational
 
@@ -53,6 +44,7 @@
 - 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE**
 - 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **READY TO EXECUTE**
 - 🎯 [REFACTOR-014] Extract YouthTeamId Workaround (1 hour) - **NEW** Create chpp_utils.get_user_teams() to centralize workaround **SIMPLIFICATION**
+- 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **SIMPLIFICATION**
 - 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
@@ -78,7 +70,7 @@
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
 **Priority 6: Documentation & Polish** (Make it complete)
-- 🎯 [DOC-029] Comprehensive Documentation Cleanup (2-3 hours) - **CONSOLIDATED TASK**
+- 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED TASK** (includes UI consolidation, env config, navigation, waste elimination)
   - Remove legacy configuration files and unused configs/duplicates (DOC-026) - ✅ requirements.txt COMPLETE, .flake8 remaining
   - Consolidate environment templates from 3 to 2 variants (DOC-027)
   - Merge scattered README setup instructions (DOC-028)
@@ -98,7 +90,7 @@
 
 ## ✅ All Priority Levels Summary
 
-**P0**: ✅ All critical bugs resolved - No active functionality regressions
+**P0**: ✅ COMPLETE - All critical bugs resolved, no active functionality regressions
 **P1**: ✅ COMPLETE - Testing infrastructure operational (19/22 quality gates passing)
 **P2**: ✅ MILESTONE COMPLETE - Deployment & Operations infrastructure stable (INFRA-018 ✅ COMPLETE, INFRA-021 ✅ COMPLETE)
 **P3**: 🎯 CURRENT FOCUS - Type sync resolution (85 failures), security updates (SECURITY-001), blueprint auth test fix
@@ -785,6 +777,82 @@ Debug page has multiple issues affecting development workflow:
 
 ---
 
+### [REFACTOR-015] Simplify prompts.json UI Guidelines
+**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P3 | **Impact**: Reduced duplication, single source of truth
+**Dependencies**: DOC-031 (UI Documentation Consolidation) | **Strategic Value**: Eliminate redundant definitions, improve maintainability
+
+**Problem Statement**:
+The `.project/prompts.json` file contains **46 lines of UI guidelines** (color system, typography, spacing, components) that duplicate information from UI documentation files:
+- Color definitions: `hsl(120, 45%, 25%)` repeated in prompts.json AND ui-*.md files
+- Typography rules duplicated
+- Component patterns duplicated
+- Framework notes duplicated
+
+This creates:
+- Maintenance burden (update in 2 places: prompts.json + UI docs)
+- Risk of inconsistency between prompts.json and authoritative UI docs
+- Bloated prompts.json file (46 lines of redundant data)
+- Confusion about which source is authoritative
+
+**Implementation**:
+1. **Remove Redundant Definitions** (15 min):
+   - Delete detailed color_system object (7 HSL color definitions)
+   - Delete detailed typography object (headings, body, line_height)
+   - Delete detailed spacing rules
+   - Delete detailed components object
+   - Keep ONLY high-level reference to UI docs
+
+2. **Add Reference Pointer** (10 min):
+   - Replace detailed definitions with: "See .project/ui-guidelines.md for complete design system"
+   - Keep minimal hints for AI agents (e.g., "Use football green theme, see ui-guidelines.md")
+   - Add direct file path reference for easy lookup
+   - Preserve framework_notes (Flask vs React differences) as these are implementation-specific
+
+3. **Validate Prompts Still Work** (5 min):
+   - Test that "execute" prompt still references UI guidelines correctly
+   - Ensure AI agents can find UI documentation from simplified reference
+   - Verify no functionality lost
+
+**Before** (46 lines):
+```json
+"ui_guidelines": {
+  "color_system": {
+    "primary": "hsl(120, 45%, 25%)",
+    "success": "hsl(120, 70%, 35%)",
+    // ... 5 more colors
+  },
+  "typography": { /* detailed rules */ },
+  "spacing": "0.25rem increments...",
+  "components": { /* detailed patterns */ },
+  "framework_notes": { /* Flask/React differences */ }
+}
+```
+
+**After** (~10 lines):
+```json
+"ui_guidelines": {
+  "design_system": "See .project/ui-guidelines.md for complete color system, typography, spacing, and component patterns",
+  "quick_reference": "Football green theme (hsl(120, 45%, 25%)), responsive design, accessibility standards",
+  "framework_notes": {
+    "flask": "Use .btn-primary-custom, .table-custom, .card-custom classes",
+    "react": "Use existing button/table/card components, consistent with TailwindCSS utilities"
+  }
+}
+```
+
+**Acceptance Criteria**:
+- prompts.json ui_guidelines section reduced from 46 lines to ~10 lines
+- Redundant color/typography/spacing definitions removed
+- Clear reference to .project/ui-guidelines.md added
+- Framework-specific notes preserved (Flask vs React implementation)
+- AI agent prompts (execute, review) still function correctly
+- No loss of essential information for AI agents
+- Single source of truth established (ui-guidelines.md)
+
+**Expected Outcomes**: 75% reduction in prompts.json UI section, eliminated duplication, improved maintainability, single authoritative source for design system
+
+---
+
 ### [REFACTOR-003] Type Sync Issues Resolution
 **Status**: 🔮 Future Task | **Effort**: 8-12 hours | **Impact**: Type safety improvement
 **Dependencies**: INFRA-008 Type Sync Validation (completed) | **Strategic Value**: Clean dual architecture, reduced technical debt
@@ -923,6 +991,135 @@ Debug page has multiple issues affecting development workflow:
 ---
 
 ## Priority 6: Documentation & Polish
+
+### [DOC-029] Comprehensive Documentation Cleanup
+**Status**: 🎯 Ready to Execute | **Effort**: 4-5 hours | **Priority**: P6 | **Impact**: Major documentation and configuration simplification
+**Dependencies**: None | **Strategic Value**: Eliminate 40% documentation redundancy, single source of truth, cleaner repository
+
+**Problem Statement** (Consolidated cleanup addressing multiple issues):
+
+**1. UI Documentation Proliferation** - 5 separate UI documentation files (2,264 total lines) with significant overlap:
+- `ui-style-guide.md` (610 lines) - Color system, typography, components
+- `ui-design-guidelines.md` (444 lines) - Design patterns and templates
+- `ui-implementation-standards.md` (640 lines) - Flask/React implementation code examples
+- `ui-content-boxes-pattern.md` (389 lines) - Specific pattern documentation
+- `ui-audit-analysis.md` (181 lines) - Historical audit from January 2026 (completed work)
+
+This creates:
+- Confusion about which file to reference
+- Duplicate information across multiple files (color definitions, typography rules)
+- Maintenance burden (updates needed in multiple places)
+- Difficulty for AI agents and developers finding the right information
+
+**2. Environment Configuration Duplication** - 5 configuration files (440 lines) in `environments/` directory with 80%+ duplicate content:
+- `.env.development.example`, `.env.staging.example`, `.env.production.example` (440 lines total)
+- Each file repeats same variables with minor differences
+- Creates maintenance burden (update same variable 3 times)
+- Risk of inconsistency between files
+
+**3. Legacy Configuration Waste** - Obsolete files creating confusion:
+- `configs/requirements.txt` - **COMPLETELY EMPTY** (dependencies moved to pyproject.toml)
+- `configs/.flake8` - **OBSOLETE** (6 lines, replaced by ruff in pyproject.toml)
+- Add clutter and false impression of active use
+
+**4. Documentation Navigation Complexity** - 21+ documentation files without clear entry points:
+- 3 root docs + 14+ .project/ docs + 4 docs/ files
+- No clear "you are here" navigation
+- Duplication between .project/README.md and main README.md
+- Uncertainty about which file to read first
+
+**Implementation**:
+1. **Eliminate Legacy Configuration Waste** (15 min):
+   - Delete `configs/requirements.txt` (empty file)
+   - Delete `configs/.flake8` (obsolete, using ruff)
+   - Update configs/README.md if needed
+   - Verify no references in codebase or CI/CD
+
+2. **Consolidate Core Design System** (1-1.5 hours):
+   - Merge `ui-style-guide.md` + `ui-design-guidelines.md` + `ui-content-boxes-pattern.md` → `ui-guidelines.md`
+   - Structure: Colors → Typography → Spacing → Components → Patterns → Design Philosophy
+   - Remove duplicate color/typography definitions
+   - Integrate content-boxes pattern as section in main guidelines
+   - Create single authoritative source for design decisions
+
+2. **Archive Historical Content** (15 min):
+   - Move `ui-audit-analysis.md` to `.project/history/ui-audit-analysis.md`
+   - Update with "Completed January 2026" header
+   - This is historical context, not active development guidance
+
+3. **Refine Implementation Guide** (30 min):
+   - Keep `ui-implementation-standards.md` as separate file (implementation details)
+   - Remove redundant design theory (reference ui-guidelines.md instead)
+   - Focus purely on Flask/React code examples and integration patterns
+   - Add "See ui-guidelines.md for design system" cross-reference
+
+4. **Update All References** (30-45 min):
+   - Update `backlog.md` task descriptions referencing old UI docs
+   - Update `prompts.json` UI guidelines section (see REFACTOR-015)
+   - Update any cross-references in other .project/ docs
+   - Fix broken links and ensure consistency
+
+**Acceptance Criteria**:
+- 5 UI documentation files reduced to 2 active files
+- `ui-guidelines.md` created as single source of truth for design system
+- `ui-implementation-standards.md` focused on code examples only
+- `ui-audit-analysis.md` moved to .project/history/
+- Old files (`ui-style-guide.md`, `ui-design-guidelines.md`, `ui-content-boxes-pattern.md`) deleted
+- All backlog.md and prompts.json references updated
+- No duplicate color/typography definitions across files
+- Clear navigation between guidelines (design) and implementation (code)
+
+**File Structure After Consolidation**:
+- `ui-guidelines.md` (~900 lines) - Design system authority: colors, typography, components, patterns
+- `ui-implementation-standards.md` (~500 lines) - Code examples: Flask classes, React components
+- `.project/history/ui-audit-analysis.md` - Historical audit (archived)
+
+**Expected Reduction**: 2,264 lines → ~1,400 lines (38% reduction), 5 files → 2 active files
+
+**Expected Outcomes**: Single source of truth for UI design, reduced maintenance burden, improved clarity for developers and AI agents, eliminated duplication
+
+3. **Environment Configuration Simplification** (1 hour):
+   - Create unified `.env.template` with inline environment variants
+   - Format: `# Development: value1 | Staging: value2 | Production: value3`
+   - Delete 3 separate `.env.*.example` files (development, staging, production)
+   - Enhance `config.py.example` with detailed comments
+   - Update environments/README.md and main README.md
+   - Expected: 440 lines → ~200 lines (55% reduction)
+
+4. **Documentation Navigation Simplification** (1-2 hours):
+   - Add "Documentation Index" section to main README.md
+   - Create categories: Getting Started, Development, Architecture, Planning, Deployment
+   - Consolidate or reference .project/README.md content
+   - Add cross-references and "See Also" links to all major docs
+   - Create consistent "Quick Navigation" sections
+   - Ensure new developers can find docs in <30 seconds
+
+5. **Update AI Agent References** (15 min):
+   - Update `prompts.json` UI guidelines section (see REFACTOR-015)
+   - Update all task references in backlog.md
+   - Fix any broken cross-references
+
+**Acceptance Criteria**:
+- ✅ Legacy waste eliminated: configs/requirements.txt and configs/.flake8 deleted
+- ✅ UI docs consolidated: 5 files → 2 active files (ui-guidelines.md + ui-implementation-standards.md)
+- ✅ ui-audit-analysis.md moved to .project/history/
+- ✅ Environment configs: Single .env.template replacing 3 duplicate .env.*.example files
+- ✅ Documentation navigation: README.md has clear index, .project/README.md consolidated or focused
+- ✅ All backlog.md and prompts.json references updated
+- ✅ No duplicate color/typography definitions across files
+- ✅ Total reduction: ~850 lines eliminated, 6 files removed, 38% documentation reduction
+- ✅ Clear single sources of truth established for UI design, environment config, navigation
+
+**Expected Outcomes**:
+- Cleaner repository (6 fewer files)
+- 38% reduction in UI documentation lines (2,264 → ~1,400)
+- 55% reduction in environment config lines (440 → ~200)
+- Eliminated maintenance burden from duplicate definitions
+- Single authoritative sources for all documentation categories
+- Improved developer and AI agent navigation
+- Faster onboarding with clearer entry points
+
+---
 
 ### [DOC-011] API Documentation
 **Status**: 🎯 Ready to Execute | **Effort**: 4-6 hours | **Impact**: Developer experience
@@ -1820,73 +2017,7 @@ Recent blueprint migration created new code organization but test coverage dropp
 
 ---
 
-### [SIMPLIFY-003] Consolidate Environment Templates
-**Status**: 🎯 Ready to Execute | **Effort**: 30 minutes | **Priority**: P6 | **Impact**: Reduced decision complexity
-**Dependencies**: None | **Strategic Value**: Simplified environment setup
-
-**Problem Statement**:
-3 environment templates + duplicate config.py examples create decision paralysis and maintenance overhead.
-
-**Implementation**:
-1. **Merge Staging into Production** (15 min):
-   - Review .env.staging.example differences
-   - Merge unique staging configurations into .env.production.example
-   - Remove .env.staging.example
-
-2. **Remove Duplicate Config Template** (10 min):
-   - Choose between config.py.template vs environments/config.py.example
-   - Remove the redundant one
-   - Update documentation references
-
-3. **Update Documentation** (5 min):
-   - Update environments/README.md
-   - Simplify setup instructions
-
-**Acceptance Criteria**:
-- 2 environment templates instead of 3
-- 1 config.py template instead of 2
-- Documentation updated consistently
-- No setup functionality lost
-
-**Expected Outcomes**: Simpler environment setup, reduced maintenance overhead
-
----
-
-### [SIMPLIFY-004] Consolidate README Files
-**Status**: 🎯 Ready to Execute | **Effort**: 1 hour | **Priority**: P6 | **Impact**: Documentation consistency
-**Dependencies**: None | **Strategic Value**: Single source of truth for setup
-
-**Problem Statement**:
-5 README files with overlapping content create confusion about where to find setup instructions and project information.
-
-**Implementation**:
-1. **Merge Subdirectory READMEs** (30 min):
-   - Integrate configs/README.md content into main README or DEPLOYMENT.md
-   - Integrate environments/README.md content into main README
-   - Integrate scripts/README.md content into main README or TECHNICAL.md
-
-2. **Handle Development Methodology** (20 min):
-   - Evaluate .project/README.md content
-   - Merge relevant content into documentation-guide.md or main README
-   - Remove redundant development workflow descriptions
-
-3. **Update Cross-References** (10 min):
-   - Find and update any links to removed README files
-   - Ensure navigation remains functional
-
-**Acceptance Criteria**:
-- Single authoritative README.md for project setup
-- Subdirectory content integrated appropriately
-- No broken links or references
-- Information remains accessible
-
-**Expected Outcomes**: Clear information hierarchy, reduced documentation maintenance, better user experience
-
-
-**Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P6 | **Impact**: Documentation clarity
-**Dependencies**: REFACTOR-007 (✅ completed) | **Strategic Value**: Accurate technical documentation
-
-**Problem Statement**:
+### [DOC-023] Update TECHNICAL.md Route Architecture
 TECHNICAL.md contains extensive outdated information about route architecture that contradicts the current system:
 - **Line 22**: "Dual registration system with functional routes in routes.py and blueprint organization in routes_bp.py" - routes.py no longer exists
 - **Lines 30-55**: Entire "Route Ownership Strategy" section describes BUG-001 resolution and "dual registration" - this is historical context, not current architecture
