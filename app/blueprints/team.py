@@ -60,6 +60,8 @@ def team():
 @require_authentication
 def update():
     """Update player data from Hattrick API."""
+    from models import Players  # Import here to avoid circular dependencies
+
     dprint(1, "=== DATA UPDATE PROCESS STARTED ===")
 
     # Session state validation using standardized functions
@@ -120,9 +122,6 @@ def update():
     # changesplayers_day = []  # TODO: Unused - remove if not needed
     # changesplayers_week = []  # TODO: Unused - remove if not needed
 
-    for i in range(len(all_teams)):
-        updated[all_teams[i]] = [all_team_names[i]]
-
     new_players = []
     left_players = []
     playernames = {}
@@ -131,6 +130,14 @@ def update():
         try:
             the_team = chpp.team(ht_id=teamid)
             dprint(1, f"Team data fetched successfully: {the_team.name}")
+
+            # Use the actual team name from CHPP API instead of session data
+            updated[teamid] = [the_team.name]
+
+            # Update session with correct team name
+            team_index = all_teams.index(teamid)
+            session['all_team_names'][team_index] = the_team.name
+            session.modified = True
 
         except Exception as e:
             error_details = traceback.format_exc()
@@ -148,9 +155,9 @@ def update():
 
         try:
             dprint(1, f"Fetching players for team: {the_team.name}")
-            players_count = len(the_team.players)
+            players_count = len(the_team.players())
             dprint(1, f"Found {players_count} players in team")
-            dprint(2, the_team.players)
+            dprint(2, the_team.players())
 
         except Exception as e:
             errorincode = traceback.format_exc()
@@ -175,25 +182,26 @@ def update():
             )
 
         players_fromht = []
-        for p in the_team.players:
+        for p in the_team.players():
             thisplayer = {}
 
-            the_player = chpp.player(ht_id=p.ht_id)
+            the_player = chpp.player(id_=p.id)
 
             if the_player.transfer_details:
                 dprint(2, "transfer details --- ", the_player.transfer_details.deadline)
 
-            thisplayer["ht_id"] = p.ht_id
+            thisplayer["ht_id"] = p.id
             thisplayer["first_name"] = p.first_name
             thisplayer["nick_name"] = p.nick_name
             thisplayer["last_name"] = p.last_name
             thisplayer["number"] = p.number
             thisplayer["category_id"] = p.category_id
             thisplayer["owner_notes"] = p.owner_notes
-            thisplayer["age_years"] = p.age_years
+            thisplayer["age_years"] = p.age  # pychpp 0.5.10+ uses 'age' instead of 'age_years'
             thisplayer["age_days"] = p.age_days
             thisplayer["age"] = p.age
-            thisplayer["next_birthday"] = p.next_birthday
+            # next_birthday no longer available in pychpp 0.5.10+
+            thisplayer["next_birthday"] = None
 
             thedate = dt(
                 p.arrival_date.year,
@@ -208,8 +216,9 @@ def update():
             thisplayer["cards"] = p.cards
             thisplayer["injury_level"] = p.injury_level
             thisplayer["statement"] = p.statement
-            thisplayer["language"] = p.language
-            thisplayer["language_id"] = p.language_id
+            # language/language_id removed in pychpp 0.5.10+, use country_id instead
+            thisplayer["language"] = None
+            thisplayer["language_id"] = getattr(p, 'country_id', None)
             thisplayer["agreeability"] = p.agreeability
             thisplayer["aggressiveness"] = p.aggressiveness
             thisplayer["honesty"] = p.honesty
@@ -217,9 +226,10 @@ def update():
             thisplayer["loyalty"] = p.loyalty
             thisplayer["aggressiveness"] = p.aggressiveness
             thisplayer["specialty"] = p.specialty
-            thisplayer["native_country_id"] = p.native_country_id
-            thisplayer["native_league_id"] = p.native_league_id
-            thisplayer["native_league_name"] = p.native_league_name
+            # native_country_id/native_league_id/native_league_name removed in pychpp 0.5.10+
+            thisplayer["native_country_id"] = getattr(p, 'country_id', None)
+            thisplayer["native_league_id"] = None
+            thisplayer["native_league_name"] = None
             thisplayer["tsi"] = p.tsi
             thisplayer["salary"] = p.salary
             thisplayer["caps"] = p.caps
@@ -228,23 +238,19 @@ def update():
             thisplayer["career_hattricks"] = p.career_hattricks
             thisplayer["league_goals"] = p.league_goals
             thisplayer["cup_goals"] = p.cup_goals
-            thisplayer["friendly_goals"] = p.friendly_goals
-            thisplayer["current_team_matches"] = p.current_team_matches
-            thisplayer["current_team_goals"] = p.current_team_goals
+            thisplayer["friendly_goals"] = p.friendlies_goals  # renamed in pychpp 0.5.10+
+            thisplayer["current_team_matches"] = p.matches_current_team  # renamed in pychpp 0.5.10+
+            thisplayer["current_team_goals"] = p.goals_current_team  # renamed in pychpp 0.5.10+
             thisplayer["national_team_id"] = p.national_team_id
-            thisplayer["national_team_name"] = p.national_team_name
-            thisplayer["is_transfer_listed"] = the_player.is_transfer_listed
-            thisplayer["team_id"] = p.team_ht_id
+            thisplayer["national_team_name"] = None  # removed in pychpp 0.5.10+
+            thisplayer["is_transfer_listed"] = p.transfer_listed  # renamed in pychpp 0.5.10+
+            thisplayer["team_id"] = None  # team_ht_id removed in pychpp 0.5.10+
             thisplayer["mother_club_bonus"] = p.mother_club_bonus
             thisplayer["leadership"] = p.leadership
 
-            # Debug: Check which object has skills
-            # Use the_player.skills instead of p.skills for pychpp 0.3.12
-            skills_source = (
-                the_player.skills
-                if hasattr(the_player, "skills") and the_player.skills
-                else p.skills
-            )
+            # In pychpp 0.5.10+, use p.player_skills directly
+            # It's now a PlayerSkills object, not a dict
+            skills_source = p.player_skills if hasattr(p, "player_skills") else None
 
             # Helper function to safely extract int from skill value
             def safe_skill_int(skill_val):
@@ -259,35 +265,36 @@ def update():
                     return 0
 
             thisplayer["stamina"] = safe_skill_int(
-                skills_source.get("stamina") if skills_source else None
+                getattr(skills_source, "stamina", None) if skills_source else None
             )
             thisplayer["keeper"] = safe_skill_int(
-                skills_source.get("keeper") if skills_source else None
+                getattr(skills_source, "keeper", None) if skills_source else None
             )
             thisplayer["defender"] = safe_skill_int(
-                skills_source.get("defender") if skills_source else None
+                getattr(skills_source, "defender", None) if skills_source else None
             )
             thisplayer["playmaker"] = safe_skill_int(
-                skills_source.get("playmaker") if skills_source else None
+                getattr(skills_source, "playmaker", None) if skills_source else None
             )
             thisplayer["winger"] = safe_skill_int(
-                skills_source.get("winger") if skills_source else None
+                getattr(skills_source, "winger", None) if skills_source else None
             )
             thisplayer["passing"] = safe_skill_int(
-                skills_source.get("passing") if skills_source else None
+                getattr(skills_source, "passing", None) if skills_source else None
             )
             thisplayer["scorer"] = safe_skill_int(
-                skills_source.get("scorer") if skills_source else None
+                getattr(skills_source, "scorer", None) if skills_source else None
             )
             thisplayer["set_pieces"] = safe_skill_int(
-                skills_source.get("set_pieces") if skills_source else None
+                getattr(skills_source, "set_pieces", None) if skills_source else None
             )
 
             thisplayer["data_date"] = time.strftime("%Y-%m-%d")
 
+            # Owner is the team ID (players are owned by teams, not users)
             thisplayer["owner"] = teamid
 
-            playernames[p.ht_id] = p.first_name + " " + p.last_name
+            playernames[p.id] = p.first_name + " " + p.last_name
 
             try:
                 dbplayer = (
@@ -357,12 +364,19 @@ def update():
         updated[teamid].append("/player?id=" + str(teamid))
         updated[teamid].append("players")
 
-        # Of each of the players you ever have owned, get the last download
+        # Get the most recent player roster from database to compare
+        # We need to find the latest data_date and get only those players
+        from sqlalchemy import func
+        latest_date_subquery = (
+            db.session.query(func.max(Players.data_date))
+            .filter_by(owner=teamid)
+            .scalar_subquery()
+        )
+
         players_data = (
             db.session.query(Players)
             .filter_by(owner=teamid)
-            .order_by(text("number"))
-            .order_by(text("data_date"))
+            .filter(Players.data_date == latest_date_subquery)
             .all()
         )
         players_indb = []

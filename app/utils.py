@@ -847,7 +847,7 @@ def downloadMatches(teamid):
                 dprint(2, " - Adding ", p.first_name, " ", p.last_name, " to database")
                 thismatchlineup = {}
                 thismatchlineup["match_id"] = match.ht_id
-                thismatchlineup["player_id"] = p.ht_id
+                thismatchlineup["player_id"] = p.id
                 thismatchlineup["datetime"] = thedate
                 thismatchlineup["role_id"] = p.role_id
                 thismatchlineup["first_name"] = p.first_name

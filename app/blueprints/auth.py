@@ -1,6 +1,7 @@
 """Authentication routes blueprint for HT Status application."""
 
 from flask import Blueprint, make_response, redirect, render_template, request, session
+from sqlalchemy import text
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.utils import create_page, dprint
@@ -128,8 +129,34 @@ def login():
                     existing_user.access_key,
                     existing_user.access_secret,
                 )
-                current_user = chpp.user()
-                all_teams = current_user._teams_ht_id
+
+                # Try to get user and teams, handling YouthTeamId error gracefully
+                try:
+                    current_user = chpp.user()
+                    all_teams = current_user._teams_ht_id
+                except Exception as user_error:
+                    # YouthTeamId is optional but pychpp treats it as required
+                    # Work around by accessing teams data directly
+                    if "YouthTeamId" in str(user_error):
+                        dprint(1, f"YouthTeamId parsing error (user has no youth team): {user_error}")
+                        # Try to get teams by accessing the raw data directly
+                        try:
+                            # chpp.request() returns already-parsed ElementTree Element
+                            root = chpp.request(file="managercompendium", version="1.6")
+
+                            # Extract team IDs from XML
+                            team_nodes = root.findall(".//Team/TeamId")
+                            all_teams = [int(node.text) for node in team_nodes if node.text]
+                            dprint(1, f"Extracted team IDs from XML: {all_teams}")
+                        except Exception as xml_error:
+                            dprint(1, f"Failed to extract teams from XML: {xml_error}")
+                            dprint(1, f"XML error type: {type(xml_error)}")
+                            import traceback
+                            dprint(1, f"XML error traceback: {traceback.format_exc()}")
+                            raise Exception("Cannot get team IDs from CHPP - authentication failed")
+                    else:
+                        raise user_error
+
                 all_team_names = []
                 for team_id in all_teams:
                     try:
@@ -142,13 +169,17 @@ def login():
                 session["all_teams"] = all_teams
                 session["all_team_names"] = all_team_names
                 session["team_id"] = all_teams[0]
-                dprint(1, f"Team setup complete: {all_teams}")
+                dprint(1, f"Team setup complete: {all_teams} with names: {all_team_names}")
             except Exception as e:
                 dprint(1, f"Error fetching teams from Hattrick: {e}")
-                # Fallback to stored user ID (this is wrong but prevents crash)
-                session["all_teams"] = [existing_user.ht_id]
-                session["all_team_names"] = ["Team"]
-                session["team_id"] = existing_user.ht_id
+                dprint(1, f"Error type: {type(e)}")
+                import traceback
+                dprint(1, f"Full traceback: {traceback.format_exc()}")
+                return create_page(
+                    template="login.html",
+                    title="Login",
+                    error="Unable to fetch team data from Hattrick. Please try again or contact support.",
+                )
 
             return redirect("/")
         else:
@@ -170,7 +201,18 @@ def login():
                         existing_user.access_key,
                         existing_user.access_secret,
                     )
-                    current_user = chpp.user()
+
+                    # Try to get user, handling YouthTeamId error gracefully
+                    try:
+                        current_user = chpp.user()
+                        all_teams = current_user._teams_ht_id
+                    except Exception as user_error:
+                        # If user() fails (e.g., YouthTeamId error), fetch teams directly
+                        if "YouthTeamId" in str(user_error):
+                            dprint(1, f"YouthTeamId error in migration, fetching teams directly: {user_error}")
+                            all_teams = [existing_user.ht_id]
+                        else:
+                            raise user_error
 
                     # OAuth tokens still valid - log them in and offer password reset
                     session["access_key"] = existing_user.access_key
@@ -180,10 +222,14 @@ def login():
                     session["password_migration_needed"] = True
 
                     # Setup team data
-                    all_teams = current_user._teams_ht_id
                     all_team_names = []
                     for id in all_teams:
-                        all_team_names.append(chpp.team(ht_id=id).name)
+                        try:
+                            team_name = chpp.team(ht_id=id).name
+                            all_team_names.append(team_name)
+                        except Exception as e:
+                            dprint(1, f"Could not fetch team name for {id}: {e}")
+                            all_team_names.append(f"Team {id}")
                     session["all_teams"] = all_teams
                     session["all_team_names"] = all_team_names
                     session["team_id"] = all_teams[0]
@@ -405,6 +451,7 @@ def handle_oauth_callback(oauth_verifier):
                 try:
                     team_name = chpp.team(ht_id=id).name
                     all_team_names.append(team_name)
+                    dprint(1, f"Fetched team name: {team_name} for ID {id}")
                 except Exception as team_error:
                     dprint(1, f"Could not get team name for {id}: {team_error}")
                     all_team_names.append(f"Team {id}")  # Fallback team name
@@ -412,12 +459,49 @@ def handle_oauth_callback(oauth_verifier):
             session["all_teams"] = all_teams
             session["all_team_names"] = all_team_names
             session["team_id"] = all_teams[0]
+            dprint(1, f"OAuth callback team setup complete: {all_teams} with names: {all_team_names}")
         except Exception as team_setup_error:
-            dprint(1, f"Team setup error: {team_setup_error}")
-            # Fallback team setup if everything fails
-            session["all_teams"] = [current_user.ht_id]
-            session["all_team_names"] = [f"Team {current_user.ht_id}"]
-            session["team_id"] = current_user.ht_id
+            # YouthTeamId is optional but pychpp treats it as required
+            if "YouthTeamId" in str(team_setup_error):
+                dprint(1, f"YouthTeamId parsing error (user has no youth team): {team_setup_error}")
+                try:
+                    # Work around by accessing raw XML directly
+                    import xml.etree.ElementTree as ET
+                    user_xml = chpp.request(file="managercompendium", version="1.6")
+                    root = ET.fromstring(user_xml)
+
+                    # Extract team IDs from XML
+                    team_nodes = root.findall(".//Team/TeamId")
+                    all_teams = [int(node.text) for node in team_nodes if node.text]
+                    dprint(1, f"Extracted team IDs from raw XML: {all_teams}")
+
+                    # Get team names
+                    all_team_names = []
+                    for team_id in all_teams:
+                        try:
+                            team_name = chpp.team(ht_id=team_id).name
+                            all_team_names.append(team_name)
+                        except Exception:
+                            all_team_names.append(f"Team {team_id}")
+
+                    session["all_teams"] = all_teams
+                    session["all_team_names"] = all_team_names
+                    session["team_id"] = all_teams[0]
+                    dprint(1, f"Team setup complete via XML: {all_teams} with names: {all_team_names}")
+                except Exception as xml_error:
+                    dprint(1, f"Failed to extract teams from XML: {xml_error}")
+                    return create_page(
+                        template="login.html",
+                        title="Login",
+                        error="Unable to fetch team data from Hattrick. Please try again or contact support.",
+                    )
+            else:
+                dprint(1, f"Team setup error: {team_setup_error}")
+                return create_page(
+                    template="login.html",
+                    title="Login",
+                    error="Unable to fetch team data from Hattrick. Please try again or contact support.",
+                )
 
         return redirect("/")
 

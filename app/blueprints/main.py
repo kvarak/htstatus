@@ -52,6 +52,11 @@ def index():
             activeusers=len(activeusers),
         )
 
+    # Check if session has team data (may be missing if CHPP failed during login)
+    if "all_teams" not in session or not session["all_teams"]:
+        session.clear()
+        return redirect(url_for("auth.login"))
+
     all_teams = session["all_teams"]
     all_team_names = session["all_team_names"]
     updated = {}

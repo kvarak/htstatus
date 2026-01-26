@@ -82,11 +82,10 @@ def player():
         return handle_error(TeamAccessError(error_msg))
 
     if updategroup and playerid and groupid:
-        current_user_id = get_current_user_id()
         if int(groupid) < 0:
             theconnection = (
                 db.session.query(PlayerSetting)
-                .filter_by(player_id=int(playerid), user_id=current_user_id)
+                .filter_by(player_id=int(playerid), user_id=session["current_user_id"])
                 .first()
             )
             if theconnection:
@@ -95,19 +94,19 @@ def player():
         else:
             connection = (
                 db.session.query(PlayerSetting)
-                .filter_by(player_id=int(playerid), user_id=current_user_id)
+                .filter_by(player_id=int(playerid), user_id=session["current_user_id"])
                 .first()
             )
             if connection:
                 (
                     db.session.query(PlayerSetting)
-                    .filter_by(player_id=int(playerid), user_id=current_user_id)
+                    .filter_by(player_id=int(playerid), user_id=session["current_user_id"])
                     .update({"group_id": groupid})
                 )
                 db.session.commit()
             else:
                 newconnection = PlayerSetting(
-                    player_id=int(playerid), user_id=current_user_id, group_id=groupid
+                    player_id=int(playerid), user_id=session["current_user_id"], group_id=groupid
                 )
                 db.session.add(newconnection)
                 db.session.commit()
@@ -144,18 +143,40 @@ def player():
         players_now.append(val)
 
     # Of each of the players you ever have owned, get the first download
-    players_data = (
+    players_data_oldest = (
         db.session.query(Players)
         .filter_by(owner=teamid)
-        .order_by(text("data_date desc"))
+        .order_by(Players.data_date.asc())
         .all()
     )
-    newlst = {}
-    for thislist in players_data:
-        newlst[thislist.ht_id] = dict(iter(thislist))
+
+    if players_data_oldest:
+        first_rec = players_data_oldest[0]
+        dprint(1, f"DEBUG: First record - player {first_rec.ht_id}, date {first_rec.data_date}, owner {first_rec.owner}")
+        last_rec = players_data_oldest[-1]
+        dprint(1, f"DEBUG: Last record - player {last_rec.ht_id}, date {last_rec.data_date}")
+
     players_oldest_dict = {}
-    for _k, val in newlst.items():
-        players_oldest_dict[val["ht_id"]] = val
+    for thislist in players_data_oldest:
+        # Only keep the first (oldest) record for each player
+        if thislist.ht_id not in players_oldest_dict:
+            players_oldest_dict[thislist.ht_id] = dict(iter(thislist))
+
+    # Debug: Check a sample player
+    if players_oldest_dict:
+        sample_ht_id = list(players_oldest_dict.keys())[0]
+        sample_oldest = players_oldest_dict[sample_ht_id]
+        dprint(1, f"DEBUG player.py: Sample player {sample_ht_id}")
+        dprint(1, f"  oldest date: {sample_oldest.get('data_date')}")
+        dprint(1, f"  oldest keeper: {sample_oldest.get('keeper')}")
+
+        # Find the same player in players_now
+        sample_now = next((p for p in players_now if p['ht_id'] == sample_ht_id), None)
+        if sample_now:
+            dprint(1, f"  current date: {sample_now.get('data_date')}")
+            dprint(1, f"  current keeper: {sample_now.get('keeper')}")
+            dprint(1, f"  difference: {sample_now.get('keeper') - sample_oldest.get('keeper')}")
+
 
     # Add stars to the list of players
     for p in players_now:
