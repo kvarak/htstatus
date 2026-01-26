@@ -1,0 +1,152 @@
+"""Data model classes for CHPP API responses.
+
+Matches pychpp interface exactly for zero breaking changes.
+Supports dict-like access for backward compatibility.
+"""
+
+from dataclasses import dataclass, field
+from typing import Any
+
+
+@dataclass
+class CHPPUser:
+    """User data from managercompendium endpoint.
+
+    Attributes:
+        ht_id: Hattrick user ID
+        username: Hattrick login name
+        _teams_ht_id: List of team IDs owned by user
+        youth_team_id: Youth team ID (optional, fixes pychpp bug)
+        _SOURCE_FILE: CHPP file name (for compatibility)
+    """
+
+    ht_id: int
+    username: str
+    _teams_ht_id: list[int]
+    youth_team_id: int | None = None
+    _SOURCE_FILE: str = "managercompendium"
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access: user['ht_id']."""
+        return getattr(self, key)
+
+
+@dataclass
+class CHPPTeam:
+    """Team data from teamdetails endpoint.
+
+    Attributes:
+        team_id: Hattrick team ID
+        name: Full team name
+        short_team_name: Abbreviated team name
+        league_name: League name
+        league_level: League level (1-11)
+        region_id: Region ID
+        founded_date: Team foundation date
+        arena_name: Arena/stadium name
+        arena_id: Arena ID
+        fanclub_size: Number of fanclub members
+        fans_mood: Current fan mood
+        fans_match_attitude: Fan attitude for matches
+        dress_uri: Team kit image URI
+        dress_alternate_uri: Alternate kit image URI
+        _players: Internal list of players (lazy loaded)
+        _SOURCE_FILE: CHPP file name (for compatibility)
+    """
+
+    team_id: int
+    name: str
+    short_team_name: str
+    league_name: str | None = None
+    league_level: int | None = None
+    region_id: int | None = None
+    founded_date: str | None = None
+    arena_name: str | None = None
+    arena_id: int | None = None
+    fanclub_size: int | None = None
+    fans_mood: str | None = None
+    fans_match_attitude: str | None = None
+    dress_uri: str | None = None
+    dress_alternate_uri: str | None = None
+    _players: list["CHPPPlayer"] = field(default_factory=list)
+    _SOURCE_FILE: str = "teamdetails"
+
+    def players(self) -> list["CHPPPlayer"]:
+        """Return list of players (lazy loaded).
+
+        Returns:
+            List of CHPPPlayer instances
+
+        Note:
+            Populated by CHPP.team() method when fetching team data
+        """
+        return self._players
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access: team['name']."""
+        return getattr(self, key)
+
+
+@dataclass
+class CHPPPlayer:
+    """Player data from players endpoint.
+
+    Attributes:
+        player_id: Hattrick player ID
+        first_name: Player first name
+        last_name: Player last name
+        nick_name: Player nickname (optional)
+        age: Player age in years
+        age_days: Additional days beyond age years
+        tsi: Total Skill Index
+        player_number: Jersey number
+        form: Current form level (0-8)
+        stamina: Stamina level (0-9)
+        experience: Experience level (0-20)
+        loyalty: Loyalty level (0-20)
+        keeper: Goalkeeping skill (0-20)
+        defender: Defending skill (0-20)
+        playmaker: Playmaking skill (0-20)
+        winger: Winger skill (0-20)
+        passing: Passing skill (0-20)
+        scorer: Scoring skill (0-20)
+        set_pieces: Set pieces skill (0-20)
+        specialty: Player specialty (0-8, optional)
+        injury_level: Injury severity (-1 for none, 0-6)
+        statement: Player statement text
+        owner_notes: Manager's notes about player
+        transfer_listed: Whether player is on transfer list
+        _SOURCE_FILE: CHPP file name (for compatibility)
+    """
+
+    player_id: int
+    first_name: str
+    last_name: str
+    nick_name: str | None
+    age: int
+    age_days: int
+    tsi: int
+    player_number: int
+    form: int
+    stamina: int
+    experience: int
+    loyalty: int
+    # 7 Core Skills
+    keeper: int
+    defender: int
+    playmaker: int
+    winger: int
+    passing: int
+    scorer: int
+    set_pieces: int
+    # Additional attributes
+    specialty: int | None = None
+    injury_level: int = 0
+    statement: str | None = None
+    owner_notes: str | None = None
+    transfer_listed: bool = False
+    _SOURCE_FILE: str = "players"
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access: player['scorer']."""
+        return getattr(self, key)
