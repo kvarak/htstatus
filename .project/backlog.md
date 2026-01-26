@@ -46,8 +46,6 @@
 - 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments after custom client completion **SIMPLIFICATION**
 - 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **SIMPLIFICATION**
 - 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
-- 🎯 [REFACTOR-023] Consolidate get_chpp_client() (30-45 min) - **NEW** Extract duplicate `get_chpp_client()` functions from auth.py and team.py into shared `app/chpp_utils.py` **SIMPLIFICATION** (discovered in INFRA-025 review)
-- 🎯 [REFACTOR-024] Startup Logging Enhancement (30-45 min) - **NEW** Move feature flag status display from routes_bp.py to factory.py and generalize as configuration status report **SIMPLIFICATION** (discovered in INFRA-025 review)
 - 🎯 [INFRA-027] Feature Flag Configuration Documentation (30 min) - **NEW** Create `.env.example` entries and deployment guide for USE_CUSTOM_CHPP flag **DOCUMENTATION** (discovered in INFRA-025 review)
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
@@ -95,7 +93,7 @@
 **P0**: ✅ COMPLETE (8/8) - All critical bugs resolved, zero regressions
 **P1**: ✅ MILESTONE COMPLETE (18/18) - Custom CHPP client operational, feature flag deployed
 **P2**: ✅ MILESTONE COMPLETE (3/3) - Deployment infrastructure stable (INFRA-018, INFRA-021, INFRA-025)
-**P3**: 🎯 CURRENT FOCUS - Type sync (85 issues), UI guidelines, 3 new simplification tasks (REFACTOR-023, REFACTOR-024, INFRA-027)
+**P3**: 🎯 CURRENT FOCUS - Type sync (85 issues), UI guidelines, simplification tasks (INFRA-027, REFACTOR-013, REFACTOR-021, REFACTOR-015)
 **P4**: Ready (9 tasks) - Core functionality improvements and bug fixes
 **P5**: Ready (6 tasks) - DevOps and developer experience
 **P6**: Ready (1 consolidated task) - Documentation cleanup and new content
@@ -103,20 +101,11 @@
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-### 🔴 **URGENT: Active Debug Session**
-**[BUG-013-DEBUG] Custom CHPP player() Endpoint OAuth 401 Error** (1-2 hours) - P2 BLOCKING - Actively debugging 401 Unauthorized error when custom CHPP calls player() endpoint. Works for user() and team() endpoints but fails on player(). OAuth signature issue specific to player endpoint with Hattrick API. Non-blocking to production (pychpp default works), but blocking INFRA-026 finalization.
+**Priority 2: Custom CHPP Completion**:
 
-**Investigation approach**:
-- Compare HTTP request signatures between pychpp (working) and custom CHPP (failing) for player endpoint
-- Check if playerId parameter encoding differs from other endpoints
-- Verify if access token scope includes player endpoint permissions
-- Test if nonce/timestamp handling is different for subsequent API calls
-- Check Hattrick API documentation for player endpoint-specific OAuth requirements
+1. **[INFRA-028] Fix Custom CHPP Data Parity** (2-3 hours) - P2 - **READY TO EXECUTE** - Custom CHPP client functional but missing key data compared to pychpp production: team logo URL, power rating, league competition info, goal statistics aggregation. Complete API documentation created with exact field mappings.
 
----
-
-**Priority 2: Custom CHPP Migration** (BLOCKED - See BUG-013):
-1. **[INFRA-026] Finalize Custom CHPP Migration** - P2 - **BLOCKED** - Custom CHPP implementation complete but OAuth signature validation failing on real Hattrick API (see BUG-013). pychpp (default) continues to work correctly in production.
+2. **[INFRA-026] Finalize Custom CHPP Migration** (1 hour) - P2 - **READY TO EXECUTE** - Complete migration to custom CHPP client. OAuth issues resolved (BUG-013 complete), data parity pending (INFRA-028). Production-ready for deployment with feature flag.
 
 **Priority 3: Stability & Simplification Tasks** (Next priority tasks):
 1. **[INFRA-027] Feature Flag Configuration Documentation** (30 min) - P3 - Document deployment guide **NEXT TASK**
@@ -126,7 +115,7 @@
 5. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
 6. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
 
-**Next Action**: Pause INFRA-027 to debug BUG-013-DEBUG (player endpoint OAuth issue). Once resolved, continue with INFRA-027. Production safe with pychpp default.
+**Next Action**: Execute INFRA-028 (Custom CHPP data parity fixes) then INFRA-026 (finalize migration). INFRA-027 (feature flag documentation) ready for execution.
 
 ---
 
@@ -456,6 +445,75 @@ After successful validation in production with feature flag (1-2 weeks monitorin
 - Should only be needed if critical issues found
 
 **Expected Outcomes**: Complete migration to custom CHPP client, pychpp dependency eliminated, long-term independence achieved, YouthTeamId bug permanently fixed
+
+---
+
+### [INFRA-028] Fix Custom CHPP Data Parity
+**Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P2 | **Impact**: Complete feature parity with production pychpp
+**Dependencies**: BUG-013 Complete | **Strategic Value**: User-expected functionality, production-ready custom client
+
+**Problem Statement**:
+Custom CHPP client successfully fetches core data (team details, players, skills) but is missing key information that production pychpp provides, resulting in incomplete stats pages and reduced user experience. Analysis of production vs custom client shows missing: team logos, power ratings, proper league data, and goal statistics aggregation.
+
+**User Impact**:
+- Stats page shows "None" for league level instead of actual league information
+- Missing team logo display (shows kits but no logo)
+- Power rating section missing entirely
+- Team goals show 0 instead of actual accumulated goals from players
+- Top scorers show "No goal data available" instead of player goal lists
+- Reduced confidence in custom client completeness
+
+**Root Cause Analysis**:
+1. **Team Logo**: `CHPPTeam.logo_url` field exists but not populated from teamdetails XML
+2. **Power Rating**: Data available in CHPP API but not requested/parsed
+3. **League Data**: Parser extracts basic league_name but missing league_level details
+4. **Goal Aggregation**: Player goal data (career_goals, current_team_goals) exists but not properly summed
+5. **Match Statistics**: Has matches_archive method but data not being used for team statistics
+
+**Implementation**:
+
+1. **Enhanced Team Data Parsing** (45-60 min):
+   - Add logo URL extraction to `parse_team()` in `app/chpp/parsers.py`
+   - Add power rating fields: `power_rating`, `power_rating_global_ranking`, `power_rating_league_ranking`
+   - Improve league data: ensure `league_level` extraction from teamdetails XML
+   - Add missing team competition fields: `league_level_unit_name`, `cup_name`, `cup_level`
+   - Update `CHPPTeam` model to include all missing fields
+
+2. **Goal Statistics Enhancement** (30-45 min):
+   - Verify player goal fields are correctly parsed in `parse_player()` (career_goals, current_team_goals, league_goals, cup_goals, friendly_goals)
+   - Update `calculate_team_statistics()` in `app/utils.py` to properly aggregate goal data from CHPPPlayer objects
+   - Ensure `get_top_scorers()` function works with CHPPPlayer data format
+
+3. **Template Data Integration** (30-45 min):
+   - Verify `app/blueprints/matches.py` stats() route properly extracts competition data from CHPPTeam
+   - Test that logo_url, power_rating fields are accessible in stats.html template
+   - Validate that team goal aggregation displays correctly in stats cards
+   - Ensure kits display works with CHPPTeam dress_uri fields
+
+4. **Match Archive Integration** (30-45 min):
+   - Test `matches_archive()` endpoint returns proper match data
+   - Verify `downloadMatches()` function works with CHPPMatch objects
+   - Update match statistics calculation to use archived match data
+   - Ensure match results charts display actual data instead of zeros
+
+**Testing Approach**:
+- Unit tests: Verify new parsing fields with sample CHPP XML
+- Integration test: Compare custom CHPP stats output with production pychpp
+- Visual validation: Load stats page with USE_CUSTOM_CHPP=true and verify all sections populated
+- Real API test: Confirm logo URLs, power ratings load correctly from live CHPP API
+
+**Deliverables**:
+- Enhanced `CHPPTeam` model with logo_url, power_rating fields
+- Updated `parse_team()` parser extracting all competition data
+- Validated goal aggregation displaying in stats page
+- Complete feature parity between custom CHPP and pychpp stats output
+
+**Success Criteria**:
+- Stats page with custom CHPP shows: team logo, power rating, league info, actual goal counts, top scorers list
+- No functional differences between USE_CUSTOM_CHPP=true and USE_CUSTOM_CHPP=false stats pages
+- User experience identical between custom and pychpp implementations
+
+**Expected Outcomes**: Production-ready custom client with complete feature parity, user confidence in custom implementation, seamless migration capability
 
 ---
 

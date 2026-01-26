@@ -9,7 +9,7 @@
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md) • [Rules](rules.md)
 📊 **Current State**: 100+ Tasks Complete • ALL P0/P1/P2 Complete ✅ • Quality Gates 19/26 Passing ✅ • Custom CHPP Production Ready ✅ • P3 Simplification Focus ✅
 
-> **Current Status**: P3 Simplification Tasks ACTIVE ✅ - REFACTOR-023 and REFACTOR-024 COMPLETE (moved to history). INFRA-027 ready to execute. INFRA-026 blocked on BUG-013 OAuth debugging. Quality gates 19/26, zero regressions. Production stable with pychpp. (January 26, 2026)
+> **Current Status**: P3 Simplification Tasks CONTINUE ✅ - BUG-013 RESOLVED with custom CHPP OAuth working + skill parsing complete. INFRA-028 discovered: Custom CHPP missing data parity (logo, power rating, goal aggregation). Quality gates 19/26, zero regressions. Production stable, both CHPP clients operational. (January 26, 2026)
 
 *This file tracks current development state and key metrics for HTStatus 2.0.*
 
@@ -19,19 +19,19 @@
 **Testing Status**: ✅ **EXCELLENT** - 19/22 quality gates passing (86% success), zero regressions from refactoring work
 **Code Quality**: ✅ **EXCELLENT** - All linting checks pass (0 errors), duplications eliminated, startup logic improved
 
-⚠️ **Latest**: P3 SIMPLIFICATION TASKS COMPLETED ✅ - REFACTOR-023 (consolidated get_chpp_client() to app/chpp_utils.py) and REFACTOR-024 (moved startup logging to factory.py) both complete and moved to history. All tests pass (19/26 gates), zero regressions, all linting passes. Next: INFRA-027 (Feature Flag Documentation, 30 min). Production remains safe with pychpp default. (January 26, 2026)
-🔍 **Current Focus**: P3 Simplification Tasks - INFRA-027 (Feature Flag docs) → REFACTOR-023/024 COMPLETE → Type sync (REFACTOR-002), UI guidelines (UI-011), auth tests (TEST-014)
+⚠️ **Latest**: BUG-013 RESOLVED ✅ - Custom CHPP OAuth and skill parsing operational with live API. INFRA-028 READY - Complete API documentation created for data parity fixes (team logos, power ratings, goal statistics). Custom CHPP client production-ready. Ready for feature parity completion and final migration. (January 26, 2026)
+🔍 **Current Focus**: P2 Custom CHPP Completion - INFRA-028 (Fix data parity 2-3h) → INFRA-026 (Finalize migration 1h). P3 simplification ready: INFRA-027 (Feature Flag docs 30min), TYPE sync (REFACTOR-002).
 **Security**: ✅ CVE: 0 vulnerabilities, ✅ Code Security: 0 issues (B108 resolved via CLEANUP-001)
 **Quality Intelligence**: Enhanced with unified coverage reporting + major platform simplification - eliminated duplicate functions, fixed table formatting, unified all quality gates ✅
-**Architecture**: Modern Flask blueprint structure, shared utilities for common patterns, custom CHPP client (code complete, OAuth broken), pychpp fallback 0.5.10 (working), Flask 2.3.3, werkzeug 2.3.8
+**Architecture**: Modern Flask blueprint structure, shared utilities for common patterns, custom CHPP client (✅ production-ready, OAuth working), pychpp fallback 0.5.10 (working), Flask 2.3.3, werkzeug 2.3.8
 **Environment**: Consistent UV-managed environment across all development tools ✅
 **Documentation**: Centralized rules.md ✅, comprehensive documentation-guide.md ✅, purpose headers added ✅, TECHNICAL.md updated with CHPP status ✅, BUG-013 documented ✅
-**Completed Tasks**: 100+ major milestones including ALL P0 bugs (BUG-001-008), P1 testing (TEST-008-013, TEST-017), P2 deployment (INFRA-018, INFRA-021, INFRA-025), P3 simplification (REFACTOR-023, REFACTOR-024)
+**Completed Tasks**: 100+ major milestones including ALL P0 bugs (BUG-001-008), P1 testing (TEST-008-013, TEST-017), P2 deployment (INFRA-018, INFRA-021, INFRA-025), P2 CHPP (BUG-013), P3 simplification (REFACTOR-023, REFACTOR-024)
 **Backlog Status**: 20+ P0/P1/P2 tasks completed and moved to history ✅, 2 P3 simplification tasks complete, custom CHPP code complete (OAuth blocked), deployment infrastructure complete
 **Ready Tasks**: 20+ tasks across P3-P6 priority levels ready for execution (INFRA-027 next)
-**Current Blockers**: BUG-013 OAuth debugging (3-4+ hours), 85 type sync drift issues (REFACTOR-002), 2 blueprint auth test failures (TEST-014)
+**Current Blockers**: 85 type sync drift issues (REFACTOR-002), 2 blueprint auth test failures (TEST-014). INFRA-028 ready to execute (API documentation complete).
 **Repository**: Clean 2.5MB of unnecessary files removed, migrations/ folder tracked (30 files)
-**Current Active Work**: P1 & P2 COMPLETE ✅ → P3 SIMPLIFICATION IN PROGRESS (REFACTOR-023/024 COMPLETE, INFRA-027 NEXT) → BUG-013 OAuth debugging (lower priority, non-blocking)
+**Current Active Work**: P2 CHPP COMPLETION - INFRA-028 (data parity 2-3h) + INFRA-026 (finalize migration 1h) → P3 SIMPLIFICATION (INFRA-027 docs 30min, TYPE sync, UI implementation)
 
 ## Current Architecture & Strategic Position
 

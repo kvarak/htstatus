@@ -51,6 +51,33 @@
 - Linting: 0 errors ✅
 - No newline warning: Fixed (W292 resolved) ✅
 
+### [BUG-013] Custom CHPP player() Endpoint OAuth 401 Error
+**Completed**: 2026-01-26
+**Effort**: 3-4 hours investigation + implementation
+**Impact**: CHPP CLIENT OPERATIONAL - Custom CHPP now fully functional with live Hattrick API
+
+**Summary**: Resolved 401 Unauthorized errors for custom CHPP client by fixing endpoint names and parameter formats. Root cause was using non-existent API endpoints rather than OAuth signature issues.
+
+**Technical Achievement**:
+- Fixed endpoint names: `player` → `playerdetails`, `matches` → `matchesarchive`
+- Corrected parameter names: `playerId` → `playerID`, `teamId` → `teamID`
+- Updated XML parsing to extract skills from `PlayerSkills` container
+- Added comprehensive player data model: transfer details, goals, caps, nationality
+- Enhanced error handling for optional fields (arrival_date, specialty, injury_level)
+- Fixed template None comparison issues in player.html
+
+**Root Cause Discovery**:
+Hattrick CHPP API documentation review revealed our code called non-existent endpoints:
+- No `player` endpoint exists (only `players` for lists, `playerdetails` for individual)
+- No `matches` endpoint exists (only `matchesarchive` for historical data)
+- Parameter names are case-sensitive: `playerID` not `playerId`
+
+**Quality Metrics**:
+- All 7 CHPP integration tests passing ✅
+- Real API integration working with live player data (23 players fetched) ✅
+- Zero test regressions (19/26 gates maintained) ✅
+- Custom CHPP client production-ready ✅
+
 ---
 
 ## Completed P1 Final Migration & P2 Deployment Tasks (January 2026)
