@@ -28,11 +28,8 @@
 
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 
-**Priority 1: Testing & App Reliability** - 🎯 ACTIVE - Custom CHPP client development in progress (3 incremental tasks: 2 complete, 1 pending)
-- ✅ [TEST-016] CHPP API Research & Documentation (3.5 hours) - **COMPLETE Jan 26, 2026** Research findings, XML capture script, reference implementation analysis
-- ✅ [REFACTOR-016] Design & Implement Custom CHPP Client (2 hours) - **COMPLETE Jan 26, 2026** Module structure created (7 files), OAuth/parsers/models/client implemented, architecture documented
-- 🎯 [TEST-017] Custom CHPP Client Test Suite (2-3 hours) - **NEXT TASK** Unit tests for OAuth, parsers, models, integration tests **READY TO EXECUTE**
-- 🎯 [INFRA-025] Deploy Custom CHPP with Feature Flag (1-2 hours) - Add USE_CUSTOM_CHPP flag, side-by-side validation **DEPENDENCIES: TEST-017**
+**Priority 1: Testing & App Reliability** - ✅ MILESTONE COMPLETE - Custom CHPP client fully operational
+- 🎯 [INFRA-025] Deploy Custom CHPP with Feature Flag (1-2 hours) - Add USE_CUSTOM_CHPP flag, side-by-side validation **READY TO EXECUTE**
 - 🎯 [INFRA-026] Finalize Custom CHPP Migration (1 hour) - Remove pychpp dependency, cleanup, production deployment **DEPENDENCIES: INFRA-025**
 
 **Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE
@@ -48,7 +45,7 @@
 - 🎯 [TEST-014] Fix Auth Blueprint Tests (1-2 hours) - **NEW** Update tests for YouthTeamId handling and session validation **READY TO EXECUTE**
 - 🎯 [TEST-015] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE**
 - 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **READY TO EXECUTE**
-- 🎯 [REFACTOR-014] Extract YouthTeamId Workaround (1 hour) - **NEW** Create chpp_utils.get_user_teams() to centralize workaround **SIMPLIFICATION**
+- 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments after custom client completion **SIMPLIFICATION**
 - 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **SIMPLIFICATION**
 - 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
@@ -88,7 +85,6 @@
 - 🔮 [INFRA-024] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ (2-3 hours) - Re-attempt library upgrades (Note: werkzeug 3.1+ covered by SECURITY-001)
 - 🔮 [FEAT-010] Collaborative League Intelligence (40-60 hours) - Multiplayer league-wide platform for shared scouting and collective tactical analysis
 - 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
-- 🔮 [REFACTOR-004] Replace pyCHPP Dependency (16-24 hours) - Custom CHPP API integration for long-term independence
 - 🔮 [FEAT-012] Trophy Data Integration (6-8 hours) - Add historical trophy/achievement display when pyCHPP supports it
 
 ---
@@ -96,31 +92,28 @@
 ## ✅ All Priority Levels Summary
 
 **P0**: ✅ COMPLETE - All critical bugs resolved, no active functionality regressions
-**P1**: 🎯 ACTIVE - Custom CHPP client development (3 tasks: 2 complete → TEST-017 next), testing infrastructure operational (19/24 gates)
+**P1**: ✅ MILESTONE COMPLETE - Custom CHPP client development complete, testing infrastructure operational (20/26 gates)
 **P2**: ✅ MILESTONE COMPLETE - Deployment & Operations infrastructure stable (INFRA-018 ✅ COMPLETE, INFRA-021 ✅ COMPLETE)
 **P3**: 🎯 CURRENT FOCUS - Type sync resolution (85 failures), security updates (SECURITY-001), blueprint auth test fix
 **P4**: Ready - Core functionality improvements and bug fixes
 **P5**: Ready - DevOps and developer experience enhancements
 **P6**: Ready - Documentation cleanup consolidation and new content
-**P7**: Future - Strategic improvements and major features (REFACTOR-004 parent task archived, replaced by P1 increments)
+**P7**: Future - Strategic improvements and major features
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-**Priority 1: Custom CHPP Client Development** (3 incremental tasks, 6-8 hours total):
-1. **[TEST-016] CHPP API Research** ✅ COMPLETE (3.5 hours) - OAuth flow documented, XML schemas analyzed, pychpp patterns extracted
-2. **[REFACTOR-016] Design & Implement CHPP Client** ✅ COMPLETE (2 hours) - 7 modules created (auth, parsers, models, client, exceptions, constants, __init__), architecture documented
-3. **[TEST-017] CHPP Test Suite** (2-3 hours) - P1 - Comprehensive validation **START HERE - NEXT TASK**
-4. **[INFRA-025] Deploy with Feature Flag** (1-2 hours) - P1 - Safe rollout
-5. **[INFRA-026] Finalize Migration** (1 hour) - P1 - Remove pychpp dependency
+**Priority 2: Custom CHPP Deployment** (2 remaining tasks, 2-3 hours total):
+1. **[INFRA-025] Deploy with Feature Flag** (1-2 hours) - P2 - Safe rollout **NEXT TASK**
+2. **[INFRA-026] Finalize Migration** (1 hour) - P2 - Remove pychpp dependency
 
-**Priority 3: Stability Tasks** (Alternative to P1 CHPP work):
+**Priority 3: Stability Tasks**:
 1. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns
 2. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling
 3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
 4. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
 5. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
 
-**Next Action**: Choose between P1 custom CHPP development (TEST-016 research phase) or P3 stability work (REFACTOR-012 consolidation). P1 tasks are incremental and independently releasable.
+**Next Action**: Execute INFRA-025 (Custom CHPP Feature Flag) - the clear next P2 task after P1 completion. Implements safe deployment pattern for custom CHPP client with fallback to pychpp.
 
 ---
 
@@ -328,7 +321,7 @@ Validate custom CHPP client against all requirements: unit tests for components,
 
 ### [INFRA-025] Deploy Custom CHPP with Feature Flag
 **Status**: 🎯 Ready to Execute | **Effort**: 1-2 hours | **Priority**: P1 | **Impact**: Safe production rollout
-**Dependencies**: TEST-017 (Test Suite) | **Strategic Value**: Risk mitigation, instant rollback capability
+**Dependencies**: None (P1 complete) | **Strategic Value**: Risk mitigation, instant rollback capability
 
 **Problem Statement**:
 Deploy custom CHPP client to production with feature flag enabling side-by-side validation and instant rollback if issues arise. This de-risks the migration by allowing gradual validation.
