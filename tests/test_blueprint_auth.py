@@ -124,7 +124,7 @@ class TestAuthBlueprintLoginRoutes:
         assert response.status_code == 200
         assert b"Password must be at least 8 characters long" in response.data
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.chpp_utils.get_chpp_client")
     def test_login_existing_user_with_tokens(
         self, mock_chpp_class, client, sample_user
     ):
@@ -214,7 +214,7 @@ class TestAuthBlueprintOAuthFlow:
 
         mock_handle_callback.assert_called_once_with("test_verifier")
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.chpp_utils.get_chpp_client")
     @patch("app.blueprints.auth.render_template")
     def test_start_oauth_flow_function(
         self, mock_render_template, mock_chpp_class, auth_app
@@ -238,7 +238,7 @@ class TestAuthBlueprintOAuthFlow:
             assert response == "redirect_html"
             mock_chpp.get_auth.assert_called_once()
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.chpp_utils.get_chpp_client")
     @patch("app.blueprints.auth.User")
     def test_handle_oauth_callback_new_user(
         self, mock_user_class, mock_chpp_class, auth_app
@@ -298,7 +298,7 @@ class TestAuthBlueprintOAuthFlow:
 class TestAuthBlueprintErrorHandling:
     """Test error handling in authentication."""
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.chpp_utils.get_chpp_client")
     def test_login_chpp_error_handling(self, mock_chpp_class, client, sample_user):
         """Test handling of CHPP errors during login."""
         # Mock CHPP to raise exception
@@ -311,7 +311,7 @@ class TestAuthBlueprintErrorHandling:
         # Should still redirect (graceful error handling)
         assert response.status_code == 302
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.chpp_utils.get_chpp_client")
     def test_oauth_callback_error_handling(self, mock_chpp_class, auth_app):
         """Test OAuth callback error handling."""
         with auth_app.test_request_context(), auth_app.test_client() as client:
