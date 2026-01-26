@@ -29,8 +29,7 @@
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 
 **Priority 1: Testing & App Reliability** - ✅ MILESTONE COMPLETE - Custom CHPP client fully operational
-- 🎯 [INFRA-025] Deploy Custom CHPP with Feature Flag (1-2 hours) - Add USE_CUSTOM_CHPP flag, side-by-side validation **READY TO EXECUTE**
-- 🎯 [INFRA-026] Finalize Custom CHPP Migration (1 hour) - Remove pychpp dependency, cleanup, production deployment **DEPENDENCIES: INFRA-025**
+- 🎯 [INFRA-026] Finalize Custom CHPP Migration (1 hour) - Remove pychpp dependency, implement missing methods (player(), matches_archive()), production deployment **READY TO EXECUTE**
 
 **Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE
 
@@ -48,6 +47,9 @@
 - 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments after custom client completion **SIMPLIFICATION**
 - 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **SIMPLIFICATION**
 - 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
+- 🎯 [REFACTOR-023] Consolidate get_chpp_client() (30-45 min) - **NEW** Extract duplicate `get_chpp_client()` functions from auth.py and team.py into shared `app/chpp_utils.py` **SIMPLIFICATION** (discovered in INFRA-025 review)
+- 🎯 [REFACTOR-024] Startup Logging Enhancement (30-45 min) - **NEW** Move feature flag status display from routes_bp.py to factory.py and generalize as configuration status report **SIMPLIFICATION** (discovered in INFRA-025 review)
+- 🎯 [INFRA-027] Feature Flag Configuration Documentation (30 min) - **NEW** Create `.env.example` entries and deployment guide for USE_CUSTOM_CHPP flag **DOCUMENTATION** (discovered in INFRA-025 review)
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
 - 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
 
@@ -91,29 +93,31 @@
 
 ## ✅ All Priority Levels Summary
 
-**P0**: ✅ COMPLETE - All critical bugs resolved, no active functionality regressions
-**P1**: ✅ MILESTONE COMPLETE - Custom CHPP client development complete, testing infrastructure operational (20/26 gates)
-**P2**: ✅ MILESTONE COMPLETE - Deployment & Operations infrastructure stable (INFRA-018 ✅ COMPLETE, INFRA-021 ✅ COMPLETE)
-**P3**: 🎯 CURRENT FOCUS - Type sync resolution (85 failures), security updates (SECURITY-001), blueprint auth test fix
-**P4**: Ready - Core functionality improvements and bug fixes
-**P5**: Ready - DevOps and developer experience enhancements
-**P6**: Ready - Documentation cleanup consolidation and new content
-**P7**: Future - Strategic improvements and major features
+**P0**: ✅ COMPLETE (8/8) - All critical bugs resolved, zero regressions
+**P1**: ✅ MILESTONE COMPLETE (18/18) - Custom CHPP client operational, feature flag deployed
+**P2**: ✅ MILESTONE COMPLETE (3/3) - Deployment infrastructure stable (INFRA-018, INFRA-021, INFRA-025)
+**P3**: 🎯 CURRENT FOCUS - Type sync (85 issues), UI guidelines, 3 new simplification tasks (REFACTOR-023, REFACTOR-024, INFRA-027)
+**P4**: Ready (9 tasks) - Core functionality improvements and bug fixes
+**P5**: Ready (6 tasks) - DevOps and developer experience
+**P6**: Ready (1 consolidated task) - Documentation cleanup and new content
+**P7**: Future (3 research-phase tasks) - Strategic improvements and major features
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-**Priority 2: Custom CHPP Deployment** (2 remaining tasks, 2-3 hours total):
-1. **[INFRA-025] Deploy with Feature Flag** (1-2 hours) - P2 - Safe rollout **NEXT TASK**
-2. **[INFRA-026] Finalize Migration** (1 hour) - P2 - Remove pychpp dependency
+**Priority 2: Custom CHPP Migration** (1 remaining task, 1 hour):
+1. **[INFRA-026] Finalize Custom CHPP Migration** (1 hour) - P2 - Implement missing methods, remove pychpp dependency **NEXT TASK**
 
-**Priority 3: Stability Tasks**:
-1. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns
-2. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling
-3. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
-4. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-5. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
+**Priority 3: Stability & Simplification Tasks**:
+1. **[REFACTOR-023] Consolidate get_chpp_client()** (30-45 min) - P3 - Extract shared utility function **NEW SIMPLIFICATION**
+2. **[REFACTOR-024] Startup Logging Enhancement** (30-45 min) - P3 - Move status display to factory.py **NEW SIMPLIFICATION**
+3. **[INFRA-027] Feature Flag Configuration Documentation** (30 min) - P3 - Document deployment guide **NEW DOCUMENTATION**
+4. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling
+5. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues
+6. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns
+7. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
+8. **[TEST-015] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
 
-**Next Action**: Execute INFRA-025 (Custom CHPP Feature Flag) - the clear next P2 task after P1 completion. Implements safe deployment pattern for custom CHPP client with fallback to pychpp.
+**Next Action**: Execute INFRA-026 (Finalize Custom CHPP Migration) - Complete custom CHPP client by implementing missing methods (player(), matches_archive()), then remove pychpp dependency. Then execute P3 simplification tasks starting with REFACTOR-023.
 
 ---
 

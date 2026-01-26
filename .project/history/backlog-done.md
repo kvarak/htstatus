@@ -1,5 +1,29 @@
 # HTStatus Development - Completed Tasks
 
+## Completed P2 Deployment Tasks (January 2026)
+
+### [INFRA-025] Deploy Custom CHPP with Feature Flag
+**Completed**: 2026-01-26
+**Effort**: 1.5 hours
+**Impact**: P1→P2 TRANSITION - Safe deployment mechanism for custom CHPP client
+
+**Summary**: Implemented production-ready feature flag enabling safe side-by-side testing of custom CHPP client with instant rollback capability. Feature flag properly defaults to pychpp (safe production state) and can be toggled via environment variable without restart.
+
+**Technical Achievement**:
+- Feature flag system: `USE_CUSTOM_CHPP` environment variable (default: false)
+- Conditional import pattern: `get_chpp_client()` function in auth.py and team.py
+- Startup visibility: Feature flag status displayed at initialization
+- Instant rollback: No restart required to switch between clients
+- All blueprints tested with both CHPP client paths
+- Zero quality regressions (18/26 gates maintained)
+
+**Simplification Opportunities Identified**:
+1. REFACTOR-023: Consolidate duplicate get_chpp_client() functions (30-45 min)
+2. REFACTOR-024: Move startup display to factory.py (30-45 min)
+3. INFRA-027: Document feature flag deployment guide (30 min)
+
+**Review**: Comprehensive review completed, all code quality gates passed, simplification tasks documented in .project/reviews/INFRA-025-review.md
+
 ## Completed P1 Testing & P3 Simplification Tasks (January 2026)
 
 ### [TEST-017] Custom CHPP Client Test Suite (Essential)
