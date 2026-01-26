@@ -151,16 +151,18 @@ class TestMultiTeamScenarios:
 
         # Test team 1 players
         retrieved_team1 = chpp.team(ht_id=111)
-        assert len(retrieved_team1.players) == 2
-        player_names = [p.first_name for p in retrieved_team1.players]
+        players1 = retrieved_team1.players()
+        assert len(players1) == 2
+        player_names = [p.first_name for p in players1]
         assert "Player1A" in player_names
         assert "Player1B" in player_names
         assert "Player2A" not in player_names, "Team 1 should not have Team 2 players"
 
         # Test team 2 players
         retrieved_team2 = chpp.team(ht_id=222)
-        assert len(retrieved_team2.players) == 2
-        player_names = [p.first_name for p in retrieved_team2.players]
+        players2 = retrieved_team2.players()
+        assert len(players2) == 2
+        player_names = [p.first_name for p in players2]
         assert "Player2A" in player_names
         assert "Player2B" in player_names
         assert "Player1A" not in player_names, "Team 2 should not have Team 1 players"
@@ -242,7 +244,7 @@ class TestCHPPAuthenticationFlow:
         assert isinstance(team.team_id, int)
         assert isinstance(team.team_name, str)
         assert isinstance(team.name, str)
-        assert isinstance(team.players, list)
+        assert isinstance(team.players(), list)
 
     def test_chpp_api_error_handling(self):
         """Test CHPP API error scenarios."""
@@ -382,14 +384,15 @@ class TestCHPPPlayerDataIntegration:
         chpp = create_mock_chpp_client(teams=[team])
 
         retrieved_team = chpp.team(ht_id=777)
-        assert len(retrieved_team.players) == 3
+        players_list = retrieved_team.players()
+        assert len(players_list) == 3
 
         # Test that players maintain skill data
-        keeper = next(p for p in retrieved_team.players if p.first_name == "Keeper")
+        keeper = next(p for p in players_list if p.first_name == "Keeper")
         assert keeper.keeper == 15
         assert keeper.scorer == 1
 
-        striker = next(p for p in retrieved_team.players if p.first_name == "Striker")
+        striker = next(p for p in players_list if p.first_name == "Striker")
         assert striker.scorer == 16
         assert striker.defender == 6
 
@@ -535,7 +538,7 @@ class TestCHPPRoutePatternsIntegration:
             team_data = chpp.team(ht_id=teamid)
             assert team_data is not None
             assert team_data.team_id == teamid
-            assert len(team_data.players) > 0
+            assert len(team_data.players()) > 0
 
             # Verify we're getting the right team, not user data
             assert team_data.team_id != user_id, "Team ID should differ from user ID"

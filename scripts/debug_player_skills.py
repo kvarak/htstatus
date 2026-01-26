@@ -58,7 +58,7 @@ def debug_player_skills(player_id: int):
 
         # Fetch player details
         print(f"\n📥 Fetching player {player_id}...")
-        player = chpp.player(player_id)
+        player = chpp.player(id_=player_id)
 
         print("\n" + "=" * 70)
         print("PLAYER DETAILS")

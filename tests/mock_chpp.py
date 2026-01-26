@@ -24,7 +24,11 @@ class MockCHPPTeam:
         self.team_name = team_name
         self.name = team_name  # Expected by team route
         self.short_team_name = team_name.split()[0]
-        self.players = []
+        self._players = []
+
+    def players(self):
+        """Return players list as a method to match pychpp 0.5.10+ API."""
+        return self._players
 
     def __getitem__(self, key):
         """Allow dict-like access for backward compatibility."""
@@ -37,11 +41,16 @@ class MockCHPPPlayer:
     def __init__(self, player_id=123456, **kwargs):
         # Basic info
         self.player_id = player_id
-        self.ht_id = player_id
+        self.id = player_id  # New pychpp 0.5.10+ uses 'id' instead of 'ht_id'
+        self.ht_id = player_id  # Keep for backward compatibility
         self.first_name = kwargs.get("first_name", "Test")
         self.nick_name = kwargs.get("nick_name", "TestPlayer")
         self.last_name = kwargs.get("last_name", "Player")
         self.age = kwargs.get("age", 25)
+        self.age_days = kwargs.get("age_days", 0)
+        self.number = kwargs.get("number", 1)
+        self.category_id = kwargs.get("category_id", 2)
+        self.owner_notes = kwargs.get("owner_notes", "")
 
         # Skills
         self.keeper = kwargs.get("keeper", 5)
@@ -84,7 +93,7 @@ class MockCHPP:
         self._mock_players = [MockCHPPPlayer()]
 
         # Add players to team
-        self._mock_teams[0].players = self._mock_players
+        self._mock_teams[0]._players = self._mock_players
 
     def user(self):
         """Return mock user object."""
@@ -116,7 +125,7 @@ class MockCHPP:
         self._mock_players = players
         # Update first team's players
         if self._mock_teams:
-            self._mock_teams[0].players = players
+            self._mock_teams[0]._players = players
 
 
 # Factory functions for creating test data
@@ -129,7 +138,7 @@ def create_mock_team(team_id=54321, team_name="Test Team", players=None):
     """Create a mock team with optional players."""
     team = MockCHPPTeam(team_id, team_name)
     if players:
-        team.players = players
+        team._players = players
     return team
 
 

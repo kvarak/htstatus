@@ -28,7 +28,7 @@ def test_mock_chpp_team():
     assert team.team_id == 54321
     assert team.team_name == "Test Team FC"
     assert team.short_team_name == "Test"
-    assert isinstance(team.players, list)
+    assert isinstance(team.players(), list)
 
 
 def test_mock_chpp_player(sample_player_data):
@@ -91,8 +91,9 @@ def test_mock_chpp_client_custom_data():
     assert team.team_name == "Custom Team"
 
     # Test custom player
-    assert len(team.players) == 1
-    player = team.players[0]
+    players_list = team.players()
+    assert len(players_list) == 1
+    player = players_list[0]
     assert player.player_id == 888888
     assert player.first_name == "Custom"
     assert player.scorer == 15
