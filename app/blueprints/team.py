@@ -204,15 +204,17 @@ def update():
             # next_birthday no longer available in pychpp 0.5.10+
             thisplayer["next_birthday"] = None
 
-            thedate = dt(
-                p.arrival_date.year,
-                p.arrival_date.month,
-                p.arrival_date.day,
-                p.arrival_date.hour,
-                p.arrival_date.minute,
-            )
-
-            thisplayer["arrival_date"] = thedate
+            if p.arrival_date:
+                thedate = dt(
+                    p.arrival_date.year,
+                    p.arrival_date.month,
+                    p.arrival_date.day,
+                    p.arrival_date.hour,
+                    p.arrival_date.minute,
+                )
+                thisplayer["arrival_date"] = thedate
+            else:
+                thisplayer["arrival_date"] = None
             thisplayer["form"] = p.form
             thisplayer["cards"] = p.cards
             thisplayer["injury_level"] = p.injury_level
@@ -249,46 +251,37 @@ def update():
             thisplayer["mother_club_bonus"] = p.mother_club_bonus
             thisplayer["leadership"] = p.leadership
 
-            # In pychpp 0.5.10+, use p.player_skills directly
-            # It's now a PlayerSkills object, not a dict
-            skills_source = p.player_skills if hasattr(p, "player_skills") else None
+            # Try to get skill values from CHPPPlayer attributes
+            # If they're 0 (not provided by API), fetch old values from database
+            from sqlalchemy import func
+
+            old_player_query = (
+                db.session.query(Players)
+                .filter_by(ht_id=p.id, owner=teamid)
+                .order_by(Players.data_date.desc())
+                .first()
+            )
 
             # Helper function to safely extract int from skill value
-            def safe_skill_int(skill_val):
-                if skill_val is None:
-                    return 0
-                if isinstance(skill_val, int):
-                    return skill_val
-                try:
-                    result = int(skill_val)
-                    return result if result is not None else 0
-                except (TypeError, ValueError):
-                    return 0
+            def safe_skill_int(new_val, old_player, field_name):
+                # If new value is non-zero, use it
+                if isinstance(new_val, int) and new_val > 0:
+                    return new_val
+                # Otherwise, try to get old value from database
+                if old_player and hasattr(old_player, field_name):
+                    old_val = getattr(old_player, field_name, 0)
+                    return old_val if old_val else 0
+                return 0
 
-            thisplayer["stamina"] = safe_skill_int(
-                getattr(skills_source, "stamina", None) if skills_source else None
-            )
-            thisplayer["keeper"] = safe_skill_int(
-                getattr(skills_source, "keeper", None) if skills_source else None
-            )
-            thisplayer["defender"] = safe_skill_int(
-                getattr(skills_source, "defender", None) if skills_source else None
-            )
-            thisplayer["playmaker"] = safe_skill_int(
-                getattr(skills_source, "playmaker", None) if skills_source else None
-            )
-            thisplayer["winger"] = safe_skill_int(
-                getattr(skills_source, "winger", None) if skills_source else None
-            )
-            thisplayer["passing"] = safe_skill_int(
-                getattr(skills_source, "passing", None) if skills_source else None
-            )
-            thisplayer["scorer"] = safe_skill_int(
-                getattr(skills_source, "scorer", None) if skills_source else None
-            )
-            thisplayer["set_pieces"] = safe_skill_int(
-                getattr(skills_source, "set_pieces", None) if skills_source else None
-            )
+            # Extract skills from CHPPPlayer attributes
+            thisplayer["stamina"] = safe_skill_int(p.stamina, old_player_query, "stamina")
+            thisplayer["keeper"] = safe_skill_int(p.keeper, old_player_query, "keeper")
+            thisplayer["defender"] = safe_skill_int(p.defender, old_player_query, "defender")
+            thisplayer["playmaker"] = safe_skill_int(p.playmaker, old_player_query, "playmaker")
+            thisplayer["winger"] = safe_skill_int(p.winger, old_player_query, "winger")
+            thisplayer["passing"] = safe_skill_int(p.passing, old_player_query, "passing")
+            thisplayer["scorer"] = safe_skill_int(p.scorer, old_player_query, "scorer")
+            thisplayer["set_pieces"] = safe_skill_int(p.set_pieces, old_player_query, "set_pieces")
 
             thisplayer["data_date"] = time.strftime("%Y-%m-%d")
 

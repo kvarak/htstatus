@@ -4,6 +4,7 @@ Unified interface for CHPP API matching pychpp exactly.
 Orchestrates OAuth, XML parsing, and data models.
 """
 
+import logging
 import xml.etree.ElementTree as ET
 from typing import Any
 
@@ -22,6 +23,8 @@ from app.chpp.constants import (
 from app.chpp.exceptions import CHPPAPIError, CHPPAuthError
 from app.chpp.models import CHPPMatch, CHPPPlayer, CHPPTeam, CHPPUser
 from app.chpp.parsers import parse_players, parse_team, parse_user
+
+logger = logging.getLogger(__name__)
 
 
 class CHPP:
@@ -221,8 +224,40 @@ class CHPP:
         }
 
         try:
-            # Make authenticated request
+            # Log request details for debugging OAuth issues
+            logger.debug(f"CHPP request: file={file}, version={version}, params={params}")
+            logger.debug(f"Full request params: {request_params}")
+
+            # Make authenticated GET request
             response = self.session.get(CHPP_BASE_URL, params=request_params)
+
+            # Log response details
+            logger.debug(f"CHPP response status: {response.status_code}")
+            logger.debug(f"CHPP response headers: {dict(response.headers)}")
+            logger.debug(f"CHPP request URL: {response.url}")
+            logger.debug(f"CHPP request method: {response.request.method}")
+            logger.debug(f"CHPP request headers: {dict(response.request.headers)}")
+
+            # Log Authorization header details (without exposing signature)
+            auth_header = response.request.headers.get('Authorization', '')
+            if isinstance(auth_header, bytes):
+                auth_header = auth_header.decode('utf-8', errors='replace')
+
+            if auth_header.startswith('OAuth '):
+                # Parse OAuth params (safe to log since it's public info)
+                oauth_params = {}
+                for part in auth_header[6:].split(', '):
+                    if '=' in part:
+                        key, val = part.split('=', 1)
+                        # Truncate long values but show structure
+                        display_val = val[:40] + '...' if len(val) > 40 else val
+                        oauth_params[key] = display_val
+                logger.debug(f"OAuth parameters: {oauth_params}")
+
+            # Log request body if present
+            if response.request.body:
+                logger.debug(f"CHPP request body: {response.request.body[:200]}")
+
             response.raise_for_status()
 
             # Parse XML response
@@ -245,6 +280,7 @@ class CHPP:
             raise
         except Exception as e:
             # Wrap other errors as auth errors
+            logger.error(f"CHPP request failed: {e}", exc_info=True)
             raise CHPPAuthError(f"CHPP request failed: {e}") from e
 
     def user(self) -> CHPPUser:
@@ -292,18 +328,29 @@ class CHPP:
         team_root = self.request("teamdetails", "3.6", teamId=ht_id)
         team = parse_team(team_root)
 
-        # Fetch players for this team
+        # Fetch basic players list first
         players_root = self.request("players", "2.7", teamId=ht_id)
-        players = parse_players(players_root)
+        basic_players = parse_players(players_root)
 
-        # Attach players to team (lazy loading pattern)
-        team._players = players
+        # Then fetch detailed info for each player to get skills
+        detailed_players = []
+        for basic_player in basic_players:
+            try:
+                detailed_player = self.player(basic_player.player_id)
+                detailed_players.append(detailed_player)
+            except Exception as e:
+                # If individual player fetch fails, use basic info
+                print(f"Warning: Failed to fetch details for player {basic_player.player_id}: {e}")
+                detailed_players.append(basic_player)
+
+        # Attach detailed players to team
+        team._players = detailed_players
 
         return team
     def player(self, id_: int) -> "CHPPPlayer":
         """Get individual player details.
 
-        Fetches player data from player endpoint.
+        Fetches player data from playerdetails endpoint.
 
         Args:
             id_: Hattrick player ID
@@ -321,13 +368,14 @@ class CHPP:
         """
         from app.chpp.parsers import parse_player
 
-        root = self.request("player", "2.4", playerId=id_)
+        # Use playerdetails endpoint with playerID parameter (GET request)
+        root = self.request("playerdetails", "2.5", playerID=id_)
         return parse_player(root)
 
     def matches_archive(self, id_: int, is_youth: bool = False) -> list["CHPPMatch"]:
         """Get match history for a team.
 
-        Fetches match archive from matches endpoint.
+        Fetches match archive from matchesarchive endpoint.
 
         Args:
             id_: Hattrick team ID
@@ -347,5 +395,6 @@ class CHPP:
         """
         from app.chpp.parsers import parse_matches
 
-        root = self.request("matches", "2.6", teamId=id_, isYouthTeam=is_youth)
+        # Use matchesarchive endpoint with teamID parameter (GET request)
+        root = self.request("matchesarchive", "2.8", teamID=id_, isYouthTeam=is_youth)
         return parse_matches(root)

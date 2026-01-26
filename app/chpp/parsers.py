@@ -5,6 +5,7 @@ Handles optional fields gracefully (YouthTeamId fix).
 """
 
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from typing import Any
 
 from app.chpp.models import CHPPMatch, CHPPPlayer, CHPPTeam, CHPPUser
@@ -275,27 +276,104 @@ def parse_player(root: ET.Element) -> CHPPPlayer:
     age_days = safe_find_int(player_elem, "AgeDays")
     tsi = safe_find_int(player_elem, "TSI")
     player_number = safe_find_int(player_elem, "PlayerNumber")
-    form = safe_find_int(player_elem, "Form")
-    stamina = safe_find_int(player_elem, "Stamina")
+    category_id_text = safe_find_text(player_elem, "PlayerCategoryID")
+    category_id = int(category_id_text) if category_id_text else None
+    form = safe_find_int(player_elem, "PlayerForm")  # Form is PlayerForm in API
     experience = safe_find_int(player_elem, "Experience")
     loyalty = safe_find_int(player_elem, "Loyalty")
 
-    # 7 core skills
-    keeper = safe_find_int(player_elem, "Keeper")
-    defender = safe_find_int(player_elem, "Defender")
-    playmaker = safe_find_int(player_elem, "Playmaker")
-    winger = safe_find_int(player_elem, "Winger")
-    passing = safe_find_int(player_elem, "Passing")
-    scorer = safe_find_int(player_elem, "Scorer")
-    set_pieces = safe_find_int(player_elem, "SetPieces")
+    # 7 core skills - from PlayerSkills container per CHPP API docs
+    player_skills_elem = player_elem.find("PlayerSkills")
+    if player_skills_elem is not None:
+        stamina = safe_find_int(player_skills_elem, "StaminaSkill")
+        keeper = safe_find_int(player_skills_elem, "KeeperSkill")
+        defender = safe_find_int(player_skills_elem, "DefenderSkill")
+        playmaker = safe_find_int(player_skills_elem, "PlaymakerSkill")
+        winger = safe_find_int(player_skills_elem, "WingerSkill")
+        passing = safe_find_int(player_skills_elem, "PassingSkill")
+        scorer = safe_find_int(player_skills_elem, "ScorerSkill")
+        set_pieces = safe_find_int(player_skills_elem, "SetPiecesSkill")
+    else:
+        # Fallback if PlayerSkills container not found
+        stamina = 0
+        keeper = 0
+        defender = 0
+        playmaker = 0
+        winger = 0
+        passing = 0
+        scorer = 0
+        set_pieces = 0
 
     # Additional attributes
-    specialty = safe_find_int(player_elem, "Specialty")
-    specialty = specialty if specialty > 0 else None
+    specialty = safe_find_int(player_elem, "Specialty", 0)  # Default to 0, not None
+    category_id_text = safe_find_text(player_elem, "PlayerCategoryID")
+    category_id = int(category_id_text) if category_id_text else None
+    arrival_date_str = safe_find_text(player_elem, "ArrivalDate")
+    # Parse arrival_date string to datetime object
+    arrival_date = None
+    if arrival_date_str:
+        try:
+            # Try parsing ISO format from API: "2024-01-15 14:30:00"
+            arrival_date = datetime.fromisoformat(arrival_date_str.replace(" ", "T"))
+        except (ValueError, AttributeError, TypeError):
+            # If parsing fails, keep as None
+            arrival_date = None
+    cards = safe_find_int(player_elem, "Cards")
+    agreeability = safe_find_text(player_elem, "Agreeability")
+    aggressiveness = safe_find_text(player_elem, "Aggressiveness")
+    honesty = safe_find_text(player_elem, "Honesty")
+    country_id_text = safe_find_text(player_elem, "NativeCountryID")
+    country_id = int(country_id_text) if country_id_text else None
+    salary_text = safe_find_text(player_elem, "Salary")
+    salary = int(salary_text) if salary_text else None
+    caps = safe_find_int(player_elem, "Caps")
+    caps_u20 = safe_find_int(player_elem, "CapsU20")
+    career_goals = safe_find_int(player_elem, "CareerGoals")
+    career_hattricks = safe_find_int(player_elem, "CareerHattricks")
+    league_goals = safe_find_int(player_elem, "LeagueGoals")
+    cup_goals = safe_find_int(player_elem, "CupGoals")
+    friendlies_goals = safe_find_int(player_elem, "FriendliesGoals")
+    matches_current_team = safe_find_int(player_elem, "MatchesCurrentTeam")
+    goals_current_team = safe_find_int(player_elem, "GoalsCurrentTeam")
+    assists_current_team = safe_find_int(player_elem, "AssistsCurrentTeam")
+    career_assists = safe_find_int(player_elem, "CareerAssists")
+    national_team_id_text = safe_find_text(player_elem, "NationalTeamID")
+    national_team_id = int(national_team_id_text) if national_team_id_text else None
+    mother_club_bonus = safe_find_int(player_elem, "MotherClubBonus")
+    leadership = safe_find_int(player_elem, "Leadership")
     injury_level = safe_find_int(player_elem, "InjuryLevel", -1)
     statement = safe_find_text(player_elem, "Statement")
     owner_notes = safe_find_text(player_elem, "OwnerNotes")
     transfer_listed = safe_find_bool(player_elem, "TransferListed")
+
+    # Parse TransferDetails if player is on transfer list
+    transfer_details = None
+    if transfer_listed:
+        transfer_elem = player_elem.find("TransferDetails")
+        if transfer_elem is not None:
+            from app.chpp.models import BidderTeam, TransferDetails
+
+            asking_price = safe_find_int(transfer_elem, "AskingPrice")
+            deadline = safe_find_text(transfer_elem, "Deadline", "")
+            highest_bid = safe_find_int(transfer_elem, "HighestBid")
+            max_bid_text = safe_find_text(transfer_elem, "MaxBid")
+            max_bid = int(max_bid_text) if max_bid_text else None
+
+            bidder_team = None
+            bidder_elem = transfer_elem.find("BidderTeam")
+            if bidder_elem is not None:
+                bidder_team_id = safe_find_int(bidder_elem, "TeamID")
+                bidder_team_name = safe_find_text(bidder_elem, "TeamName", "")
+                if bidder_team_id:  # Only create if we have a team ID
+                    bidder_team = BidderTeam(team_id=bidder_team_id, team_name=bidder_team_name)
+
+            transfer_details = TransferDetails(
+                asking_price=asking_price,
+                deadline=deadline,
+                highest_bid=highest_bid,
+                max_bid=max_bid,
+                bidder_team=bidder_team,
+            )
 
     return CHPPPlayer(
         player_id=player_id,
@@ -318,10 +396,33 @@ def parse_player(root: ET.Element) -> CHPPPlayer:
         scorer=scorer,
         set_pieces=set_pieces,
         specialty=specialty,
+        category_id=category_id,
+        arrival_date=arrival_date,
+        cards=cards,
+        agreeability=agreeability,
+        aggressiveness=aggressiveness,
+        honesty=honesty,
+        country_id=country_id,
+        salary=salary,
+        caps=caps,
+        caps_u20=caps_u20,
+        career_goals=career_goals,
+        career_hattricks=career_hattricks,
+        league_goals=league_goals,
+        cup_goals=cup_goals,
+        friendlies_goals=friendlies_goals,
+        matches_current_team=matches_current_team,
+        goals_current_team=goals_current_team,
+        assists_current_team=assists_current_team,
+        career_assists=career_assists,
+        national_team_id=national_team_id,
+        mother_club_bonus=mother_club_bonus,
+        leadership=leadership,
         injury_level=injury_level,
         statement=statement,
         owner_notes=owner_notes,
         transfer_listed=transfer_listed,
+        transfer_details=transfer_details,
         _SOURCE_FILE="player",
     )
 

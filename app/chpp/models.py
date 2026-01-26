@@ -5,7 +5,48 @@ Supports dict-like access for backward compatibility.
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
+
+
+@dataclass
+class BidderTeam:
+    """Team information for transfer bid.
+
+    Attributes:
+        team_id: Hattrick team ID
+        team_name: Team name
+    """
+
+    team_id: int
+    team_name: str
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access."""
+        return getattr(self, key)
+
+
+@dataclass
+class TransferDetails:
+    """Transfer details for a player on the transfer list.
+
+    Attributes:
+        asking_price: Original asking price
+        deadline: Transfer deadline (DateTime)
+        highest_bid: Highest bid made so far (0 if none)
+        max_bid: Maximum autobid set by owner (None if not set)
+        bidder_team: Team holding highest bid (None if no bids)
+    """
+
+    asking_price: int
+    deadline: str  # DateTime string from API
+    highest_bid: int = 0
+    max_bid: int | None = None
+    bidder_team: BidderTeam | None = None
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access."""
+        return getattr(self, key)
 
 
 @dataclass
@@ -140,17 +181,45 @@ class CHPPPlayer:
     scorer: int
     set_pieces: int
     # Additional attributes
-    specialty: int | None = None
+    specialty: int = 0  # 0 = no specialty
+    category_id: int | None = None
+    arrival_date: datetime | None = None  # DateTime object from parsed API string
+    cards: int = 0
+    agreeability: str | None = None
+    aggressiveness: str | None = None
+    honesty: str | None = None
+    country_id: int | None = None
+    salary: int | None = None
+    caps: int = 0
+    caps_u20: int = 0
+    career_goals: int = 0
+    career_hattricks: int = 0
+    league_goals: int = 0
+    cup_goals: int = 0
+    friendlies_goals: int = 0
+    matches_current_team: int = 0
+    goals_current_team: int = 0
+    assists_current_team: int = 0
+    career_assists: int = 0
+    national_team_id: int | None = None
+    mother_club_bonus: int = 0
+    leadership: int = 0
     injury_level: int = 0
     statement: str | None = None
     owner_notes: str | None = None
     transfer_listed: bool = False
+    transfer_details: TransferDetails | None = None
     _SOURCE_FILE: str = "players"
 
     @property
     def id(self) -> int:
         """Alias for player_id to match pychpp interface."""
         return self.player_id
+
+    @property
+    def number(self) -> int:
+        """Alias for player_number to match pychpp interface."""
+        return self.player_number
 
     def __getitem__(self, key: str) -> Any:
         """Support dict-like access: player['scorer']."""

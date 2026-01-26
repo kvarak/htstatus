@@ -555,18 +555,8 @@ def calculateContribution(position, player):
 
 def calculate_team_statistics(players):
     """Calculate comprehensive team statistics from player list."""
-    print(
-        f"\n=== DEBUG: calculate_team_statistics called with {len(players) if players else 0} players ==="
-    )
-
     if not players:
         return {}
-
-    # Debug first few players
-    for i, p in enumerate(players[:3]):
-        print(
-            f"Player {i + 1}: age_years={getattr(p, 'age_years', 'N/A')}, tsi={getattr(p, 'tsi', 'N/A')}, current_team_goals={getattr(p, 'current_team_goals', 'N/A')}, salary={getattr(p, 'salary', 'N/A')}"
-        )
 
     stats = {
         "total_players": len(players),
@@ -626,10 +616,6 @@ def calculate_team_statistics(players):
         get_player_attr(player, "current_team_matches") for player in players
     )
 
-    print(
-        f"DEBUG totals: age={total_age}, tsi={total_tsi}, salary={total_salary}, team_goals={total_goals}, career_goals={total_career_goals}, matches={total_matches}"
-    )
-
     stats["avg_age"] = round(total_age / len(players), 1) if len(players) > 0 else 0
     stats["avg_tsi"] = round(total_tsi / len(players), 0) if len(players) > 0 else 0
     stats["total_salary"] = total_salary
@@ -640,8 +626,6 @@ def calculate_team_statistics(players):
         round(total_goals / total_matches, 1) if total_matches > 0 else 0
     )
     stats["avg_wage"] = round(total_salary / len(players), 0) if len(players) > 0 else 0
-
-    print(f"DEBUG final stats: {stats}")
 
     # Calculate skill averages
     skills = [
@@ -655,7 +639,8 @@ def calculate_team_statistics(players):
     ]
     for skill in skills:
         skill_sum = sum(get_player_attr(player, skill) for player in players)
-        stats["skill_averages"][skill] = round(skill_sum / len(players), 1)
+        avg_skill = round(skill_sum / len(players), 1)
+        stats["skill_averages"][skill] = avg_skill
 
     return stats
 

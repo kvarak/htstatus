@@ -155,7 +155,7 @@
 
                       {% elif val == "specialty" %}
                         <td class="text-small">
-                          {% if p['specialty'] > 0 %}
+                          {% if p['specialty'] and p['specialty'] > 0 %}
                             {% set pngnr = p['specialty'] | string() %}
                             {% set pngname = 'ico-sp-' + pngnr + '.png' %}
                             <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
@@ -189,7 +189,7 @@
 
                           {% if p['injury_level'] == 0 %}
                           <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% elif p['injury_level'] > 0 %}
+                          {% elif p['injury_level'] and p['injury_level'] > 0 %}
                             <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ p['injury_level'] }}
                           {% endif %}
                         </td>
@@ -251,7 +251,7 @@
                 {{ p['first_name'] }} {{ p['last_name'] }}
               </a>
 
-              {% if p['specialty'] > 0 %}
+              {% if p['specialty'] and p['specialty'] > 0 %}
                 {% set pngnr = p['specialty'] | string() %}
                 {% set pngname = 'ico-sp-' + pngnr + '.png' %}
                 <img src="{{url_for('static', filename=pngname)}}" height="25">
@@ -271,7 +271,7 @@
 
               {% if p['injury_level'] == 0 %}
               <img src="{{url_for('static', filename='ico-damage.png')}}" height="25">
-              {% elif p['injury_level'] > 0 %}
+              {% elif p['injury_level'] and p['injury_level'] > 0 %}
                 <img src="{{url_for('static', filename='ico-injury.png')}}" height="25">{{ p['injury_level'] }}
               {% endif %}
 
@@ -304,11 +304,11 @@
               goal{% if p['career_goals'] != 1 %}s{% endif %}
               and made {{ p['career_hattricks'] }}
               hattrick{% if p['career_hattricks'] != 1 %}s{% endif %}.
-              {% if p['caps'] > 0 %}
+              {% if p['caps'] and p['caps'] > 0 %}
                 He has played {{ p['caps'] }} international league
                 game{% if p['caps'] != 1 %}s{% endif %}.
               {% endif %}
-              {% if p['caps_u20'] > 0 %}
+              {% if p['caps_u20'] and p['caps_u20'] > 0 %}
                 Additionally, {{ p.first_name }} attended {{ p['caps_u20'] }} international U20
                 league game{% if p['caps_u20'] != 1 %}s{% endif %}.
               {% endif %}
