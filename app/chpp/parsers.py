@@ -141,6 +141,32 @@ def parse_team(root: ET.Element) -> CHPPTeam:
     dress_uri = safe_find_text(root, ".//Team/DressURI")
     dress_alternate_uri = safe_find_text(root, ".//Team/DressAlternateURI")
 
+    # INFRA-028: Extract missing critical data parity fields
+    logo_url = safe_find_text(root, ".//Team/LogoURL")
+
+    # Power rating information
+    power_rating = safe_find_int(root, ".//PowerRating/PowerRating", None)
+    power_rating_global_ranking = safe_find_int(root, ".//PowerRating/GlobalRanking", None)
+    power_rating_league_ranking = safe_find_int(root, ".//PowerRating/LeagueRanking", None)
+    power_rating_region_ranking = safe_find_int(root, ".//PowerRating/RegionRanking", None)
+
+    # League level unit information
+    league_level_unit_id = safe_find_int(root, ".//LeagueLevelUnit/LeagueLevelUnitID", None)
+    league_level_unit_name = safe_find_text(root, ".//LeagueLevelUnit/LeagueLevelUnitName")
+    # Override league_level with proper LeagueLevelUnit extraction
+    league_level_unit_level = safe_find_int(root, ".//LeagueLevelUnit/LeagueLevel", None)
+    if league_level_unit_level is not None:
+        league_level = league_level_unit_level
+
+    # Cup information
+    cup_name = safe_find_text(root, ".//Cup/CupName")
+    cup_level = safe_find_int(root, ".//Cup/CupLevel", None)
+    still_in_cup = safe_find_bool(root, ".//Cup/StillInCup", False)
+
+    # Team performance streaks
+    number_of_victories = safe_find_int(root, ".//NumberOfVictories", None)
+    number_of_undefeated = safe_find_int(root, ".//NumberOfUndefeated", None)
+
     return CHPPTeam(
         team_id=team_id,
         name=name,
@@ -156,6 +182,19 @@ def parse_team(root: ET.Element) -> CHPPTeam:
         fans_match_attitude=fans_match_attitude,
         dress_uri=dress_uri,
         dress_alternate_uri=dress_alternate_uri,
+        # INFRA-028: Include missing data parity fields
+        logo_url=logo_url,
+        power_rating=power_rating,
+        power_rating_global_ranking=power_rating_global_ranking,
+        power_rating_league_ranking=power_rating_league_ranking,
+        power_rating_region_ranking=power_rating_region_ranking,
+        league_level_unit_id=league_level_unit_id,
+        league_level_unit_name=league_level_unit_name,
+        cup_name=cup_name,
+        cup_level=cup_level,
+        still_in_cup=still_in_cup,
+        number_of_victories=number_of_victories,
+        number_of_undefeated=number_of_undefeated,
         _SOURCE_FILE="teamdetails",
     )
 
@@ -192,18 +231,31 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
 
         # Current form and condition
         form = safe_find_int(player_node, "PlayerForm")
-        stamina = safe_find_int(player_node, "Stamina")
         experience = safe_find_int(player_node, "Experience")
         loyalty = safe_find_int(player_node, "Loyalty")
 
-        # 7 Core Skills (match real API field names)
-        keeper = safe_find_int(player_node, "Keeper")
-        defender = safe_find_int(player_node, "Defender")
-        playmaker = safe_find_int(player_node, "Playmaker")
-        winger = safe_find_int(player_node, "Winger")
-        passing = safe_find_int(player_node, "Passing")
-        scorer = safe_find_int(player_node, "Scorer")
-        set_pieces = safe_find_int(player_node, "SetPieces")
+        # 7 Core Skills (extract from PlayerSkills container)
+        player_skills = player_node.find("PlayerSkills")
+        if player_skills is not None:
+            # Use correct API field names from PlayerSkills container
+            stamina = safe_find_int(player_skills, "StaminaSkill")
+            keeper = safe_find_int(player_skills, "KeeperSkill")
+            defender = safe_find_int(player_skills, "DefenderSkill")
+            playmaker = safe_find_int(player_skills, "PlaymakerSkill")
+            winger = safe_find_int(player_skills, "WingerSkill")
+            passing = safe_find_int(player_skills, "PassingSkill")
+            scorer = safe_find_int(player_skills, "ScorerSkill")
+            set_pieces = safe_find_int(player_skills, "SetPiecesSkill")
+        else:
+            # Fallback: try direct field names (may not exist in players endpoint)
+            stamina = safe_find_int(player_node, "Stamina")
+            keeper = safe_find_int(player_node, "Keeper")
+            defender = safe_find_int(player_node, "Defender")
+            playmaker = safe_find_int(player_node, "Playmaker")
+            winger = safe_find_int(player_node, "Winger")
+            passing = safe_find_int(player_node, "Passing")
+            scorer = safe_find_int(player_node, "Scorer")
+            set_pieces = safe_find_int(player_node, "SetPieces")
 
         # Additional attributes
         specialty = safe_find_int(player_node, "Specialty", None)
@@ -213,6 +265,24 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
 
         # Transfer data
         transfer_listed = safe_find_bool(player_node, "TransferListed")
+
+        # Goal statistics extraction (MISSING IN ORIGINAL IMPLEMENTATION)
+        career_goals = safe_find_int(player_node, "CareerGoals", 0)
+        career_hattricks = safe_find_int(player_node, "CareerHattricks", 0)
+        league_goals = safe_find_int(player_node, "LeagueGoals", 0)
+        cup_goals = safe_find_int(player_node, "CupGoals", 0)
+        friendlies_goals = safe_find_int(player_node, "FriendliesGoals", 0)
+        current_team_matches = safe_find_int(player_node, "MatchesCurrentTeam", 0)
+        goals_current_team = safe_find_int(player_node, "GoalsCurrentTeam", 0)
+        assists_current_team = safe_find_int(player_node, "AssistsCurrentTeam", 0)
+        career_assists = safe_find_int(player_node, "CareerAssists", 0)
+
+        # Team and league data
+        caps = safe_find_int(player_node, "Caps", 0)
+        caps_u20 = safe_find_int(player_node, "CapsU20", 0)
+        country_id = safe_find_int(player_node, "NativeCountryID", None)
+        salary = safe_find_int(player_node, "Salary", None)
+        national_team_id = safe_find_int(player_node, "NationalTeamID", None)
 
         player = CHPPPlayer(
             player_id=player_id,
@@ -239,6 +309,22 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
             statement=statement,
             owner_notes=owner_notes,
             transfer_listed=transfer_listed,
+            # Goal statistics (ADDED)
+            career_goals=career_goals,
+            career_hattricks=career_hattricks,
+            league_goals=league_goals,
+            cup_goals=cup_goals,
+            friendlies_goals=friendlies_goals,
+            matches_current_team=current_team_matches,
+            goals_current_team=goals_current_team,
+            assists_current_team=assists_current_team,
+            career_assists=career_assists,
+            # Team data (ADDED)
+            caps=caps,
+            caps_u20=caps_u20,
+            country_id=country_id,
+            salary=salary,
+            national_team_id=national_team_id,
             _SOURCE_FILE="players",
         )
         players.append(player)
@@ -337,6 +423,29 @@ def parse_player(root: ET.Element) -> CHPPPlayer:
     goals_current_team = safe_find_int(player_elem, "GoalsCurrentTeam")
     assists_current_team = safe_find_int(player_elem, "AssistsCurrentTeam")
     career_assists = safe_find_int(player_elem, "CareerAssists")
+    # DEBUG: Print actual XML goal field values for investigation
+    player_id_debug = safe_find_int(player_elem, "PlayerID")
+    if player_id_debug in [461202762, 476003339, 474535474]:  # Key test players
+        print(f"[XML DEBUG] Player {player_id_debug}: GoalsCurrentTeam='{player_elem.find('GoalsCurrentTeam')}', MatchesCurrentTeam='{player_elem.find('MatchesCurrentTeam')}'")
+        if player_elem.find('GoalsCurrentTeam') is not None:
+            print(f"[XML DEBUG] GoalsCurrentTeam element text: '{player_elem.find('GoalsCurrentTeam').text}'")
+        if player_elem.find('MatchesCurrentTeam') is not None:
+            print(f"[XML DEBUG] MatchesCurrentTeam element text: '{player_elem.find('MatchesCurrentTeam').text}'")
+
+        # Show ALL available goal-related XML elements for debugging
+        print(f"[XML DEBUG] Available goal fields for player {player_id_debug}:")
+        for child in player_elem:
+            if 'goal' in child.tag.lower() or 'match' in child.tag.lower() or 'assist' in child.tag.lower():
+                print(f"  - {child.tag}: '{child.text}'")
+
+        # Check if goals are in a different container
+        for container in ['PlayerStats', 'Statistics', 'Goals', 'TeamStats']:
+            container_elem = player_elem.find(container)
+            if container_elem is not None:
+                print(f"[XML DEBUG] Found container {container}, checking for goals...")
+                for child in container_elem:
+                    print(f"  - {container}/{child.tag}: '{child.text}'")
+
     national_team_id_text = safe_find_text(player_elem, "NationalTeamID")
     national_team_id = int(national_team_id_text) if national_team_id_text else None
     mother_club_bonus = safe_find_int(player_elem, "MotherClubBonus")

@@ -109,6 +109,19 @@ class CHPPTeam:
     fans_match_attitude: str | None = None
     dress_uri: str | None = None
     dress_alternate_uri: str | None = None
+    # INFRA-028: Missing data parity fields
+    logo_url: str | None = None
+    power_rating: int | None = None
+    power_rating_global_ranking: int | None = None
+    power_rating_league_ranking: int | None = None
+    power_rating_region_ranking: int | None = None
+    league_level_unit_id: int | None = None
+    league_level_unit_name: str | None = None
+    cup_name: str | None = None
+    cup_level: int | None = None
+    still_in_cup: bool = False
+    number_of_victories: int | None = None
+    number_of_undefeated: int | None = None
     _players: list["CHPPPlayer"] = field(default_factory=list)
     _SOURCE_FILE: str = "teamdetails"
 

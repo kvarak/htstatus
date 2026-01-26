@@ -300,7 +300,7 @@ class CHPP:
             >>> print(user.username, user.ht_id)
             >>> print(f"Teams: {user._teams_ht_id}")
         """
-        root = self.request("managercompendium", "1.6")
+        root = self.request("managercompendium", "1.5")
         return parse_user(root)
 
     def team(self, ht_id: int) -> CHPPTeam:
@@ -325,22 +325,25 @@ class CHPP:
             ...     print(player.first_name, player.scorer)
         """
         # Fetch team details
-        team_root = self.request("teamdetails", "3.6", teamId=ht_id)
+        team_root = self.request("teamdetails", "3.7", teamId=ht_id)
         team = parse_team(team_root)
 
         # Fetch basic players list first
         players_root = self.request("players", "2.7", teamId=ht_id)
         basic_players = parse_players(players_root)
 
-        # Then fetch detailed info for each player to get skills
+        # Then fetch detailed info for each player to get skills and goal data
         detailed_players = []
         for basic_player in basic_players:
             try:
+                print(f"[DEBUG] Fetching detailed info for player {basic_player.player_id} ({basic_player.first_name} {basic_player.last_name})")
                 detailed_player = self.player(basic_player.player_id)
+                print(f"[DEBUG] Success: {detailed_player.first_name} {detailed_player.last_name}, goals_current_team={getattr(detailed_player, 'goals_current_team', 'MISSING')}, matches_current_team={getattr(detailed_player, 'matches_current_team', 'MISSING')}, career_goals={getattr(detailed_player, 'career_goals', 'MISSING')}")
                 detailed_players.append(detailed_player)
             except Exception as e:
                 # If individual player fetch fails, use basic info
-                print(f"Warning: Failed to fetch details for player {basic_player.player_id}: {e}")
+                print(f"[WARNING] Failed to fetch details for player {basic_player.player_id}: {e}")
+                print(f"[DEBUG] Using basic info: goals_current_team={getattr(basic_player, 'goals_current_team', 'MISSING')}")
                 detailed_players.append(basic_player)
 
         # Attach detailed players to team
@@ -369,7 +372,9 @@ class CHPP:
         from app.chpp.parsers import parse_player
 
         # Use playerdetails endpoint with playerID parameter (GET request)
-        root = self.request("playerdetails", "2.5", playerID=id_)
+        # Try latest version and include match info to ensure all goal fields are available
+        root = self.request("playerdetails", "3.1", playerID=id_, includeMatchInfo="true")
+        print(f"[DEBUG] API 3.1 request for player {id_}")
         return parse_player(root)
 
     def matches_archive(self, id_: int, is_youth: bool = False) -> list["CHPPMatch"]:
@@ -396,5 +401,5 @@ class CHPP:
         from app.chpp.parsers import parse_matches
 
         # Use matchesarchive endpoint with teamID parameter (GET request)
-        root = self.request("matchesarchive", "2.8", teamID=id_, isYouthTeam=is_youth)
+        root = self.request("matchesarchive", "1.5", teamID=id_, isYouthTeam=is_youth)
         return parse_matches(root)
