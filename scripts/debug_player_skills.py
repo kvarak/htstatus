@@ -16,7 +16,7 @@ import os
 import sys
 
 # Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from config import Config
 from pychpp import CHPP
@@ -35,8 +35,8 @@ def debug_player_skills(player_id: int):
 
     # Get OAuth credentials from environment
     # These should be set from a logged-in session
-    access_key = os.environ.get('CHPP_ACCESS_KEY')
-    access_secret = os.environ.get('CHPP_ACCESS_SECRET')
+    access_key = os.environ.get("CHPP_ACCESS_KEY")
+    access_secret = os.environ.get("CHPP_ACCESS_SECRET")
 
     if not access_key or not access_secret:
         print("❌ ERROR: CHPP OAuth credentials not found in environment")
@@ -80,25 +80,43 @@ def debug_player_skills(player_id: int):
         print("\n" + "=" * 70)
         print("INDIVIDUAL SKILL VALUES")
         print("=" * 70)
-        print(f"Stamina:     {player.skills.stamina} (type: {type(player.skills.stamina)})")
-        print(f"Keeper:      {player.skills.keeper} (type: {type(player.skills.keeper)})")
-        print(f"Defender:    {player.skills.defender} (type: {type(player.skills.defender)})")
-        print(f"Playmaker:   {player.skills.playmaker} (type: {type(player.skills.playmaker)})")
-        print(f"Winger:      {player.skills.winger} (type: {type(player.skills.winger)})")
-        print(f"Passing:     {player.skills.passing} (type: {type(player.skills.passing)})")
-        print(f"Scorer:      {player.skills.scorer} (type: {type(player.skills.scorer)})")
-        print(f"Set Pieces:  {player.skills.set_pieces} (type: {type(player.skills.set_pieces)})")
+        print(
+            f"Stamina:     {player.skills.stamina} (type: {type(player.skills.stamina)})"
+        )
+        print(
+            f"Keeper:      {player.skills.keeper} (type: {type(player.skills.keeper)})"
+        )
+        print(
+            f"Defender:    {player.skills.defender} (type: {type(player.skills.defender)})"
+        )
+        print(
+            f"Playmaker:   {player.skills.playmaker} (type: {type(player.skills.playmaker)})"
+        )
+        print(
+            f"Winger:      {player.skills.winger} (type: {type(player.skills.winger)})"
+        )
+        print(
+            f"Passing:     {player.skills.passing} (type: {type(player.skills.passing)})"
+        )
+        print(
+            f"Scorer:      {player.skills.scorer} (type: {type(player.skills.scorer)})"
+        )
+        print(
+            f"Set Pieces:  {player.skills.set_pieces} (type: {type(player.skills.set_pieces)})"
+        )
 
         # Check if all skills are None
-        skills_none = all([
-            player.skills.keeper is None,
-            player.skills.defender is None,
-            player.skills.playmaker is None,
-            player.skills.winger is None,
-            player.skills.passing is None,
-            player.skills.scorer is None,
-            player.skills.set_pieces is None
-        ])
+        skills_none = all(
+            [
+                player.skills.keeper is None,
+                player.skills.defender is None,
+                player.skills.playmaker is None,
+                player.skills.winger is None,
+                player.skills.passing is None,
+                player.skills.scorer is None,
+                player.skills.set_pieces is None,
+            ]
+        )
 
         print("\n" + "=" * 70)
         print("ANALYSIS")
@@ -116,17 +134,19 @@ def debug_player_skills(player_id: int):
         else:
             print("✅ Some or all skills have values")
             skill_values = {
-                'keeper': player.skills.keeper,
-                'defender': player.skills.defender,
-                'playmaker': player.skills.playmaker,
-                'winger': player.skills.winger,
-                'passing': player.skills.passing,
-                'scorer': player.skills.scorer,
-                'set_pieces': player.skills.set_pieces
+                "keeper": player.skills.keeper,
+                "defender": player.skills.defender,
+                "playmaker": player.skills.playmaker,
+                "winger": player.skills.winger,
+                "passing": player.skills.passing,
+                "scorer": player.skills.scorer,
+                "set_pieces": player.skills.set_pieces,
             }
 
             none_skills = [k for k, v in skill_values.items() if v is None]
-            valued_skills = [f"{k}={v}" for k, v in skill_values.items() if v is not None]
+            valued_skills = [
+                f"{k}={v}" for k, v in skill_values.items() if v is not None
+            ]
 
             if none_skills:
                 print(f"\nSkills with None: {', '.join(none_skills)}")
@@ -136,6 +156,7 @@ def debug_player_skills(player_id: int):
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         print(f"\n{traceback.format_exc()}")
         sys.exit(1)
 

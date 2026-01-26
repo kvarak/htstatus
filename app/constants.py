@@ -29,7 +29,7 @@ HT_MATCH_TYPE = {
     104: "RESERVED",
     105: "Youth international friendly match",
     106: "Youth international friendly match (Cup rules)",
-    107: "RESERVED"
+    107: "RESERVED",
 }
 
 # Hattrick match roles (player positions)
@@ -82,7 +82,7 @@ HT_MATCH_ROLE = {
     29: "Penalty taker (8)",
     30: "Penalty taker (9)",
     31: "Penalty taker (10)",
-    32: "Penalty taker (11)"
+    32: "Penalty taker (11)",
 }
 
 # Hattrick match behaviors
@@ -95,27 +95,41 @@ HT_MATCH_BEHAVIOUR = {
     4: "Towards wing",
     5: "Extra forward",
     6: "Extra inner midfield",
-    7: "Extra defender"
+    7: "Extra defender",
 }
 
 # Player column definitions for UI tables
 ALL_COLUMNS = [
-    ('Group', 'group'), ('Number', 'number'),
-    ('Specialty', 'specialty'), ('Name', 'name'),
-    ('Age', 'age_years'), ('Keeper', 'keeper'),
-    ('Defence', 'defender'), ('Playmaking', 'playmaker'),
-    ('Winger', 'winger'), ('Passing', 'passing'),
-    ('Scorer', 'scorer'), ('Set pieces', 'set_pieces'),
-    ('Max stars', 'max_stars'), ('Last stars', 'last_stars'),
-    ('Status', 'status'), ('First seen', 'firstseen'),
-    ('Player notes', 'owner_notes'),
-    ('Leadership', 'leadership'), ('Agreeability', 'agreeability'),
-    ('Aggressiveness', 'aggressiveness'), ('Honesty', 'honesty'),
-    ('Experience', 'experience'), ('Loyalty', 'loyalty'), ('TSI', 'tsi'),
-    ('Form', 'form'), ('Stamina', 'stamina'),
-    ('Career goals', 'career_goals'), ('Statement', 'statement'),
-    ('Salary', 'salary'),
-    ('Goalkeeper contribution (GC)', 'GC'),
+    ("Group", "group"),
+    ("Number", "number"),
+    ("Specialty", "specialty"),
+    ("Name", "name"),
+    ("Age", "age_years"),
+    ("Keeper", "keeper"),
+    ("Defence", "defender"),
+    ("Playmaking", "playmaker"),
+    ("Winger", "winger"),
+    ("Passing", "passing"),
+    ("Scorer", "scorer"),
+    ("Set pieces", "set_pieces"),
+    ("Max stars", "max_stars"),
+    ("Last stars", "last_stars"),
+    ("Status", "status"),
+    ("First seen", "firstseen"),
+    ("Player notes", "owner_notes"),
+    ("Leadership", "leadership"),
+    ("Agreeability", "agreeability"),
+    ("Aggressiveness", "aggressiveness"),
+    ("Honesty", "honesty"),
+    ("Experience", "experience"),
+    ("Loyalty", "loyalty"),
+    ("TSI", "tsi"),
+    ("Form", "form"),
+    ("Stamina", "stamina"),
+    ("Career goals", "career_goals"),
+    ("Statement", "statement"),
+    ("Salary", "salary"),
+    ("Goalkeeper contribution (GC)", "GC"),
     ("Central Defender Normal (CD)", "CD"),
     ("Central Defender Offensive (CDO)", "CDO"),
     ("Side Central Defender Towards Wing (CDTW)", "CDTW"),
@@ -135,32 +149,57 @@ ALL_COLUMNS = [
     ("Forward Towards Wing (FTW) ", "FTW"),
     ("Defensive Forward (DF)", "DF"),
     ("Best position", "bestposition"),
-    ("Man marking capability", "MMC")
+    ("Man marking capability", "MMC"),
 ]
 
 DEFAULT_COLUMNS = [
-    ('Group', 'group'), ('Number', 'number'),
-    ('Specialty', 'specialty'), ('Name', 'name'),
-    ('Age', 'age_years'), ('Keeper', 'keeper'),
-    ('Defence', 'defender'), ('Playmaking', 'playmaker'),
-    ('Winger', 'winger'), ('Passing', 'passing'),
-    ('Scorer', 'scorer'), ('Set pieces', 'set_pieces'),
-    ('Max stars', 'max_stars'), ('Last stars', 'last_stars'),
-    ('Status', 'status'), ('First seen', 'firstseen'),
-    ("Best position", "bestposition")
+    ("Group", "group"),
+    ("Number", "number"),
+    ("Specialty", "specialty"),
+    ("Name", "name"),
+    ("Age", "age_years"),
+    ("Keeper", "keeper"),
+    ("Defence", "defender"),
+    ("Playmaking", "playmaker"),
+    ("Winger", "winger"),
+    ("Passing", "passing"),
+    ("Scorer", "scorer"),
+    ("Set pieces", "set_pieces"),
+    ("Max stars", "max_stars"),
+    ("Last stars", "last_stars"),
+    ("Status", "status"),
+    ("First seen", "firstseen"),
+    ("Best position", "bestposition"),
 ]
 
 TRACE_COLUMNS = [
-    'keeper', 'defender', 'playmaker',
-    'winger', 'passing', 'scorer', 'set_pieces'
+    "keeper",
+    "defender",
+    "playmaker",
+    "winger",
+    "passing",
+    "scorer",
+    "set_pieces",
 ]
 
 CALC_COLUMNS = [
-    'GC',
-    'CD', 'CDO', 'CDTW',
-    'WBD', 'WBN', 'WBO', 'WBTM',
-    'WO', 'WTM', 'WN', 'WD',
-    'IMN', 'IMD', 'IMO', 'IMTW',
-    'FW',
-    'FTW', 'DF'
+    "GC",
+    "CD",
+    "CDO",
+    "CDTW",
+    "WBD",
+    "WBN",
+    "WBO",
+    "WBTM",
+    "WO",
+    "WTM",
+    "WN",
+    "WD",
+    "IMN",
+    "IMD",
+    "IMO",
+    "IMTW",
+    "FW",
+    "FTW",
+    "DF",
 ]

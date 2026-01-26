@@ -48,17 +48,16 @@ print(f"Testing connection to: {conn_string}")
 try:
     # Parse the connection string manually to test with psycopg2 directly
     import re
-    match = re.match(r'postgresql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)', conn_string)
+
+    match = re.match(r"postgresql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)", conn_string)
     if match:
         user, password, host, port, database = match.groups()
-        print(f"Parsed - User: {user}, Host: {host}, Port: {port}, Database: {database}")
+        print(
+            f"Parsed - User: {user}, Host: {host}, Port: {port}, Database: {database}"
+        )
 
         conn = psycopg2.connect(
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-            database=database
+            user=user, password=password, host=host, port=port, database=database
         )
         cursor = conn.cursor()
         cursor.execute("SELECT current_user, current_database();")

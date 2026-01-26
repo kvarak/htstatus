@@ -12,8 +12,9 @@ def test_config_loading():
     """Test that configuration can be loaded."""
     try:
         from config import Config
+
         config = Config()
-        assert hasattr(config, 'SECRET_KEY')
+        assert hasattr(config, "SECRET_KEY")
     except Exception as e:
         pytest.fail(f"Config loading failed: {e}")
 

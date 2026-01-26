@@ -16,7 +16,7 @@ Environment:
 import os
 import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import traceback
 
@@ -45,7 +45,9 @@ def test_chpp_connection():
         print("   1. Run 'make dev'")
         print("   2. Navigate to http://localhost:5010")
         print("   3. Login with your Hattrick credentials")
-        print("   4. Click 'Update data' and check console logs for detailed diagnostics")
+        print(
+            "   4. Click 'Update data' and check console logs for detailed diagnostics"
+        )
 
         return True
 
@@ -54,17 +56,14 @@ def test_chpp_connection():
         print(f"Full error: {traceback.format_exc()}")
         return False
 
+
 def test_configuration():
     """Test basic configuration setup."""
 
     print("\n🔧 Testing Configuration...")
     print("=" * 50)
 
-    required_vars = [
-        'CONSUMER_KEY',
-        'CONSUMER_SECRETS',
-        'SQLALCHEMY_DATABASE_URI'
-    ]
+    required_vars = ["CONSUMER_KEY", "CONSUMER_SECRETS", "SQLALCHEMY_DATABASE_URI"]
 
     try:
         cfg = Config()
@@ -87,6 +86,7 @@ def test_configuration():
     except Exception as e:
         print(f"❌ Configuration loading error: {str(e)}")
         return False
+
 
 if __name__ == "__main__":
     print("HTStatus CHPP API Diagnostics")

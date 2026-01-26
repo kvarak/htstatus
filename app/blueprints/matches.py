@@ -4,11 +4,11 @@ from flask import Blueprint, request, session
 from sqlalchemy import text
 
 from app.auth_utils import require_authentication
+from app.model_registry import get_match_model, get_match_play_model
 from app.utils import create_page
-from models import Match, MatchPlay
 
 # Create Blueprint for match and stats routes
-matches_bp = Blueprint('matches', __name__)
+matches_bp = Blueprint("matches", __name__)
 
 # These will be set by setup_matches_blueprint()
 db = None
@@ -26,40 +26,43 @@ def setup_matches_blueprint(db_instance, match_types, match_roles, match_behavio
     HTmatchbehaviour = match_behaviours
 
 
-@matches_bp.route('/matches', methods=['GET', 'POST'])
+@matches_bp.route("/matches", methods=["GET", "POST"])
 @require_authentication
 def matches():
     """Display team matches and match details."""
+    # Get model classes from registry
+    Match = get_match_model()
+    MatchPlay = get_match_play_model()
 
-    teamid = request.values.get('id')
-    matchid = request.values.get('m')
+    teamid = request.values.get("id")
+    matchid = request.values.get("m")
 
-    teamid = int(teamid) if teamid else request.form.get('id')
-    matchid = int(matchid) if matchid else request.form.get('m')
-    all_teams = session['all_teams']
+    teamid = int(teamid) if teamid else request.form.get("id")
+    matchid = int(matchid) if matchid else request.form.get("m")
+    all_teams = session["all_teams"]
 
     error = ""
     if teamid not in all_teams:
         error = "Wrong teamid, try the links."
-        return create_page(
-            template='matches.html',
-            error=error,
-            title='Matches')
+        return create_page(template="matches.html", error=error, title="Matches")
 
-    all_team_names = session['all_team_names']
+    all_team_names = session["all_team_names"]
     teamname = all_team_names[all_teams.index(teamid)]
 
     # Get all registered matches
-    dbmatches = db.session.query(Match).filter(
-        (Match.away_team_id == teamid) |
-        (Match.home_team_id == teamid)).order_by(text("datetime desc")).all()
+    dbmatches = (
+        db.session.query(Match)
+        .filter((Match.away_team_id == teamid) | (Match.home_team_id == teamid))
+        .order_by(text("datetime desc"))
+        .all()
+    )
     dbmatchplays = {}
     for m in dbmatches:
         dbmatch = db.session.query(MatchPlay).filter_by(match_id=m.ht_id).all()
         dbmatchplays[m.ht_id] = dbmatch
 
     return create_page(
-        template='matches.html',
+        template="matches.html",
         error=error,
         matches=dbmatches,
         matchplays=dbmatchplays,
@@ -69,33 +72,35 @@ def matches():
         HTmatchtype=HTmatchtype,
         HTmatchrole=HTmatchrole,
         HTmatchbehaviour=HTmatchbehaviour,
-        title='Matches')
+        title="Matches",
+    )
 
 
-@matches_bp.route('/stats')
+@matches_bp.route("/stats")
 @require_authentication
 def stats():
     """Display team statistics."""
 
-    teamid = request.values.get('id')
+    teamid = request.values.get("id")
 
-    teamid = int(teamid) if teamid else request.form.get('id')
-    all_teams = session['all_teams']
+    teamid = int(teamid) if teamid else request.form.get("id")
+    all_teams = session["all_teams"]
 
     if teamid not in all_teams:
-        return create_page(
-            template='stats.html',
-            title='Stats')
+        return create_page(template="stats.html", title="Stats")
 
-    all_team_names = session['all_team_names']
+    all_team_names = session["all_team_names"]
     teamname = all_team_names[all_teams.index(teamid)]
 
     # Get all current players for the team
     from models import Players
-    current_players = (db.session.query(Players)
-                       .filter_by(owner=teamid)
-                       .order_by(Players.data_date.desc())
-                       .all())
+
+    current_players = (
+        db.session.query(Players)
+        .filter_by(owner=teamid)
+        .order_by(Players.data_date.desc())
+        .all()
+    )
 
     # Filter to get the most recent data for each player
     latest_players = {}
@@ -112,6 +117,7 @@ def stats():
         get_top_performers,
         get_top_scorers,
     )
+
     team_stats = calculate_team_statistics(current_players_list)
 
     # Get top performers
@@ -121,7 +127,7 @@ def stats():
     # Get match statistics for the team
     match_stats = get_team_match_statistics(teamid)
 
-# Get competition data from CHPP (trophies not supported in this pyCHPP version)
+    # Get competition data from CHPP (trophies not supported in this pyCHPP version)
     trophies = []
     competition_info = {}
     try:
@@ -130,13 +136,16 @@ def stats():
 
         from pychpp import CHPP
 
-        chpp = CHPP(app.config['CONSUMER_KEY'],
-                    app.config['CONSUMER_SECRETS'],
-                    session['access_key'],
-                    session['access_secret'])
+        chpp = CHPP(
+            app.config["CONSUMER_KEY"],
+            app.config["CONSUMER_SECRETS"],
+            session["access_key"],
+            session["access_secret"],
+        )
 
         # Check pyCHPP version
         import pychpp
+
         print(f"pyCHPP version: {getattr(pychpp, '__version__', 'Unknown')}")
 
         team_details = chpp.team(ht_id=teamid)
@@ -144,19 +153,25 @@ def stats():
 
         # Extract available competition information
         competition_info = {
-            'league_name': getattr(team_details, 'league_name', None),
-            'league_level': getattr(team_details, 'league_level', None),
-            'league_level_unit_name': getattr(team_details, 'league_level_unit_name', None),
-            'cup_name': getattr(team_details, 'cup_name', None),
-            'cup_level': getattr(team_details, 'cup_level', None),
-            'still_in_cup': getattr(team_details, 'still_in_cup', False),
-            'cup_match_rounds_left': getattr(team_details, 'cup_match_rounds_left', 0),
-            'power_rating': getattr(team_details, 'power_rating', None),
-            'power_rating_global_ranking': getattr(team_details, 'power_rating_global_ranking', None),
-            'power_rating_league_ranking': getattr(team_details, 'power_rating_league_ranking', None),
-            'dress_uri': getattr(team_details, 'dress_uri', None),
-            'dress_alternate_uri': getattr(team_details, 'dress_alternate_uri', None),
-            'logo_url': getattr(team_details, 'logo_url', None),
+            "league_name": getattr(team_details, "league_name", None),
+            "league_level": getattr(team_details, "league_level", None),
+            "league_level_unit_name": getattr(
+                team_details, "league_level_unit_name", None
+            ),
+            "cup_name": getattr(team_details, "cup_name", None),
+            "cup_level": getattr(team_details, "cup_level", None),
+            "still_in_cup": getattr(team_details, "still_in_cup", False),
+            "cup_match_rounds_left": getattr(team_details, "cup_match_rounds_left", 0),
+            "power_rating": getattr(team_details, "power_rating", None),
+            "power_rating_global_ranking": getattr(
+                team_details, "power_rating_global_ranking", None
+            ),
+            "power_rating_league_ranking": getattr(
+                team_details, "power_rating_league_ranking", None
+            ),
+            "dress_uri": getattr(team_details, "dress_uri", None),
+            "dress_alternate_uri": getattr(team_details, "dress_alternate_uri", None),
+            "logo_url": getattr(team_details, "logo_url", None),
         }
 
         print(f"Competition info extracted: {competition_info}")
@@ -165,13 +180,14 @@ def stats():
     except Exception as e:
         print(f"Error fetching competition data: {e}")
         import traceback
+
         print(traceback.format_exc())
         competition_info = {}
 
     print("=== COMPETITION FETCH COMPLETE ===\n")
 
     return create_page(
-        template='stats.html',
+        template="stats.html",
         teamname=teamname,
         teamid=teamid,
         team_stats=team_stats,
@@ -180,4 +196,5 @@ def stats():
         match_stats=match_stats,
         trophies=trophies,
         competition_info=competition_info,
-        title='Stats')
+        title="Stats",
+    )

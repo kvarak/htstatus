@@ -2,6 +2,7 @@
 Minimal route testing to achieve coverage goals for TEST-003.
 This file tests route functionality without requiring full database setup.
 """
+
 import os
 from unittest.mock import Mock, patch
 
@@ -17,21 +18,24 @@ from config import TestConfig
 
 class MinimalTestConfig:
     """Minimal test configuration avoiding database issues."""
+
     TESTING = True
-    SECRET_KEY = 'test-secret-key'
-    CONSUMER_KEY = 'test-key'
-    CONSUMER_SECRETS = 'test-secret'
+    SECRET_KEY = "test-secret-key"
+    CONSUMER_KEY = "test-key"
+    CONSUMER_SECRETS = "test-secret"
     DEBUG_LEVEL = 0
     WTF_CSRF_ENABLED = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # Add minimal DB URI
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"  # Add minimal DB URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def minimal_app():
     """Create minimal app with transaction isolation for database tests."""
-    os.environ['FLASK_ENV'] = 'testing'
-    app = create_app(TestConfig, include_routes=False)  # Use TestConfig for database consistency
+    os.environ["FLASK_ENV"] = "testing"
+    app = create_app(
+        TestConfig, include_routes=False
+    )  # Use TestConfig for database consistency
 
     with app.app_context():
         # Create tables using the same pattern as conftest.py
@@ -39,6 +43,7 @@ def minimal_app():
 
         # Create connection and begin transaction for test isolation
         from sqlalchemy.orm import sessionmaker
+
         connection = db.engine.connect()
         transaction = connection.begin()
 
@@ -59,7 +64,7 @@ def minimal_app():
         connection.close()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def client(minimal_app):
     """Create test client without database."""
     return minimal_app.test_client()
@@ -71,25 +76,28 @@ class TestBlueprintFunctions:
     def test_blueprint_object_exists(self):
         """Test that the main blueprint exists and is configured."""
         assert main_bp is not None
-        assert hasattr(main_bp, 'name')
-        assert main_bp.name == 'main'
+        assert hasattr(main_bp, "name")
+        assert main_bp.name == "main"
 
     def test_debug_print_function_exists(self):
         """Test that dprint function exists and is callable."""
         # Should be callable without errors
-        dprint(1, 'test_route', 'test_function', 'arg1', 'arg2')
+        dprint(1, "test_route", "test_function", "arg1", "arg2")
         assert True  # If no exception, function works
 
-    @patch('app.utils.render_template')
+    @patch("app.utils.render_template")
     def test_create_page_function(self, mock_render, minimal_app):
         """Test create_page function with mocked dependencies."""
-        mock_render.return_value = 'mocked_template'
+        mock_render.return_value = "mocked_template"
 
         # Use proper application context with database setup
-        with minimal_app.app_context(), patch('flask.session', {'current_user': 'testuser'}):
-            result = create_page('test.html', 'Test Title')
+        with (
+            minimal_app.app_context(),
+            patch("flask.session", {"current_user": "testuser"}),
+        ):
+            result = create_page("test.html", "Test Title")
             mock_render.assert_called_once()
-            assert result == 'mocked_template'
+            assert result == "mocked_template"
 
     def test_initialize_routes_function_exists(self):
         """Test that initialize_routes function exists."""
@@ -104,7 +112,7 @@ class TestBlueprintRegistration:
         """Test that blueprint can be registered with app."""
         # Should be able to register without errors
         minimal_app.register_blueprint(main_bp)
-        assert 'main' in minimal_app.blueprints
+        assert "main" in minimal_app.blueprints
 
     def test_blueprint_routes_after_registration(self, minimal_app):
         """Test that blueprint routes are available after registration."""
@@ -117,8 +125,10 @@ class TestBlueprintRegistration:
     def test_app_configuration_access(self, minimal_app):
         """Test accessing app configuration."""
         with minimal_app.app_context():
-            assert minimal_app.config['TESTING'] is True
-            assert minimal_app.config['SECRET_KEY'] == 'test-secret-key-not-for-production'
+            assert minimal_app.config["TESTING"] is True
+            assert (
+                minimal_app.config["SECRET_KEY"] == "test-secret-key-not-for-production"
+            )
 
 
 class TestRouteModuleImports:
@@ -130,16 +140,17 @@ class TestRouteModuleImports:
         import app.utils as utils
 
         # Check routes_bp has its expected functions
-        assert hasattr(routes_bp, 'main_bp')  # Temporary backward compatibility
-        assert hasattr(routes_bp, 'initialize_routes')
+        assert hasattr(routes_bp, "main_bp")  # Temporary backward compatibility
+        assert hasattr(routes_bp, "initialize_routes")
 
         # Check utils has helper functions
-        assert hasattr(utils, 'create_page')
-        assert hasattr(utils, 'dprint')
+        assert hasattr(utils, "create_page")
+        assert hasattr(utils, "dprint")
 
     def test_factory_import(self):
         """Test that factory module imports successfully."""
         from app.factory import create_app, setup_routes
+
         assert callable(create_app)
         assert callable(setup_routes)
 
@@ -151,19 +162,20 @@ class TestFlaskAppCreation:
         """Test creating minimal app instance."""
         app = create_app(MinimalTestConfig, include_routes=False)
         assert isinstance(app, Flask)
-        assert app.config['TESTING'] is True
+        assert app.config["TESTING"] is True
 
     def test_app_with_blueprint_routes(self):
         """Test app creation with blueprint routes only."""
         app = create_app(MinimalTestConfig, include_routes=True)
         with app.app_context():
             # Should have blueprint registered
-            assert 'main' in app.blueprints
+            assert "main" in app.blueprints
 
     def test_app_context_functionality(self, minimal_app):
         """Test that app context works properly."""
         with minimal_app.app_context():
             from flask import current_app
+
             assert current_app == minimal_app
 
 
@@ -173,26 +185,28 @@ class TestRouteHelperFunctions:
     def test_debug_print_with_various_args(self):
         """Test dprint with different argument patterns."""
         # Should handle various argument combinations
-        dprint(1, 'route1', 'func1')
-        dprint(2, 'route2', 'func2', 'arg1')
-        dprint(3, 'route3', 'func3', 'arg1', 'arg2', 'arg3')
+        dprint(1, "route1", "func1")
+        dprint(2, "route2", "func2", "arg1")
+        dprint(3, "route3", "func3", "arg1", "arg2", "arg3")
         assert True  # If no exceptions, all variants work
 
-    @patch('app.utils.render_template')
+    @patch("app.utils.render_template")
     def test_create_page_with_session_data(self, mock_render, minimal_app):
         """Test create_page with various session configurations."""
         from unittest.mock import patch
-        mock_render.return_value = 'rendered_content'
+
+        mock_render.return_value = "rendered_content"
 
         # Test with minimal session data within request context
-        with minimal_app.test_request_context(), \
-             patch('flask.session') as mock_session:
-                mock_session.__getitem__ = Mock(side_effect=lambda k: {'current_user': 'test'}[k])
-                mock_session.get = Mock(return_value=[])
+        with minimal_app.test_request_context(), patch("flask.session") as mock_session:
+            mock_session.__getitem__ = Mock(
+                side_effect=lambda k: {"current_user": "test"}[k]
+            )
+            mock_session.get = Mock(return_value=[])
 
-                result = create_page('template.html', 'Page Title')
-                assert result == 'rendered_content'
-                mock_render.assert_called_once()
+            result = create_page("template.html", "Page Title")
+            assert result == "rendered_content"
+            mock_render.assert_called_once()
 
 
 class TestConfigurationHandling:
@@ -202,8 +216,11 @@ class TestConfigurationHandling:
         """Test that required config keys are available."""
         with minimal_app.app_context():
             config_keys = [
-                'TESTING', 'SECRET_KEY', 'CONSUMER_KEY',
-                'CONSUMER_SECRETS', 'DEBUG_LEVEL'
+                "TESTING",
+                "SECRET_KEY",
+                "CONSUMER_KEY",
+                "CONSUMER_SECRETS",
+                "DEBUG_LEVEL",
             ]
             for key in config_keys:
                 assert key in minimal_app.config
@@ -211,23 +228,26 @@ class TestConfigurationHandling:
     def test_config_values_correct(self, minimal_app):
         """Test that config values are set correctly."""
         with minimal_app.app_context():
-            assert minimal_app.config['TESTING'] is True
-            assert minimal_app.config['DEBUG_LEVEL'] == 0
-            assert minimal_app.config['CONSUMER_KEY'] == 'test-consumer-key'
+            assert minimal_app.config["TESTING"] is True
+            assert minimal_app.config["DEBUG_LEVEL"] == 0
+            assert minimal_app.config["CONSUMER_KEY"] == "test-consumer-key"
 
 
 class TestRouteErrorHandling:
     """Test error handling in route contexts."""
 
-    @patch('app.utils.render_template')
+    @patch("app.utils.render_template")
     def test_create_page_with_template_error(self, mock_render, minimal_app):
         """Test create_page behavior when template rendering fails."""
         mock_render.side_effect = Exception("Template not found")
 
         # Use proper application context with database setup
-        with minimal_app.app_context(), patch('flask.session', {'current_user': 'test'}):
+        with (
+            minimal_app.app_context(),
+            patch("flask.session", {"current_user": "test"}),
+        ):
             try:
-                create_page('nonexistent.html', 'Title')
+                create_page("nonexistent.html", "Title")
                 raise AssertionError("Should have raised exception")
             except Exception as e:
                 assert "Template not found" in str(e)
@@ -252,18 +272,21 @@ class TestModuleFunctionality:
         """Test that all necessary imports work at module level."""
         from app.routes_bp import initialize_routes
         from app.utils import create_page, dprint
-        assert all([
-            main_bp is not None,
-            callable(initialize_routes),
-            callable(create_page),
-            callable(dprint)
-        ])
+
+        assert all(
+            [
+                main_bp is not None,
+                callable(initialize_routes),
+                callable(create_page),
+                callable(dprint),
+            ]
+        )
 
     def test_blueprint_attributes(self):
         """Test blueprint object attributes."""
-        assert hasattr(main_bp, 'name')
-        assert hasattr(main_bp, 'url_prefix')
-        assert hasattr(main_bp, 'static_folder')
+        assert hasattr(main_bp, "name")
+        assert hasattr(main_bp, "url_prefix")
+        assert hasattr(main_bp, "static_folder")
 
     def test_function_signatures(self):
         """Test that functions have expected signatures."""
@@ -272,10 +295,10 @@ class TestModuleFunctionality:
         # Test create_page signature
         sig = inspect.signature(create_page)
         params = list(sig.parameters.keys())
-        assert 'template' in params
-        assert 'title' in params
+        assert "template" in params
+        assert "title" in params
 
         # Test dprint signature
         sig = inspect.signature(dprint)
         params = list(sig.parameters.keys())
-        assert 'lvl' in params
+        assert "lvl" in params

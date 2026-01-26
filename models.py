@@ -7,7 +7,7 @@ from app import db
 
 
 class MatchPlay(db.Model):
-    __tablename__ = 'matchplay'
+    __tablename__ = "matchplay"
 
     id = db.Column(db.Integer, primary_key=True)
     match_id = db.Column(db.Integer, primary_key=True)
@@ -22,25 +22,26 @@ class MatchPlay(db.Model):
     behaviour = db.Column(db.Integer)
 
     def __init__(self, matchdata):
-        self.match_id = matchdata['match_id']
-        self.player_id = matchdata['player_id']
-        self.datetime = matchdata['datetime']
-        self.first_name = matchdata['first_name']
-        self.nick_name = matchdata['nick_name']
-        self.last_name = matchdata['last_name']
-        self.role_id = matchdata['role_id']
-        self.rating_stars = matchdata['rating_stars']
-        self.rating_stars_eom = matchdata['rating_stars_eom']
-        self.behaviour = matchdata['behaviour']
+        self.match_id = matchdata["match_id"]
+        self.player_id = matchdata["player_id"]
+        self.datetime = matchdata["datetime"]
+        self.first_name = matchdata["first_name"]
+        self.nick_name = matchdata["nick_name"]
+        self.last_name = matchdata["last_name"]
+        self.role_id = matchdata["role_id"]
+        self.rating_stars = matchdata["rating_stars"]
+        self.rating_stars_eom = matchdata["rating_stars_eom"]
+        self.behaviour = matchdata["behaviour"]
 
     def __repr__(self):
-        return f'{self.first_name} {self.last_name}: {self.rating_stars}/{self.rating_stars_eom}'
+        return f"{self.first_name} {self.last_name}: {self.rating_stars}/{self.rating_stars_eom}"
+
 
 # --------------------------------------------------------------------------------
 
 
 class Match(db.Model):
-    __tablename__ = 'match'
+    __tablename__ = "match"
 
     ht_id = db.Column(db.Integer, primary_key=True)
     home_team_id = db.Column(db.Integer)
@@ -57,32 +58,33 @@ class Match(db.Model):
     away_goals = db.Column(db.Integer)
 
     def __init__(self, matchdata):
-        self.ht_id = matchdata['ht_id']
-        self.home_team_id = matchdata['home_team_id']
-        self.home_team_name = matchdata['home_team_name']
-        self.away_team_id = matchdata['away_team_id']
-        self.away_team_name = matchdata['away_team_name']
-        self.datetime = matchdata['datetime']
-        self.matchtype = matchdata['matchtype']
-        self.context_id = matchdata['context_id']
-        self.rule_id = matchdata['rule_id']
-        self.cup_level = matchdata['cup_level']
-        self.cup_level_index = matchdata['cup_level_index']
-        self.home_goals = matchdata['home_goals']
-        self.away_goals = matchdata['away_goals']
+        self.ht_id = matchdata["ht_id"]
+        self.home_team_id = matchdata["home_team_id"]
+        self.home_team_name = matchdata["home_team_name"]
+        self.away_team_id = matchdata["away_team_id"]
+        self.away_team_name = matchdata["away_team_name"]
+        self.datetime = matchdata["datetime"]
+        self.matchtype = matchdata["matchtype"]
+        self.context_id = matchdata["context_id"]
+        self.rule_id = matchdata["rule_id"]
+        self.cup_level = matchdata["cup_level"]
+        self.cup_level_index = matchdata["cup_level_index"]
+        self.home_goals = matchdata["home_goals"]
+        self.away_goals = matchdata["away_goals"]
 
     def __repr__(self):
-        return f'{self.home_team_name} - {self.away_team_name}: {self.ht_id}'
+        return f"{self.home_team_name} - {self.away_team_name}: {self.ht_id}"
+
 
 # --------------------------------------------------------------------------------
 
 
 class PlayerSetting(db.Model):
-    __tablename__ = 'playersetting'
+    __tablename__ = "playersetting"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'))
-    group_id = db.Column(db.Integer, db.ForeignKey('playergroup.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"))
+    group_id = db.Column(db.Integer, db.ForeignKey("playergroup.id"))
     player_id = db.Column(db.Integer)
 
     def __init__(self, player_id, user_id, group_id):
@@ -91,20 +93,17 @@ class PlayerSetting(db.Model):
         self.group_id = group_id
 
     def __repr__(self):
-        return f'<{self.player_id} {self.group_id}>'
+        return f"<{self.player_id} {self.group_id}>"
+
 
 # --------------------------------------------------------------------------------
 
 
 class Group(db.Model):
-    __tablename__ = 'playergroup'
+    __tablename__ = "playergroup"
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True,
-        unique=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"))
     name = db.Column(db.String(100))
     order = db.Column(db.Integer)
     textcolor = db.Column(db.String(100))
@@ -118,13 +117,14 @@ class Group(db.Model):
         self.bgcolor = bgcolor
 
     def __repr__(self):
-        return f'<{self.name} {self.order}>'
+        return f"<{self.name} {self.order}>"
+
 
 # --------------------------------------------------------------------------------
 
 
 class User(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     ht_id = db.Column(db.Integer, primary_key=True, unique=True)
     ht_user = db.Column(db.String(100), unique=True)
@@ -145,8 +145,7 @@ class User(db.Model):
     role = db.Column(db.String(100))
     player_columns = db.Column(db.PickleType())
 
-    def __init__(self, ht_id, ht_user, username,
-                 password, access_key, access_secret):
+    def __init__(self, ht_id, ht_user, username, password, access_key, access_secret):
         self.ht_id = ht_id
         self.ht_user = ht_user
         self.username = username
@@ -159,18 +158,18 @@ class User(db.Model):
         self.c_matches = 0
         self.c_training = 0
         self.c_update = 0
-        self.last_login = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.last_update = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.created = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.last_update = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.created = time.strftime("%Y-%m-%d %H:%M:%S")
         self.role = ""
         self.player_columns = pickle.dumps([])
 
     def __repr__(self):
-        return f'<id {self.username}>'
+        return f"<id {self.username}>"
 
     def getRole(self):
-        return f'{self.role}'
+        return f"{self.role}"
 
     def setRole(self, newrole):
         self.role = newrole
@@ -181,34 +180,34 @@ class User(db.Model):
         self.access_key = access_key
         self.access_secret = access_secret
         self.c_login += 1
-        self.last_login = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def login(self):
         self.c_login += 1
-        self.last_login = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def player(self):
         self.c_player += 1
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def matches(self):
         self.c_matches += 1
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def team(self):
         self.c_team = self.c_team + 1
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def training(self):
         self.c_training += 1
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def updatedata(self):
         self.c_update += 1
-        self.last_update = time.strftime('%Y-%m-%d %H:%M:%S')
-        self.last_usage = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.last_update = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def updateColumns(self, cols):
         pcols = pickle.dumps(cols)
@@ -221,11 +220,12 @@ class User(db.Model):
         except Exception:
             return []
 
+
 # --------------------------------------------------------------------------------
 
 
 class Players(db.Model):
-    __tablename__ = 'players'
+    __tablename__ = "players"
 
     ht_id = db.Column(db.Integer, primary_key=True)
     data_date = db.Column(db.DateTime, primary_key=True)
@@ -284,61 +284,61 @@ class Players(db.Model):
     leadership = db.Column(db.Integer)
 
     def __init__(self, playerdata):
-        self.ht_id = playerdata['ht_id']
-        self.data_date = time.strftime('%Y-%m-%d')
-        self.first_name = playerdata['first_name']
-        self.nick_name = playerdata['nick_name']
-        self.last_name = playerdata['last_name']
-        self.number = playerdata['number']
-        self.category_id = playerdata['category_id']
-        self.owner_notes = playerdata['owner_notes']
-        self.age_years = playerdata['age_years']
-        self.age_days = playerdata['age_days']
-        self.age = str(playerdata['age'])
-        self.next_birthday = playerdata['next_birthday']
-        self.arrival_date = playerdata['arrival_date']
-        self.form = playerdata['form']
-        self.cards = playerdata['cards']
-        self.injury_level = playerdata['injury_level']
-        self.statement = playerdata['statement']
-        self.language = playerdata['language']
-        self.language_id = playerdata['language_id']
-        self.agreeability = playerdata['agreeability']
-        self.aggressiveness = playerdata['aggressiveness']
-        self.honesty = playerdata['honesty']
-        self.experience = playerdata['experience']
-        self.loyalty = playerdata['loyalty']
-        self.specialty = playerdata['specialty']
-        self.native_country_id = playerdata['native_country_id']
-        self.native_league_id = playerdata['native_league_id']
-        self.native_league_name = playerdata['native_league_name']
-        self.tsi = playerdata['tsi']
-        self.salary = playerdata['salary']
-        self.caps = playerdata['caps']
-        self.caps_u20 = playerdata['caps_u20']
-        self.career_goals = playerdata['career_goals']
-        self.career_hattricks = playerdata['career_hattricks']
-        self.league_goals = playerdata['league_goals']
-        self.cup_goals = playerdata['cup_goals']
-        self.friendly_goals = playerdata['friendly_goals']
-        self.current_team_matches = playerdata['current_team_matches']
-        self.current_team_goals = playerdata['current_team_goals']
-        self.national_team_id = playerdata['national_team_id']
-        self.national_team_name = playerdata['national_team_name']
-        self.is_transfer_listed = bool(playerdata['is_transfer_listed'])
-        self.team_id = playerdata['team_id']
-        self.stamina = int(playerdata['stamina'])
-        self.keeper = int(playerdata['keeper'])
-        self.defender = int(playerdata['defender'])
-        self.playmaker = int(playerdata['playmaker'])
-        self.winger = int(playerdata['winger'])
-        self.passing = int(playerdata['passing'])
-        self.scorer = int(playerdata['scorer'])
-        self.set_pieces = int(playerdata['set_pieces'])
-        self.owner = playerdata['owner']
+        self.ht_id = playerdata["ht_id"]
+        self.data_date = time.strftime("%Y-%m-%d")
+        self.first_name = playerdata["first_name"]
+        self.nick_name = playerdata["nick_name"]
+        self.last_name = playerdata["last_name"]
+        self.number = playerdata["number"]
+        self.category_id = playerdata["category_id"]
+        self.owner_notes = playerdata["owner_notes"]
+        self.age_years = playerdata["age_years"]
+        self.age_days = playerdata["age_days"]
+        self.age = str(playerdata["age"])
+        self.next_birthday = playerdata["next_birthday"]
+        self.arrival_date = playerdata["arrival_date"]
+        self.form = playerdata["form"]
+        self.cards = playerdata["cards"]
+        self.injury_level = playerdata["injury_level"]
+        self.statement = playerdata["statement"]
+        self.language = playerdata["language"]
+        self.language_id = playerdata["language_id"]
+        self.agreeability = playerdata["agreeability"]
+        self.aggressiveness = playerdata["aggressiveness"]
+        self.honesty = playerdata["honesty"]
+        self.experience = playerdata["experience"]
+        self.loyalty = playerdata["loyalty"]
+        self.specialty = playerdata["specialty"]
+        self.native_country_id = playerdata["native_country_id"]
+        self.native_league_id = playerdata["native_league_id"]
+        self.native_league_name = playerdata["native_league_name"]
+        self.tsi = playerdata["tsi"]
+        self.salary = playerdata["salary"]
+        self.caps = playerdata["caps"]
+        self.caps_u20 = playerdata["caps_u20"]
+        self.career_goals = playerdata["career_goals"]
+        self.career_hattricks = playerdata["career_hattricks"]
+        self.league_goals = playerdata["league_goals"]
+        self.cup_goals = playerdata["cup_goals"]
+        self.friendly_goals = playerdata["friendly_goals"]
+        self.current_team_matches = playerdata["current_team_matches"]
+        self.current_team_goals = playerdata["current_team_goals"]
+        self.national_team_id = playerdata["national_team_id"]
+        self.national_team_name = playerdata["national_team_name"]
+        self.is_transfer_listed = bool(playerdata["is_transfer_listed"])
+        self.team_id = playerdata["team_id"]
+        self.stamina = int(playerdata["stamina"])
+        self.keeper = int(playerdata["keeper"])
+        self.defender = int(playerdata["defender"])
+        self.playmaker = int(playerdata["playmaker"])
+        self.winger = int(playerdata["winger"])
+        self.passing = int(playerdata["passing"])
+        self.scorer = int(playerdata["scorer"])
+        self.set_pieces = int(playerdata["set_pieces"])
+        self.owner = playerdata["owner"]
         self.old_owner = 0
-        self.mother_club_bonus = bool(playerdata['mother_club_bonus'])
-        self.leadership = int(playerdata['leadership'])
+        self.mother_club_bonus = bool(playerdata["mother_club_bonus"])
+        self.leadership = int(playerdata["leadership"])
 
     def __repr__(self):
         ret = self.first_name + " " + self.last_name
@@ -346,61 +346,64 @@ class Players(db.Model):
         return ret
 
     def __iter__(self):
-        ret = (("ht_id", self.ht_id),
-               ("data_date", self.data_date),
-               ("first_name", self.first_name),
-               ("nick_name", self.nick_name),
-               ("last_name", self.last_name),
-               ("number", self.number),
-               ("category_id", self.category_id),
-               ("owner_notes", self.owner_notes),
-               ("age_years", self.age_years),
-               ("age_days", self.age_days),
-               ("age", self.age),
-               ("next_birthday", self.next_birthday),
-               ("arrival_date", self.arrival_date),
-               ("form", self.form),
-               ("cards", self.cards),
-               ("injury_level", self.injury_level),
-               ("statement", self.statement),
-               ("language", self.language),
-               ("language_id", self.language_id),
-               ("agreeability", self.agreeability),
-               ("aggressiveness", self.aggressiveness),
-               ("honesty", self.honesty),
-               ("experience", self.experience),
-               ("loyalty", self.loyalty),
-               ("specialty", self.specialty),
-               ("native_country_id", self.native_country_id),
-               ("native_league_id", self.native_league_id),
-               ("native_league_name", self.native_league_name),
-               ("tsi", self.tsi),
-               ("salary", self.salary),
-               ("caps", self.caps),
-               ("caps_u20", self.caps_u20),
-               ("career_goals", self.career_goals),
-               ("career_hattricks", self.career_hattricks),
-               ("league_goals", self.league_goals),
-               ("cup_goals", self.cup_goals),
-               ("friendly_goals", self.friendly_goals),
-               ("current_team_matches", self.current_team_matches),
-               ("current_team_goals", self.current_team_goals),
-               ("national_team_id", self.national_team_id),
-               ("national_team_name", self.national_team_name),
-               ("is_transfer_listed", self.is_transfer_listed),
-               ("team_id", self.team_id),
-               ("stamina", self.stamina),
-               ("keeper", self.keeper),
-               ("defender", self.defender),
-               ("playmaker", self.playmaker),
-               ("winger", self.winger),
-               ("passing", self.passing),
-               ("scorer", self.scorer),
-               ("set_pieces", self.set_pieces),
-               ("owner", self.owner),
-               ("old_owner", self.old_owner),
-               ("mother_club_bonus", self.mother_club_bonus),
-               ("leadership", self.leadership))
+        ret = (
+            ("ht_id", self.ht_id),
+            ("data_date", self.data_date),
+            ("first_name", self.first_name),
+            ("nick_name", self.nick_name),
+            ("last_name", self.last_name),
+            ("number", self.number),
+            ("category_id", self.category_id),
+            ("owner_notes", self.owner_notes),
+            ("age_years", self.age_years),
+            ("age_days", self.age_days),
+            ("age", self.age),
+            ("next_birthday", self.next_birthday),
+            ("arrival_date", self.arrival_date),
+            ("form", self.form),
+            ("cards", self.cards),
+            ("injury_level", self.injury_level),
+            ("statement", self.statement),
+            ("language", self.language),
+            ("language_id", self.language_id),
+            ("agreeability", self.agreeability),
+            ("aggressiveness", self.aggressiveness),
+            ("honesty", self.honesty),
+            ("experience", self.experience),
+            ("loyalty", self.loyalty),
+            ("specialty", self.specialty),
+            ("native_country_id", self.native_country_id),
+            ("native_league_id", self.native_league_id),
+            ("native_league_name", self.native_league_name),
+            ("tsi", self.tsi),
+            ("salary", self.salary),
+            ("caps", self.caps),
+            ("caps_u20", self.caps_u20),
+            ("career_goals", self.career_goals),
+            ("career_hattricks", self.career_hattricks),
+            ("league_goals", self.league_goals),
+            ("cup_goals", self.cup_goals),
+            ("friendly_goals", self.friendly_goals),
+            ("current_team_matches", self.current_team_matches),
+            ("current_team_goals", self.current_team_goals),
+            ("national_team_id", self.national_team_id),
+            ("national_team_name", self.national_team_name),
+            ("is_transfer_listed", self.is_transfer_listed),
+            ("team_id", self.team_id),
+            ("stamina", self.stamina),
+            ("keeper", self.keeper),
+            ("defender", self.defender),
+            ("playmaker", self.playmaker),
+            ("winger", self.winger),
+            ("passing", self.passing),
+            ("scorer", self.scorer),
+            ("set_pieces", self.set_pieces),
+            ("owner", self.owner),
+            ("old_owner", self.old_owner),
+            ("mother_club_bonus", self.mother_club_bonus),
+            ("leadership", self.leadership),
+        )
         return iter(ret)
+
 
 # --------------------------------------------------------------------------------

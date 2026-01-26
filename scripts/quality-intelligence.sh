@@ -12,6 +12,18 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m' # No Color
 
+# Function to truncate title to max width
+truncate_title() {
+    local title="$1"
+    local max_width=23  # Adjust this to fit the table nicely
+
+    if [ ${#title} -gt $max_width ]; then
+        echo "${title:0:$((max_width-1))}..."
+    else
+        echo "$title"
+    fi
+}
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo -e "${BOLD}🎯 HTStatus Quality Intelligence Report - Detailed Summary${NC}"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -114,6 +126,7 @@ parse_qi_json() {
         local warnings=$(jq -r '.warnings' "$file" 2>/dev/null || echo "0")
         local errors=$(jq -r '.errors' "$file" 2>/dev/null || echo "0")
         local makecommand=$(jq -r '.makecommand' "$file" 2>/dev/null || echo "unknown")
+        local coverage="N/A"  # QI JSON doesn't typically have coverage
 
     elif jq -e '.summary and .tests and .exitcode' "$file" >/dev/null 2>&1; then
         # pytest JSON format
@@ -124,16 +137,46 @@ parse_qi_json() {
         local skipped=$(jq -r '.summary.skipped // 0' "$file")
         local exit_code=$(jq -r '.exitcode // 0' "$file")
 
+        # Extract coverage data if available - check for separate coverage JSON file
+        local coverage="N/A"
+        local coverage_file="${file%-test-each-*-cov.json}"
+        if [[ "$file" == *"test-each-"* ]]; then
+            # For test-each files, look for corresponding -cov.json file
+            local base_name=$(echo "$basename" | sed 's/test-each-//')
+            local cov_file_path="$(dirname "$file")/test-each-${base_name}-cov.json"
+            if [[ -f "$cov_file_path" ]]; then
+                # Extract total coverage percentage from coverage JSON
+                local total_coverage=$(jq -r '.totals.percent_covered // empty' "$cov_file_path" 2>/dev/null)
+                if [[ -n "$total_coverage" && "$total_coverage" != "null" ]]; then
+                    coverage=$(printf "%.1f%%" "$total_coverage")
+                fi
+            fi
+        fi
+
         # Convert test type from filename to title
         case "$basename" in
             test-core) local title="Core Tests" ;;
             test-db) local title="Database Tests" ;;
             test-routes) local title="Route Tests" ;;
             test-config) local title="Configuration Tests" ;;
-            *) local title="$(echo "$basename" | sed 's/-/ /g' | sed 's/\b\w/\u&/g')" ;;
+            test-each-test_*)
+                # Clean up individual test names
+                local clean_name=$(echo "$basename" | sed 's/test-each-test_//' | sed 's/_/ /g' | sed 's/\b\w/\u&/g')
+                local title="$(truncate_title "$clean_name")"
+                ;;
+            *) local title="$(truncate_title "$(echo "$basename" | sed 's/-/ /g' | sed 's/\b\w/\u&/g')")" ;;
         esac
 
-        local makecommand="make $basename"
+        # Generate make command - simplify for individual tests
+        case "$basename" in
+            test-each-test_*)
+                local test_name=$(echo "$basename" | sed 's/test-each-//')
+                local makecommand="make test-single FILE=tests/$test_name.py"
+                ;;
+            *)
+                local makecommand="make $basename"
+                ;;
+        esac
         local total_issues=$((failed + errors_count))
 
         # Determine status
@@ -148,7 +191,7 @@ parse_qi_json() {
         local errors="$total_issues"
 
     else
-        echo "Unknown|UNK|-|-|unknown"
+        echo "Unknown|UNK|-|-|N/A|unknown"
         return 1
     fi
 
@@ -164,7 +207,7 @@ parse_qi_json() {
     if [ "$warnings" = "0" ]; then warnings="   -"; fi
     if [ "$errors" = "0" ]; then errors="   -"; fi
 
-    echo "$title|$status|$warnings|$errors|$makecommand"
+    echo "$title|$status|$warnings|$errors|$coverage|$makecommand"
 }
 
 # Check if out/tests directory exists
@@ -181,16 +224,23 @@ fi
 
 echo ""
 echo "📊 Quality Gates Overview"
-echo "┌─────────────────────────┬──────────┬──────────┬──────────┬────────────────────────┐"
-echo "│ Quality Gate            │ Status   │ Warnings │ Errors   │ Make Command           │"
-echo "├─────────────────────────┼──────────┼──────────┼──────────┼────────────────────────┤"
+printf "${BOLD}%-25s %-10s %10s %10s %10s %-25s${NC}\n" \
+    "Quality Gate" "Status" "Warnings" "Errors" "Coverage" "Make Command"
 
 # Process all JSON files in out/tests/
 passed_gates=0
 total_gates=0
 validation_warnings=0
+min_coverage=100
+least_covered_file=""
+least_covered_title=""
 
 for json_file in out/tests/*.json; do
+    # Skip coverage JSON files (they are processed separately for coverage data)
+    if [[ "$json_file" == *-cov.json ]]; then
+        continue
+    fi
+
     if [ -f "$json_file" ]; then
         total_gates=$((total_gates + 1))
 
@@ -201,19 +251,30 @@ for json_file in out/tests/*.json; do
 
         # Parse and display gate data
         gate_data=$(parse_qi_json "$json_file")
-        IFS='|' read -r title status warnings errors makecommand <<< "$gate_data"
+        IFS='|' read -r title status warnings errors coverage makecommand <<< "$gate_data"
+
+        # Track least covered test file
+        if [[ "$coverage" != "N/A" && "$coverage" != "   -" ]]; then
+            # Extract numeric value from coverage percentage (e.g., "22.1%" -> "22.1")
+            coverage_value=$(echo "$coverage" | sed 's/%//')
+            if [[ "$coverage_value" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+                if (( $(echo "$coverage_value < $min_coverage" | bc -l 2>/dev/null || [ "${coverage_value%.*}" -lt "${min_coverage%.*}" ]) )); then
+                    min_coverage="$coverage_value"
+                    least_covered_file="$makecommand"
+                    least_covered_title="$title"
+                fi
+            fi
+        fi
 
         # Count passed gates
         if [ "$status" = "PASS" ]; then
             passed_gates=$((passed_gates + 1))
         fi
 
-        printf "│ %-23s │ %-8s │ %8s │ %8s │ %-22s │\n" \
-            "$title" "$status" "$warnings" "$errors" "$makecommand"
+        printf "%-25s %-10s %10s %10s %10s %-25s\n" \
+            "$title" "$status" "$warnings" "$errors" "$coverage" "$makecommand"
     fi
 done
-
-echo "└─────────────────────────┴──────────┴──────────┴──────────┴────────────────────────┘"
 
 # Display validation warnings if any
 if [ $validation_warnings -gt 0 ]; then
@@ -243,6 +304,24 @@ elif [ $passed_gates -ge $((final_gates / 2)) ]; then
     echo -e "   ${YELLOW}MODERATE ⚠️${NC} ($passed_gates/$final_gates quality gates passed)"
 else
     echo -e "   ${RED}LOW ❌${NC} ($passed_gates/$final_gates quality gates passed)"
+fi
+
+echo ""
+echo -e "${BOLD}📉 Test Coverage Insight${NC}"
+if [[ -n "$least_covered_file" ]]; then
+    # Color code the coverage percentage
+    if (( $(echo "$min_coverage >= 80" | bc -l 2>/dev/null || [ "${min_coverage%.*}" -ge 80 ]) )); then
+        coverage_status="${GREEN}✅${NC}"
+    elif (( $(echo "$min_coverage >= 60" | bc -l 2>/dev/null || [ "${min_coverage%.*}" -ge 60 ]) )); then
+        coverage_status="${YELLOW}⚠️${NC}"
+    else
+        coverage_status="${RED}❌${NC}"
+    fi
+
+    echo -e "   Least Covered Test: ${BOLD}$least_covered_title${NC} (${min_coverage}%) $coverage_status"
+    echo -e "   Command to run: $least_covered_file"
+else
+    echo "   No coverage data available for analysis"
 fi
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

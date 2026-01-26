@@ -1,13 +1,14 @@
 """Mock CHPP API responses for testing."""
 
+
 class MockCHPPUser:
     """Mock CHPP User object."""
 
-    def __init__(self, user_id=12345, loginname='testuser'):
+    def __init__(self, user_id=12345, loginname="testuser"):
         self.user_id = user_id
         self.loginname = loginname
-        self.supporter_tier = 'none'
-        self._SOURCE_FILE = 'managercompendium'  # Expected by team route
+        self.supporter_tier = "none"
+        self._SOURCE_FILE = "managercompendium"  # Expected by team route
         self._teams_ht_id = [54321]  # List of team IDs this user manages
 
     def __getitem__(self, key):
@@ -18,7 +19,7 @@ class MockCHPPUser:
 class MockCHPPTeam:
     """Mock CHPP Team object."""
 
-    def __init__(self, team_id=54321, team_name='Test Team'):
+    def __init__(self, team_id=54321, team_name="Test Team"):
         self.team_id = team_id
         self.team_name = team_name
         self.name = team_name  # Expected by team route
@@ -37,25 +38,25 @@ class MockCHPPPlayer:
         # Basic info
         self.player_id = player_id
         self.ht_id = player_id
-        self.first_name = kwargs.get('first_name', 'Test')
-        self.nick_name = kwargs.get('nick_name', 'TestPlayer')
-        self.last_name = kwargs.get('last_name', 'Player')
-        self.age = kwargs.get('age', 25)
+        self.first_name = kwargs.get("first_name", "Test")
+        self.nick_name = kwargs.get("nick_name", "TestPlayer")
+        self.last_name = kwargs.get("last_name", "Player")
+        self.age = kwargs.get("age", 25)
 
         # Skills
-        self.keeper = kwargs.get('keeper', 5)
-        self.defender = kwargs.get('defender', 8)
-        self.playmaker = kwargs.get('playmaker', 6)
-        self.winger = kwargs.get('winger', 7)
-        self.passing = kwargs.get('passing', 6)
-        self.scorer = kwargs.get('scorer', 9)
-        self.set_pieces = kwargs.get('set_pieces', 4)
+        self.keeper = kwargs.get("keeper", 5)
+        self.defender = kwargs.get("defender", 8)
+        self.playmaker = kwargs.get("playmaker", 6)
+        self.winger = kwargs.get("winger", 7)
+        self.passing = kwargs.get("passing", 6)
+        self.scorer = kwargs.get("scorer", 9)
+        self.set_pieces = kwargs.get("set_pieces", 4)
 
         # Additional attributes
-        self.experience = kwargs.get('experience', 7)
-        self.loyalty = kwargs.get('loyalty', 8)
-        self.form = kwargs.get('form', 6)
-        self.stamina = kwargs.get('stamina', 8)
+        self.experience = kwargs.get("experience", 7)
+        self.loyalty = kwargs.get("loyalty", 8)
+        self.form = kwargs.get("form", 6)
+        self.stamina = kwargs.get("stamina", 8)
 
     def __getitem__(self, key):
         """Allow dict-like access for backward compatibility."""
@@ -65,12 +66,17 @@ class MockCHPPPlayer:
 class MockCHPP:
     """Mock CHPP API client for testing."""
 
-    def __init__(self, consumer_key=None, consumer_secret=None,
-                 access_key=None, access_secret=None):
-        self.consumer_key = consumer_key or 'test_consumer'
-        self.consumer_secret = consumer_secret or 'test_secret'
-        self.access_key = access_key or 'test_access'
-        self.access_secret = access_secret or 'test_access_secret'
+    def __init__(
+        self,
+        consumer_key=None,
+        consumer_secret=None,
+        access_key=None,
+        access_secret=None,
+    ):
+        self.consumer_key = consumer_key or "test_consumer"
+        self.consumer_secret = consumer_secret or "test_secret"
+        self.access_key = access_key or "test_access"
+        self.access_secret = access_secret or "test_access_secret"
 
         # Default mock data
         self._mock_user = MockCHPPUser()
@@ -119,7 +125,7 @@ def create_mock_player(**kwargs):
     return MockCHPPPlayer(**kwargs)
 
 
-def create_mock_team(team_id=54321, team_name='Test Team', players=None):
+def create_mock_team(team_id=54321, team_name="Test Team", players=None):
     """Create a mock team with optional players."""
     team = MockCHPPTeam(team_id, team_name)
     if players:
@@ -127,7 +133,7 @@ def create_mock_team(team_id=54321, team_name='Test Team', players=None):
     return team
 
 
-def create_mock_user(user_id=12345, loginname='testuser'):
+def create_mock_user(user_id=12345, loginname="testuser"):
     """Create a mock user."""
     return MockCHPPUser(user_id, loginname)
 
@@ -136,13 +142,13 @@ def create_mock_chpp_client(**kwargs):
     """Create a mock CHPP client with optional custom data."""
     chpp = MockCHPP()
 
-    if 'user' in kwargs:
-        chpp.set_mock_user(kwargs['user'])
+    if "user" in kwargs:
+        chpp.set_mock_user(kwargs["user"])
 
-    if 'teams' in kwargs:
-        chpp.set_mock_teams(kwargs['teams'])
+    if "teams" in kwargs:
+        chpp.set_mock_teams(kwargs["teams"])
 
-    if 'players' in kwargs:
-        chpp.set_mock_players(kwargs['players'])
+    if "players" in kwargs:
+        chpp.set_mock_players(kwargs["players"])
 
     return chpp

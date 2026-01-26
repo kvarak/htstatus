@@ -8,11 +8,16 @@ from flask import Blueprint, redirect, render_template, request, session, url_fo
 from sqlalchemy import text
 
 from app.auth_utils import get_current_user_id, require_authentication
+from app.model_registry import (
+    get_group_model,
+    get_player_setting_model,
+    get_players_model,
+    get_user_model,
+)
 from app.utils import create_page, diff_month, dprint, player_diff
-from models import Group, Players, PlayerSetting, User
 
 # Create Blueprint for main routes
-main_bp = Blueprint('main', __name__)
+main_bp = Blueprint("main", __name__)
 
 # These will be set by setup_main_blueprint()
 db = None
@@ -30,23 +35,25 @@ def setup_main_blueprint(db_instance, cols, all_cols, group_order=99):
     default_group_order = group_order
 
 
-@main_bp.route('/')
-@main_bp.route('/index')
+@main_bp.route("/")
+@main_bp.route("/index")
 def index():
     """Display home page with user and team statistics."""
+    User = get_user_model()
     allusers = db.session.query(User).all()
     time1m = date.today() - relativedelta(months=1)
     activeusers = db.session.query(User).filter(User.last_usage > time1m).all()
 
-    if 'current_user' not in session:
+    if "current_user" not in session:
         return create_page(
-            template='main.html',
-            title='Home',
+            template="main.html",
+            title="Home",
             usercount=len(allusers),
-            activeusers=len(activeusers))
+            activeusers=len(activeusers),
+        )
 
-    all_teams = session['all_teams']
-    all_team_names = session['all_team_names']
+    all_teams = session["all_teams"]
+    all_team_names = session["all_team_names"]
     updated = {}
 
     for i in range(len(all_teams)):
@@ -55,80 +62,83 @@ def index():
     dprint(2, updated)
 
     current_user_id = get_current_user_id()
-    thisuserdata = (db.session.query(User)
-                    .filter_by(ht_id=current_user_id)
-                    .first())
+    thisuserdata = db.session.query(User).filter_by(ht_id=current_user_id).first()
 
     if not thisuserdata:
         # User not found in database, clear session and redirect to login
         session.clear()
-        return redirect(url_for('auth.login'))
+        return redirect(url_for("auth.login"))
 
     thisuser = {
-        'id': thisuserdata.ht_id,
-        'name': thisuserdata.ht_user,
-        'role': thisuserdata.role,
-        'c_team': thisuserdata.c_team,
-        'c_training': thisuserdata.c_training,
-        'c_player': thisuserdata.c_player,
-        'c_matches': thisuserdata.c_matches,
-        'c_login': thisuserdata.c_login,
-        'c_update': thisuserdata.c_update,
-        'last_update': thisuserdata.last_update,
-        'last_usage': thisuserdata.last_usage,
-        'last_login': thisuserdata.last_login,
-        'created': thisuserdata.created}
+        "id": thisuserdata.ht_id,
+        "name": thisuserdata.ht_user,
+        "role": thisuserdata.role,
+        "c_team": thisuserdata.c_team,
+        "c_training": thisuserdata.c_training,
+        "c_player": thisuserdata.c_player,
+        "c_matches": thisuserdata.c_matches,
+        "c_login": thisuserdata.c_login,
+        "c_update": thisuserdata.c_update,
+        "last_update": thisuserdata.last_update,
+        "last_usage": thisuserdata.last_usage,
+        "last_login": thisuserdata.last_login,
+        "created": thisuserdata.created,
+    }
 
     dprint(2, thisuser)
 
     return create_page(
-        template='main.html',
-        title='Home',
+        template="main.html",
+        title="Home",
         thisuser=thisuser,
         usercount=len(allusers),
         activeusers=len(activeusers),
-        updated=updated)
+        updated=updated,
+    )
 
 
-@main_bp.route('/settings', methods=['GET', 'POST'])
+@main_bp.route("/settings", methods=["GET", "POST"])
 @require_authentication
 def settings():
     """Handle user settings for player groups and display columns."""
+    # Get model classes from registry
+    User = get_user_model()
+    Group = get_group_model()
+    PlayerSetting = get_player_setting_model()
+
     error = ""
 
-    groupname = request.form.get('groupname')
-    grouporder = request.form.get('grouporder')
-    addgroup = request.form.get('addgroup')
-    updategroup = request.form.get('updategroup')
-    deletegroup = request.form.get('deletegroup')
-    groupid = request.form.get('groupid')
-    textcolor = request.form.get('textcolor')
-    bgcolor = request.form.get('bgcolor')
+    groupname = request.form.get("groupname")
+    grouporder = request.form.get("grouporder")
+    addgroup = request.form.get("addgroup")
+    updategroup = request.form.get("updategroup")
+    deletegroup = request.form.get("deletegroup")
+    groupid = request.form.get("groupid")
+    textcolor = request.form.get("textcolor")
+    bgcolor = request.form.get("bgcolor")
     if not textcolor:
         textcolor = "#000000"
     if not bgcolor:
         bgcolor = "#FFFFFF"
 
-    user = (db.session.query(User)
-            .filter_by(ht_id=get_current_user_id())
-            .first())
+    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
     columns = User.getColumns(user)
     if len(columns) == 0:
         columns = defaultcolumns
 
-    columnsorder = request.form.get('columnsorder')
-    setcolumnsdefault = request.form.get('defaultcolumns')
+    columnsorder = request.form.get("columnsorder")
+    setcolumnsdefault = request.form.get("defaultcolumns")
     showdefaultcolumns = False
     if columnsorder and columnsorder != "empty":
         columns = []
-        columngroups = columnsorder.split('Hidden columns')
+        columngroups = columnsorder.split("Hidden columns")
         # Columns to show
-        for r in columngroups[0].split('<div'):
+        for r in columngroups[0].split("<div"):
             r = r.strip()
             if r == "":
                 continue
             key = re.search('id="(.+?)"', r)
-            text_match = re.search('>(.+?)</div>', r)
+            text_match = re.search(">(.+?)</div>", r)
             if key:
                 columns.append((text_match.group(1), key.group(1)))
         User.updateColumns(user, columns)
@@ -146,7 +156,8 @@ def settings():
                 name=groupname,
                 order=grouporder,
                 textcolor=textcolor,
-                bgcolor=bgcolor)
+                bgcolor=bgcolor,
+            )
             db.session.add(newgroup)
             db.session.commit()
         else:
@@ -154,23 +165,25 @@ def settings():
 
     elif updategroup and groupid:
         if groupname and grouporder:
-            (db.session
-             .query(Group)
-             .filter_by(id=groupid)
-             .update({"name": groupname,
-                      "order": grouporder,
-                      "textcolor": textcolor,
-                      "bgcolor": bgcolor}))
+            (
+                db.session.query(Group)
+                .filter_by(id=groupid)
+                .update(
+                    {
+                        "name": groupname,
+                        "order": grouporder,
+                        "textcolor": textcolor,
+                        "bgcolor": bgcolor,
+                    }
+                )
+            )
             db.session.commit()
         else:
             error = "Groups need both name and order."
 
     elif deletegroup and groupid:
         try:
-            thegroup = (db.session
-                        .query(Group)
-                        .filter_by(id=groupid)
-                        .first())
+            thegroup = db.session.query(Group).filter_by(id=groupid).first()
             db.session.delete(thegroup)
             db.session.commit()
         except Exception:
@@ -178,32 +191,34 @@ def settings():
             db.session.rollback()
 
             # remove all connected players
-            connections = (db.session.query(PlayerSetting)
-                           .filter_by(group_id=groupid,
-                                      user_id=get_current_user_id())
-                           .all())
+            connections = (
+                db.session.query(PlayerSetting)
+                .filter_by(group_id=groupid, user_id=get_current_user_id())
+                .all()
+            )
             dprint(2, connections)
 
             for playersetting in connections:
-                connection = (db.session
-                              .query(PlayerSetting)
-                              .filter_by(player_id=playersetting.player_id,
-                                         user_id=get_current_user_id())
-                              .first())
+                connection = (
+                    db.session.query(PlayerSetting)
+                    .filter_by(
+                        player_id=playersetting.player_id, user_id=get_current_user_id()
+                    )
+                    .first()
+                )
                 db.session.delete(connection)
                 db.session.commit()
 
-            thegroup = (db.session
-                        .query(Group)
-                        .filter_by(id=groupid)
-                        .first())
+            thegroup = db.session.query(Group).filter_by(id=groupid).first()
             db.session.delete(thegroup)
             db.session.commit()
 
-    group_data = (db.session.query(Group)
-                  .filter_by(user_id=get_current_user_id())
-                  .order_by(Group.order)
-                  .all())
+    group_data = (
+        db.session.query(Group)
+        .filter_by(user_id=get_current_user_id())
+        .order_by(Group.order)
+        .all()
+    )
 
     # Add a default group
     default_group = Group(
@@ -211,7 +226,8 @@ def settings():
         name="<default>",
         order=default_group_order,
         textcolor="#000000",
-        bgcolor="#FFFFFF")
+        bgcolor="#FFFFFF",
+    )
     before_default = [g for g in group_data if g.order < default_group_order]
     after_default = [g for g in group_data if g.order >= default_group_order]
     before_default.append(default_group)
@@ -219,47 +235,43 @@ def settings():
     group_data = before_default + after_default
 
     return create_page(
-        template='settings.html',
-        title='Settings',
+        template="settings.html",
+        title="Settings",
         columns=columns,
         hiddencolumns=hiddencolumns,
         showdefaultcolumns=showdefaultcolumns,
         group_data=group_data,
-        error=error)
+        error=error,
+    )
 
 
-@main_bp.route('/debug', methods=['GET', 'POST'])
+@main_bp.route("/debug", methods=["GET", "POST"])
 @require_authentication
 def admin():
     """Admin dashboard for user management."""
+    # Get model classes from registry
+    User = get_user_model()
+    Players = get_players_model()
 
     error = ""
 
     try:
-        user = (db.session.query(User)
-                .filter_by(ht_id=get_current_user_id())
-                .first())
+        user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
         role = User.getRole(user)
         if role != "Admin":
-            return render_template(
-                '_forward.html',
-                url='/')
+            return render_template("_forward.html", url="/")
     except Exception:
-        return render_template(
-            '_forward.html',
-            url='/')
+        return render_template("_forward.html", url="/")
 
-    adminchecked = request.form.get('admin')
-    userid = request.form.get('userid')
+    adminchecked = request.form.get("admin")
+    userid = request.form.get("userid")
 
     dprint(2, "Checkbox: ", adminchecked)
     dprint(2, userid)
 
     if userid:
         try:
-            user = (db.session.query(User)
-                    .filter_by(ht_id=userid)
-                    .first())
+            user = db.session.query(User).filter_by(ht_id=userid).first()
             updateto = "Admin" if adminchecked else "User"
 
             dprint(2, updateto)
@@ -270,7 +282,7 @@ def admin():
         except Exception:
             error = "couldn't change user"
 
-    allusers = db.session.query(User).order_by(text('last_usage desc')).all()
+    allusers = db.session.query(User).order_by(text("last_usage desc")).all()
     users = []
     for user in allusers:
         if (user.last_update - user.created).days < 1:
@@ -280,24 +292,24 @@ def admin():
         elif diff_month(user.last_update, user.created) < 2:
             active_time = str((user.last_update - user.created).days) + " days"
         else:
-            active_time = (str(diff_month(user.last_update, user.created)) +
-                           " months")
+            active_time = str(diff_month(user.last_update, user.created)) + " months"
 
         thisuser = {
-            'id': user.ht_id,
-            'name': user.ht_user,
-            'role': user.role,
-            'c_team': user.c_team,
-            'c_training': user.c_training,
-            'c_player': user.c_player,
-            'c_matches': user.c_matches,
-            'c_login': user.c_login,
-            'c_update': user.c_update,
-            'last_update': user.last_update,
-            'last_usage': user.last_usage,
-            'last_login': user.last_login,
-            'created': user.created,
-            'active_time': active_time}
+            "id": user.ht_id,
+            "name": user.ht_user,
+            "role": user.role,
+            "c_team": user.c_team,
+            "c_training": user.c_training,
+            "c_player": user.c_player,
+            "c_matches": user.c_matches,
+            "c_login": user.c_login,
+            "c_update": user.c_update,
+            "last_update": user.last_update,
+            "last_usage": user.last_usage,
+            "last_login": user.last_login,
+            "created": user.created,
+            "active_time": active_time,
+        }
         users.append(thisuser)
 
     # Get recent player changes for administrative visibility
@@ -306,11 +318,13 @@ def admin():
         # Get all players updated in the last 7 days across all users
         cutoff_date = datetime.now() - timedelta(days=7)
 
-        recent_players = (db.session.query(Players)
-                         .filter(Players.data_date >= cutoff_date)
-                         .order_by(text('data_date desc'))
-                         .limit(100)  # Limit to most recent 100 player updates for performance
-                         .all())
+        recent_players = (
+            db.session.query(Players)
+            .filter(Players.data_date >= cutoff_date)
+            .order_by(text("data_date desc"))
+            .limit(100)  # Limit to most recent 100 player updates for performance
+            .all()
+        )
 
         # Track which players we've already processed to avoid duplicates
         processed_players = set()
@@ -350,8 +364,9 @@ def admin():
         changelogfull = []
 
     return create_page(
-        template='debug.html',
-        title='Debug',
+        template="debug.html",
+        title="Debug",
         users=users,
         changelogfull=changelogfull,
-        error=error)
+        error=error,
+    )

@@ -33,17 +33,14 @@ class TestCHPPTeamIDValidation:
         team_id_2 = 67890  # Also different from user ID
 
         # User manages multiple teams
-        mock_user = create_mock_user(user_id, 'testuser')
+        mock_user = create_mock_user(user_id, "testuser")
         mock_user._teams_ht_id = [team_id_1, team_id_2]
 
         # Create teams with correct IDs
-        team1 = create_mock_team(team_id_1, 'Team One')
-        team2 = create_mock_team(team_id_2, 'Team Two')
+        team1 = create_mock_team(team_id_1, "Team One")
+        team2 = create_mock_team(team_id_2, "Team Two")
 
-        chpp = create_mock_chpp_client(
-            user=mock_user,
-            teams=[team1, team2]
-        )
+        chpp = create_mock_chpp_client(user=mock_user, teams=[team1, team2])
 
         # Test user ID vs team IDs
         user = chpp.user()
@@ -62,7 +59,7 @@ class TestCHPPTeamIDValidation:
         user_id = 123456
         team_ids = [654321, 789012]  # Multiple teams, different from user ID
 
-        mock_user = create_mock_user(user_id, 'multiuser')
+        mock_user = create_mock_user(user_id, "multiuser")
         mock_user._teams_ht_id = team_ids
 
         # Simulate session setup (as done in login route)
@@ -79,10 +76,10 @@ class TestCHPPTeamIDValidation:
         valid_team_id = 222222
         invalid_team_id = 999999
 
-        mock_user = create_mock_user(user_id, 'testuser')
+        mock_user = create_mock_user(user_id, "testuser")
         mock_user._teams_ht_id = [valid_team_id]
 
-        team = create_mock_team(valid_team_id, 'Valid Team')
+        team = create_mock_team(valid_team_id, "Valid Team")
         chpp = create_mock_chpp_client(user=mock_user, teams=[team])
 
         # Valid team access
@@ -107,13 +104,13 @@ class TestMultiTeamScenarios:
         user_id = 100001
         team_ids = [200001, 200002, 200003]
 
-        mock_user = create_mock_user(user_id, 'multiowner')
+        mock_user = create_mock_user(user_id, "multiowner")
         mock_user._teams_ht_id = team_ids
 
         teams = [
-            create_mock_team(200001, 'Alpha Team'),
-            create_mock_team(200002, 'Beta Team'),
-            create_mock_team(200003, 'Gamma Team'),
+            create_mock_team(200001, "Alpha Team"),
+            create_mock_team(200002, "Beta Team"),
+            create_mock_team(200003, "Gamma Team"),
         ]
 
         chpp = create_mock_chpp_client(user=mock_user, teams=teams)
@@ -124,7 +121,9 @@ class TestMultiTeamScenarios:
         assert all(tid in user._teams_ht_id for tid in team_ids)
 
         # Test individual team access
-        for team_id, expected_name in zip(team_ids, ['Alpha Team', 'Beta Team', 'Gamma Team']):
+        for team_id, expected_name in zip(
+            team_ids, ["Alpha Team", "Beta Team", "Gamma Team"]
+        ):
             team = chpp.team(ht_id=team_id)
             assert team is not None
             assert team.team_id == team_id
@@ -133,19 +132,19 @@ class TestMultiTeamScenarios:
     def test_team_data_isolation(self):
         """Test that teams have isolated player data."""
         team1_players = [
-            create_mock_player(player_id=301, first_name='Player1A', scorer=10),
-            create_mock_player(player_id=302, first_name='Player1B', scorer=8),
+            create_mock_player(player_id=301, first_name="Player1A", scorer=10),
+            create_mock_player(player_id=302, first_name="Player1B", scorer=8),
         ]
 
         team2_players = [
-            create_mock_player(player_id=401, first_name='Player2A', scorer=12),
-            create_mock_player(player_id=402, first_name='Player2B', scorer=9),
+            create_mock_player(player_id=401, first_name="Player2A", scorer=12),
+            create_mock_player(player_id=402, first_name="Player2B", scorer=9),
         ]
 
-        team1 = create_mock_team(111, 'Team One', team1_players)
-        team2 = create_mock_team(222, 'Team Two', team2_players)
+        team1 = create_mock_team(111, "Team One", team1_players)
+        team2 = create_mock_team(222, "Team Two", team2_players)
 
-        user = create_mock_user(555, 'manager')
+        user = create_mock_user(555, "manager")
         user._teams_ht_id = [111, 222]
 
         chpp = create_mock_chpp_client(user=user, teams=[team1, team2])
@@ -154,27 +153,27 @@ class TestMultiTeamScenarios:
         retrieved_team1 = chpp.team(ht_id=111)
         assert len(retrieved_team1.players) == 2
         player_names = [p.first_name for p in retrieved_team1.players]
-        assert 'Player1A' in player_names
-        assert 'Player1B' in player_names
-        assert 'Player2A' not in player_names, "Team 1 should not have Team 2 players"
+        assert "Player1A" in player_names
+        assert "Player1B" in player_names
+        assert "Player2A" not in player_names, "Team 1 should not have Team 2 players"
 
         # Test team 2 players
         retrieved_team2 = chpp.team(ht_id=222)
         assert len(retrieved_team2.players) == 2
         player_names = [p.first_name for p in retrieved_team2.players]
-        assert 'Player2A' in player_names
-        assert 'Player2B' in player_names
-        assert 'Player1A' not in player_names, "Team 2 should not have Team 1 players"
+        assert "Player2A" in player_names
+        assert "Player2B" in player_names
+        assert "Player1A" not in player_names, "Team 2 should not have Team 1 players"
 
     def test_single_team_user_scenario(self):
         """Test user with only one team (most common scenario)."""
         user_id = 777
         team_id = 888
 
-        mock_user = create_mock_user(user_id, 'singleowner')
+        mock_user = create_mock_user(user_id, "singleowner")
         mock_user._teams_ht_id = [team_id]  # Single team list
 
-        team = create_mock_team(team_id, 'Solo Team')
+        team = create_mock_team(team_id, "Solo Team")
         chpp = create_mock_chpp_client(user=mock_user, teams=[team])
 
         # Test user
@@ -185,7 +184,7 @@ class TestMultiTeamScenarios:
         # Test team access
         retrieved_team = chpp.team(ht_id=team_id)
         assert retrieved_team.team_id == team_id
-        assert retrieved_team.team_name == 'Solo Team'
+        assert retrieved_team.team_name == "Solo Team"
 
 
 class TestCHPPAuthenticationFlow:
@@ -193,16 +192,16 @@ class TestCHPPAuthenticationFlow:
 
     def test_chpp_initialization_with_credentials(self):
         """Test CHPP client initialization with OAuth credentials."""
-        consumer_key = 'test_consumer_key'
-        consumer_secret = 'test_consumer_secret'
-        access_key = 'user_access_key'
-        access_secret = 'user_access_secret'
+        consumer_key = "test_consumer_key"
+        consumer_secret = "test_consumer_secret"
+        access_key = "user_access_key"
+        access_secret = "user_access_secret"
 
         chpp = MockCHPP(
             consumer_key=consumer_key,
             consumer_secret=consumer_secret,
             access_key=access_key,
-            access_secret=access_secret
+            access_secret=access_secret,
         )
 
         # Test credentials storage
@@ -217,10 +216,10 @@ class TestCHPPAuthenticationFlow:
         user = chpp.user()
 
         # Test required attributes for application
-        assert hasattr(user, 'user_id')
-        assert hasattr(user, 'loginname')
-        assert hasattr(user, '_teams_ht_id')
-        assert hasattr(user, '_SOURCE_FILE')
+        assert hasattr(user, "user_id")
+        assert hasattr(user, "loginname")
+        assert hasattr(user, "_teams_ht_id")
+        assert hasattr(user, "_SOURCE_FILE")
 
         # Test data types
         assert isinstance(user.user_id, int)
@@ -234,10 +233,10 @@ class TestCHPPAuthenticationFlow:
         team = chpp.team()
 
         # Test required attributes for application
-        assert hasattr(team, 'team_id')
-        assert hasattr(team, 'team_name')
-        assert hasattr(team, 'name')  # Expected by team route
-        assert hasattr(team, 'players')
+        assert hasattr(team, "team_id")
+        assert hasattr(team, "team_name")
+        assert hasattr(team, "name")  # Expected by team route
+        assert hasattr(team, "players")
 
         # Test data types
         assert isinstance(team.team_id, int)
@@ -252,7 +251,7 @@ class TestCHPPAuthenticationFlow:
         # Test team not found scenario
         nonexistent_team = chpp.team(ht_id=999999)
         # Should not crash, either return None or handle gracefully
-        assert nonexistent_team is None or hasattr(nonexistent_team, 'team_id')
+        assert nonexistent_team is None or hasattr(nonexistent_team, "team_id")
 
 
 class TestCHPPSessionIntegration:
@@ -262,28 +261,30 @@ class TestCHPPSessionIntegration:
         """Test session data structure matches CHPP requirements."""
         with client.session_transaction() as sess:
             # Setup session as done in login route
-            sess['current_user'] = 'testuser'
-            sess['current_user_id'] = 12345
-            sess['access_key'] = 'mock_access_key'
-            sess['access_secret'] = 'mock_access_secret'
-            sess['all_teams'] = [54321, 67890]  # Team IDs, not user ID
-            sess['all_team_names'] = ['Team A', 'Team B']
-            sess['team_id'] = 54321  # Current/default team
+            sess["current_user"] = "testuser"
+            sess["current_user_id"] = 12345
+            sess["access_key"] = "mock_access_key"
+            sess["access_secret"] = "mock_access_secret"
+            sess["all_teams"] = [54321, 67890]  # Team IDs, not user ID
+            sess["all_team_names"] = ["Team A", "Team B"]
+            sess["team_id"] = 54321  # Current/default team
 
         with client.session_transaction() as sess:
             # Verify session structure
-            assert 'access_key' in sess
-            assert 'access_secret' in sess
-            assert 'all_teams' in sess
-            assert 'current_user_id' in sess
+            assert "access_key" in sess
+            assert "access_secret" in sess
+            assert "all_teams" in sess
+            assert "current_user_id" in sess
 
             # Verify team ID vs user ID separation
-            user_id = sess['current_user_id']
-            team_ids = sess['all_teams']
+            user_id = sess["current_user_id"]
+            team_ids = sess["all_teams"]
             assert user_id not in team_ids, "User ID should not be in team list"
-            assert all(isinstance(tid, int) for tid in team_ids), "Team IDs should be integers"
+            assert all(isinstance(tid, int) for tid in team_ids), (
+                "Team IDs should be integers"
+            )
 
-    @patch('app.blueprints.team.CHPP')
+    @patch("app.blueprints.team.CHPP")
     def test_chpp_route_integration_team_access(self, mock_chpp_class, client):
         """Test CHPP integration in team route with proper ID handling."""
         # Setup mock CHPP
@@ -292,17 +293,17 @@ class TestCHPPSessionIntegration:
         mock_user._teams_ht_id = [54321, 67890]  # Multiple teams
 
         # Create teams with proper IDs
-        team1 = create_mock_team(54321, 'Primary Team')
-        team2 = create_mock_team(67890, 'Secondary Team')
+        team1 = create_mock_team(54321, "Primary Team")
+        team2 = create_mock_team(67890, "Secondary Team")
         mock_chpp.set_mock_teams([team1, team2])
         mock_chpp_class.return_value = mock_chpp
 
         # Setup authenticated session
         with client.session_transaction() as sess:
-            sess['current_user'] = 'testuser'
-            sess['current_user_id'] = 12345  # User ID differs from team IDs
-            sess['access_key'] = 'test_access'
-            sess['access_secret'] = 'test_secret'
+            sess["current_user"] = "testuser"
+            sess["current_user_id"] = 12345  # User ID differs from team IDs
+            sess["access_key"] = "test_access"
+            sess["access_secret"] = "test_secret"
 
         # Test team route (would normally require authentication)
         # This tests the CHPP integration pattern without full route execution
@@ -324,8 +325,8 @@ class TestCHPPPlayerDataIntegration:
         """Test player data structure supports skill calculations."""
         player = create_mock_player(
             player_id=123456,
-            first_name='Test',
-            nick_name='TestPlayer',
+            first_name="Test",
+            nick_name="TestPlayer",
             keeper=8,
             defender=12,
             playmaker=10,
@@ -336,47 +337,59 @@ class TestCHPPPlayerDataIntegration:
             experience=8,
             loyalty=9,
             form=7,
-            stamina=9
+            stamina=9,
         )
 
         # Test all skill attributes exist
-        skills = ['keeper', 'defender', 'playmaker', 'winger', 'passing', 'scorer', 'set_pieces']
+        skills = [
+            "keeper",
+            "defender",
+            "playmaker",
+            "winger",
+            "passing",
+            "scorer",
+            "set_pieces",
+        ]
         for skill in skills:
             assert hasattr(player, skill)
             assert isinstance(getattr(player, skill), int)
             assert getattr(player, skill) >= 0
 
         # Test additional calculation attributes
-        calc_attrs = ['experience', 'loyalty', 'form', 'stamina']
+        calc_attrs = ["experience", "loyalty", "form", "stamina"]
         for attr in calc_attrs:
             assert hasattr(player, attr)
             assert isinstance(getattr(player, attr), int)
 
         # Test dict-like access (backward compatibility)
-        assert player['first_name'] == 'Test'
-        assert player['keeper'] == 8
-        assert player['scorer'] == 15
+        assert player["first_name"] == "Test"
+        assert player["keeper"] == 8
+        assert player["scorer"] == 15
 
     def test_team_players_integration(self):
         """Test team player list integration for skill calculations."""
         players = [
-            create_mock_player(player_id=101, first_name='Keeper', keeper=15, scorer=1),
-            create_mock_player(player_id=102, first_name='Defender', defender=14, keeper=1),
-            create_mock_player(player_id=103, first_name='Striker', scorer=16, defender=6),
+            create_mock_player(player_id=101, first_name="Keeper", keeper=15, scorer=1),
+            create_mock_player(
+                player_id=102, first_name="Defender", defender=14, keeper=1
+            ),
+            create_mock_player(
+                player_id=103, first_name="Striker", scorer=16, defender=6
+            ),
         ]
 
-        team = create_mock_team(777, 'Test Team', players)
+        team = create_mock_team(777, "Test Team", players)
         chpp = create_mock_chpp_client(teams=[team])
 
         retrieved_team = chpp.team(ht_id=777)
         assert len(retrieved_team.players) == 3
 
         # Test that players maintain skill data
-        keeper = next(p for p in retrieved_team.players if p.first_name == 'Keeper')
+        keeper = next(p for p in retrieved_team.players if p.first_name == "Keeper")
         assert keeper.keeper == 15
         assert keeper.scorer == 1
 
-        striker = next(p for p in retrieved_team.players if p.first_name == 'Striker')
+        striker = next(p for p in retrieved_team.players if p.first_name == "Striker")
         assert striker.scorer == 16
         assert striker.defender == 6
 
@@ -386,7 +399,7 @@ class TestCHPPErrorScenarios:
 
     def test_empty_teams_list(self):
         """Test user with no teams (edge case)."""
-        user = create_mock_user(555, 'noteams')
+        user = create_mock_user(555, "noteams")
         user._teams_ht_id = []  # No teams
 
         chpp = create_mock_chpp_client(user=user, teams=[])
@@ -400,11 +413,11 @@ class TestCHPPErrorScenarios:
 
     def test_mismatched_team_data(self):
         """Test handling of mismatched team data."""
-        user = create_mock_user(123, 'testuser')
+        user = create_mock_user(123, "testuser")
         user._teams_ht_id = [456, 789]  # User claims to own these teams
 
         # But only provide one team in mock data
-        team = create_mock_team(456, 'Available Team')
+        team = create_mock_team(456, "Available Team")
         chpp = create_mock_chpp_client(user=user, teams=[team])
 
         # Access to existing team should work
@@ -424,20 +437,20 @@ class TestCHPPErrorScenarios:
 
     def test_dict_access_backward_compatibility(self):
         """Test backward compatibility with dict-like access patterns."""
-        user = create_mock_user(999, 'dictuser')
-        team = create_mock_team(888, 'Dict Team')
-        player = create_mock_player(player_id=777, first_name='DictPlayer', scorer=10)
+        user = create_mock_user(999, "dictuser")
+        team = create_mock_team(888, "Dict Team")
+        player = create_mock_player(player_id=777, first_name="DictPlayer", scorer=10)
 
         # Test dict-like access for all objects
-        assert user['user_id'] == 999
-        assert user['loginname'] == 'dictuser'
+        assert user["user_id"] == 999
+        assert user["loginname"] == "dictuser"
 
-        assert team['team_id'] == 888
-        assert team['team_name'] == 'Dict Team'
+        assert team["team_id"] == 888
+        assert team["team_name"] == "Dict Team"
 
-        assert player['player_id'] == 777
-        assert player['first_name'] == 'DictPlayer'
-        assert player['scorer'] == 10
+        assert player["player_id"] == 777
+        assert player["first_name"] == "DictPlayer"
+        assert player["scorer"] == 10
 
 
 # Integration test for actual route patterns
@@ -447,16 +460,13 @@ class TestCHPPRoutePatternsIntegration:
     def test_login_route_pattern_simulation(self):
         """Test the CHPP pattern used in login route."""
         # Simulate login route CHPP usage pattern
-        mock_user = create_mock_user(182085, 'loginuser')
+        mock_user = create_mock_user(182085, "loginuser")
         mock_user._teams_ht_id = [54321, 67890]  # Correct: team IDs not user ID
 
-        team1 = create_mock_team(54321, 'Primary Team')
-        team2 = create_mock_team(67890, 'Secondary Team')
+        team1 = create_mock_team(54321, "Primary Team")
+        team2 = create_mock_team(67890, "Secondary Team")
 
-        chpp = create_mock_chpp_client(
-            user=mock_user,
-            teams=[team1, team2]
-        )
+        chpp = create_mock_chpp_client(user=mock_user, teams=[team1, team2])
 
         # Simulate login route logic
         current_user = chpp.user()
@@ -468,18 +478,20 @@ class TestCHPPRoutePatternsIntegration:
 
         # Verify correct session setup pattern
         assert all_teams == [54321, 67890]
-        assert current_user.user_id not in all_teams, "User ID should not be in all_teams"
-        assert all_team_names == ['Primary Team', 'Secondary Team']
+        assert current_user.user_id not in all_teams, (
+            "User ID should not be in all_teams"
+        )
+        assert all_team_names == ["Primary Team", "Secondary Team"]
         assert len(all_teams) == 2
 
     def test_team_route_pattern_simulation(self):
         """Test the CHPP pattern used in team route."""
-        mock_user = create_mock_user(111, 'teamuser')
+        mock_user = create_mock_user(111, "teamuser")
         mock_user._teams_ht_id = [222, 333]
 
         teams = [
-            create_mock_team(222, 'First Team'),
-            create_mock_team(333, 'Second Team'),
+            create_mock_team(222, "First Team"),
+            create_mock_team(333, "Second Team"),
         ]
 
         chpp = create_mock_chpp_client(user=mock_user, teams=teams)
@@ -495,8 +507,8 @@ class TestCHPPRoutePatternsIntegration:
 
         # Verify route pattern works correctly
         assert len(teams_data) == 2
-        assert 'First Team' in teams_data
-        assert 'Second Team' in teams_data
+        assert "First Team" in teams_data
+        assert "Second Team" in teams_data
 
     def test_update_route_pattern_simulation(self):
         """Test the CHPP pattern used in update route."""
@@ -505,14 +517,14 @@ class TestCHPPRoutePatternsIntegration:
         team_id = 654321  # Must differ from user_id
 
         players = [
-            create_mock_player(player_id=1001, first_name='Player1', age=25, scorer=10),
-            create_mock_player(player_id=1002, first_name='Player2', age=27, scorer=8),
+            create_mock_player(player_id=1001, first_name="Player1", age=25, scorer=10),
+            create_mock_player(player_id=1002, first_name="Player2", age=27, scorer=8),
         ]
 
-        mock_user = create_mock_user(user_id, 'updateuser')
+        mock_user = create_mock_user(user_id, "updateuser")
         mock_user._teams_ht_id = [team_id]
 
-        team = create_mock_team(team_id, 'Update Team', players)
+        team = create_mock_team(team_id, "Update Team", players)
         chpp = create_mock_chpp_client(user=mock_user, teams=[team])
 
         # Simulate update route team data fetching

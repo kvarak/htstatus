@@ -27,6 +27,7 @@ with app.app_context():
 
     # Verify tables were created
     from sqlalchemy import inspect
+
     inspector = inspect(db.engine)
     tables = inspector.get_table_names()
     print(f"\nCreated {len(tables)} tables:")

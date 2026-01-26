@@ -18,11 +18,13 @@ def require_authentication(f):
         def protected_route():
             # Route logic here
     """
+
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('current_user') is None:
-            return render_template('_forward.html', url='/login')
+        if session.get("current_user") is None:
+            return render_template("_forward.html", url="/login")
         return f(*args, **kwargs)
+
     return decorated_function
 
 
@@ -31,7 +33,7 @@ def get_current_user_id():
 
     Standardized access to current user ID to replace direct session access.
     """
-    return session.get('current_user_id')
+    return session.get("current_user_id")
 
 
 def get_user_teams():
@@ -39,12 +41,12 @@ def get_user_teams():
 
     Returns tuple of (team_ids, team_names) for consistent access.
     """
-    return session.get('all_teams', []), session.get('all_team_names', [])
+    return session.get("all_teams", []), session.get("all_team_names", [])
 
 
 def is_authenticated():
     """Check if user is currently authenticated."""
-    return session.get('current_user') is not None
+    return session.get("current_user") is not None
 
 
 def get_team_info(teamid, user_teams=None):

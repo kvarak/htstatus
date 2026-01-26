@@ -7,22 +7,20 @@ import platform
 from app.factory import create_app
 
 # Set development environment
-os.environ.setdefault('FLASK_ENV', 'development')
+os.environ.setdefault("FLASK_ENV", "development")
 
 # Create app using factory pattern
 # For Flask-Migrate and other CLI tools, app needs to be at module level
 app = create_app()
 
 # Only print version when actually running the server, not when imported
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Python version " + platform.python_version())
 
     # Use environment variables for host and port configuration
-    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
-    port = int(os.environ.get('FLASK_RUN_PORT', '5000'))
-    debug = os.environ.get('FLASK_ENV', 'production') == 'development'
+    host = os.environ.get("FLASK_RUN_HOST", "0.0.0.0")
+    port = int(os.environ.get("FLASK_RUN_PORT", "5000"))
+    debug = os.environ.get("FLASK_ENV", "production") == "development"
 
     # Temporarily disable reloader for debugging
     app.run(host=host, port=port, debug=debug, use_reloader=False)
-
-

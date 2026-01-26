@@ -9,6 +9,7 @@ Environment:
     This script requires the UV-managed Python environment.
     Always use 'uv run' to ensure correct dependency resolution.
 """
+
 from dotenv import load_dotenv
 from flask_migrate import Migrate
 
@@ -22,7 +23,7 @@ app = create_app()
 # Initialize Flask-Migrate
 migrate = Migrate(app, db)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # For backwards compatibility, but prefer using: flask db upgrade
     print("Use 'flask db upgrade' to apply migrations")
     print("Use 'flask db migrate' to create new migrations")

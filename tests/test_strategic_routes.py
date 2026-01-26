@@ -3,6 +3,7 @@ Strategic route testing to maximize coverage for TEST-003.
 This file targets improving routes_bp.py coverage from 51% to 80%+ while
 avoiding the database schema issues in the main application.
 """
+
 import contextlib
 import gc
 import os
@@ -16,25 +17,25 @@ from app.factory import create_app
 
 class StrategicTestConfig:
     """Configuration for strategic testing."""
+
     TESTING = True
-    SECRET_KEY = 'test-strategic-key'
-    CONSUMER_KEY = 'strategic-key'
-    CONSUMER_SECRETS = 'strategic-secret'
+    SECRET_KEY = "test-strategic-key"
+    CONSUMER_KEY = "strategic-key"
+    CONSUMER_SECRETS = "strategic-secret"
     DEBUG_LEVEL = 1  # Enable debug to test debug paths
     WTF_CSRF_ENABLED = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    APP_NAME = 'Test HT Status'  # For create_page function
+    APP_NAME = "Test HT Status"  # For create_page function
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def strategic_app():
     """Create app for strategic testing."""
-    os.environ['FLASK_ENV'] = 'testing'
+    os.environ["FLASK_ENV"] = "testing"
     app = None
     # Patch the problematic MatchPlay model creation
-    with patch('models.MatchPlay'), \
-         patch('app.factory.db.create_all'):
+    with patch("models.MatchPlay"), patch("app.factory.db.create_all"):
         app = create_app(StrategicTestConfig, include_routes=True)
         with app.app_context():
             # Mock db.create_all to avoid schema issues
@@ -45,26 +46,28 @@ def strategic_app():
         with app.app_context():
             try:
                 from app.factory import db
+
                 # Close all sessions first
-                if hasattr(db, 'session'):
+                if hasattr(db, "session"):
                     db.session.remove()
                 # Dispose of engine to close all connections
-                if hasattr(db, 'engine'):
+                if hasattr(db, "engine"):
                     db.engine.dispose()
                 # Force immediate cleanup
                 import gc
+
                 gc.collect()
             except Exception:
                 pass
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def strategic_client(strategic_app):
     """Create test client for strategic testing."""
     return strategic_app.test_client()
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def cleanup_strategic_connections():
     """Automatically clean up strategic test connections."""
     # Clean up before test
@@ -99,37 +102,43 @@ class TestBlueprintRoutesCoverage:
 
             # Expected blueprint routes
             expected = [
-                'main.index', 'auth.logout', 'player.player',
-                'team.team', 'matches.matches', 'training.training', 'team.update',
-                'main.settings', 'main.admin'
+                "main.index",
+                "auth.logout",
+                "player.player",
+                "team.team",
+                "matches.matches",
+                "training.training",
+                "team.update",
+                "main.settings",
+                "main.admin",
             ]
 
             for endpoint in expected:
                 assert endpoint in route_endpoints, f"Missing endpoint: {endpoint}"
 
-    @patch('app.utils.session', {})
-    @patch('app.utils.render_template')
+    @patch("app.utils.session", {})
+    @patch("app.utils.render_template")
     def test_create_page_comprehensive(self, mock_render, strategic_app):
         """Test create_page function comprehensively."""
-        mock_render.return_value = 'rendered_template'
+        mock_render.return_value = "rendered_template"
 
         with strategic_app.test_request_context():
             from app.utils import create_page
 
             # Test with minimal kwargs
-            result = create_page('test.html', 'Test Title')
-            assert result == 'rendered_template'
+            result = create_page("test.html", "Test Title")
+            assert result == "rendered_template"
 
             # Test with custom kwargs
-            result = create_page('test.html', 'Test', custom_var='value')
-            assert result == 'rendered_template'
+            result = create_page("test.html", "Test", custom_var="value")
+            assert result == "rendered_template"
 
             # Verify render_template was called with expected context
             call_args = mock_render.call_args
-            assert call_args[0][0] == 'test.html'  # Template name
+            assert call_args[0][0] == "test.html"  # Template name
             context = call_args[1]
-            assert context['title'] == 'Test'
-            assert context['apptitle'] == 'Test HT Status'
+            assert context["title"] == "Test"
+            assert context["apptitle"] == "Test HT Status"
 
     def test_dprint_function_coverage(self, strategic_app):
         """Test dprint function with various debug levels."""
@@ -137,13 +146,13 @@ class TestBlueprintRoutesCoverage:
             from app.utils import dprint
 
             # Test with different debug levels
-            dprint(0, 'debug', 'low priority message')
-            dprint(1, 'info', 'normal message')
-            dprint(2, 'warn', 'warning message')
-            dprint(3, 'error', 'error message')
+            dprint(0, "debug", "low priority message")
+            dprint(1, "info", "normal message")
+            dprint(2, "warn", "warning message")
+            dprint(3, "error", "error message")
 
             # Test with multiple arguments
-            dprint(1, 'test', 'function', 'arg1', 'arg2', 'arg3')
+            dprint(1, "test", "function", "arg1", "arg2", "arg3")
 
             # All should complete without errors
             assert True
@@ -151,8 +160,16 @@ class TestBlueprintRoutesCoverage:
     def test_blueprint_route_handlers(self, strategic_client):
         """Test blueprint route handlers for coverage."""
         routes_to_test = [
-            '/bp/', '/bp/login', '/bp/logout', '/bp/player', '/bp/team',
-            '/bp/matches', '/bp/training', '/bp/update', '/bp/settings', '/bp/debug'
+            "/bp/",
+            "/bp/login",
+            "/bp/logout",
+            "/bp/player",
+            "/bp/team",
+            "/bp/matches",
+            "/bp/training",
+            "/bp/update",
+            "/bp/settings",
+            "/bp/debug",
         ]
 
         for route in routes_to_test:
@@ -165,37 +182,41 @@ class TestBlueprintRoutesCoverage:
         with strategic_app.test_client() as client:
             with client.session_transaction() as sess:
                 # Set up session data
-                sess['current_user'] = 'test_user'
-                sess['current_user_id'] = 123
-                sess['all_teams'] = ['team1', 'team2']
-                sess['all_team_names'] = ['Team One', 'Team Two']
-                sess['team_id'] = 'team1'
+                sess["current_user"] = "test_user"
+                sess["current_user_id"] = 123
+                sess["all_teams"] = ["team1", "team2"]
+                sess["all_team_names"] = ["Team One", "Team Two"]
+                sess["team_id"] = "team1"
 
             # Mock render_template and User query to avoid database access
-            with patch('app.utils.render_template') as mock_render, \
-                 patch('models.User') as mock_user_class:
-                mock_render.return_value = 'session_template'
+            with (
+                patch("app.utils.render_template") as mock_render,
+                patch("models.User") as mock_user_class,
+            ):
+                mock_render.return_value = "session_template"
                 # Mock User.query to return None (no user found)
                 mock_user_class.query.filter_by.return_value.first.return_value = None
 
                 with strategic_app.test_request_context():
                     # Setup session in request context
                     from flask import session
-                    session['current_user'] = 'test_user'
-                    session['current_user_id'] = 123
-                    session['all_teams'] = ['team1', 'team2']
-                    session['all_team_names'] = ['Team One', 'Team Two']
-                    session['team_id'] = 'team1'
+
+                    session["current_user"] = "test_user"
+                    session["current_user_id"] = 123
+                    session["all_teams"] = ["team1", "team2"]
+                    session["all_team_names"] = ["Team One", "Team Two"]
+                    session["team_id"] = "team1"
 
                     from app.utils import create_page
-                    result = create_page('session_test.html', 'Session Test')
-                    assert result == 'session_template'
+
+                    result = create_page("session_test.html", "Session Test")
+                    assert result == "session_template"
 
                     # Verify render_template was called with session variables
                     call_kwargs = mock_render.call_args[1]
-                    assert call_kwargs['current_user'] == 'test_user'
-                    assert call_kwargs['all_teams'] == ['team1', 'team2']
-                    assert call_kwargs['all_team_names'] == ['Team One', 'Team Two']
+                    assert call_kwargs["current_user"] == "test_user"
+                    assert call_kwargs["all_teams"] == ["team1", "team2"]
+                    assert call_kwargs["all_team_names"] == ["Team One", "Team Two"]
 
     def test_initialize_routes_function_comprehensive(self, strategic_app):
         """Test initialize_routes function comprehensively."""
@@ -212,14 +233,16 @@ class TestBlueprintRoutesCoverage:
             except Exception as e:
                 # Expected for some initialization failures (git, bootstrap)
                 error_msg = str(e).lower()
-                expected_errors = ['git', 'bootstrap', 'chpp', 'version']
+                expected_errors = ["git", "bootstrap", "chpp", "version"]
                 assert any(err in error_msg for err in expected_errors)
 
-    @patch('app.routes_bp.Bootstrap')
-    @patch('subprocess.check_output')
-    def test_initialize_routes_mocked(self, mock_subprocess, mock_bootstrap, strategic_app):
+    @patch("app.routes_bp.Bootstrap")
+    @patch("subprocess.check_output")
+    def test_initialize_routes_mocked(
+        self, mock_subprocess, mock_bootstrap, strategic_app
+    ):
         """Test initialize_routes with comprehensive mocking."""
-        mock_subprocess.return_value = b'v1.0-5-abc123'
+        mock_subprocess.return_value = b"v1.0-5-abc123"
         mock_bootstrap_instance = Mock()
         mock_bootstrap.return_value = mock_bootstrap_instance
 
@@ -239,42 +262,42 @@ class TestBlueprintRoutesCoverage:
         from app.blueprints.main import main_bp
 
         # Test all accessible attributes
-        assert main_bp.name == 'main'
-        assert hasattr(main_bp, 'url_prefix')
-        assert hasattr(main_bp, 'static_folder')
-        assert hasattr(main_bp, 'template_folder')
-        assert hasattr(main_bp, 'deferred_functions')
+        assert main_bp.name == "main"
+        assert hasattr(main_bp, "url_prefix")
+        assert hasattr(main_bp, "static_folder")
+        assert hasattr(main_bp, "template_folder")
+        assert hasattr(main_bp, "deferred_functions")
 
     def test_error_handling_in_routes(self, strategic_client):
         """Test error handling in route handlers."""
         # Test POST requests to routes that expect GET
-        post_routes = ['/bp/', '/bp/team', '/bp/matches', '/bp/training']
+        post_routes = ["/bp/", "/bp/team", "/bp/matches", "/bp/training"]
 
         for route in post_routes:
             response = strategic_client.post(route)
             # Should handle gracefully
             assert response.status_code in [200, 302, 404, 405, 500]
 
-    @patch('app.utils.session', {'current_user': 'test'})
-    @patch('app.utils.render_template')
+    @patch("app.utils.session", {"current_user": "test"})
+    @patch("app.utils.render_template")
     def test_template_rendering_edge_cases(self, mock_render, strategic_app):
         """Test template rendering edge cases."""
-        mock_render.return_value = 'edge_case_template'
+        mock_render.return_value = "edge_case_template"
 
         with strategic_app.test_request_context():
             from app.utils import create_page
 
             # Test with None title
-            result = create_page('test.html', None)
-            assert result == 'edge_case_template'
+            result = create_page("test.html", None)
+            assert result == "edge_case_template"
 
             # Test with empty title
-            result = create_page('test.html', '')
-            assert result == 'edge_case_template'
+            result = create_page("test.html", "")
+            assert result == "edge_case_template"
 
             # Test with unicode title
-            result = create_page('test.html', 'Test ünicöde tïtle')
-            assert result == 'edge_case_template'
+            result = create_page("test.html", "Test ünicöde tïtle")
+            assert result == "edge_case_template"
 
 
 class TestModuleImportCoverage:
@@ -288,9 +311,16 @@ class TestModuleImportCoverage:
 
         # Verify routes_bp functions (stubs that redirect to blueprints)
         expected_bp_functions = [
-            'initialize_routes',
-            'index', 'logout', 'player', 'team',
-            'matches', 'training', 'update', 'settings', 'debug'
+            "initialize_routes",
+            "index",
+            "logout",
+            "player",
+            "team",
+            "matches",
+            "training",
+            "update",
+            "settings",
+            "debug",
         ]
 
         for func_name in expected_bp_functions:
@@ -298,7 +328,7 @@ class TestModuleImportCoverage:
             assert callable(getattr(bp_module, func_name))
 
         # Verify utils functions (helper functions)
-        expected_utils_functions = ['dprint', 'create_page']
+        expected_utils_functions = ["dprint", "create_page"]
         for func_name in expected_utils_functions:
             assert hasattr(utils_module, func_name)
             assert callable(getattr(utils_module, func_name))
@@ -308,17 +338,17 @@ class TestModuleImportCoverage:
         from app.blueprints.main import main_bp
 
         # Test the main blueprint
-        assert main_bp.name == 'main'
+        assert main_bp.name == "main"
 
     def test_module_level_constants(self):
         """Test module-level constants and variables."""
         import app.routes_bp as bp_module
 
         # Test that module has expected attributes
-        assert hasattr(bp_module, 'main_bp')
+        assert hasattr(bp_module, "main_bp")
 
         # Module should be importable without errors
-        assert bp_module.__name__ == 'app.routes_bp'
+        assert bp_module.__name__ == "app.routes_bp"
 
 
 class TestDebugAndLogging:
@@ -331,10 +361,10 @@ class TestDebugAndLogging:
 
             # Test with app debug level 1 (from config)
             # Messages at or below debug level should be processed
-            dprint(0, 'Should print - level 0')
-            dprint(1, 'Should print - level 1')
-            dprint(2, 'Might not print - level 2')
-            dprint(5, 'Definitely won\'t print - level 5')
+            dprint(0, "Should print - level 0")
+            dprint(1, "Should print - level 1")
+            dprint(2, "Might not print - level 2")
+            dprint(5, "Definitely won't print - level 5")
 
             assert True  # Completion indicates success
 
@@ -346,7 +376,7 @@ class TestDebugAndLogging:
 
             # Large number of log messages
             for i in range(10):
-                dprint(1, f'Log message {i}', 'additional', 'parameters')
+                dprint(1, f"Log message {i}", "additional", "parameters")
 
             assert True
 
@@ -356,20 +386,22 @@ class TestRequestContextHandling:
 
     def test_create_page_request_context_variables(self, strategic_app):
         """Test create_page access to request context variables."""
-        with strategic_app.test_request_context('/test?param=value'):
+        with strategic_app.test_request_context("/test?param=value"):
             from app.utils import create_page
 
-            with patch('app.utils.render_template') as mock_render, \
-                 patch('app.utils.session', {'user': 'test'}):
-                    mock_render.return_value = 'context_template'
+            with (
+                patch("app.utils.render_template") as mock_render,
+                patch("app.utils.session", {"user": "test"}),
+            ):
+                mock_render.return_value = "context_template"
 
-                    result = create_page('context.html', 'Context Test')
-                    assert result == 'context_template'
+                result = create_page("context.html", "Context Test")
+                assert result == "context_template"
 
-                    # Verify render_template received context
-                    call_kwargs = mock_render.call_args[1]
-                    assert 'title' in call_kwargs
-                    assert 'apptitle' in call_kwargs
+                # Verify render_template received context
+                call_kwargs = mock_render.call_args[1]
+                assert "title" in call_kwargs
+                assert "apptitle" in call_kwargs
 
     def test_app_context_in_functions(self, strategic_app):
         """Test that functions work properly in app context."""
@@ -378,8 +410,9 @@ class TestRequestContextHandling:
             from flask import current_app
 
             from app.utils import dprint
+
             assert current_app == strategic_app
 
             # Functions should work in this context
-            dprint(1, 'App context test')
+            dprint(1, "App context test")
             assert True
