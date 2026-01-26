@@ -616,11 +616,25 @@ def calculate_team_statistics(players):
         get_player_attr(player, "current_team_matches") for player in players
     )
 
+    # Breakdown by competition type
+    total_league_goals = sum(
+        get_player_attr(player, "league_goals") for player in players
+    )
+    total_cup_goals = sum(
+        get_player_attr(player, "cup_goals") for player in players
+    )
+    total_friendlies_goals = sum(
+        get_player_attr(player, "friendlies_goals") for player in players
+    )
+
     stats["avg_age"] = round(total_age / len(players), 1) if len(players) > 0 else 0
     stats["avg_tsi"] = round(total_tsi / len(players), 0) if len(players) > 0 else 0
     stats["total_salary"] = total_salary
     stats["total_team_goals"] = total_goals
     stats["total_career_goals"] = total_career_goals
+    stats["total_league_goals"] = total_league_goals
+    stats["total_cup_goals"] = total_cup_goals
+    stats["total_friendlies_goals"] = total_friendlies_goals
     stats["total_matches"] = total_matches
     stats["goals_per_match"] = (
         round(total_goals / total_matches, 1) if total_matches > 0 else 0
@@ -646,16 +660,46 @@ def calculate_team_statistics(players):
 
 
 def get_top_scorers(players, limit=5):
-    """Get top scoring players from the list."""
-    # Filter players with goals and sort by goals scored
-    scorers = [
-        p
-        for p in players
-        if getattr(p, "current_team_goals", 0) and p.current_team_goals > 0
-    ]
-    scorers.sort(key=lambda x: getattr(x, "current_team_goals", 0) or 0, reverse=True)
+    """Get top scoring players from the list.
 
-    return scorers[:limit]
+    Enhanced for INFRA-028 to work correctly with both SQLAlchemy and CHPPPlayer data.
+    Returns all players sorted by goals (including 0-goal players) for consistent display.
+    """
+    # Use the same helper function as calculate_team_statistics
+    def get_player_attr(player, attr):
+        # For SQLAlchemy objects, always use getattr
+        # For dictionaries, use .get() method
+        if hasattr(player, attr):
+            value = getattr(player, attr, 0)
+        elif hasattr(player, "get"):
+            value = player.get(attr, 0)
+        else:
+            value = 0
+
+        # Convert to numeric, handling None, string, and other types
+        if value is None:
+            return 0
+        try:
+            return float(value) if value != "" else 0
+        except (ValueError, TypeError):
+            return 0
+
+    # Helper function to get goal count from various goal fields
+    def get_player_goals(player):
+        # Try multiple goal fields for broader compatibility
+        current_team_goals = get_player_attr(player, "current_team_goals") or 0
+        goals_current_team = get_player_attr(player, "goals_current_team") or 0
+        career_goals = get_player_attr(player, "career_goals") or 0
+
+        # Prefer current team goals, fall back to career goals
+        return current_team_goals or goals_current_team or career_goals
+
+    # Return all players sorted by goals (including 0-goal players) for consistent display
+    # Show top goal scorers even if they have 0 goals (new team scenario)
+    all_players = list(players)
+    all_players.sort(key=get_player_goals, reverse=True)
+
+    return all_players[:limit]
 
 
 def get_top_performers(players, limit=5):

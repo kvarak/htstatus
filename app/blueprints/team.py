@@ -233,27 +233,26 @@ def update():
             thisplayer["native_country_id"] = getattr(p, 'country_id', None)
             thisplayer["native_league_id"] = None
             thisplayer["native_league_name"] = None
-            thisplayer["tsi"] = p.tsi
-            thisplayer["salary"] = p.salary
-            thisplayer["caps"] = p.caps
-            thisplayer["caps_u20"] = p.caps_u20
-            thisplayer["career_goals"] = p.career_goals
-            thisplayer["career_hattricks"] = p.career_hattricks
-            thisplayer["league_goals"] = p.league_goals
-            thisplayer["cup_goals"] = p.cup_goals
-            thisplayer["friendly_goals"] = p.friendlies_goals  # renamed in pychpp 0.5.10+
-            thisplayer["current_team_matches"] = p.matches_current_team  # renamed in pychpp 0.5.10+
-            thisplayer["current_team_goals"] = p.goals_current_team  # renamed in pychpp 0.5.10+
-            thisplayer["national_team_id"] = p.national_team_id
-            thisplayer["national_team_name"] = None  # removed in pychpp 0.5.10+
-            thisplayer["is_transfer_listed"] = p.transfer_listed  # renamed in pychpp 0.5.10+
-            thisplayer["team_id"] = None  # team_ht_id removed in pychpp 0.5.10+
-            thisplayer["mother_club_bonus"] = p.mother_club_bonus
-            thisplayer["leadership"] = p.leadership
+            thisplayer["tsi"] = the_player.tsi
+            thisplayer["salary"] = the_player.salary
+            thisplayer["caps"] = the_player.caps
+            thisplayer["caps_u20"] = the_player.caps_u20
+            thisplayer["career_goals"] = the_player.career_goals
+            thisplayer["career_hattricks"] = the_player.career_hattricks
+            thisplayer["league_goals"] = the_player.league_goals
+            thisplayer["cup_goals"] = the_player.cup_goals
+            thisplayer["friendly_goals"] = the_player.friendlies_goals  # Custom CHPP field name
+            thisplayer["current_team_matches"] = the_player.matches_current_team  # Custom CHPP field name
+            thisplayer["current_team_goals"] = the_player.goals_current_team  # Custom CHPP field name
+            thisplayer["national_team_id"] = the_player.national_team_id
+            thisplayer["national_team_name"] = None  # Not available in Custom CHPP
+            thisplayer["is_transfer_listed"] = the_player.transfer_listed  # Custom CHPP field name
+            thisplayer["team_id"] = None  # Not available in Custom CHPP
+            thisplayer["mother_club_bonus"] = the_player.mother_club_bonus
+            thisplayer["leadership"] = the_player.leadership
 
             # Try to get skill values from CHPPPlayer attributes
             # If they're 0 (not provided by API), fetch old values from database
-            from sqlalchemy import func
 
             old_player_query = (
                 db.session.query(Players)

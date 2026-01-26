@@ -226,8 +226,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="col-md-3">
       <div class="card text-center">
         <div class="card-body">
-          <h5 class="card-title">{{ team_stats.total_team_goals or 0 }}</h5>
-          <p class="card-text">Team Goals</p>
+          <h5 class="card-title">{{ team_stats.total_career_goals or 0 }}</h5>
+          <p class="card-text">Career Goals</p>
         </div>
       </div>
     </div>
@@ -288,10 +288,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <tbody>
               {% for player in top_scorers %}
               <tr>
-                <td>{{ player.first_name }} {{ player.nick_name }} {{ player.last_name }}</td>
-                <td>{{ player.current_team_goals or 0 }}</td>
-                <td>{{ player.current_team_matches or 0 }}</td>
-                <td>{{ "%.2f"|format((player.current_team_goals or 0) / (player.current_team_matches or 1)) }}</td>
+                <td>{{ player.first_name }} {{ player.last_name }}</td>
+                <td>{{ (player.current_team_goals or player.goals_current_team or player.career_goals) or 0 }}</td>
+                <td>{{ (player.current_team_matches or player.matches_current_team) or 0 }}</td>
+                <td>{{ "%.2f"|format(((player.current_team_goals or player.goals_current_team or player.career_goals) or 0) / ((player.current_team_matches or player.matches_current_team) or 1)) if ((player.current_team_matches or player.matches_current_team) or 0) > 0 else "N/A" }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <tbody>
               {% for player in top_performers %}
               <tr>
-                <td>{{ player.first_name }} {{ player.nick_name }} {{ player.last_name }}</td>
+                <td>{{ player.first_name }} {{ player.last_name }}</td>
                 <td>{{ "{:,}".format(player.tsi|int) if player.tsi else 0 }}</td>
                 <td>{{ player.age|format_age }}</td>
               </tr>

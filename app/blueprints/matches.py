@@ -1,4 +1,5 @@
 """Matches and stats routes blueprint for HT Status application."""
+import traceback
 
 from flask import Blueprint, request, session
 from sqlalchemy import text
@@ -6,7 +7,7 @@ from sqlalchemy import text
 from app.auth_utils import require_authentication
 from app.chpp_utils import get_chpp_client
 from app.model_registry import get_match_model, get_match_play_model
-from app.utils import create_page
+from app.utils import create_page, dprint
 
 # Create Blueprint for match and stats routes
 matches_bp = Blueprint("matches", __name__)
@@ -153,7 +154,7 @@ def stats():
             print("Using custom CHPP client")
 
         team_details = chpp.team(ht_id=teamid)
-        print(f"Team details fetched: {team_details.name}")
+        dprint(2, f"Team details fetched: {team_details.name}")
 
         # Extract available competition information
         competition_info = {
@@ -178,14 +179,11 @@ def stats():
             "logo_url": getattr(team_details, "logo_url", None),
         }
 
-        print(f"Competition info extracted: {competition_info}")
-        print("Note: Trophy data not supported in this pyCHPP version")
+        dprint(2, f"Competition info extracted: {competition_info}")
 
     except Exception as e:
-        print(f"Error fetching competition data: {e}")
-        import traceback
-
-        print(traceback.format_exc())
+        dprint(1, f"Error fetching competition data: {e}")
+        dprint(3, traceback.format_exc())
         competition_info = {}
 
     print("=== COMPETITION FETCH COMPLETE ===\n")
