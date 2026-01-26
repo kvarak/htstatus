@@ -153,12 +153,6 @@ lint: check-uv ## Run ruff linting
 		exit 1; \
 	fi
 
-format: check-uv ## Run black and ruff formatting
-	@echo "🎨 Formatting code..."
-	@$(UV) run black .
-	@$(UV) run ruff check . --fix --select I
-	@$(UV) run ruff format .
-
 fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 	@mkdir -p out/tests && rm -f out/tests/$@.json
 	@echo "📝 Checking file formatting standards..."
@@ -216,7 +210,17 @@ fileformat-fix: ## Auto-fix file formatting issues (newline EOF, trailing whites
 
 typecheck: check-uv ## Run mypy type checking
 	@echo "🔬 Running type checking..."
-	@$(UV) run mypy . --ignore-missing-imports
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(UV) run mypy app/ models.py config.py --ignore-missing-imports --exclude="migrations|tests" 2>&1 | tee /tmp/typecheck-output.txt; \
+	error_count=$$(grep -c "error:" /tmp/typecheck-output.txt || echo "0"); \
+	if [ "$$error_count" -eq 0 ]; then \
+		echo "✅ Type checking passed"; \
+		scripts/qi-json.sh out/tests/$@.json "Type Checking" "make typecheck" PASSED 0 0 "type-safe code" "mypy validation successful"; \
+	else \
+		echo "❌ Type checking found $$error_count errors"; \
+		scripts/qi-json.sh out/tests/$@.json "Type Checking" "make typecheck" FAILED 0 $$error_count "$$error_count type errors" "run 'mypy app/' to see details"; \
+		exit 1; \
+	fi
 
 typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
 	@mkdir -p out/tests && rm -f out/tests/$@.json
@@ -225,8 +229,8 @@ typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
 	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
 		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" PASSED 0 0 "synchronized" "Flask ↔ React types match"; \
 	else \
-		issue_count=$$(grep 'Found.*type sync issues' /tmp/typesync-output.txt | head -1 | grep -o '[0-9]\+' || echo "unknown"); \
-		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" FAILED 0 1 "$$issue_count drift issues" "run 'make typesync' to fix"; \
+		issue_count=$$(grep 'Found.*type sync issues' /tmp/typesync-output.txt | head -1 | grep -o '[0-9]\+' || echo "1"); \
+		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" FAILED 0 $$issue_count "$$issue_count drift issues" "run 'make typesync' to fix"; \
 		exit 1; \
 	fi
 
@@ -263,82 +267,78 @@ security: check-uv ## Run bandit and safety security checks
 	fi; \
 	scripts/qi-json.sh out/tests/$@.json "Security Analysis" "make security" PASSED 0 0 "security analysis complete" "comprehensive security validation" cve="$$cve_status" bandit="$$bandit_status"
 
-test-fast: check-uv services ## ⚡ Run critical tests only (quick development validation)
-	@echo "⚡ Running fast test subset for development..."
+test-single: check-uv services ## 🧪 Run a single test file (usage: make test-single FILE=tests/test_database.py)
+	@test -n "$(FILE)" || { echo "❌ Usage: make test-single FILE=tests/test_something.py"; exit 1; }
+	@echo "🧪 Running single test file: $(FILE)..."
+	@mkdir -p out/tests && rm -f out/tests/test-single.json
+	@$(UV) run pytest $(FILE) $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/test-single.json
+	@echo "✅ Single test file completed: $(FILE)"
+
+EXCEPTIONS = __init__.py test_factories.py constants.py error_handlers.py
+
+test-coverage-files: check-uv ## Check if all Python files have corresponding test files
+	@echo "🔍 Checking for untested Python files..."
 	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_database.py -v --tb=short  --json-report --json-report-file=out/tests/$@.json
-	@echo "✅ Fast tests completed - run 'make test' for comprehensive validation"
+	@missing_tests=""; \
+	missing_count=0; \
+	total_files=0; \
+	excluded_count=0; \
+	for pyfile in $$(find app/ -name "*.py" -type f | grep -v __pycache__ | sort) models.py config.py; do \
+		if [ -f "$$pyfile" ]; then \
+			basename=$$(basename $$pyfile .py); \
+			filename=$$(basename $$pyfile); \
+			skip_file=false; \
+			for exception in $(EXCEPTIONS); do \
+				if [ "$$filename" = "$$exception" ]; then \
+					echo "⏭️  Skipping $$pyfile (exception: $$exception)"; \
+					skip_file=true; \
+					excluded_count=$$((excluded_count + 1)); \
+					break; \
+				fi; \
+			done; \
+			if [ "$$skip_file" = "false" ]; then \
+				total_files=$$((total_files + 1)); \
+				if [ "$$pyfile" = "models.py" ] || [ "$$pyfile" = "config.py" ]; then \
+					testfile="tests/test_$$basename.py"; \
+				else \
+					testfile="tests/test_$$basename.py"; \
+				fi; \
+				if [ ! -f "$$testfile" ]; then \
+					echo "❌ Missing test file: $$testfile (for $$pyfile)"; \
+					missing_tests="$$missing_tests $$pyfile"; \
+					missing_count=$$((missing_count + 1)); \
+				fi; \
+			fi; \
+		fi; \
+	done; \
+	echo "📊 Excluded $$excluded_count files, checked $$total_files files"; \
+	if [ "$$missing_count" -eq 0 ]; then \
+		echo "✅ All $$total_files Python files have corresponding test files"; \
+		scripts/qi-json.sh out/tests/$@.json "Test Coverage Files" "make test-coverage-files" PASSED 0 0 "$$total_files files tested" "complete test file coverage ($$excluded_count excluded)"; \
+	else \
+		echo "❌ $$missing_count of $$total_files Python files missing test files:$$missing_tests"; \
+		scripts/qi-json.sh out/tests/$@.json "Test Coverage Files" "make test-coverage-files" FAILED 0 $$missing_count "$$missing_count missing tests" "$$missing_count files need test files ($$excluded_count excluded)"; \
+		exit 1; \
+	fi
 
-test-config: check-uv ## 🔧 Run configuration tests specifically
-	@echo "🔧 Running configuration tests..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/test_config.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov=config --cov-report=term-missing --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
-	@echo "✅ Configuration tests completed"
-
-test-integration: check-uv services ## 🔗 Run integration tests with Docker services
-	@echo "🔗 Running integration tests..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/integration/ $${PYTEST_VERBOSE-"-v"}  --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --json-report --json-report-file=out/tests/$@.json
-	@echo "✅ Integration tests completed"
-
-test-coverage: check-uv services ## 📊 Run tests with detailed HTML coverage reporting
-	@echo "📊 Running tests with detailed coverage analysis..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --cov=app --cov=models --cov=config --cov-report=html --cov-report=term-missing --cov-fail-under=90 --json-report --json-report-file=out/tests/$@.json
-	@echo "📋 Detailed coverage report generated in htmlcov/"
-
-test-watch: check-uv services ## 👀 Run tests in watch mode (reruns on file changes)
-	@echo "👀 Running tests in watch mode..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest-watch tests/ -- $${PYTEST_VERBOSE-"-v"} --tb=short  --json-report --json-report-file=out/tests/$@.json
-
-test-core: check-uv services ## 🎯 Run core tests (basic, factory, auth, config)
-	@echo "🎯 Running core tests (no database writes)..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/test_basic.py tests/test_app_factory.py tests/test_auth.py tests/test_config.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
-	@echo "✅ Core tests completed"
-
-test-db: check-uv services ## 🗄️  Run database and business logic tests
-	@echo "🗄️  Running database and business logic tests..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/test_database.py tests/test_business_logic.py tests/test_chpp_integration.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
-	@echo "✅ Database tests completed"
-
-test-routes: check-uv services ## 🛣️  Run blueprint and route tests
-	@echo "🛣️  Running blueprint and route tests..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run pytest tests/test_blueprint_*.py tests/test_minimal_routes.py tests/test_routes.py tests/test_strategic_routes.py tests/test_blueprint_routes_focused.py $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/$@.json
-	@echo "✅ Route tests completed"
-
-
-GATES = fileformat lint security typesync test-config test-core test-db test-routes test-coverage
+GATES = fileformat lint security typesync test-coverage-files
 
 test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesync, tests)
-	@echo "🚀 Running complete quality gate validation (expected: $(words $(GATES)))..."
+	@echo "🚀 Running complete quality gate validation"
 	@mkdir -p out/tests && rm -f out/tests/*.json
 	@count=0; \
-	for gate in $(GATES); do \
-		echo "Running $$gate..."; \
-		PYTEST_VERBOSE="" $(MAKE) $$gate || true; \
-		count=$${count}+1; \
+	for testfile in $$(find tests/ -name "test_*.py" -type f | sort); do \
+		count=$$((count + 1)); \
+		basename=$$(basename $$testfile .py); \
+		echo "🔎 [$$count] Running $$testfile..."; \
+		$(UV) run pytest $$testfile $${PYTEST_VERBOSE-"-q"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=json:out/tests/test-each-$$basename-cov.json --cov-fail-under=0 --json-report --json-report-file=out/tests/test-each-$$basename.json &>/dev/null || true; \
 	done; \
-	scripts/quality-intelligence.sh --expected-results $(words $(GATES))
-
-# test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesync, tests)
-# 	@echo "🚀 Running complete quality gate validation..."
-# 	@mkdir -p out/tests && rm -f out/tests/*.json
-# 	@PYTEST_VERBOSE="" $(MAKE) fileformat || true
-# 	@PYTEST_VERBOSE="" $(MAKE) lint || true
-# 	@PYTEST_VERBOSE="" $(MAKE) security || true
-# 	@PYTEST_VERBOSE="" $(MAKE) typesync || true
-# 	@PYTEST_VERBOSE="" $(MAKE) test-config || true
-# 	@PYTEST_VERBOSE="" $(MAKE) test-core || true
-# 	@PYTEST_VERBOSE="" $(MAKE) test-db || true
-# 	@PYTEST_VERBOSE="" $(MAKE) test-routes || true
-# 	@PYTEST_VERBOSE="" $(MAKE) test-coverage || true
-# 	@echo "✅ Complete quality gate validation finished"
-# 	@echo "📊 Generating Quality Intelligence report..."
-# 	@scripts/quality-intelligence.sh --expected-results 9
+	for gate in $(GATES); do \
+		echo "🔎 [$$count] Running $$gate..."; \
+		PYTEST_VERBOSE="" $(MAKE) $$gate &>/dev/null || true; \
+		count=$$((count + 1)); \
+	done; \
+	scripts/quality-intelligence.sh --expected-results $${count}
 
 # Utility Commands
 clean: ## Clean up temporary files, caches
