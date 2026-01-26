@@ -85,14 +85,14 @@ def parse_user(root: ET.Element) -> CHPPUser:
     """
     # Extract user ID and username
     ht_id = safe_find_int(root, ".//Manager/UserId")
-    username = safe_find_text(root, ".//Manager/LoginName", "")
+    username = safe_find_text(root, ".//Manager/Loginname", "")
 
     # YouthTeamId FIX: Handle as optional field (eliminates 27-line workaround)
-    youth_team_id_text = safe_find_text(root, ".//Manager/YouthTeamId")
+    youth_team_id_text = safe_find_text(root, ".//YouthTeam/YouthTeamId")
     youth_team_id = int(youth_team_id_text) if youth_team_id_text else None
 
     # Extract team IDs (senior teams only)
-    team_nodes = root.findall(".//Team/TeamId")
+    team_nodes = root.findall(".//Teams/Team/TeamId")
     teams = [int(node.text) for node in team_nodes if node.text]
 
     return CHPPUser(
@@ -119,7 +119,7 @@ def parse_team(root: ET.Element) -> CHPPTeam:
         >>> print(team.name, team.team_id)
     """
     # Extract required fields
-    team_id = safe_find_int(root, ".//Team/TeamId")
+    team_id = safe_find_int(root, ".//Team/TeamID")
     name = safe_find_text(root, ".//Team/TeamName", "")
     short_name = safe_find_text(root, ".//Team/ShortTeamName", "")
 
@@ -176,9 +176,9 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
     """
     players = []
 
-    for player_node in root.findall(".//Player"):
+    for player_node in root.findall(".//PlayerList/Player"):
         # Extract player identity
-        player_id = safe_find_int(player_node, "PlayerId")
+        player_id = safe_find_int(player_node, "PlayerID")
         first_name = safe_find_text(player_node, "FirstName", "")
         last_name = safe_find_text(player_node, "LastName", "")
         nick_name = safe_find_text(player_node, "NickName")
@@ -191,18 +191,18 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
 
         # Current form and condition
         form = safe_find_int(player_node, "PlayerForm")
-        stamina = safe_find_int(player_node, "StaminaSkill")
+        stamina = safe_find_int(player_node, "Stamina")
         experience = safe_find_int(player_node, "Experience")
         loyalty = safe_find_int(player_node, "Loyalty")
 
-        # 7 Core Skills
-        keeper = safe_find_int(player_node, "KeeperSkill")
-        defender = safe_find_int(player_node, "DefenderSkill")
-        playmaker = safe_find_int(player_node, "PlaymakerSkill")
-        winger = safe_find_int(player_node, "WingerSkill")
-        passing = safe_find_int(player_node, "PassingSkill")
-        scorer = safe_find_int(player_node, "ScorerSkill")
-        set_pieces = safe_find_int(player_node, "SetPiecesSkill")
+        # 7 Core Skills (match real API field names)
+        keeper = safe_find_int(player_node, "Keeper")
+        defender = safe_find_int(player_node, "Defender")
+        playmaker = safe_find_int(player_node, "Playmaker")
+        winger = safe_find_int(player_node, "Winger")
+        passing = safe_find_int(player_node, "Passing")
+        scorer = safe_find_int(player_node, "Scorer")
+        set_pieces = safe_find_int(player_node, "SetPieces")
 
         # Additional attributes
         specialty = safe_find_int(player_node, "Specialty", None)
