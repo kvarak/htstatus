@@ -12,7 +12,7 @@ Version: 1.0.0
 """
 
 from app.chpp.client import CHPP
-from app.chpp.exceptions import CHPPAuthError, CHPPAPIError, CHPPError
+from app.chpp.exceptions import CHPPAPIError, CHPPAuthError, CHPPError
 
 __version__ = "1.0.0"
 __all__ = ["CHPP", "CHPPError", "CHPPAuthError", "CHPPAPIError"]

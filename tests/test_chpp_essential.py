@@ -4,9 +4,8 @@ Focuses on critical functionality: YouthTeamId handling, field mappings, dict ac
 Tests the fixes applied from real API documentation analysis.
 """
 
-import pytest
 
-from app.chpp.models import CHPPUser, CHPPTeam, CHPPPlayer
+from app.chpp.models import CHPPPlayer, CHPPTeam, CHPPUser
 
 
 class TestCHPPEssentials:

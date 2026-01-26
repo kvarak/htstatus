@@ -4,7 +4,6 @@ Handles request token generation and access token exchange using HMAC-SHA1 signa
 Uses requests-oauthlib for automatic OAuth signature handling.
 """
 
-from typing import Any
 
 from requests_oauthlib import OAuth1Session
 

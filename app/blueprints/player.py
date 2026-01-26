@@ -6,7 +6,6 @@ from flask import Blueprint, request, session
 from sqlalchemy import text
 
 from app.auth_utils import (
-    get_current_user_id,
     get_team_info,
     get_user_teams,
     require_authentication,

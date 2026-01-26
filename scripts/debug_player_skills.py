@@ -18,8 +18,9 @@ import sys
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from config import Config
 from pychpp import CHPP
+
+from config import Config
 
 
 def debug_player_skills(player_id: int):

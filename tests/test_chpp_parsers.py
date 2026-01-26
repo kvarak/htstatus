@@ -3,18 +3,17 @@
 Tests XML parsing functions for CHPP API responses.
 """
 
-import pytest
 import xml.etree.ElementTree as ET
 
+from app.chpp.models import CHPPPlayer, CHPPTeam, CHPPUser
 from app.chpp.parsers import (
-    safe_find_text,
-    safe_find_int,
-    safe_find_bool,
-    parse_user,
+    parse_players,
     parse_team,
-    parse_players
+    parse_user,
+    safe_find_bool,
+    safe_find_int,
+    safe_find_text,
 )
-from app.chpp.models import CHPPUser, CHPPTeam, CHPPPlayer
 
 
 class TestSafeHelperFunctions:
@@ -102,7 +101,7 @@ class TestSafeHelperFunctions:
         root = ET.fromstring(xml)
 
         result = safe_find_bool(root, ".//flag", default=True)
-        assert result == True
+        assert result
 
 
 class TestParseUser:
