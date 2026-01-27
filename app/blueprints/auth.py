@@ -364,6 +364,9 @@ def handle_oauth_callback(oauth_verifier):
                 )
             else:
                 # Cannot proceed without user identification
+                # Clear session to prevent conflicting success/failure messages
+                session.pop("current_user", None)
+                session.pop("current_user_id", None)
                 return create_page(
                     template="login.html",
                     title="Login / Signup",
@@ -471,6 +474,9 @@ def handle_oauth_callback(oauth_verifier):
                     dprint(1, f"Team setup complete via XML: {all_teams} with names: {all_team_names}")
                 except Exception as xml_error:
                     dprint(1, f"Failed to extract teams from XML: {xml_error}")
+                    # Clear session to prevent conflicting success/failure messages
+                    session.pop("current_user", None)
+                    session.pop("current_user_id", None)
                     return create_page(
                         template="login.html",
                         title="Login",
@@ -478,6 +484,9 @@ def handle_oauth_callback(oauth_verifier):
                     )
             else:
                 dprint(1, f"Team setup error: {team_setup_error}")
+                # Clear session to prevent conflicting success/failure messages
+                session.pop("current_user", None)
+                session.pop("current_user_id", None)
                 return create_page(
                     template="login.html",
                     title="Login",
