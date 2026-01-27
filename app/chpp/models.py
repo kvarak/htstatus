@@ -6,7 +6,7 @@ Supports dict-like access for backward compatibility.
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 
 @dataclass
@@ -41,8 +41,8 @@ class TransferDetails:
     asking_price: int
     deadline: str  # DateTime string from API
     highest_bid: int = 0
-    max_bid: int | None = None
-    bidder_team: BidderTeam | None = None
+    max_bid: Optional[int] = None
+    bidder_team: Optional[BidderTeam] = None
 
     def __getitem__(self, key: str) -> Any:
         """Support dict-like access."""
@@ -64,7 +64,7 @@ class CHPPUser:
     ht_id: int
     username: str
     _teams_ht_id: list[int]
-    youth_team_id: int | None = None
+    youth_team_id: Optional[int] = None
     _SOURCE_FILE: str = "managercompendium"
 
     def __getitem__(self, key: str) -> Any:
@@ -98,30 +98,30 @@ class CHPPTeam:
     team_id: int
     name: str
     short_team_name: str
-    league_name: str | None = None
-    league_level: int | None = None
-    region_id: int | None = None
-    founded_date: str | None = None
-    arena_name: str | None = None
-    arena_id: int | None = None
-    fanclub_size: int | None = None
-    fans_mood: str | None = None
-    fans_match_attitude: str | None = None
-    dress_uri: str | None = None
-    dress_alternate_uri: str | None = None
+    league_name: Optional[str] = None
+    league_level: Optional[int] = None
+    region_id: Optional[int] = None
+    founded_date: Optional[str] = None
+    arena_name: Optional[str] = None
+    arena_id: Optional[int] = None
+    fanclub_size: Optional[int] = None
+    fans_mood: Optional[str] = None
+    fans_match_attitude: Optional[str] = None
+    dress_uri: Optional[str] = None
+    dress_alternate_uri: Optional[str] = None
     # INFRA-028: Missing data parity fields
-    logo_url: str | None = None
-    power_rating: int | None = None
-    power_rating_global_ranking: int | None = None
-    power_rating_league_ranking: int | None = None
-    power_rating_region_ranking: int | None = None
-    league_level_unit_id: int | None = None
-    league_level_unit_name: str | None = None
-    cup_name: str | None = None
-    cup_level: int | None = None
+    logo_url: Optional[str] = None
+    power_rating: Optional[int] = None
+    power_rating_global_ranking: Optional[int] = None
+    power_rating_league_ranking: Optional[int] = None
+    power_rating_region_ranking: Optional[int] = None
+    league_level_unit_id: Optional[int] = None
+    league_level_unit_name: Optional[str] = None
+    cup_name: Optional[str] = None
+    cup_level: Optional[int] = None
     still_in_cup: bool = False
-    number_of_victories: int | None = None
-    number_of_undefeated: int | None = None
+    number_of_victories: Optional[int] = None
+    number_of_undefeated: Optional[int] = None
     _players: list["CHPPPlayer"] = field(default_factory=list)
     _SOURCE_FILE: str = "teamdetails"
 
@@ -176,7 +176,7 @@ class CHPPPlayer:
     player_id: int
     first_name: str
     last_name: str
-    nick_name: str | None
+    nick_name: Optional[str]
     age: int
     age_days: int
     tsi: int
@@ -195,14 +195,14 @@ class CHPPPlayer:
     set_pieces: int
     # Additional attributes
     specialty: int = 0  # 0 = no specialty
-    category_id: int | None = None
-    arrival_date: datetime | None = None  # DateTime object from parsed API string
+    category_id: Optional[int] = None
+    arrival_date: Optional[datetime] = None  # DateTime object from parsed API string
     cards: int = 0
-    agreeability: str | None = None
-    aggressiveness: str | None = None
-    honesty: str | None = None
-    country_id: int | None = None
-    salary: int | None = None
+    agreeability: Optional[str] = None
+    aggressiveness: Optional[str] = None
+    honesty: Optional[str] = None
+    country_id: Optional[int] = None
+    salary: Optional[int] = None
     caps: int = 0
     caps_u20: int = 0
     career_goals: int = 0
@@ -214,14 +214,14 @@ class CHPPPlayer:
     goals_current_team: int = 0
     assists_current_team: int = 0
     career_assists: int = 0
-    national_team_id: int | None = None
+    national_team_id: Optional[int] = None
     mother_club_bonus: int = 0
     leadership: int = 0
     injury_level: int = 0
-    statement: str | None = None
-    owner_notes: str | None = None
+    statement: Optional[str] = None
+    owner_notes: Optional[str] = None
     transfer_listed: bool = False
-    transfer_details: TransferDetails | None = None
+    transfer_details: Optional[TransferDetails] = None
     _SOURCE_FILE: str = "players"
 
     @property
@@ -261,18 +261,18 @@ class CHPPMatch:
     """
 
     ht_id: int
-    datetime: str | None
+    datetime: Optional[str]
     home_team_id: int
     home_team_name: str
     away_team_id: int
     away_team_name: str
-    home_goals: int | None = None
-    away_goals: int | None = None
-    matchtype: int | None = None
-    context_id: int | None = None
-    rule_id: int | None = None
-    cup_level: int | None = None
-    cup_level_index: int | None = None
+    home_goals: Optional[int] = None
+    away_goals: Optional[int] = None
+    matchtype: Optional[int] = None
+    context_id: Optional[int] = None
+    rule_id: Optional[int] = None
+    cup_level: Optional[int] = None
+    cup_level_index: Optional[int] = None
     _SOURCE_FILE: str = "matches"
 
     def __getitem__(self, key: str) -> Any:
