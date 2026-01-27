@@ -33,6 +33,7 @@
 - ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
+- 🎯 [UI-012] Fix Version Display Format (15 min) - **NEW** Change version display from "3.0-5-g949b2e1" to semantic versioning "3.0.5-g949b2e1" format in templates **UI CONSISTENCY**
 - 🎯 [REFACTOR-022] Fix Legacy Branding References (30 min) - **NEW** Update "HattrickPlanner" references to "HTStatus" in templates and docs **BRANDING CONSISTENCY**
 - 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments **WASTE ELIMINATION**
 - 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **WASTE ELIMINATION**
@@ -103,6 +104,40 @@
 3. **[REFACTOR-015] Simplify prompts.json UI Guidelines** (30 min) - P2 - Remove redundant UI definitions **READY TO EXECUTE**
 
 **Next Action**: P1 FINAL TASK ✅ - Execute REFACTOR-012 (Extract CHPP Client Utilities) to complete P1 Custom CHPP production milestone, then proceed to P2 minimization tasks.
+
+---
+
+## Priority 2 Detailed Tasks
+
+### [UI-012] Fix Version Display Format
+**Status**: 🎯 Ready to Execute | **Effort**: 15 minutes | **Priority**: P2 | **Impact**: UI consistency, version clarity
+**Dependencies**: None | **Strategic Value**: Improve version display formatting for semantic versioning standard
+
+**Problem Statement**:
+Current version display format shows "3.0-5-g949b2e1" (git describe format) instead of semantic versioning format "3.0.5-g949b2e1". The git describe output is directly parsed without proper formatting to match SemVer convention.
+
+**Current Implementation**:
+- Git command: `git describe --tags` returns format like "3.0-5-g949b2e1"
+- Parsing code splits on "-" and reconstructs as "3.0" + "." + "5" + "-" + "g949b2e1"
+- Displays in templates: main.html line 71-72, line 154, update.html line 202
+
+**Implementation**:
+1. **Update Version Formatting Logic** (10 min):
+   - Modify app/routes_bp.py lines 57-59
+   - Parse git describe output: "3.0-5-g949b2e1"
+   - Format to semantic version: "3.0.5-g949b2e1" (replace dashes with dots before 'g')
+   - Update version variable: `fullversion = f"{versionstr[0]}.{versionstr[1]}-{versionstr[2]}"`
+
+2. **Verify Display** (5 min):
+   - Test version display in Flask templates
+   - Confirm format shows as "x.y.z-gsha" across all templates
+   - Verify fallback version format also uses semantic versioning
+
+**Success Criteria**:
+- Version displays as semantic format "3.0.5-g949b2e1" (not "3.0-5-g949b2e1")
+- All template displays use consistent formatting
+- Fallback development version uses same format: "2.0.0-dev"
+- No functional changes to version detection, only formatting
 
 ---
 
