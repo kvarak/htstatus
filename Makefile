@@ -346,11 +346,11 @@ test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesy
 		count=$$((count + 1)); \
 		basename=$$(basename $$testfile .py); \
 		echo "🔎 [$$count] Running $$testfile..."; \
-		$(UV) run pytest $$testfile $${PYTEST_VERBOSE-"-q"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=json:out/tests/test-each-$$basename-cov.json --cov-fail-under=0 --json-report --json-report-file=out/tests/test-each-$$basename.json &>/dev/null || true; \
+		USE_CUSTOM_CHPP=true $(UV) run pytest $$testfile $${PYTEST_VERBOSE-"-q"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=json:out/tests/test-each-$$basename-cov.json --cov-fail-under=0 --json-report --json-report-file=out/tests/test-each-$$basename.json &>/dev/null || true; \
 	done; \
 	for gate in $(GATES); do \
 		echo "🔎 [$$count] Running $$gate..."; \
-		PYTEST_VERBOSE="" $(MAKE) $$gate &>/dev/null || true; \
+		USE_CUSTOM_CHPP=true PYTEST_VERBOSE="" $(MAKE) $$gate &>/dev/null || true; \
 		count=$$((count + 1)); \
 	done; \
 	scripts/quality-intelligence.sh --expected-results $${count}

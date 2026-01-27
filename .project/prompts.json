@@ -45,7 +45,7 @@
       "what to do": [
         "Read .project/rules.md, .project/ docs. Use `uv run` and `make help`.",
         "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working, don't settle for the same code coverage but strive to improve it.",
-        "Apply simplification hierarchy: Holistic view >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
+        "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Test: `make test-all` - no coverage loss or failures.",
         "UI: Use ui_guidelines colors/typography. Flask: .btn-primary-custom classes. React: existing components.",
         "Update docs. Note new tasks for backlog. Break large tasks into sub-tasks.",
@@ -57,7 +57,7 @@
       "title": "Review previous development work with simplification focus",
       "what to do": [
         "Review all changes since last commit. Read .project/rules.md, .project/ docs.",
-        "Apply simplification hierarchy: Holistic view >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
+        "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Identify: complexity (monoliths, unclear responsibilities), waste (unused code, redundant logic), inappropriate consolidation (merging distinct tools).",
         "Respect separation of concerns: Don't merge tools with different purposes (e.g., qi-json.sh, pytest-qi-parser.sh, quality-intelligence.sh each have distinct roles).",
         "Test: `make test-all`. Check docs alignment with goals.md.",
@@ -71,7 +71,6 @@
       "what to do": [
         "Review progress.md, backlog.md. Holistic view for consolidation.",
         "Update with completed tasks. Move completed (✅) to history/backlog-done.md.",
-        "Eliminate redundant tasks. Merge overlapping work.",
         "Make sure 'make help' reflects current state.",
         "Unblock dependencies. Update docs to reflect current state.",
         "Aggressively remove complete and outdated content.",
