@@ -37,22 +37,30 @@ def login():
     """Handle user login and Hattrick OAuth authentication."""
     from models import User
 
+    dprint(1, "=== LOGIN FUNCTION START ===")
+
     # Return early if already logged in
     if session.get("current_user"):
+        dprint(1, "User already logged in, redirecting")
         return redirect("/")
 
     # Handle OAuth callback
     oauth_verifier = request.args.get("oauth_verifier")
     if oauth_verifier:
+        dprint(1, "Handling OAuth callback")
         return handle_oauth_callback(oauth_verifier)
 
     # Handle GET request - show login form
     if request.method == "GET":
+        dprint(1, "Showing login form")
         return create_page(template="login.html", title="Login / Signup")
 
     # Handle POST request (form submission)
+    dprint(1, "Processing POST login request")
     username = request.form.get("username")
     password = request.form.get("password")
+    dprint(1, f"Login attempt for username: {username}")
+    dprint(1, f"Password provided: {bool(password)}, length: {len(password) if password else 0}")
 
     # Validate form data
     if not username:
@@ -118,6 +126,8 @@ def login():
     if existing_user and password_valid:
         # Existing user login with valid password
         dprint(1, f"Password validation successful for user: {username}")
+        dprint(1, f"User has access_key: {bool(existing_user.access_key)}")
+        dprint(1, f"User has access_secret: {bool(existing_user.access_secret)}")
         if existing_user.access_key and existing_user.access_secret:
             # User has OAuth tokens - log them in directly
             dprint(1, "User has valid OAuth tokens, logging in directly")
@@ -125,23 +135,32 @@ def login():
             session["access_secret"] = existing_user.access_secret
             session["current_user"] = existing_user.ht_user
             session["current_user_id"] = existing_user.ht_id
+            dprint(1, f"Set session current_user: {existing_user.ht_user}")
+            dprint(1, f"Set session current_user_id: {existing_user.ht_id}")
 
             # Setup team data from Hattrick API using OAuth tokens
+            print("Setting up team data")
             dprint(1, "Setting up team data for logged-in user")
             try:
                 CHPP = get_chpp_client()
+                dprint(1, f"Got CHPP client class: {CHPP}")
                 chpp = CHPP(
                     consumer_key,
                     consumer_secret,
                     existing_user.access_key,
                     existing_user.access_secret,
                 )
+                dprint(1, "Created CHPP instance")
 
                 # Try to get user and teams, handling YouthTeamId error gracefully
                 try:
+                    dprint(1, "Calling chpp.user() to get user data")
                     current_user = chpp.user()
+                    dprint(1, f"Got current_user from CHPP: {current_user}")
                     all_teams = current_user._teams_ht_id
+                    dprint(1, f"Got teams from user: {all_teams}")
                 except Exception as user_error:
+                    dprint(1, f"Exception in chpp.user(): {user_error}")
                     # YouthTeamId is optional but pychpp treats it as required
                     # Work around by accessing teams data directly
                     if "YouthTeamId" in str(user_error):
@@ -167,7 +186,9 @@ def login():
                 all_team_names = []
                 for team_id in all_teams:
                     try:
+                        dprint(1, f"Fetching team name for team_id: {team_id}")
                         team_name = chpp.team(ht_id=team_id).name
+                        dprint(1, f"Got team name: {team_name}")
                         all_team_names.append(team_name)
                     except Exception as e:
                         dprint(1, f"Could not fetch team name for {team_id}: {e}")
@@ -188,9 +209,11 @@ def login():
                     error="Unable to fetch team data from Hattrick. Please try again or contact support.",
                 )
 
+            dprint(1, "Login successful, redirecting to /")
             return redirect("/")
         else:
             # Need to get OAuth tokens for existing user
+            dprint(1, "User needs OAuth tokens, starting OAuth flow")
             session["username"] = username
             session["password"] = generate_password_hash(password)
             return start_oauth_flow()
@@ -198,73 +221,25 @@ def login():
     # Handle authentication failures and migration cases
     if existing_user:
         if needs_migration:
-            # User has an old SHA256 password that can't be verified
-            if existing_user.access_key and existing_user.access_secret:
-                # Try to use existing OAuth tokens
-                try:
-                    CHPP = get_chpp_client()
-                    chpp = CHPP(
-                        consumer_key,
-                        consumer_secret,
-                        existing_user.access_key,
-                        existing_user.access_secret,
-                    )
-
-                    # Try to get user, handling YouthTeamId error gracefully
-                    try:
-                        current_user = chpp.user()
-                        all_teams = current_user._teams_ht_id
-                    except Exception as user_error:
-                        # If user() fails (e.g., YouthTeamId error), fetch teams directly
-                        if "YouthTeamId" in str(user_error):
-                            dprint(1, f"YouthTeamId error in migration, fetching teams directly: {user_error}")
-                            all_teams = [existing_user.ht_id]
-                        else:
-                            raise user_error
-
-                    # OAuth tokens still valid - log them in and offer password reset
-                    session["access_key"] = existing_user.access_key
-                    session["access_secret"] = existing_user.access_secret
-                    session["current_user"] = existing_user.ht_user
-                    session["current_user_id"] = existing_user.ht_id
-                    session["password_migration_needed"] = True
-
-                    # Setup team data
-                    all_team_names = []
-                    for id in all_teams:
-                        try:
-                            team_name = chpp.team(ht_id=id).name
-                            all_team_names.append(team_name)
-                        except Exception as e:
-                            dprint(1, f"Could not fetch team name for {id}: {e}")
-                            all_team_names.append(f"Team {id}")
-                    session["all_teams"] = all_teams
-                    session["all_team_names"] = all_team_names
-                    session["team_id"] = all_teams[0]
-
-                    return redirect("/?migration_notice=true")
-
-                except Exception as e:
-                    dprint(1, f"OAuth tokens expired for migration user: {e}")
-                    # OAuth tokens expired - need to re-authenticate
-
             return create_page(
                 template="login.html",
                 title="Login / Signup",
-                error='Your password needs to be updated for security. Please <a href="/login/oauth">re-authenticate with Hattrick</a> to continue.',
+                error="Your password needs to be updated. Please use the 'Register via Hattrick' button to log in with your Hattrick account.",
             )
         else:
-            # Wrong password for normal user
+            # Wrong password
             return create_page(
                 template="login.html",
                 title="Login / Signup",
                 error="Invalid username or password",
             )
+    else:
+        # Store new user credentials and start OAuth flow
+        session["username"] = username
+        session["password"] = generate_password_hash(password)
+        return start_oauth_flow()
 
-    # New user - start OAuth flow
-    session["username"] = username
-    session["password"] = generate_password_hash(password)
-    return start_oauth_flow()
+    print("ERROR: Reached end of login function without returning - this should not happen!")
 
 
 def start_oauth_flow():

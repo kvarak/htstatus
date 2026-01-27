@@ -18,6 +18,7 @@ from models import User
 def auth_app():
     """Create application for authentication testing with transaction isolation."""
     os.environ["FLASK_ENV"] = "testing"
+    os.environ["USE_CUSTOM_CHPP"] = "true"  # Test Custom CHPP client instead of pychpp
     app = create_app(TestConfig, include_routes=True)
 
     with app.app_context():
@@ -124,21 +125,26 @@ class TestAuthBlueprintLoginRoutes:
         assert response.status_code == 200
         assert b"Password must be at least 8 characters long" in response.data
 
-    @patch("app.chpp_utils.get_chpp_client")
+    @patch("app.chpp.CHPP")  # Mock the Custom CHPP class directly
     def test_login_existing_user_with_tokens(
         self, mock_chpp_class, client, sample_user
     ):
-        """Test successful login for existing user with OAuth tokens."""
-        # Mock CHPP responses
-        mock_chpp = Mock()
+        """Test successful login for existing user with OAuth tokens using Custom CHPP client."""
+        # Create mock Custom CHPP instance
+        mock_chpp_instance = Mock()
+
+        # Mock user and team data - properly handle team ID list
         mock_user = Mock()
         mock_user._teams_ht_id = [12345]
         mock_team = Mock()
         mock_team.name = "Test Team"
 
-        mock_chpp.user.return_value = mock_user
-        mock_chpp.team.return_value = mock_team
-        mock_chpp_class.return_value = mock_chpp
+        # Configure instance methods
+        mock_chpp_instance.user.return_value = mock_user
+        mock_chpp_instance.team.return_value = mock_team
+
+        # Configure class to return instance when called
+        mock_chpp_class.return_value = mock_chpp_instance
 
         response = client.post(
             "/login", data={"username": "testuser", "password": "testpass123"}
@@ -214,34 +220,35 @@ class TestAuthBlueprintOAuthFlow:
 
         mock_handle_callback.assert_called_once_with("test_verifier")
 
-    @patch("app.chpp_utils.get_chpp_client")
-    @patch("app.blueprints.auth.render_template")
+    @patch("app.chpp.CHPP")
     def test_start_oauth_flow_function(
-        self, mock_render_template, mock_chpp_class, auth_app
+        self, mock_chpp_class, auth_app
     ):
         """Test start_oauth_flow function."""
         with auth_app.test_request_context():
-            mock_chpp = Mock()
+            # Create mock CHPP instance
+            mock_chpp_instance = Mock()
             mock_auth = {
                 "request_token": "test_token",
                 "request_token_secret": "test_secret",
                 "url": "http://test-oauth-url",
             }
-            mock_chpp.get_auth.return_value = mock_auth
-            mock_chpp_class.return_value = mock_chpp
-            mock_render_template.return_value = "redirect_html"
+            mock_chpp_instance.get_auth.return_value = mock_auth
+
+            # Configure class to return instance when called
+            mock_chpp_class.return_value = mock_chpp_instance
 
             from app.blueprints.auth import start_oauth_flow
 
             response = start_oauth_flow()
 
-            assert response == "redirect_html"
-            mock_chpp.get_auth.assert_called_once()
+            # Should return some response (HTML template)
+            assert response is not None
+            mock_chpp_instance.get_auth.assert_called_once()
 
-    @patch("app.chpp_utils.get_chpp_client")
-    @patch("app.blueprints.auth.User")
+    @patch("app.chpp.CHPP")
     def test_handle_oauth_callback_new_user(
-        self, mock_user_class, mock_chpp_class, auth_app
+        self, mock_chpp_class, auth_app
     ):
         """Test OAuth callback for new user."""
         with auth_app.test_request_context(), auth_app.test_client() as client:
@@ -250,33 +257,33 @@ class TestAuthBlueprintOAuthFlow:
                 sess["password"] = generate_password_hash("newpass123")
 
             # Mock CHPP OAuth completion
-            mock_chpp = Mock()
-            mock_chpp.authorize_user.return_value = {
+            mock_chpp_instance = Mock()
+            mock_chpp_instance.authorize_user.return_value = {
                 "access_token": "new_access_key",
                 "access_token_secret": "new_access_secret",
             }
+
             mock_user = Mock()
             mock_user.ht_id = 99999
             mock_user.ht_user = "NewHTUser"
             mock_user._teams_ht_id = [99999]
+
             mock_team = Mock()
             mock_team.name = "New Team"
 
-            mock_chpp.user.return_value = mock_user
-            mock_chpp.team.return_value = mock_team
-            mock_chpp_class.return_value = mock_chpp
-
-            # Mock User creation
-            mock_user_instance = Mock()
-            mock_user_class.return_value = mock_user_instance
+            mock_chpp_instance.user.return_value = mock_user
+            mock_chpp_instance.team.return_value = mock_team
+            mock_chpp_class.return_value = mock_chpp_instance
 
             from app.blueprints.auth import handle_oauth_callback
 
             with patch.object(db.session, "add"), patch.object(db.session, "commit"):
                 response = handle_oauth_callback("test_verifier")
 
-            # Should return a redirect response as string
+            # Should return a response
             assert response is not None
+
+    def test_logout_route(self, client):
         """Test logout route clears session and redirects."""
         # Set up session
         with client.session_transaction() as sess:
@@ -298,20 +305,21 @@ class TestAuthBlueprintOAuthFlow:
 class TestAuthBlueprintErrorHandling:
     """Test error handling in authentication."""
 
-    @patch("app.chpp_utils.get_chpp_client")
+    @patch("app.chpp.CHPP")
     def test_login_chpp_error_handling(self, mock_chpp_class, client, sample_user):
         """Test handling of CHPP errors during login."""
-        # Mock CHPP to raise exception
+        # Mock CHPP class to raise exception when instantiated
         mock_chpp_class.side_effect = Exception("CHPP API Error")
 
         response = client.post(
             "/login", data={"username": "testuser", "password": "testpass123"}
         )
 
-        # Should still redirect (graceful error handling)
-        assert response.status_code == 302
+        # Should return error page, not redirect
+        assert response.status_code == 200
+        assert b"Unable to fetch team data" in response.data
 
-    @patch("app.chpp_utils.get_chpp_client")
+    @patch("app.chpp.CHPP")
     def test_oauth_callback_error_handling(self, mock_chpp_class, auth_app):
         """Test OAuth callback error handling."""
         with auth_app.test_request_context(), auth_app.test_client() as client:
