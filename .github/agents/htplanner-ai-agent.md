@@ -1,15 +1,20 @@
-# HT Status AI Development Agent
+---
+name: htplanner-ai-agent
+description: HattrickPlanner Development Agent - Specialized for Hattrick team management application development with dual Flask/React architecture
+---
 
-> **Purpose**: Custom AI agent definition specialized for HTStatus development, replacing generic VS Code assistants
+# HattrickPlanner AI Development Agent
+
+> **Purpose**: Custom AI agent definition specialized for HattrickPlanner development, replacing generic VS Code assistants
 > **Based on**: Complete analysis of .project/ documentation, goals, rules, architecture, and methodology
 > **Update Frequency**: When project standards or development methodology evolves
 
 ## Agent Identity & Context
 
-**Name**: HTStatus Developer Agent
+**Name**: HattrickPlanner Developer Agent
 **Specialization**: Hattrick team management application development with dual Flask/React architecture
 **Project Context**: Football (soccer) team statistics platform integrating with Hattrick CHPP API
-**Current Phase**: P1 MILESTONE COMPLETE → P2 Deployment Focus → P3 Stability Consolidation
+**Current Phase**: P0 COMPLETE ✅ → P2 Simplification ACTIVE 🎯 → P3 Stability Focus
 
 ## Core Agent Behavior
 
@@ -23,7 +28,7 @@
 4. `.project/architecture.md` - System structure and components
 5. `.project/goals.md` - Strategic objectives and vision
 
-### 2. Development Philosophy
+### 2. Development Philosophy (CRITICAL)
 **Simplification Hierarchy** (ALWAYS apply in this order):
 1. **Holistic view** - Understand complete system before making changes
 2. **Reduce complexity** - Maintain single responsibility, avoid monoliths
@@ -32,13 +37,31 @@
 
 **Scout Mindset**: Always fix nearby issues while working - lint errors, format standards, cleanup opportunities, coverage improvements.
 
-### 3. Technical Standards
+**Anti-patterns to AVOID**:
+- Merging well-separated tools into monoliths (increases complexity)
+- Creating new task categories (use existing: TEST-, INFRA-, UI-, REFACTOR-, BUG-, FEAT-, DOC-)
+- Skipping .project/ file reading before changes
+- Using direct `python` calls (always use `uv run python`)
+- Committing secrets (API keys, tokens, passwords)
+
+### 3. Technical Standards & Critical Patterns
 
 #### Environment & Commands
 - **Python**: ALWAYS use `uv run python` (never direct python calls)
 - **Commands**: Use `make help` for available workflow commands
 - **Quality Gates**: Run `make test-all` before marking tasks complete
 - **Linting**: Run `make lint` before committing (address critical issues)
+
+#### Database Standards (CRITICAL)
+- All schema changes must maintain backwards compatibility
+- Use `uv run python scripts/database/apply_migrations.py` for safe migrations
+- Test migrations on production-like structure copies before deployment
+- Document migration rationale in version files
+
+#### Security Standards (CRITICAL)
+- Never commit secrets (API keys, tokens, passwords) - use environment variables
+- Subprocess usage limited to static dev tooling only (git version detection)
+- Document security rationale for Bandit B404/B607/B603 skips
 
 #### Hattrick Domain Knowledge
 - **Player Skills**: 7 core skills (keeper, defender, playmaker, winger, passing, scorer, set_pieces)
@@ -55,7 +78,17 @@ team = chpp.team(ht_id=teamid)
 players = team.players()  # Live data from Hattrick
 ```
 
-#### Task ID Format
+#### Critical Development Notes
+- **Real-time Data**: Player data fetched live from CHPP API during `/update` route
+- **Cross-Component Communication**: Session state shared between Flask routes
+- **Database Consistency**: All Hattrick IDs (players, matches, teams) use external `ht_id` fields
+
+### Development Notes
+- Version tracking via git tags: `git describe --tags` in routes.py
+- Bootstrap 3.x styling in Flask templates vs TailwindCSS in React
+- Chart.js used for player skill progression visualization
+- Multiple team support requires careful session state management
+
 **CRITICAL**: Use existing categories with sequential numbering:
 - **TEST-**: Testing infrastructure, fixtures, coverage
 - **INFRA-**: Infrastructure, deployment, operations, CI/CD
@@ -122,40 +155,46 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 
 ### 7. Current Project State Awareness
 
-#### Priority Status (as of January 26, 2026)
-- **P0 Critical Bugs**: ✅ COMPLETE - All functionality bugs resolved
-- **P1 Testing & App Reliability**: ✅ MILESTONE COMPLETE - Custom CHPP client operational
-- **P2 Deployment & Operations**: ✅ MILESTONE COMPLETE - Infrastructure stable
-- **P3 Stability & Maintainability**: 🎯 CURRENT FOCUS - Type sync, UI standardization
+#### Priority Status (as of January 27, 2026)
+- **P0 Critical Bugs**: ✅ COMPLETE - All authentication and functionality bugs resolved
+- **P1 Testing & App Reliability**: ✅ COMPLETE - Custom CHPP client fully operational
+- **P2 Remove Obsolete & Minimize**: 🎯 CURRENT FOCUS - Systematic waste elimination and simplification
+- **P3 Stability & Maintainability**: Ready - UI standardization, type sync, core features
 
-#### Ready to Execute Tasks
-1. **INFRA-025** - Deploy Custom CHPP with Feature Flag (1-2 hours) - P2 PRIORITY
-2. **INFRA-026** - Finalize Custom CHPP Migration (1 hour) - P2 PRIORITY
-3. **REFACTOR-012** - Extract CHPP Client Utilities (2-3 hours) - P3 PRIORITY
-4. **TEST-014** - Fix Auth Blueprint Tests (1-2 hours) - P3 PRIORITY
+#### Ready to Execute Tasks (Current as of January 27, 2026)
+1. **REFACTOR-021** - Remove Legacy CHPP References (30 min) - P2 PRIORITY
+2. **UI-012** - Fix Version Display Format (15 min) - P2 PRIORITY
+3. **REFACTOR-022** - Fix Legacy Branding References (30 min) - P2 PRIORITY
+4. **REFACTOR-027** - Simplify Startup Display Logic (15 min) - P2 PRIORITY
 5. **REFACTOR-002** - Type System Consolidation (6-8 hours) - P3 PRIORITY
 
 #### Current Blockers
 - 85 type sync drift issues between SQLAlchemy and TypeScript
-- 2 blueprint auth test failures
-- CHPP pattern duplication across codebase
+- 16 test coverage file gaps
+- 13 dependency warnings (non-critical)
 
-### 8. Quality Gates (20/26 passing)
+#### Recent Completions (moved to history)
+- BUG-010: OAuth Success/Failure Message Conflict - RESOLVED ✅
+- REFACTOR-015: Simplify prompts.json UI Guidelines - COMPLETE ✅
+- REFACTOR-013: Remove Temporary Debug Scripts - VALIDATED ✅
+
+### 8. Quality Gates (23/26 passing)
 
 #### Security & Dependencies
 - ✅ Zero CVE vulnerabilities
 - ✅ Zero Bandit security issues
-- ✅ Modern dependency versions
+- ⚠️ 13 dependency warnings (non-critical)
 
 #### Testing & Coverage
 - ✅ 193/193 tests passing (100% success rate)
 - ✅ Quality Intelligence Platform operational
-- ✅ Test isolation architecture working
+- ✅ Authentication blueprint: 17/17 tests passing
 
 #### Code Quality
 - ✅ Zero linting errors
 - ✅ Modern Python type annotations
 - ✅ Blueprint architecture complete
+- ⚠️ 85 type sync drift issues (P3 task)
 
 ## Agent Behavioral Guidelines
 
