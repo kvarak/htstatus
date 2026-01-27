@@ -11,15 +11,15 @@
 1. ALWAYS read this entire backlog before selecting tasks
 2. Choose tasks marked 🎯 Ready to Execute with no blockers
 3. Update task status when starting (🚀 ACTIVE) and completing (✅ COMPLETED)
-4. Follow priority order: P0 Critical Bugs → P1 Testing → P2 Deployment → P3 Stability → P4 Functionality → P5 DevOps → P6 Documentation → P7 Future
+4. Follow priority order: P0 Critical Bugs → P1 Custom CHPP Production → P2 Remove Obsolete & Minimize → P3 Stability → P4 DevOps → P5 Documentation → P6 Future
 5. Move completed tasks to history/backlog-done.md with completion notes and REMOVE them from here.
 
 **For Humans**:
-- Tasks organized by 8 priority levels based on project maturity and risk
+- Tasks organized by 7 priority levels based on strategic focus
 - P0 tasks are critical bugs blocking core functionality
-- P1 tasks ensure application reliability and testing confidence
-- P2-P3 tasks build stability and maintainability
-- P4-P6 tasks enhance operations, developer experience, and documentation
+- P1 tasks complete Custom CHPP production migration
+- P2 tasks eliminate obsolete content and minimize project complexity
+- P3-P6 tasks ensure stability, DevOps, documentation, and future features
 - Choose based on available time, skills, and project needs
 
 ---
@@ -28,42 +28,41 @@
 
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 
-**Priority 1: Testing & App Reliability** - ✅ MILESTONE COMPLETE - Custom CHPP client operational and validated
+**Priority 1: Custom CHPP Production** (Complete migration to production) - 🎯 CURRENT FOCUS
+- 🎯 [INFRA-030] Finalize Custom CHPP Production Migration (2-3 hours) - **NEW** Remove pychpp dependency completely, enable Custom CHPP as default **PRODUCTION READY** **NEXT TASK**
+- 🎯 [REFACTOR-012] Extract CHPP Client Utilities (2-3 hours) - **NEW** Consolidate CHPP initialization and team data fetching patterns **PRODUCTION OPTIMIZATION**
 
-**Priority 2: Deployment & Operations** - ✅ MILESTONE COMPLETE - Custom CHPP feature flag deployment infrastructure complete
+- 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns for Custom CHPP consistency **PRODUCTION TESTING**
+- 🎯 [TEST-004-005] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage validating Custom CHPP integration **PRODUCTION CONFIDENCE**
 
-**Priority 3: Stability & Maintainability** (It stays working) - 🎯 CURRENT FOCUS
-- 🎯 [REFACTOR-012] Extract CHPP Client Utilities (2-3 hours) - **NEW** Consolidate CHPP initialization and team data fetching patterns **SIMPLIFICATION**
-- 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **HIGH PRIORITY SIMPLIFICATION**
-- 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED TASK**
+**Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
+- 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments **WASTE ELIMINATION**
+- 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **WASTE ELIMINATION**
+- 🎯 [REFACTOR-026] Remove Startup Debug Output (15 min) - **NEW** Clean up debug print statements from initialization **WASTE ELIMINATION**
+- 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **MINIMIZE DUPLICATION**
+- 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **MINIMIZE INCONSISTENCY**
+- 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED** Remove legacy config files, obsolete content **MINIMIZE DOCUMENTATION WASTE**
+- 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup and obsolete code removal **MINIMIZE COMPLEXITY**
+- 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Remove unused dependencies, consolidate tooling **MINIMIZE DEPENDENCIES**
+
+**Priority 3: Stability & Core Features** (It stays working and does what it should)
+- 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED**
   - Apply unified design system to Flask templates and React components (UI-008: 8-12 hours)
   - Document Content-in-Boxes pattern references and link from ui-design-guidelines.md (UI-009: 1-2 hours)
   - Apply UI guidelines to core pages: Players, training, stats, settings (UI-010: 4-6 hours)
-  - **Value**: Unified UI implementation sprint vs scattered individual tasks **SIMPLIFICATION**
-- 🎯 [TEST-014] Fix Auth Blueprint Tests (1-2 hours) - **NEW** Update tests for YouthTeamId handling and session validation **READY TO EXECUTE**
-- 🎯 [TEST-004-005] Blueprint & Utils Test Coverage (4-6 hours) - Achieve 80% coverage for blueprint modules and validate migrated utility functions **READY TO EXECUTE**
-- 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **READY TO EXECUTE**
-- 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments after custom client completion **SIMPLIFICATION**
-- 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **SIMPLIFICATION**
-- 🎯 [REFACTOR-009] CHPP Mock Pattern Standardization (1-2 hours) - Consolidate CHPP test patterns from test_chpp_integration_comprehensive.py for reuse across test suite **SIMPLIFICATION**
-- 🎯 [REFACTOR-025] Complete Auth Blueprint Test Migration (30-45 min) - **NEW** Fix remaining 4 auth test failures by completing mock pattern migration from @patch("app.blueprints.auth.CHPP") to @patch("app.chpp_utils.get_chpp_client") **SIMPLIFICATION**
-- 🎯 [REFACTOR-026] Remove Startup Debug Output (15 min) - **NEW** Clean up any remaining debug print statements from initialization and route setup **WASTE ELIMINATION**
-- 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup
-- 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Maintenance planning
+  - **Value**: Unified UI implementation sprint vs scattered individual tasks **STABILITY**
+- 🎯 [BUG-008] Fix sorttable.js TypeError (30-45 min) - Fix table sorting error on update page **FUNCTIONALITY**
+- 🎯 [BUG-009] Fix Player Changes Calculation Error (1-2 hours) - Resolve list index error in player change display **FUNCTIONALITY**
+- 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **FUNCTIONALITY**
+- 🎯 [FEAT-013] Error Monitoring System (4-6 hours) - Database-backed error tracking with debug page dashboard **RELIABILITY**
+- 🎯 [FEAT-009] Display Player Group Names in Update Timeline (1-2 hours) - Show group names in update timeline **USABILITY**
+- 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **FUNCTIONALITY**
+- 🎯 [DOC-021] New Player Tutorial (3-5 hours) - Onboarding walkthrough **USER EXPERIENCE**
+- 🎯 [FEAT-005] Team Statistics Dashboard (8-10 hours) - Performance analytics **CORE FEATURE**
+- 🎯 [FEAT-008] Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis **CORE FEATURE**
+- 🔮 [FEAT-003] Formation Tester & Tactics Analyzer - Research Phase **FUTURE FEATURE**
 
-**Priority 4: Core Functionality** (It does what it should)
-- 🎯 [BUG-008] Fix sorttable.js TypeError (30-45 min) - Fix `node.getAttribute is not a function` error preventing table sorting on update page **NEW**
-- 🎯 [BUG-009] Fix Player Changes Calculation Error (1-2 hours) - Resolve "list index out of range" error in main.py preventing player change display **NEW**
-- 🎯 [BUG-006] Fix Players Page "Last Updated" Display (30 min) - Display missing timestamp **READY**
-- 🎯 [FEAT-013] Error Monitoring System (4-6 hours) - Database-backed error tracking with debug page dashboard **NEW**
-- 🎯 [FEAT-009] Display Player Group Names in Update Timeline (1-2 hours) - Show group names after player names when players belong to user groups **NEW**
-- 🎯 [BUG-007] Fix Debug Page Issues (1-2 hours) - Visibility and changelog display **READY**
-- 🎯 [DOC-021](#doc-021-new-player-tutorial) New Player Tutorial (3-5 hours) - Onboarding walkthrough **READY**
-- 🎯 [FEAT-005](#feat-005-team-statistics-dashboard) Team Statistics Dashboard (8-10 hours) - Performance analytics
-- 🎯 [FEAT-008](#feat-008-next-game-analyser) Next Game Analyser (12-16 hours) - Tactical preparation and opponent analysis
-- 🔮 [FEAT-003](#feat-003-formation-tester--tactics-analyzer) Formation Tester & Tactics Analyzer - Research Phase
-
-**Priority 5: DevOps & Developer Experience** (Make it easy)
+**Priority 4: DevOps & Developer Experience** (Make it easy)
 - 🎯 [DOC-019] macOS Setup Guide (30 min) - Platform support
 - 🎯 [DOC-020] UV Installation Guide (30 min) - Environment onboarding
 - 🎯 [DOC-010] Testing Prompts (30 min) - AI agent testing workflows
@@ -71,7 +70,7 @@
 - 🎯 [INFRA-023] Script Linting Cleanup (1-2 hours) - Fix 32 linting errors in test files **READY TO EXECUTE**
 - 🎯 [FEAT-006] Default Player Groups for New Users (2-3 hours) - Onboarding
 
-**Priority 6: Documentation & Polish** (Make it complete)
+**Priority 5: Documentation & Polish** (Make it complete)
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED TASK** (includes UI consolidation, env config, navigation, waste elimination)
   - Remove legacy configuration files and unused configs/duplicates (DOC-026) - ✅ requirements.txt COMPLETE, .flake8 remaining
   - Consolidate environment templates from 3 to 2 variants (DOC-027)
@@ -81,7 +80,7 @@
   - Update architecture.md file structure (DOC-025)
   - **Value**: Single focused cleanup session vs 6 separate tasks **SIMPLIFICATION**
 
-**Priority 7: Potential Future Improvements**
+**Priority 6: Potential Future Improvements**
 - 🔮 [INFRA-024] Re-upgrade to pychpp 0.5.10 + Flask 3.1+ (2-3 hours) - Re-attempt library upgrades (Note: werkzeug 3.1+ covered by SECURITY-001)
 - 🔮 [FEAT-010] Collaborative League Intelligence (40-60 hours) - Multiplayer league-wide platform for shared scouting and collective tactical analysis
 - 🔮 [FEAT-011] AI-Powered Training Optimization Engine (60-80 hours) - Machine learning on historical skill progression for optimal training schedules
@@ -92,26 +91,27 @@
 ## ✅ All Priority Levels Summary
 
 **P0**: ✅ COMPLETE (8/8) - All critical bugs resolved, zero regressions
-**P1**: ✅ MILESTONE COMPLETE (18/18) - Custom CHPP client operational, feature flag deployed
-**P2**: ✅ MILESTONE COMPLETE (4/4) - Custom CHPP Migration Complete: API version 3.1 success, complete feature parity achieved, production-ready
-**P3**: 🎯 CURRENT FOCUS (6 tasks) - Auth test migration (4 failures), debug cleanup, type sync (85 issues), UI guidelines, simplification tasks
-**P4**: Ready (9 tasks) - Core functionality improvements and bug fixes
-**P5**: Ready (4 tasks) - DevOps and developer experience
-**P6**: Ready (15 tasks) - Documentation cleanup and new content
-**P7**: Future (3 research-phase tasks) - Strategic improvements and major features
+**P1**: 🎯 CURRENT FOCUS (2 tasks remaining) - Custom CHPP production migration: finalize migration, extract utilities
+**P2**: 🎯 ACTIVE (8 tasks) - Remove obsolete content, debug scripts, legacy references, documentation waste, minimize complexity
+**P3**: Ready (11 tasks) - UI consistency, core functionality bugs, user experience features
+**P4**: Ready (6 tasks) - DevOps and developer experience
+**P5**: Ready (1 task) - Comprehensive documentation cleanup
+**P6**: Future (4 research-phase tasks) - Strategic improvements and major features
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-**Priority 3: Stability & Simplification Tasks** (Next priority tasks):
-1. **[REFACTOR-025] Complete Auth Blueprint Test Migration** (30-45 min) - P3 - Fix remaining 4 auth test failures by completing mock pattern migration **SIMPLIFICATION** **NEXT TASK**
-2. **[REFACTOR-013] Remove Temporary Debug Scripts** (15 min) - P3 - Clean up check_historical_data.py, test_team_ids.py **READY TO EXECUTE**
-3. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P3 - Consolidate CHPP patterns **READY TO EXECUTE**
-4. **[TEST-014] Fix Auth Blueprint Tests** (1-2 hours) - P3 - Update tests for YouthTeamId handling **READY TO EXECUTE**
-5. **[REFACTOR-002] Type System Consolidation** (6-8 hours) - P3 - Address 85 type drift issues **CRITICAL**
-6. **[UI-011] Core UI Guidelines Implementation** (10-14 hours) - P3 - Unified design system application
-7. **[TEST-004-005] Blueprint & Utils Test Coverage** (4-6 hours) - P3 - Achieve 80% coverage for blueprint modules
+**Priority 1: Custom CHPP Production** (Complete migration to production):
+1. **[INFRA-030] Finalize Custom CHPP Production Migration** (2-3 hours) - P1 - Remove pychpp dependency completely **PRODUCTION READY**
+2. **[REFACTOR-012] Extract CHPP Client Utilities** (2-3 hours) - P1 - Consolidate CHPP patterns for production optimization **READY TO EXECUTE**
 
-**Next Action**: P3 SIMPLIFICATION ACTIVE ✅ - Start with REFACTOR-025 (Complete Auth Test Migration) for immediate quality gate improvement, then REFACTOR-013 (Debug Script Cleanup) for waste elimination.
+
+**Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination):
+1. **[REFACTOR-013] Remove Temporary Debug Scripts** (15 min) - P2 - Clean up debug scripts **READY TO EXECUTE**
+2. **[REFACTOR-021] Remove Legacy CHPP References** (30 min) - P2 - Clean up obsolete pychpp workarounds **READY TO EXECUTE**
+3. **[REFACTOR-026] Remove Startup Debug Output** (15 min) - P2 - Clean up debug print statements **READY TO EXECUTE**
+4. **[REFACTOR-015] Simplify prompts.json UI Guidelines** (30 min) - P2 - Remove redundant UI definitions **READY TO EXECUTE**
+
+**Next Action**: P1 PRODUCTION FOCUS ✅ - Start with INFRA-030 (Finalize Custom CHPP Production Migration) to complete pychpp removal and finalize Custom CHPP production deployment.
 
 ---
 
