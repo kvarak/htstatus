@@ -4,6 +4,44 @@
 > **Created**: January 26, 2026
 > **Update Frequency**: Tasks moved here when completed
 
+## January 27, 2026
+
+### [REFACTOR-012] Extract CHPP Client Utilities
+**Completed**: Jan 27, 2026 | **Actual Effort**: 3 hours | **Priority**: P1
+
+**Summary**: Successfully consolidated CHPP initialization patterns into centralized utilities module. Eliminated 50+ lines of duplication across 3 blueprints while maintaining full functionality.
+
+**Deliverables**:
+- Created app/chpp_utilities.py with 6 utility functions (164 lines)
+- Refactored app/blueprints/auth.py to use centralized utilities
+- Refactored app/blueprints/team.py to use fetch_user_teams utility
+- Refactored app/blueprints/matches.py to use get_chpp_client utility
+- Updated all test mocks to use centralized pattern (create_mock_chpp_utilities)
+- Fixed lint issue ARG001 in tests/conftest.py
+- Zero functional regressions, all 193 tests passing
+
+**Strategic Value**:
+- P1 Custom CHPP Production milestone completion
+- Single source of truth for CHPP operations established
+- Simplified maintenance and testing patterns
+- Quality gates improved to 23/26 passing (88% success)
+- Foundation for future CHPP enhancements
+
+### [TEST-014] Update CHPP Test Mocks
+**Completed**: Jan 27, 2026 | **Actual Effort**: 1 hour | **Priority**: P1
+
+**Summary**: Updated all auth and routes tests to mock centralized chpp_utilities instead of blueprint-specific CHPP imports. Consolidated mock patterns to reduce test duplication.
+
+**Deliverables**:
+- Updated 5 auth blueprint tests with centralized utility mocking
+- Updated 2 routes comprehensive tests with proper import location mocking
+- Added create_mock_chpp_utilities() helper to tests/conftest.py
+- All tests passing with consistent mock patterns
+
+**Strategic Value**: Simplified test maintenance, eliminated test mock duplication, improved test reliability.
+
+---
+
 ## January 26, 2026
 
 ### [TEST-016] CHPP API Research & Documentation
