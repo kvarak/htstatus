@@ -26,22 +26,16 @@
 
 ## Current Focus
 
-**Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
-- ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
-- ✅ [INFRA-028] Fix Deployment Script Dependencies (15 min) - **DEPLOYMENT CRITICAL** Apply simplification hierarchy to deployment: remove .venv cache, use direct dependency installation. **RESOLVED**
-- ✅ [INFRA-030] Unify Python Version Management (10 min) - **DEPLOYMENT CRITICAL** Use UV to ensure same Python version (3.14) in development and deployment, eliminate compatibility workarounds. **RESOLVED**
-- ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
+**Priority 0: Critical Bugs** - ✅ COMPLETE - All critical bugs resolved, moved to history
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
 - 🎯 [UI-012] Fix Version Display Format (15 min) - **NEW** Change version display from "3.0-5-g949b2e1" to semantic versioning "3.0.5-g949b2e1" format in templates **UI CONSISTENCY**
 - 🎯 [REFACTOR-022] Fix Legacy Branding References (30 min) - **NEW** Update "HattrickPlanner" references to "HTStatus" in templates and docs **BRANDING CONSISTENCY**
 - 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments **WASTE ELIMINATION**
-- 🎯 [REFACTOR-013] Remove Temporary Debug Scripts (15 min) - **NEW** Clean up check_historical_data.py, test_team_ids.py **WASTE ELIMINATION**
-- 🎯 [REFACTOR-015] Simplify prompts.json UI Guidelines (30 min) - **NEW** Remove redundant UI definitions, reference .project/ui-guidelines.md instead **MINIMIZE DUPLICATION**
+- 🎯 [REFACTOR-027] Simplify Startup Display Logic (15 min) - **REVIEW DISCOVERY** Reduce factory.py _display_startup_status() hardcoded strings, improve consistency **REDUCE COMPLEXITY**
 - 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **MINIMIZE INCONSISTENCY**
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED** Remove legacy config files, obsolete content **MINIMIZE DOCUMENTATION WASTE**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup and obsolete code removal **MINIMIZE COMPLEXITY**
-- 🎯 [INFRA-009] Dependency Strategy (4-6 hours) - Remove unused dependencies, consolidate tooling **MINIMIZE DEPENDENCIES**
 
 **Priority 3: Stability & Core Features** (It stays working and does what it should)
 - 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED**
@@ -88,9 +82,9 @@
 
 ## ✅ All Priority Levels Summary
 
-**P0**: ✅ COMPLETE (8/8) - All critical bugs resolved, zero regressions
+**P0**: ✅ COMPLETE (4/4) - All critical bugs resolved, zero regressions
 **P1**: ✅ COMPLETE (4/4) - Custom CHPP production migration complete
-**P2**: 🎯 ACTIVE (7 tasks) - Remove obsolete content, debug scripts, legacy references, documentation waste, minimize complexity
+**P2**: 🎯 ACTIVE (5 tasks) - Remove obsolete content, legacy references, documentation waste, minimize complexity
 **P3**: Ready (11 tasks) - UI consistency, core functionality bugs, user experience features
 **P4**: Ready (6 tasks) - DevOps and developer experience
 **P5**: Ready (1 task) - Comprehensive documentation cleanup
@@ -99,11 +93,12 @@
 ## Ready to Execute Tasks (🎯 Immediate)
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination):
-1. **[REFACTOR-013] Remove Temporary Debug Scripts** (15 min) - P2 - Clean up debug scripts **READY TO EXECUTE**
-2. **[REFACTOR-021] Remove Legacy CHPP References** (30 min) - P2 - Clean up obsolete pychpp workarounds **READY TO EXECUTE**
-3. **[REFACTOR-015] Simplify prompts.json UI Guidelines** (30 min) - P2 - Remove redundant UI definitions **READY TO EXECUTE**
+1. **[REFACTOR-021] Remove Legacy CHPP References** (30 min) - P2 - Clean up obsolete pychpp workarounds **READY TO EXECUTE**
+2. **[UI-012] Fix Version Display Format** (15 min) - P2 - Change to semantic versioning format **READY TO EXECUTE**
+3. **[REFACTOR-022] Fix Legacy Branding References** (30 min) - P2 - Update HattrickPlanner→HTStatus references **READY TO EXECUTE**
+4. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
 
-**Next Action**: P1 FINAL TASK ✅ - Execute REFACTOR-012 (Extract CHPP Client Utilities) to complete P1 Custom CHPP production milestone, then proceed to P2 minimization tasks.
+**Next Action**: Execute REFACTOR-021 (Remove Legacy CHPP References) - 30 minutes to clean up obsolete pychpp workarounds and comments.
 
 ---
 
@@ -854,6 +849,44 @@ This creates:
 - Single source of truth established (ui-guidelines.md)
 
 **Expected Outcomes**: 75% reduction in prompts.json UI section, eliminated duplication, improved maintainability, single authoritative source for design system
+
+---
+
+### [REFACTOR-027] Simplify Startup Display Logic
+**Status**: 🎯 Ready to Execute | **Effort**: 15 minutes | **Priority**: P2 | **Impact**: Code simplification, reduce hardcoded strings
+**Dependencies**: None | **Strategic Value**: Improve startup logging consistency and maintainability
+
+**Problem Statement** (Discovered during review process):
+The `_display_startup_status()` function in app/factory.py contains hardcoded strings and could be simplified. The function shows CHPP client status but lacks consistency with broader feature flag patterns used elsewhere in the application.
+
+**Current Implementation**:
+```python
+def _display_startup_status():
+    chpp_status = "✅ Using Custom CHPP Client (app.chpp)"
+    print(f"\n{'='*60}")
+    print("Configuration Status:")
+    print(f"  {chpp_status}")
+    print(f"{'='*60}\n")
+```
+
+**Implementation**:
+1. **Reduce Hardcoded Strings** (10 min):
+   - Extract configuration logic to use actual feature flag detection
+   - Use configuration module to determine CHPP client type dynamically
+   - Replace hardcoded "✅ Using Custom CHPP Client" with dynamic status
+
+2. **Improve Consistency** (5 min):
+   - Align display format with other application logging patterns
+   - Ensure function follows project standards for status display
+   - Test startup display shows accurate configuration
+
+**Success Criteria**:
+- Startup status reflects actual CHPP client configuration (not hardcoded)
+- Consistent formatting with other application status displays
+- No functional changes to startup sequence
+- Function maintains clarity and readability
+
+**Expected Outcomes**: Reduced hardcoded strings, improved configuration accuracy, better maintenance consistency
 
 ---
 
