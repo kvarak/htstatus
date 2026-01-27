@@ -2,11 +2,11 @@ services:
   # PostgreSQL database
   postgres:
     image: postgres:13-alpine
-    container_name: htstatus_postgres
+    container_name: htplanner_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-htplanner}
-      POSTGRES_USER: ${POSTGRES_USER:-htstatus}
+      POSTGRES_USER: ${POSTGRES_USER:-htplanner}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-development}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
@@ -14,17 +14,17 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-htstatus} -d ${POSTGRES_DB:-htplanner}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-htplanner} -d ${POSTGRES_DB:-htplanner}"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - htstatus_network
+      - htplanner_network
 
   # Redis for caching (Task 4.1 preparation)
   redis:
     image: redis:7-alpine
-    container_name: htstatus_redis
+    container_name: htplanner_redis
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"
@@ -37,15 +37,15 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - htstatus_network
+      - htplanner_network
 
   # pgAdmin for database administration (development only)
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: htstatus_pgadmin
+    container_name: htplanner_pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@htstatus.local}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@htplanner.local}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-development}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
@@ -56,7 +56,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - htstatus_network
+      - htplanner_network
     profiles:
       - admin
 
@@ -69,5 +69,5 @@ volumes:
     driver: local
 
 networks:
-  htstatus_network:
+  htplanner_network:
     driver: bridge

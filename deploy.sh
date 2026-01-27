@@ -7,7 +7,7 @@
 
 show_help() {
   cat << EOF
-HT Status Deployment Script
+HattrickPlanner Deployment Script
 
 Usage: ./deploy.sh --run [OPTIONS]
 
