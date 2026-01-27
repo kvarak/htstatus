@@ -211,7 +211,15 @@ if ! command -v uv &> /dev/null; then
     pip3 install --user uv
 fi
 
+# Force clean dependency installation for updated pyproject.toml
+echo "=== Installing Dependencies ==="
+# Clear any cached virtual environment
+rm -rf .venv 2>/dev/null || true
+# Fresh install from pyproject.toml
 uv sync
+# Explicitly install the new dependencies that were added
+uv pip install requests requests-oauthlib
+echo "✓ Dependencies installed/updated"
 
 echo ""
 echo "=== Running Database Migrations ==="
