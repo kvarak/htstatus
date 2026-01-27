@@ -211,15 +211,15 @@ if ! command -v uv &> /dev/null; then
     pip3 install --user uv
 fi
 
-# Force clean dependency installation for updated pyproject.toml
+# Force clean dependency installation with consistent Python version
 echo "=== Installing Dependencies ==="
 # Clear any cached virtual environment
 rm -rf .venv 2>/dev/null || true
-# Fresh install from pyproject.toml
-uv sync
+# Use same Python version as development (3.14.2)
+uv sync --python 3.14
 # Explicitly install the new dependencies that were added
 uv pip install requests requests-oauthlib
-echo "✓ Dependencies installed/updated"
+echo "✓ Dependencies installed/updated with Python 3.14"
 
 echo ""
 echo "=== Running Database Migrations ==="

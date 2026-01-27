@@ -29,7 +29,7 @@
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
 - ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
 - ✅ [INFRA-028] Fix Deployment Script Dependencies (15 min) - **DEPLOYMENT CRITICAL** Apply simplification hierarchy to deployment: remove .venv cache, use direct dependency installation. **RESOLVED**
-- ✅ [INFRA-029] Fix Python 3.9 Type Compatibility (10 min) - **DEPLOYMENT CRITICAL** Replace Python 3.10+ union syntax (int | None) with Optional[int] for Python 3.9 compatibility. **RESOLVED**
+- ✅ [INFRA-030] Unify Python Version Management (10 min) - **DEPLOYMENT CRITICAL** Use UV to ensure same Python version (3.14) in development and deployment, eliminate compatibility workarounds. **RESOLVED**
 - ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
