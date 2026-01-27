@@ -206,6 +206,50 @@
 
 **Strategic Value**: Eliminated significant maintenance overhead while establishing clear, authoritative development standards for both AI agents and human developers.
 
+### [REFACTOR-021] Remove Legacy CHPP References ✅ WASTE ELIMINATION
+**Completed**: 2026-01-27
+**Effort**: 30 minutes
+**Impact**: Code clarity and maintainability - Removed obsolete pychpp-specific comments and workarounds, updated terminology to generic API references
+
+**Problem**: Legacy comments and references to specific pychpp version workarounds created confusion in codebase:
+- Comments referencing "pychpp 0.5.10+" changes that are no longer relevant
+- Version-specific workarounds that apply to generic API behavior
+- References to pychpp-specific bugs now fixed in Custom CHPP client
+- Inconsistent terminology mixing pychpp specifics with general API concepts
+
+**Comprehensive Cleanup**:
+- **Code Comments**: Updated 7 pychpp-specific comments to generic API terminology
+- **app/blueprints/team.py**: Removed pychpp version references in player data mapping
+- **app/blueprints/auth.py**: Updated YouthTeamId comments from "pychpp treats as required" to "API treats as required"
+- **app/blueprints/matches.py**: Updated trophy comment from pyCHPP version-specific to generic
+- **Backlog Documentation**: Cleaned BUG-008, BUG-009 task descriptions from pychpp upgrade references
+- **TECHNICAL.md**: Updated API integration description to highlight Custom CHPP as primary with pychpp fallback
+
+**Technical Changes**:
+- Removed 7 obsolete version-specific comments (pychpp 0.5.10+)
+- Updated terminology to focus on API behavior rather than library implementation
+- Maintained all functional logic while improving code clarity
+- Fixed 2 lint issues discovered during cleanup (unused import, unsorted imports)
+
+**Scout Mindset Applied**:
+- Fixed lint issues: Removed unused `re` import, sorted imports in app/utils.py
+- Improved code consistency across CHPP integration files
+- Enhanced documentation clarity by removing library-specific references
+
+**Validation**:
+- All 23/26 quality gates maintained (no regressions) ✅
+- File format checks passed ✅
+- Lint issues fixed (I001, F401) ✅
+- No functional changes to API integration ✅
+
+**Waste Elimination Results**:
+- 7 obsolete comments cleaned up
+- Improved code clarity by removing version-specific references
+- Enhanced maintainability with generic API terminology
+- Reduced confusion for future developers unfamiliar with pychpp history
+
+**Strategic Value**: Cleaner codebase with reduced historical baggage, improved maintainability, and consistent terminology focused on current Custom CHPP implementation rather than legacy workarounds.
+
 **Simplification Applied**:
 - **Reduce complexity**: Removed unnecessary parameter that served no purpose
 - **Reduce waste**: Cleaned up outdated docstring referencing eliminated feature flag logic

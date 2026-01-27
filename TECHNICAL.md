@@ -24,7 +24,7 @@ Critical understanding for working with Hattrick's data model:
 - **Backend**: Python (Flask), SQLAlchemy ORM
 - **Frontend**: React (Vite, TypeScript, TailwindCSS, Radix UI), Jinja2 templates (legacy)
 - **Database**: PostgreSQL
-- **API Integration**: pychpp 0.5.10 (OAuth, CHPP API) - upgraded January 2026 for security patches
+- **API Integration**: Custom CHPP client (app/chpp/) with pychpp 0.5.10 fallback - upgraded January 2026
 - **Dev Tools**: Makefile, Docker Compose, UV (Python deps), pytest, ruff, mypy
 - **PWA Features**: Service Worker, App Manifest, responsive design, offline functionality
 
@@ -34,10 +34,10 @@ Critical understanding for working with Hattrick's data model:
 - **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked (19/26 quality gates passing)
 - **CI/CD**: GitHub Actions for linting and basic CI
 - **Route Architecture**: Modern Flask blueprint architecture with 6 blueprints (auth, main, player, team, matches, training) registered in factory.py
-- **CHPP Integration Notes**: pychpp 0.5.10 has YouthTeamId parsing bug for users without youth teams - workaround implemented via XML extraction from managercompendium endpoint
-- **CHPP Feature Flag**: `USE_CUSTOM_CHPP` environment variable toggles between pychpp and custom CHPP client (default: false for safe deployment)
-  - `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (production stable, full backward compatibility)
-  - `USE_CUSTOM_CHPP=true`: Uses custom CHPP client (app/chpp/) - **PRODUCTION READY as of INFRA-026**
+- **CHPP Integration Notes**: Custom CHPP client handles YouthTeamId as optional field, fixing parsing issues for users without youth teams
+- **CHPP Feature Flag**: `USE_CUSTOM_CHPP` environment variable toggles between custom CHPP and pychpp client (default: false for safe deployment)
+  - `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (legacy fallback, full backward compatibility)
+  - `USE_CUSTOM_CHPP=true`: Uses custom CHPP client (app/chpp/) - **PRODUCTION READY**
   - **Custom CHPP Client Endpoints**: ✅ ALL IMPLEMENTED
     - `user()` - Get current user and team IDs
     - `team(ht_id)` - Get team details and players
@@ -46,7 +46,7 @@ Critical understanding for working with Hattrick's data model:
     - YouthTeamId bug fixed (handles as optional field)
     - XML parsing with safe field extraction
     - Zero breaking changes from pychpp interface
-  - **Migration Path**: Custom CHPP client can replace pychpp entirely; pychpp can be removed from dependencies once fully tested in production
+  - **Migration Path**: Custom CHPP client can fully replace pychpp; fallback dependency can be removed once fully tested in production
 
   - **Rollback**: Instant rollback via environment variable toggle (no restart required)
   - **Implementation**: Conditional imports in blueprints (auth, team, matches) and utils

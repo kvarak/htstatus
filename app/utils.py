@@ -81,7 +81,6 @@ def get_version_info():
     - Git hash for identification
     """
     import subprocess
-    import re
 
     try:
         # Get git describe output

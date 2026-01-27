@@ -29,9 +29,8 @@
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical bugs resolved, moved to history
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
-- 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments **WASTE ELIMINATION**
 - 🎯 [REFACTOR-027] Simplify Startup Display Logic (15 min) - **REVIEW DISCOVERY** Reduce factory.py _display_startup_status() hardcoded strings, improve consistency **REDUCE COMPLEXITY**
-- 🎯 [REFACTOR-028] Fix File Format Standards Issues (15 min) - **REVIEW DISCOVERY** Address 2 file format errors from quality gates **REDUCE WASTE**
+- 🎯 [REFACTOR-028] Fix File Format Standards Issues (15 min) - **OBSOLETE** File format checks now passing (✅ PASS in latest test-all), task may be unnecessary **REVIEW NEEDED**
 - 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **MINIMIZE INCONSISTENCY**
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED** Remove legacy config files, obsolete content **MINIMIZE DOCUMENTATION WASTE**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup and obsolete code removal **MINIMIZE COMPLEXITY**
@@ -83,7 +82,7 @@
 
 **P0**: ✅ COMPLETE (4/4) - All critical bugs resolved, zero regressions
 **P1**: ✅ COMPLETE (4/4) - Custom CHPP production migration complete
-**P2**: 🎯 ACTIVE (2 tasks) - Remove obsolete content, legacy references, documentation waste, minimize complexity
+**P2**: 🎯 ACTIVE (1 task) - Remove obsolete content, legacy references, documentation waste, minimize complexity
 **P3**: Ready (11 tasks) - UI consistency, core functionality bugs, user experience features
 **P4**: Ready (6 tasks) - DevOps and developer experience
 **P5**: Ready (1 task) - Comprehensive documentation cleanup
@@ -92,10 +91,9 @@
 ## Ready to Execute Tasks (🎯 Immediate)
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination):
-1. **[REFACTOR-021] Remove Legacy CHPP References** (30 min) - P2 - Clean up obsolete pychpp workarounds **READY TO EXECUTE**
-2. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
+1. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
 
-**Next Action**: Execute REFACTOR-021 (Remove Legacy CHPP References) - 30 minutes to clean up obsolete pychpp workarounds and comments.
+**Next Action**: Execute REFACTOR-027 (Simplify Startup Display Logic) - 15 minutes to reduce hardcoded strings and improve consistency.
 
 ---
 
@@ -652,7 +650,7 @@ Uncaught TypeError: node.getAttribute is not a function
 ```
 
 **Root Cause**:
-The sorttable.js library is attempting to process table cells that may contain text nodes directly, or the table structure has changed after the pychpp 0.5.10 upgrade modifications, causing the sorting script to encounter unexpected node types.
+The sorttable.js library is attempting to process table cells that may contain text nodes directly, or the table structure has changed, causing the sorting script to encounter unexpected node types.
 
 **Implementation**:
 1. Add null/type checking before calling `getAttribute()` in getInnerText function
@@ -671,24 +669,24 @@ The sorttable.js library is attempting to process table cells that may contain t
 **Dependencies**: None | **Strategic Value**: Core functionality restoration
 
 **Problem Statement**:
-Error `[main.py] Error calculating player changes: list index out of range` occurs when displaying the home page, preventing player skill change timeline from displaying correctly. This error appears after the pychpp 0.5.10 upgrade.
+Error `[main.py] Error calculating player changes: list index out of range` occurs when displaying the home page, preventing player skill change timeline from displaying correctly.
 
 **Error Context**:
 - Occurs in main.py when trying to calculate player changes for display
 - Related to accessing list indices that may not exist
-- Likely caused by changes in data structure after pychpp upgrade
+- Likely caused by changes in data structure or API response format
 - May be related to how player data or team names are stored/accessed
 
 **Root Cause Investigation**:
 The error suggests that code is trying to access a list index that doesn't exist, possibly:
 1. Accessing team names by index when list is empty or shorter than expected
-2. Player data structure changes from pychpp 0.5.10 affecting list access patterns
+2. Player data structure changes affecting list access patterns
 3. Session data structure inconsistencies after API changes
 
 **Implementation**:
 1. Locate the specific code in main.py that calculates player changes
 2. Add bounds checking before accessing list indices
-3. Verify data structure assumptions are still valid after pychpp upgrade
+3. Verify data structure assumptions are still valid
 4. Handle edge cases (empty lists, None values)
 5. Test with various player data scenarios
 

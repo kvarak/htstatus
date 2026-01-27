@@ -164,7 +164,7 @@ def login():
                     dprint(1, f"Got teams from user: {all_teams}")
                 except Exception as user_error:
                     dprint(1, f"Exception in chpp.user(): {user_error}")
-                    # YouthTeamId is optional but pychpp treats it as required
+                    # YouthTeamId is optional but API treats it as required
                     # Work around by accessing teams data directly
                     if "YouthTeamId" in str(user_error):
                         dprint(1, f"YouthTeamId parsing error (user has no youth team): {user_error}")
@@ -445,7 +445,7 @@ def handle_oauth_callback(oauth_verifier):
             session["team_id"] = all_teams[0]
             dprint(1, f"OAuth callback team setup complete: {all_teams} with names: {all_team_names}")
         except Exception as team_setup_error:
-            # YouthTeamId is optional but pychpp treats it as required
+            # YouthTeamId is optional but API treats it as required
             if "YouthTeamId" in str(team_setup_error):
                 dprint(1, f"YouthTeamId parsing error (user has no youth team): {team_setup_error}")
                 try:

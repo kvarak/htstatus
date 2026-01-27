@@ -129,7 +129,7 @@ def stats():
     # Get match statistics for the team
     match_stats = get_team_match_statistics(teamid)
 
-    # Get competition data from CHPP (trophies not supported in this pyCHPP version)
+    # Get competition data from CHPP (trophies not currently supported)
     trophies = []
     competition_info = {}
     try:

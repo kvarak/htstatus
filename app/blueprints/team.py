@@ -181,10 +181,10 @@ def update():
             thisplayer["number"] = p.number
             thisplayer["category_id"] = p.category_id
             thisplayer["owner_notes"] = p.owner_notes
-            thisplayer["age_years"] = p.age  # pychpp 0.5.10+ uses 'age' instead of 'age_years'
+            thisplayer["age_years"] = p.age
             thisplayer["age_days"] = p.age_days
             thisplayer["age"] = p.age
-            # next_birthday no longer available in pychpp 0.5.10+
+            # next_birthday not available
             thisplayer["next_birthday"] = None
 
             if p.arrival_date:
@@ -202,7 +202,7 @@ def update():
             thisplayer["cards"] = p.cards
             thisplayer["injury_level"] = p.injury_level
             thisplayer["statement"] = p.statement
-            # language/language_id removed in pychpp 0.5.10+, use country_id instead
+            # language/language_id use country_id instead
             thisplayer["language"] = None
             thisplayer["language_id"] = getattr(p, 'country_id', None)
             thisplayer["agreeability"] = p.agreeability
@@ -212,7 +212,7 @@ def update():
             thisplayer["loyalty"] = p.loyalty
             thisplayer["aggressiveness"] = p.aggressiveness
             thisplayer["specialty"] = p.specialty
-            # native_country_id/native_league_id/native_league_name removed in pychpp 0.5.10+
+            # native_country_id/native_league_id/native_league_name use country_id fallback
             thisplayer["native_country_id"] = getattr(p, 'country_id', None)
             thisplayer["native_league_id"] = None
             thisplayer["native_league_name"] = None
