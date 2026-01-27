@@ -1,6 +1,6 @@
-# HTStatus Development Backlog
+# HattrickPlanner Development Backlog
 
-> **Purpose**: Prioritized active task tracking with 7-level priority system for HTStatus development
+> **Purpose**: Prioritized active task tracking with 7-level priority system for HattrickPlanner development
 > **Audience**: Developers and AI agents selecting and executing tasks
 > **Update Frequency**: Continuously - update status when starting/completing tasks, add new tasks as discovered
 > **Standards**: Follow [rules.md](rules.md) for editing guidelines
@@ -30,9 +30,10 @@
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
 - 🎯 [UI-012] Fix Version Display Format (15 min) - **NEW** Change version display from "3.0-5-g949b2e1" to semantic versioning "3.0.5-g949b2e1" format in templates **UI CONSISTENCY**
-- 🎯 [REFACTOR-022] Fix Legacy Branding References (30 min) - **NEW** Update "HattrickPlanner" references to "HTStatus" in templates and docs **BRANDING CONSISTENCY**
+- ✅ [REFACTOR-022] Fix Legacy Branding References (90 min) - **COMPLETE** Update "HTStatus" references to "HattrickPlanner" in templates and docs **BRANDING CONSISTENCY**
 - 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments **WASTE ELIMINATION**
 - 🎯 [REFACTOR-027] Simplify Startup Display Logic (15 min) - **REVIEW DISCOVERY** Reduce factory.py _display_startup_status() hardcoded strings, improve consistency **REDUCE COMPLEXITY**
+- 🎯 [REFACTOR-028] Fix File Format Standards Issues (15 min) - **REVIEW DISCOVERY** Address 2 file format errors from quality gates **REDUCE WASTE**
 - 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **MINIMIZE INCONSISTENCY**
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED** Remove legacy config files, obsolete content **MINIMIZE DOCUMENTATION WASTE**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup and obsolete code removal **MINIMIZE COMPLEXITY**
@@ -95,10 +96,9 @@
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination):
 1. **[REFACTOR-021] Remove Legacy CHPP References** (30 min) - P2 - Clean up obsolete pychpp workarounds **READY TO EXECUTE**
 2. **[UI-012] Fix Version Display Format** (15 min) - P2 - Change to semantic versioning format **READY TO EXECUTE**
-3. **[REFACTOR-022] Fix Legacy Branding References** (30 min) - P2 - Update HattrickPlanner→HTStatus references **READY TO EXECUTE**
-4. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
+3. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
 
-**Next Action**: Execute REFACTOR-021 (Remove Legacy CHPP References) - 30 minutes to clean up obsolete pychpp workarounds and comments.
+**Next Action**: Execute UI-012 (Fix Version Display Format) - 15 minutes to update version format from git describe to semantic versioning.
 
 ---
 
@@ -133,6 +133,42 @@ Current version display format shows "3.0-5-g949b2e1" (git describe format) inst
 - All template displays use consistent formatting
 - Fallback development version uses same format: "2.0.0-dev"
 - No functional changes to version detection, only formatting
+
+---
+
+### [REFACTOR-028] Fix File Format Standards Issues
+**Status**: 🎯 Ready to Execute | **Effort**: 15 minutes | **Priority**: P2 | **Impact**: Code quality, repository hygiene
+**Dependencies**: None | **Strategic Value**: Eliminate quality gate failures, maintain standards consistency
+
+**Problem Statement** (Discovered during review process):
+Quality gate testing revealed 2 file format errors that need addressing:
+- Files missing trailing newlines or having trailing whitespace
+- Inconsistent file formatting that fails `make fileformat` checks
+- These issues impact code quality gates (currently 22/26 passing instead of optimal)
+
+**Implementation**:
+1. **Run File Format Check** (5 min):
+   - Execute `make fileformat` to identify specific file format issues
+   - Document which files have trailing whitespace or missing newlines
+   - Understand scope of format violations
+
+2. **Apply Auto-fixes** (5 min):
+   - Run `make fileformat-fix` to automatically resolve formatting issues
+   - Verify that auto-fix resolves the identified problems
+   - Check that no new issues are introduced
+
+3. **Validate Resolution** (5 min):
+   - Re-run `make fileformat` to confirm all issues resolved
+   - Re-run `make test-all` to verify quality gate improvement
+   - Ensure file format gate changes from FAIL to PASS
+
+**Success Criteria**:
+- `make fileformat` passes with 0 errors
+- Quality gates improve from 22/26 to 23/26 passing
+- All files have proper trailing newlines and no trailing whitespace
+- No functional changes to code, only formatting standards compliance
+
+**Expected Outcomes**: Improved quality gate score, cleaner repository hygiene, automated format standards compliance
 
 ---
 
