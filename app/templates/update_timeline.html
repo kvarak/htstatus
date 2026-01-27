@@ -366,7 +366,7 @@
                   {% if week.is_current %}
                     Today through 6 days ago
                   {% else %}
-                    {{ week.days_ago_start }}-{{ week.days_ago_end }} days ago
+                    {{ week.days_ago_end }}-{{ week.days_ago_start }} days ago
                   {% endif %}
                 </div>
                 {% if week.is_current %}
