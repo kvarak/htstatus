@@ -3,7 +3,7 @@
 > **Purpose**: Prioritized active task tracking with 7-level priority system for HattrickPlanner development
 > **Audience**: Developers and AI agents selecting and executing tasks
 > **Update Frequency**: Continuously - update status when starting/completing tasks, add new tasks as discovered
-> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+> **Standards**: Follow [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) for editing guidelines
 
 ## Management Rules
 
@@ -29,8 +29,6 @@
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical bugs resolved, moved to history
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
-- 🎯 [UI-012] Fix Version Display Format (15 min) - **NEW** Change version display from "3.0-5-g949b2e1" to semantic versioning "3.0.5-g949b2e1" format in templates **UI CONSISTENCY**
-- ✅ [REFACTOR-022] Fix Legacy Branding References (90 min) - **COMPLETE** Update "HTStatus" references to "HattrickPlanner" in templates and docs **BRANDING CONSISTENCY**
 - 🎯 [REFACTOR-021] Remove Legacy CHPP References (30 min) - **NEW** Clean up obsolete pychpp workarounds and comments **WASTE ELIMINATION**
 - 🎯 [REFACTOR-027] Simplify Startup Display Logic (15 min) - **REVIEW DISCOVERY** Reduce factory.py _display_startup_status() hardcoded strings, improve consistency **REDUCE COMPLEXITY**
 - 🎯 [REFACTOR-028] Fix File Format Standards Issues (15 min) - **REVIEW DISCOVERY** Address 2 file format errors from quality gates **REDUCE WASTE**
@@ -65,7 +63,7 @@
 
 **Priority 5: Documentation & Polish** (Make it complete)
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED TASK** (includes UI consolidation, env config, navigation, waste elimination)
-  - Remove legacy configuration files and unused configs/duplicates (DOC-026) - ✅ requirements.txt COMPLETE, .flake8 remaining
+  - Remove legacy configuration files and unused configs/duplicates (DOC-026) - ✅ requirements.txt COMPLETE ✅ .flake8 COMPLETE (moved to history)
   - Consolidate environment templates from 3 to 2 variants (DOC-027)
   - Merge scattered README setup instructions (DOC-028)
   - Clean TECHNICAL.md obsolete route architecture content (DOC-023)
@@ -85,7 +83,7 @@
 
 **P0**: ✅ COMPLETE (4/4) - All critical bugs resolved, zero regressions
 **P1**: ✅ COMPLETE (4/4) - Custom CHPP production migration complete
-**P2**: 🎯 ACTIVE (5 tasks) - Remove obsolete content, legacy references, documentation waste, minimize complexity
+**P2**: 🎯 ACTIVE (2 tasks) - Remove obsolete content, legacy references, documentation waste, minimize complexity
 **P3**: Ready (11 tasks) - UI consistency, core functionality bugs, user experience features
 **P4**: Ready (6 tasks) - DevOps and developer experience
 **P5**: Ready (1 task) - Comprehensive documentation cleanup
@@ -95,46 +93,13 @@
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination):
 1. **[REFACTOR-021] Remove Legacy CHPP References** (30 min) - P2 - Clean up obsolete pychpp workarounds **READY TO EXECUTE**
-2. **[UI-012] Fix Version Display Format** (15 min) - P2 - Change to semantic versioning format **READY TO EXECUTE**
-3. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
+2. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
 
-**Next Action**: Execute UI-012 (Fix Version Display Format) - 15 minutes to update version format from git describe to semantic versioning.
+**Next Action**: Execute REFACTOR-021 (Remove Legacy CHPP References) - 30 minutes to clean up obsolete pychpp workarounds and comments.
 
 ---
 
 ## Priority 2 Detailed Tasks
-
-### [UI-012] Fix Version Display Format
-**Status**: 🎯 Ready to Execute | **Effort**: 15 minutes | **Priority**: P2 | **Impact**: UI consistency, version clarity
-**Dependencies**: None | **Strategic Value**: Improve version display formatting for semantic versioning standard
-
-**Problem Statement**:
-Current version display format shows "3.0-5-g949b2e1" (git describe format) instead of semantic versioning format "3.0.5-g949b2e1". The git describe output is directly parsed without proper formatting to match SemVer convention.
-
-**Current Implementation**:
-- Git command: `git describe --tags` returns format like "3.0-5-g949b2e1"
-- Parsing code splits on "-" and reconstructs as "3.0" + "." + "5" + "-" + "g949b2e1"
-- Displays in templates: main.html line 71-72, line 154, update.html line 202
-
-**Implementation**:
-1. **Update Version Formatting Logic** (10 min):
-   - Modify app/routes_bp.py lines 57-59
-   - Parse git describe output: "3.0-5-g949b2e1"
-   - Format to semantic version: "3.0.5-g949b2e1" (replace dashes with dots before 'g')
-   - Update version variable: `fullversion = f"{versionstr[0]}.{versionstr[1]}-{versionstr[2]}"`
-
-2. **Verify Display** (5 min):
-   - Test version display in Flask templates
-   - Confirm format shows as "x.y.z-gsha" across all templates
-   - Verify fallback version format also uses semantic versioning
-
-**Success Criteria**:
-- Version displays as semantic format "3.0.5-g949b2e1" (not "3.0-5-g949b2e1")
-- All template displays use consistent formatting
-- Fallback development version uses same format: "2.0.0-dev"
-- No functional changes to version detection, only formatting
-
----
 
 ### [REFACTOR-028] Fix File Format Standards Issues
 **Status**: 🎯 Ready to Execute | **Effort**: 15 minutes | **Priority**: P2 | **Impact**: Code quality, repository hygiene

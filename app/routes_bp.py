@@ -1,6 +1,6 @@
 """Flask routes converted to Blueprint pattern for HT Status application."""
 
-import subprocess  # noqa: B404 - Used only for git version detection (static commands)
+# subprocess import removed - using shared version detection from app.utils
 import time
 
 from flask import Blueprint
@@ -45,22 +45,15 @@ def initialize_routes(app, _db_instance):
     consumer_key = app.config.get("CONSUMER_KEY", "dev_key")
     consumer_secret = app.config.get("CONSUMER_SECRETS", "dev_secret")
 
-    # Handle version detection safely
+    # Handle version detection using shared utility
     print("DEBUG: initialize_routes - Detecting version")
-    # Security Note: Git version detection for UI display only
-    # - Static command with no user input injection vectors
-    # - Development/operations utility with fallback for missing git
-    # - Risk is theoretical (partial path warning) rather than practical
-    # - Acceptable for development tooling purposes
-    try:
-        versionstr = subprocess.check_output(["git", "describe", "--tags"]).strip()  # noqa: B607,B603
-        versionstr = versionstr.decode("utf-8").split("-")
-        fullversion = versionstr[0] + "." + versionstr[1] + "-" + versionstr[2]
-        version = versionstr[0] + "." + versionstr[1]
-    except (subprocess.CalledProcessError, FileNotFoundError, IndexError):
-        # Fallback for development environment
-        fullversion = "2.0.0-dev"
-        version = "2.0.0"
+    from app.utils import get_version_info
+    version_info = get_version_info()
+
+    # Extract version variables for module-level access
+    versionstr = version_info["versionstr"]
+    fullversion = version_info["fullversion"]
+    version = version_info["version"]
 
     timenow = time.strftime("%Y-%m-%d %H:%M:%S")
     debug_level = app.config.get("DEBUG_LEVEL", 1)

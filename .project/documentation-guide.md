@@ -8,7 +8,7 @@
 
 | What to Document | Where to Put It | When to Update |
 |------------------|----------------|----------------|
-| **Development rules & standards** | [.project/rules.md](.project/rules.md) | When coding conventions or quality gates change |
+| **Development rules & standards** | [.github/agents/htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) | When coding conventions or quality gates change |
 | **Active tasks & priorities** | [.project/backlog.md](.project/backlog.md) | When starting/completing tasks or discovering new work |
 | **Current project status** | [.project/progress.md](.project/progress.md) | After milestones, when metrics change, or status shifts |
 | **System architecture** | [.project/architecture.md](.project/architecture.md) | When structure, data flow, or tech stack changes |
@@ -34,7 +34,7 @@
 **Audience**: Developers, AI agents, project maintainers
 
 **Key Files**:
-- **rules.md**: Authoritative standards and conventions (READ THIS FIRST)
+- **htplanner-ai-agent.md**: Development standards and AI behavior (in .github/agents/)
 - **backlog.md**: Prioritized task tracking with 7-level priority system
 - **progress.md**: Current state, metrics, accomplishments, blockers
 - **architecture.md**: System structure, components, data flow
@@ -107,7 +107,7 @@
 Ask yourself these questions:
 
 1. **Is it a development rule or standard?**
-   - ✅ → [.project/rules.md](.project/rules.md)
+   - ✅ → [.github/agents/htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md)
    - Examples: coding conventions, quality gates, workflow commands
 
 2. **Is it an active task or todo item?**

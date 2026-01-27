@@ -3,11 +3,11 @@
 > **Purpose**: Long-term roadmap, requirements, and future opportunities for HTStatus project
 > **Audience**: Developers and project maintainers planning strategic direction
 > **Update Frequency**: When project goals shift, requirements change, or new opportunities identified
-> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+> **Standards**: Follow [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) for editing guidelines
 
 ## Quick Navigation
 🔗 **Project Documentation**: [Architecture](architecture.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
-🚀 **Development**: [Prompts](prompts.json) • [Rules](rules.md) • [Technical Docs](../TECHNICAL.md) • [README](../README.md)
+🚀 **Development**: [Prompts](prompts.json) • [Agent Standards](../.github/agents/htplanner-ai-agent.md) • [Technical Docs](../TECHNICAL.md) • [README](../README.md)
 ✅ **Latest**: P0 CRITICAL BUGS COMPLETE + BACKLOG CLEANED - All authentication issues resolved, completed tasks moved to history - January 27, 2026
 
 ## Project Requirements

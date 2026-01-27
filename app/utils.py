@@ -67,28 +67,104 @@ def diff(first, second):
 
 
 # =============================================================================
+# Version Detection Utilities
+# =============================================================================
+
+
+def get_version_info():
+    """Get version information with feature-based minor versioning.
+
+    Returns dict with version, fullversion, versionstr for consistent use across app.
+    - Major version from git tags (e.g., "3.0")
+    - Minor version = count of features implemented since last major version
+    - Patch version from git describe build number
+    - Git hash for identification
+    """
+    import subprocess
+    import re
+
+    try:
+        # Get git describe output
+        versionstr_raw = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
+        versionstr_parts = versionstr_raw.split("-")
+
+        if len(versionstr_parts) >= 3:
+            major_version_tag = versionstr_parts[0]  # e.g., "3.0"
+            build_number = versionstr_parts[1]       # e.g., "16"
+            git_hash = versionstr_parts[2]           # e.g., "gb9fb21c"
+
+            # Extract major version number (3 from "3.0")
+            major_number = major_version_tag.split('.')[0]  # "3"
+
+            # Count features since last major version tag
+            try:
+                # Get commit messages since the last major version tag
+                feature_commits = subprocess.check_output([
+                    "git", "log", f"{major_version_tag}..HEAD", "--oneline", "--grep=FEAT-", "--grep=Add feature", "--grep=Implement"
+                ]).strip().decode()
+
+                # Count feature commits (non-empty lines)
+                feature_count = len([line for line in feature_commits.split('\n') if line.strip()]) if feature_commits.strip() else 0
+
+                # Count commits since last feature commit
+                if feature_commits.strip():
+                    # Get the hash of the most recent feature commit
+                    recent_feature_lines = feature_commits.strip().split('\n')
+                    most_recent_feature_hash = recent_feature_lines[0].split()[0]  # First word is the commit hash
+
+                    # Count commits since that feature commit
+                    commits_since_feature = subprocess.check_output([
+                        "git", "rev-list", "--count", f"{most_recent_feature_hash}..HEAD"
+                    ]).strip().decode()
+
+                    patch_count = int(commits_since_feature) if commits_since_feature.isdigit() else 0
+                else:
+                    # No feature commits, count all commits since major version tag
+                    commits_since_major = subprocess.check_output([
+                        "git", "rev-list", "--count", f"{major_version_tag}..HEAD"
+                    ]).strip().decode()
+                    patch_count = int(commits_since_major) if commits_since_major.isdigit() else 0
+
+            except subprocess.CalledProcessError:
+                # Fallback: use build number if git log fails
+                feature_count = int(build_number) if build_number.isdigit() else 0
+                patch_count = 0
+
+            # Semantic versioning format: major.minor.patch-ghash where minor = feature count, patch = commits since last feature
+            version = f"{major_number}.{feature_count}"
+            fullversion = f"{major_number}.{feature_count}.{patch_count}-{git_hash}"
+            versionstr = fullversion
+        else:
+            # Simple tag without build info
+            fullversion = versionstr_raw
+            version = versionstr_raw
+            versionstr = versionstr_raw
+    except (subprocess.CalledProcessError, FileNotFoundError, IndexError):
+        # Fallback for development environment
+        fullversion = "2.0.0-dev"
+        version = "2.0.0"
+        versionstr = "2.0.0-dev"
+
+    return {
+        "version": version,
+        "fullversion": fullversion,
+        "versionstr": versionstr,
+    }
+
+
+# =============================================================================
 # Template and Page Utilities
 # =============================================================================
 
 
 def create_page(template, title, **kwargs):
     """Create standardized page response with common template variables."""
-    import subprocess
     import time
 
     from flask import current_app, session
 
-    # Get version info
-    try:
-        versionstr = (
-            subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
-        )
-        version = versionstr.split("-")[0] if "-" in versionstr else versionstr
-        fullversion = versionstr
-    except Exception:
-        versionstr = "2.0.0-dev"
-        version = "2.0.0"
-        fullversion = "2.0.0-dev"
+    # Get version info using shared function
+    version_info = get_version_info()
 
     # Standard template variables
     template_vars = {
@@ -97,9 +173,9 @@ def create_page(template, title, **kwargs):
         "apptitle": current_app.config.get("APP_NAME", "HT Status"),
         "consumer_key": current_app.config.get("CONSUMER_KEY", ""),
         "consumer_secret": current_app.config.get("CONSUMER_SECRETS", ""),
-        "versionstr": versionstr,
-        "fullversion": fullversion,
-        "version": version,
+        "versionstr": version_info["versionstr"],
+        "fullversion": version_info["fullversion"],
+        "version": version_info["version"],
         "timenow": time.strftime("%Y-%m-%d %H:%M:%S"),
     }
 

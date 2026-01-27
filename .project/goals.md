@@ -5,7 +5,7 @@
 > **Update Frequency**: When strategic direction changes, milestones achieved, or objectives evolve
 
 ## Quick Navigation
-🔗 **Related**: [Progress](progress.md) • [Backlog](backlog.md) • [Plan](plan.md) • [Architecture](architecture.md) • [Rules](rules.md)
+🔗 **Related**: [Progress](progress.md) • [Backlog](backlog.md) • [Plan](plan.md) • [Architecture](architecture.md) • [Agent Standards](../.github/agents/htplanner-ai-agent.md)
 🎯 **Strategic Status**: ALL P1 COMPLETE ✅ • P2 Simplification Focus • Custom CHPP Production Complete • HattrickPlanner Branding Complete
 ✅ **Latest**: SIMPLIFICATION MILESTONE - Quality Intelligence Platform consolidated, Makefile optimized, table formatting fixed, duplicate functions eliminated. ALL P1 Testing complete with 100% success rate. (January 24, 2026)
 🔍 **Current Focus**: P2 Deployment Operations (INFRA-021) → P3 UI Standardization (UI-011) → Type sync resolution (REFACTOR-002)

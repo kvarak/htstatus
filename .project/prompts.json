@@ -1,6 +1,6 @@
 {
   "ui_guidelines": {
-    "design_system": "See .project/ui-design-guidelines.md for complete color system, typography, spacing, and component patterns",
+    "design_system": "See .github/agents/htplanner-ai-agent.md for complete UI development standards and design system",
     "quick_reference": "Football green theme (hsl(120, 45%, 25%)), responsive design, accessibility standards",
     "framework_notes": {
       "flask": "Use .btn-primary-custom, .table-custom, .card-custom classes",
@@ -12,7 +12,7 @@
       "name": "plan",
       "title": "Plan the next development task",
       "what to do": [
-        "Read .project/rules.md, .project/ docs for context. Use `make help` and `uv run`.",
+        "Read .github/agents/htplanner-ai-agent.md, .project/ docs for context. Use `make help` and `uv run`.",
         "Take holistic view: consolidate, eliminate duplication, reduce waste.",
         "Scout mindset: Do not be afraid to take a step back and fix fix more than in the task",
         "Structure: # Plan ## Analysis ## Solution ## Steps ## Testing",
@@ -24,7 +24,7 @@
       "name": "execute",
       "title": "Execute the planned development task",
       "what to do": [
-        "Read .project/rules.md, .project/ docs. Use `uv run` and `make help`.",
+        "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Use `uv run` and `make help`.",
         "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working, don't settle for the same code coverage but strive to improve it.",
         "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Test: `make test-all` - no coverage loss or failures.",
@@ -37,7 +37,7 @@
       "name": "review",
       "title": "Review previous development work with simplification focus",
       "what to do": [
-        "Review all changes since last commit. Read .project/rules.md, .project/ docs.",
+        "Review all changes since last commit. Read .github/agents/htplanner-ai-agent.md, .project/ docs.",
         "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Identify: complexity (monoliths, unclear responsibilities), waste (unused code, redundant logic), inappropriate consolidation (merging distinct tools).",
         "Respect separation of concerns: Don't merge tools with different purposes (e.g., qi-json.sh, pytest-qi-parser.sh, quality-intelligence.sh each have distinct roles).",
@@ -50,13 +50,14 @@
       "name": "update",
       "title": "Update project status and planning",
       "what to do": [
-        "Review progress.md, backlog.md. Holistic view for consolidation.",
-        "Update with completed tasks. Move completed (✅) to history/backlog-done.md.",
-        "Make sure 'make help' reflects current state (compare with the Makefile).",
-        "Unblock dependencies. Update docs to reflect current state.",
-        "Aggressively remove complete and outdated content.",
-        "Important: Search for completed tasks and delete them from the backlog. The backlog should be clean from historical tasks.",
-        "All plans in .project/plans/ that are completed should be removed from there as well.",
+        "STEP 1: Read .project/backlog.md and identify ALL completed tasks (marked ✅ COMPLETE).",
+        "STEP 2: For EACH completed task found, move the complete task description to .project/history/backlog-done.md with completion date, then DELETE the completed task from backlog.md.",
+        "STEP 3: Review progress.md, backlog.md for holistic consolidation opportunities.",
+        "STEP 4: Update with recent accomplishments. Update priority counts (P0: X/Y complete).",
+        "STEP 5: Make sure 'make help' reflects current state (compare with Makefile).",
+        "STEP 6: Unblock dependencies. Update docs to reflect current state.",
+        "STEP 7: Remove any completed plans from .project/plans/ directory.",
+        "CRITICAL: The backlog must be completely clean of ✅ COMPLETE tasks after this prompt. Search systematically for '✅.*COMPLETE' pattern and move ALL matches to history.",
         "Do not commit code."
       ]
     },
@@ -65,7 +66,10 @@
       "title": "Create commits for changes since last commit following git guidelines",
       "what to do": [
         "Analyze changes and additions since last commit. Group related changes logically.",
+        "Check for feature additions: Look for FEAT- tasks marked complete, new functionality, or feature implementations.",
         "Write factual commit messages: <50 char subject, body: imperative mood, no fluff, refer to issues if possible.",
+        "For feature commits: Add unique identifier suffix like [feat-abc123] or [feature-xyz] to enable version counting.",
+        "Feature detection patterns: FEAT- task completion, Add feature, Implement, new functionality.",
         "Stage and commit. Don't push.",
         "git status should be clean after."
       ]
@@ -74,7 +78,7 @@
       "name": "add-to-backlog",
       "title": "Add a new task to the project backlog with simplification focus",
       "what to do": [
-        "Read .project/rules.md, .project/ docs. Check for duplicate work.",
+        "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Check for duplicate work.",
         "Challenge: can this be simplified or merged with existing tasks?",
         "Add to backlog.md Current Focus and Detailed sections."
       ]
@@ -83,10 +87,11 @@
       "name": "execute-backlog-item",
       "title": "Plan and execute a specific backlog item with simplification focus",
       "what to do": [
-        "Read .project/rules.md, .project/ docs. Challenge if task can be simplified.",
+        "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Challenge if task can be simplified.",
         "Scout mindset: fix lint errors, cleanup nearby code while executing.",
         "Execute with `uv run`. Test against acceptance criteria.",
-        "Update docs. Mark completed in backlog.",
+        "Update docs. Mark completed in backlog (✅ COMPLETED with completion notes).",
+        "IMPORTANT: After marking complete, immediately move the completed task to .project/history/backlog-done.md and delete from backlog.md to keep backlog clean.",
         "Structure: # Execution: [TASK-ID] ## Plan ## Steps ## Summary"
       ]
     },

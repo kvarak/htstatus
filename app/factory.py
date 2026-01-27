@@ -89,9 +89,6 @@ def setup_routes(app_instance, db_instance):
     init_routes_bp(app_instance, db_instance)
 
     # Import blueprint functions and blueprints
-    # Get version info
-    import subprocess
-
     from app.blueprints.auth import auth_bp, setup_auth_blueprint
     from app.blueprints.main import (
         main_bp,
@@ -117,16 +114,11 @@ def setup_routes(app_instance, db_instance):
         TRACE_COLUMNS,
     )
 
-    try:
-        versionstr = (
-            subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
-        )
-        version = versionstr.split("-")[0] if "-" in versionstr else versionstr
-        fullversion = versionstr
-    except Exception:
-        versionstr = "2.0.0-dev"
-        version = "2.0.0"
-        fullversion = "2.0.0-dev"
+    # Get version info using shared utility
+    from app.utils import get_version_info
+    version_info = get_version_info()
+    version = version_info["version"]
+    fullversion = version_info["fullversion"]
 
     # Setup blueprint dependencies
     setup_auth_blueprint(

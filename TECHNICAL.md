@@ -2,7 +2,7 @@
 
 > **Purpose**: Technical architecture, implementation patterns, and design decisions for HattrickPlanner
 > **Audience**: Developers understanding or modifying the system implementation
-> **See Also**: [README.md](README.md) for setup • [.project/architecture.md](.project/architecture.md) for structure • [.project/rules.md](.project/rules.md) for standards
+> **See Also**: [README.md](README.md) for setup • [.project/architecture.md](.project/architecture.md) for structure • [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md) for standards
 
 ## Architecture Overview
 

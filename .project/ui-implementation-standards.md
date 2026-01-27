@@ -386,6 +386,8 @@ const useErrorHandler = () => {
 
 ## Development Workflow Standards
 
+> **Note**: Core development workflow standards have been consolidated into [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md). This section focuses on UI-specific implementation details.
+
 ### Pre-Development Checklist
 
 Before starting any UI work:

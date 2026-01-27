@@ -22,11 +22,11 @@ description: HattrickPlanner Development Agent - Specialized for Hattrick team m
 **CRITICAL**: ALWAYS read ALL files in `.project/` directory before making any code or documentation changes. This ensures awareness of project requirements, standards, and current planning context.
 
 **Required Reading Order**:
-1. `.project/rules.md` - Development standards and quality gates
-2. `.project/backlog.md` - Current priorities and active tasks
-3. `.project/progress.md` - Current status and blockers
-4. `.project/architecture.md` - System structure and components
-5. `.project/goals.md` - Strategic objectives and vision
+1. `.project/backlog.md` - Current priorities and active tasks
+2. `.project/progress.md` - Current status and blockers
+3. `.project/architecture.md` - System structure and components
+4. `.project/goals.md` - Strategic objectives and vision
+5. This agent file - Development standards and quality gates
 
 ### 2. Development Philosophy (CRITICAL)
 **Simplification Hierarchy** (ALWAYS apply in this order):
@@ -36,6 +36,16 @@ description: HattrickPlanner Development Agent - Specialized for Hattrick team m
 4. **Consolidate duplication** - Merge identical patterns/functions (NOT distinct tools)
 
 **Scout Mindset**: Always fix nearby issues while working - lint errors, format standards, cleanup opportunities, coverage improvements.
+
+**Scout Mindset (CRITICAL)**: Leave the codebase better than you found it. This means:
+- **Fix Nearby Issues**: Address lint errors, format violations, and obvious bugs while working in an area
+- **Opportunistic Cleanup**: Remove unused imports, dead code, redundant logic encountered during tasks
+- **Quality Improvements**: Enhance test coverage, add missing documentation, improve code clarity
+- **Standards Enforcement**: Apply consistent formatting, naming conventions, and architectural patterns
+- **Proactive Maintenance**: Update outdated comments, fix broken links, consolidate duplicated code
+- **No Broken Windows**: Never leave technical debt worse than you found it, even for "quick fixes"
+
+This principle applies at all levels: individual functions, modules, documentation, configuration, and project structure.
 
 **Anti-patterns to AVOID**:
 - Merging well-separated tools into monoliths (increases complexity)
@@ -113,7 +123,44 @@ players = team.players()  # Live data from Hattrick
 - **Typography**: h1: 2.5rem/700, h2: 2rem/600, body: 1rem/1.6 line-height
 - **Spacing**: 0.25rem increments (1=4px, 4=16px, 6=24px, 8=32px)
 
-### 5. Documentation Standards
+### 5. Development Standards & Documentation
+
+#### Task ID Format
+**CRITICAL**: All task IDs must follow [CATEGORY]-[NUMBER] format using existing categories:
+- **TEST-**: Testing infrastructure, fixtures, coverage
+- **INFRA-**: Infrastructure, deployment, operations, CI/CD
+- **UI-**: User interface, design system, frontend
+- **REFACTOR-**: Code cleanup, architecture improvements
+- **BUG-**: Bug fixes and functionality regressions
+- **FEAT-**: New features and functionality
+- **DOC-**: Documentation, guides, cleanup
+**Never invent new categories** - use existing numbering sequence for category
+
+#### Project Documentation Structure
+
+**Development Metadata** (`.project/`):
+- **architecture.md**: Update with structural changes
+- **plan.md**: Mark completed items and update status
+- **backlog.md**: Update with new tasks and milestones
+- **progress.md**: Update accomplishments and next steps
+- **goals.md**: Strategic vision and objectives - keep up to date
+- **prompts.json**: AI agent prompt definitions
+
+**Historical Documentation** (`.project/history/`):
+- Implementation guides, bug reviews, retrospectives
+- Completed task archives from backlog.md
+- Never delete - audit trail for project decisions
+
+**User Documentation** (root level):
+- **README.md**: User-focused setup and usage guide
+- **CHANGELOG.md**: Notable changes, new features, bug fixes
+- **TECHNICAL.md**: Technical architecture and implementation details
+- **DEPLOYMENT.md**: Deployment procedures and configuration
+
+**Specialized Documentation**:
+- **docs/**: Detailed technical guides and workflows
+- **scripts/README.md**: Development scripts and utilities
+- **configs/README.md**: Configuration management
 
 #### Update Triggers
 - **architecture.md**: System structure, data flow, or tech stack changes
@@ -121,12 +168,26 @@ players = team.players()  # Live data from Hattrick
 - **progress.md**: Milestones, accomplishments, status changes
 - **plan.md**: Strategic direction or goal changes
 - **README.md**: Setup process or user-facing feature changes
+- **TECHNICAL.md**: Implementation patterns or technical detail changes
+- **CHANGELOG.md**: All user-visible changes, features, bug fixes
 
-#### File Organization
-- **Development Metadata**: `.project/` (active project management)
-- **Historical Documentation**: `.project/history/` (never delete - audit trail)
-- **User Documentation**: Root level (README, CHANGELOG, TECHNICAL, DEPLOYMENT)
-- **Specialized Guides**: `docs/` (detailed technical workflows)
+#### File Organization Rules
+
+**Backend Structure**:
+- `/app/routes_bp.py`: Blueprint organization and registration
+- `/app/blueprints/`: Modular route handlers by feature
+- `/models.py`: SQLAlchemy models defining database schema
+- `/config.py`: Configuration management (not tracked in git)
+
+**Frontend Structure**:
+- `/app/templates/`: Jinja2 templates for legacy frontend (Flask-Bootstrap 3.x)
+- `/src/`: React components for modern frontend (TailwindCSS, TypeScript)
+- `/src/types/index.ts`: TypeScript interfaces matching database models
+
+**Test Structure**:
+- `/tests/conftest.py`: Central test fixture configuration
+- `/tests/test_*.py`: Test suites organized by feature area
+- Transaction isolation pattern for database tests
 
 ### 6. Workflow Commands (from prompts.json)
 
@@ -178,7 +239,98 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 - REFACTOR-015: Simplify prompts.json UI Guidelines - COMPLETE ✅
 - REFACTOR-013: Remove Temporary Debug Scripts - VALIDATED ✅
 
-### 8. Quality Gates (23/26 passing)
+### 8. Technology Stack & Configuration
+
+#### Backend
+- **Framework**: Flask 2.x with Blueprint architecture
+- **Database**: PostgreSQL with SQLAlchemy ORM
+- **Authentication**: Hattrick OAuth via pychpp library
+- **Testing**: pytest with transaction isolation
+- **Deployment**: Docker containers with uWSGI
+
+#### Frontend
+- **Legacy**: Server-rendered Jinja2 templates with Flask-Bootstrap 3.x
+- **Modern**: React SPA with Vite, TypeScript, Radix UI, TailwindCSS
+- **Visualization**: Chart.js for player skill progression
+- **PWA**: Service Worker with cache-first strategy
+
+#### DevOps & Commands
+- `./scripts/run.sh` - Flask dev server (port 5000)
+- `npm run dev` - React dev server (port 8080)
+- `make test-all` - Run full test suite with coverage
+- `make lint` - Run linter
+- `uv run python scripts/manage.py db migrate/upgrade` - Database migrations
+
+#### Configuration Requirements
+- **config.py**: CHPP credentials (CONSUMER_KEY, CONSUMER_SECRETS, CALLBACK_URL), PostgreSQL connection string
+- **Environment**: Use DEBUG_LEVEL config (0-3) to control `dprint()` verbosity
+
+#### UI Development Standards
+
+**Pre-Development Checklist**:
+- Check existing component patterns in both Flask and React
+- Review UI guidelines for color/typography standards
+- Examine similar existing components for consistency
+- Ensure development environment running (`make dev`)
+
+**Quality Assurance**:
+- Compare Flask and React versions side by side for visual consistency
+- Verify keyboard navigation and screen reader compatibility
+- Check color contrast meets WCAG 2.1 AA standards (4.5:1 ratio)
+- Test responsive behavior across breakpoints
+- Run `make test-all` for automated validation
+
+**Cross-Framework Testing**:
+- Ensure identical appearance between Flask and React versions
+- Verify consistent behavior and shared design system tokens
+- Test on Chrome, Firefox, Safari, and mobile browsers
+
+#### Git Standards
+- Conventional commit messages, logical grouping, test before commit, atomic changes
+
+#### Task Management Rules
+
+**For AI Agents**:
+1. **ALWAYS read .project/ docs before starting work**
+   - Read `backlog.md` to understand active tasks
+   - Read this agent file for development standards
+   - Read relevant documentation for context
+
+2. **Follow simplification hierarchy consistently**
+   - Apply holistic view first
+   - Reduce complexity within components
+   - Eliminate waste and unused code
+   - Consolidate identical patterns only
+
+3. **Update task status appropriately**
+   - Mark tasks 🚀 ACTIVE when starting
+   - Mark tasks ✅ COMPLETED when finished
+   - **CRITICAL**: Immediately move completed tasks to `.project/history/backlog-done.md` and delete from backlog
+   - Add new discovered tasks to backlog
+
+4. **Maintain clean backlog at all times**
+   - Never leave ✅ COMPLETED tasks in backlog.md after finishing work
+   - Use search pattern `✅.*COMPLETE` to find all completed tasks during update prompts
+   - Backlog should only contain active (🚀), ready (🎯), or future (🔮) tasks
+   - Historical tasks belong in `.project/history/backlog-done.md` with completion dates
+   - Reduce complexity within components
+   - Eliminate waste and unused code
+   - Consolidate identical patterns only
+
+3. **Update task status appropriately**
+   - Mark tasks 🚀 ACTIVE when starting
+   - Mark tasks ✅ COMPLETED when finished
+   - Move completed tasks to `.project/history/backlog-done.md`
+   - Add new discovered tasks to backlog
+
+#### Coding Standards
+
+**Python Development**:
+- **Debugging**: Use `dprint(level, msg)` instead of print() (levels 0-3 controlled by DEBUG_LEVEL config)
+- **Routes**: Use `create_page(template='...', title='...', ...)` pattern consistently
+- **CHPP**: Initialize with `CHPP(consumer_key, consumer_secret, session['access_key'], session['access_secret'])`
+
+### 9. Quality Gates (23/26 passing)
 
 #### Security & Dependencies
 - ✅ Zero CVE vulnerabilities
@@ -214,9 +366,23 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 ### When Completing Work
 1. Run quality gates (`make test-all`, `make lint`)
 2. Update relevant documentation files
-3. Move completed tasks to `.project/history/backlog-done.md`
+3. **IMMEDIATELY move completed tasks to `.project/history/backlog-done.md` and DELETE from backlog**
 4. Add new discovered tasks to backlog with proper categorization
 5. Update progress.md with accomplishments
+
+### When Executing Update Prompt
+1. **MANDATORY**: Search backlog.md for pattern `✅.*COMPLETE` to find ALL completed tasks
+2. **For EACH completed task found**: Move complete task description to history/backlog-done.md with completion date
+3. **DELETE the completed task from backlog.md** - backlog must be clean of ✅ COMPLETE tasks
+4. Update priority counts and status summaries
+5. Identify and unblock dependencies
+
+### Backlog Hygiene Rules (CRITICAL)
+- **Never leave completed tasks in backlog.md** - this is a primary failure mode
+- Backlog should only contain: 🚀 ACTIVE, 🎯 Ready to Execute, or 🔮 Future tasks
+- All ✅ COMPLETED tasks belong in `.project/history/backlog-done.md` with completion dates
+- Use systematic search approach: grep for `✅.*COMPLETE` pattern during updates
+- Clean backlog = clear priorities, no historical clutter interfering with current planning
 
 ### When Creating Content
 1. Use football/soccer terminology appropriately

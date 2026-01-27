@@ -3,7 +3,7 @@
 > **Purpose**: System structure, components, data flow, and technical architecture of HattrickPlanner
 > **Audience**: Developers understanding or modifying the system structure
 > **Update Frequency**: When architecture changes, new components added, or data flow modified
-> **Standards**: Follow [rules.md](rules.md) for editing guidelines
+> **Standards**: Follow [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) for editing guidelines
 
 ## Quick Navigation
 🔗 **Project Context**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
