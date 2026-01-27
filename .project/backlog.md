@@ -27,6 +27,8 @@
 ## Current Focus
 
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical functionality bugs resolved, no active regressions
+- ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
+- ✅ [INFRA-027] Fix Custom CHPP Dependencies (15 min) - **DEPLOYMENT CRITICAL** Added missing requests and requests-oauthlib dependencies to pyproject.toml. Fixed ModuleNotFoundError blocking deployment. **RESOLVED**
 
 **Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
 - 🎯 [REFACTOR-022] Fix Legacy Branding References (30 min) - **NEW** Update "HattrickPlanner" references to "HTStatus" in templates and docs **BRANDING CONSISTENCY**

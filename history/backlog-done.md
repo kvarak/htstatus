@@ -6,6 +6,16 @@
 
 ## January 27, 2026
 
+### [INFRA-027] Fix Custom CHPP Dependencies
+**Completed**: Jan 27, 2026 | **Actual Effort**: 15 minutes | **Priority**: P0
+**Description**: Critical deployment fix - Added missing requests>=2.31.0 and requests-oauthlib>=1.3.0 dependencies to pyproject.toml. Custom CHPP client requires these for OAuth1Session and HTTP adapter functionality.
+**Impact**:
+- Fixes ModuleNotFoundError: No module named 'requests_oauthlib' during deployment
+- Enables Flask CLI 'db' command by fixing import failures
+- Resolves deployment blocking issue discovered during production deployment
+**Files Changed**: pyproject.toml (added 2 dependencies)
+**Strategic Value**: Ensures Custom CHPP client deployment stability
+
 ### [REFACTOR-012] Extract CHPP Client Utilities
 **Completed**: Jan 27, 2026 | **Actual Effort**: 3 hours | **Priority**: P1
 
