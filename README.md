@@ -1,6 +1,6 @@
-# HT Status
+# HattrickPlanner
 
-> **Purpose**: User-focused setup, installation, and usage guide for HTStatus application
+> **Purpose**: User-focused setup, installation, and usage guide for HattrickPlanner application
 > **Audience**: End users, new developers, and contributors getting started
 > **See Also**: [TECHNICAL.md](TECHNICAL.md) for architecture • [DEPLOYMENT.md](DEPLOYMENT.md) for production • [.project/](project/) for development
 
@@ -104,6 +104,24 @@ Run `make help` to see all available commands:
 - `make changelog` - Generate changelog
 
 For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
+
+## Development with AI Assistance
+
+HattrickPlanner includes a specialized AI agent for VS Code that provides project-specific development guidance:
+
+**Recommended Setup:**
+- **VS Code + Custom Agent**: Use `@htplanner-ai-agent` for HattrickPlanner-specific development guidance
+- **Custom Agent Definition**: `.github/agents/htplanner-ai-agent.md` contains complete project context and standards
+- **Structured Workflows**: Access development workflows from `.project/prompts.json`
+
+**AI Agent Features:**
+- Current project status and priorities (P2 simplification focus)
+- HattrickPlanner development standards and quality gates
+- Hattrick domain knowledge and CHPP integration patterns
+- Football-themed UI design system guidance
+- Security standards and database migration patterns
+
+To get started with AI-assisted development, use `@htplanner-ai-agent` in VS Code or reference the custom agent file for other AI tools.
 
 ## Documentation
 

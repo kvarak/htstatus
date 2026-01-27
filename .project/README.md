@@ -1,14 +1,14 @@
-# HTStatus Development Methodology Guide
+# HattrickPlanner Development Methodology Guide
 
-*This file provides a structured, AI-assisted development workflow for the HTStatus project.*
+*This file provides a structured, AI-assisted development workflow for the HattrickPlanner project.*
 
 ## Overview
 
-This guide documents the professional development methodology for HTStatus, featuring systematic task execution, quality assurance, documentation standards, and infrastructure setup for efficient, maintainable development.
+This guide documents the professional development methodology for HattrickPlanner, featuring systematic task execution, quality assurance, documentation standards, and infrastructure setup for efficient, maintainable development.
 
 ## Development Philosophy
 
-HTStatus development follows a **structured, quality-gated methodology**:
+HTPlanner development follows a **structured, quality-gated methodology**:
 - **Systematic Development**: Prompt-based workflows for consistent task execution
 - **Quality Assurance**: Testing gates before completion
 - **Documentation Integrity**: Clear separation of user, technical, and development documentation
@@ -25,10 +25,11 @@ HTStatus development follows a **structured, quality-gated methodology**:
 
 ### AI-Assisted Development Setup
 
-- Use VS Code with an AI assistant extension for prompt-based workflows
-- Access structured prompts from `.project/prompts.json` (if present)
+**Recommended**: Use the custom HattrickPlanner AI agent for optimal development experience:
+- **VS Code**: Use `@htplanner-ai-agent` for HattrickPlanner-specific guidance
+- **Custom Agent**: Located at `.github/agents/htplanner-ai-agent.md` with complete project context
+- **Structured Prompts**: Access workflows from `.project/prompts.json` for systematic development
 
-### Workflow Commands
 
 - **Plan**: Analyze next development task with strategic alignment
 - **Execute**: Implement planned solution with testing and documentation

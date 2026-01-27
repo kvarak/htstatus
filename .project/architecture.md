@@ -1,6 +1,6 @@
-# HTStatus Architecture
+# HattrickPlanner Architecture
 
-> **Purpose**: System structure, components, data flow, and technical architecture of HTStatus
+> **Purpose**: System structure, components, data flow, and technical architecture of HattrickPlanner
 > **Audience**: Developers understanding or modifying the system structure
 > **Update Frequency**: When architecture changes, new components added, or data flow modified
 > **Standards**: Follow [rules.md](rules.md) for editing guidelines
@@ -61,7 +61,7 @@ HT Status is a Hattrick football team management application built with a dual f
   - `matches.py` - Match history and analysis
   - `training.py` - Player training progression
 - **Authentication Utilities**: `/app/auth_utils.py` - Unified authentication patterns with @require_authentication decorator (**NEW** ✅ REFACTOR-008)
-- **Error Handling**: `/app/error_handlers.py` - Standardized error handling with HTStatusError exception hierarchy (**NEW** ✅ REFACTOR-008)
+- **Error Handling**: `/app/error_handlers.py` - Standardized error handling with HattrickPlannerError exception hierarchy (**NEW** ✅ REFACTOR-008)
 - **Test Utilities**: `/app/test_factories.py` - Simplified fixture creation for testing infrastructure (**NEW** ✅ REFACTOR-008)
 - **Constants Module**: `/app/constants.py` - Hattrick data definitions (match types, roles, behaviors, column specs)
 - **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, team statistics)

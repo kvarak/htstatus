@@ -1,12 +1,12 @@
-# HTStatus Technical Documentation
+# HattrickPlanner Technical Documentation
 
-> **Purpose**: Technical architecture, implementation patterns, and design decisions for HTStatus
+> **Purpose**: Technical architecture, implementation patterns, and design decisions for HattrickPlanner
 > **Audience**: Developers understanding or modifying the system implementation
 > **See Also**: [README.md](README.md) for setup • [.project/architecture.md](.project/architecture.md) for structure • [.project/rules.md](.project/rules.md) for standards
 
 ## Architecture Overview
 
-HTStatus 2.0 is a Hattrick team management application with a dual frontend architecture (legacy Flask and modern React) and a PostgreSQL backend. It integrates with the Hattrick CHPP API for live football data.
+HattrickPlanner 2.0 is a Hattrick team management application with a dual frontend architecture (legacy Flask and modern React) and a PostgreSQL backend. It integrates with the Hattrick CHPP API for live football data.
 
 ### Hattrick Ownership Hierarchy
 
@@ -62,7 +62,7 @@ Critical understanding for working with Hattrick's data model:
 
 **Current Implementation** (as of REFACTOR-007, January 2026):
 
-HTStatus uses a modern Flask blueprint architecture with clean separation of concerns:
+HattrickPlanner uses a modern Flask blueprint architecture with clean separation of concerns:
 - **6 Blueprints**: auth, main, player, team, matches, training - each handling specific feature domains
 - **Factory Pattern**: `app/factory.py` initializes app with `create_app()` and registers blueprints via `setup_routes()`
 - **Constants Extraction**: `app/constants.py` defines Hattrick data (match types, roles, behaviors, column specs)
@@ -137,7 +137,7 @@ See `.gitignore` for complete exclusion patterns.
 
 ## Development Scripts
 
-HTStatus includes debugging utilities in the `scripts/` directory, created during troubleshooting and preserved for future development use.
+HattrickPlanner includes debugging utilities in the `scripts/` directory, created during troubleshooting and preserved for future development use.
 
 ### Script Execution Policy
 
@@ -663,7 +663,7 @@ If issues persist after this checklist, consult the specific debugging sections 
 
 ### Alembic Configuration
 
-HTStatus uses Alembic for database schema management with the following configuration:
+HattrickPlanner uses Alembic for database schema management with the following configuration:
 
 **Location**: `/migrations/` directory with 30 existing migration files
 
@@ -696,7 +696,7 @@ uv run alembic current
 
 ### Critical Constraints
 
-**Backward Compatibility**: Database changes must work with multiple HTStatus versions accessing the same database simultaneously.
+**Backward Compatibility**: Database changes must work with multiple HattrickPlanner versions accessing the same database simultaneously.
 
 **Safe Patterns**:
 - ✅ Adding nullable columns (applications ignore new columns)

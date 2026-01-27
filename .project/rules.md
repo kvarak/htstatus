@@ -1,6 +1,6 @@
-# HTStatus Development Rules
+# HattrickPlanner Development Rules
 
-> **Purpose**: Authoritative source for all development standards, coding conventions, and quality gates for the HTStatus project. Referenced by [prompts.json](prompts.json) for AI agent behavior.
+> **Purpose**: Authoritative source for all development standards, coding conventions, and quality gates for the HattrickPlanner project. Referenced by [prompts.json](prompts.json) for AI agent behavior.
 
 ## Core Development Standards
 
