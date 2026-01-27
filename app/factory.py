@@ -165,24 +165,16 @@ def setup_routes(app_instance, db_instance):
     app_instance.register_blueprint(matches_bp)
     app_instance.register_blueprint(training_bp)
     # Display configuration status at startup
-    _display_startup_status(app_instance)
+    _display_startup_status()
 
 
-def _display_startup_status(app):
+def _display_startup_status():
     """Display application configuration status at startup.
 
-    Shows the current feature flag status (custom CHPP vs pychpp client)
-    and other relevant configuration details for operational awareness.
-
-    Args:
-        app: Flask application instance
+    Shows the current CHPP client configuration and other relevant
+    configuration details for operational awareness.
     """
-    use_custom_chpp = app.config.get("USE_CUSTOM_CHPP", False)
-    chpp_status = (
-        "✅ Using Custom CHPP Client (app.chpp)"
-        if use_custom_chpp
-        else "✅ Using pychpp Client"
-    )
+    chpp_status = "✅ Using Custom CHPP Client (app.chpp)"
 
     print(f"\n{'='*60}")
     print("Configuration Status:")
