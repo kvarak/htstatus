@@ -5,7 +5,7 @@ from flask import Blueprint, request, session
 from sqlalchemy import text
 
 from app.auth_utils import require_authentication
-from app.chpp_utils import get_chpp_client
+from app.chpp import CHPP
 from app.model_registry import get_match_model, get_match_play_model
 from app.utils import create_page, dprint
 
@@ -136,9 +136,7 @@ def stats():
         print(f"\n=== FETCHING COMPETITION DATA FOR TEAM {teamid} ===")
         from flask import current_app as app
 
-        # Get CHPP client based on feature flag
-        CHPP = get_chpp_client()
-
+        # Get CHPP client
         chpp = CHPP(
             app.config["CONSUMER_KEY"],
             app.config["CONSUMER_SECRETS"],
@@ -146,12 +144,7 @@ def stats():
             session["access_secret"],
         )
 
-        # Check pyCHPP version (only for pychpp client)
-        if not app.config.get('USE_CUSTOM_CHPP'):
-            import pychpp
-            print(f"pyCHPP version: {getattr(pychpp, '__version__', 'Unknown')}")
-        else:
-            print("Using custom CHPP client")
+        print("Using Custom CHPP client")
 
         team_details = chpp.team(ht_id=teamid)
         dprint(2, f"Team details fetched: {team_details.name}")

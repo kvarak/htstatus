@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from flask import Blueprint, render_template, session
 
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
-from app.chpp_utils import get_chpp_client
+from app.chpp import CHPP
 from app.utils import create_page, diff, dprint, get_player_changes
 
 # Create Blueprint for team routes
@@ -38,7 +38,6 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
 @require_authentication
 def team():
     """Display team information."""
-    CHPP = get_chpp_client()
     chpp = CHPP(
         consumer_key, consumer_secret, session["access_key"], session["access_secret"]
     )
@@ -77,7 +76,6 @@ def update():
     try:
         # Initialize CHPP with enhanced error handling
         dprint(1, "Initializing CHPP client...")
-        CHPP = get_chpp_client()
         chpp = CHPP(
             consumer_key,
             consumer_secret,

@@ -193,7 +193,7 @@ fileformat-fix: ## Auto-fix file formatting issues (newline EOF, trailing whites
 	@echo "   → Adding newlines at end of files..."
 	@git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | \
 	while read -r file; do \
-		if test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then \
+		if [ -f "$$file" ] && test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then \
 			echo "Adding newline to: $$file"; \
 			echo "" >> "$$file"; \
 		fi; \
@@ -201,7 +201,7 @@ fileformat-fix: ## Auto-fix file formatting issues (newline EOF, trailing whites
 	@echo "   → Removing trailing whitespace..."
 	@git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | \
 	while read -r file; do \
-		if grep -q '[[:space:]]$$' "$$file"; then \
+		if [ -f "$$file" ] && grep -q '[[:space:]]$$' "$$file"; then \
 			echo "Cleaned: $$file"; \
 			sed -i '' 's/[[:space:]]*$$//' "$$file"; \
 		fi; \
@@ -346,11 +346,11 @@ test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesy
 		count=$$((count + 1)); \
 		basename=$$(basename $$testfile .py); \
 		echo "🔎 [$$count] Running $$testfile..."; \
-		USE_CUSTOM_CHPP=true $(UV) run pytest $$testfile $${PYTEST_VERBOSE-"-q"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=json:out/tests/test-each-$$basename-cov.json --cov-fail-under=0 --json-report --json-report-file=out/tests/test-each-$$basename.json &>/dev/null || true; \
+		$(UV) run pytest $$testfile $${PYTEST_VERBOSE-"-q"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=json:out/tests/test-each-$$basename-cov.json --cov-fail-under=0 --json-report --json-report-file=out/tests/test-each-$$basename.json &>/dev/null || true; \
 	done; \
 	for gate in $(GATES); do \
 		echo "🔎 [$$count] Running $$gate..."; \
-		USE_CUSTOM_CHPP=true PYTEST_VERBOSE="" $(MAKE) $$gate &>/dev/null || true; \
+		PYTEST_VERBOSE="" $(MAKE) $$gate &>/dev/null || true; \
 		count=$$((count + 1)); \
 	done; \
 	scripts/quality-intelligence.sh --expected-results $${count}
@@ -397,4 +397,3 @@ legacy-run: ## [DEPRECATED] Use 'make dev' instead
 legacy-changelog: ## [DEPRECATED] Use 'make changelog' instead
 	@echo "⚠️  WARNING: This command is deprecated. Use 'make changelog' instead."
 	@bash scripts/changelog.sh
-

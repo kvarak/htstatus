@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import current_app, render_template, session
 
-from app.chpp_utils import get_chpp_client
+from app.chpp import CHPP
 
 # Global variables - will be initialized by initialize_utils()
 db = None
@@ -821,9 +821,6 @@ def downloadMatches(teamid):
     from flask import current_app
 
     from models import Match
-
-    # Get CHPP client based on feature flag
-    CHPP = get_chpp_client()
 
     # Get CHPP credentials from app config
     consumer_key = current_app.config.get("CONSUMER_KEY")

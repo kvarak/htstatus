@@ -10,7 +10,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.chpp_utils import get_chpp_client
+from app.chpp import CHPP
 from app.utils import create_page, dprint
 
 # Create Blueprint for authentication routes
@@ -142,7 +142,6 @@ def login():
             print("Setting up team data")
             dprint(1, "Setting up team data for logged-in user")
             try:
-                CHPP = get_chpp_client()
                 dprint(1, f"Got CHPP client class: {CHPP}")
                 chpp = CHPP(
                     consumer_key,
@@ -245,7 +244,6 @@ def login():
 def start_oauth_flow():
     """Start OAuth flow with Hattrick."""
     try:
-        CHPP = get_chpp_client()
         chpp = CHPP(consumer_key, consumer_secret)
         auth = chpp.get_auth(callback_url=app.config["CALLBACK_URL"], scope="")
 
@@ -279,7 +277,6 @@ def handle_oauth_callback(oauth_verifier):
 
     try:
         # Get access tokens
-        CHPP = get_chpp_client()
         chpp = CHPP(consumer_key, consumer_secret)
         access_token = chpp.get_access_token(
             request_token=session["request_token"],
@@ -291,7 +288,6 @@ def handle_oauth_callback(oauth_verifier):
         session["access_secret"] = access_token["secret"]
 
         # Get user from Hattrick with error handling for CHPP library issues
-        CHPP = get_chpp_client()
         chpp = CHPP(
             consumer_key,
             consumer_secret,

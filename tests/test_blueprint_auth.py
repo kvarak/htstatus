@@ -18,7 +18,6 @@ from models import User
 def auth_app():
     """Create application for authentication testing with transaction isolation."""
     os.environ["FLASK_ENV"] = "testing"
-    os.environ["USE_CUSTOM_CHPP"] = "true"  # Test Custom CHPP client instead of pychpp
     app = create_app(TestConfig, include_routes=True)
 
     with app.app_context():
@@ -125,7 +124,7 @@ class TestAuthBlueprintLoginRoutes:
         assert response.status_code == 200
         assert b"Password must be at least 8 characters long" in response.data
 
-    @patch("app.chpp.CHPP")  # Mock the Custom CHPP class directly
+    @patch("app.blueprints.auth.CHPP")  # Mock CHPP at the blueprint level
     def test_login_existing_user_with_tokens(
         self, mock_chpp_class, client, sample_user
     ):
@@ -220,7 +219,7 @@ class TestAuthBlueprintOAuthFlow:
 
         mock_handle_callback.assert_called_once_with("test_verifier")
 
-    @patch("app.chpp.CHPP")
+    @patch("app.blueprints.auth.CHPP")
     def test_start_oauth_flow_function(
         self, mock_chpp_class, auth_app
     ):
@@ -246,7 +245,7 @@ class TestAuthBlueprintOAuthFlow:
             assert response is not None
             mock_chpp_instance.get_auth.assert_called_once()
 
-    @patch("app.chpp.CHPP")
+    @patch("app.blueprints.auth.CHPP")
     def test_handle_oauth_callback_new_user(
         self, mock_chpp_class, auth_app
     ):
@@ -305,7 +304,7 @@ class TestAuthBlueprintOAuthFlow:
 class TestAuthBlueprintErrorHandling:
     """Test error handling in authentication."""
 
-    @patch("app.chpp.CHPP")
+    @patch("app.blueprints.auth.CHPP")
     def test_login_chpp_error_handling(self, mock_chpp_class, client, sample_user):
         """Test handling of CHPP errors during login."""
         # Mock CHPP class to raise exception when instantiated
@@ -319,7 +318,7 @@ class TestAuthBlueprintErrorHandling:
         assert response.status_code == 200
         assert b"Unable to fetch team data" in response.data
 
-    @patch("app.chpp.CHPP")
+    @patch("app.blueprints.auth.CHPP")
     def test_oauth_callback_error_handling(self, mock_chpp_class, auth_app):
         """Test OAuth callback error handling."""
         with auth_app.test_request_context(), auth_app.test_client() as client:
