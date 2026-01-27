@@ -216,3 +216,58 @@ def mock_chpp_response():
             }
         ],
     }
+
+
+def create_mock_chpp_utilities(user_id=12345, team_ids=None, team_names=None):
+    """Create standardized mock for CHPP utilities functions.
+
+    Consolidates CHPP mocking patterns to reduce test duplication.
+    Returns tuple of (mock_get_chpp_client, mock_get_context) for use with @patch decorators.
+
+    Args:
+        user_id: Mock user ID (default: 12345)
+        team_ids: List of team IDs (default: [12345])
+        team_names: List of team names (default: ["Test Team"])
+
+    Returns:
+        dict: Contains 'get_chpp_client' and 'get_context' mocks
+
+    Example:
+        @patch("app.chpp_utilities.get_current_user_context")
+        @patch("app.chpp_utilities.get_chpp_client")
+        def test_something(self, mock_get_chpp, mock_get_context):
+            mocks = create_mock_chpp_utilities()
+            mock_get_chpp.return_value = mocks['chpp_instance']
+            mock_get_context.return_value = mocks['user_context']
+    """
+    from unittest.mock import Mock
+
+    if team_ids is None:
+        team_ids = [12345]
+    if team_names is None:
+        team_names = ["Test Team"]
+
+    # Create mock CHPP instance
+    mock_chpp_instance = Mock()
+    mock_chpp_instance.user = Mock()
+    mock_chpp_instance.team = Mock()
+
+    # Create user context data
+    user_context = {
+        "user": Mock(username="testuser", user_id=user_id, ht_id=user_id),
+        "team_ids": team_ids,
+        "team_names": team_names,
+        "ht_user": "testuser",
+        "ht_id": user_id,
+    }
+
+    # Create team fetch data
+    def mock_fetch_teams(_chpp):
+        return team_ids, team_names
+
+    return {
+        "chpp_instance": mock_chpp_instance,
+        "user_context": user_context,
+        "fetch_teams": mock_fetch_teams,
+    }
+

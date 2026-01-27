@@ -286,8 +286,8 @@ class TestCHPPSessionIntegration:
                 "Team IDs should be integers"
             )
 
-    @patch("app.blueprints.team.CHPP")
-    def test_chpp_route_integration_team_access(self, mock_chpp_class, client):
+    @patch("app.chpp_utilities.get_chpp_client")
+    def test_chpp_route_integration_team_access(self, mock_get_chpp, client):
         """Test CHPP integration in team route with proper ID handling."""
         # Setup mock CHPP
         mock_chpp = create_mock_chpp_client()
@@ -298,7 +298,7 @@ class TestCHPPSessionIntegration:
         team1 = create_mock_team(54321, "Primary Team")
         team2 = create_mock_team(67890, "Secondary Team")
         mock_chpp.set_mock_teams([team1, team2])
-        mock_chpp_class.return_value = mock_chpp
+        mock_get_chpp.return_value = mock_chpp
 
         # Setup authenticated session
         with client.session_transaction() as sess:

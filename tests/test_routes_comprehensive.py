@@ -348,12 +348,14 @@ class TestSessionHandling:
         response = routes_client.get("/")
         assert response.status_code == 200
 
-    @patch("app.blueprints.team.CHPP")
-    def test_session_persistence(self, mock_chpp_class, authenticated_client):
+    @patch("app.blueprints.team.fetch_user_teams")
+    @patch("app.blueprints.team.get_chpp_client")
+    def test_session_persistence(self, mock_get_chpp_client, mock_fetch_teams, authenticated_client):
         """Test session persistence across multiple requests."""
         # Set up mock CHPP client
         mock_chpp = create_mock_chpp_client()
-        mock_chpp_class.return_value = mock_chpp
+        mock_get_chpp_client.return_value = mock_chpp
+        mock_fetch_teams.return_value = ([12345], ["Test Team"])
 
         response1 = authenticated_client.get("/")
         assert response1.status_code == 200
@@ -376,12 +378,14 @@ class TestErrorHandling:
         response = routes_client.delete("/")
         assert response.status_code in [405, 404]  # Method not allowed or not found
 
-    @patch("app.blueprints.team.CHPP")
-    def test_missing_database_data(self, mock_chpp_class, authenticated_client):
+    @patch("app.blueprints.team.fetch_user_teams")
+    @patch("app.blueprints.team.get_chpp_client")
+    def test_missing_database_data(self, mock_get_chpp_client, mock_fetch_teams, authenticated_client):
         """Test routes when expected database data is missing."""
         # Set up mock CHPP client
         mock_chpp = create_mock_chpp_client()
-        mock_chpp_class.return_value = mock_chpp
+        mock_get_chpp_client.return_value = mock_chpp
+        mock_fetch_teams.return_value = ([12345], ["Test Team"])
 
         # All routes should handle missing data gracefully
         routes_to_test = ["/", "/team", "/player", "/matches", "/training", "/settings"]

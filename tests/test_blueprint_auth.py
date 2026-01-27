@@ -124,26 +124,38 @@ class TestAuthBlueprintLoginRoutes:
         assert response.status_code == 200
         assert b"Password must be at least 8 characters long" in response.data
 
-    @patch("app.blueprints.auth.CHPP")  # Mock CHPP at the blueprint level
+    @patch("app.blueprints.auth.get_current_user_context")  # Mock at import location
+    @patch("app.blueprints.auth.get_chpp_client")  # Mock at import location
     def test_login_existing_user_with_tokens(
-        self, mock_chpp_class, client, sample_user
+        self, mock_get_chpp, mock_get_context, client, sample_user
     ):
         """Test successful login for existing user with OAuth tokens using Custom CHPP client."""
         # Create mock Custom CHPP instance
         mock_chpp_instance = Mock()
 
-        # Mock user and team data - properly handle team ID list
-        mock_user = Mock()
-        mock_user._teams_ht_id = [12345]
+        # Mock the chpp.request() call that happens during team setup
+        mock_request_root = Mock()
+        mock_team_node = Mock()
+        mock_team_node.text = "12345"
+        mock_request_root.findall.return_value = [mock_team_node]
+        mock_chpp_instance.request.return_value = mock_request_root
+
+        # Mock team() call for getting team names
         mock_team = Mock()
         mock_team.name = "Test Team"
-
-        # Configure instance methods
-        mock_chpp_instance.user.return_value = mock_user
         mock_chpp_instance.team.return_value = mock_team
 
-        # Configure class to return instance when called
-        mock_chpp_class.return_value = mock_chpp_instance
+        # Mock user context data
+        mock_get_context.return_value = {
+            "user": Mock(),
+            "team_ids": [12345],
+            "team_names": ["Test Team"],
+            "ht_user": "testuser",
+            "ht_id": 12345,
+        }
+
+        # Configure get_chpp_client to return instance
+        mock_get_chpp.return_value = mock_chpp_instance
 
         response = client.post(
             "/login", data={"username": "testuser", "password": "testpass123"}
@@ -219,9 +231,9 @@ class TestAuthBlueprintOAuthFlow:
 
         mock_handle_callback.assert_called_once_with("test_verifier")
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.blueprints.auth.get_chpp_client_no_auth")
     def test_start_oauth_flow_function(
-        self, mock_chpp_class, auth_app
+        self, mock_get_chpp_no_auth, auth_app
     ):
         """Test start_oauth_flow function."""
         with auth_app.test_request_context():
@@ -234,8 +246,8 @@ class TestAuthBlueprintOAuthFlow:
             }
             mock_chpp_instance.get_auth.return_value = mock_auth
 
-            # Configure class to return instance when called
-            mock_chpp_class.return_value = mock_chpp_instance
+            # Configure utility to return instance
+            mock_get_chpp_no_auth.return_value = mock_chpp_instance
 
             from app.blueprints.auth import start_oauth_flow
 
@@ -245,9 +257,11 @@ class TestAuthBlueprintOAuthFlow:
             assert response is not None
             mock_chpp_instance.get_auth.assert_called_once()
 
-    @patch("app.blueprints.auth.CHPP")
+    @patch("app.chpp_utilities.get_current_user_context")
+    @patch("app.chpp_utilities.get_chpp_client")
+    @patch("app.chpp_utilities.get_chpp_client_no_auth")
     def test_handle_oauth_callback_new_user(
-        self, mock_chpp_class, auth_app
+        self, mock_get_no_auth, mock_get_chpp, mock_get_context, auth_app
     ):
         """Test OAuth callback for new user."""
         with auth_app.test_request_context(), auth_app.test_client() as client:
@@ -255,24 +269,25 @@ class TestAuthBlueprintOAuthFlow:
                 sess["username"] = "newuser"
                 sess["password"] = generate_password_hash("newpass123")
 
-            # Mock CHPP OAuth completion
-            mock_chpp_instance = Mock()
-            mock_chpp_instance.authorize_user.return_value = {
-                "access_token": "new_access_key",
-                "access_token_secret": "new_access_secret",
+            # Mock CHPP client for getting access tokens
+            mock_no_auth_chpp = Mock()
+            mock_no_auth_chpp.get_access_token.return_value = {
+                "key": "new_access_key",
+                "secret": "new_access_secret",
+            }
+            mock_get_no_auth.return_value = mock_no_auth_chpp
+
+            # Mock user context
+            mock_get_context.return_value = {
+                "user": Mock(username="NewHTUser", user_id=99999, ht_id=99999),
+                "team_ids": [99999],
+                "team_names": ["New Team"],
+                "ht_user": "NewHTUser",
+                "ht_id": 99999,
             }
 
-            mock_user = Mock()
-            mock_user.ht_id = 99999
-            mock_user.ht_user = "NewHTUser"
-            mock_user._teams_ht_id = [99999]
-
-            mock_team = Mock()
-            mock_team.name = "New Team"
-
-            mock_chpp_instance.user.return_value = mock_user
-            mock_chpp_instance.team.return_value = mock_team
-            mock_chpp_class.return_value = mock_chpp_instance
+            mock_chpp_instance = Mock()
+            mock_get_chpp.return_value = mock_chpp_instance
 
             from app.blueprints.auth import handle_oauth_callback
 
@@ -304,11 +319,11 @@ class TestAuthBlueprintOAuthFlow:
 class TestAuthBlueprintErrorHandling:
     """Test error handling in authentication."""
 
-    @patch("app.blueprints.auth.CHPP")
-    def test_login_chpp_error_handling(self, mock_chpp_class, client, sample_user):
+    @patch("app.chpp_utilities.get_chpp_client")
+    def test_login_chpp_error_handling(self, mock_get_chpp, client, sample_user):
         """Test handling of CHPP errors during login."""
-        # Mock CHPP class to raise exception when instantiated
-        mock_chpp_class.side_effect = Exception("CHPP API Error")
+        # Mock utility to raise exception when called
+        mock_get_chpp.side_effect = Exception("CHPP API Error")
 
         response = client.post(
             "/login", data={"username": "testuser", "password": "testpass123"}
@@ -318,15 +333,15 @@ class TestAuthBlueprintErrorHandling:
         assert response.status_code == 200
         assert b"Unable to fetch team data" in response.data
 
-    @patch("app.blueprints.auth.CHPP")
-    def test_oauth_callback_error_handling(self, mock_chpp_class, auth_app):
+    @patch("app.chpp_utilities.get_chpp_client_no_auth")
+    def test_oauth_callback_error_handling(self, mock_get_no_auth, auth_app):
         """Test OAuth callback error handling."""
         with auth_app.test_request_context(), auth_app.test_client() as client:
             with client.session_transaction() as sess:
                 sess["username"] = "testuser"
 
-            # Mock CHPP to raise exception
-            mock_chpp_class.side_effect = Exception("OAuth Error")
+            # Mock utility to raise exception
+            mock_get_no_auth.side_effect = Exception("OAuth Error")
 
             from app.blueprints.auth import handle_oauth_callback
 
