@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from flask import Blueprint, render_template, session
 
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
-from app.chpp import CHPP
+from app.chpp_utilities import fetch_user_teams, get_chpp_client
 from app.utils import create_page, diff, dprint, get_player_changes
 
 # Create Blueprint for team routes
@@ -38,19 +38,9 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
 @require_authentication
 def team():
     """Display team information."""
-    chpp = CHPP(
-        consumer_key, consumer_secret, session["access_key"], session["access_secret"]
-    )
+    chpp = get_chpp_client(session)
 
-    current_user = chpp.user()
-    all_teams = current_user._teams_ht_id
-
-    teams = []
-    for teamid in all_teams:
-        dprint(1, teamid)
-        this_team = chpp.team(ht_id=teamid)
-        dprint(2, vars(this_team))
-        teams.append(this_team.name)
+    team_ids, team_names = fetch_user_teams(chpp)
 
     return create_page(template="team.html", title="Team")
 
@@ -76,12 +66,7 @@ def update():
     try:
         # Initialize CHPP with enhanced error handling
         dprint(1, "Initializing CHPP client...")
-        chpp = CHPP(
-            consumer_key,
-            consumer_secret,
-            session["access_key"],
-            session["access_secret"],
-        )
+        chpp = get_chpp_client(session)
         dprint(1, "CHPP client initialized successfully")
 
         # Test basic API connectivity with YouthTeamId error handling

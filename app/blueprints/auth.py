@@ -10,7 +10,11 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from app.chpp import CHPP
+from app.chpp_utilities import (
+    get_chpp_client,
+    get_chpp_client_no_auth,
+    get_current_user_context,
+)
 from app.utils import create_page, dprint
 
 # Create Blueprint for authentication routes
@@ -142,21 +146,21 @@ def login():
             print("Setting up team data")
             dprint(1, "Setting up team data for logged-in user")
             try:
-                dprint(1, f"Got CHPP client class: {CHPP}")
-                chpp = CHPP(
-                    consumer_key,
-                    consumer_secret,
-                    existing_user.access_key,
-                    existing_user.access_secret,
-                )
+                # Create temporary session with user's OAuth tokens for CHPP client
+                temp_session = {
+                    "access_key": existing_user.access_key,
+                    "access_secret": existing_user.access_secret,
+                }
+                dprint(1, "Initializing CHPP client with user credentials")
+                chpp = get_chpp_client(temp_session)
                 dprint(1, "Created CHPP instance")
 
                 # Try to get user and teams, handling YouthTeamId error gracefully
                 try:
-                    dprint(1, "Calling chpp.user() to get user data")
-                    current_user = chpp.user()
-                    dprint(1, f"Got current_user from CHPP: {current_user}")
-                    all_teams = current_user._teams_ht_id
+                    dprint(1, "Fetching user context from CHPP")
+                    user_context = get_current_user_context(chpp)
+                    dprint(1, f"Got user context: {user_context['ht_user']}")
+                    all_teams = user_context["team_ids"]
                     dprint(1, f"Got teams from user: {all_teams}")
                 except Exception as user_error:
                     dprint(1, f"Exception in chpp.user(): {user_error}")
@@ -244,7 +248,7 @@ def login():
 def start_oauth_flow():
     """Start OAuth flow with Hattrick."""
     try:
-        chpp = CHPP(consumer_key, consumer_secret)
+        chpp = get_chpp_client_no_auth()
         auth = chpp.get_auth(callback_url=app.config["CALLBACK_URL"], scope="")
 
         dprint(1, f"OAuth auth response keys: {list(auth.keys()) if auth else 'None'}")
@@ -277,7 +281,7 @@ def handle_oauth_callback(oauth_verifier):
 
     try:
         # Get access tokens
-        chpp = CHPP(consumer_key, consumer_secret)
+        chpp = get_chpp_client_no_auth()
         access_token = chpp.get_access_token(
             request_token=session["request_token"],
             request_token_secret=session["req_secret"],
@@ -288,18 +292,13 @@ def handle_oauth_callback(oauth_verifier):
         session["access_secret"] = access_token["secret"]
 
         # Get user from Hattrick with error handling for CHPP library issues
-        chpp = CHPP(
-            consumer_key,
-            consumer_secret,
-            session["access_key"],
-            session["access_secret"],
-        )
+        chpp = get_chpp_client(session)
 
         current_user = None
         try:
-            current_user = chpp.user()
-            session["current_user"] = current_user.username
-            session["current_user_id"] = current_user.ht_id
+            user_context = get_current_user_context(chpp)
+            session["current_user"] = user_context["ht_user"]
+            session["current_user_id"] = user_context["ht_id"]
         except Exception as chpp_error:
             dprint(1, f"CHPP user() error (likely YouthTeamId issue): {chpp_error}")
             # This is a known CHPP library issue where YouthTeamId field is None
