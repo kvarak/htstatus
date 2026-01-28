@@ -12,8 +12,6 @@
 ## P1: Critical 🔥
 
 - **[UI-011]** Core UI Guidelines Implementation → [Details](.project/tasks/UI-011.md)
-- **[BUG-006]** Fix Players Page "Last Updated" Display → [Details](.project/tasks/BUG-006.md)
-- **[BUG-007]** Fix Debug Page Issues → [Details](.project/tasks/BUG-007.md)
 
 ## P2: Features 🎯
 
@@ -49,6 +47,8 @@
 - **[REFACTOR-032]** Optimize Database Query Performance → [Details](.project/tasks/REFACTOR-032.md)
 - **[INFRA-030]** Add Health Check Endpoints → [Details](.project/tasks/INFRA-030.md)
 - **[INFRA-031]** Implement Application Metrics Collection → [Details](.project/tasks/INFRA-031.md)
+- **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
+- **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
 ## P4: Possibilities 🔮
 
