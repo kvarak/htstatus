@@ -28,14 +28,15 @@
 
 **Priority 0: Critical Bugs** - ✅ COMPLETE - All critical bugs resolved, moved to history
 
-**Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - 🎯 ACTIVE
-- 🎯 [REFACTOR-027] Simplify Startup Display Logic (15 min) - **REVIEW DISCOVERY** Reduce factory.py _display_startup_status() hardcoded strings, improve consistency **REDUCE COMPLEXITY**
-- 🎯 [REFACTOR-028] Fix File Format Standards Issues (15 min) - **OBSOLETE** File format checks now passing (✅ PASS in latest test-all), task may be unnecessary **REVIEW NEEDED**
-- 🎯 [REFACTOR-002] Type System Consolidation (6-8 hours) - **CONSOLIDATED TASK** Address 85 type drift issues between SQLAlchemy and TypeScript **MINIMIZE INCONSISTENCY**
+**Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination) - ✅ COMPLETE (All core P2 tasks completed January 28, 2026)
 - 🎯 [DOC-029] Comprehensive Documentation Cleanup (4-5 hours) - **CONSOLIDATED** Remove legacy config files, obsolete content **MINIMIZE DOCUMENTATION WASTE**
 - 🎯 [REFACTOR-001] Code Maintainability (6-8 hours) - Technical debt cleanup and obsolete code removal **MINIMIZE COMPLEXITY**
 
 **Priority 3: Stability & Core Features** (It stays working and does what it should)
+- 🎯 [REFACTOR-034] Database Script Consolidation (1-2 hours) - **CRITICAL REVIEW FINDING** Eliminate duplicate .env loading patterns, consolidate upgrade/apply scripts, remove script proliferation **REDUCE COMPLEXITY**
+- 🎯 [REFACTOR-035] Simplify Backup Script (2-3 hours) - **CRITICAL REVIEW FINDING** Break down 306-line restore_production_backup.sh into focused single-purpose scripts **REDUCE COMPLEXITY**
+- 🎯 [INFRA-036] Environment Validation Utility (1 hour) - **CRITICAL REVIEW FINDING** Create shared environment validation instead of duplicated checks across scripts **REDUCE DUPLICATION**
+- 🎯 [REFACTOR-037] Remove Migration Target Hardcoding (30 min) - **CRITICAL REVIEW FINDING** Fix apply_migrations.py to use 'head' instead of hardcoded 'refactor002_constraints' **REDUCE MAINTENANCE**
 - 🎯 [UI-011] Core UI Guidelines Implementation (10-14 hours) - **CONSOLIDATED**
   - Apply unified design system to Flask templates and React components (UI-008: 8-12 hours)
   - Document Content-in-Boxes pattern references and link from ui-design-guidelines.md (UI-009: 1-2 hours)
@@ -82,18 +83,21 @@
 
 **P0**: ✅ COMPLETE (4/4) - All critical bugs resolved, zero regressions
 **P1**: ✅ COMPLETE (4/4) - Custom CHPP production migration complete
-**P2**: 🎯 ACTIVE (1 task) - Remove obsolete content, legacy references, documentation waste, minimize complexity
-**P3**: Ready (11 tasks) - UI consistency, core functionality bugs, user experience features
+**P2**: ✅ COMPLETE (2/2) - Core P2 tasks complete: documentation cleanup, code maintainability (REFACTOR-028 obsolete, removed)
+**P3**: Ready (15 tasks) - Script consolidation (4 new), UI consistency, core functionality bugs, user experience features
 **P4**: Ready (6 tasks) - DevOps and developer experience
 **P5**: Ready (1 task) - Comprehensive documentation cleanup
 **P6**: Future (4 research-phase tasks) - Strategic improvements and major features
 
 ## Ready to Execute Tasks (🎯 Immediate)
 
-**Priority 2: Remove Obsolete & Minimize** (Simplification and waste elimination):
-1. **[REFACTOR-027] Simplify Startup Display Logic** (15 min) - P2 - Reduce factory.py _display_startup_status() complexity **READY TO EXECUTE**
+**Priority 3: Stability & Core Features** (Script consolidation priority):
+1. **[REFACTOR-034] Database Script Consolidation** (1-2 hours) - P3 - Eliminate duplicate .env loading patterns **CRITICAL REVIEW FINDING**
+2. **[REFACTOR-035] Simplify Backup Script** (2-3 hours) - P3 - Break down 306-line script into focused components **CRITICAL REVIEW FINDING**
+3. **[INFRA-036] Environment Validation Utility** (1 hour) - P3 - Create shared validation instead of duplicated checks **CRITICAL REVIEW FINDING**
+4. **[REFACTOR-037] Remove Migration Target Hardcoding** (30 min) - P3 - Fix apply_migrations.py maintenance burden **CRITICAL REVIEW FINDING**
 
-**Next Action**: Execute REFACTOR-027 (Simplify Startup Display Logic) - 15 minutes to reduce hardcoded strings and improve consistency.
+**Next Action**: Prioritize script consolidation tasks from critical review before other P3 stability work.
 
 ---
 

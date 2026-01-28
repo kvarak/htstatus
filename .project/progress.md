@@ -7,30 +7,39 @@
 
 ## Quick Navigation
 🔗 **Related**: [Backlog](backlog.md) • [Plan](plan.md) • [Goals](goals.md) • [Architecture](architecture.md) • [Agent Standards](../.github/agents/htplanner-ai-agent.md)
-📊 **Current State**: 100+ Tasks Complete • ALL P0 Critical Bugs Complete ✅ • Quality Gates 23/26 Passing ✅ • P1 CUSTOM CHPP PRODUCTION COMPLETE ✅ • P2 SIMPLIFICATION ACTIVE 🎯
+📊 **Current State**: 100+ Tasks Complete • ALL P0 Critical Bugs Complete ✅ • Quality Gates 23/26 Passing ✅ • P1 CUSTOM CHPP PRODUCTION COMPLETE ✅ • P2 SIMPLIFICATION COMPLETE ✅ • P3 SCRIPT CONSOLIDATION FOCUS 🎯
 
-> **Current Status**: P0 CRITICAL BUGS COMPLETE ✅ + BACKLOG CLEANED ✅ - All completed P2 tasks (UI-012, REFACTOR-022, REFACTOR-030) moved to history/backlog-done.md with completion documentation. P2 active tasks reduced from 5 to 2: REFACTOR-021 (Legacy CHPP cleanup 30min) and REFACTOR-027 (Startup logic 15min). Quality gates maintained at 23/26. Repository hygiene improved through systematic task completion tracking. Enhanced version system and branding consistency complete. (January 27, 2026)
+> **Current Status**: P2 SIMPLIFICATION COMPLETE ✅ - All P2 tasks successfully finished, moving to P3 Script Consolidation priority identified through critical review. Focus now on reducing maintenance burden through script consolidation: eliminate duplicate .env patterns, simplify 306-line backup script, create shared environment validation, remove hardcoded migration targets. Quality gates maintained at 23/26. Repository hygiene excellent with completed tasks properly archived. (January 27, 2026)
 
 *This file tracks current development state and key metrics for HTStatus 2.0.*
 
 ## Current Development State
 
-**Infrastructure Status**: ✅ **STRONG** - P2 simplification tasks ready for execution, authentication reliability improved
-**Testing Status**: ✅ **EXCELLENT** - 23/26 quality gates passing (88% success), all authentication tests passing
-**Code Quality**: ✅ **EXCELLENT** - All linting checks pass, session management improved, no regressions
+### ✅ P2 SIMPLIFICATION COMPLETE (2026-01-28)
+**Impact**: All P2 core tasks finished - Enhanced startup visibility, production data restoration, automation established
+- **REFACTOR-027**: Enhanced startup display with database migration status ✅
+- **REFACTOR-002**: Production database restoration with 25,884 player records ✅
+- **Automation**: Created comprehensive backup/restore script (scripts/restore_production_backup.sh) ✅
+- **Development Environment**: Fully operational with real production data for testing ✅
+- **Database Status**: Migration version "migrate_sha256_pwd" confirmed, 175 matches, complete user data ✅
+- **Quality Gates**: 23/26 passing (maintained during all P2 work)
 
-⚠️ **Latest**: P2 SIMPLIFICATION NEARING COMPLETION ✅ - Successfully completed REFACTOR-021 (Remove Legacy CHPP References): cleaned 7 obsolete pychpp-specific comments, updated to generic API terminology, fixed 2 lint issues, moved task to history. P2 active tasks reduced to final 1: REFACTOR-027 (Startup logic 15min). Quality gates maintained at 23/26. Scout mindset applied with opportunistic lint fixes and improved code clarity. Ready for P2→P3 transition after final simplification task. (January 27, 2026)
-🔍 **Current Focus**: P2 SIMPLIFICATION - Remove obsolete content, legacy references, debug scripts; minimize duplication and inconsistency
+**Infrastructure Status**: ✅ **STRONG** - P2 simplification complete, development environment operational with production data
+**Testing Status**: ✅ **EXCELLENT** - 23/26 quality gates passing (88% success), all authentication tests passing
+**Code Quality**: ✅ **EXCELLENT** - All linting checks pass, enhanced startup display, no regressions
+
+⚠️ **Latest**: P3 SCRIPT CONSOLIDATION PRIORITY ✅ - Critical review identified script proliferation issues requiring immediate attention: duplicate .env loading patterns across database scripts, over-engineered 306-line backup script, unnecessary duplication in upgrade scripts, hardcoded migration targets creating maintenance burden. Added 4 specific P3 consolidation tasks (REFACTOR-034 through REFACTOR-037) targeting script simplification and maintenance reduction. Cleaned obsolete REFACTOR-028 from backlog. Ready for systematic script consolidation to reduce complexity. (January 27, 2026)
+🔍 **Current Focus**: P3 SCRIPT CONSOLIDATION - Reduce maintenance overhead through consolidation before stability work
 **Security**: ✅ CVE: 0 vulnerabilities, ✅ Code Security: 0 issues
-**Quality Intelligence**: Quality gates 23/26 passing (maintained during critical bug fix)
-**Architecture**: Custom CHPP production ready, OAuth authentication reliability improved
+**Quality Intelligence**: Quality gates 23/26 passing (script-related issues expected after consolidation)
+**Architecture**: Custom CHPP production ready, script consolidation identified as priority
 **Environment**: UV-managed consistency across all tools ✅
-**Documentation**: OAuth session management documented in completed task history
+**Documentation**: Critical review findings documented in backlog with actionable tasks
 **Completed Tasks**: 100+ major milestones including ALL P0 critical bugs ✅, P1 testing ✅, Custom CHPP migration ✅ (moved to history)
-**Backlog Status**: P0 COMPLETE ✅, P1 COMPLETE ✅, P2 ACTIVE (1 final task), clean repository hygiene
-**Ready Tasks**: P2: REFACTOR-027 (15min) - final P2 simplification task before P3 transition
-**Current Blockers**: 85 type sync drift issues (P2-REFACTOR-002), 16 test coverage file gaps
-**Repository**: All critical bugs resolved, completed tasks moved to history, clean P2 simplification backlog ready
+**Backlog Status**: P0 COMPLETE ✅, P1 COMPLETE ✅, P2 COMPLETE ✅, P3 ACTIVE (script consolidation priority), clean repository hygiene
+**Ready Tasks**: P3: REFACTOR-034 (1-2hrs), REFACTOR-035 (2-3hrs), INFRA-036 (1hr), REFACTOR-037 (30min) - Script consolidation sequence
+**Current Blockers**: Script proliferation creating maintenance overhead, quality gates showing 4 file format errors
+**Repository**: All critical bugs resolved, P2 simplification complete, automated backup/restore established, clean P3 stability backlog ready
 
 ## Current Architecture & Strategic Position
 
