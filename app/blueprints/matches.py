@@ -306,6 +306,7 @@ def stats():
         team_stats=team_stats,
         top_scorers=top_scorers,
         top_performers=top_performers,
+        current_players=current_players_list,
         match_stats=match_stats,
         trophies=trophies,
         competition_info=competition_info,

@@ -169,6 +169,26 @@ def training():
                 changes = [skills[j] - older_skills[j] for j in range(7)]
             skill_changes[player_id].append((date_val, skills, changes))
 
+    # Get first and latest player records for additional info
+    player_info = {}
+    for player_id in allplayerids:
+        first_record = (
+            db.session.query(Players)
+            .filter_by(ht_id=player_id, owner=teamid)
+            .order_by(text("data_date"))
+            .first()
+        )
+        latest_record = (
+            db.session.query(Players)
+            .filter_by(ht_id=player_id, owner=teamid)
+            .order_by(text("data_date DESC"))
+            .first()
+        )
+        player_info[player_id] = {
+            'first': first_record,
+            'latest': latest_record
+        }
+
     return create_page(
         template="training.html",
         teamname=teamname,
@@ -180,5 +200,6 @@ def training():
         allplayerids=allplayerids,
         allplayers=allplayers,
         skill_changes=skill_changes,
+        player_info=player_info,
         title="Training",
     )
