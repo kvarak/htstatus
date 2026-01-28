@@ -32,8 +32,8 @@ Updated: January 28, 2026 (Use Alembic directly to avoid Flask startup issues)
 """
 
 import os
-import sys
 from pathlib import Path
+
 from alembic import command
 from alembic.config import Config
 from dotenv import load_dotenv

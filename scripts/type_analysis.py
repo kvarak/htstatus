@@ -112,4 +112,4 @@ if __name__ == "__main__":
     api_guarantees = analyze_hattrick_api()
     make_required, keep_optional, special_cases = generate_type_decisions()
 
-    print(f"\nAnalysis complete. Ready to implement type consolidation.")
+    print("\nAnalysis complete. Ready to implement type consolidation.")

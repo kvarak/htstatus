@@ -200,8 +200,9 @@ def _get_database_migration_status():
         if not current_app:
             return "🔄 Database: Status check requires app context"
 
-        from app import db
         from sqlalchemy import text
+
+        from app import db
 
         # Check if database is accessible
         with db.engine.connect() as connection:

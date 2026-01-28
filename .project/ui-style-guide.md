@@ -12,10 +12,10 @@
 ```
 
 ## Implementation
-**Flask**: `.btn-primary-custom`, `.table-custom`, `.card-custom`  
+**Flask**: `.btn-primary-custom`, `.table-custom`, `.card-custom`
 **React**: Use existing Button/Table/Card components
 
-## Typography Scale  
+## Typography Scale
 **h1**: 2.5rem/700, **h2**: 2rem/600, **body**: 1rem/1.6, **spacing**: 4px increments
 
 ## Quality Gates
