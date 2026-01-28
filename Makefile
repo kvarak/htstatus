@@ -53,8 +53,8 @@ help: ## Show this help message
 	@echo "  make dev         # Start development server"
 	@echo ""
 	@echo "Development Workflow:"
-	@echo "  make test-fast   # Quick validation during development"
-	@echo "  make test        # Comprehensive testing before commits"
+	@echo "  make lint        # Quick validation during development"
+	@echo "  make test-single # Run specific test file (FILE=tests/test_name.py)"
 	@echo "  make test-all    # Full quality gates for deployment"
 	@echo ""
 
@@ -152,6 +152,11 @@ lint: check-uv ## Run ruff linting
 		fi; \
 		exit 1; \
 	fi
+
+lint-fix: check-uv ## Auto-fix linting issues using ruff
+	@echo "🔧 Auto-fixing linting issues..."
+	@$(UV) run ruff check . --fix
+	@echo "✅ Linting auto-fix completed"
 
 fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 	@mkdir -p out/tests && rm -f out/tests/$@.json
@@ -338,7 +343,7 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 
 GATES = fileformat lint security-bandit security-deps typesync test-coverage-files
 
-test-all: check-uv services ## ✅ Run all quality gates (lint, security, typesync, tests)
+test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"
 	@mkdir -p out/tests && rm -f out/tests/*.json
 	@count=0; \
