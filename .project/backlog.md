@@ -20,26 +20,17 @@
 - **[FEAT-005]** Team Statistics Dashboard → [Details](.project/tasks/FEAT-005.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-006]** Default Player Groups for New Users → [Details](.project/tasks/FEAT-006.md)
+- **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
+- **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
 ## P3: Maintenance 🔧
 
-- **[REFACTOR-034]** Database Script Consolidation → [Details](.project/tasks/REFACTOR-034.md)
-- **[REFACTOR-035]** Simplify Backup Script → [Details](.project/tasks/REFACTOR-035.md)
-- **[INFRA-036]** Environment Validation Utility → [Details](.project/tasks/INFRA-036.md)
+- **[REFACTOR-035]** Quick File Format Fix → [Details](.project/tasks/REFACTOR-035.md)
 - **[REFACTOR-028]** Fix File Format Standards Issues → [Details](.project/tasks/REFACTOR-028.md)
-- **[CLEANUP-002]** Remove Obsolete Migration Debug Scripts → [Details](.project/tasks/CLEANUP-002.md)
+- **[REFACTOR-034]** Database Script Consolidation → [Details](.project/tasks/REFACTOR-034.md)
 - **[INFRA-029]** Add Error Tracking and Monitoring Infrastructure → [Details](.project/tasks/INFRA-029.md)
-- **[INFRA-020]** Fix GitHub Workflows → [Details](.project/tasks/INFRA-020.md)
-- **[INFRA-023]** Script Linting Cleanup → [Details](.project/tasks/INFRA-023.md)
-- **[DOC-019]** macOS Setup Guide → [Details](.project/tasks/DOC-019.md)
-- **[DOC-020]** UV Installation Guide → [Details](.project/tasks/DOC-020.md)
-- **[DOC-010]** Testing Prompts → [Details](.project/tasks/DOC-010.md)
 - **[FEAT-013]** Error Monitoring System → [Details](.project/tasks/FEAT-013.md)
-- **[DOC-024]** Remove Legacy Setup Instructions → [Details](.project/tasks/DOC-024.md)
-- **[DOC-025]** Update architecture.md File Structure → [Details](.project/tasks/DOC-025.md)
-- **[DOC-026]** Clean backlog.md Historical References → [Details](.project/tasks/DOC-026.md)
-- **[DOC-029]** Comprehensive Documentation Cleanup → [Details](.project/tasks/DOC-029.md)
-- **[REFACTOR-001]** Code Maintainability → [Details](.project/tasks/REFACTOR-001.md)
+- **[DOC-024]** Documentation Cleanup (Legacy Setup, Architecture, Historical References) → [Details](.project/tasks/DOC-024.md)
 - **[UI-013]** Implement Loading States for CHPP Operations → [Details](.project/tasks/UI-013.md)
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 - **[REFACTOR-030]** Implement Rate Limiting for CHPP Requests → [Details](.project/tasks/REFACTOR-030.md)
@@ -47,8 +38,6 @@
 - **[REFACTOR-032]** Optimize Database Query Performance → [Details](.project/tasks/REFACTOR-032.md)
 - **[INFRA-030]** Add Health Check Endpoints → [Details](.project/tasks/INFRA-030.md)
 - **[INFRA-031]** Implement Application Metrics Collection → [Details](.project/tasks/INFRA-031.md)
-- **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
-- **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
 ## P4: Possibilities 🔮
 
