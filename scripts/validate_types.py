@@ -20,7 +20,7 @@ TYPE_MAPPING = {
     "Boolean": "boolean",
     "DateTime": "Date",
     "Float": "number",
-    "PickleType": "any",  # player_columns is serialized data
+    "PickleType": "string[]",  # player_columns maps to string[] in TypeScript
 }
 
 
@@ -47,25 +47,29 @@ def extract_model_fields(models_path: Path) -> dict[str, dict[str, Any]]:
         ]:
             fields = {}
 
-            # Extract db.Column definitions
-            column_pattern = r"(\w+)\s*=\s*db\.Column\(([^)]+)\)"
-            column_matches = re.findall(column_pattern, class_content)
+            # Extract db.Column definitions - match the full line to capture all parameters
+            lines = class_content.split('\n')
+            for line in lines:
+                # Match pattern: field_name = db.Column(...) with optional comment
+                match = re.match(r'\s*(\w+)\s*=\s*db\.Column\((.*?)\)(?:\s*#.*)?$', line.strip())
+                if match:
+                    field_name = match.group(1)
+                    column_def = match.group(2)
 
-            for field_name, column_def in column_matches:
-                # Extract column type
-                type_match = re.match(r"db\.(\w+)(?:\([^)]*\))?", column_def.strip())
-                if type_match:
-                    sql_type = type_match.group(1)
+                    # Extract column type
+                    type_match = re.match(r"db\.(\w+)(?:\([^)]*\))?", column_def.strip())
+                    if type_match:
+                        sql_type = type_match.group(1)
 
-                    # Check for nullable/optional
-                    is_nullable = "nullable=False" not in column_def
-                    is_primary_key = "primary_key=True" in column_def
+                        # Check for nullable/optional
+                        is_nullable = "nullable=False" not in column_def
+                        is_primary_key = "primary_key=True" in column_def
 
-                    fields[field_name] = {
-                        "type": sql_type,
-                        "nullable": is_nullable and not is_primary_key,
-                        "primary_key": is_primary_key,
-                    }
+                        fields[field_name] = {
+                            "type": sql_type,
+                            "nullable": is_nullable and not is_primary_key,
+                            "primary_key": is_primary_key,
+                        }
 
             # Map class name to TypeScript interface name
             ts_name = class_name

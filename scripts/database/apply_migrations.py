@@ -2,7 +2,7 @@
 """
 HTStatus Database Migration Utility
 
-Apply database migrations safely with proper Flask application context.
+Apply database migrations safely using Alembic directly.
 Created during INFRA-011 troubleshooting for authentication system restoration.
 
 Usage:
@@ -13,14 +13,14 @@ Environment:
     Always use 'uv run' to ensure correct dependency resolution.
 
 Features:
-    - Creates Flask app with routes disabled to avoid startup issues
-    - Uses proper application context for migration safety
+    - Uses Alembic directly to avoid Flask app startup issues
+    - Loads database configuration from environment variables
     - Provides clear success/failure feedback
 
 Requirements:
     - Must be run from project root directory
     - Database connection must be properly configured in .env
-    - Flask-Migrate must be installed in environment
+    - Alembic must be installed in environment
 
 Related Commands:
     make db-upgrade     # Standard migration command (recommended)
@@ -28,16 +28,39 @@ Related Commands:
 
 Author: HTStatus Development Team
 Created: January 13, 2026 (INFRA-011 authentication fix)
+Updated: January 28, 2026 (Use Alembic directly to avoid Flask startup issues)
 """
 
-from flask_migrate import upgrade
-
-from app.factory import create_app
+import os
+from alembic import command
+from alembic.config import Config
+from dotenv import load_dotenv
 
 if __name__ == "__main__":
-    # Create app with routes disabled to avoid startup issues
-    app = create_app(include_routes=False)
-    with app.app_context():
-        print("Applying database migrations...")
-        upgrade()
+    # Load environment variables
+    load_dotenv()
+
+    # Get database URL from environment
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        print("❌ ERROR: DATABASE_URL environment variable not set")
+        print("Please ensure .env file contains DATABASE_URL")
+        exit(1)
+
+    print("Applying database migrations...")
+    print(f"Database: {database_url.split('@')[1] if '@' in database_url else 'configured'}")
+
+    try:
+        # Configure Alembic
+        alembic_cfg = Config('migrations/alembic.ini')
+        alembic_cfg.set_main_option('script_location', 'migrations')
+        alembic_cfg.set_main_option('sqlalchemy.url', database_url)
+
+        # Run migrations to our target revision (refactor002_constraints)
+        command.upgrade(alembic_cfg, 'refactor002_constraints')
+
         print("✅ Database migrations completed successfully!")
+
+    except Exception as e:
+        print(f"❌ Migration failed: {e}")
+        exit(1)
