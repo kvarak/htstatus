@@ -32,11 +32,17 @@ Updated: January 28, 2026 (Use Alembic directly to avoid Flask startup issues)
 """
 
 import os
+import sys
+from pathlib import Path
 from alembic import command
 from alembic.config import Config
 from dotenv import load_dotenv
 
 if __name__ == "__main__":
+    # Ensure we're in the project root directory
+    script_dir = Path(__file__).resolve().parent.parent.parent
+    os.chdir(script_dir)
+
     # Load environment variables
     load_dotenv()
 
@@ -53,11 +59,10 @@ if __name__ == "__main__":
     try:
         # Configure Alembic
         alembic_cfg = Config('migrations/alembic.ini')
-        alembic_cfg.set_main_option('script_location', 'migrations')
         alembic_cfg.set_main_option('sqlalchemy.url', database_url)
 
-        # Run migrations to our target revision (refactor002_constraints)
-        command.upgrade(alembic_cfg, 'refactor002_constraints')
+        # Run migrations to latest revision
+        command.upgrade(alembic_cfg, 'head')
 
         print("✅ Database migrations completed successfully!")
 
