@@ -718,6 +718,7 @@ def calculate_team_statistics(players):
         "passing",
         "scorer",
         "set_pieces",
+        "leadership",
     ]
     for skill in skills:
         skill_sum = sum(get_player_attr(player, skill) for player in players)
