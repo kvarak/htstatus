@@ -399,13 +399,3 @@ db-migrate: check-uv ## Create database migration (usage: make db-migrate MESSAG
 db-upgrade: check-uv services ## Apply database upgrades
 	@echo "🗄️  Applying database upgrades..."
 	@./scripts/database/upgrade_local_database.sh --force
-
-# Legacy Support (deprecated but functional)
-.PHONY: legacy-run legacy-changelog
-legacy-run: ## [DEPRECATED] Use 'make dev' instead
-	@echo "⚠️  WARNING: This command is deprecated. Use 'make dev' instead."
-	@bash run.sh
-
-legacy-changelog: ## [DEPRECATED] Use 'make changelog' instead
-	@echo "⚠️  WARNING: This command is deprecated. Use 'make changelog' instead."
-	@bash scripts/changelog.sh
