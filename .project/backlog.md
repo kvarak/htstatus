@@ -7,14 +7,13 @@
 
 ## P0: Production-Breaking 🚨
 
-- **[BUG-009]** Fix Player Changes Calculation Error → [Details](.project/tasks/BUG-009.md)
-- **[BUG-008]** Fix sorttable.js TypeError → [Details](.project/tasks/BUG-008.md)
+*All P0 production-breaking issues resolved as of January 28, 2026*
 
 ## P1: Critical 🔥
 
+- **[UI-011]** Core UI Guidelines Implementation → [Details](.project/tasks/UI-011.md)
 - **[BUG-006]** Fix Players Page "Last Updated" Display → [Details](.project/tasks/BUG-006.md)
 - **[BUG-007]** Fix Debug Page Issues → [Details](.project/tasks/BUG-007.md)
-- **[UI-011]** Core UI Guidelines Implementation → [Details](.project/tasks/UI-011.md)
 
 ## P2: Features 🎯
 
@@ -53,6 +52,8 @@
 
 ## P4: Possibilities 🔮
 
+- **[INFRA-037]** Add Pre-commit Hooks → [Details](.project/tasks/INFRA-037.md)
+- **[TEST-008]** Test Coverage Quality Gates → [Details](.project/tasks/TEST-008.md)
 - **[INFRA-024]** Re-upgrade to pychpp 0.5.10 + Flask 3.1+ → [Details](.project/tasks/INFRA-024.md)
 - **[INFRA-032]** Multi-Region Deployment → [Details](.project/tasks/INFRA-032.md)
 - **[FEAT-010]** Player Comparison Tool → [Details](.project/tasks/FEAT-010.md)
