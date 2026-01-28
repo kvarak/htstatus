@@ -33,8 +33,16 @@ def setup_matches_blueprint(db_instance, match_types, match_roles, match_behavio
 def matches():
     """Display team matches and match details."""
     # Get model classes from registry
+    from app.model_registry import get_user_model
     Match = get_match_model()
     MatchPlay = get_match_play_model()
+
+    # Track user activity
+    User = get_user_model()
+    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    if current_user:
+        current_user.matches()
+        db.session.commit()
 
     teamid = request.values.get("id")
     matchid = request.values.get("m")
@@ -82,6 +90,14 @@ def matches():
 @require_authentication
 def stats():
     """Display team statistics."""
+    from app.model_registry import get_user_model
+
+    # Track user activity (team-related page)
+    User = get_user_model()
+    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    if current_user:
+        current_user.team()
+        db.session.commit()
 
     teamid = request.values.get("id")
 

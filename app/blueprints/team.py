@@ -8,6 +8,7 @@ from flask import Blueprint, render_template, session
 
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
 from app.chpp_utilities import fetch_user_teams, get_chpp_client
+from app.model_registry import get_user_model
 from app.utils import create_page, diff, dprint, get_player_changes
 
 # Create Blueprint for team routes
@@ -38,6 +39,13 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
 @require_authentication
 def team():
     """Display team information."""
+    # Track user activity
+    User = get_user_model()
+    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    if current_user:
+        current_user.team()
+        db.session.commit()
+
     chpp = get_chpp_client(session)
 
     team_ids, team_names = fetch_user_teams(chpp)
@@ -378,6 +386,14 @@ def update():
                 .update({"old_owner": teamid, "owner": 0})
             )
             db.session.commit()
+
+    # Update user's last_update timestamp using model method
+    User = get_user_model()
+    user = db.session.query(User).filter_by(ht_id=current_user_id).first()
+    if user:
+        user.updatedata()  # This method sets last_update and increments c_update
+        db.session.commit()
+        dprint(1, f"Updated user last_update timestamp: {user.last_update}")
 
     return create_page(
         template="update_timeline.html",

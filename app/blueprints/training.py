@@ -28,6 +28,14 @@ def setup_training_blueprint(db_instance, trace_cols):
 def training():
     """Display player training progression and skill development."""
     from models import Players  # Import here to avoid circular dependencies
+    from app.model_registry import get_user_model
+
+    # Track user activity
+    User = get_user_model()
+    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    if current_user:
+        current_user.training()
+        db.session.commit()
 
     teamid = request.values.get("id")
 

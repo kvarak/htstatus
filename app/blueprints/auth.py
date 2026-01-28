@@ -142,6 +142,11 @@ def login():
             dprint(1, f"Set session current_user: {existing_user.ht_user}")
             dprint(1, f"Set session current_user_id: {existing_user.ht_id}")
 
+            # Track login activity
+            existing_user.login()
+            db.session.commit()
+            dprint(1, f"Updated login counter and timestamp for user: {existing_user.ht_user}")
+
             # Setup team data from Hattrick API using OAuth tokens
             print("Setting up team data")
             dprint(1, "Setting up team data for logged-in user")
@@ -302,6 +307,11 @@ def handle_oauth_callback(oauth_verifier):
             # Create current_user object from successful CHPP response
             current_user = user_context["user"]
             dprint(1, f"Successfully got user from CHPP: {current_user.username} (ID: {current_user.ht_id})")
+
+            # Track login activity
+            current_user.login()
+            db.session.commit()
+            dprint(1, f"Updated login counter and timestamp for user: {current_user.ht_user}")
         except Exception as chpp_error:
             dprint(1, f"CHPP user() error (likely YouthTeamId issue): {chpp_error}")
             # This is a known CHPP library issue where YouthTeamId field is None
@@ -349,6 +359,11 @@ def handle_oauth_callback(oauth_verifier):
                     1,
                     f"Using existing user data: {existing_user.ht_user} ({existing_user.ht_id})",
                 )
+
+                # Track login activity
+                existing_user.login()
+                db.session.commit()
+                dprint(1, f"Updated login counter and timestamp for user: {existing_user.ht_user}")
 
                 # Create a minimal current_user object for the rest of the function
                 class MinimalUser:
