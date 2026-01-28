@@ -280,7 +280,7 @@ def parse_players(root: ET.Element) -> list[CHPPPlayer]:
         # Team and league data
         caps = safe_find_int(player_node, "Caps", 0)
         caps_u20 = safe_find_int(player_node, "CapsU20", 0)
-        country_id = safe_find_int(player_node, "NativeCountryID", None)
+        country_id = safe_find_int(player_node, "NativeLeagueID", None)
         salary = safe_find_int(player_node, "Salary", None)
         national_team_id = safe_find_int(player_node, "NationalTeamID", None)
 
@@ -408,7 +408,7 @@ def parse_player(root: ET.Element) -> CHPPPlayer:
     agreeability = safe_find_text(player_elem, "Agreeability")
     aggressiveness = safe_find_text(player_elem, "Aggressiveness")
     honesty = safe_find_text(player_elem, "Honesty")
-    country_id_text = safe_find_text(player_elem, "NativeCountryID")
+    country_id_text = safe_find_text(player_elem, "NativeLeagueID")
     country_id = int(country_id_text) if country_id_text else None
     salary_text = safe_find_text(player_elem, "Salary")
     salary = int(salary_text) if salary_text else None
