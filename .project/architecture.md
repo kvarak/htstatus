@@ -6,8 +6,8 @@
 > **Standards**: Follow [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) for editing guidelines
 
 ## Quick Navigation
-🔗 **Project Context**: [Plan](plan.md) • [Progress](progress.md) • [Goals](goals.md) • [Backlog](backlog.md)
-🛠️ **Technical Details**: [Rules](rules.md) • [Implementation Guide](../TECHNICAL.md) • [Setup Instructions](../README.md)
+🔗 **Project Context**: [Goals](goals.md) • [Backlog](backlog.md)
+🛠️ **Setup Instructions**: [README.md](../README.md) for user setup • [DEPLOYMENT.md](../DEPLOYMENT.md) for production
 
 *This file preserves all 2.0 architecture documentation, adapted to the new format. Update as the project evolves.*
 
@@ -202,3 +202,61 @@ htstatus-2.0/
 - [Change History](../CHANGELOG.md) - Version history and architectural evolution
 
 📋 **Development Tasks**: [Project Backlog](backlog.md) - Architecture-related tasks and technical debt items
+
+## Implementation Standards
+
+### Hattrick Domain Knowledge
+
+**Critical Ownership Hierarchy**:
+- **User ID** (e.g., 182085 "kvarak") owns teams
+- **Team ID** (e.g., 9838 "Dalby Stenbrotters") owns players
+- `Players.owner` field = Team ID (correct in historical data)
+- `session['current_user_id']` = User ID
+- `session['all_teams']` = list of Team IDs owned by user
+
+**Important**: Auth fallback code must not use User ID as Team ID when `_teams_ht_id` fails, as URL patterns like `/player?id=USER_ID` will fail to find players owned by TEAM_ID.
+
+### Development Environment
+
+**Python Execution**: Always use `uv run python` (never direct python calls)
+**Commands**: Use `make help` for available workflow commands
+**Quality Gates**: Run `make test-all` before marking tasks complete
+
+### CHPP Integration
+
+**Feature Flag**: `USE_CUSTOM_CHPP` environment variable toggles between custom CHPP and pychpp client (default: false)
+- `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (legacy fallback, backward compatible)
+- `USE_CUSTOM_CHPP=true`: Uses custom CHPP client (app/chpp/) - **PRODUCTION READY**
+
+**Custom CHPP Client**: ✅ ALL ENDPOINTS IMPLEMENTED
+- `user()` - Get current user and team IDs
+- `team(ht_id)` - Get team details and players
+- `player(id_)` - Get individual player details
+- `matches_archive(id_, is_youth)` - Get team match history
+- YouthTeamId bug fixed (handles as optional field)
+- Zero breaking changes from pychpp interface
+
+### Database Migration Standards
+
+**Backward Compatibility**: All schema changes must work with multiple application versions simultaneously
+
+**Safe Patterns**:
+- ✅ Adding nullable columns (applications ignore new columns)
+- ✅ Adding indices (improves performance, backward compatible)
+- ✅ Adding constraints with default values
+- ❌ Removing columns in use by active versions
+- ❌ Making columns non-nullable without defaults
+- ❌ Renaming columns without deprecation period
+
+**Migration Commands**:
+```bash
+uv run python scripts/database/apply_migrations.py  # Safe migrations
+uv run alembic revision --autogenerate -m "description"  # Generate
+uv run alembic upgrade head  # Apply
+```
+
+### Security Standards
+
+- Never commit secrets (API keys, tokens, passwords) - use environment variables
+- Subprocess usage limited to static dev tooling only (git version detection)
+- Document security rationale for Bandit B404/B607/B603 skips

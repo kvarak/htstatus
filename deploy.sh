@@ -213,6 +213,15 @@ cd $DEPLOY_REPO_PATH
 git fetch --all
 git reset --hard $DEPLOY_GIT_BRANCH
 git pull
+
+# Clean up any untracked migration files that could cause multiple heads
+find migrations/versions/ -name "*.py" -not -path "*/__pycache__/*" | while read -r file; do
+    if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
+        echo "Removing untracked migration file: $file"
+        rm -f "$file"
+    fi
+done
+
 ./scripts/changelog.sh || ./changelog.sh
 
 # Clear Python bytecode cache to force reload of updated code

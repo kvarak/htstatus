@@ -296,36 +296,36 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 
 **For AI Agents**:
 1. **ALWAYS read .project/ docs before starting work**
-   - Read `backlog.md` to understand active tasks
+   - Read `backlog.md` to understand active tasks and priorities
+   - Read individual task files in `.project/tasks/<taskid>.md` for detailed requirements
    - Read this agent file for development standards
    - Read relevant documentation for context
 
-2. **Follow simplification hierarchy consistently**
+2. **Task File Structure** (NEW):
+   - Task details are stored in individual `.project/tasks/<taskid>.md` files
+   - `backlog.md` contains summary view with links to task files
+   - When tasks are completed, DELETE the task file (git preserves history)
+   - Task files contain: Problem Statement, Implementation details, Acceptance Criteria
+
+3. **Follow simplification hierarchy consistently**
    - Apply holistic view first
    - Reduce complexity within components
    - Eliminate waste and unused code
    - Consolidate identical patterns only
 
-3. **Update task status appropriately**
+4. **Update task status appropriately**
    - Mark tasks 🚀 ACTIVE when starting
    - Mark tasks ✅ COMPLETED when finished
-   - **CRITICAL**: Immediately move completed tasks to `.project/history/backlog-done.md` and delete from backlog
+   - **CRITICAL**: Move completed tasks to `.project/history/backlog-done.md` and DELETE from backlog
+   - **NEW**: DELETE completed task files from `.project/tasks/` (git preserves history)
    - Add new discovered tasks to backlog
 
-4. **Maintain clean backlog at all times**
+5. **Maintain clean backlog at all times**
    - Never leave ✅ COMPLETED tasks in backlog.md after finishing work
    - Use search pattern `✅.*COMPLETE` to find all completed tasks during update prompts
    - Backlog should only contain active (🚀), ready (🎯), or future (🔮) tasks
    - Historical tasks belong in `.project/history/backlog-done.md` with completion dates
-   - Reduce complexity within components
-   - Eliminate waste and unused code
-   - Consolidate identical patterns only
-
-3. **Update task status appropriately**
-   - Mark tasks 🚀 ACTIVE when starting
-   - Mark tasks ✅ COMPLETED when finished
-   - Move completed tasks to `.project/history/backlog-done.md`
-   - Add new discovered tasks to backlog
+   - **NEW**: Completed task files must be deleted from `.project/tasks/`
 
 #### Coding Standards
 
