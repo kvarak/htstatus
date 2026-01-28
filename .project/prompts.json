@@ -52,7 +52,7 @@
       "name": "update",
       "title": "Update project status and planning",
       "what to do": [
-        "Add suggestions from the 'review' prompt to backlog.md unless already present or can be merged.",
+        "Add suggestions from the 'review' prompt to backlog.md under 'P4: Possibilities' unless already present or can be merged.",
         "STEP 1: Read .project/backlog.md and identify ALL completed tasks (marked ✅ COMPLETE or OBSOLETE).",
         "STEP 2: For EACH completed and obsolete task found, DELETE the completed task from backlog.md (git preserves history).",
         "STEP 3: DELETE the corresponding task file from .project/tasks/<taskid>.md for each completed task (git preserves history).",

@@ -17,6 +17,14 @@
 - Phase 4: Cross-browser and responsive testing
 
 ## Recent Completions (January 28, 2026)
+
+### Chart Development Simplification
+- **Leadership Charts Removal**: Removed complex radar charts, bubble charts, and timeline visualizations based on user feedback
+- **Stats Page Simplified**: Reduced to essential Squad Composition and Team Age Distribution charts only
+- **Training Page Enhanced**: Added dual progress bar system (base + improvement) with clearer "Current" headers
+- **Architecture Learning**: Identified need for modular chart system to prevent repetitive cleanup cycles
+
+### Country Data & UI Improvements
 - **Country Data Fix**: Fixed CHPP XML parsing to use NativeLeagueID instead of NativeCountryID
   - Resolved "unknown countries" appearing in pie charts (IDs 40, 180, 191)
   - Added comprehensive country mapping system with flags and colors (279 countries)
@@ -36,14 +44,25 @@
 - **BUG-008**: Fixed sorttable.js TypeError preventing table functionality (January 28, 2026)
 - **Major simplification**: Eliminated 20+ redundant files, reduced repository complexity by 67%
 
+### Process Improvements
+- **Critical Review**: Identified over-simplification patterns and architectural issues with hardcoded implementations
+- **Backlog Organization**: Added 4 new tasks addressing modular chart system, user preferences, and UI consistency
+- **Task File Integration**: Synchronized backlog.md with all task files, ensuring no orphaned tasks
+
 ## Ready Tasks (P2 Features)
+- **UI-015**: Create Modular Chart Component System (NEW - addresses architectural issues)
+- **FEAT-016**: Alternative Leadership Indicators (NEW - simple text-based leadership metrics)
+- **UI-016**: Training Page UI Consistency (NEW - align with stats page patterns)
+- **FEAT-017**: User Preference System (NEW - prevent future feature rejection cycles)
 - **FEAT-009**: Display Player Group Names in Update Timeline
 - **DOC-021**: New Player Tutorial
 - **FEAT-005**: Team Statistics Dashboard
 
-## Ready Tasks (P3 Maintenance)
+## Ready Tasks (P4 Possibilities)
+- **DOC-025**: Update architecture.md File Structure (re-integrated from orphaned task files)
+- **DOC-026**: Clean backlog.md Historical References (re-integrated from orphaned task files)
+- **FEAT-003**: Formation Tester & Tactics Analyzer (re-integrated from orphaned task files)
 - **REFACTOR-034**: Database Script Consolidation
-- **REFACTOR-035**: Simplify Backup Script
 - **REFACTOR-036**: Consolidate Activity Tracking Pattern (HIGH PRIORITY - new discovery)
 - **REFACTOR-037**: Optimize User Context Queries (HIGH PRIORITY - new discovery)
 

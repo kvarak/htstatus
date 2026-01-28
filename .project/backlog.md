@@ -43,6 +43,13 @@
 
 ## P4: Possibilities 🔮
 
+- **[UI-015]** Create Modular Chart Component System (50 min) - Consolidate hardcoded Chart.js implementations
+- **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics
+- **[UI-016]** Training Page UI Consistency (20 min) - Align training page styling with stats page patterns
+- **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences to avoid future rejections
+- **[DOC-025]** Update architecture.md File Structure → [Details](.project/tasks/DOC-025.md)
+- **[DOC-026]** Clean backlog.md Historical References → [Details](.project/tasks/DOC-026.md)
+- **[FEAT-003]** Formation Tester & Tactics Analyzer → [Details](.project/tasks/FEAT-003.md)
 - **[INFRA-037]** Add Pre-commit Hooks → [Details](.project/tasks/INFRA-037.md)
 - **[TEST-008]** Test Coverage Quality Gates → [Details](.project/tasks/TEST-008.md)
 - **[INFRA-024]** Re-upgrade to pychpp 0.5.10 + Flask 3.1+ → [Details](.project/tasks/INFRA-024.md)
