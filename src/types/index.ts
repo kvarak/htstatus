@@ -4,124 +4,125 @@ export interface User {
   ht_id: number;
   ht_user: string;
   username: string;
+  password?: string;  // Security field - optional in interface
   access_key?: string;
   access_secret?: string;
-  c_login: number;
-  c_team: number;
-  c_player: number;
-  c_matches: number;
-  c_training: number;
-  c_update: number;
+  c_login?: number;
+  c_team?: number;
+  c_player?: number;
+  c_matches?: number;
+  c_training?: number;
+  c_update?: number;
   last_login?: Date;
   last_update?: Date;
   last_usage?: Date;
   created?: Date;
-  role: string;
-  player_columns?: string[];
+  role?: string;
+  player_columns?: string[];  // PickleType -> string[]
 }
 
 export interface Player {
   ht_id: number;
   data_date: Date;
-  first_name: string;
-  nick_name?: string;
-  last_name: string;
-  number: number;
-  category_id: number;
+  first_name: string;  // Required - core identity
+  nick_name?: string;  // Optional - not always provided
+  last_name: string;  // Required - core identity
+  number?: number;
+  category_id?: number;
   owner_notes?: string;
-  age_years: number;
-  age_days: number;
-  age: string;
-  next_birthday: Date;
-  arrival_date: Date;
-  form: number;
-  cards: number;
-  injury_level: number;
+  age_years?: number;
+  age_days?: number;
+  age?: string;
+  next_birthday?: Date;
+  arrival_date?: Date;
+  form?: number;
+  cards?: number;
+  injury_level?: number;  // Optional - may be 0 or null
   statement?: string;
   language?: string;
-  language_id: number;
-  agreeability: number;
-  aggressiveness: number;
-  honesty: number;
-  experience: number;
-  loyalty: number;
-  specialty: number;
-  native_country_id: number;
-  native_league_id: number;
-  native_league_name: string;
-  tsi: number;
-  salary: number;
-  caps: number;
-  caps_u20: number;
-  career_goals: number;
-  career_hattricks: number;
-  league_goals: number;
-  cup_goals: number;
-  friendly_goals: number;
-  current_team_matches: number;
-  current_team_goals: number;
+  language_id?: number;
+  agreeability?: number;
+  aggressiveness?: number;
+  honesty?: number;
+  experience?: number;
+  loyalty?: number;
+  specialty?: number;
+  native_country_id?: number;
+  native_league_id?: number;
+  native_league_name?: string;
+  tsi?: number;
+  salary?: number;
+  caps?: number;  // Optional - not all players have caps
+  caps_u20?: number;  // Optional - not all players have caps
+  career_goals?: number;
+  career_hattricks?: number;
+  league_goals?: number;
+  cup_goals?: number;
+  friendly_goals?: number;
+  current_team_matches?: number;
+  current_team_goals?: number;
   national_team_id?: number;
   national_team_name?: string;
-  is_transfer_listed: boolean;
-  team_id: number;
-  stamina: number;
-  keeper: number;
-  defender: number;
-  playmaker: number;
-  winger: number;
-  passing: number;
-  scorer: number;
-  set_pieces: number;
-  owner: number;
-  old_owner: number;
-  mother_club_bonus: boolean;
-  leadership: number;
+  is_transfer_listed?: boolean;
+  team_id?: number;
+  stamina?: number;
+  keeper?: number;
+  defender?: number;
+  playmaker?: number;
+  winger?: number;
+  passing?: number;
+  scorer?: number;
+  set_pieces?: number;
+  owner?: number;
+  old_owner?: number;
+  mother_club_bonus?: boolean;  // Optional - not all players have this
+  leadership?: number;
 }
 
 export interface Match {
   ht_id: number;
-  home_team_id: number;
-  home_team_name: string;
-  away_team_id: number;
-  away_team_name: string;
-  datetime: Date;
-  matchtype: number;
-  context_id: number;
-  rule_id: number;
-  cup_level: number;
-  cup_level_index: number;
-  home_goals: number;
-  away_goals: number;
+  home_team_id: number;  // Required - core match data
+  home_team_name: string;  // Required - core match data
+  away_team_id: number;  // Required - core match data
+  away_team_name: string;  // Required - core match data
+  datetime?: Date;
+  matchtype?: number;
+  context_id?: number;
+  rule_id?: number;
+  cup_level?: number;  // Optional - only for cup matches
+  cup_level_index?: number;  // Optional - only for cup matches
+  home_goals?: number;
+  away_goals?: number;
 }
 
 export interface MatchPlay {
   id: number;
-  match_id: number;
-  player_id: number;
-  datetime: Date;
-  first_name: string;
+  match_id: number;  // Required - core relationship
+  player_id: number;  // Required - core relationship
+  datetime?: Date;
+  first_name: string;  // Required - core player identity
   nick_name?: string;
-  last_name: string;
-  role_id: number;
-  rating_stars: number;
-  rating_stars_eom: number;
-  behaviour: number;
+  last_name: string;  // Required - core player identity
+  role_id?: number;
+  rating_stars?: number;
+  rating_stars_eom?: number;  // Optional - may not always be available
+  behaviour?: number;  // Optional - may not always be available
 }
 
 export interface PlayerGroup {
   id: number;
-  user_id: number;
-  name: string;
-  order: number;
-  textcolor: string;
-  bgcolor: string;
+  user_id: number;  // Required - core relationship
+  name: string;  // Required - core group data
+  order?: number;
+  textcolor?: string;
+  bgcolor?: string;
 }
 
 export interface PlayerSetting {
   id: number;
-  user_id: number;
-  group_id: number;
-  player_id: number;
+  user_id: number;  // Required - core relationship
+  group_id?: number;  // Optional - player may not be in a group
+  player_id: number;  // Required - core relationship
 }
 
 // UI Types

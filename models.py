@@ -13,9 +13,9 @@ class MatchPlay(db.Model):
     match_id = db.Column(db.Integer, primary_key=True)
     player_id = db.Column(db.Integer, primary_key=True)
     datetime = db.Column(db.DateTime)
-    first_name = db.Column(db.String(100))
+    first_name = db.Column(db.String(100), nullable=False)
     nick_name = db.Column(db.String(100))
-    last_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100), nullable=False)
     role_id = db.Column(db.Integer)
     rating_stars = db.Column(db.Float)
     rating_stars_eom = db.Column(db.Float)
@@ -44,10 +44,10 @@ class Match(db.Model):
     __tablename__ = "match"
 
     ht_id = db.Column(db.Integer, primary_key=True)
-    home_team_id = db.Column(db.Integer)
-    home_team_name = db.Column(db.String(100))
-    away_team_id = db.Column(db.Integer)
-    away_team_name = db.Column(db.String(100))
+    home_team_id = db.Column(db.Integer, nullable=False)
+    home_team_name = db.Column(db.String(100), nullable=False)
+    away_team_id = db.Column(db.Integer, nullable=False)
+    away_team_name = db.Column(db.String(100), nullable=False)
     datetime = db.Column(db.DateTime)
     matchtype = db.Column(db.Integer)
     context_id = db.Column(db.Integer)
@@ -83,9 +83,9 @@ class PlayerSetting(db.Model):
     __tablename__ = "playersetting"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey("playergroup.id"))
-    player_id = db.Column(db.Integer)
+    player_id = db.Column(db.Integer, nullable=False)
 
     def __init__(self, player_id, user_id, group_id):
         self.user_id = user_id
@@ -103,8 +103,8 @@ class Group(db.Model):
     __tablename__ = "playergroup"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"))
-    name = db.Column(db.String(100))
+    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
     order = db.Column(db.Integer)
     textcolor = db.Column(db.String(100))
     bgcolor = db.Column(db.String(100))
@@ -127,8 +127,8 @@ class User(db.Model):
     __tablename__ = "users"
 
     ht_id = db.Column(db.Integer, primary_key=True, unique=True)
-    ht_user = db.Column(db.String(100), unique=True)
-    username = db.Column(db.String(100), unique=True)
+    ht_user = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255))  # Increased from 100 to 255 for modern hashing
     access_key = db.Column(db.String(100))
     access_secret = db.Column(db.String(100))
@@ -229,9 +229,9 @@ class Players(db.Model):
 
     ht_id = db.Column(db.Integer, primary_key=True)
     data_date = db.Column(db.DateTime, primary_key=True)
-    first_name = db.Column(db.String)
+    first_name = db.Column(db.String, nullable=False)
     nick_name = db.Column(db.String)
-    last_name = db.Column(db.String)
+    last_name = db.Column(db.String, nullable=False)
     number = db.Column(db.Integer)
     category_id = db.Column(db.Integer)
     owner_notes = db.Column(db.String)

@@ -25,11 +25,29 @@ logger = logging.getLogger('alembic.env')
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from flask import current_app
-config.set_main_option(
-    'sqlalchemy.url',
-    str(current_app.extensions['migrate'].db.engine.url).replace('%', '%%'))
-target_metadata = current_app.extensions['migrate'].db.metadata
+
+try:
+    from flask import current_app
+    config.set_main_option(
+        'sqlalchemy.url',
+        str(current_app.extensions['migrate'].db.engine.url).replace('%', '%%'))
+    target_metadata = current_app.extensions['migrate'].db.metadata
+except RuntimeError:
+    # Running outside Flask context (e.g., direct alembic command)
+    # Use the database URL from alembic.ini or environment
+    import os
+    database_url = config.get_main_option("sqlalchemy.url")
+    if not database_url:
+        database_url = os.environ.get('DATABASE_URL')
+    if database_url:
+        config.set_main_option('sqlalchemy.url', database_url)
+
+    # Import models directly for metadata
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from models import db
+    target_metadata = db.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -83,11 +101,19 @@ def run_migrations_online():
     )
 
     with connectable.connect() as connection:
+        # Get configure args from Flask if available, otherwise use defaults
+        try:
+            from flask import current_app
+            configure_args = current_app.extensions['migrate'].configure_args
+        except (RuntimeError, KeyError):
+            # Running outside Flask context, use minimal configuration
+            configure_args = {}
+
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
             process_revision_directives=process_revision_directives,
-            **current_app.extensions['migrate'].configure_args
+            **configure_args
         )
 
         with context.begin_transaction():
