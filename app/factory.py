@@ -71,6 +71,10 @@ def create_app(config_object=None, include_routes=True):
     if include_routes:
         setup_routes(app, db)
 
+    # Display configuration status after everything is set up
+    with app.app_context():
+        _display_startup_status()
+
     return app
 
 
@@ -156,19 +160,93 @@ def setup_routes(app_instance, db_instance):
     app_instance.register_blueprint(team_bp)
     app_instance.register_blueprint(matches_bp)
     app_instance.register_blueprint(training_bp)
-    # Display configuration status at startup
-    _display_startup_status()
 
 
 def _display_startup_status():
     """Display application configuration status at startup.
 
-    Shows the current CHPP client configuration and other relevant
-    configuration details for operational awareness.
+    Shows the current CHPP client configuration, database migration status,
+    and other relevant configuration details for operational awareness.
     """
+    # Configuration constants for consistent formatting
+    SEPARATOR_WIDTH = 60
+    STATUS_PREFIX = "  "
+
+    separator = "=" * SEPARATOR_WIDTH
+
+    # Get CHPP client status
     chpp_status = "✅ Using Custom CHPP Client (app.chpp)"
 
-    print(f"\n{'='*60}")
+    # Get database migration status
+    db_status = _get_database_migration_status()
+
+    print(f"\n{separator}")
     print("Configuration Status:")
-    print(f"  {chpp_status}")
-    print(f"{'='*60}\n")
+    print(f"{STATUS_PREFIX}{chpp_status}")
+    print(f"{STATUS_PREFIX}{db_status}")
+    print(f"{separator}\n")
+
+
+def _get_database_migration_status():
+    """Get current database migration status for startup display.
+
+    Returns:
+        str: Formatted database status message
+    """
+    try:
+        from flask import current_app
+
+        # Ensure we're in app context
+        if not current_app:
+            return "🔄 Database: Status check requires app context"
+
+        from app import db
+        from sqlalchemy import text
+
+        # Check if database is accessible
+        with db.engine.connect() as connection:
+            # Check if alembic_version table exists
+            result = connection.execute(text("""
+                SELECT table_name FROM information_schema.tables
+                WHERE table_schema = 'public' AND table_name = 'alembic_version'
+            """))
+
+            if result.fetchone() is None:
+                # No alembic_version table = fresh database with tables created via db.create_all()
+                return "✅ Database: Schema ready (created via db.create_all())"
+
+            # Get current migration version
+            result = connection.execute(text("SELECT version_num FROM alembic_version"))
+            current_version = result.fetchone()
+
+            if current_version is None:
+                return "🔄 Database: No migrations applied"
+
+            version = current_version[0]
+            version_short = version[:8] if version else "unknown"
+
+            # Try to get migration file name for more info
+            try:
+                import os
+                migrations_dir = "migrations/versions"
+                if os.path.exists(migrations_dir):
+                    for filename in os.listdir(migrations_dir):
+                        if filename.startswith(version_short):
+                            # Extract meaningful name from filename
+                            name_part = filename.replace(version_short + '_', '').replace('.py', '')
+                            if name_part and name_part != '_':
+                                return f"✅ Database: {version_short} ({name_part.replace('_', ' ')})"
+                            break
+            except Exception:
+                pass
+
+            return f"✅ Database: Migration {version_short}"
+
+    except Exception as e:
+        error_msg = str(e)
+        if "does not exist" in error_msg:
+            return "🔄 Database: Tables not created"
+        elif "connection" in error_msg.lower():
+            return "❌ Database: Connection failed"
+        elif "Working outside of application" in error_msg:
+            return "🔄 Database: Checking after app startup..."
