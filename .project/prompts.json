@@ -55,12 +55,10 @@
         "Add suggestions from the 'review' prompt to backlog.md unless already present or can be merged.",
         "STEP 1: Read .project/backlog.md and identify ALL completed tasks (marked ✅ COMPLETE or OBSOLETE).",
         "STEP 2: For EACH completed and obsolete task found, DELETE the completed task from backlog.md (git preserves history).",
-        "STEP 3: DELETE the corresponding task file from .project/tasks/<taskid>.md for each completed task (git will preserve history).",
-        "STEP 4: Review progress.md, backlog.md for holistic consolidation opportunities.",
-        "STEP 5: Update with recent accomplishments. Update priority counts (P0: X/Y complete).",
-        "STEP 6: Make sure 'make help' reflects current state (compare with Makefile).",
-        "STEP 7: Unblock dependencies. Update docs to reflect current state.",
-        "STEP 8: Remove any completed plans from .project/plans/ directory.",
+        "STEP 3: DELETE the corresponding task file from .project/tasks/<taskid>.md for each completed task (git preserves history).",
+        "STEP 4: Review backlog.md for holistic consolidation opportunities.",
+        "STEP 5: Make sure 'make help' reflects current state (compare with Makefile).",
+        "STEP 6: Unblock dependencies. Update docs to reflect current state.",
         "CRITICAL: The backlog must be completely clean of ✅ COMPLETE tasks after this prompt. Search systematically for '✅.*COMPLETE' pattern and remove ALL matches.",
         "Do not commit code."
       ]
@@ -108,7 +106,7 @@
       "what to do": [
         "Use list_dir and file_search to analyze repository structure with focus on simplification.",
         "Take a holistic view: identify duplication, waste, over-engineered solutions, and unnecessary complexity.",
-        "Review all docs (README.md, .project/*, TECHNICAL.md, DEPLOYMENT.md, docs/*) for redundancy and outdated content.",
+        "Review all docs (README.md, .project/*, DEPLOYMENT.md) for redundancy and outdated content.",
         "Find opportunities to consolidate, merge, or eliminate redundant components and processes.",
         "Create backlog tasks for: simplification, deduplication, waste reduction, complexity reduction.",
         "Structure: # Analysis ## Simplification Opportunities ## Duplication & Waste ## Complexity Reduction ## Actions"
@@ -131,11 +129,11 @@
       "name": "look-outside-the-box",
       "title": "Generate innovative opportunities",
       "what to do": [
-        "Scan plan.md, progress.md, backlog.md for existing suggestions.",
+        "Scan backlog.md, goals.md for existing suggestions.",
         "Simplification Challenge: What if we eliminated 50% of features?",
         "Black Hat: Question 2-3 fundamental decisions. What could collapse the project?",
         "Techniques: Contrarian questions, industry analogies, radical simplification.",
-        "Add high-value suggestions to plan.md Future Opportunities.",
+        "Add high-value suggestions to backlog.md or goals.md as appropriate.",
         "Structure: # Innovation ## Assessment ## Challenges ## Opportunities"
       ]
     }
