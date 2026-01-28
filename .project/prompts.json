@@ -35,14 +35,16 @@
     },
     {
       "name": "review",
-      "title": "Review previous development work with simplification focus",
+      "title": "Critical review of recent development work",
       "what to do": [
-        "Review all changes since last commit. Read .github/agents/htplanner-ai-agent.md, .project/ docs.",
-        "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
-        "Identify: complexity (monoliths, unclear responsibilities), waste (unused code, redundant logic), inappropriate consolidation (merging distinct tools).",
-        "Respect separation of concerns: Don't merge tools with different purposes (e.g., qi-json.sh, pytest-qi-parser.sh, quality-intelligence.sh each have distinct roles).",
-        "Test: `make test-all`. Check docs alignment with goals.md.",
-        "Add appropriate simplification tasks to backlog: eliminate waste, reduce complexity within components, consolidate identical patterns.",
+        "Review changes since last commit. Be critical, not celebratory.",
+        "Structure: ## What Was Done ## Critical Analysis ## Missed Opportunities ## Questions",
+        "What Was Done: 3-4 bullet points max. Facts only, no praise.",
+        "Critical Analysis: What could have been simpler? What seems over-engineered? What creates new dependencies or complexity?",
+        "Missed Opportunities: What obvious improvements were skipped? What cleanup was ignored?",
+        "Questions: Challenge 2-3 decisions. Why this approach vs alternatives? What are the downsides?",
+        "Test: `make test-all` - note failures and quality regressions.",
+        "Add specific improvement tasks to backlog based on identified issues.",
         "Do not commit code."
       ]
     },
@@ -50,8 +52,9 @@
       "name": "update",
       "title": "Update project status and planning",
       "what to do": [
-        "STEP 1: Read .project/backlog.md and identify ALL completed tasks (marked ✅ COMPLETE).",
-        "STEP 2: For EACH completed task found, move the complete task description to .project/history/backlog-done.md with completion date, then DELETE the completed task from backlog.md.",
+        "Add suggestions from the 'review' prompt to backlog.md unless already present or can be merged.",
+        "STEP 1: Read .project/backlog.md and identify ALL completed tasks (marked ✅ COMPLETE or OBSOLETE).",
+        "STEP 2: For EACH completed and obsolete task found, move the complete task description to .project/history/backlog-done.md with completion date, then DELETE the completed task from backlog.md.",
         "STEP 3: Review progress.md, backlog.md for holistic consolidation opportunities.",
         "STEP 4: Update with recent accomplishments. Update priority counts (P0: X/Y complete).",
         "STEP 5: Make sure 'make help' reflects current state (compare with Makefile).",
