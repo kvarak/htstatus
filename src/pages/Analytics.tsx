@@ -88,7 +88,7 @@ export default function Analytics() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Squad Size
+                    Team Size
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -141,7 +141,7 @@ export default function Analytics() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{avgForm}/8</div>
-                  <div className="text-xs text-muted-foreground">Squad fitness</div>
+                  <div className="text-xs text-muted-foreground">Team fitness</div>
                 </CardContent>
               </Card>
             </div>

@@ -108,7 +108,7 @@ export default function Players() {
                   Players
                 </h1>
                 <p className="text-muted-foreground">
-                  Manage your squad and player development
+                  Manage your team and player development
                 </p>
               </div>
               <Button variant="pitch" size="lg">

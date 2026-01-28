@@ -56,7 +56,7 @@ const Index = () => {
                 change={5.2}
                 changeType="increase"
                 icon={Users}
-                description="Active squad members"
+                description="Active team members"
               />
               <StatCard
                 title="Recent Matches"
@@ -68,7 +68,7 @@ const Index = () => {
                 title="Average Age"
                 value={`${averageAge} years`}
                 icon={Calendar}
-                description="Squad average"
+                description="Team average"
               />
               <StatCard
                 title="Average TSI"

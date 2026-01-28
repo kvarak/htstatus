@@ -173,7 +173,7 @@ export default function TrainingPage({ players, teamName }: TrainingPageProps) {
         {/* Player List */}
         <Card className="lg:col-span-1 h-fit">
           <CardHeader>
-            <CardTitle>Squad</CardTitle>
+            <CardTitle>Players</CardTitle>
             <CardDescription>{filteredPlayers.length} players</CardDescription>
           </CardHeader>
           <CardContent>

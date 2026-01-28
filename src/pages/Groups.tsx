@@ -80,7 +80,7 @@ export default function Groups() {
                 <CardContent>
                   <div className="text-2xl font-bold">{players.length}</div>
                   <div className="text-xs text-muted-foreground">
-                    In squad
+                    In team
                   </div>
                 </CardContent>
               </Card>
