@@ -118,6 +118,7 @@
       "what to do": [
         "Read .project/ docs. Holistic view for consolidation opportunities.",
         "Apply simplification hierarchy: Holistic view >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
+        "Validate task relevance: Check if BUG-, DOC-, REFACTOR-, INFRA- tasks are still valid/needed. FEAT- tasks should generally remain unless superseded.",
         "Identify: complexity (monoliths, unclear responsibilities), waste (unused code, redundant logic), inappropriate consolidation (merging distinct tools).",
         "Respect separation of concerns: Don't merge tasks with different purposes.",
         "Consolidate duplicate tasks. Remove obsolete. Simplify complex tasks.",
