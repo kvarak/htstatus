@@ -59,6 +59,7 @@
         "STEP 4: Review backlog.md for holistic consolidation opportunities.",
         "STEP 5: Compare 'make help' with the rules in the Makefile, do not leave DEPRECATED entries.",
         "STEP 6: Unblock dependencies. Update docs to reflect current state.",
+        "STEP 7: Clean up all temporary scripts and files, ensure codebase is tidy.",
         "CRITICAL: The backlog must be completely clean of ✅ COMPLETE tasks after this prompt. Search systematically for '✅.*COMPLETE' pattern and remove ALL matches.",
         "Do not commit code."
       ]

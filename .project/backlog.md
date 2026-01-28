@@ -11,10 +11,14 @@
 
 ## P1: Critical 🔥
 
-- **[UI-011]** Core UI Guidelines Implementation → [Details](.project/tasks/UI-011.md)
+- **[UI-011]** Core UI Guidelines Implementation → [Details](.project/tasks/UI-011.md) 🚀 ACTIVE
 
 ## P2: Features 🎯
 
+- **[REFACTOR-038]** Simplify CSS Design System (Remove Redundant Bootstrap Duplication)
+- **[REFACTOR-039]** Consolidate Country Data Migration Script (Fix Historical Database Inaccuracies)
+- **[REFACTOR-040]** Template Inheritance for Breadcrumb Pattern
+- **[REFACTOR-041]** Consolidate Debug Scripts (Country Investigation Scripts)
 - **[FEAT-009]** Display Player Group Names in Update Timeline → [Details](.project/tasks/FEAT-009.md)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-005]** Team Statistics Dashboard → [Details](.project/tasks/FEAT-005.md)
@@ -25,11 +29,9 @@
 
 ## P3: Maintenance 🔧
 
-- **[REFACTOR-035]** Quick File Format Fix → [Details](.project/tasks/REFACTOR-035.md)
-- **[REFACTOR-028]** Fix File Format Standards Issues → [Details](.project/tasks/REFACTOR-028.md)
+- **[REFACTOR-042]** Consolidate File Format Standards Tasks (Merge REFACTOR-035 & REFACTOR-028)
+- **[REFACTOR-043]** Consolidate Error Monitoring Infrastructure (Merge INFRA-029 & FEAT-013)
 - **[REFACTOR-034]** Database Script Consolidation → [Details](.project/tasks/REFACTOR-034.md)
-- **[INFRA-029]** Add Error Tracking and Monitoring Infrastructure → [Details](.project/tasks/INFRA-029.md)
-- **[FEAT-013]** Error Monitoring System → [Details](.project/tasks/FEAT-013.md)
 - **[DOC-024]** Documentation Cleanup (Legacy Setup, Architecture, Historical References) → [Details](.project/tasks/DOC-024.md)
 - **[UI-013]** Implement Loading States for CHPP Operations → [Details](.project/tasks/UI-013.md)
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
