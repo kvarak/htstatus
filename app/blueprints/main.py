@@ -344,20 +344,31 @@ def admin():
                 if changes:
                     # Format each change as a readable string
                     for change in changes:
-                        # change format: [team_name, first_name, last_name, skill, old_value, new_value]
-                        team_name = change[0]
-                        player_name = f"{change[1]} {change[2]}"
-                        skill = change[3]
-                        old_val = change[4]
-                        new_val = change[5]
+                        try:
+                            # Defensive programming: ensure change has expected structure
+                            if not change or len(change) < 6:
+                                dprint(2, f"Skipping malformed change data: {change}")
+                                continue
 
-                        # Format with color indication
-                        if new_val > old_val:
-                            arrow = "↑"
-                            color = "green"
-                        else:
-                            arrow = "↓"
-                            color = "red"
+                            # change format: [team_name, first_name, last_name, skill, old_value, new_value]
+                            team_name = change[0] if change[0] else "Unknown Team"
+                            player_name = f"{change[1] or 'Unknown'} {change[2] or 'Player'}"
+                            skill = change[3] if change[3] else "Unknown Skill"
+                            old_val = change[4] if change[4] is not None else 0
+                            new_val = change[5] if change[5] is not None else 0
+
+                            # Format with color indication
+                            if new_val > old_val:
+                                arrow = "↑"
+                                color = "green"
+                            else:
+                                arrow = "↓"
+                                color = "red"
+
+                        except (IndexError, TypeError) as change_error:
+                            dprint(1, f"Error processing individual change for player {player.ht_id}: {change_error}")
+                            dprint(2, f"Problematic change data: {change}")
+                            continue
 
                         change_str = f'<font color="{color}">{team_name}: {player_name} - {skill}: {old_val} → {new_val} {arrow}</font>'
                         changelogfull.append(change_str)
