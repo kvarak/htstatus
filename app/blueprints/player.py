@@ -60,6 +60,12 @@ def player():
     User = get_user_model()
     MatchPlay = get_match_play_model()
 
+    # Track user activity
+    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    if current_user:
+        current_user.player()
+        db.session.commit()
+
     updategroup = request.form.get("updategroup")
     playerid = request.form.get("playerid")
     groupid = request.form.get("groupid")
@@ -279,4 +285,5 @@ def player():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
+        last_update=user.last_update,
     )
