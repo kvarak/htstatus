@@ -95,6 +95,270 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Age Distribution Chart - All Players
+  var ctx3 = document.getElementById('ageDistributionAllChart');
+  if (ctx3) {
+    var ageDistChart = new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for age, count in age_distribution_all %}
+          '{{ age }}'{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Number of Players',
+          data: [
+            {% for age, count in age_distribution_all %}
+            {{ count }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ],
+          backgroundColor: 'rgba(54, 162, 235, 0.8)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 2,
+          barThickness: 20
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              suggestedMax: {{ max_count_all }},
+              stepSize: 1,
+              precision: 0,
+              callback: function(value) {
+                return Number.isInteger(value) ? value : '';
+              }
+            }
+          }],
+          xAxes: [{
+            type: 'category',
+            scaleLabel: {
+              display: true,
+              labelString: 'Age (years)'
+            },
+            ticks: {
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            }
+          }]
+        }
+      }
+    });
+  } else {
+    console.log('Canvas element not found for all players chart');
+  }
+
+  // Age Distribution Chart - Top 11 Players
+  var ctx4 = document.getElementById('ageDistributionTop11Chart');
+  if (ctx4) {
+    var ageDistTop11Chart = new Chart(ctx4, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for age, count in age_distribution_top11 %}
+          '{{ age }}'{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Number of Players',
+          data: [
+            {% for age, count in age_distribution_top11 %}
+            {{ count }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ],
+          backgroundColor: 'rgba(75, 192, 192, 0.8)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 2,
+          barThickness: 20
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+              suggestedMax: {{ max_count_all }},
+              stepSize: 1,
+              precision: 0,
+              callback: function(value) {
+                return Number.isInteger(value) ? value : '';
+              }
+            }
+          }],
+          xAxes: [{
+            type: 'category',
+            scaleLabel: {
+              display: true,
+              labelString: 'Age (years)'
+            },
+            ticks: {
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            }
+          }]
+        }
+      }
+    });
+  }
+
+  // Country Distribution Pie Chart - All Players
+  var ctx5 = document.getElementById('countryDistributionAllChart');
+  if (ctx5) {
+    new Chart(ctx5, {
+      type: 'pie',
+      data: {
+        labels: [
+          {% for country, count, color in country_distribution_all %}
+          '{{ country|safe }}'{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        datasets: [{
+          data: [
+            {% for country, count, color in country_distribution_all %}
+            {{ count }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ],
+          backgroundColor: [
+            {% for country, count, color in country_distribution_all %}
+            '{{ color }}'{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 0,
+            padding: 8,
+            fontSize: 11,
+            generateLabels: function(chart) {
+              var data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                return data.labels.map(function(label, i) {
+                  var dataset = data.datasets[0];
+                  return {
+                    text: label + ' (' + dataset.data[i] + ')',
+                    fillStyle: 'transparent',
+                    strokeStyle: 'transparent',
+                    lineWidth: 0,
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem, data) {
+              var dataset = data.datasets[tooltipItem.datasetIndex];
+              var total = dataset.data.reduce((a, b) => a + b, 0);
+              var currentValue = dataset.data[tooltipItem.index];
+              var percentage = Math.round((currentValue / total) * 100);
+              return data.labels[tooltipItem.index] + ': ' + currentValue + ' players (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Country Distribution Pie Chart - Top 11 Players
+  var ctx6 = document.getElementById('countryDistributionTop11Chart');
+  if (ctx6) {
+    new Chart(ctx6, {
+      type: 'pie',
+      data: {
+        labels: [
+          {% for country, count, color in country_distribution_top11 %}
+          '{{ country|safe }}'{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        datasets: [{
+          data: [
+            {% for country, count, color in country_distribution_top11 %}
+            {{ count }}{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ],
+          backgroundColor: [
+            {% for country, count, color in country_distribution_top11 %}
+            '{{ color }}'{% if not loop.last %},{% endif %}
+            {% endfor %}
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 0,
+            padding: 8,
+            fontSize: 11,
+            generateLabels: function(chart) {
+              var data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                return data.labels.map(function(label, i) {
+                  var dataset = data.datasets[0];
+                  return {
+                    text: label + ' (' + dataset.data[i] + ')',
+                    fillStyle: 'transparent',
+                    strokeStyle: 'transparent',
+                    lineWidth: 0,
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem, data) {
+              var dataset = data.datasets[tooltipItem.datasetIndex];
+              var total = dataset.data.reduce((a, b) => a + b, 0);
+              var currentValue = dataset.data[tooltipItem.index];
+              var percentage = Math.round((currentValue / total) * 100);
+              return data.labels[tooltipItem.index] + ': ' + currentValue + ' players (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    });
+  }
+
 });
 </script>
 
@@ -105,10 +369,12 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="container">
   <div class="row">
     <div class="col-sm">
-      <div class="container">
-        <h1 class="display-6">{{ title }}</h1>
-        <p class="lead">{{ teamname }}</p>
-      </div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">{{ teamname }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
     </div>
   </div>
 
@@ -118,149 +384,146 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
   {% endif %}
 
-  <!-- Current Competition Status -->
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          <h5>🏆 Current Competition Status</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <!-- Team Kits Section -->
-            <div class="col-md-12 mb-3">
-              <div class="card border-info">
-                <div class="card-body">
-                  <h6 class="card-title">👕 Team Kits & Logo</h6>
-                  <div class="row text-center">
-                    {% if competition_info and competition_info.logo_url %}
-                    <div class="col-md-4">
-                      <p><strong>Team Logo</strong></p>
-                      <img src="{{ competition_info.logo_url }}" alt="Team Logo" class="img-fluid" style="max-height: 80px;">
-                    </div>
-                    {% endif %}
-                    {% if competition_info and competition_info.dress_uri %}
-                    <div class="col-md-4">
-                      <p><strong>Home Kit</strong></p>
-                      <img src="{{ competition_info.dress_uri }}" alt="Home Kit" class="img-fluid" style="max-height: 120px;">
-                    </div>
-                    {% endif %}
-                    {% if competition_info and competition_info.dress_alternate_uri %}
-                    <div class="col-md-4">
-                      <p><strong>Away Kit</strong></p>
-                      <img src="{{ competition_info.dress_alternate_uri }}" alt="Away Kit" class="img-fluid" style="max-height: 120px;">
-                    </div>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {% if competition_info and competition_info.league_name %}
-            <div class="col-md-6 mb-3">
-              <div class="card border-primary">
-                <div class="card-body">
-                  <h6 class="card-title">🏅 League Competition</h6>
-                  <p class="card-text">
-                    <strong>League:</strong> {{ competition_info.league_name }}<br>
-                    <strong>Level:</strong> {{ competition_info.league_level }}<br>
-                    <strong>Division:</strong> {{ competition_info.league_level_unit_name or 'N/A' }}<br>
-                  </p>
-                </div>
-              </div>
+<!-- Current Competition Status -->
+  <div class="row mb-3 g-2">
+    <!-- Team Kits Section - Half Width -->
+    {% if competition_info and (competition_info.logo_url or competition_info.dress_uri or competition_info.dress_alternate_uri) %}
+    <div class="col-md-6">
+      <div class="card border-info h-100">
+        <div class="card-body p-2">
+          <h6 class="card-title mb-2 small">👕 Team Kits & Logo</h6>
+          <div class="row text-center g-1">
+            {% if competition_info.logo_url %}
+            <div class="col-4">
+              <p class="small mb-1"><strong>Logo</strong></p>
+              <img src="{{ competition_info.logo_url }}" alt="Team Logo" class="img-fluid" style="max-height: 50px;">
             </div>
             {% endif %}
-
-            {% if competition_info and competition_info.cup_name %}
-            <div class="col-md-6 mb-3">
-              <div class="card border-success">
-                <div class="card-body">
-                  <h6 class="card-title">🏆 Cup Competition</h6>
-                  <p class="card-text">
-                    <strong>Cup:</strong> {{ competition_info.cup_name }}<br>
-                    <strong>Level:</strong> {{ competition_info.cup_level or 'N/A' }}<br>
-                    <strong>Still Active:</strong> {{ 'Yes' if competition_info.still_in_cup else 'No' }}<br>
-                    {% if competition_info.still_in_cup and competition_info.cup_match_rounds_left %}
-                    <strong>Rounds Left:</strong> {{ competition_info.cup_match_rounds_left }}<br>
-                    {% endif %}
-                  </p>
-                </div>
-              </div>
+            {% if competition_info.dress_uri %}
+            <div class="col-4">
+              <p class="small mb-1"><strong>Home</strong></p>
+              <img src="{{ competition_info.dress_uri }}" alt="Home Kit" class="img-fluid" style="max-height: 70px;">
             </div>
             {% endif %}
-
-            {% if competition_info and competition_info.power_rating %}
-            <div class="col-md-6 mb-3">
-              <div class="card border-warning">
-                <div class="card-body">
-                  <h6 class="card-title">📊 Power Rating</h6>
-                  <p class="card-text">
-                    <strong>Rating:</strong> {{ competition_info.power_rating }}<br>
-                    {% if competition_info.power_rating_global_ranking %}
-                    <strong>Global Rank:</strong> #{{ competition_info.power_rating_global_ranking }}<br>
-                    {% endif %}
-                    {% if competition_info.power_rating_league_ranking %}
-                    <strong>League Rank:</strong> #{{ competition_info.power_rating_league_ranking }}<br>
-                    {% endif %}
-                  </p>
-                </div>
-              </div>
+            {% if competition_info.dress_alternate_uri %}
+            <div class="col-4">
+              <p class="small mb-1"><strong>Away</strong></p>
+              <img src="{{ competition_info.dress_alternate_uri }}" alt="Away Kit" class="img-fluid" style="max-height: 70px;">
             </div>
             {% endif %}
           </div>
         </div>
       </div>
     </div>
+    {% endif %}
+
+    <!-- League Competition - Quarter Width -->
+    {% if competition_info and competition_info.league_name %}
+    <div class="col-md-3">
+      <div class="card border-primary h-100">
+        <div class="card-body p-2">
+          <h6 class="card-title mb-2 small">🏅 League</h6>
+          <p class="card-text small mb-0" style="line-height: 1.4;">
+            <strong>{{ competition_info.league_name }}</strong><br>
+            Level {{ competition_info.league_level }}<br>
+            <span class="text-muted">{{ competition_info.league_level_unit_name or 'N/A' }}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Power Rating - Quarter Width -->
+    {% if competition_info and competition_info.power_rating %}
+    <div class="col-md-3">
+      <div class="card border-warning h-100">
+        <div class="card-body p-2">
+          <h6 class="card-title mb-2 small">📊 Power</h6>
+          <p class="card-text small mb-0" style="line-height: 1.4;">
+            <strong>{{ competition_info.power_rating }}</strong><br>
+            {% if competition_info.power_rating_global_ranking %}
+            Global: #{{ competition_info.power_rating_global_ranking }}<br>
+            {% endif %}
+            {% if competition_info.power_rating_league_ranking %}
+            League: #{{ competition_info.power_rating_league_ranking }}
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Cup Competition - Quarter Width if needed -->
+    {% if competition_info and competition_info.cup_name %}
+    <div class="col-md-3">
+      <div class="card border-success h-100">
+        <div class="card-body p-2">
+          <h6 class="card-title mb-2 small">🏆 Cup</h6>
+          <p class="card-text small mb-0" style="line-height: 1.4;">
+            <strong>{{ competition_info.cup_name }}</strong><br>
+            {% if competition_info.still_in_cup %}
+            <span class="badge bg-success">Active</span>
+            {% if competition_info.cup_match_rounds_left %}
+            <br>{{ competition_info.cup_match_rounds_left }} rounds left
+            {% endif %}
+            {% else %}
+            <span class="text-muted">Eliminated</span>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   <!-- Team Overview Statistics -->
-  <div class="row mb-4">
+  <div class="row mb-3 g-2">
     <div class="col-md-3">
       <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">{{ team_stats.total_players or 0 }}</h5>
-          <p class="card-text">Total Players</p>
+        <div class="card-body p-3">
+          <h6 class="card-title mb-1">{{ team_stats.total_players or 0 }}</h6>
+          <p class="card-text text-muted small mb-0">Total Players</p>
         </div>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">{{ team_stats.total_career_goals or 0 }}</h5>
-          <p class="card-text">Career Goals</p>
+        <div class="card-body p-3">
+          <h6 class="card-title mb-1">{{ team_stats.total_career_goals or 0 }}</h6>
+          <p class="card-text text-muted small mb-0">Career Goals</p>
         </div>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">{{ team_stats.avg_age|round(1) if team_stats.avg_age else 0 }} years</h5>
-          <p class="card-text">Average Age</p>
+        <div class="card-body p-3">
+          <h6 class="card-title mb-1">{{ team_stats.avg_age|round(1) if team_stats.avg_age else 0 }} years</h6>
+          <p class="card-text text-muted small mb-0">Average Age</p>
         </div>
       </div>
     </div>
     <div class="col-md-3">
       <div class="card text-center">
-        <div class="card-body">
-          <h5 class="card-title">{{ "{:,}".format(team_stats.avg_tsi|int) if team_stats.avg_tsi else 0 }}</h5>
-          <p class="card-text">Average TSI</p>
+        <div class="card-body p-3">
+          <h6 class="card-title mb-1">{{ "{:,}".format(team_stats.avg_tsi|int) if team_stats.avg_tsi else 0 }}</h6>
+          <p class="card-text text-muted small mb-0">Average TSI</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Charts Row -->
-  <div class="row mb-4">
+  <div class="row mb-3 g-2">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body p-3">
           <canvas id="goalsChart" width="400" height="300"></canvas>
         </div>
       </div>
     </div>
     <div class="col-md-6">
       <div class="card">
-        <div class="card-body">
+        <div class="card-body p-3">
           <canvas id="matchResultsChart" width="400" height="300"></canvas>
         </div>
       </div>
@@ -268,15 +531,15 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 
   <!-- Top Performers Tables -->
-  <div class="row mb-4">
+  <div class="row mb-3 g-2">
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header">
-          <h5>Top Scorers</h5>
+        <div class="card-header py-2">
+          <h6 class="mb-0">Top Scorers</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body p-2">
           {% if top_scorers %}
-          <table class="table table-sm">
+          <table class="table-custom">
             <thead>
               <tr>
                 <th>Player</th>
@@ -305,17 +568,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <div class="col-md-6">
       <div class="card">
-        <div class="card-header">
-          <h5>Top Performers (TSI)</h5>
+        <div class="card-header py-2">
+          <h6 class="mb-0">Top Performers (TSI)</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body p-2">
           {% if top_performers %}
-          <table class="table table-sm">
+          <table class="table-custom">
             <thead>
               <tr>
                 <th>Player</th>
                 <th>TSI</th>
                 <th>Age</th>
+                <th>Country</th>
               </tr>
             </thead>
             <tbody>
@@ -324,6 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>{{ player.first_name }} {{ player.last_name }}</td>
                 <td>{{ "{:,}".format(player.tsi|int) if player.tsi else 0 }}</td>
                 <td>{{ player.age|format_age }}</td>
+                <td>{{ player.native_country_id|country_display }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -336,14 +601,14 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- Match Statistics -->
-  <div class="row mb-4">
+  <!-- Match Statistics - Hidden until data is available
+  <div class="row mb-3">
     <div class="col-md-12">
       <div class="card">
-        <div class="card-header">
-          <h5>Match Statistics (Last 10 Games)</h5>
+        <div class="card-header py-2">
+          <h6 class="mb-0">Match Statistics (Last 10 Games)</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body p-3">
           <div class="row">
             <div class="col-md-2">
               <strong>{{ match_stats.total_matches or 0 }}</strong><br>
@@ -384,32 +649,120 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
   </div>
+  -->
 
   <!-- Team Skill Averages -->
-  <div class="row mb-4">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          <h5>Team Skill Averages</h5>
+  <div class="row mb-3 g-2">
+    <!-- All Players Skill Averages - Half Width -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Team Skill Averages</h6>
         </div>
-        <div class="card-body">
+        <div class="card-body p-2">
           {% if team_stats.skill_averages %}
-            <div class="row">
-              {% for skill, avg in team_stats.skill_averages.items() %}
-                <div class="col-md-3 mb-3">
-                  <div class="text-center">
-                    <strong>{{ avg }}</strong><br>
-                    <small class="text-muted text-capitalize">{{ skill.replace('_', ' ') }}</small>
-                  </div>
-                </div>
-                {% if loop.index % 4 == 0 and not loop.last %}
-                  </div><div class="row">
-                {% endif %}
-              {% endfor %}
-            </div>
+            <table class="table-custom">
+              <tbody>
+                {% for skill, avg in team_stats.skill_averages.items() %}
+                <tr>
+                  <td class="text-small text-capitalize">{{ skill.replace('_', ' ') }}</td>
+                  <td class="text-small">{{ avg }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ (avg / 20 * 100)|round(1) }}%" aria-valuenow="{{ (avg / 20 * 100)|round(1) }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           {% else %}
-            <p class="text-muted">No skill data available</p>
+            <p class="text-muted small mb-0">No skill data available</p>
           {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 11 TSI Players Skill Averages - Half Width -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Top 11 Players Skill Averages</h6>
+        </div>
+        <div class="card-body p-2">
+          {% if top_11_skill_averages %}
+            <table class="table-custom">
+              <tbody>
+                {% for skill, avg in top_11_skill_averages.items() %}
+                <tr>
+                  <td class="text-small text-capitalize">{{ skill.replace('_', ' ') }}</td>
+                  <td class="text-small">{{ avg }}</td>
+                  <td class="text-small" style="width: 80%">
+                    <div class="progress" style="height: 13px;">
+                      <div class="progress-bar" role="progressbar" style="width: {{ (avg / 20 * 100)|round(1) }}%" aria-valuenow="{{ (avg / 20 * 100)|round(1) }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="text-muted small mb-0">No skill data available</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Age Distribution -->
+  <div class="row mb-3 g-2">
+    <!-- All Players Age Distribution - Half Width -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Age Distribution (All Players)</h6>
+        </div>
+        <div class="card-body p-2">
+          <canvas id="ageDistributionAllChart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 11 TSI Players Age Distribution - Half Width -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Top 11 Players Age Distribution</h6>
+        </div>
+        <div class="card-body p-2">
+          <canvas id="ageDistributionTop11Chart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Country Distribution -->
+  <div class="row mb-3 g-2">
+    <!-- All Players Country Distribution - Half Width -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Country Distribution (All Players)</h6>
+        </div>
+        <div class="card-body p-2">
+          <canvas id="countryDistributionAllChart" height="250"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 11 TSI Players Country Distribution - Half Width -->
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Top 11 Players Country Distribution</h6>
+        </div>
+        <div class="card-body p-2">
+          <canvas id="countryDistributionTop11Chart" height="250"></canvas>
         </div>
       </div>
     </div>

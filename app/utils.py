@@ -727,11 +727,16 @@ def calculate_team_statistics(players):
     return stats
 
 
-def get_top_scorers(players, limit=5):
+def get_top_scorers(players, limit=5, sort_by_ratio=False):
     """Get top scoring players from the list.
 
     Enhanced for INFRA-028 to work correctly with both SQLAlchemy and CHPPPlayer data.
     Returns all players sorted by goals (including 0-goal players) for consistent display.
+
+    Args:
+        players: List of player objects
+        limit: Maximum number of players to return
+        sort_by_ratio: If True, sort by goals/match ratio instead of total goals
     """
     # Use the same helper function as calculate_team_statistics
     def get_player_attr(player, attr):
@@ -762,10 +767,27 @@ def get_top_scorers(players, limit=5):
         # Prefer current team goals, fall back to career goals
         return current_team_goals or goals_current_team or career_goals
 
-    # Return all players sorted by goals (including 0-goal players) for consistent display
-    # Show top goal scorers even if they have 0 goals (new team scenario)
+    # Helper function to get matches played
+    def get_player_matches(player):
+        current_team_matches = get_player_attr(player, "current_team_matches") or 0
+        matches_current_team = get_player_attr(player, "matches_current_team") or 0
+        return current_team_matches or matches_current_team or 0
+
+    # Helper function to calculate goals per match ratio
+    def get_goals_per_match(player):
+        goals = get_player_goals(player)
+        matches = get_player_matches(player)
+        return goals / matches if matches > 0 else 0
+
+    # Return all players sorted by goals or goals/match ratio
     all_players = list(players)
-    all_players.sort(key=get_player_goals, reverse=True)
+
+    if sort_by_ratio:
+        # Sort by goals/match ratio (for players with at least 1 match)
+        all_players.sort(key=lambda p: (get_player_matches(p) > 0, get_goals_per_match(p)), reverse=True)
+    else:
+        # Sort by total goals
+        all_players.sort(key=get_player_goals, reverse=True)
 
     return all_players[:limit]
 

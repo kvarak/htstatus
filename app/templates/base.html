@@ -15,6 +15,312 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 
 <style>
+  /* ========================================
+     HattrickPlanner Design System
+     Football-themed unified design tokens
+     ======================================== */
+
+  :root {
+    /* Color System - Football Theme (Aligned with React) */
+    /* Using HSL without hsl() wrapper for compatibility with TailwindCSS */
+
+    --primary: 120 45% 25%;                    /* Football green */
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 120 60% 45%;
+
+    --secondary: 120 25% 88%;                  /* Light pitch green */
+    --secondary-foreground: 120 20% 12%;
+
+    --success: 120 70% 35%;                    /* Goal green */
+    --success-foreground: 0 0% 98%;
+
+    --warning: 45 90% 55%;                     /* Yellow card */
+    --warning-foreground: 45 20% 15%;
+
+    --destructive: 0 84% 60%;                  /* Red card */
+    --destructive-foreground: 0 0% 98%;
+
+    --muted: 120 15% 92%;
+    --muted-foreground: 120 10% 45%;
+
+    --accent: 120 60% 45%;                     /* Bright football green */
+    --accent-foreground: 0 0% 98%;
+
+    --background: 120 8% 97%;
+    --foreground: 120 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 120 20% 12%;
+
+    --border: 120 20% 85%;
+    --input: 120 20% 85%;
+    --ring: 120 45% 25%;
+
+    /* Legacy color aliases for existing Flask templates */
+    /* These maintain backward compatibility during migration */
+    --color-primary: hsl(120, 45%, 25%);
+    --color-primary-hover: hsl(120, 45%, 20%);
+    --color-primary-light: hsl(120, 45%, 35%);
+    --color-success: hsl(120, 70%, 35%);
+    --color-success-hover: hsl(120, 70%, 30%);
+    --color-warning: hsl(45, 90%, 55%);
+    --color-warning-hover: hsl(45, 90%, 45%);
+    --color-destructive: hsl(0, 84%, 60%);
+    --color-destructive-hover: hsl(0, 84%, 50%);
+    --color-background: hsl(120, 8%, 97%);
+    --color-foreground: hsl(0, 0%, 15%);
+    --color-muted: hsl(120, 8%, 90%);
+    --color-muted-foreground: hsl(0, 0%, 45%);
+    --color-border: hsl(120, 8%, 85%);
+    --color-input: hsl(120, 8%, 88%);
+
+    /* Gradients - Football pitch inspired (aligned with React) */
+    --gradient-pitch: linear-gradient(135deg, hsl(120, 45%, 25%), hsl(120, 60%, 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(120, 60%, 45%), hsl(120, 45%, 25%));
+    --gradient-subtle: linear-gradient(180deg, hsl(120, 8%, 97%), hsl(120, 15%, 92%));
+
+    /* Shadows - Enhanced football theme (aligned with React) */
+    --shadow-football: 0 4px 12px hsla(120, 45%, 25%, 0.15);
+    --shadow-glow: 0 0 20px hsla(120, 60%, 45%, 0.3);
+    --shadow-elegant: 0 8px 25px -8px hsla(120, 45%, 25%, 0.2);
+
+    /* Border Radius (aligned with React) */
+    --radius: 0.75rem;      /* 12px - default */
+
+    /* Typography Scale */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 2rem;      /* 32px */
+    --font-size-4xl: 2.5rem;    /* 40px */
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Spacing Scale (0.25rem increments) */
+    --spacing-1: 0.25rem;   /* 4px */
+    --spacing-2: 0.5rem;    /* 8px */
+    --spacing-3: 0.75rem;   /* 12px */
+    --spacing-4: 1rem;      /* 16px */
+    --spacing-6: 1.5rem;    /* 24px */
+    --spacing-8: 2rem;      /* 32px */
+    --spacing-12: 3rem;     /* 48px */
+    --spacing-16: 4rem;     /* 64px */
+
+    /* Border Radius */
+    --radius-sm: 0.125rem;  /* 2px */
+    --radius-md: 0.375rem;  /* 6px */
+    --radius-lg: 0.5rem;    /* 8px */
+    --radius-xl: 0.75rem;   /* 12px */
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-football: 0 4px 14px 0 rgba(34, 139, 34, 0.25);
+  }
+
+  /* ========================================
+     Component Classes - Unified System
+     ======================================== */
+
+  /* Button Components */
+  .btn-primary-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    border: none;
+    border-radius: var(--radius);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-football);
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:hover {
+    background-color: hsl(var(--primary) / 0.9);
+    box-shadow: var(--shadow-glow);
+    color: hsl(var(--primary-foreground));
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:focus {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  .btn-primary-custom:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success-custom {
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+  }
+
+  .btn-success-custom:hover {
+    background-color: hsl(var(--success) / 0.9);
+  }
+
+  .btn-warning-custom {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+  }
+
+  .btn-warning-custom:hover {
+    background-color: hsl(var(--warning) / 0.9);
+  }
+
+  .btn-destructive-custom {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+  }
+
+  .btn-destructive-custom:hover {
+    background-color: hsl(var(--destructive) / 0.9);
+  }
+
+  /* Table Components */
+  .table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-xs);
+    background-color: hsl(var(--card));
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-football);
+  }
+
+  .table-custom thead {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .table-custom thead th {
+    padding: var(--spacing-2);
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    border-bottom: 2px solid hsl(var(--primary) / 0.9);
+    vertical-align: bottom;
+  }
+
+  /* Special styling for player table with rotated headers */
+  .table-custom.table-rotated thead th {
+    padding-top: 4rem;
+    height: 5rem;
+  }
+
+  .table-custom tbody tr {
+    border-bottom: 1px solid hsl(var(--border));
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .table-custom tbody tr:hover {
+    background-color: hsl(var(--muted));
+  }
+
+  .table-custom tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table-custom tbody td {
+    padding: var(--spacing-1) var(--spacing-2);
+    line-height: var(--line-height-tight);
+  }
+
+  .table-custom.table-striped tbody tr:nth-child(even) {
+    background-color: hsl(var(--background));
+  }
+
+  /* Card Components */
+  .card-custom {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-football);
+    overflow: hidden;
+  }
+
+  .card-custom-header {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-bottom: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  .card-custom-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: hsl(var(--foreground));
+    margin: 0;
+  }
+
+  .card-custom-body {
+    padding: var(--spacing-6);
+  }
+
+  .card-custom-footer {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  /* Typography Utilities */
+  .text-primary-custom {
+    color: hsl(var(--primary));
+  }
+
+  .text-success-custom {
+    color: hsl(var(--success));
+  }
+
+  .text-warning-custom {
+    color: hsl(var(--warning));
+  }
+
+  .text-destructive-custom {
+    color: hsl(var(--destructive));
+  }
+
+  .text-muted-custom {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Background Utilities */
+  .bg-primary-custom {
+    background-color: hsl(var(--primary));
+  }
+
+  .bg-success-custom {
+    background-color: hsl(var(--success));
+  }
+
+  .bg-muted-custom {
+    background-color: hsl(var(--muted));
+  }
+
+  /* ========================================
+     Original Styles (Legacy - To Review)
+     ======================================== */
+
   body, html {
     height: 100%;
   }

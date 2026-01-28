@@ -6,6 +6,7 @@ from sqlalchemy import text
 
 from app.auth_utils import require_authentication
 from app.chpp_utilities import get_chpp_client
+from app.hattrick_countries import get_country_display
 from app.model_registry import get_match_model, get_match_play_model
 from app.utils import create_page, dprint
 
@@ -26,6 +27,12 @@ def setup_matches_blueprint(db_instance, match_types, match_roles, match_behavio
     HTmatchtype = match_types
     HTmatchrole = match_roles
     HTmatchbehaviour = match_behaviours
+
+
+@matches_bp.app_template_filter('country_display')
+def country_display_filter(country_id):
+    """Template filter to display country with flag."""
+    return get_country_display(country_id, include_flag=True)
 
 
 @matches_bp.route("/matches", methods=["GET", "POST"])
@@ -139,10 +146,111 @@ def stats():
     team_stats = calculate_team_statistics(current_players_list)
 
     # Get top performers
-    top_scorers = get_top_scorers(current_players_list)
-    top_performers = get_top_performers(current_players_list)
+    top_scorers = get_top_scorers(current_players_list, limit=10, sort_by_ratio=True)
+    top_performers = get_top_performers(current_players_list, limit=10)
 
-    # Get match statistics for the team
+    # Calculate skill averages for top 11 TSI players
+    top_11_players = get_top_performers(current_players_list, limit=11)
+    top_11_stats = calculate_team_statistics(top_11_players) if top_11_players else {}
+    top_11_skill_averages = top_11_stats.get('skill_averages', {}) if top_11_stats else {}
+
+    # Calculate age distribution for all players and top 11
+    def calculate_age_distribution_unified(all_players, subset_players, min_age=16):
+        """Calculate age distribution with unified age range for both datasets."""
+        # Get all ages from all players to define the complete range
+        all_ages = []
+        for player in all_players:
+            age = getattr(player, 'age_years', 0)
+            if age >= min_age:
+                all_ages.append(age)
+
+        if not all_ages:
+            return [], []
+
+        # Define unified age range
+        min_age_range = min(all_ages)
+        max_age_range = max(all_ages)
+
+        # Calculate distribution for all players
+        all_age_counts = {}
+        for player in all_players:
+            age = getattr(player, 'age_years', 0)
+            if age >= min_age:
+                all_age_counts[age] = all_age_counts.get(age, 0) + 1
+
+        # Calculate distribution for subset players
+        subset_age_counts = {}
+        for player in subset_players:
+            age = getattr(player, 'age_years', 0)
+            if age >= min_age:
+                subset_age_counts[age] = subset_age_counts.get(age, 0) + 1
+
+        # Create complete distributions with unified range
+        all_distribution = []
+        subset_distribution = []
+        for age in range(min_age_range, max_age_range + 1):
+            all_distribution.append((age, all_age_counts.get(age, 0)))
+            subset_distribution.append((age, subset_age_counts.get(age, 0)))
+
+        return all_distribution, subset_distribution
+
+    age_distribution_all, age_distribution_top11 = calculate_age_distribution_unified(
+        current_players_list,
+        top_11_players if top_11_players else []
+    )
+
+    # Calculate country distribution for all players and top 11
+    def calculate_country_distribution(all_players, subset_players):
+        """Calculate country distribution for both datasets."""
+        from app.hattrick_countries import get_country_info
+
+        # Calculate distribution for all players
+        all_country_data = {}
+        for player in all_players:
+            country_id = getattr(player, 'native_country_id', None)
+            country_info = get_country_info(country_id)
+            country_display = f"{country_info['flag']} {country_info['name']}"
+            if country_display not in all_country_data:
+                all_country_data[country_display] = {
+                    'count': 0,
+                    'color': country_info['color'],
+                    'name': country_info['name']
+                }
+            all_country_data[country_display]['count'] += 1
+
+        # Calculate distribution for subset players
+        subset_country_data = {}
+        for player in subset_players:
+            country_id = getattr(player, 'native_country_id', None)
+            country_info = get_country_info(country_id)
+            country_display = f"{country_info['flag']} {country_info['name']}"
+            if country_display not in subset_country_data:
+                subset_country_data[country_display] = {
+                    'count': 0,
+                    'color': country_info['color'],
+                    'name': country_info['name']
+                }
+            subset_country_data[country_display]['count'] += 1
+
+        # Convert to list of tuples sorted by count, maintaining color info
+        all_distribution = sorted(
+            [(country, data['count'], data['color']) for country, data in all_country_data.items()],
+            key=lambda x: x[1], reverse=True
+        )
+        subset_distribution = sorted(
+            [(country, data['count'], data['color']) for country, data in subset_country_data.items()],
+            key=lambda x: x[1], reverse=True
+        )
+
+        return all_distribution, subset_distribution
+
+    country_distribution_all, country_distribution_top11 = calculate_country_distribution(
+        current_players_list,
+        top_11_players if top_11_players else []
+    )
+
+    # Find max count for scaling the bars (use all players max for both charts)
+    max_count_all = max([count for age, count in age_distribution_all], default=1)
     match_stats = get_team_match_statistics(teamid)
 
     # Get competition data from CHPP (trophies not currently supported)
@@ -201,5 +309,11 @@ def stats():
         match_stats=match_stats,
         trophies=trophies,
         competition_info=competition_info,
+        top_11_skill_averages=top_11_skill_averages,
+        age_distribution_all=age_distribution_all,
+        age_distribution_top11=age_distribution_top11,
+        country_distribution_all=country_distribution_all,
+        country_distribution_top11=country_distribution_top11,
+        max_count_all=max_count_all,
         title="Stats",
     )

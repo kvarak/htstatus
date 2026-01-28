@@ -20,7 +20,7 @@
         <input type="hidden" id="id" name="id" value="{{ teamid }}">
         < !-- <button type="submit" name="updatebutton" value="updatelatest" class="btn btn-primary"  aria-label="Text input">Get latest match</button> -- >
         < !-- <button type="submit" name="updatebutton" value="update" class="btn btn-primary"  aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Be careful! This could take a few minutes." onclick="loading();">Get all matches</button> -- >
-        <button type="submit" name="updatebutton" value="update" class="btn btn-primary"  aria-label="Text input" onclick="loading();">Get all matches</button>
+        <button type="submit" name="updatebutton" value="update" class="btn-primary-custom"  aria-label="Text input" onclick="loading();">Get all matches</button>
       </form>
       {% endif %}
     </div> -->
@@ -137,7 +137,7 @@
                   {{ HTmatchtype[m.matchtype] }}<br>
                   {# {{ m.context_id }} #}
                 </p>
-                <table class="table table-bordered">
+                <table class="table-custom">
                   <tr>
                     <td class="text-small" style="text-align: center"></td>
                     <td class="text-small" style="text-align: center"></td>

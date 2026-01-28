@@ -99,7 +99,7 @@ def update():
         dprint(1, f"Full error traceback: {error_details}")
 
         return create_page(
-            template="update.html",
+            template="update_error.html",
             title="Update Failed",
             error=f"Cannot connect to Hattrick API: {str(e)}",
             errorinfo="Please check your internet connection and try again. If the problem persists, Hattrick servers may be unavailable.",
@@ -137,7 +137,7 @@ def update():
             dprint(1, f"Team fetch error traceback: {error_details}")
 
             return create_page(
-                template="update.html",
+                template="update_error.html",
                 title="Update Failed",
                 error=f"Failed to fetch team data for team {teamid}: {str(e)}",
                 errorinfo=error_details,
@@ -161,7 +161,7 @@ def update():
             errorinfo += f"Technical details: {str(e)}\n\n{errorincode}"
 
             return render_template(
-                "update.html",
+                "update_error.html",
                 version=version,
                 timenow=timenow,
                 fullversion=fullversion,
@@ -221,7 +221,10 @@ def update():
             thisplayer["aggressiveness"] = p.aggressiveness
             thisplayer["specialty"] = p.specialty
             # native_country_id/native_league_id/native_league_name use country_id fallback
-            thisplayer["native_country_id"] = getattr(p, 'country_id', None)
+            country_id_value = getattr(p, 'country_id', None)
+            thisplayer["native_country_id"] = country_id_value
+
+
             thisplayer["native_league_id"] = None
             thisplayer["native_league_name"] = None
             thisplayer["tsi"] = the_player.tsi
@@ -311,7 +314,7 @@ def update():
                 dprint(1, f"Database error traceback: {error_details}")
 
                 return create_page(
-                    template="update.html",
+                    template="update_error.html",
                     title="Update Failed",
                     error=f"Database error while saving player data: {str(e)}",
                     errorinfo=f"Failed to save {thisplayer['first_name']} {thisplayer['last_name']} to database.\n\n{error_details}",
