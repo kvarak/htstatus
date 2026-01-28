@@ -380,13 +380,20 @@ changelog: ## Generate changelog (from scripts/changelog.sh)
 	@bash scripts/changelog.sh
 
 # Database Commands
-db-migrate: check-uv ## Run database migrations
+db-migrate: check-uv ## Create database migration (usage: make db-migrate MESSAGE="description")
 	@echo "🗄️  Creating database migration..."
-	@$(PYTHON) scripts/manage.py db migrate
+	@if [ -z "$(MESSAGE)" ]; then \
+		echo "❌ Error: MESSAGE parameter required"; \
+		echo "Usage: make db-migrate MESSAGE=\"description\""; \
+		echo "Alternative: uv run alembic -c migrations/alembic.ini revision --autogenerate -m \"description\""; \
+		exit 1; \
+	fi
+	@echo "Using Alembic directly to avoid Flask context issues..."
+	@uv run alembic -c migrations/alembic.ini revision --autogenerate -m "$(MESSAGE)"
 
 db-upgrade: check-uv services ## Apply database upgrades
 	@echo "🗄️  Applying database upgrades..."
-	@$(PYTHON) scripts/manage.py db upgrade
+	@./scripts/database/upgrade_local_database.sh --force
 
 # Legacy Support (deprecated but functional)
 .PHONY: legacy-run legacy-changelog

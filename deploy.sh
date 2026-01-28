@@ -74,6 +74,32 @@ set -o allexport
 source .env
 set +o allexport
 
+# Validate required environment variables
+REQUIRED_VARS=("DEPLOY_SERVER" "DEPLOY_REPO_PATH" "DEPLOY_GIT_BRANCH" "DEPLOY_USER")
+MISSING_VARS=()
+
+for var in "${REQUIRED_VARS[@]}"; do
+  if [ -z "${!var}" ]; then
+    MISSING_VARS+=("$var")
+  fi
+done
+
+if [ ${#MISSING_VARS[@]} -ne 0 ]; then
+  echo "ERROR: Missing required environment variables in .env file:"
+  for var in "${MISSING_VARS[@]}"; do
+    echo "  - $var"
+  done
+  echo ""
+  echo "Please update your .env file with the missing variables."
+  exit 1
+fi
+
+echo "✓ Environment variables loaded successfully"
+echo "  Target server: $DEPLOY_SERVER"
+echo "  Repository: $DEPLOY_REPO_PATH"
+echo "  Branch: $DEPLOY_GIT_BRANCH"
+echo ""
+
 # Define deployment steps - shared between dry-run validation and actual deployment
 DEPLOYMENT_STEPS=(
   "cd:Change to repository directory:$DEPLOY_REPO_PATH"
@@ -82,11 +108,10 @@ DEPLOYMENT_STEPS=(
   "git:Pull changes:git pull"
   "script:Generate changelog:./scripts/changelog.sh || ./changelog.sh"
   "file:Touch routes:touch app/routes.py"
-  "secret:Update SECRET_KEY:(conditional)"
+  "secret:Update SECRET_KEY in .env:(conditional)"
   "dep:Install uv:pip3 install uv"
   "dep:Sync dependencies:uv sync"
-  "db:Generate migrations:uv run python scripts/manage.py db migrate"
-  "db:Apply migrations:uv run flask db upgrade"
+  "db:Apply migrations:uv run python scripts/database/apply_migrations.py"
   "service:Restart service:sudo systemctl restart htstatus"
 )
 
@@ -141,14 +166,14 @@ else
   echo "! uv not found - would be installed via pip3 install uv"
 fi
 
-# [6/7] Database migration scripts - validates: db migrate, db upgrade
+# [6/7] Database migration scripts - validates: apply_migrations.py
 echo ""
 echo "[6/7] Testing database migration..."
 uv sync --dry-run 2>&1 || echo "! Dependencies would be synced"
-if [ -f "scripts/manage.py" ]; then
+if [ -f "scripts/database/apply_migrations.py" ]; then
   echo "✓ Migration script exists"
 else
-  echo "ERROR: scripts/manage.py not found"
+  echo "ERROR: scripts/database/apply_migrations.py not found"
   exit 1
 fi
 
@@ -200,7 +225,8 @@ SCRIPT
   if [ "$MAJOR_RELEASE" = true ]; then
     newsecret=$(cat /dev/urandom | env LC_CTYPE=C tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1)
     cat >> command.sh << SCRIPT
-sed -i -e "s/SECRET_KEY.*/SECRET_KEY               = '$newsecret'/g" config.py
+# Update SECRET_KEY in .env file
+sed -i -e "s/SECRET_KEY=.*/SECRET_KEY=$newsecret/g" .env
 SCRIPT
   fi
 
@@ -225,16 +251,17 @@ echo ""
 echo "=== Running Database Migrations ==="
 echo "Checking for pending migrations..."
 
-# Run migrations and capture output
-FLASK_APP=run.py uv run flask db upgrade 2>&1 | tee /tmp/migration_output.txt
+# Use our new Alembic-direct migration script
+uv run python scripts/database/apply_migrations.py 2>&1 | tee /tmp/migration_output.txt
 MIGRATION_EXIT_CODE=${PIPESTATUS[0]}
 
-# Check if there were actual migrations applied
-if grep -q "Running upgrade" /tmp/migration_output.txt; then
-  echo "✓ Database migrations applied successfully"
-elif grep -q "Context impl PostgresqlImpl" /tmp/migration_output.txt; then
-  # Migrations ran but nothing to apply (already at head)
-  echo "✓ Database already at latest version"
+# Check migration results
+if [ $MIGRATION_EXIT_CODE -eq 0 ]; then
+  if grep -q "Running upgrade" /tmp/migration_output.txt; then
+    echo "✓ Database migrations applied successfully"
+  else
+    echo "✓ Database already at latest version"
+  fi
 else
   echo "✗ Database migrations failed!"
   cat /tmp/migration_output.txt

@@ -299,6 +299,9 @@ def handle_oauth_callback(oauth_verifier):
             user_context = get_current_user_context(chpp)
             session["current_user"] = user_context["ht_user"]
             session["current_user_id"] = user_context["ht_id"]
+            # Create current_user object from successful CHPP response
+            current_user = user_context["user"]
+            dprint(1, f"Successfully got user from CHPP: {current_user.username} (ID: {current_user.ht_id})")
         except Exception as chpp_error:
             dprint(1, f"CHPP user() error (likely YouthTeamId issue): {chpp_error}")
             # This is a known CHPP library issue where YouthTeamId field is None
@@ -306,6 +309,7 @@ def handle_oauth_callback(oauth_verifier):
 
             # Try to find existing user by OAuth tokens since we can't get user ID from CHPP
             existing_user = None
+            dprint(1, "Attempting to find existing user for fallback authentication")
 
             # First try to find by username if available (from form login)
             if session.get("username"):
@@ -314,7 +318,7 @@ def handle_oauth_callback(oauth_verifier):
                 ).first()
                 dprint(
                     1,
-                    f"Found user by session username: {existing_user.username if existing_user else 'None'}",
+                    f"Found user by session username '{session.get('username')}': {existing_user.username if existing_user else 'None'}",
                 )
 
             # If no username in session (direct OAuth), try to find by access tokens
@@ -324,7 +328,7 @@ def handle_oauth_callback(oauth_verifier):
                 ).first()
                 dprint(
                     1,
-                    f"Found user by access_key: {existing_user.username if existing_user else 'None'}",
+                    f"Found user by access_key '{session['access_key'][:10]}...': {existing_user.username if existing_user else 'None'}",
                 )
 
             # If still no user found, try to find any user with legacy password hash
@@ -372,6 +376,17 @@ def handle_oauth_callback(oauth_verifier):
                     title="Login / Signup",
                     error="There was an issue with Hattrick authentication. Please try logging in with your username and password instead.",
                 )
+
+        # Verify current_user is not None before proceeding
+        if current_user is None:
+            dprint(1, "current_user is None after CHPP processing - authentication failed")
+            session.pop("current_user", None)
+            session.pop("current_user_id", None)
+            return create_page(
+                template="login.html",
+                title="Login / Signup",
+                error="Unable to authenticate with Hattrick. Please try again.",
+            )
 
         # Check if user exists in database
         existing_user = User.query.filter_by(ht_id=current_user.ht_id).first()
