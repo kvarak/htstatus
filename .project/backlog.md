@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. **Active: 24 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. **Active: 26 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -13,7 +13,8 @@
 
 ## P1: Critical 🔥
 
-*All P1 critical tasks resolved as of January 29, 2026*
+- **[BUG-011]** Player Blueprint NoneType User Crash → [Details](.project/tasks/BUG-011.md)
+- **[TEST-009]** Fix Test Coverage Files Quality Gate Failure → [Details](.project/tasks/TEST-009.md)
 
 ## P2: Features 🎯
 
