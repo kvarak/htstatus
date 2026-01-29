@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. **Active: 26 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. **Active: 29 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -13,7 +13,6 @@
 
 ## P1: Critical 🔥
 
-- **[BUG-011]** Player Blueprint NoneType User Crash → [Details](.project/tasks/BUG-011.md)
 - **[TEST-009]** Fix Test Coverage Files Quality Gate Failure → [Details](.project/tasks/TEST-009.md)
 
 ## P2: Features 🎯
@@ -42,6 +41,12 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Improvements from Critical Review (January 29, 2026)
+- **[REFACTOR-050]** Authentication Flow Analysis - Investigate why authenticated sessions reference non-existent users (root cause of BUG-011)
+- **[REFACTOR-051]** Systematic User Query Audit - Review all User.filter_by() patterns for consistency and safety
+- **[FEAT-018]** Automatic User Creation Strategy - Ensure user records exist for all authenticated sessions
+- **[TEST-010]** Authentication Test Environment - Fix test setup to properly create user records for authenticated clients
 
 ### Core Hattrick Features (Aligned with Geek Audience)
 - **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics → [Details](.project/tasks/FEAT-016.md)

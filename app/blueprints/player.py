@@ -212,7 +212,7 @@ def player():
 
     # Get the columns
     user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-    columns = User.getColumns(user)
+    columns = user.getColumns() if user else []
     if len(columns) == 0:
         columns = defaultcolumns
 
@@ -285,5 +285,5 @@ def player():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
-        last_update=user.last_update,
+        last_update=user.last_update if user else None,
     )

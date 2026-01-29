@@ -127,7 +127,7 @@ def settings():
         bgcolor = "#FFFFFF"
 
     user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-    columns = User.getColumns(user)
+    columns = user.getColumns() if user else []
     if len(columns) == 0:
         columns = defaultcolumns
 
@@ -146,7 +146,8 @@ def settings():
             text_match = re.search(">(.+?)</div>", r)
             if key:
                 columns.append((text_match.group(1), key.group(1)))
-        User.updateColumns(user, columns)
+        if user:
+            user.updateColumns(columns)
         db.session.commit()
     elif setcolumnsdefault == "defaultcolumns":
         columns = defaultcolumns
@@ -262,7 +263,7 @@ def admin():
 
     try:
         user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-        role = User.getRole(user)
+        role = user.getRole() if user else "User"
         if role != "Admin":
             return render_template("_forward.html", url="/")
     except Exception:
@@ -281,7 +282,8 @@ def admin():
 
             dprint(2, updateto)
 
-            User.setRole(user, updateto)
+            if user:
+                user.setRole(updateto)
             db.session.commit()
 
         except Exception:
