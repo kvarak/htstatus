@@ -41,7 +41,7 @@ COUNTRIES = {
     37: {"name": "Romania", "flag": "🇷🇴", "color": "#002B7F"},  # Romanian blue ("blue, yellow and red")
     38: {"name": "Iceland", "flag": "🇮🇸", "color": "#003897"},  # Icelandic blue
     39: {"name": "Austria", "flag": "🇦🇹", "color": "#ED2939"},  # Austrian red
-    40: {"name": "Unknown Country 40", "flag": "❓", "color": "#CCCCCC"},  # TODO: Research actual country
+    # 40: Deprecated ID - was unknown, now mapped to Switzerland (46)
     44: {"name": "Belgium", "flag": "🇧🇪", "color": "#FFCD00"},  # Belgian yellow (changed from black)
     45: {"name": "Malaysia", "flag": "🇲🇾", "color": "#CC0001"},  # Malaysian red
     46: {"name": "Switzerland", "flag": "🇨🇭", "color": "#DA020E"},  # Swiss red
@@ -162,8 +162,8 @@ COUNTRIES = {
     176: {"name": "Gibraltar", "flag": "🇬🇮", "color": "#DA020E"},  # Red from flag
     177: {"name": "Bhutan", "flag": "🇧🇹", "color": "#FFD520"},  # Yellow from flag
     178: {"name": "Belize", "flag": "🇧🇿", "color": "#CE1126"},  # Second Belize entry (duplicate country) - using red
-    180: {"name": "Unknown Country 180", "flag": "❓", "color": "#DDDDDD"},  # TODO: Research actual country
-    191: {"name": "Unknown Country 191", "flag": "❓", "color": "#EEEEEE"},  # TODO: Research actual country
+    # 180: Deprecated ID - was unknown, now mapped to Comoros (151)
+    # 191: Deprecated ID - was unknown, now mapped to San Marino (163)
     1000: {"name": "Hattrick International", "flag": "🌍", "color": "#4A90E2"},  # International blue
 }
 

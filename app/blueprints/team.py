@@ -111,8 +111,6 @@ def update():
     all_team_names = session["all_team_names"]
 
     updated = {}
-    # changesplayers_day = []  # TODO: Unused - remove if not needed
-    # changesplayers_week = []  # TODO: Unused - remove if not needed
 
     new_players = []
     left_players = []
