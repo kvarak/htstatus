@@ -18,7 +18,7 @@ Users need a way to experiment with different formations and see how effective t
    - Check community recommendations and resources
 
 2. **Technical Investigation** (3-4 hours):
-   - Research drag-and-drop libraries (React DnD, dnd-kit, react-beautiful-dnd)
+   - Research drag-and-drop libraries (SortableJS, Draggable, vanilla JavaScript)
    - Evaluate soccer field visualization libraries
    - Investigate Hattrick position contribution calculations
    - Determine skill weighting algorithms
