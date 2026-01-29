@@ -133,6 +133,17 @@ def player():
         .all()
     )
 
+    # Create default groups if user has none
+    if not group_data:
+        try:
+            from app.utils import create_default_groups
+            created_groups = create_default_groups(session["current_user_id"])
+            if created_groups:
+                group_data = created_groups
+                dprint(1, f"Created {len(created_groups)} default groups for user {session['current_user_id']}")
+        except Exception as e:
+            dprint(1, f"Failed to create default groups: {e}")
+
     into_groups = (
         db.session.query(PlayerSetting)
         .filter_by(user_id=session["current_user_id"])
