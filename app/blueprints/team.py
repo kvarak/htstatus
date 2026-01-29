@@ -346,6 +346,22 @@ def update():
                 for change in player_changes:
                     timeline_changes[f"week_{week_num}"]["changes"].append(change)
 
+            # Sort changes by group order (None last), then by player name
+            def sort_changes_key(change):
+                player_data = change[0]  # First element is player display data
+                if isinstance(player_data, dict):
+                    # Sort by group order (None values last), then by player name
+                    group_order = player_data.get('group_order')
+                    if group_order is None:
+                        group_order = 9999  # Put players without groups at the end
+                    player_name = player_data.get('name', '')
+                    return (group_order, player_name)
+                else:
+                    # Legacy string format - use as is
+                    return (9999, str(player_data))
+
+            timeline_changes[f"week_{week_num}"]["changes"].sort(key=sort_changes_key)
+
         updated[teamid].append("/player?id=" + str(teamid))
         updated[teamid].append("players")
 

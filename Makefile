@@ -52,11 +52,6 @@ help: ## Show this help message
 	@echo "  make setup       # Initialize development environment"
 	@echo "  make dev         # Start development server"
 	@echo ""
-	@echo "Development Workflow:"
-	@echo "  make lint        # Quick validation during development"
-	@echo "  make test-single # Run specific test file (FILE=tests/test_name.py)"
-	@echo "  make test-all    # Full quality gates for deployment"
-	@echo ""
 
 # Development Environment Commands
 setup: check-uv ## Initialize development environment (UV sync, Docker setup)

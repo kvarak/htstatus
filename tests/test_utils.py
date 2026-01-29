@@ -434,3 +434,235 @@ class TestGetTraining:
 
         # None values should become 0
         assert skills == [0, 8, 0, 4, 0, 9, 0]
+
+
+class TestGetPlayerChanges:
+    """Test get_player_changes function with simplified approach."""
+
+    def _create_mock_player_record(self, first_name, last_name, date, **kwargs):
+        """Helper to create mock player records with default attributes."""
+        record = Mock()
+        record.first_name = first_name
+        record.last_name = last_name
+        record.data_date = date
+
+        # Set defaults for all expected attributes
+        defaults = {
+            "keeper": 0, "defender": 0, "playmaker": 0, "winger": 0,
+            "passing": 0, "scorer": 0, "set_pieces": 0, "experience": 0,
+            "age_years": 25, "cards": 0, "injury_level": -1
+        }
+        defaults.update(kwargs)
+
+        for attr, value in defaults.items():
+            setattr(record, attr, value)
+
+        return record
+
+    @patch('app.utils.db')
+    @patch('app.utils._get_player_display_data')
+    def test_get_player_changes_basic_functionality(self, mock_display_data, mock_db):
+        """Test basic get_player_changes functionality."""
+        from app.utils import get_player_changes
+
+        old_record = self._create_mock_player_record("Test", "Player", datetime(2024, 1, 8), keeper=5)
+        new_record = self._create_mock_player_record("Test", "Player", datetime(2024, 1, 15), keeper=6)
+
+        # Mock the display data
+        mock_display_data.return_value = {
+            'name': "Test Player",
+            'group_name': None,
+            'text_color': None,
+            'bg_color': None
+        }
+
+        mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
+            old_record, new_record
+        ]
+
+        result = get_player_changes(123456, 7, 0)
+
+        assert len(result) == 1
+        change = result[0]
+        assert change[1] == "Keeper"  # Attribute name
+        assert change[2] == 5  # Old value
+        assert change[3] == 6  # New value
+        assert change[4] == "skill"  # Change type
+
+        # Check player data structure
+        player_data = change[0]
+        assert player_data['name'] == "Test Player"
+        mock_display_data.assert_called_once_with(123456, new_record)
+
+    @patch('app.utils.db')
+    def test_get_player_changes_no_records(self, mock_db):
+        """Test get_player_changes with no records found."""
+        from app.utils import get_player_changes
+
+        mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.return_value = None
+
+        result = get_player_changes(123456, 7, 0)
+        assert result == []
+
+    @patch('app.utils.db')
+    def test_get_player_changes_exception_handling(self, mock_db):
+        """Test get_player_changes exception handling."""
+        from app.utils import get_player_changes
+
+        mock_db.session.query.side_effect = Exception("Database error")
+
+        result = get_player_changes(123456, 7, 0)
+        assert result == []
+
+
+class TestGetPlayerDisplayName:
+    """Test _get_player_display_name helper function."""
+
+    def _create_mock_player_record(self, first_name, last_name):
+        """Helper to create simple mock player records."""
+        record = Mock()
+        record.first_name = first_name
+        record.last_name = last_name
+        return record
+
+    def test_get_player_display_name_basic(self):
+        """Test basic player display name without group."""
+        from app.utils import _get_player_display_name
+
+        player_record = self._create_mock_player_record("John", "Doe")
+
+        with patch('app.utils.session', {}):
+            result = _get_player_display_name(123456, player_record)
+            assert result == "John Doe"
+
+    @patch('app.utils.db')
+    @patch('app.utils.session', {"current_user_id": 12345})
+    def test_get_player_display_name_with_group(self, mock_db):
+        """Test player display name with group using direct patching."""
+        from app.utils import _get_player_display_name
+
+        player_record = self._create_mock_player_record("Jane", "Smith")
+
+        # Mock PlayerSetting and Group instances with proper attribute setup
+        mock_player_setting = Mock()
+        mock_player_setting.group_id = 5
+
+        mock_group = Mock()
+        mock_group.name = "Defenders"  # Set as direct attribute, not a Mock
+        mock_group.textcolor = "#ffffff"
+        mock_group.bgcolor = "#ff0000"
+
+        # Simple mock setup - return PlayerSetting, then Group
+        mock_db.session.query.return_value.filter_by.return_value.first.side_effect = [
+            mock_player_setting, mock_group
+        ]
+
+        # Mock successful model imports
+        with patch('models.PlayerSetting'), patch('models.Group'):
+            result = _get_player_display_name(123456, player_record)
+            assert result == "Jane Smith (Defenders)"
+
+
+class TestGetPlayerDisplayData:
+    """Test _get_player_display_data helper function."""
+
+    def _create_mock_player_record(self, first_name, last_name):
+        """Helper to create simple mock player records."""
+        record = Mock()
+        record.first_name = first_name
+        record.last_name = last_name
+        return record
+
+    def test_get_player_display_data_basic(self):
+        """Test basic player display data without group."""
+        from app.utils import _get_player_display_data
+
+        player_record = self._create_mock_player_record("John", "Doe")
+
+        with patch('app.utils.session', {}):
+            result = _get_player_display_data(123456, player_record)
+            expected = {
+                'name': 'John Doe',
+                'group_name': None,
+                'group_order': None,
+                'text_color': None,
+                'bg_color': None
+            }
+            assert result == expected
+
+    @patch('app.utils.db')
+    @patch('app.utils.session', {"current_user_id": 12345})
+    def test_get_player_display_data_with_group(self, mock_db):
+        """Test player display data with group and colors."""
+        from app.utils import _get_player_display_data
+
+        player_record = self._create_mock_player_record("Jane", "Smith")
+
+        # Mock PlayerSetting and Group instances with color info
+        mock_player_setting = Mock()
+        mock_player_setting.group_id = 5
+
+        mock_group = Mock()
+        mock_group.name = "Defenders"
+        mock_group.order = 2
+        mock_group.textcolor = "#ffffff"
+        mock_group.bgcolor = "#ff0000"
+
+        # Simple mock setup - return PlayerSetting, then Group
+        mock_db.session.query.return_value.filter_by.return_value.first.side_effect = [
+            mock_player_setting, mock_group
+        ]
+
+        # Mock successful model imports
+        with patch('models.PlayerSetting'), patch('models.Group'):
+            result = _get_player_display_data(123456, player_record)
+            expected = {
+                'name': 'Jane Smith (Defenders)',
+                'group_name': 'Defenders',
+                'group_order': 2,
+                'text_color': '#ffffff',
+                'bg_color': '#ff0000'
+            }
+            assert result == expected
+
+    @patch('app.utils.db')
+    @patch('app.utils.session', {"current_user_id": 12345})
+    def test_get_player_display_data_no_group(self, mock_db):
+        """Test player display data when no group is found."""
+        from app.utils import _get_player_display_data
+
+        player_record = self._create_mock_player_record("Bob", "Jones")
+
+        # Mock no PlayerSetting found
+        mock_db.session.query.return_value.filter_by.return_value.first.return_value = None
+
+        with patch('models.PlayerSetting'), patch('models.Group'):
+            result = _get_player_display_data(123456, player_record)
+            expected = {
+                'name': 'Bob Jones',
+                'group_name': None,
+                'group_order': None,
+                'text_color': None,
+                'bg_color': None
+            }
+            assert result == expected
+
+
+class TestFormatAttributeName:
+    """Test _format_attribute_name helper function."""
+
+    def test_format_attribute_name_basic_cases(self):
+        """Test basic attribute name formatting."""
+        from app.utils import _format_attribute_name
+
+        assert _format_attribute_name("keeper") == "Keeper"
+        assert _format_attribute_name("defender") == "Defender"
+        assert _format_attribute_name("playmaker") == "Playmaker"
+
+    def test_format_attribute_name_special_cases(self):
+        """Test special case attribute name formatting."""
+        from app.utils import _format_attribute_name
+
+        assert _format_attribute_name("set_pieces") == "Set Pieces"
+        assert _format_attribute_name("tsi") == "TSI"
+        assert _format_attribute_name("injury_level") == "Injury Level"

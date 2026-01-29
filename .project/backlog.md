@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements from simplification review. **Active: 37 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements from simplification review. **Completed FEAT-009**: Player group names and colors now display in update timeline with sorting by group order. **Active: 35 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -17,7 +17,6 @@
 
 ## P2: Features 🎯
 
-- **[FEAT-009]** Display Player Group Names in Update Timeline → [Details](.project/tasks/FEAT-009.md)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-005]** Team Statistics Dashboard → [Details](.project/tasks/FEAT-005.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
@@ -69,6 +68,9 @@
 - **[FEAT-011]** Training Camp Planner → [Details](.project/tasks/FEAT-011.md)
 
 ### Simple Improvements
+- **[REFACTOR-057]** Replace individual group queries with single JOIN query for performance optimization (15 min)
+- **[REFACTOR-059]** Evaluate SQL-level sorting vs Python-level sorting for timeline changes (30 min)
+- **[TEST-035]** Create shared test fixture for new player display data structure (20 min)
 - **[REFACTOR-038]** Simplify CSS Design System & UI Consistency (Consolidates UI-015, UI-016) → [Details](.project/tasks/REFACTOR-038.md)
 - **[REFACTOR-040]** Template Inheritance for Breadcrumb Pattern → [Details](.project/tasks/REFACTOR-040.md)
 - **[REFACTOR-041]** Consolidate Debug Scripts & Country Data Migration (Consolidates REFACTOR-039) → [Details](.project/tasks/REFACTOR-041.md)

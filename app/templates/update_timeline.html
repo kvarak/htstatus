@@ -377,20 +377,30 @@
               <div class="week-content">
                 {% if week.changes %}
                   <div class="week-changes">
-                    {# Group changes by player name #}
+                    {# Group changes by player data #}
                     {% set player_changes = {} %}
                     {% for change in week.changes %}
-                      {% set player_name = change[0] %}
-                      {% if player_name not in player_changes %}
-                        {% set _ = player_changes.update({player_name: []}) %}
+                      {% set player_data = change[0] %}
+                      {% set player_key = player_data.name if player_data is mapping else player_data %}
+                      {% if player_key not in player_changes %}
+                        {% set _ = player_changes.update({player_key: {'data': player_data, 'changes': []}}) %}
                       {% endif %}
-                      {% set _ = player_changes[player_name].append(change) %}
+                      {% set _ = player_changes[player_key]['changes'].append(change) %}
                     {% endfor %}
 
-                    {% for player_name, changes in player_changes.items() %}
+                    {% for player_key, player_info in player_changes.items() %}
                       <div class="player-entry">
-                        <div class="player-name">{{ player_name }}</div>
-                        {% for change in changes %}
+                        {% set player_data = player_info.data %}
+                        {% if player_data is mapping and player_data.text_color and player_data.bg_color %}
+                          <div class="player-name" style="color: {{ player_data.text_color }}; background-color: {{ player_data.bg_color }}; padding: 0.2rem 0.4rem; border-radius: 0.2rem; display: inline-block;">
+                            {{ player_data.name }}
+                          </div>
+                        {% else %}
+                          <div class="player-name">
+                            {{ player_data.name if player_data is mapping else player_data }}
+                          </div>
+                        {% endif %}
+                        {% for change in player_info.changes %}
                           <div class="change-item">
                             {% if change[4] == 'skill' %}
                               {% if change[3] > change[2] %}

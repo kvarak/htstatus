@@ -437,6 +437,7 @@ def get_player_changes(player_id, start_days_ago, end_days_ago):
 
     Returns:
         List of changes: [player_name, attribute, old_value, new_value, change_type]
+        player_name includes group name if player belongs to a group: "Player Name (Group Name)"
     """
     try:
         from datetime import datetime, timedelta
@@ -497,29 +498,108 @@ def get_player_changes(player_id, start_days_ago, end_days_ago):
         # 'stamina': 'other', 'form': 'other', 'tsi': 'money', 'salary': 'money',
 
         changes = []
-        player_name = (
-            f"{new_record.first_name or ''} {new_record.last_name or ''}".strip()
-        )
+        player_display_data = _get_player_display_data(player_id, new_record)
 
         for attr, change_type in check_attrs.items():
             old_val = getattr(old_record, attr, None) or 0
             new_val = getattr(new_record, attr, None) or 0
 
             if old_val != new_val:
-                # Clean up attribute name
-                attr_name = attr.replace("_", " ").title()
-                if attr == "tsi":
-                    attr_name = "TSI"
-                elif attr == "set_pieces":
-                    attr_name = "Set Pieces"
-
-                changes.append([player_name, attr_name, old_val, new_val, change_type])
+                attr_name = _format_attribute_name(attr)
+                changes.append([player_display_data, attr_name, old_val, new_val, change_type])
 
         return changes
 
     except Exception as e:
         dprint(1, f"Error in get_player_changes: {e}")
         return []
+
+
+def _get_player_display_name(player_id, player_record):
+    """Get player display name with optional group name (legacy function).
+
+    Args:
+        player_id: Hattrick player ID
+        player_record: Player database record
+
+    Returns:
+        str: "Player Name" or "Player Name (Group Name)" if group exists
+    """
+    display_data = _get_player_display_data(player_id, player_record)
+    return display_data['name']
+
+
+def _get_player_display_data(player_id, player_record):
+    """Get player display data including name and group colors.
+
+    Args:
+        player_id: Hattrick player ID
+        player_record: Player database record
+
+    Returns:
+        dict: {
+            'name': str,           # "Player Name" or "Player Name (Group Name)"
+            'group_name': str,     # Group name or None
+            'group_order': int,    # Group order number or None
+            'text_color': str,     # Group text color or None
+            'bg_color': str        # Group background color or None
+        }
+    """
+    base_name = f"{player_record.first_name or ''} {player_record.last_name or ''}".strip()
+
+    result = {
+        'name': base_name,
+        'group_name': None,
+        'group_order': None,
+        'text_color': None,
+        'bg_color': None
+    }
+
+    try:
+        # Use module-level session import to work with test mocking
+        current_user_id = session.get("current_user_id") if session else None
+
+        if not current_user_id:
+            return result
+
+        # Import models using registry pattern with fallback
+        try:
+            from app.model_registry import get_group_model, get_player_setting_model
+            PlayerSetting = get_player_setting_model()
+            Group = get_group_model()
+        except (ImportError, ValueError):
+            from models import Group, PlayerSetting
+
+        # Query for player's group
+        player_setting = (
+            db.session.query(PlayerSetting)
+            .filter_by(player_id=player_id, user_id=current_user_id)
+            .first()
+        )
+
+        if player_setting and player_setting.group_id:
+            group = db.session.query(Group).filter_by(id=player_setting.group_id).first()
+            if group and group.name:
+                result['name'] = f"{base_name} ({group.name})"
+                result['group_name'] = group.name
+                result['group_order'] = group.order
+                result['text_color'] = group.textcolor
+                result['bg_color'] = group.bgcolor
+
+    except Exception as e:
+        dprint(2, f"Group lookup failed for player {player_id}: {e}")
+
+    return result
+
+
+def _format_attribute_name(attr):
+    """Format attribute name for display."""
+    attr_name = attr.replace("_", " ").title()
+    if attr == "tsi":
+        return "TSI"
+    elif attr == "set_pieces":
+        return "Set Pieces"
+    return attr_name
 
 
 # =============================================================================
