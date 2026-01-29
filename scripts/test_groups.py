@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Test script to check current groups for user 182085"""
 
+import importlib.util
 import sys
 from pathlib import Path
 
@@ -11,7 +12,6 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import config
-import importlib.util
 
 spec = importlib.util.spec_from_file_location("config", project_root / "config.py")
 config_module = importlib.util.module_from_spec(spec)

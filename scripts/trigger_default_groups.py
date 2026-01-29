@@ -5,12 +5,12 @@ Trigger default groups creation for an existing user
 import sys
 from pathlib import Path
 
+from app.factory import create_app
+from app.utils import create_default_groups
+
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from app.factory import create_app
-from app.utils import create_default_groups
 
 
 def trigger_groups_for_user(user_id):

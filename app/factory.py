@@ -103,6 +103,10 @@ def setup_routes(app_instance, db_instance):
         setup_matches_blueprint,
     )
     from app.blueprints.player import player_bp, setup_player_blueprint
+    from app.blueprints.stats import (
+        setup_stats_blueprint,
+        stats_bp,
+    )
     from app.blueprints.team import setup_team_blueprint, team_bp
     from app.blueprints.training import setup_training_blueprint, training_bp
 
@@ -151,6 +155,8 @@ def setup_routes(app_instance, db_instance):
         db_instance, HT_MATCH_TYPE, HT_MATCH_ROLE, HT_MATCH_BEHAVIOUR
     )
 
+    setup_stats_blueprint(db_instance)
+
     setup_training_blueprint(db_instance, TRACE_COLUMNS)
 
     # Register blueprints with Flask
@@ -159,6 +165,7 @@ def setup_routes(app_instance, db_instance):
     app_instance.register_blueprint(player_bp)
     app_instance.register_blueprint(team_bp)
     app_instance.register_blueprint(matches_bp)
+    app_instance.register_blueprint(stats_bp)
     app_instance.register_blueprint(training_bp)
 
 

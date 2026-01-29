@@ -1,0 +1,1346 @@
+{% extends 'base.html' %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+/* Enhanced Formation System Styles */
+.position-slot {
+    min-width: 60px;
+    min-height: 40px;
+    border: 2px dashed rgba(0,0,0,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 2px;
+}
+
+.position-slot.goalkeeper-slot {
+    background: rgba(255,193,7,0.3);
+    border-color: rgba(255,193,7,0.6);
+    min-width: 80px;
+    min-height: 50px;
+}
+
+.position-slot.defender-slot {
+    background: rgba(0,123,255,0.3);
+    border-color: rgba(0,123,255,0.6);
+}
+
+.position-slot.midfielder-slot {
+    background: rgba(40,167,69,0.3);
+    border-color: rgba(40,167,69,0.6);
+}
+
+.position-slot.forward-slot {
+    background: rgba(220,53,69,0.3);
+    border-color: rgba(220,53,69,0.6);
+}
+
+.position-slot.occupied {
+    background: rgba(76, 175, 80, 0.9) !important;
+    border-color: rgba(76, 175, 80, 1) !important;
+    border-style: solid;
+}
+
+.position-slot.drag-over {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.position-label {
+    font-size: 0.7rem;
+    color: rgba(0,0,0,0.7);
+    font-weight: bold;
+    pointer-events: none;
+}
+
+.positioned-player {
+    background: rgba(255,255,255,0.95);
+    color: #333;
+    border: 2px solid #28a745;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: grab;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.positioned-player:active {
+    cursor: grabbing;
+}
+
+.positioned-player.dragging {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.9);
+}
+
+/* Player Pool Styling */
+#player-pool {
+    min-height: 60px;
+    border: 2px dashed rgba(0,123,255,0.5);
+    border-radius: 8px;
+    padding: 10px;
+    background: rgba(248,249,250,0.8);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.available-player {
+    background: white;
+    color: #333;
+    border: 2px solid #007bff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.available-player:hover {
+    background: #007bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.available-player:active {
+    cursor: grabbing;
+}
+
+/* Legacy compatibility */
+.position-slot {
+    min-width: 60px;
+    min-height: 40px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.defender-slot, .midfielder-slot, .forward-slot {
+    background: rgba(0,123,255,0.3);
+    border: 2px dashed rgba(0,123,255,0.6);
+}
+
+.midfielder-slot {
+    background: rgba(23,162,184,0.3);
+    border: 2px dashed rgba(23,162,184,0.6);
+}
+
+.forward-slot {
+    background: rgba(220,53,69,0.3);
+    border: 2px dashed rgba(220,53,69,0.6);
+}
+
+/* Work in Progress Sticker */
+.wip-sticker {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transform: rotate(12deg);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    cursor: default;
+    user-select: none;
+}
+
+.wip-sticker:hover {
+    transform: rotate(12deg) scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.6);
+}
+
+.wip-sticker::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+.position-player {
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.position-player:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Tooltip styles for player stats */
+.player-tooltip {
+    position: absolute;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    min-width: 200px;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.tooltip-name {
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #4CAF50;
+}
+
+.tooltip-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    font-size: 0.7rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-label {
+    color: #ccc;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: white;
+}
+
+/* Tooltip styles for player stats */
+.player-tooltip {
+    position: absolute;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    min-width: 200px;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.tooltip-name {
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #4CAF50;
+}
+
+.tooltip-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    font-size: 0.7rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-label {
+    color: #ccc;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: white;
+}
+
+.position-player.dragging {
+    opacity: 0.6;
+    transform: rotate(5deg) scale(1.1);
+    z-index: 1000;
+}
+
+.available-player {
+    background: white;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: grab;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.positioned-player {
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.position-label {
+    color: rgba(255,255,255,0.8);
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+#player-pool {
+    min-height: 50px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 10px;
+}
+</style>
+<script>
+// Formation Tester with Drag & Drop JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    // Player assignments storage
+    let playerAssignments = {};
+
+    // Initialize tooltips
+    initializePlayerTooltips();
+
+    // Auto-submit form when formation radio buttons change
+    const formationRadios = document.querySelectorAll('input[name="formation"]');
+    formationRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.checked) {
+                setTimeout(() => {
+                    this.form.submit();
+                }, 100);
+            }
+        });
+    });
+
+    // Formation label clicks
+    const formationLabels = document.querySelectorAll('label[for^="formation_"]');
+    formationLabels.forEach(label => {
+        label.addEventListener('click', function() {
+            const radioId = this.getAttribute('for');
+            const radio = document.getElementById(radioId);
+            if (radio && !radio.checked) {
+                radio.checked = true;
+                setTimeout(() => {
+                    radio.form.submit();
+                }, 100);
+            }
+        });
+    });
+
+    // Drag and Drop Functionality
+    function initializeDragAndDrop() {
+        // Make players draggable - both original class and new class
+        const players = document.querySelectorAll('.draggable-player, .position-player, .available-player, .positioned-player');
+        players.forEach(player => {
+            player.addEventListener('dragstart', handleDragStart);
+            player.addEventListener('dragend', handleDragEnd);
+        });
+
+        // Setup drop zones - both original and new classes, including player pool
+        const dropZones = document.querySelectorAll('.drop-zone, .position-slot');
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', handleDragOver);
+            zone.addEventListener('dragenter', handleDragEnter);
+            zone.addEventListener('dragleave', handleDragLeave);
+            zone.addEventListener('drop', handleDrop);
+            zone.addEventListener('dblclick', handleSlotDoubleClick);
+        });
+
+        // Make player pool a drop zone for removing players from field
+        const playerPool = document.getElementById('player-pool');
+        if (playerPool) {
+            playerPool.addEventListener('dragover', handleDragOver);
+            playerPool.addEventListener('dragenter', handleDragEnter);
+            playerPool.addEventListener('dragleave', handleDragLeave);
+            playerPool.addEventListener('drop', handlePoolDrop);
+        }
+    }
+
+    // Double-click handler for removing players from positions
+    function handleSlotDoubleClick(e) {
+        const positionId = this.dataset.positionId;
+        if (playerAssignments[positionId]) {
+            removePlayerFromPosition(positionId);
+        }
+    }
+
+    let draggedElement = null;
+    let playerData = {}; // Store all player data for calculations
+
+    // Load player data on page load
+    function loadPlayerData() {
+        document.querySelectorAll('.available-player[data-player-data]').forEach(player => {
+            const data = JSON.parse(player.getAttribute('data-player-data'));
+            playerData[data.ht_id] = data;
+        });
+    }
+
+    // Calculate and update formation display
+    function updateFormationDisplay() {
+        const assignedCount = Object.keys(playerAssignments).length;
+
+        // Update player count
+        document.getElementById('player-count-display').textContent = `Players: ${assignedCount}/11`;
+
+        // Calculate current formation
+        let defenders = 0, midfielders = 0, forwards = 0;
+
+        Object.keys(playerAssignments).forEach(positionId => {
+            const pos = parseInt(positionId);
+            if (pos >= 101 && pos <= 105) defenders++;
+            else if (pos >= 106 && pos <= 110) midfielders++;
+            else if (pos >= 111 && pos <= 113) forwards++;
+        });
+
+        const formationString = `${defenders}-${midfielders}-${forwards}`;
+        document.getElementById('formation-status').textContent = formationString;
+    }
+
+    // Calculate live formation analysis
+    function calculateLiveAnalysis() {
+        const assignedCount = Object.keys(playerAssignments).length;
+        let totalScore = 0;
+        let positionScores = {};
+
+        // Update formation display
+        updateFormationDisplay();
+
+        if (assignedCount === 0) {
+            document.getElementById('overall-rating').textContent = '0.0';
+            document.getElementById('position-analysis').innerHTML = '<p class="text-muted-custom small text-center">Assign players to see analysis</p>';
+            return;
+        }
+
+        // Calculate effectiveness for each assigned position
+        Object.keys(playerAssignments).forEach(positionId => {
+            const playerId = playerAssignments[positionId];
+            const player = playerData[playerId];
+
+            if (player) {
+                const positionScore = calculatePlayerContribution(player, parseInt(positionId));
+                positionScores[positionId] = {
+                    score: positionScore,
+                    player: player,
+                    positionName: getPositionName(parseInt(positionId))
+                };
+                totalScore += positionScore;
+            }
+        });
+
+        const averageScore = assignedCount > 0 ? totalScore / assignedCount : 0;
+
+        // Update overall rating
+        document.getElementById('overall-rating').textContent = averageScore.toFixed(1);
+
+        // Update position analysis
+        updatePositionAnalysis(positionScores);
+    }
+
+    // Calculate player contribution to position (simplified version)
+    function calculatePlayerContribution(player, positionId) {
+        let baseScore = 0;
+
+        // Position-specific skill weights
+        switch(positionId) {
+            case 100: // Goalkeeper
+                baseScore = player.keeper * 0.8 + player.set_pieces * 0.2;
+                break;
+            case 101: case 102: case 103: case 104: case 105: // Defenders
+                baseScore = player.defender * 0.6 + player.playmaker * 0.2 + player.set_pieces * 0.2;
+                break;
+            case 106: case 107: case 108: case 109: case 110: // Midfielders
+                baseScore = player.playmaker * 0.4 + player.passing * 0.3 + player.winger * 0.3;
+                break;
+            case 111: case 112: case 113: // Forwards
+                baseScore = player.scorer * 0.5 + player.winger * 0.3 + player.set_pieces * 0.2;
+                break;
+            default:
+                baseScore = (player.defender + player.playmaker + player.scorer) / 3;
+        }
+
+        // Apply form, experience, and loyalty multipliers
+        const formMultiplier = 1 + (player.form - 7) * 0.05;
+        const expMultiplier = 1 + player.experience * 0.02;
+        const loyaltyMultiplier = 1 + player.loyalty * 0.01;
+
+        return Math.max(0, baseScore * formMultiplier * expMultiplier * loyaltyMultiplier);
+    }
+
+    // Get position abbreviation from ID
+    function getPositionAbbreviation(positionId) {
+        const positionAbbrs = {
+            100: 'G',
+            101: 'RB', 102: 'RCB', 103: 'CB', 104: 'LCB', 105: 'LB',
+            106: 'RW', 107: 'RIM', 108: 'CM', 109: 'LIM', 110: 'LW',
+            111: 'RF', 112: 'CF', 113: 'LF'
+        };
+        return positionAbbrs[positionId] || '?';
+    }
+
+    // Get position name from ID
+    function getPositionName(positionId) {
+        const positionNames = {
+            100: 'Goalkeeper',
+            101: 'Right Back', 102: 'Right Centre Back', 103: 'Centre Back', 104: 'Left Centre Back', 105: 'Left Back',
+            106: 'Right Winger', 107: 'Right Inner Mid', 108: 'Centre Mid', 109: 'Left Inner Mid', 110: 'Left Winger',
+            111: 'Right Forward', 112: 'Centre Forward', 113: 'Left Forward'
+        };
+        return positionNames[positionId] || 'Unknown';
+    }
+
+    // Update position analysis display
+    function updatePositionAnalysis(positionScores) {
+        let html = '';
+
+        Object.keys(positionScores).forEach(positionId => {
+            const data = positionScores[positionId];
+            const score = data.score;
+            const percentage = Math.min(100, (score / 20) * 100);
+            const colorClass = score >= 12 ? 'bg-success' : score >= 8 ? 'bg-warning' : 'bg-danger';
+            const positionAbbr = getPositionAbbreviation(parseInt(positionId));
+
+            html += `
+                <div class="row align-items-center mb-2">
+                    <div class="col-4">
+                        <span class="badge ${getPositionBadgeClass(parseInt(positionId))}" style="font-size: 0.6rem;">
+                            ${positionAbbr}
+                        </span>
+                    </div>
+                    <div class="col-8">
+                        <div class="progress" style="height: 12px;">
+                            <div class="progress-bar ${colorClass}"
+                                 style="width: ${percentage}%">
+                                <small style="font-size: 0.6rem; line-height: 12px;">${score.toFixed(1)}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('position-analysis').innerHTML = html || '<p class="text-muted-custom small text-center">No positions assigned</p>';
+    }
+
+    // Get badge class for position
+    function getPositionBadgeClass(positionId) {
+        if (positionId === 100) return 'bg-warning text-dark';
+        if (positionId <= 105) return 'bg-primary text-white';
+        if (positionId <= 110) return 'bg-info text-white';
+        return 'bg-danger text-white';
+    }
+
+    function handleDragStart(e) {
+        draggedElement = this;
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+
+        // Enhanced data format for better drag and drop
+        const dragData = {
+            playerId: this.dataset.playerId,
+            playerNumber: this.dataset.playerNumber,
+            playerName: this.dataset.playerName,
+            fromPosition: this.dataset.fromPosition || null
+        };
+
+        e.dataTransfer.setData('text/html', this.outerHTML);
+        e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        // Clean up any remaining drag-over states
+        document.querySelectorAll('.drop-zone, .position-slot').forEach(zone => {
+            zone.classList.remove('drag-over');
+        });
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+
+        this.classList.remove('drag-over');
+
+        // Try to get enhanced data format, fallback to simple format
+        let dragData;
+        const rawData = e.dataTransfer.getData('text/plain');
+        try {
+            if (rawData.startsWith('{')) {
+                dragData = JSON.parse(rawData);
+            } else {
+                // Legacy format
+                dragData = {
+                    playerId: rawData,
+                    playerNumber: draggedElement?.dataset.playerNumber || '#',
+                    playerName: draggedElement?.dataset.playerName || 'Player',
+                    fromPosition: draggedElement?.dataset.fromPosition || null
+                };
+            }
+        } catch (e) {
+            console.warn('Could not parse drag data:', e);
+            return false;
+        }
+
+        const positionId = this.dataset.positionId;
+
+        if (draggedElement && dragData.playerId && positionId) {
+            assignPlayerToPositionEnhanced(dragData, positionId);
+        }
+
+        return false;
+    }
+
+    // Handle dropping players back to pool (remove from field)
+    function handlePoolDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+
+        this.classList.remove('drag-over');
+
+        // Try to get enhanced data format
+        let dragData;
+        const rawData = e.dataTransfer.getData('text/plain');
+        try {
+            if (rawData.startsWith('{')) {
+                dragData = JSON.parse(rawData);
+            } else {
+                // Legacy format
+                dragData = {
+                    playerId: rawData,
+                    fromPosition: draggedElement?.dataset.fromPosition || null
+                };
+            }
+        } catch (e) {
+            console.warn('Could not parse drag data:', e);
+            return false;
+        }
+
+        // Only allow removing players that are currently on the field
+        if (dragData.fromPosition && playerAssignments[dragData.fromPosition]) {
+            removePlayerFromPosition(dragData.fromPosition);
+            showMessage('Player removed from field', 'info');
+        }
+
+        return false;
+    }
+
+    function assignPlayerToPosition(playerId, positionId, playerElement) {
+        // Remove player from previous position if assigned
+        Object.keys(playerAssignments).forEach(pos => {
+            if (playerAssignments[pos] === playerId) {
+                delete playerAssignments[pos];
+                const oldZone = document.querySelector(`[data-position-id="${pos}"]`);
+                if (oldZone) {
+                    oldZone.classList.remove('occupied');
+                    oldZone.innerHTML = `<span class="text-white-50">${oldZone.dataset.positionName}</span>`;
+                }
+            }
+        });
+
+        // Assign player to new position
+        playerAssignments[positionId] = playerId;
+
+        const dropZone = document.querySelector(`[data-position-id="${positionId}"]`);
+        if (dropZone) {
+            dropZone.classList.add('occupied');
+            const playerNumber = playerElement.dataset.playerNumber || '#';
+            dropZone.innerHTML = `
+                <div class="assigned-player">
+                    <button type="button" class="remove-btn" onclick="removePlayerFromPosition('${positionId}')">&times;</button>
+                    <strong>${playerNumber}</strong>
+                </div>
+            `;
+        }
+
+        // Hide assigned player from available list
+        playerElement.style.display = 'none';
+
+        // Trigger live analysis update
+        calculateLiveAnalysis();
+    }
+
+    // Enhanced assignment function for new drag and drop system
+    function assignPlayerToPositionEnhanced(dragData, positionId) {
+        const { playerId, playerNumber, playerName, fromPosition } = dragData;
+
+        // Check if target position is occupied - handle swapping first
+        if (playerAssignments[positionId]) {
+            if (fromPosition) {
+                // Swap players if dragging from another position
+                swapPlayersEnhanced(fromPosition, positionId, playerId, playerNumber, playerName);
+                return;
+            } else {
+                // Swap: Position occupied and player from pool - move field player to pool
+                const currentPlayerId = playerAssignments[positionId];
+                const currentPlayerElement = document.querySelector(`[data-player-id="${currentPlayerId}"].available-player`);
+
+                if (currentPlayerElement) {
+                    // Move current field player back to pool
+                    currentPlayerElement.style.display = 'block';
+                    delete playerAssignments[positionId];
+
+                    const currentZone = document.querySelector(`[data-position-id="${positionId}"]`);
+                    if (currentZone) {
+                        currentZone.classList.remove('occupied');
+                        const oldPlayer = currentZone.querySelector('.positioned-player, .assigned-player');
+                        if (oldPlayer) oldPlayer.remove();
+                        // Restore position label
+                        const labelText = currentZone.dataset.positionName?.split(' ').map(w => w[0]).join('') || '';
+                        currentZone.innerHTML = `<span class="position-label small">${labelText}</span>`;
+                    }
+                }
+                // Continue with assigning new player to position (fall through)
+            }
+        } else {
+            // Position is empty - validate limits only for new assignments from pool
+            if (!fromPosition) {
+                if (positionId === '100') {
+                    // Goalkeeper position - should be fine since position is empty
+                } else {
+                    // Field positions (101-113): max 10 players
+                    const fieldPlayerCount = Object.keys(playerAssignments).filter(pos => pos !== '100').length;
+                    if (fieldPlayerCount >= 10) {
+                        showMessage('Maximum 10 outfield players allowed!', 'warning');
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Remove player from previous position if moving
+        if (fromPosition) {
+            delete playerAssignments[fromPosition];
+            const oldZone = document.querySelector(`[data-position-id="${fromPosition}"]`);
+            if (oldZone) {
+                oldZone.classList.remove('occupied');
+                const oldPlayer = oldZone.querySelector('.positioned-player, .assigned-player');
+                if (oldPlayer) oldPlayer.remove();
+                // Restore position label
+                const labelText = oldZone.dataset.positionName?.split(' ').map(w => w[0]).join('') || '';
+                oldZone.innerHTML = `<span class="position-label small">${labelText}</span>`;
+            }
+        }
+
+        // Assign player to new position
+        playerAssignments[positionId] = playerId;
+
+        updatePositionDisplay(positionId, playerNumber, playerId, playerName);
+
+        // Hide assigned player from available list (if not moving from another position)
+        if (!fromPosition) {
+            const availablePlayer = document.querySelector(`[data-player-id="${playerId}"].available-player`);
+            if (availablePlayer) {
+                availablePlayer.style.display = 'none';
+            }
+        }
+
+        // Trigger live analysis update
+        calculateLiveAnalysis();
+        showMessage(`${playerName} assigned to ${document.querySelector(`[data-position-id="${positionId}"]`).dataset.positionName}`, 'success');
+    }
+
+    // Enhanced swap function
+    function swapPlayersEnhanced(position1, position2, playerId1, playerNumber1, playerName1) {
+        const playerId2 = playerAssignments[position2];
+        const dropZone2 = document.querySelector(`[data-position-id="${position2}"]`);
+        const player2Element = dropZone2?.querySelector('.positioned-player, .assigned-player');
+        const playerNumber2 = player2Element?.dataset.playerNumber || player2Element?.textContent?.replace('#', '') || '#';
+        const playerName2 = player2Element?.dataset.playerName || 'Player';
+
+        // Swap assignments
+        playerAssignments[position1] = playerId2;
+        playerAssignments[position2] = playerId1;
+
+        // Update both positions
+        updatePositionDisplay(position1, playerNumber2, playerId2, playerName2);
+        updatePositionDisplay(position2, playerNumber1, playerId1, playerName1);
+
+        calculateLiveAnalysis();
+        showMessage(`${playerName1} and ${playerName2} swapped!`, 'success');
+    }
+
+    // Helper function to update position display
+    function updatePositionDisplay(positionId, playerNumber, playerId, playerName) {
+        const dropZone = document.querySelector(`[data-position-id="${positionId}"]`);
+        if (!dropZone) return;
+
+        dropZone.classList.add('occupied');
+
+        // Create positioned player element
+        const playerElement = document.createElement('div');
+        playerElement.className = 'positioned-player position-player';
+        playerElement.draggable = true;
+        playerElement.textContent = playerNumber;
+        playerElement.dataset.playerId = playerId;
+        playerElement.dataset.playerNumber = playerNumber;
+        playerElement.dataset.playerName = playerName;
+        playerElement.dataset.fromPosition = positionId;
+        playerElement.title = playerName;
+
+        // Add drag listeners
+        playerElement.addEventListener('dragstart', handleDragStart);
+        playerElement.addEventListener('dragend', handleDragEnd);
+
+        // Clear and rebuild position content
+        dropZone.innerHTML = '';
+        const label = document.createElement('span');
+        label.className = 'position-label small';
+        label.textContent = dropZone.dataset.positionName?.split(' ').map(w => w[0]).join('') || '';
+        dropZone.appendChild(label);
+        dropZone.appendChild(playerElement);
+    }
+
+    // Enhanced message display function
+    function showMessage(text, type = 'info') {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info'} alert-dismissible fade show position-fixed`;
+        messageDiv.style.cssText = 'top: 20px; right: 20px; z-index: 1050; min-width: 300px; max-width: 400px;';
+        messageDiv.innerHTML = `
+            ${text}
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        `;
+
+        document.body.appendChild(messageDiv);
+        setTimeout(() => messageDiv.remove(), 3000);
+    }
+
+    // Enhanced global function for remove button
+    window.removePlayerFromPosition = function(positionId) {
+        const playerId = playerAssignments[positionId];
+        if (playerId) {
+            delete playerAssignments[positionId];
+
+            const dropZone = document.querySelector(`[data-position-id="${positionId}"]`);
+            if (dropZone) {
+                dropZone.classList.remove('occupied');
+
+                // Clear existing content and restore position label
+                const labelText = dropZone.dataset.positionName?.split(' ').map(w => w[0]).join('') || '';
+                dropZone.innerHTML = `<span class="position-label small">${labelText}</span>`;
+            }
+
+            // Show player back in available list
+            const playerElement = document.querySelector(`[data-player-id="${playerId}"].available-player`);
+            if (playerElement) {
+                playerElement.style.display = 'block';
+            }
+
+            // Trigger live analysis update
+            calculateLiveAnalysis();
+            showMessage(`Player removed from ${dropZone?.dataset.positionName}`, 'info');
+        }
+    }
+
+    // Initialize drag and drop when page loads
+    initializeDragAndDrop();
+    loadPlayerData();
+    updateFormationDisplay(); // Initialize formation display
+    calculateLiveAnalysis();
+    initializePlayerTooltips();
+
+    // Initialize hover tooltips for players
+    function initializePlayerTooltips() {
+        let tooltip = null;
+
+        // Function to get specialty name from number
+        function getSpecialtyName(specialtyNum) {
+            const specialties = {
+                0: "None",
+                1: "Technical",
+                2: "Quick",
+                3: "Powerful",
+                4: "Unpredictable",
+                5: "Head specialist",
+                6: "Resilient",
+                7: "Support",
+                8: "Regainer"
+            };
+            return specialties[specialtyNum] || "Unknown";
+        }
+
+        // Function to calculate best position based on skills
+        function getBestPosition(data) {
+            const positions = {
+                'Goalkeeper': data.keeper,
+                'Defender': (data.defender * 0.8) + (data.passing * 0.2),
+                'Wing Back': (data.defender * 0.6) + (data.passing * 0.4),
+                'Midfielder': (data.playmaker * 0.6) + (data.passing * 0.4),
+                'Winger': (data.winger * 0.7) + (data.passing * 0.3),
+                'Forward': (data.scorer * 0.8) + (data.passing * 0.2)
+            };
+
+            let bestPos = 'Midfielder';
+            let maxScore = 0;
+
+            Object.entries(positions).forEach(([position, score]) => {
+                if (score > maxScore) {
+                    maxScore = score;
+                    bestPos = position;
+                }
+            });
+
+            return bestPos;
+        }
+
+        // Helper function to get specialty name
+        function getSpecialtyName(specialty) {
+            const specialties = {
+                0: 'None',
+                1: 'Technical',
+                2: 'Quick',
+                3: 'Powerful',
+                4: 'Unpredictable',
+                5: 'Head specialist',
+                6: 'Resilient',
+                7: 'Support',
+                8: 'Regainer'
+            };
+            return specialties[specialty] || 'Unknown';
+        }
+
+        // Helper function to calculate best position
+        function calculateBestPosition(data) {
+            // Match the backend CALC_COLUMNS position calculations exactly
+            const positions = {
+                'GC': data.keeper || 0,  // Goalkeeper contribution
+                'CD': (data.defender || 0) * 0.8 + (data.passing || 0) * 0.2,  // Central Defender Normal
+                'CDO': (data.defender || 0) * 0.6 + (data.passing || 0) * 0.3 + (data.playmaker || 0) * 0.1,  // Central Defender Offensive
+                'CDTW': (data.defender || 0) * 0.8 + (data.passing || 0) * 0.2,  // Side Central Defender Towards Wing
+                'WBD': (data.defender || 0) * 0.8 + (data.passing || 0) * 0.2,  // Wing Back Defensive
+                'WBN': (data.defender || 0) * 0.7 + (data.passing || 0) * 0.3,  // Wingback Normal
+                'WBO': (data.defender || 0) * 0.5 + (data.passing || 0) * 0.3 + (data.winger || 0) * 0.2,  // Wing Back Offensive
+                'WBTM': (data.defender || 0) * 0.6 + (data.passing || 0) * 0.4,  // Wingback Towards Middle
+                'WO': (data.winger || 0) * 0.8 + (data.passing || 0) * 0.2,  // Winger Offensive
+                'WTM': (data.winger || 0) * 0.5 + (data.playmaker || 0) * 0.3 + (data.passing || 0) * 0.2,  // Winger Towards Middle
+                'WN': (data.winger || 0) * 0.7 + (data.passing || 0) * 0.3,  // Winger Normal
+                'WD': (data.winger || 0) * 0.6 + (data.defender || 0) * 0.2 + (data.passing || 0) * 0.2,  // Winger Defensive
+                'IMN': (data.playmaker || 0) * 0.8 + (data.passing || 0) * 0.2,  // Inner Midfielder Normal
+                'IMD': (data.defender || 0) * 0.3 + (data.playmaker || 0) * 0.5 + (data.passing || 0) * 0.2,  // Inner Midfielder Defensive
+                'IMO': (data.playmaker || 0) * 0.6 + (data.scorer || 0) * 0.2 + (data.passing || 0) * 0.2,  // Inner Midfielder Offensive
+                'IMTW': (data.playmaker || 0) * 0.5 + (data.winger || 0) * 0.3 + (data.passing || 0) * 0.2,  // Inner Midfielder Towards Wing
+                'FW': (data.scorer || 0) * 0.8 + (data.passing || 0) * 0.2,  // Forward Normal
+                'FTW': (data.scorer || 0) * 0.6 + (data.winger || 0) * 0.2 + (data.passing || 0) * 0.2,  // Forward Towards Wing
+                'DF': (data.scorer || 0) * 0.6 + (data.defender || 0) * 0.2 + (data.passing || 0) * 0.2  // Defensive Forward
+            };
+
+            // Apply experience and form multipliers like the backend does
+            const experience = data.experience || 0;
+            const form = data.form || 7;  // Default form is 7 in Hattrick
+            const loyalty = data.loyalty || 0;
+
+            const experienceMultiplier = 1.0 + (Math.min(experience, 20) / 100.0);  // Up to 20% bonus
+            const formMultiplier = 1.0 + (form - 5) / 20.0;  // -25% to +25% based on form
+            const loyaltyMultiplier = 1.0 + (Math.min(loyalty, 20) / 200.0);  // Up to 10% bonus
+
+            let bestPosition = 'IMN';
+            let maxValue = 0;
+
+            for (const [position, baseValue] of Object.entries(positions)) {
+                const adjustedValue = baseValue * experienceMultiplier * formMultiplier * loyaltyMultiplier;
+                if (adjustedValue > maxValue) {
+                    maxValue = adjustedValue;
+                    bestPosition = position;
+                }
+            }
+
+            return bestPosition;
+        }
+
+        function createTooltip(playerData, playerName) {
+            if (tooltip) {
+                tooltip.remove();
+            }
+
+            tooltip = document.createElement('div');
+            tooltip.className = 'player-tooltip';
+
+            const data = typeof playerData === 'string' ? JSON.parse(playerData) : playerData;
+
+            tooltip.innerHTML = `
+                <div class="tooltip-name">${playerName}</div>
+                <div class="tooltip-stats">
+                    <div class="stat-item"><span class="stat-label">Keeper:</span> <span class="stat-value">${data.keeper || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">Defender:</span> <span class="stat-value">${data.defender || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">Playmaker:</span> <span class="stat-value">${data.playmaker || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">Winger:</span> <span class="stat-value">${data.winger || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">Passing:</span> <span class="stat-value">${data.passing || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">Scorer:</span> <span class="stat-value">${data.scorer || 0}</span></div>
+                </div>
+                <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #555;">
+                    <div class="stat-item"><span class="stat-label">Best Pos:</span> <span class="stat-value">${calculateBestPosition(data)}</span></div>
+                    <div class="stat-item"><span class="stat-label">Specialty:</span> <span class="stat-value">${getSpecialtyName(data.specialty)}</span></div>
+                </div>
+            `;
+
+            document.body.appendChild(tooltip);
+            return tooltip;
+        }
+
+        function updateTooltipPosition(e, tooltip) {
+            const x = e.pageX + 15;
+            const y = e.pageY - 10;
+            tooltip.style.left = x + 'px';
+            tooltip.style.top = y + 'px';
+        }
+
+        function addTooltipEvents(element) {
+            element.addEventListener('mouseenter', function(e) {
+                const playerData = this.dataset.playerData;
+                const playerName = this.dataset.playerName;
+
+                if (playerData && playerName) {
+                    const tooltipEl = createTooltip(playerData, playerName);
+                    updateTooltipPosition(e, tooltipEl);
+                }
+            });
+
+            element.addEventListener('mousemove', function(e) {
+                if (tooltip) {
+                    updateTooltipPosition(e, tooltip);
+                }
+            });
+
+            element.addEventListener('mouseleave', function() {
+                if (tooltip) {
+                    tooltip.remove();
+                    tooltip = null;
+                }
+            });
+        }
+
+        // Add tooltips to existing players
+        document.querySelectorAll('.position-player, .available-player, .positioned-player').forEach(addTooltipEvents);
+
+        // Re-add tooltips when players are moved (observer pattern)
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === Node.ELEMENT_NODE &&
+                            (node.classList?.contains('position-player') ||
+                             node.classList?.contains('available-player') ||
+                             node.classList?.contains('positioned-player'))) {
+                            addTooltipEvents(node);
+                        }
+                    });
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<!-- Work in Progress Sticker -->
+<div class="wip-sticker">
+  <span>🚧 Work in Progress</span>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">{{ teamname }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
+
+<!-- Two Column Layout: Formation Layout | Live Analysis -->
+  <div class="row mb-4">
+    {% if selected_formation and formation_templates[selected_formation] %}
+    <!-- Formation Interactive Field - Main Content -->
+    <div class="col-lg-8 col-md-7">
+      <div class="card-custom">
+        <div class="card-custom-header">
+          <p class="text-muted-custom mb-0 small">Drag & drop players between positions | Maximum 11 players (1 GK + 10 outfield)</p>
+        </div>
+        <div class="card-custom-body p-3">
+          <!-- Player Assignment Info -->
+          <div class="mb-3 text-center">
+            <span id="player-count-display" class="badge bg-primary text-white me-2">Players: 0/11</span>
+            <span id="formation-status" class="badge bg-info text-white">{{ selected_formation }}</span>
+          </div>
+
+          <!-- Football Pitch Visual -->
+          <div class="position-relative bg-success" style="background: linear-gradient(90deg, #228B22 0%, #32CD32 50%, #228B22 100%);
+                                                            border-radius: 8px; padding: 20px; min-height: 400px;">
+            <div class="text-center text-white">
+              <!-- Available Players Pool -->
+              <div class="mb-4">
+                <h6 class="mb-2">🏃 Available Players</h6>
+                <div id="player-pool" class="d-flex justify-content-center flex-wrap gap-2" style="min-height: 50px; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
+                  {% for player in current_players %}
+                  <div class="position-player available-player"
+                       draggable="true"
+                       data-player-id="{{ player.ht_id }}"
+                       data-player-number="{{ player.number or '#' }}"
+                       data-player-name="{{ player.first_name }} {{ player.last_name }}"
+                       data-player-data='{"ht_id": {{ player.ht_id }}, "keeper": {{ player.keeper or 0 }}, "defender": {{ player.defender or 0 }}, "playmaker": {{ player.playmaker or 0 }}, "winger": {{ player.winger or 0 }}, "passing": {{ player.passing or 0 }}, "scorer": {{ player.scorer or 0 }}, "set_pieces": {{ player.set_pieces or 0 }}, "form": {{ player.form or 7 }}, "experience": {{ player.experience or 0 }}, "loyalty": {{ player.loyalty or 0 }}, "specialty": {{ player.specialty or 0 }}}'
+                       style="background: white; color: #333; padding: 4px 8px; border-radius: 4px; cursor: grab; font-size: 0.8rem; font-weight: bold;">
+                    {% if player.number %}
+                      #{{ player.number }}
+                    {% else %}
+                      {{ (player.first_name[:1] + player.last_name[:1]) if player.first_name and player.last_name else '?' }}
+                    {% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Formation Positions -->
+              <div class="row justify-content-center">
+                <!-- Goalkeeper Row -->
+                <div class="col-12 mb-4">
+                  <div class="d-flex justify-content-center">
+                    <div class="position-slot goalkeeper-slot"
+                         data-position-id="100"
+                         data-position-name="Goalkeeper"
+                         data-position-type="GK"
+                         style="min-width: 80px; min-height: 50px; background: rgba(255,193,7,0.3); border: 2px dashed rgba(255,193,7,0.6); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 5px;">
+                      <span class="position-label">GK</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Defenders Row (All 5 positions) -->
+                <div class="col-12 mb-4">
+                  <div class="d-flex justify-content-center flex-wrap gap-2">
+                    <div class="position-slot defender-slot" data-position-id="101" data-position-name="Right Back" data-position-type="DEF"
+                         style="min-width: 60px; min-height: 40px; background: rgba(0,123,255,0.3); border: 2px dashed rgba(0,123,255,0.6); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 2px;">
+                      <span class="position-label small">RB</span>
+                    </div>
+                    <div class="position-slot defender-slot" data-position-id="102" data-position-name="Right Centre Back" data-position-type="DEF">
+                      <span class="position-label small">RCB</span>
+                    </div>
+                    <div class="position-slot defender-slot" data-position-id="103" data-position-name="Centre Back" data-position-type="DEF">
+                      <span class="position-label small">CB</span>
+                    </div>
+                    <div class="position-slot defender-slot" data-position-id="104" data-position-name="Left Centre Back" data-position-type="DEF">
+                      <span class="position-label small">LCB</span>
+                    </div>
+                    <div class="position-slot defender-slot" data-position-id="105" data-position-name="Left Back" data-position-type="DEF">
+                      <span class="position-label small">LB</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Midfielders Row (All 5 positions) -->
+                <div class="col-12 mb-4">
+                  <div class="d-flex justify-content-center flex-wrap gap-2">
+                    <div class="position-slot midfielder-slot" data-position-id="106" data-position-name="Right Winger" data-position-type="MID">
+                      <span class="position-label small">RW</span>
+                    </div>
+                    <div class="position-slot midfielder-slot" data-position-id="107" data-position-name="Right Inner Mid" data-position-type="MID">
+                      <span class="position-label small">RIM</span>
+                    </div>
+                    <div class="position-slot midfielder-slot" data-position-id="108" data-position-name="Centre Mid" data-position-type="MID">
+                      <span class="position-label small">CM</span>
+                    </div>
+                    <div class="position-slot midfielder-slot" data-position-id="109" data-position-name="Left Inner Mid" data-position-type="MID">
+                      <span class="position-label small">LIM</span>
+                    </div>
+                    <div class="position-slot midfielder-slot" data-position-id="110" data-position-name="Left Winger" data-position-type="MID">
+                      <span class="position-label small">LW</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Forwards Row (All 3 positions) -->
+                <div class="col-12">
+                  <div class="d-flex justify-content-center flex-wrap gap-2">
+                    <div class="position-slot forward-slot" data-position-id="111" data-position-name="Right Forward" data-position-type="FWD">
+                      <span class="position-label small">RF</span>
+                    </div>
+                    <div class="position-slot forward-slot" data-position-id="112" data-position-name="Centre Forward" data-position-type="FWD">
+                      <span class="position-label small">CF</span>
+                    </div>
+                    <div class="position-slot forward-slot" data-position-id="113" data-position-name="Left Forward" data-position-type="FWD">
+                      <span class="position-label small">LF</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Formation Analysis - Right Column -->
+    <div class="col-lg-4 col-md-5">
+      <div class="card-custom h-100">
+        <div class="card-custom-header">
+          <h6 class="card-custom-title mb-0">📊 Live Formation Analysis</h6>
+        </div>
+        <div class="card-custom-body p-3">
+          <div id="live-analysis">
+            <!-- Overall Rating -->
+            <div class="text-center p-3 bg-muted-custom rounded mb-3">
+              <h3 class="text-primary-custom mb-1" id="overall-rating">0.0</h3>
+              <p class="text-muted-custom mb-0 small"><strong>Overall Rating</strong></p>
+            </div>
+
+            <!-- Position Effectiveness -->
+            <div>
+              <h6 class="mb-2 small">Position Effectiveness</h6>
+              <div id="position-analysis">
+                <p class="text-muted-custom small text-center">Assign players to see analysis</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <!-- No Formation Selected State -->
+    <div class="col-12">
+      <div class="card-custom text-center p-5">
+        <h5 class="text-muted-custom mb-3">⚽ Select a Formation</h5>
+        <p class="text-muted-custom mb-4">Choose a formation to start building your lineup</p>
+        <form method="GET" action="/formations" class="d-inline">
+          <input type="hidden" name="id" value="{{ teamid }}">
+          <select name="formation" onchange="this.form.submit();" class="form-select form-select-lg mx-auto" style="max-width: 300px;">
+            <option value="">Choose Formation...</option>
+            {% for formation in formation_list %}
+            <option value="{{ formation.key }}">{{ formation.name }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Analysis Results - Full Width when available -->
+  {% if formation_analysis %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card-custom">
+        <div class="card-custom-header">
+          <h5 class="card-custom-title">📈 Formation Analysis Results</h5>
+        </div>
+        <div class="card-custom-body">
+          <div class="row">
+            <!-- Overall Rating -->
+            <div class="col-lg-3 col-md-4 mb-4">
+              <div class="text-center p-4 bg-muted-custom rounded">
+                <h2 class="text-primary-custom mb-2">{{ "%.1f"|format(formation_analysis.average_score) }}</h2>
+                <p class="text-muted-custom mb-0"><strong>Overall Rating</strong></p>
+                <small class="text-muted-custom">out of 20.0</small>
+              </div>
+            </div>
+
+            <!-- Position Effectiveness -->
+            <div class="col-lg-9 col-md-8">
+              <h6 class="mb-3">Position Effectiveness</h6>
+              {% for position_id, score_data in formation_analysis.position_scores.items() %}
+              <div class="row align-items-center mb-3">
+                <div class="col-md-4">
+                  <span class="badge {% if position_id == 100 %}bg-warning text-dark{% elif position_id <= 105 %}bg-primary{% elif position_id <= 110 %}bg-info{% else %}bg-danger{% endif %} me-2">
+                    {{ position_id }}
+                  </span>
+                  <strong>{{ score_data.position_name }}</strong>
+                </div>
+                <div class="col-md-6">
+                  <div class="progress" style="height: 20px;">
+                    <div class="progress-bar {% if score_data.contribution >= 12 %}bg-success{% elif score_data.contribution >= 8 %}bg-warning{% else %}bg-danger{% endif %}"
+                         style="width: {% if score_data.contribution > 0 %}{{ (score_data.contribution / 20) * 100 }}{% else %}5{% endif %}%">
+                      <small class="text-white"><strong>{{ "%.1f"|format(score_data.contribution) }}</strong></small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2 text-end">
+                  <small class="text-muted-custom">
+                    {% if score_data.contribution >= 12 %}
+                    <span class="text-success-custom">Excellent</span>
+                    {% elif score_data.contribution >= 8 %}
+                    <span class="text-warning-custom">Good</span>
+                    {% else %}
+                    <span class="text-destructive-custom">Poor</span>
+                    {% endif %}
+                  </small>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+
+
+</div>
+{% endblock %}

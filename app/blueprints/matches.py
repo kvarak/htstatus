@@ -1,16 +1,20 @@
-"""Matches and stats routes blueprint for HT Status application."""
-import traceback
+"""Matches routes blueprint for HT Status application."""
 
 from flask import Blueprint, request, session
 from sqlalchemy import text
 
 from app.auth_utils import require_authentication
-from app.chpp_utilities import get_chpp_client
+from app.constants import HT_MATCH_ROLE
 from app.hattrick_countries import get_country_display
 from app.model_registry import get_match_model, get_match_play_model
-from app.utils import create_page, dprint
+from app.utils import (
+    FORMATION_TEMPLATES,
+    calculate_formation_effectiveness,
+    create_page,
+    get_formation_list,
+)
 
-# Create Blueprint for match and stats routes
+# Create Blueprint for match routes
 matches_bp = Blueprint("matches", __name__)
 
 # These will be set by setup_matches_blueprint()
@@ -87,17 +91,18 @@ def matches():
         teamname=teamname,
         teamid=teamid,
         HTmatchtype=HTmatchtype,
-        HTmatchrole=HTmatchrole,
+        HTmatchrole=HT_MATCH_ROLE,
         HTmatchbehaviour=HTmatchbehaviour,
         title="Matches",
     )
 
 
-@matches_bp.route("/stats")
+@matches_bp.route("/formations")
 @require_authentication
-def stats():
-    """Display team statistics."""
+def formations():
+    """Display formation tester and tactical analyzer."""
     from app.model_registry import get_user_model
+    from models import Players
 
     # Track user activity (team-related page)
     User = get_user_model()
@@ -107,23 +112,20 @@ def stats():
         db.session.commit()
 
     teamid = request.values.get("id")
-
     teamid = int(teamid) if teamid else request.form.get("id")
     all_teams = session["all_teams"]
 
     if teamid not in all_teams:
-        return create_page(template="stats.html", title="Stats")
+        return create_page(template="formations.html", title="Formation Tester")
 
     all_team_names = session["all_team_names"]
     teamname = all_team_names[all_teams.index(teamid)]
 
     # Get all current players for the team
-    from models import Players
-
     current_players = (
         db.session.query(Players)
         .filter_by(owner=teamid)
-        .order_by(Players.data_date.desc())
+        .order_by(Players.data_date.desc(), Players.tsi.desc())
         .all()
     )
 
@@ -135,186 +137,37 @@ def stats():
 
     current_players_list = list(latest_players.values())
 
-    # Calculate team statistics
-    from app.utils import (
-        calculate_team_statistics,
-        get_team_match_statistics,
-        get_top_performers,
-        get_top_scorers,
-    )
+    # Sort players by number (players without numbers go to end)
+    current_players_list.sort(key=lambda p: (p.number is None, p.number or 999))
 
-    team_stats = calculate_team_statistics(current_players_list)
+    # Handle formation analysis if form was submitted
+    formation_analysis = None
+    # Get selected formation from either GET or POST request
+    selected_formation = request.args.get("formation", request.form.get("formation", "4-4-2"))
 
-    # Get top performers
-    top_scorers = get_top_scorers(current_players_list, limit=10, sort_by_ratio=True)
-    top_performers = get_top_performers(current_players_list, limit=10)
+    if request.method == "POST" and request.form.get("analyze"):
+        player_assignments = {}
+        formation_positions = FORMATION_TEMPLATES[selected_formation]["positions"]
 
-    # Calculate skill averages for top 11 TSI players
-    top_11_players = get_top_performers(current_players_list, limit=11)
-    top_11_stats = calculate_team_statistics(top_11_players) if top_11_players else {}
-    top_11_skill_averages = top_11_stats.get('skill_averages', {}) if top_11_stats else {}
+        for position_id in formation_positions:
+            player_ht_id = request.form.get(f"position_{position_id}")
+            if player_ht_id:
+                # Find the player object
+                player = next((p for p in current_players_list if str(p.ht_id) == player_ht_id), None)
+                if player:
+                    player_assignments[position_id] = player
 
-    # Calculate age distribution for all players and top 11
-    def calculate_age_distribution_unified(all_players, subset_players, min_age=16):
-        """Calculate age distribution with unified age range for both datasets."""
-        # Get all ages from all players to define the complete range
-        all_ages = []
-        for player in all_players:
-            age = getattr(player, 'age_years', 0)
-            if age >= min_age:
-                all_ages.append(age)
-
-        if not all_ages:
-            return [], []
-
-        # Define unified age range
-        min_age_range = min(all_ages)
-        max_age_range = max(all_ages)
-
-        # Calculate distribution for all players
-        all_age_counts = {}
-        for player in all_players:
-            age = getattr(player, 'age_years', 0)
-            if age >= min_age:
-                all_age_counts[age] = all_age_counts.get(age, 0) + 1
-
-        # Calculate distribution for subset players
-        subset_age_counts = {}
-        for player in subset_players:
-            age = getattr(player, 'age_years', 0)
-            if age >= min_age:
-                subset_age_counts[age] = subset_age_counts.get(age, 0) + 1
-
-        # Create complete distributions with unified range
-        all_distribution = []
-        subset_distribution = []
-        for age in range(min_age_range, max_age_range + 1):
-            all_distribution.append((age, all_age_counts.get(age, 0)))
-            subset_distribution.append((age, subset_age_counts.get(age, 0)))
-
-        return all_distribution, subset_distribution
-
-    age_distribution_all, age_distribution_top11 = calculate_age_distribution_unified(
-        current_players_list,
-        top_11_players if top_11_players else []
-    )
-
-    # Calculate country distribution for all players and top 11
-    def calculate_country_distribution(all_players, subset_players):
-        """Calculate country distribution for both datasets."""
-        from app.hattrick_countries import get_country_info
-
-        # Calculate distribution for all players
-        all_country_data = {}
-        for player in all_players:
-            country_id = getattr(player, 'native_country_id', None)
-            country_info = get_country_info(country_id)
-            country_display = f"{country_info['flag']} {country_info['name']}"
-            if country_display not in all_country_data:
-                all_country_data[country_display] = {
-                    'count': 0,
-                    'color': country_info['color'],
-                    'name': country_info['name']
-                }
-            all_country_data[country_display]['count'] += 1
-
-        # Calculate distribution for subset players
-        subset_country_data = {}
-        for player in subset_players:
-            country_id = getattr(player, 'native_country_id', None)
-            country_info = get_country_info(country_id)
-            country_display = f"{country_info['flag']} {country_info['name']}"
-            if country_display not in subset_country_data:
-                subset_country_data[country_display] = {
-                    'count': 0,
-                    'color': country_info['color'],
-                    'name': country_info['name']
-                }
-            subset_country_data[country_display]['count'] += 1
-
-        # Convert to list of tuples sorted by count, maintaining color info
-        all_distribution = sorted(
-            [(country, data['count'], data['color']) for country, data in all_country_data.items()],
-            key=lambda x: x[1], reverse=True
-        )
-        subset_distribution = sorted(
-            [(country, data['count'], data['color']) for country, data in subset_country_data.items()],
-            key=lambda x: x[1], reverse=True
-        )
-
-        return all_distribution, subset_distribution
-
-    country_distribution_all, country_distribution_top11 = calculate_country_distribution(
-        current_players_list,
-        top_11_players if top_11_players else []
-    )
-
-    # Find max count for scaling the bars (use all players max for both charts)
-    max_count_all = max([count for age, count in age_distribution_all], default=1)
-    match_stats = get_team_match_statistics(teamid)
-
-    # Get competition data from CHPP (trophies not currently supported)
-    trophies = []
-    competition_info = {}
-    try:
-        print(f"\n=== FETCHING COMPETITION DATA FOR TEAM {teamid} ===")
-
-        # Get CHPP client
-        chpp = get_chpp_client(session)
-
-        print("Using Custom CHPP client")
-
-        team_details = chpp.team(ht_id=teamid)
-        dprint(2, f"Team details fetched: {team_details.name}")
-
-        # Extract available competition information
-        competition_info = {
-            "league_name": getattr(team_details, "league_name", None),
-            "league_level": getattr(team_details, "league_level", None),
-            "league_level_unit_name": getattr(
-                team_details, "league_level_unit_name", None
-            ),
-            "cup_name": getattr(team_details, "cup_name", None),
-            "cup_level": getattr(team_details, "cup_level", None),
-            "still_in_cup": getattr(team_details, "still_in_cup", False),
-            "cup_match_rounds_left": getattr(team_details, "cup_match_rounds_left", 0),
-            "power_rating": getattr(team_details, "power_rating", None),
-            "power_rating_global_ranking": getattr(
-                team_details, "power_rating_global_ranking", None
-            ),
-            "power_rating_league_ranking": getattr(
-                team_details, "power_rating_league_ranking", None
-            ),
-            "dress_uri": getattr(team_details, "dress_uri", None),
-            "dress_alternate_uri": getattr(team_details, "dress_alternate_uri", None),
-            "logo_url": getattr(team_details, "logo_url", None),
-        }
-
-        dprint(2, f"Competition info extracted: {competition_info}")
-
-    except Exception as e:
-        dprint(1, f"Error fetching competition data: {e}")
-        dprint(3, traceback.format_exc())
-        competition_info = {}
-
-    print("=== COMPETITION FETCH COMPLETE ===\n")
+        formation_analysis = calculate_formation_effectiveness(selected_formation, player_assignments)
 
     return create_page(
-        template="stats.html",
+        template="formations.html",
         teamname=teamname,
         teamid=teamid,
-        team_stats=team_stats,
-        top_scorers=top_scorers,
-        top_performers=top_performers,
         current_players=current_players_list,
-        match_stats=match_stats,
-        trophies=trophies,
-        competition_info=competition_info,
-        top_11_skill_averages=top_11_skill_averages,
-        age_distribution_all=age_distribution_all,
-        age_distribution_top11=age_distribution_top11,
-        country_distribution_all=country_distribution_all,
-        country_distribution_top11=country_distribution_top11,
-        max_count_all=max_count_all,
-        title="Stats",
+        formation_list=get_formation_list(),
+        formation_templates=FORMATION_TEMPLATES,
+        selected_formation=selected_formation,
+        formation_analysis=formation_analysis,
+        HTmatchrole=HT_MATCH_ROLE,
+        title="Formation Tester",
     )

@@ -640,25 +640,83 @@ def calculateManmark(player):
 def calculateContribution(position, player):
     """Calculate player contribution to team based on position and skills."""
     try:
-        # Position skill mappings based on Hattrick position requirements
+        # Map position codes to position IDs if needed
+        position_code_to_id = {
+            "GC": 100,    # Goalkeeper contribution
+            "CD": 103,    # Central Defender Normal - using middle central defender
+            "CDO": 103,   # Central Defender Offensive - using middle central defender with offensive weighting
+            "CDTW": 102,  # Side Central Defender Towards Wing - using right central defender
+            "WBD": 101,   # Wing Back Defensive - using right back
+            "WBN": 101,   # Wingback Normal - using right back
+            "WBO": 101,   # Wing Back Offensive - using right back with offensive weighting
+            "WBTM": 101,  # Wingback Towards Middle - using right back
+            "WO": 106,    # Winger Offensive - using right winger
+            "WTM": 106,   # Winger Towards Middle - using right winger
+            "WN": 106,    # Winger Normal - using right winger
+            "WD": 106,    # Winger Defensive - using right winger with defensive weighting
+            "IMN": 108,   # Inner Midfielder Normal - using central inner midfield
+            "IMD": 108,   # Inner Midfielder Defensive - using central inner midfield
+            "IMO": 108,   # Inner Midfielder Offensive - using central inner midfield
+            "IMTW": 107,  # Inner Midfielder Towards Wing - using right inner midfield
+            "FW": 112,    # Forward Normal - using middle forward
+            "FTW": 111,   # Forward Towards Wing - using right forward
+            "DF": 112,    # Defensive Forward - using middle forward
+        }
+
+        # Convert position code to ID if it's a string
+        if isinstance(position, str):
+            position = position_code_to_id.get(position, 108)  # Default to central midfield if not found
+
+        # Position skill mappings based on Hattrick position requirements and tactical variations
         position_skills = {
             100: {"keeper": 1.0},  # Goalkeeper
-            101: {"defender": 0.7, "passing": 0.3},  # Right Back
+            101: {"defender": 0.7, "passing": 0.3},  # Right Back / Wing Back base
             102: {"defender": 0.8, "passing": 0.2},  # Right Centre Back
-            103: {"defender": 0.8, "passing": 0.2},  # Centre Back
+            103: {"defender": 0.8, "passing": 0.2},  # Centre Back / Central Defender base
             104: {"defender": 0.8, "passing": 0.2},  # Left Centre Back
             105: {"defender": 0.7, "passing": 0.3},  # Left Back
-            106: {"winger": 0.7, "passing": 0.3},  # Right Winger
+            106: {"winger": 0.7, "passing": 0.3},  # Right Winger / Winger base
             107: {"playmaker": 0.6, "passing": 0.4},  # Right Inner Midfield
-            108: {"playmaker": 0.8, "passing": 0.2},  # Central Inner Midfield
+            108: {"playmaker": 0.8, "passing": 0.2},  # Central Inner Midfield / Inner Midfielder base
             109: {"playmaker": 0.6, "passing": 0.4},  # Left Inner Midfield
             110: {"winger": 0.7, "passing": 0.3},  # Left Winger
             111: {"scorer": 0.6, "passing": 0.4},  # Right Forward
-            112: {"scorer": 0.8, "passing": 0.2},  # Central Forward
+            112: {"scorer": 0.8, "passing": 0.2},  # Central Forward / Forward base
             113: {"scorer": 0.6, "passing": 0.4},  # Left Forward
         }
 
-        skills_weights = position_skills.get(position, {"passing": 1.0})
+        # Handle tactical variations with custom skill weightings
+        if isinstance(position, str):
+            if position == "CDO":  # Central Defender Offensive
+                skills_weights = {"defender": 0.6, "passing": 0.3, "playmaker": 0.1}
+            elif position == "WBD":  # Wing Back Defensive
+                skills_weights = {"defender": 0.8, "passing": 0.2}
+            elif position == "WBO":  # Wing Back Offensive
+                skills_weights = {"defender": 0.5, "passing": 0.3, "winger": 0.2}
+            elif position == "WBTM":  # Wingback Towards Middle
+                skills_weights = {"defender": 0.6, "passing": 0.4}
+            elif position == "WO":  # Winger Offensive
+                skills_weights = {"winger": 0.8, "passing": 0.2}
+            elif position == "WTM":  # Winger Towards Middle
+                skills_weights = {"winger": 0.5, "playmaker": 0.3, "passing": 0.2}
+            elif position == "WD":  # Winger Defensive
+                skills_weights = {"winger": 0.6, "defender": 0.2, "passing": 0.2}
+            elif position == "IMD":  # Inner Midfielder Defensive
+                skills_weights = {"defender": 0.3, "playmaker": 0.5, "passing": 0.2}
+            elif position == "IMO":  # Inner Midfielder Offensive
+                skills_weights = {"playmaker": 0.6, "scorer": 0.2, "passing": 0.2}
+            elif position == "IMTW":  # Inner Midfielder Towards Wing
+                skills_weights = {"playmaker": 0.5, "winger": 0.3, "passing": 0.2}
+            elif position == "FTW":  # Forward Towards Wing
+                skills_weights = {"scorer": 0.6, "winger": 0.2, "passing": 0.2}
+            elif position == "DF":  # Defensive Forward
+                skills_weights = {"scorer": 0.6, "defender": 0.2, "passing": 0.2}
+            else:
+                # Use standard position mapping
+                skills_weights = position_skills.get(position, {"passing": 1.0})
+        else:
+            # Numeric position ID
+            skills_weights = position_skills.get(position, {"passing": 1.0})
 
         contribution = 0.0
         for skill, weight in skills_weights.items():
@@ -1175,3 +1233,232 @@ def create_default_groups(user_id):
         dprint(1, f"Error creating default groups for user {user_id}: {e}")
         db.session.rollback()
         raise
+
+
+# =============================================================================
+# Formation Testing Utilities
+# =============================================================================
+
+# Standard Hattrick formations with position mappings
+FORMATION_TEMPLATES = {
+    "5-5-0": {
+        "name": "5-5-0 (Defensive)",
+        "description": "5 defenders, 5 midfielders, 0 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},  # GK
+            101: {"row": 2, "col": 5, "name": "Right Back"},  # RB
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},  # RCB
+            103: {"row": 2, "col": 3, "name": "Centre Back"},  # CB
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},  # LCB
+            105: {"row": 2, "col": 1, "name": "Left Back"},  # LB
+            106: {"row": 3, "col": 5, "name": "Right Midfielder"},  # RM
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},  # RIM
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},  # CM
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},  # LIM
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},  # LM
+        }
+    },
+    "5-4-1": {
+        "name": "5-4-1 (Defensive Counter)",
+        "description": "5 defenders, 4 midfielders, 1 forward",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            101: {"row": 2, "col": 5, "name": "Right Back"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            103: {"row": 2, "col": 3, "name": "Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            105: {"row": 2, "col": 1, "name": "Left Back"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},
+            112: {"row": 4, "col": 3, "name": "Centre Forward"},
+        }
+    },
+    "5-3-2": {
+        "name": "5-3-2 (Wing Backs)",
+        "description": "5 defenders, 3 midfielders, 2 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            101: {"row": 2, "col": 5, "name": "Right Back"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            103: {"row": 2, "col": 3, "name": "Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            105: {"row": 2, "col": 1, "name": "Left Back"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    },
+    "5-2-3": {
+        "name": "5-2-3 (Attack)",
+        "description": "5 defenders, 2 midfielders, 3 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            101: {"row": 2, "col": 5, "name": "Right Back"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            103: {"row": 2, "col": 3, "name": "Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            105: {"row": 2, "col": 1, "name": "Left Back"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            112: {"row": 4, "col": 3, "name": "Centre Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    },
+    "4-5-1": {
+        "name": "4-5-1 (Control)",
+        "description": "4 defenders, 5 midfielders, 1 forward",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            101: {"row": 2, "col": 5, "name": "Right Back"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            105: {"row": 2, "col": 1, "name": "Left Back"},
+            106: {"row": 3, "col": 5, "name": "Right Midfielder"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},
+            112: {"row": 4, "col": 3, "name": "Centre Forward"},
+        }
+    },
+    "4-4-2": {
+        "name": "4-4-2 (Classic)",
+        "description": "4 defenders, 4 midfielders, 2 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            101: {"row": 2, "col": 5, "name": "Right Back"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            105: {"row": 2, "col": 1, "name": "Left Back"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    },
+    "4-3-3": {
+        "name": "4-3-3 (Attacking)",
+        "description": "4 defenders, 3 midfielders, 3 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            101: {"row": 2, "col": 5, "name": "Right Back"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            105: {"row": 2, "col": 1, "name": "Left Back"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            112: {"row": 4, "col": 3, "name": "Centre Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    },
+    "3-5-2": {
+        "name": "3-5-2 (Midfield)",
+        "description": "3 defenders, 5 midfielders, 2 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            103: {"row": 2, "col": 3, "name": "Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            106: {"row": 3, "col": 5, "name": "Right Midfielder"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    },
+    "3-4-3": {
+        "name": "3-4-3 (All-out Attack)",
+        "description": "3 defenders, 4 midfielders, 3 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            102: {"row": 2, "col": 4, "name": "Right Centre Back"},
+            103: {"row": 2, "col": 3, "name": "Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            112: {"row": 4, "col": 3, "name": "Centre Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    },
+    "2-5-3": {
+        "name": "2-5-3 (Ultra Attack)",
+        "description": "2 defenders, 5 midfielders, 3 forwards",
+        "positions": {
+            100: {"row": 1, "col": 3, "name": "Goalkeeper"},
+            103: {"row": 2, "col": 3, "name": "Centre Back"},
+            104: {"row": 2, "col": 2, "name": "Left Centre Back"},
+            106: {"row": 3, "col": 5, "name": "Right Midfielder"},
+            107: {"row": 3, "col": 4, "name": "Right Inner Midfield"},
+            108: {"row": 3, "col": 3, "name": "Central Midfield"},
+            109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
+            110: {"row": 3, "col": 1, "name": "Left Midfielder"},
+            111: {"row": 4, "col": 4, "name": "Right Forward"},
+            112: {"row": 4, "col": 3, "name": "Centre Forward"},
+            113: {"row": 4, "col": 2, "name": "Left Forward"},
+        }
+    }
+}
+
+
+def calculate_formation_effectiveness(formation_key, player_assignments):
+    """Calculate total team effectiveness for a given formation and player assignments.
+
+    Args:
+        formation_key: String key for the formation (e.g., "4-4-2")
+        player_assignments: Dict mapping position_id to player object
+
+    Returns:
+        Dict with effectiveness score and position breakdowns
+    """
+    if formation_key not in FORMATION_TEMPLATES:
+        return {"total_score": 0, "position_scores": {}, "error": "Invalid formation"}
+
+    formation = FORMATION_TEMPLATES[formation_key]
+    total_score = 0.0
+    position_scores = {}
+
+    for position_id in formation["positions"]:
+        player = player_assignments.get(position_id)
+        if player:
+            contribution = calculateContribution(position_id, player)
+            position_scores[position_id] = {
+                "contribution": contribution,
+                "position_name": formation["positions"][position_id]["name"],
+                "player_name": f"{getattr(player, 'first_name', '')} {getattr(player, 'last_name', '')}"
+            }
+            total_score += contribution
+        else:
+            position_scores[position_id] = {
+                "contribution": 0,
+                "position_name": formation["positions"][position_id]["name"],
+                "player_name": "No player assigned"
+            }
+
+    return {
+        "total_score": round(total_score, 2),
+        "average_score": round(total_score / len(formation["positions"]), 2),
+        "position_scores": position_scores,
+        "formation_name": formation["name"]
+    }
+
+
+def get_formation_list():
+    """Get list of available formations for dropdown selection."""
+    return [
+        {"key": key, "name": template["name"], "description": template["description"]}
+        for key, template in FORMATION_TEMPLATES.items()
+    ]

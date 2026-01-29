@@ -1,14 +1,28 @@
 # [FEAT-003] Formation Tester & Tactics Analyzer
 
-**Status**: 🔮 Research & Planning | **Effort**: 24-32 hours (estimated) | **Priority**: P6 | **Impact**: Tactical decision support
+**Status**: 🔮 Research & Planning | **Effort**: 24-32 hours (estimated) | **Priority**: P4 | **Impact**: Tactical decision support
 **Dependencies**: Player data system (completed), Backend API structure | **Strategic Value**: Competitive advantage, engagement
 
 ## Problem Statement
-Users need a way to experiment with different formations and see how effective they would be based on player skills and positions. Currently only "Player" and "Training" pages exist per team. A third "Formations" page would allow users to:
-- Visually design and test different formations
-- Get feedback on formation quality (based on player skills and position-suitability)
+Users need a dedicated matches page where they can choose and test different formations, and experiment with player positioning. Currently only "Player" and "Training" pages exist per team. A new "Matches" page would allow users to:
+- Choose from standard Hattrick formations (Goalie + 5-5-0, 5-4-1, 5-3-2, 5-2-3, 4-5-1, 4-4-2, 4-3-3, 3-5-2, 3-4-3, 2-5-3)
+- Test players in different positions on the field
+- Get feedback on formation effectiveness based on player skills and position-suitability
 - Compare different tactical approaches
 - Export or save formations for reference
+
+## Supported Formations
+Standard Hattrick formations with goalkeeper plus:
+- **5-5-0**: 5 defenders, 5 midfielders, 0 forwards
+- **5-4-1**: 5 defenders, 4 midfielders, 1 forward
+- **5-3-2**: 5 defenders, 3 midfielders, 2 forwards
+- **5-2-3**: 5 defenders, 2 midfielders, 3 forwards
+- **4-5-1**: 4 defenders, 5 midfielders, 1 forward
+- **4-4-2**: 4 defenders, 4 midfielders, 2 forwards (classic)
+- **4-3-3**: 4 defenders, 3 midfielders, 3 forwards
+- **3-5-2**: 3 defenders, 5 midfielders, 2 forwards
+- **3-4-3**: 3 defenders, 4 midfielders, 3 forwards
+- **2-5-3**: 2 defenders, 5 midfielders, 3 forwards
 
 ## Research Phase (Required before implementation)
 1. **Industry Analysis** (4-6 hours):

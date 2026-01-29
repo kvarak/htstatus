@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements from simplification review. **Completed FEAT-006** (Default Player Groups) and **FEAT-009** (Player group names and colors). **Active: 34 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. **Active: 23 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -18,7 +18,6 @@
 ## P2: Features 🎯
 
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
-- **[FEAT-005]** Team Statistics Dashboard → [Details](.project/tasks/FEAT-005.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
@@ -40,7 +39,17 @@
 
 ## P4: Possibilities 🔮
 
-### Improvements from Critical Review (January 29, 2026)
+### Recent Critical Review Improvements (January 29, 2026)
+
+#### Formation System & Architecture Improvements
+- **[REFACTOR-058]** Simplify calculateContribution Function - Normalize position inputs to single format, remove dual-mode complexity (45 min)
+- **[REFACTOR-059]** Extract Frontend Formation API - Replace JavaScript position calculations with API endpoints to eliminate code duplication (60 min)
+- **[REFACTOR-060]** Externalize Position Configuration - Move formation templates and skill weightings from hardcoded dictionaries to JSON/YAML config (30 min)
+- **[TEST-036]** Comprehensive calculateContribution Test Coverage - Add missing test coverage for position code mapping and tactical variations (45 min)
+- **[REFACTOR-061]** Blueprint Architecture Review - Systematic analysis of all blueprints for consistency and logical responsibility boundaries (90 min)
+- **[DOC-022]** Architecture Decision Records - Document rationale for blueprint separation, calculation approaches, and frontend business logic decisions (30 min)
+
+### Previously Identified Improvements
 
 #### Test Isolation & Architecture (from simplification review)
 - **[REFACTOR-028]** Evaluate Model Registry Necessity - Assess whether the model registry pattern is justified for this hobby project or if simpler import restructuring would suffice (30 min)
@@ -62,7 +71,6 @@
 ### Core Hattrick Features (Aligned with Geek Audience)
 - **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics → [Details](.project/tasks/FEAT-016.md)
 - **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences to avoid future rejections → [Details](.project/tasks/FEAT-017.md)
-- **[FEAT-003]** Formation Tester & Tactics Analyzer → [Details](.project/tasks/FEAT-003.md)
 - **[FEAT-010]** Player Comparison Tool → [Details](.project/tasks/FEAT-010.md)
 - **[FEAT-011]** Training Camp Planner → [Details](.project/tasks/FEAT-011.md)
 

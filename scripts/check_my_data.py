@@ -2,12 +2,12 @@
 import sys
 from pathlib import Path
 
+from app.factory import create_app
+from models import Players, PlayerSetting, User
+
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from app.factory import create_app
-from models import *
 
 app = create_app()
 with app.app_context():
@@ -35,5 +35,5 @@ with app.app_context():
         your_players = Players.query.filter(Players.ht_id.in_(player_ids)).all()
         print(f'Your actual players: {len(your_players)}')
         if your_players:
-            team_ids = set([p.team_id for p in your_players[:5]])
+            team_ids = {p.team_id for p in your_players[:5]}
             print(f'Sample player team_ids: {team_ids}')

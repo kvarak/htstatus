@@ -5,12 +5,12 @@ Audit ALL data in the database to understand what's there
 import sys
 from pathlib import Path
 
+from app.factory import create_app
+from models import Group, Match, MatchPlay, Players, PlayerSetting, User, db
+
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
-
-from app.factory import create_app
-from models import *
 
 
 def audit_all_data():
