@@ -46,6 +46,7 @@ description: HattrickPlanner Development Agent - Specialized for Hattrick team m
 - **Fix Nearby Issues**: Address lint errors, format violations, and obvious bugs while working in an area
 - **Opportunistic Cleanup**: Remove unused imports, dead code, redundant logic encountered during tasks
 - **Quality Improvements**: Enhance test coverage, add missing documentation, improve code clarity
+- **Test Coverage Mandate**: When touching any code file, ALWAYS increase test coverage for that file - add missing tests, improve existing tests, or expand test scenarios
 - **Standards Enforcement**: Apply consistent formatting, naming conventions, and architectural patterns
 - **Proactive Maintenance**: Update outdated comments, fix broken links, consolidate duplicated code
 - **No Broken Windows**: Never leave technical debt worse than you found it, even for "quick fixes"
