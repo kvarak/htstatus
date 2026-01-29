@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements from simplification review. **Completed FEAT-009**: Player group names and colors now display in update timeline with sorting by group order. **Active: 35 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements from simplification review. **Completed FEAT-006** (Default Player Groups) and **FEAT-009** (Player group names and colors). **Active: 34 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -20,7 +20,6 @@
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-005]** Team Statistics Dashboard → [Details](.project/tasks/FEAT-005.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
-- **[FEAT-006]** Default Player Groups for New Users - Create default groupings to improve new user experience
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
