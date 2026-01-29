@@ -36,18 +36,36 @@ class ModelRegistry:
         if cls._initialized:
             return
 
-        # Import models here to avoid circular dependency
-        import models
+        try:
+            # Import models here to avoid circular dependency
+            import models
 
-        # Register all model classes
-        cls.register("User", models.User)
-        cls.register("Players", models.Players)
-        cls.register("Group", models.Group)
-        cls.register("PlayerSetting", models.PlayerSetting)
-        cls.register("Match", models.Match)
-        cls.register("MatchPlay", models.MatchPlay)
+            # Register all model classes
+            cls.register("User", models.User)
+            cls.register("Players", models.Players)
+            cls.register("Group", models.Group)
+            cls.register("PlayerSetting", models.PlayerSetting)
+            cls.register("Match", models.Match)
+            cls.register("MatchPlay", models.MatchPlay)
 
-        cls._initialized = True
+            cls._initialized = True
+        except ImportError as e:
+            # If import fails, try to get models from sys.modules
+            import sys
+            if 'models' in sys.modules:
+                models = sys.modules['models']
+                # Register all model classes from already imported models
+                cls.register("User", models.User)
+                cls.register("Players", models.Players)
+                cls.register("Group", models.Group)
+                cls.register("PlayerSetting", models.PlayerSetting)
+                cls.register("Match", models.Match)
+                cls.register("MatchPlay", models.MatchPlay)
+                cls._initialized = True
+            else:
+                raise ValueError(f"Cannot import models module: {e}") from e
+        except AttributeError as e:
+            raise ValueError(f"Model not found in models module: {e}") from e
 
 
 # Convenience functions for blueprints

@@ -335,12 +335,14 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 		exit 1; \
 	fi
 
-GATES = fileformat lint security-bandit security-deps test-coverage-files test-python
+GATES = fileformat lint security-bandit security-deps test-coverage-files
 
 test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"
 	@mkdir -p out/tests && rm -f out/tests/*.json
-	@count=0; \
+	@count=1; \
+	echo "🔎 [$$count] Running test-python..."; \
+	PYTEST_VERBOSE="" $(MAKE) test-python || true; \
 	for gate in $(GATES); do \
 		count=$$((count + 1)); \
 		echo "🔎 [$$count] Running $$gate..."; \

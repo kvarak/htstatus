@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements to P4. **Active: 33 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements from simplification review. **Active: 37 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -43,6 +43,14 @@
 ## P4: Possibilities 🔮
 
 ### Improvements from Critical Review (January 29, 2026)
+
+#### Test Isolation & Architecture (from simplification review)
+- **[REFACTOR-028]** Evaluate Model Registry Necessity - Assess whether the model registry pattern is justified for this hobby project or if simpler import restructuring would suffice (30 min)
+- **[TEST-034]** Focus Coverage on Business Logic - Prioritize test coverage for blueprint routes (auth, main, team, matches, training) over utility functions (60 min)
+- **[REFACTOR-029]** Consolidate Model Import Patterns - Choose single approach (registry OR direct imports) to eliminate dual maintenance paths (45 min)
+- **[DOC-018]** Document Import Architecture Decision - Record why the model registry pattern was chosen over alternatives for future reference (15 min)
+
+#### Authentication & User Session Issues
 - **[REFACTOR-050]** Authentication Flow Analysis - Investigate why authenticated sessions reference non-existent users (root cause of BUG-011)
 - **[REFACTOR-051]** Systematic User Query Audit - Review all User.filter_by() patterns for consistency and safety
 - **[FEAT-018]** Automatic User Creation Strategy - Ensure user records exist for all authenticated sessions

@@ -46,19 +46,29 @@ def setup_player_blueprint(
 def player():
     """Display player list with skill tracking and grouping."""
     # Get model classes from registry
-    from app.model_registry import (
-        get_group_model,
-        get_match_play_model,
-        get_player_setting_model,
-        get_players_model,
-        get_user_model,
-    )
+    # Import models - use direct import as fallback if registry fails
+    try:
+        from app.model_registry import (
+            get_group_model,
+            get_match_play_model,
+            get_player_setting_model,
+            get_players_model,
+            get_user_model,
+        )
 
-    PlayerSetting = get_player_setting_model()
-    Group = get_group_model()
-    Players = get_players_model()
-    User = get_user_model()
-    MatchPlay = get_match_play_model()
+        PlayerSetting = get_player_setting_model()
+        Group = get_group_model()
+        Players = get_players_model()
+        User = get_user_model()
+        MatchPlay = get_match_play_model()
+    except (ImportError, ValueError):
+        # Fallback to direct imports if registry fails
+        import models
+        PlayerSetting = models.PlayerSetting
+        Group = models.Group
+        Players = models.Players
+        User = models.User
+        MatchPlay = models.MatchPlay
 
     # Track user activity
     current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
