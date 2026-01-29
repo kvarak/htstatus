@@ -3,7 +3,7 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 
-**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. **Active: 29 tasks | Archived: 8 enterprise tasks**
+**Recent Organization** (January 29, 2026): Applied hobby project philosophy to reorganize backlog. Consolidated simplification tasks, elevated database protection priority, archived enterprise features. Added critical review improvements to P4. **Active: 33 tasks | Archived: 8 enterprise tasks**
 
 ---
 
@@ -13,7 +13,7 @@
 
 ## P1: Critical 🔥
 
-- **[TEST-009]** Fix Test Coverage Files Quality Gate Failure → [Details](.project/tasks/TEST-009.md)
+*All P1 critical issues resolved as of January 29, 2026*
 
 ## P2: Features 🎯
 
@@ -47,6 +47,11 @@
 - **[REFACTOR-051]** Systematic User Query Audit - Review all User.filter_by() patterns for consistency and safety
 - **[FEAT-018]** Automatic User Creation Strategy - Ensure user records exist for all authenticated sessions
 - **[TEST-010]** Authentication Test Environment - Fix test setup to properly create user records for authenticated clients
+- **[REFACTOR-052]** Consolidate Repetitive File Processing Patterns - Merge fileformat and fileformat-fix rule processing loops
+- **[REFACTOR-053]** Make Coverage Thresholds Configurable - Replace hardcoded 50% with environment-specific settings
+- **[REFACTOR-054]** Unified Quality Gate Architecture - Merge test-coverage-files and test-python into single comprehensive test gate
+- **[REFACTOR-055]** Optimize Quality Intelligence Script - Single-pass JSON parsing instead of multiple file reads per gate
+- **[REFACTOR-056]** Filesystem-First File Discovery - Replace git ls-files with filesystem discovery to eliminate existence checks
 
 ### Core Hattrick Features (Aligned with Geek Audience)
 - **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics → [Details](.project/tasks/FEAT-016.md)

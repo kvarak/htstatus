@@ -165,7 +165,7 @@ fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 	@failed=false; \
 	failed_count=0; \
 	for file in $$(git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)'); do \
-		if test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then \
+		if [ -f "$$file" ] && test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then \
 			echo "❌ Missing newline at EOF: $$file"; \
 			failed=true; \
 			failed_count=$$((failed_count + 1)); \
@@ -179,7 +179,7 @@ fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 	@failed=false; \
 	failed_count=0; \
 	for file in $$(git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)'); do \
-		if grep -q '[[:space:]]$$' "$$file"; then \
+		if [ -f "$$file" ] && grep -q '[[:space:]]$$' "$$file"; then \
 			echo "❌ Trailing whitespace found in: $$file"; \
 			failed=true; \
 			failed_count=$$((failed_count + 1)); \
@@ -189,7 +189,7 @@ fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 		scripts/qi-json.sh out/tests/$@.json "File Format" "make fileformat" FAILED 0 $$failed_count "$$failed_count files" "files have trailing whitespace"; \
 		exit 1; \
 	fi
-	@total_files=$$(git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | wc -l | tr -d ' '); \
+	@total_files=$$(git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)' | while read f; do [ -f "$$f" ] && echo "$$f"; done | wc -l | tr -d ' '); \
 	echo "✅ File formatting checks passed"; \
 	scripts/qi-json.sh out/tests/$@.json "File Format" "make fileformat" PASSED 0 0 "$$total_files files" "consistent formatting"
 
@@ -285,6 +285,11 @@ test-single: check-uv services ## 🧪 Run a single test file (usage: make test-
 
 EXCEPTIONS = __init__.py test_factories.py constants.py error_handlers.py
 
+test-python: check-uv services ## 🧪 Run all Python tests with coverage
+	@echo "🧪 Running all Python tests with coverage..."
+	@mkdir -p out/tests && rm -f out/tests/$@.json out/tests/$@-cov.json
+	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=html --cov-report=json:out/tests/$@-cov.json --cov-fail-under=50 --json-report --json-report-file=out/tests/$@.json
+
 test-coverage-files: check-uv ## Check if all Python files have corresponding test files
 	@echo "🔍 Checking for untested Python files..."
 	@mkdir -p out/tests && rm -f out/tests/$@.json
@@ -323,29 +328,23 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 	echo "📊 Excluded $$excluded_count files, checked $$total_files files"; \
 	if [ "$$missing_count" -eq 0 ]; then \
 		echo "✅ All $$total_files Python files have corresponding test files"; \
-		scripts/qi-json.sh out/tests/$@.json "Test Coverage Files" "make test-coverage-files" PASSED 0 0 "$$total_files files tested" "complete test file coverage ($$excluded_count excluded)"; \
+		scripts/qi-json.sh out/tests/$@.json "Test Coverage (files)" "make test-coverage-files" PASSED 0 0 "$$total_files files tested" "complete test file coverage ($$excluded_count excluded)"; \
 	else \
 		echo "❌ $$missing_count of $$total_files Python files missing test files:$$missing_tests"; \
-		scripts/qi-json.sh out/tests/$@.json "Test Coverage Files" "make test-coverage-files" FAILED 0 $$missing_count "$$missing_count missing tests" "$$missing_count files need test files ($$excluded_count excluded)"; \
+		scripts/qi-json.sh out/tests/$@.json "Test Coverage (files)" "make test-coverage-files" FAILED 0 $$missing_count "$$missing_count missing tests" "$$missing_count files need test files ($$excluded_count excluded)"; \
 		exit 1; \
 	fi
 
-GATES = fileformat lint security-bandit security-deps test-coverage-files
+GATES = fileformat lint security-bandit security-deps test-coverage-files test-python
 
 test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"
 	@mkdir -p out/tests && rm -f out/tests/*.json
 	@count=0; \
-	for testfile in $$(find tests/ -name "test_*.py" -type f | sort); do \
-		count=$$((count + 1)); \
-		basename=$$(basename $$testfile .py); \
-		echo "🔎 [$$count] Running $$testfile..."; \
-		$(UV) run pytest $$testfile $${PYTEST_VERBOSE-"-q"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=json:out/tests/test-each-$$basename-cov.json --cov-fail-under=0 --json-report --json-report-file=out/tests/test-each-$$basename.json &>/dev/null || true; \
-	done; \
 	for gate in $(GATES); do \
+		count=$$((count + 1)); \
 		echo "🔎 [$$count] Running $$gate..."; \
 		PYTEST_VERBOSE="" $(MAKE) $$gate &>/dev/null || true; \
-		count=$$((count + 1)); \
 	done; \
 	scripts/quality-intelligence.sh --expected-results $${count}
 

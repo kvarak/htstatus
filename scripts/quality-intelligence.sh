@@ -151,6 +151,16 @@ parse_qi_json() {
                     coverage=$(printf "%.1f%%" "$total_coverage")
                 fi
             fi
+        elif [[ "$basename" == "test-combined" || "$basename" == "test-python" ]]; then
+            # For combined test file, look for combined coverage file
+            local cov_file_path="$(dirname "$file")/${basename}-cov.json"
+            if [[ -f "$cov_file_path" ]]; then
+                # Extract total coverage percentage from coverage JSON
+                local total_coverage=$(jq -r '.totals.percent_covered // empty' "$cov_file_path" 2>/dev/null)
+                if [[ -n "$total_coverage" && "$total_coverage" != "null" ]]; then
+                    coverage=$(printf "%.1f%%" "$total_coverage")
+                fi
+            fi
         fi
 
         # Convert test type from filename to title
@@ -307,22 +317,5 @@ else
 fi
 
 echo ""
-echo -e "${BOLD}📉 Test Coverage Insight${NC}"
-if [[ -n "$least_covered_file" ]]; then
-    # Color code the coverage percentage
-    if (( $(echo "$min_coverage >= 80" | bc -l 2>/dev/null || [ "${min_coverage%.*}" -ge 80 ]) )); then
-        coverage_status="${GREEN}✅${NC}"
-    elif (( $(echo "$min_coverage >= 60" | bc -l 2>/dev/null || [ "${min_coverage%.*}" -ge 60 ]) )); then
-        coverage_status="${YELLOW}⚠️${NC}"
-    else
-        coverage_status="${RED}❌${NC}"
-    fi
-
-    echo -e "   Least Covered Test: ${BOLD}$least_covered_title${NC} (${min_coverage}%) $coverage_status"
-    echo -e "   Command to run: $least_covered_file"
-else
-    echo "   No coverage data available for analysis"
-fi
-
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ Quality Intelligence Platform analysis complete"
