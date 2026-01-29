@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck typesync security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
 
 # Variables
 PYTHON := uv run python
@@ -227,17 +227,6 @@ typecheck: check-uv ## Run mypy type checking
 		exit 1; \
 	fi
 
-typesync: check-uv ## Validate SQLAlchemy models match TypeScript interfaces
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@echo "🔗 Validating type synchronization..."
-	@$(UV) run python scripts/validate_types.py 2>&1 | tee /tmp/typesync-output.txt; \
-	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
-		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" PASSED 0 0 "synchronized" "Flask ↔ React types match"; \
-	else \
-		issue_count=$$(grep 'Found.*type sync issues' /tmp/typesync-output.txt | head -1 | grep -o '[0-9]\+' || echo "1"); \
-		scripts/qi-json.sh out/tests/$@.json "Type Synchronization" "make typesync" FAILED 0 $$issue_count "$$issue_count drift issues" "run 'make typesync' to fix"; \
-		exit 1; \
-	fi
 
 security-bandit: check-uv ## Run bandit code security analysis
 	@mkdir -p out/tests
@@ -341,7 +330,7 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 		exit 1; \
 	fi
 
-GATES = fileformat lint security-bandit security-deps typesync test-coverage-files
+GATES = fileformat lint security-bandit security-deps test-coverage-files
 
 test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"

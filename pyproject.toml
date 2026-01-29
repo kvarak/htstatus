@@ -1,14 +1,14 @@
 [project]
 name = "htstatus"
 version = "2.0.0"
-description = "Hattrick team management application with dual Flask/React architecture"
+description = "Hattrick team management application with Flask architecture"
 authors = [
     {name = "kvarak", email = "kvarak@example.com"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10,<4.0"
-keywords = ["hattrick", "football", "flask", "react", "chpp"]
+keywords = ["hattrick", "football", "flask", "chpp"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: End Users/Desktop",

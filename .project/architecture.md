@@ -13,39 +13,41 @@
 
 ## System Overview
 
-HT Status is a Hattrick football team management application built with a dual frontend architecture, integrating with Hattrick's official CHPP API to provide comprehensive team and player analysis tools.
+HT Status is a **hobby project** for Hattrick team management built with Flask and server-side templates, integrating with Hattrick's official CHPP API to provide comprehensive team and player analysis tools.
+
+**Target Audience**: Hattrick game enthusiasts and data geeks who love diving deep into player statistics and team optimization.
+
+**Project Philosophy**:
+- **Simplicity Over Enterprise Features**: Built for spare-time maintenance, not enterprise scalability
+- **Database Protection Priority**: Production data integrity is the highest priority
+- **Hattrick-Centric Design**: Features focus on enhancing actual Hattrick gameplay experience
 
 ## High-Level Architecture
 
 ```
 ┌──────────────┐    ┌───────────────┐    ┌──────────────┐
-│   React SPA  │    │  Flask Backend│    │   Hattrick   │
-│ (Modern UI)  │◄──►│(Legacy + API) │◄──►│   CHPP API   │
-│  Port 8080   │    │  Port 5000    │    │              │
+│  Flask Web   │    │  Flask Backend│    │   Hattrick   │
+│ (Jinja2 UI)  │◄──►│  (Routes/API) │◄──►│   CHPP API   │
+│  Port 5000   │    │  Port 5000    │    │              │
 └──────────────┘    └───────────────┘    └──────────────┘
-				│
-				▼
-		       ┌──────────────────┐
-		       │   PostgreSQL     │
-		       │   Database       │
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │   PostgreSQL     │
+                    │   Database       │
 		       └──────────────────┘
 ```
 
 ## Component Breakdown
 
-### 1. Frontend Layer (Dual Architecture)
+### 1. Frontend Layer (Flask-Only Architecture)
 
-#### Legacy Flask Frontend
+#### Flask Frontend
 - **Location**: `/app/templates/`
-- **Technology**: Jinja2 templates + Flask-Bootstrap 3.x
-- **Purpose**: Server-rendered HTML pages for existing functionality
+- **Technology**: Jinja2 templates + Flask-Bootstrap 3.x + CSS
+- **Purpose**: Server-rendered HTML pages for all application functionality
 - **Key Templates**: `player.html`, `matches.html`, `team.html`, `main.html`
-
-#### Modern React Frontend
-- **Location**: `/src/`
-- **Technology**: React + TypeScript + Vite + TailwindCSS + Radix UI
-- **Purpose**: Modern SPA experience (future direction)
-- **Key Components**: Dashboard, Players, Matches, Training, Analytics
+- **Features**: Responsive design, WCAG 2.1 accessibility, football-themed UI
 
 ### 2. Backend Layer
 
@@ -136,8 +138,30 @@ User Login → Flask Session → Hattrick OAuth → CHPP Tokens → Session Stor
 
 ### 3. Analysis Flow
 ```
-Database queries → Skill calculations → Template/React rendering → User interface
+Database queries → Skill calculations → Template rendering → User interface
 ```
+
+## Database Protection Standards (CRITICAL)
+
+As a hobby project with valuable user data, **database integrity is the highest priority**:
+
+### Migration Safety
+- **Mandatory Migrations**: All schema changes use tested migration scripts via `apply_migrations.py`
+- **Backwards Compatibility**: Changes must not break existing data
+- **Production Testing**: Migrations tested on production-like data copies
+- **Rollback Plans**: Document rollback procedures for each migration
+
+### Data Integrity Protection
+- **SQLAlchemy Best Practices**: Use proper model relationships and constraints
+- **Transaction Safety**: Database operations wrapped in proper transactions
+- **Validation**: Input validation before database writes
+- **Backup Validation**: Regular backup testing and restore procedures
+
+### Development Standards
+- **Database Changes = P0 Priority**: Any database corruption is highest severity
+- **Review Requirements**: Database modifications require extra validation
+- **Testing**: Database operations must have comprehensive test coverage
+- **Documentation**: Changes to data models require architecture updates
 
 ## File Structure
 
@@ -154,11 +178,6 @@ htstatus-2.0/
 │   ├── blueprints/    # Feature-based route modules (auth, main, player, team, matches, training)
 │   ├── static/        # Static assets (CSS, JS, images)
 │   └── templates/     # Jinja2 HTML templates
-├── src/               # React frontend application
-│   ├── components/    # React components
-│   ├── pages/         # Page-level components
-│   ├── types/         # TypeScript type definitions
-│   └── lib/          # Utility libraries
 ├── migrations/        # Database migrations (30 Alembic versions)
 ├── tests/            # Test suite (218 tests, 100% passing)
 ├── environments/      # Environment configuration templates
@@ -173,12 +192,7 @@ htstatus-2.0/
 ```
 
 ### Key Architectural Notes
-- **Dual Frontend**: Legacy Flask templates + Modern React SPA coexist
-- **Type Sync Validation**: Automated consistency checking between SQLAlchemy models and TypeScript interfaces
-  - Validation script: `scripts/validate_types.py` (6 models vs 6 interfaces)
-  - Quality gate integration: Step 4/6 in `make test-all` pipeline
-  - Documentation: `docs/type-sync.md` for maintenance procedures
-  - Current baseline: 85 issues identified (83 nullability + 2 type/field mismatches)
+- **Flask-Only Frontend**: Server-rendered Jinja2 templates with Flask-Bootstrap 3.x and custom CSS
 - **Blueprint Architecture**: Modern Flask blueprint pattern with 6 feature-based blueprints (REFACTOR-007 completed January 2026)
   - Factory pattern in `app/factory.py` handles initialization and registration
   - Each blueprint has `setup_*_blueprint()` function for dependency injection

@@ -1,7 +1,12 @@
 # HattrickPlanner
 
+> **Simple Hattrick Team Management for Game Enthusiasts**
+>
+> A hobby project built by Hattrick fans for analyzing player development and team statistics.
+> Designed for managers who love diving deep into the numbers behind their virtual football teams.
+>
 > **Purpose**: User-focused setup, installation, and usage guide for HattrickPlanner application
-> **Audience**: End users, new developers, and contributors getting started
+> **Audience**: Hattrick managers, football data geeks, and contributors
 > **See Also**: [TECHNICAL.md](TECHNICAL.md) for architecture • [DEPLOYMENT.md](DEPLOYMENT.md) for production • [.project/](project/) for development
 
 ## Local Development with UV + Docker + Makefile
@@ -59,7 +64,6 @@ This project uses [UV](https://docs.astral.sh/uv/) for fast Python dependency ma
 
 4. **Access Application**:
    - **Flask App**: http://localhost:5000
-   - **React Dev Server**: `npm run dev` (http://localhost:8080)
    - **pgAdmin** (optional): `docker-compose --profile admin up -d` (http://localhost:5050)
 
 ### Make Commands

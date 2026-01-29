@@ -1,35 +1,41 @@
 # Project Goals
 
-**Vision**: Robust football team management platform for coaches and analysts
+**Vision**: Simple, reliable Hattrick team management tool for game enthusiasts and data geeks
+
+**Project Nature**: This is a **hobby project** focused on simplicity and reliability over enterprise features. Built by Hattrick fans, for Hattrick fans who love diving deep into team statistics and player development.
 
 ## Core Objectives
-1. **Data Management**: Efficient team and player data handling
-2. **Visualization**: Clear performance analysis and insights
-3. **User Experience**: Intuitive interface for all users
-4. **Modern Development**: UV/Docker/Make workflow
-5. **Security & Quality**: Safe migrations and testing
+1. **Database Protection**: Maximum safeguards for production data integrity (critical priority)
+2. **Simple Functionality**: Focus on core features that Hattrick geeks actually use
+3. **Data Insights**: Clear analysis for player development and team optimization
+4. **Hobby-Friendly Development**: Keep complexity reasonable for spare-time maintenance
+5. **Hattrick Integration**: Reliable CHPP API usage respecting rate limits
 
 ## Success Metrics
-- User adoption and active teams
-- Feature completeness
-- System reliability (uptime, bugs)
-- Test coverage (98.9% achieved)
-- Code quality standards
+- **Data Safety**: Zero database corruption incidents (highest priority)
+- **User Satisfaction**: Hattrick managers find value in player analysis
+- **Stability**: Features work reliably without constant maintenance
+- **Simplicity**: New features don't add excessive complexity
+- **Community**: Positive feedback from Hattrick community
 
-## Future Opportunities
+## Development Philosophy
 
-### Real-Time Tactical Intelligence
-**Vision**: Live match analysis with formation optimization
-**Value**: First-mover advantage in live Hattrick analysis
+### Hobby Project Principles
+- **Keep It Simple**: Avoid over-engineering for enterprise scenarios
+- **Database First**: All changes must prioritize data integrity
+- **Hattrick-Centric**: Features should enhance actual Hattrick gameplay
+- **Sustainable Effort**: Maintenance burden should remain manageable
 
-### Community Network Hub
-**Vision**: League/alliance platform beyond individual teams
-**Value**: Network effects and collaborative intelligence
+### Database Protection Standards
+- **Mandatory Migrations**: All schema changes use tested migration scripts
+- **Backup Validation**: Production data backups tested regularly
+- **Model Safety**: SQLAlchemy patterns prevent data corruption
+- **Change Review**: Database modifications require extra validation
 
-### AI-Powered Training Optimization
-**Vision**: ML-based training schedules and player development
-**Value**: Predictable revenue through AI insights
+### Future Possibilities (Low Priority)
+- Enhanced player comparison tools for transfer decisions
+- Simple training optimization suggestions
+- Basic league statistics for friendly competition
+- Mobile-friendly interface improvements
 
-### Cross-Platform Integration
-**Vision**: HTStatus as central hub for Hattrick tools
-**Value**: Platform lock-in through ecosystem orchestration
+*Note: Future features only considered if they maintain simplicity and don't compromise database safety.*

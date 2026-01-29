@@ -3,8 +3,7 @@
     "design_system": "See .github/agents/htplanner-ai-agent.md for complete UI development standards and design system",
     "quick_reference": "Football green theme (hsl(120, 45%, 25%)), responsive design, accessibility standards",
     "framework_notes": {
-      "flask": "Use .btn-primary-custom, .table-custom, .card-custom classes",
-      "react": "Use existing button/table/card components, consistent with TailwindCSS utilities"
+      "flask": "Use .btn-primary-custom, .table-custom, .card-custom classes"
     }
   },
   "tasks": [
@@ -28,7 +27,7 @@
         "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working, don't settle for the same code coverage but strive to improve it.",
         "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Test: `make test-all` - no coverage loss or failures.",
-        "UI: Use ui_guidelines colors/typography. Flask: .btn-primary-custom classes. React: existing components.",
+        "UI: Use ui_guidelines colors/typography. Flask: .btn-primary-custom classes.",
         "Update docs. Note new tasks for backlog. Break large tasks into sub-tasks.",
         "Do not commit code."
       ]

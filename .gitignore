@@ -56,12 +56,6 @@ docker-compose.override.yml
 .vscode/
 .idea/
 
-# Node.js (for React frontend)
-node_modules/
-dist/
-build/
-*.tsbuildinfopychpp
-
 # pyCHPP reference code
 pychpp/
 production_db_dump.sql
