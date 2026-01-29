@@ -80,3 +80,16 @@ def test_oauth_token_storage(client):
         # Tokens should be strings
         assert isinstance(session["access_key"], str)
         assert isinstance(session["access_secret"], str)
+
+
+def test_default_groups_creation_function_exists():
+    """Test that create_default_groups function can be imported and called."""
+    from app.utils import create_default_groups
+
+    # Test that the function exists and is callable
+    assert callable(create_default_groups)
+
+    # Test function signature by checking that it accepts user_id parameter
+    import inspect
+    sig = inspect.signature(create_default_groups)
+    assert 'user_id' in sig.parameters

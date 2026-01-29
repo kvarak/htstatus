@@ -285,8 +285,15 @@ def handle_oauth_callback(oauth_verifier):
     from models import User
 
     try:
+        # Debug session state
+        dprint(1, f"OAuth callback - verifier: {oauth_verifier}")
+        dprint(1, f"Session request_token: {session.get('request_token', 'MISSING')}")
+        dprint(1, f"Session req_secret: {session.get('req_secret', 'MISSING')}")
+
         # Get access tokens
         chpp = get_chpp_client_no_auth()
+        dprint(1, f"Using consumer key: {chpp.consumer_key[:10]}...")
+
         access_token = chpp.get_access_token(
             request_token=session["request_token"],
             request_token_secret=session["req_secret"],
@@ -308,10 +315,8 @@ def handle_oauth_callback(oauth_verifier):
             current_user = user_context["user"]
             dprint(1, f"Successfully got user from CHPP: {current_user.username} (ID: {current_user.ht_id})")
 
-            # Track login activity
-            current_user.login()
-            db.session.commit()
-            dprint(1, f"Updated login counter and timestamp for user: {current_user.ht_user}")
+            # Note: Don't call .login() here - current_user is CHPPUser object, not database User
+            # Login activity tracking will be handled after database user is created/found
         except Exception as chpp_error:
             dprint(1, f"CHPP user() error (likely YouthTeamId issue): {chpp_error}")
             # This is a known CHPP library issue where YouthTeamId field is None
@@ -341,14 +346,18 @@ def handle_oauth_callback(oauth_verifier):
                     f"Found user by access_key '{session['access_key'][:10]}...': {existing_user.username if existing_user else 'None'}",
                 )
 
-            # If still no user found, try to find any user with legacy password hash
+            # SECURITY FIX: Do NOT fall back to random legacy users!
+            # If no user found by valid means, fail gracefully instead of session cross-contamination
             if not existing_user:
-                existing_user = User.query.filter(
-                    User.password.startswith("MIGRATION_REQUIRED:")
-                ).first()
-                dprint(
-                    1,
-                    f"Found legacy user needing migration: {existing_user.username if existing_user else 'None'}",
+                dprint(1, "SECURITY: No user found by valid OAuth tokens - failing safely instead of fallback")
+                session.pop("current_user", None)
+                session.pop("current_user_id", None)
+                session.pop("access_key", None)
+                session.pop("access_secret", None)
+                return create_page(
+                    template="login.html",
+                    title="Login / Signup",
+                    error="Your Hattrick authentication tokens are no longer valid. Please log in again.",
                 )
 
             if existing_user:
@@ -455,6 +464,28 @@ def handle_oauth_callback(oauth_verifier):
             db.session.add(new_user)
 
         db.session.commit()
+
+        # Ensure user is properly persisted before creating groups
+        db.session.flush()
+
+        # Refresh the actual database User object, not the CHPPUser object
+        if not existing_user:
+            # For new users, we need to get the newly created user from the database
+            db_user = User.query.filter_by(ht_id=current_user.ht_id).first()
+            if db_user:
+                db.session.refresh(db_user)
+        else:
+            # For existing users, refresh the existing user object
+            db.session.refresh(existing_user)
+
+        # Create default player groups for new users
+        try:
+            from app.utils import create_default_groups
+            create_default_groups(current_user.ht_id)
+            dprint(1, f"Created default groups for new user {current_user.ht_id}")
+        except Exception as group_error:
+            dprint(1, f"Failed to create default groups for user {current_user.ht_id}: {group_error}")
+            # Continue with login even if group creation fails
 
         # Setup team data with error handling
         try:

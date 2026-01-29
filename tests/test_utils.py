@@ -666,3 +666,23 @@ class TestFormatAttributeName:
         assert _format_attribute_name("set_pieces") == "Set Pieces"
         assert _format_attribute_name("tsi") == "TSI"
         assert _format_attribute_name("injury_level") == "Injury Level"
+
+
+class TestCreateDefaultGroups:
+    """Test create_default_groups function."""
+
+    def test_create_default_groups_function_exists(self):
+        """Test that create_default_groups function exists and is callable."""
+        from app.utils import create_default_groups
+
+        # Test that the function exists and is callable
+        assert callable(create_default_groups)
+
+        # Test function signature by checking that it accepts user_id parameter
+        import inspect
+        sig = inspect.signature(create_default_groups)
+        assert 'user_id' in sig.parameters
+
+        # Verify function docstring
+        assert create_default_groups.__doc__ is not None
+        assert "Create default player groups" in create_default_groups.__doc__

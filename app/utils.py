@@ -1078,3 +1078,100 @@ def count_clicks(page):
     except Exception as e:
         dprint(1, f"Error counting clicks for page {page}: {e}")
         return 0
+
+
+# =============================================================================
+# Default Group Management
+# =============================================================================
+
+
+def create_default_groups(user_id):
+    """Create default player groups for a new user.
+
+    Args:
+        user_id: Hattrick user ID to create groups for
+
+    Returns:
+        list: List of created Group objects, empty list if user already has groups
+
+    Raises:
+        Exception: If database transaction fails
+    """
+    from models import Group, User
+
+    dprint(2, f"Creating default groups for user {user_id}")
+
+    # Verify user exists in database first
+    user = User.query.filter_by(ht_id=user_id).first()
+    if not user:
+        dprint(1, f"Cannot create groups: user {user_id} not found in database")
+        return []
+
+    # Check if user already has groups
+    existing_groups = Group.query.filter_by(user_id=user_id).count()
+    if existing_groups > 0:
+        dprint(2, f"User {user_id} already has {existing_groups} groups, skipping default creation")
+        return []
+
+    # Default groups with football theme colors and spacing for customization
+    default_groups = [
+        {
+            "name": "Goalkeepers",
+            "order": 10,
+            "textcolor": "#FFFFFF",
+            "bgcolor": "#001f3f"  # Navy blue
+        },
+        {
+            "name": "Defenders",
+            "order": 20,
+            "textcolor": "#FFFFFF",
+            "bgcolor": "#0074D9"  # Blue
+        },
+        {
+            "name": "Wing Defenders",
+            "order": 30,
+            "textcolor": "#FFFFFF",
+            "bgcolor": "#2ECC40"  # Green
+        },
+        {
+            "name": "Midfielders",
+            "order": 40,
+            "textcolor": "#000000",
+            "bgcolor": "#FFFFFF"  # White
+        },
+        {
+            "name": "Wingers",
+            "order": 50,
+            "textcolor": "#FFFFFF",
+            "bgcolor": "#B10DC9"  # Purple
+        },
+        {
+            "name": "Forwards",
+            "order": 60,
+            "textcolor": "#FFFFFF",
+            "bgcolor": "#FF4136"  # Red
+        }
+    ]
+
+    created_groups = []
+
+    try:
+        for group_data in default_groups:
+            group = Group(
+                user_id=user_id,
+                name=group_data["name"],
+                order=group_data["order"],
+                textcolor=group_data["textcolor"],
+                bgcolor=group_data["bgcolor"]
+            )
+            db.session.add(group)
+            created_groups.append(group)
+
+        db.session.commit()
+        dprint(1, f"Created {len(created_groups)} default groups for user {user_id}")
+        return created_groups
+
+    except Exception as e:
+        dprint(1, f"Error creating default groups for user {user_id}: {e}")
+        db.session.rollback()
+        raise
