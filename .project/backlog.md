@@ -4,7 +4,7 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (January 30, 2026): Moved INFRA-038 to history, added critical review tasks from Feedback System Review #2 (route testing, vote caching simplification, documentation consolidation). **Active: 45 tasks | Clean status maintained**
+**Recent Organization** (January 30, 2026): Completed REFACTOR-064 (Team CHPP policy compliance) and FEAT-022 (User Feedback System), added 4 new critical review tasks from Team model analysis. **Active: 46 tasks | Clean status maintained**
 
 ---
 
@@ -18,11 +18,9 @@
 
 ## P2: Features 🎯
 
-- **[REFACTOR-064]** Remove CHPP API Call from Stats Blueprint - Stats routes use get_chpp_client() which violates policy; refactor to use session + database only (30 min)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-019]** Player Skill Changes - 4 Week Timeline on Player Details Page → [Details](.project/tasks/FEAT-019.md)
-- **[FEAT-022]** User Feedback System with Voting and Comments → [Details](.project/tasks/FEAT-022.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
@@ -42,6 +40,14 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (January 30, 2026 - Team Model Analysis)
+
+#### Architecture & Testing Quality
+- **[TEST-070]** Team Model Comprehensive Test Coverage - Add tests for Team model creation, competition data updates, error handling, and database constraints (60 min)
+- **[REFACTOR-072]** Eliminate Circular Import Anti-Pattern - Restructure model imports to avoid `from models import Team` inside functions in stats.py and team.py (30 min)
+- **[REFACTOR-073]** Simplify Team Competition Data Storage - Replace 9-parameter update method with JSON field or upsert pattern for simpler data management (45 min)
+- **[BUG-074]** Add Transaction Safety for Team Data Storage - Wrap team competition data updates in proper database transactions with rollback handling (30 min)
 
 ### Recent Critical Review Improvements (January 30, 2026 - Consolidation)
 
