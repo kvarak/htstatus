@@ -104,7 +104,7 @@ def list_feedback():
 
     return create_page(
         template="feedback/list.html",
-        title="Community Feedback",
+        title="Feedback",
         active_feedback=active_feedback,
         archived_feedback=archived_feedback,
         user_votes=user_votes,
