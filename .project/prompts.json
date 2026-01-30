@@ -81,6 +81,7 @@
       "what to do": [
         "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Check for duplicate work.",
         "Challenge: can this be simplified or merged with existing tasks?",
+        "Use ./scripts/get-next-task-id.sh <TYPE> to get the next sequential task ID (e.g., FEAT-020).",
         "Create detailed task file at .project/tasks/<taskid>.md with Problem Statement, Implementation, Acceptance Criteria.",
         "Add summary entry to backlog.md Current Focus and Priority sections with link to task file."
       ]

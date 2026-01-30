@@ -149,6 +149,12 @@ players = team.players()  # Live data from Hattrick
 - **DOC-**: Documentation, guides, cleanup
 **Never invent new categories** - use existing numbering sequence for category
 
+**Task ID Generation**: Use `./scripts/get-next-task-id.sh <TYPE>` to get the next available task ID:
+```bash
+./scripts/get-next-task-id.sh FEAT  # Returns FEAT-020
+./scripts/get-next-task-id.sh DOC   # Returns DOC-027
+```
+
 #### Project Documentation Structure
 
 **Development Metadata** (`.project/`):

@@ -17,3 +17,16 @@ If you need to run scripts directly:
 # Or with UV for Python scripts
 uv run ./scripts/script_name.py
 ```
+
+## Task Management
+
+### get-next-task-id.sh
+Generates the next sequential task ID for a given task type by analyzing git history.
+
+```bash
+./scripts/get-next-task-id.sh FEAT    # Returns next FEAT task ID
+./scripts/get-next-task-id.sh DOC     # Returns next DOC task ID
+./scripts/get-next-task-id.sh TEST    # Returns next TEST task ID
+```
+
+Use this when creating new backlog tasks to ensure sequential numbering.
