@@ -4,7 +4,6 @@ import traceback
 from flask import Blueprint, request, session
 
 from app.auth_utils import require_authentication
-from app.chpp_utilities import get_chpp_client
 from app.utils import create_page, dprint
 
 # Create Blueprint for stats routes
@@ -182,45 +181,39 @@ def stats():
 
     # Get competition data from CHPP (trophies not currently supported)
     trophies = []
+    # REFACTOR-064: Get competition data from database instead of CHPP API
     competition_info = {}
     try:
-        print(f"\n=== FETCHING COMPETITION DATA FOR TEAM {teamid} ===")
+        dprint(2, f"Fetching competition data from database for team {teamid}")
 
-        # Get CHPP client
-        chpp = get_chpp_client(session)
+        # Import Team model here to avoid circular imports
+        from models import Team
 
-        print("Using Custom CHPP client")
-
-        team_details = chpp.team(ht_id=teamid)
-        dprint(2, f"Team details fetched: {team_details.name}")
-
-        # Extract available competition information
-        competition_info = {
-            "league_name": getattr(team_details, "league_name", None),
-            "league_level": getattr(team_details, "league_level", None),
-            "league_level_unit_name": getattr(
-                team_details, "league_level_unit_name", None
-            ),
-            "cup_name": getattr(team_details, "cup_name", None),
-            "cup_level": getattr(team_details, "cup_level", None),
-            "still_in_cup": getattr(team_details, "still_in_cup", False),
-            "cup_match_rounds_left": getattr(team_details, "cup_match_rounds_left", 0),
-            "power_rating": getattr(team_details, "power_rating", None),
-            "power_rating_global_ranking": getattr(
-                team_details, "power_rating_global_ranking", None
-            ),
-            "power_rating_league_ranking": getattr(
-                team_details, "power_rating_league_ranking", None
-            ),
-            "dress_uri": getattr(team_details, "dress_uri", None),
-            "dress_alternate_uri": getattr(team_details, "dress_alternate_uri", None),
-            "logo_url": getattr(team_details, "logo_url", None),
-        }
-
-        dprint(2, f"Competition info extracted: {competition_info}")
+        # Get team competition data from database
+        team_record = Team.get_by_ht_id(teamid)
+        if team_record:
+            competition_info = {
+                "league_name": team_record.league_name,
+                "league_level": team_record.league_level,
+                "league_level_unit_name": None,  # Not stored in current model
+                "cup_name": team_record.cup_cup_name,
+                "cup_level": team_record.cup_cup_round,
+                "still_in_cup": team_record.cup_still_in_cup,
+                "cup_match_rounds_left": team_record.cup_cup_round_index,
+                "power_rating": team_record.power_rating,
+                "power_rating_global_ranking": None,  # Not stored in current model
+                "power_rating_league_ranking": None,  # Not stored in current model
+                "dress_uri": team_record.dress_uri,
+                "dress_alternate_uri": None,  # Not stored in current model
+                "logo_url": team_record.logo_url,
+            }
+            dprint(2, f"Competition info loaded from database: {competition_info}")
+        else:
+            dprint(1, f"No team record found in database for team {teamid}")
+            competition_info = {}
 
     except Exception as e:
-        dprint(1, f"Error fetching competition data: {e}")
+        dprint(1, f"Error fetching competition data from database: {e}")
         dprint(3, traceback.format_exc())
         competition_info = {}
 

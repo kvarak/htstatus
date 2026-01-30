@@ -129,6 +129,44 @@ def update():
             session['all_team_names'][team_index] = the_team.name
             session.modified = True
 
+            # REFACTOR-064: Store team competition data in database for CHPP policy compliance
+            dprint(1, f"Fetching and storing competition data for team: {the_team.name}")
+            try:
+                # Import Team model here to avoid circular imports
+                from models import Team
+
+                # Find or create team record
+                team_record = Team.get_by_ht_id(teamid)
+                if not team_record:
+                    team_record = Team(
+                        ht_id=teamid,
+                        team_name=the_team.name,
+                        user_id=current_user_id
+                    )
+                    db.session.add(team_record)
+                    dprint(1, f"Created new team record for {the_team.name}")
+
+                # Extract competition data from CHPP team details
+                competition_data = {
+                    "league_name": getattr(the_team, "league_name", None),
+                    "league_level": getattr(the_team, "league_level", None),
+                    "power_rating": getattr(the_team, "power_rating", None),
+                    "cup_still_in_cup": getattr(the_team, "still_in_cup", False),
+                    "cup_cup_name": getattr(the_team, "cup_name", None),
+                    "cup_cup_round": getattr(the_team, "cup_level", None),  # Using cup_level as round info
+                    "cup_cup_round_index": getattr(the_team, "cup_match_rounds_left", 0),
+                    "dress_uri": getattr(the_team, "dress_uri", None),
+                    "logo_url": getattr(the_team, "logo_url", None),
+                }
+
+                # Update team competition data
+                team_record.update_competition_data(**competition_data)
+                dprint(1, f"Updated competition data for {the_team.name}: league={competition_data['league_name']}, power={competition_data['power_rating']}")
+
+            except Exception as comp_error:
+                dprint(1, f"Warning: Failed to store competition data for team {teamid}: {str(comp_error)}")
+                # Continue with update process even if competition data storage fails
+
         except Exception as e:
             error_details = traceback.format_exc()
             dprint(1, f"ERROR: Failed to fetch team data for team {teamid}: {str(e)}")
