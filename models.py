@@ -1,5 +1,6 @@
 import pickle
 import time
+from datetime import datetime
 
 from app import db
 
@@ -498,5 +499,109 @@ class FeedbackVote(db.Model):
     def __repr__(self):
         return f"<FeedbackVote {self.vote_type} by User {self.user_id} on Feedback {self.feedback_id}>"
 
+
+# --------------------------------------------------------------------------------
+
+
+class Team(db.Model):
+    """Model for team information including competition data."""
+
+    __tablename__ = "teams"
+
+    id = db.Column(db.Integer, primary_key=True)
+    ht_id = db.Column(db.Integer, unique=True, nullable=False, index=True)
+    team_name = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"), nullable=False)
+
+    # Competition data - previously fetched via CHPP in stats route
+    league_name = db.Column(db.String(200))
+    league_level = db.Column(db.Integer)
+    power_rating = db.Column(db.Integer)
+    cup_still_in_cup = db.Column(db.Boolean)
+    cup_cup_name = db.Column(db.String(200))
+    cup_cup_round = db.Column(db.String(100))
+    cup_cup_round_index = db.Column(db.Integer)
+    dress_uri = db.Column(db.String(500))
+    logo_url = db.Column(db.String(500))
+
+    # Timestamps
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    updated = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+
+    # Relationships
+    user = db.relationship("User", backref="teams")
+
+    def __init__(
+        self,
+        ht_id,
+        team_name,
+        user_id,
+        league_name=None,
+        league_level=None,
+        power_rating=None,
+        cup_still_in_cup=None,
+        cup_cup_name=None,
+        cup_cup_round=None,
+        cup_cup_round_index=None,
+        dress_uri=None,
+        logo_url=None,
+    ):
+        self.ht_id = ht_id
+        self.team_name = team_name
+        self.user_id = user_id
+        self.league_name = league_name
+        self.league_level = league_level
+        self.power_rating = power_rating
+        self.cup_still_in_cup = cup_still_in_cup
+        self.cup_cup_name = cup_cup_name
+        self.cup_cup_round = cup_cup_round
+        self.cup_cup_round_index = cup_cup_round_index
+        self.dress_uri = dress_uri
+        self.logo_url = logo_url
+
+    def __repr__(self):
+        return f"<Team {self.ht_id}: {self.team_name}>"
+
+    @staticmethod
+    def get_by_ht_id(ht_id):
+        """Get team by Hattrick ID."""
+        return Team.query.filter_by(ht_id=ht_id).first()
+
+    def update_competition_data(
+        self,
+        league_name=None,
+        league_level=None,
+        power_rating=None,
+        cup_still_in_cup=None,
+        cup_cup_name=None,
+        cup_cup_round=None,
+        cup_cup_round_index=None,
+        dress_uri=None,
+        logo_url=None,
+    ):
+        """Update competition data for the team."""
+        if league_name is not None:
+            self.league_name = league_name
+        if league_level is not None:
+            self.league_level = league_level
+        if power_rating is not None:
+            self.power_rating = power_rating
+        if cup_still_in_cup is not None:
+            self.cup_still_in_cup = cup_still_in_cup
+        if cup_cup_name is not None:
+            self.cup_cup_name = cup_cup_name
+        if cup_cup_round is not None:
+            self.cup_cup_round = cup_cup_round
+        if cup_cup_round_index is not None:
+            self.cup_cup_round_index = cup_cup_round_index
+        if dress_uri is not None:
+            self.dress_uri = dress_uri
+        if logo_url is not None:
+            self.logo_url = logo_url
+
+        self.updated = datetime.utcnow()
+        db.session.commit()
 
 # --------------------------------------------------------------------------------
