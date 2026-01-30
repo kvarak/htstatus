@@ -4,7 +4,7 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (January 30, 2026): Clean backlog update - removed orphaned FEAT-003 task file, linked REFACTOR-028 to task file, verified no completed tasks need cleanup. **Active: 44 tasks | Clean status maintained**
+**Recent Organization** (January 30, 2026): Moved INFRA-038 to history, added critical review tasks from Feedback System Review #2 (route testing, vote caching simplification, documentation consolidation). **Active: 46 tasks | Clean status maintained**
 
 ---
 
@@ -18,6 +18,7 @@
 
 ## P2: Features 🎯
 
+- **[REFACTOR-064]** Remove CHPP API Call from Stats Blueprint - Stats routes use get_chpp_client() which violates policy; refactor to use session + database only (30 min)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-019]** Player Skill Changes - 4 Week Timeline on Player Details Page → [Details](.project/tasks/FEAT-019.md)
@@ -41,6 +42,14 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (January 30, 2026 - Feedback System Review #2)
+
+#### Feedback System Quality Issues
+- **[TEST-037]** Add Blueprint Route Testing Infrastructure - Enhance conftest.py to support blueprint testing, add route tests for feedback routes (list, new, detail, vote, comment, status) - 0% coverage currently (60 min)
+- **[REFACTOR-065]** Simplify Feedback Vote Caching - Remove premature optimization (update_vote_score method); use simple query count for hobby project scale <50 items (15 min)
+- **[REFACTOR-063]** Organize Template Directory Structure - Move legacy templates into subdirectories for consistent organization (30 min)
+- **[DOC-028]** Consolidate CHPP Documentation - Merge 168-line CHPP-ENFORCEMENT.md into TECHNICAL.md to reduce documentation redundancy (30 min)
 
 ### Recent Critical Review Improvements (January 29, 2026)
 

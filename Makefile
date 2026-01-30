@@ -330,7 +330,12 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 		exit 1; \
 	fi
 
-GATES = fileformat lint security-bandit security-deps test-coverage-files
+check-chpp: ## Check CHPP API usage policy compliance
+	@echo "🔍 Checking CHPP API usage policy..."
+	@chmod +x scripts/check-chpp-usage.sh
+	@./scripts/check-chpp-usage.sh
+
+GATES = fileformat lint security-bandit security-deps test-coverage-files check-chpp
 
 test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"

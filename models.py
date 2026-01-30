@@ -174,6 +174,10 @@ class User(db.Model):
     def setRole(self, newrole):
         self.role = newrole
 
+    def is_admin(self):
+        """Check if user is admin (hardcoded user 182085 + role check)."""
+        return self.ht_id == 182085 or self.role == "admin"
+
     def claimUser(self, username, password, access_key, access_secret):
         self.username = username
         self.password = password
@@ -404,6 +408,93 @@ class Players(db.Model):
             ("leadership", self.leadership),
         )
         return iter(ret)
+
+
+# --------------------------------------------------------------------------------
+
+
+class Feedback(db.Model):
+    """User feedback submissions for bugs, features, and ideas."""
+    __tablename__ = "feedback"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    feedback_type = db.Column(db.String(20), nullable=False)  # bug/feature/idea
+    status = db.Column(db.String(20), default='open')  # open/planned/in-progress/completed/archived
+    author_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    vote_score = db.Column(db.Integer, default=0)  # cached vote total for performance
+
+    # Relationships
+    author = db.relationship('User', backref='feedback_submissions')
+    comments = db.relationship('FeedbackComment', backref='feedback', cascade='all, delete-orphan')
+    votes = db.relationship('FeedbackVote', backref='feedback', cascade='all, delete-orphan')
+
+    def __init__(self, title, description, feedback_type, author_id):
+        self.title = title
+        self.description = description
+        self.feedback_type = feedback_type
+        self.author_id = author_id
+
+    def __repr__(self):
+        return f"<Feedback {self.id}: {self.title[:50]}>"
+
+    def update_vote_score(self):
+        """Update cached vote score from actual votes."""
+        up_votes = FeedbackVote.query.filter_by(feedback_id=self.id, vote_type='up').count()
+        down_votes = FeedbackVote.query.filter_by(feedback_id=self.id, vote_type='down').count()
+        self.vote_score = up_votes - down_votes
+        db.session.commit()
+
+
+class FeedbackComment(db.Model):
+    """Comments on feedback items."""
+    __tablename__ = "feedback_comment"
+
+    id = db.Column(db.Integer, primary_key=True)
+    feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    # Relationships
+    author = db.relationship('User', backref='feedback_comments')
+
+    def __init__(self, feedback_id, author_id, content, is_admin=False):
+        self.feedback_id = feedback_id
+        self.author_id = author_id
+        self.content = content
+        self.is_admin = is_admin
+
+    def __repr__(self):
+        return f"<FeedbackComment {self.id} on Feedback {self.feedback_id}>"
+
+
+class FeedbackVote(db.Model):
+    """User votes on feedback items."""
+    __tablename__ = "feedback_vote"
+
+    id = db.Column(db.Integer, primary_key=True)
+    feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
+    vote_type = db.Column(db.String(10), nullable=False)  # up/down
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+
+    # Relationships
+    user = db.relationship('User', backref='feedback_votes')
+
+    # Constraint: one vote per user per feedback item
+    __table_args__ = (db.UniqueConstraint('feedback_id', 'user_id', name='unique_user_vote'),)
+
+    def __init__(self, feedback_id, user_id, vote_type):
+        self.feedback_id = feedback_id
+        self.user_id = user_id
+        self.vote_type = vote_type
+
+    def __repr__(self):
+        return f"<FeedbackVote {self.vote_type} by User {self.user_id} on Feedback {self.feedback_id}>"
 
 
 # --------------------------------------------------------------------------------

@@ -94,6 +94,7 @@ def setup_routes(app_instance, db_instance):
 
     # Import blueprint functions and blueprints
     from app.blueprints.auth import auth_bp, setup_auth_blueprint
+    from app.blueprints.feedback import feedback_bp, setup_feedback_blueprint
     from app.blueprints.main import (
         main_bp,
         setup_main_blueprint,
@@ -136,6 +137,8 @@ def setup_routes(app_instance, db_instance):
         app_instance.config.get("CONSUMER_SECRETS", "dev_secret"),
     )
 
+    setup_feedback_blueprint(app_instance, db_instance)
+
     setup_main_blueprint(db_instance, DEFAULT_COLUMNS, ALL_COLUMNS, DEFAULT_GROUP_ORDER)
 
     setup_player_blueprint(
@@ -162,6 +165,7 @@ def setup_routes(app_instance, db_instance):
     # Register blueprints with Flask
     app_instance.register_blueprint(main_bp)
     app_instance.register_blueprint(auth_bp)
+    app_instance.register_blueprint(feedback_bp)
     app_instance.register_blueprint(player_bp)
     app_instance.register_blueprint(team_bp)
     app_instance.register_blueprint(matches_bp)

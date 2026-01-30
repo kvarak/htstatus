@@ -35,6 +35,18 @@ Critical understanding for working with Hattrick's data model:
 - **Testing**: pytest with fixtures, CHPP API mocking, test coverage tracked (19/26 quality gates passing)
 - **CI/CD**: GitHub Actions for linting and basic CI
 - **Route Architecture**: Modern Flask blueprint architecture with 6 blueprints (auth, main, player, team, matches, training) registered in factory.py
+
+### CHPP API Usage Policy (CRITICAL)
+
+**CHPP API calls are expensive and rate-limited. Minimize to absolute essentials.**
+
+See [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md#chpp-api-usage-critical---performance--rate-limits) for complete policy, implementation patterns, and code examples.
+
+**Quick Reference**:
+- ✅ ONLY use for: Login/OAuth, Explicit "Update Data" button
+- ❌ NEVER use for: Page navigation, voting/commenting, form submissions, admin checks
+- Use `session["current_user_id"]` + database queries instead
+
 - **CHPP Integration Notes**: Custom CHPP client handles YouthTeamId as optional field, fixing parsing issues for users without youth teams
 - **CHPP Feature Flag**: `USE_CUSTOM_CHPP` environment variable toggles between custom CHPP and pychpp client (default: false for safe deployment)
   - `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (legacy fallback, full backward compatibility)

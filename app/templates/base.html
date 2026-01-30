@@ -670,8 +670,9 @@ window.addEventListener('beforeinstallprompt', (e) => {
         <a class="nav-link" href="/settings" onclick="loading();">Settings</a>
         <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
         {% if role == "Admin" %}
-          <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
+        <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
         {% endif %}
+        <a class="nav-link" href="/feedback" onclick="loading();"><i>Feedback</i></a>
       {% else %}
         <li class="nav-item">
           <a class="nav-link" href="/login">Login</a>

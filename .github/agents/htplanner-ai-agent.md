@@ -85,6 +85,37 @@ This principle applies at all levels: individual functions, modules, documentati
 - Subprocess usage limited to static dev tooling only (git version detection)
 - Document security rationale for Bandit B404/B607/B603 skips
 
+#### CHPP API Usage (CRITICAL - PERFORMANCE & RATE LIMITS)
+**CHPP API calls are EXPENSIVE and RATE-LIMITED. Minimize to absolute essentials.**
+
+**ONLY call CHPP API in these scenarios**:
+1. **Login/Authentication** - Initial OAuth flow and user/team data fetch
+2. **Explicit "Update Data" Action** - When user clicks "Update" button to sync with Hattrick
+
+**NEVER call CHPP API for**:
+- Page navigation (feedback, stats, any view-only page)
+- Voting, commenting, or any quick user interaction
+- Form submissions (use session data)
+- Admin actions (check User.role from database)
+
+**Implementation Pattern**:
+```python
+# ❌ WRONG - Triggers CHPP API calls
+chpp = get_chpp_client(session)
+user_context = get_current_user_context(chpp)  # Fetches all player data!
+
+# ✅ CORRECT - Use session and database only
+if "current_user_id" not in session:
+    return redirect(url_for("auth.login"))
+user_id = session["current_user_id"]
+user = User.query.filter_by(ht_id=user_id).first()
+user_context = {
+    "user": user,
+    "teams": session.get("all_teams", []),
+    "team_names": session.get("all_team_names", [])
+}
+```
+
 #### Hattrick Domain Knowledge (Target Audience: Game Geeks)
 - **Player Skills**: 7 core skills (keeper, defender, playmaker, winger, passing, scorer, set_pieces)
 - **Match Roles**: 15+ field positions (GK=100, RB=101, etc.) in HTmatchrole constants

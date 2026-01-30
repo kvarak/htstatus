@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Community Feedback</li>
+    </ol>
+  </nav>
+
+  <!-- Flash Messages -->
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+
+  <div class="row">
+    <!-- Left Column: Submit New Feedback -->
+    <div class="col-md-3">
+      <div class="card-custom mb-4">
+        <div class="card-custom-header">
+          <h5 class="card-custom-title" style="font-size: 1.1rem;">Submit Feedback</h5>
+        </div>
+        <div class="card-custom-body">
+          <form method="POST" action="{{ url_for('feedback.list_feedback') }}">
+            <div class="form-group">
+              <label for="title" class="font-weight-bold">Title *</label>
+              <input type="text" class="form-control" id="title" name="title"
+                     placeholder="Brief summary" required maxlength="255">
+              <small class="form-text text-muted">Max 255 characters</small>
+            </div>
+
+            <div class="form-group">
+              <label for="feedback_type" class="font-weight-bold">Type *</label>
+              <select class="form-control" id="feedback_type" name="feedback_type" required>
+                <option value="">Select type...</option>
+                <option value="bug">🐛 Bug Report</option>
+                <option value="feature">✨ Feature Request</option>
+                <option value="idea">💡 Idea</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="description" class="font-weight-bold">Description *</label>
+              <textarea class="form-control" id="description" name="description"
+                        rows="5" placeholder="Detailed description" required></textarea>
+              <small class="form-text text-muted">Be as detailed as possible</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary-custom btn-block">
+              <i class="fas fa-paper-plane"></i> Submit Feedback
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Guidelines -->
+      <div class="card-custom">
+        <div class="card-custom-body">
+          <h6 class="font-weight-bold mb-2">Guidelines</h6>
+          <ul class="small mb-0" style="padding-left: 1.2rem;">
+            <li>Be specific and clear</li>
+            <li>One issue per submission</li>
+            <li>Search existing feedback first</li>
+            <li>Be respectful and constructive</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Feedback List -->
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary-custom mb-0">Community Feedback</h2>
+        <span class="badge badge-secondary">{{ feedback_items|length }} items</span>
+      </div>
+
+      {% if feedback_items %}
+        <div class="list-group">
+          {% for feedback in feedback_items %}
+            <a href="{{ url_for('feedback.detail', id=feedback.id) }}"
+               class="list-group-item list-group-item-action mb-2"
+               style="border-radius: 8px; border: 1px solid hsl(var(--border));">
+              <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <div class="d-flex align-items-center mb-2">
+                    <span class="badge badge-{{ 'danger' if feedback.feedback_type == 'bug' else 'primary' if feedback.feedback_type == 'feature' else 'info' }} mr-2">
+                      {{ '🐛 Bug' if feedback.feedback_type == 'bug' else '✨ Feature' if feedback.feedback_type == 'feature' else '💡 Idea' }}
+                    </span>
+                    <h5 class="mb-0 text-dark">{{ feedback.title }}</h5>
+                  </div>
+
+                  <p class="mb-2 text-muted small" style="max-height: 3em; overflow: hidden; text-overflow: ellipsis;">
+                    {{ feedback.description[:150] }}{% if feedback.description|length > 150 %}...{% endif %}
+                  </p>
+
+                  <div class="d-flex align-items-center text-muted small">
+                    <span class="mr-3">
+                      <i class="fas fa-user"></i> {{ feedback.author.username if feedback.author else 'Unknown' }}
+                    </span>
+                    <span class="mr-3">
+                      <i class="fas fa-clock"></i> {{ feedback.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </span>
+                    <span class="mr-3">
+                      <i class="fas fa-comments"></i> {{ feedback.comments|length }}
+                    </span>
+                    {% if feedback.status != 'open' %}
+                      <span class="badge badge-{{ 'success' if feedback.status == 'completed' else 'warning' if feedback.status == 'in-progress' else 'secondary' }}">
+                        {{ feedback.status|upper }}
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="ml-3 text-center" style="min-width: 80px;">
+                  <button type="button"
+                          class="btn btn-sm {% if user_votes.get(feedback.id) == 'up' %}btn-success{% else %}btn-outline-success{% endif %}"
+                          onclick="event.preventDefault(); event.stopPropagation(); vote({{ feedback.id }}, 'up')"
+                          title="{% if user_votes.get(feedback.id) == 'up' %}Remove your upvote{% else %}Upvote this feedback{% endif %}">
+                    ↑ <i class="fas fa-thumbs-up"></i>
+                  </button>
+                  <div class="mt-1">
+                    <span id="score-{{ feedback.id }}" class="font-weight-bold">{{ feedback.vote_score }}</span>
+                  </div>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+          <h4 class="text-muted">No feedback submitted yet</h4>
+          <p class="text-muted">Be the first to share your thoughts using the form on the left!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+function vote(feedbackId, voteType) {
+  fetch(`/feedback/${feedbackId}/vote`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({vote_type: voteType})
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Update vote score
+      document.getElementById(`score-${feedbackId}`).textContent = data.vote_score;
+
+      // Update button state
+      const upBtn = document.querySelector(`button[onclick*="vote(${feedbackId}"]`);
+
+      // Reset button state
+      upBtn.className = upBtn.className.replace('btn-success', 'btn-outline-success');
+
+      // Set active state and tooltip based on vote
+      if (data.user_vote === 'up') {
+        upBtn.className = upBtn.className.replace('btn-outline-success', 'btn-success');
+        upBtn.title = 'Remove your upvote';
+      } else {
+        upBtn.title = 'Upvote this feedback';
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+</script>
+{% endblock %}
