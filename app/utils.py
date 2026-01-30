@@ -152,6 +152,87 @@ def get_version_info():
 
 
 # =============================================================================
+# Admin Feedback Utilities
+# =============================================================================
+
+
+def get_admin_feedback_counts(user_id=None):
+    """Get feedback counts for admin indicators (hobby project scale).
+
+    Returns dict with no_replies and needs_followup counts, or None if not admin.
+    Uses simple queries appropriate for <50 feedback items.
+    """
+    # Import here to avoid circular imports
+    from sqlalchemy import and_, exists
+
+    from models import Feedback, FeedbackComment, User
+
+    # Check admin status
+    user = None
+    if user_id:
+        user = User.query.filter_by(ht_id=user_id).first()
+
+    if not user or not (user.role == "Admin" or user.ht_id == 182085):
+        return None
+
+    # Handle case where feedback tables don't exist (graceful degradation)
+    try:
+        # Get all admin user IDs for query optimization
+        admin_users = User.query.filter(
+            (User.role == "Admin") | (User.ht_id == 182085)
+        ).all()
+        admin_user_ids = [admin.ht_id for admin in admin_users]
+
+        # Count feedback with no admin replies (simple approach for hobby scale)
+        no_replies_query = Feedback.query.filter(
+            Feedback.status.in_(['open', 'planned', 'in-progress']),
+            ~Feedback.archived,
+            ~exists().where(
+                and_(
+                    FeedbackComment.feedback_id == Feedback.id,
+                    FeedbackComment.author_id.in_(admin_user_ids)
+                )
+            )
+        )
+        no_replies = no_replies_query.count()
+
+        # Count feedback needing admin follow-up (simplified approach)
+        # For hobby scale: check if latest comment is from non-admin after admin reply exists
+        needs_followup = 0
+        feedback_with_admin_replies = Feedback.query.filter(
+            Feedback.status.in_(['open', 'planned', 'in-progress']),
+            ~Feedback.archived,
+            exists().where(
+                and_(
+                    FeedbackComment.feedback_id == Feedback.id,
+                    FeedbackComment.author_id.in_(admin_user_ids)
+                )
+            )
+        ).all()
+
+        for feedback in feedback_with_admin_replies:
+            # Get latest comment for this feedback
+            latest_comment = FeedbackComment.query.filter_by(
+                feedback_id=feedback.id
+            ).order_by(FeedbackComment.created_at.desc()).first()
+
+            # If latest comment is from non-admin, needs follow-up
+            if latest_comment and latest_comment.author_id not in admin_user_ids:
+                needs_followup += 1
+
+        return {
+            "no_replies": no_replies,
+            "needs_followup": needs_followup
+        }
+    except Exception:
+        # Graceful degradation if feedback tables don't exist or other DB errors
+        return {
+            "no_replies": 0,
+            "needs_followup": 0
+        }
+
+
+# =============================================================================
 # Template and Page Utilities
 # =============================================================================
 
@@ -197,8 +278,13 @@ def create_page(template, title, **kwargs):
         from models import User
 
         user = User.query.filter_by(ht_id=session.get("current_user_id")).first()
-        if user and user.role == "Admin":
+        if user and (user.role == "Admin" or user.ht_id == 182085):
             template_vars["role"] = "Admin"
+
+            # Add admin feedback counts for navigation indicators
+            feedback_counts = get_admin_feedback_counts(user.ht_id)
+            if feedback_counts:
+                template_vars["admin_feedback_counts"] = feedback_counts
 
     # Add any additional template variables
     template_vars.update(kwargs)

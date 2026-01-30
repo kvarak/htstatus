@@ -672,7 +672,11 @@ window.addEventListener('beforeinstallprompt', (e) => {
         {% if role == "Admin" %}
         <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
         {% endif %}
-        <a class="nav-link" href="/feedback" onclick="loading();"><i>Feedback</i></a>
+        {% if admin_feedback_counts and (admin_feedback_counts.no_replies > 0 or admin_feedback_counts.needs_followup > 0) %}
+        <a class="nav-link" href="/feedback" onclick="loading();">Feedback ({{ admin_feedback_counts.no_replies }} unanswered / {{ admin_feedback_counts.needs_followup }} new replies)</a>
+        {% else %}
+        <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
+        {% endif %}
       {% else %}
         <li class="nav-item">
           <a class="nav-link" href="/login">Login</a>

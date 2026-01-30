@@ -12,12 +12,13 @@
 - **CHPP Policy**: Automated enforcement via check-chpp gate (currently failing on stats.py violation)
 
 ## Current Focus
-**P2 Feature Development & CHPP Policy Enforcement**: Active development on feedback system with quality improvements
-- **CHPP Enforcement** (INFRA-038 ✅): Created automated check-chpp-usage.sh script integrated into make test-all, detected stats.py violation (REFACTOR-064)
+**P2 Feature Development & CHPP Policy Enforcement**: UI-017 completed, REFACTOR-064 (CHPP stats violation) ready for immediate execution
+- **UI-017 Complete ✅**: Admin feedback navigation indicators implemented with descriptive "(x unanswered / y new replies)" format
+- **CHPP Enforcement** (INFRA-038 ✅): Created automated check-chpp-usage.sh script integrated into make test-all, detected stats.py violation (REFACTOR-064 ready)
 - **Feedback System**: Comprehensive user feedback system (FEAT-022) with voting, comments, status changes - layout improved per user requirements
-- **Critical Review #2 Complete**: Identified 4 new improvement opportunities (route testing infrastructure, vote caching optimization, template organization, documentation consolidation)
-- **Backlog Cleanup**: Moved INFRA-038 to history, maintained clean 46-task backlog
-- **Quality Gate Status**: 4/7 gates passing, test coverage and CHPP enforcement remain priority areas
+- **Critical Review #2 Complete**: Consolidated improvements into 7 tasks (simplification, testing, organization)
+- **Backlog Cleanup**: Removed completed UI-017, maintained clean 45-task backlog with consolidated P4 sections
+- **Quality Gate Status**: 4/7 gates passing, REFACTOR-064 will resolve CHPP policy failure
 - **Next Priority**: Address CHPP policy violation (REFACTOR-064), add route testing infrastructure (TEST-037)
 
 ## Recent Completions (January 29-30, 2026)

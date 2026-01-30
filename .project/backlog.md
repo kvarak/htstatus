@@ -4,7 +4,7 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (January 30, 2026): Moved INFRA-038 to history, added critical review tasks from Feedback System Review #2 (route testing, vote caching simplification, documentation consolidation). **Active: 46 tasks | Clean status maintained**
+**Recent Organization** (January 30, 2026): Moved INFRA-038 to history, added critical review tasks from Feedback System Review #2 (route testing, vote caching simplification, documentation consolidation). **Active: 45 tasks | Clean status maintained**
 
 ---
 
@@ -43,11 +43,16 @@
 
 ## P4: Possibilities 🔮
 
-### Recent Critical Review Improvements (January 30, 2026 - Feedback System Review #2)
+### Recent Critical Review Improvements (January 30, 2026 - Consolidation)
 
-#### Feedback System Quality Issues
-- **[TEST-037]** Add Blueprint Route Testing Infrastructure - Enhance conftest.py to support blueprint testing, add route tests for feedback routes (list, new, detail, vote, comment, status) - 0% coverage currently (60 min)
+#### Simplification & Technical Debt (UI & Database)
+- **[REFACTOR-066]** Simplify Admin Feedback Count Queries - Replace complex SQLAlchemy exists() subqueries with simple COUNT/GROUP BY for hobby project scale <50 items (15 min)
+- **[REFACTOR-067]** Extract Navigation Component Logic - Move admin indicator conditional logic from Jinja2 templates to view layer for better testability (30 min)
+- **[REFACTOR-068]** Simplify Admin Feedback Test Mocking - Replace complex 15-line SQLAlchemy mocks with simple fake data for hobby project testing (20 min)
 - **[REFACTOR-065]** Simplify Feedback Vote Caching - Remove premature optimization (update_vote_score method); use simple query count for hobby project scale <50 items (15 min)
+
+#### Testing & Architecture Quality
+- **[TEST-037]** Add Blueprint Route Testing Infrastructure - Enhance conftest.py to support blueprint testing, add route tests for feedback routes (list, new, detail, vote, comment, status) - 0% coverage currently (60 min)
 - **[REFACTOR-063]** Organize Template Directory Structure - Move legacy templates into subdirectories for consistent organization (30 min)
 - **[DOC-028]** Consolidate CHPP Documentation - Merge 168-line CHPP-ENFORCEMENT.md into TECHNICAL.md to reduce documentation redundancy (30 min)
 

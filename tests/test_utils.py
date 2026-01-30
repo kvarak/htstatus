@@ -12,6 +12,7 @@ from app.utils import (
     diff,
     diff_month,
     dprint,
+    get_admin_feedback_counts,
     get_training,
     get_version_info,
     initialize_utils,
@@ -686,3 +687,112 @@ class TestCreateDefaultGroups:
         # Verify function docstring
         assert create_default_groups.__doc__ is not None
         assert "Create default player groups" in create_default_groups.__doc__
+
+
+class TestAdminFeedbackCounts:
+    """Test admin feedback count functionality."""
+
+    @patch('models.User')
+    def test_get_admin_feedback_counts_non_admin_returns_none(self, mock_user_model):
+        """Test get_admin_feedback_counts returns None for non-admin users."""
+
+        # Mock user query to return non-admin user
+        mock_user = Mock()
+        mock_user.role = "User"
+        mock_user.ht_id = 12345
+        mock_user_model.query.filter_by.return_value.first.return_value = mock_user
+
+        result = get_admin_feedback_counts(12345)
+
+        assert result is None
+
+    @patch('models.FeedbackComment')
+    @patch('models.Feedback')
+    @patch('models.User')
+    @patch('sqlalchemy.exists')
+    @patch('sqlalchemy.and_')
+    def test_get_admin_feedback_counts_admin_user_returns_counts(self, mock_and, mock_exists,
+                                                               mock_user_model, mock_feedback_model,
+                                                               mock_comment_model):
+        """Test get_admin_feedback_counts returns counts for admin users."""
+
+        # Mock admin user
+        mock_admin = Mock()
+        mock_admin.role = "Admin"
+        mock_admin.ht_id = 182085
+
+        # Mock admin users query
+        mock_admin_users = [mock_admin]
+
+        # Mock feedback queries
+        mock_no_replies_query = Mock()
+        mock_no_replies_query.count.return_value = 3
+
+        mock_feedback_with_replies = [Mock(id=1), Mock(id=2)]
+
+        # Mock latest comments (one needs follow-up)
+        mock_latest_comment1 = Mock(author_id=99999)  # Non-admin
+        mock_latest_comment2 = Mock(author_id=182085)  # Admin
+
+        # Setup mocks
+        mock_user_model.query.filter_by.return_value.first.return_value = mock_admin
+        mock_user_model.query.filter.return_value.all.return_value = mock_admin_users
+        mock_feedback_model.query.filter.return_value = mock_no_replies_query
+        mock_feedback_model.query.filter.return_value.all.return_value = mock_feedback_with_replies
+
+        # Mock comment queries for follow-up check
+        mock_comment_model.query.filter_by.return_value.order_by.return_value.first.side_effect = [
+            mock_latest_comment1,  # First feedback needs follow-up
+            mock_latest_comment2   # Second feedback doesn't need follow-up
+        ]
+
+        result = get_admin_feedback_counts(182085)
+
+        assert result is not None
+        assert result["no_replies"] == 3
+        assert result["needs_followup"] == 1
+
+    @patch('models.FeedbackComment')
+    @patch('models.Feedback')
+    @patch('models.User')
+    def test_get_admin_feedback_counts_hardcoded_admin_id(self, mock_user_model,
+                                                        mock_feedback_model, mock_comment_model):
+        """Test get_admin_feedback_counts works for hardcoded admin ID 182085."""
+
+        # Mock user with hardcoded admin ID but no admin role
+        mock_user = Mock()
+        mock_user.role = "User"  # Not admin role
+        mock_user.ht_id = 182085  # But hardcoded admin ID
+
+        # Mock empty results for simplicity
+        mock_no_replies_query = Mock()
+        mock_no_replies_query.count.return_value = 0
+
+        mock_user_model.query.filter_by.return_value.first.return_value = mock_user
+        mock_user_model.query.filter.return_value.all.return_value = [mock_user]
+        mock_feedback_model.query.filter.return_value = mock_no_replies_query
+        mock_feedback_model.query.filter.return_value.all.return_value = []
+
+        result = get_admin_feedback_counts(182085)
+        assert "no_replies" in result
+        assert "needs_followup" in result
+
+    def test_get_admin_feedback_counts_no_user_id(self):
+        """Test get_admin_feedback_counts with no user_id returns None."""
+
+        result = get_admin_feedback_counts(None)
+        assert result is None
+
+    def test_get_admin_feedback_counts_function_exists(self):
+        """Test that get_admin_feedback_counts function exists and is callable."""
+
+        assert callable(get_admin_feedback_counts)
+
+        # Test function signature
+        import inspect
+        sig = inspect.signature(get_admin_feedback_counts)
+        assert 'user_id' in sig.parameters
+
+        # Verify docstring
+        assert get_admin_feedback_counts.__doc__ is not None
+        assert "hobby project scale" in get_admin_feedback_counts.__doc__
