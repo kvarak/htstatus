@@ -421,7 +421,8 @@ class Feedback(db.Model):
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
     feedback_type = db.Column(db.String(20), nullable=False)  # bug/feature/idea
-    status = db.Column(db.String(20), default='open')  # open/planned/in-progress/completed/archived
+    status = db.Column(db.String(20), default='open')  # open/planned/in-progress/completed/wont-do
+    archived = db.Column(db.Boolean, default=False)  # separate archiving from status
     author_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     vote_score = db.Column(db.Integer, default=0)  # cached vote total for performance
@@ -431,11 +432,12 @@ class Feedback(db.Model):
     comments = db.relationship('FeedbackComment', backref='feedback', cascade='all, delete-orphan')
     votes = db.relationship('FeedbackVote', backref='feedback', cascade='all, delete-orphan')
 
-    def __init__(self, title, description, feedback_type, author_id):
+    def __init__(self, title, description, feedback_type, author_id, archived=False):
         self.title = title
         self.description = description
         self.feedback_type = feedback_type
         self.author_id = author_id
+        self.archived = archived
 
     def __repr__(self):
         return f"<Feedback {self.id}: {self.title[:50]}>"

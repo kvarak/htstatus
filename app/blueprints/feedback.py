@@ -77,8 +77,7 @@ def list_feedback():
             title=title,
             feedback_type=feedback_type,
             description=description,
-            author_id=user.ht_id,
-            status="open"
+            author_id=user.ht_id
         )
         db.session.add(feedback)
         db.session.commit()
@@ -86,9 +85,11 @@ def list_feedback():
         flash("Thank you for your feedback!", "success")
         return redirect(url_for("feedback.list_feedback"))
 
-    # Get all feedback ordered by vote score and creation date
-    feedback_items = Feedback.query.order_by(desc(Feedback.vote_score), desc(Feedback.created_at)).all()
+    # Get active feedback (non-archived) ordered by vote score and creation date
+    active_feedback = Feedback.query.filter(~Feedback.archived).order_by(desc(Feedback.vote_score), desc(Feedback.created_at)).all()
 
+    # Get archived feedback ordered by creation date (newest first)
+    archived_feedback = Feedback.query.filter(Feedback.archived).order_by(desc(Feedback.created_at)).all()
     # Get user's votes for quick lookup
     user_votes = {}
     votes = FeedbackVote.query.filter_by(user_id=user.ht_id).all()
@@ -104,7 +105,8 @@ def list_feedback():
     return create_page(
         template="feedback/list.html",
         title="Community Feedback",
-        feedback_items=feedback_items,
+        active_feedback=active_feedback,
+        archived_feedback=archived_feedback,
         user_votes=user_votes,
         user_context=user_context
     )
@@ -359,7 +361,7 @@ def update_status(id):
     feedback = Feedback.query.get_or_404(id)
     new_status = request.form.get("status")
 
-    valid_statuses = ["open", "planned", "in-progress", "completed", "archived"]
+    valid_statuses = ["open", "planned", "in-progress", "completed", "wont-do"]
     if new_status not in valid_statuses:
         flash("Invalid status.", "error")
         return redirect(url_for("feedback.detail", id=id))
@@ -372,5 +374,36 @@ def update_status(id):
         db.session.rollback()
         dprint(1, f"Error updating status: {e}")
         flash("Error updating status.", "error")
+
+    return redirect(url_for("feedback.detail", id=id))
+
+
+@feedback_bp.route("/<int:id>/archive", methods=["POST"])
+def toggle_archive(id):
+    """Toggle feedback archive status (admin only)."""
+    from models import Feedback, User
+
+    # Check authentication - verify admin without CHPP calls
+    if "access_key" not in session or "current_user_id" not in session:
+        return redirect(url_for("auth.login"))
+
+    user_id = session["current_user_id"]
+    user = User.query.filter_by(ht_id=user_id).first()
+
+    if not user or not user.is_admin():
+        abort(403)
+
+    feedback = Feedback.query.get_or_404(id)
+
+    try:
+        feedback.archived = not feedback.archived
+        db.session.commit()
+
+        action = "archived" if feedback.archived else "unarchived"
+        flash(f"Feedback {action} successfully.", "success")
+    except Exception as e:
+        db.session.rollback()
+        dprint(1, f"Error toggling archive: {e}")
+        flash("Error updating archive status.", "error")
 
     return redirect(url_for("feedback.detail", id=id))
