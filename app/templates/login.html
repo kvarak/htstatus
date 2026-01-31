@@ -24,9 +24,32 @@
   </div>
   {% endif %}
   {% if not(current_user) %}
+
   <div class="row">
     <div class="col-sm">
       <div class="card-deck">
+        <div class="card">
+          <div class="card-body">
+            <p>
+              <img src="{{url_for('static', filename='chpp.png')}}">
+            </p>
+            <p class="text-sm13">
+              You need a <i>free account</i> to use {{ apptitle }}. This account is connected to your Hattrick
+              account via CHPP with oAuth (Hattrick's login system).
+            </p>
+            <p class="text-sm13">
+              If you have used {{ apptitle }} before, just login.
+            </p>
+            <p class="text-sm13">
+              Otherwise write your username and select a password and then you'll be forwarded to Hattrick
+              to give {{ apptitle }} permission to access your Hattrick data.
+            </p>
+            <hr class="mt-3 mb-2">
+            <p class="text-sm13">
+              <i class="fas fa-cookie-bite"></i> <strong>Session Cookies:</strong> {{ apptitle }} needs to store a small cookie in your browser to keep you logged in and connect to your Hattrick account. This is only used for authentication - no tracking or third-party sharing - and is automatically deleted when you log out.
+            </p>
+            </div>
+          </div>
         <div class="card">
           <div class="card-body">
             {% if accesslink %}
@@ -67,6 +90,17 @@
                 </div>
               </div>
               <div class="form-group row">
+                <label for="cookieConsent" class="col-sm-2 col-form-label">&nbsp;</label>
+                <div class="col-sm-10">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="cookie_consent" id="cookieConsent" required>
+                    <label class="form-check-label" for="cookieConsent">
+                      <small>I understand and consent to the use of essential session cookies for authentication</small>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
                 <label for="inputSubmit" class="col-sm-2 col-form-label">&nbsp;</label>
                 <div class="col-sm-10">
                   <button class="btn-primary-custom">Login</button>
@@ -84,25 +118,6 @@
               </div>
             </form>
             {% endif %}
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <p>
-              <img src="{{url_for('static', filename='chpp.png')}}">
-            </p>
-            <p class="text-sm13">
-              You need a <i>free account</i> to use {{ apptitle }}. This account is connected to your Hattrick
-              account via CHPP with oAuth (Hattrick's login system).
-            </p>
-            <p class="text-sm13">
-              If you have used {{ apptitle }} before, just login.
-            </p>
-            <p class="text-sm13">
-              Otherwise write your username and select a password and then you'll be forwarded to Hattrick
-              to give {{ apptitle }} permission to access your Hattrick data.
-            </p>
-            </div>
           </div>
         </div>
       </div>

@@ -63,8 +63,10 @@ def login():
     dprint(1, "Processing POST login request")
     username = request.form.get("username")
     password = request.form.get("password")
+    cookie_consent = request.form.get("cookie_consent")
     dprint(1, f"Login attempt for username: {username}")
     dprint(1, f"Password provided: {bool(password)}, length: {len(password) if password else 0}")
+    dprint(1, f"Cookie consent provided: {bool(cookie_consent)}")
 
     # Validate form data
     if not username:
@@ -75,6 +77,13 @@ def login():
     if not password:
         return create_page(
             template="login.html", title="Login / Signup", error="Password is required"
+        )
+
+    if not cookie_consent:
+        return create_page(
+            template="login.html",
+            title="Login / Signup",
+            error="You must consent to the use of essential session cookies to log in"
         )
 
     if len(password) < 8:
