@@ -1,5 +1,45 @@
 """Test authentication and session management."""
 
+import contextlib
+import os
+
+import pytest
+
+
+@pytest.fixture(scope="function")
+def app_with_routes():
+    """Create a fresh application with routes properly initialized for auth testing."""
+    from app.factory import create_app, db
+    from config import TestConfig
+
+    # Set testing environment
+    os.environ["FLASK_ENV"] = "testing"
+
+    # Create app with routes included from the beginning
+    app = create_app(TestConfig, include_routes=True)
+
+    with app.app_context():
+        # Create test database tables
+        db.create_all()
+        yield app
+
+        # Complete cleanup
+        with contextlib.suppress(Exception):
+            db.session.remove()
+        with contextlib.suppress(Exception):
+            db.drop_all()
+        with contextlib.suppress(Exception):
+            db.engine.dispose()
+
+        import gc
+        gc.collect()
+
+
+@pytest.fixture(scope="function")
+def auth_client(app_with_routes):
+    """Create test client with authentication routes registered."""
+    return app_with_routes.test_client()
+
 
 def test_session_structure(client):
     """Test that session has expected structure for authenticated users."""
@@ -17,6 +57,40 @@ def test_session_structure(client):
         assert session.get("current_user") == "test_user"
         assert session.get("all_teams") == [12345]
         assert session.get("all_team_names") == ["Test Team"]
+
+
+def test_cookie_consent_required(auth_client):
+    """Test that cookie consent is required for login."""
+    # Test login without cookie consent
+    response = auth_client.post('/login', data={
+        'username': 'testuser',
+        'password': 'testpassword123'
+        # Missing cookie_consent
+    })
+
+    assert response.status_code == 200
+    assert b'You must consent to the use of essential session cookies' in response.data
+
+
+def test_cookie_consent_with_valid_form(auth_client):
+    """Test that login works with proper cookie consent."""
+    # This test will need to be expanded when OAuth mocking is available
+    response = auth_client.post('/login', data={
+        'username': 'testuser',
+        'password': 'testpassword123',
+        'cookie_consent': 'on'
+    })
+
+    # Should not show the cookie consent error
+    assert b'You must consent to the use of essential session cookies' not in response.data
+
+
+def test_cookie_consent_notice_in_template(auth_client):
+    """Test that cookie consent notice appears on login page."""
+    response = auth_client.get('/login')
+    assert b'Session Cookies:' in response.data
+    assert b'authentication - no tracking or third-party sharing' in response.data
+    assert b'cookie_consent' in response.data
 
 
 def test_multi_team_support(client):
