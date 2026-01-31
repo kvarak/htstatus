@@ -439,6 +439,8 @@ class Feedback(db.Model):
         self.feedback_type = feedback_type
         self.author_id = author_id
         self.archived = archived
+        self.status = 'open'  # Set default status explicitly
+        self.vote_score = 0   # Set default vote score explicitly
 
     def __repr__(self):
         return f"<Feedback {self.id}: {self.title[:50]}>"
