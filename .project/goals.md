@@ -38,4 +38,10 @@
 - Basic league statistics for friendly competition
 - Mobile-friendly interface improvements
 
-*Note: Future features only considered if they maintain simplicity and don't compromise database safety.*
+### Radical Simplification Opportunities (Innovation Review - January 30, 2026)
+- **Single-File Architecture**: Consider consolidating 8 blueprints into 3 core modules for simpler mental model
+- **JSON-Based Storage**: Evaluate file-based data storage vs database complexity for hobby project scale
+- **Static Generation Approach**: Daily HTML generation could eliminate deployment complexity while maintaining functionality
+- **Essential Feature Audit**: Regular assessment of whether features justify their maintenance burden
+
+*Note: Future features only considered if they maintain simplicity and don't compromise database safety. Radical approaches may be explored in experimental branches.*

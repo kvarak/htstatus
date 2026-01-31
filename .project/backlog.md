@@ -4,7 +4,7 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (January 30, 2026): Completed REFACTOR-064 (Team CHPP policy compliance) and FEAT-022 (User Feedback System), added 4 new critical review tasks from Team model analysis. **Active: 46 tasks | Clean status maintained**
+**Recent Organization** (January 31, 2026): Completed FEAT-023 session cookie management implementation, added 4 critical review improvements from development analysis. **Active: 54 tasks | FEAT-023 completed with quality improvements identified**
 
 ---
 
@@ -40,6 +40,14 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (January 31, 2026 - FEAT-023 Session Management)
+
+#### Quality & Testing Improvements
+- **[REFACTOR-081]** Simplify PWA session persistence - Replace 195-line JavaScript solution with server-side session configuration investigation (30 min)
+- **[REFACTOR-082]** Evaluate Cookie Consent Necessity - Research if hobby project actually requires cookie consent for essential authentication cookies (15 min)
+- **[TEST-081]** Add PWA session persistence tests - Create proper test coverage for session management JavaScript (45 min)
+- **[INFRA-082]** Investigate Server-Side Session Configuration - Research Flask session cookie settings for PWA compatibility before complex client-side solutions (30 min)
 
 ### Recent Critical Review Improvements (January 30, 2026 - Team Model Analysis)
 
@@ -90,6 +98,17 @@
 - **[REFACTOR-054]** Unified Quality Gate Architecture - Merge test-coverage-files and test-python into single comprehensive test gate
 - **[REFACTOR-055]** Optimize Quality Intelligence Script - Single-pass JSON parsing instead of multiple file reads per gate
 - **[REFACTOR-056]** Filesystem-First File Discovery - Replace git ls-files with filesystem discovery to eliminate existence checks
+
+### Radical Innovation Ideas (January 30, 2026 - Outside-the-Box Analysis)
+
+#### Architecture Simplification Experiments
+- **[REFACTOR-075]** Blueprint Consolidation Experiment - Prototype merging 8 blueprints into 3 core modules (auth+main, hattrick data, community) to reduce complexity (90 min)
+- **[REFACTOR-076]** JSON Storage Feasibility Study - Analyze replacing database with file-based JSON storage for hobby project scale <100 players per user (60 min)
+- **[INFRA-077]** Static Site Generation Prototype - Experiment with daily HTML generation approach to eliminate deployment complexity (120 min)
+
+#### Quality vs Velocity Balance
+- **[REFACTOR-078]** Essential Feature Audit - Systematic review of which features justify their maintenance burden in hobby project context (45 min)
+- **[INFRA-079]** Quality Gate Simplification - Consolidate 7 quality gates into essential-only checks to improve development velocity (30 min)
 
 ### Core Hattrick Features (Aligned with Geek Audience)
 - **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics → [Details](.project/tasks/FEAT-016.md)
