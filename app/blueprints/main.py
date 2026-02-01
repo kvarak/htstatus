@@ -372,14 +372,15 @@ def changes():
 
             if entry_type == 'commit':
                 hash_part = entry.get('hash', 'unknown')
+                version = entry.get('version', 'unknown')
                 message = entry.get('message', '')
                 # Add data attributes to group commits with their release
                 commit_class = f'commit-group-{current_release_id}' if current_release_id else ''
-                line = f'<div class="mb-1 py-1 px-2 border-left border-success bg-light {commit_class}" style="border-left-width: 3px !important; font-size: 0.9rem;"><small class="text-muted mr-2">{date}</small><code class="text-success small mr-2">{hash_part}</code><span class="text-dark">{message}</span></div>'
+                line = f'<div class="mb-1 py-1 px-2 border-left border-success bg-light {commit_class}" style="border-left-width: 3px !important; font-size: 0.9rem;"><small class="text-muted mr-2">{date}</small><code class="text-info small mr-2">{version}</code><span class="text-dark">{message}</span></div>'
             elif entry_type == 'user_release':
                 version = entry.get('version', '')
                 message = entry.get('message', '')
-                line = f'<div class="bg-success text-white p-3 mb-2 rounded shadow-sm"><strong><i class="fas fa-rocket"></i> {date} 🎉 {version} USER RELEASE</strong><br><small>{message}</small></div>'
+                line = f'<div class="bg-success text-white p-2 mb-2 rounded shadow-sm"><strong><i class="fas fa-rocket"></i> {date} 🎉 {version} USER RELEASE</strong><br><small>{message}</small></div>'
                 # Reset current release for grouping
                 current_release_id = None
             elif entry_type == 'internal_release':
@@ -387,8 +388,8 @@ def changes():
                 message = entry.get('message', '')
                 release_counter += 1
                 current_release_id = release_counter
-                # Make technical releases clickable
-                line = f'<div class="bg-info text-white p-3 mb-2 rounded shadow-sm" style="cursor: pointer;" onclick="toggleCommits({current_release_id})" title="Click to show/hide commits"><strong><i class="fas fa-cog"></i> {date} 🔧 {version} TECHNICAL RELEASE <i class="fas fa-chevron-down ml-2" id="chevron-{current_release_id}"></i></strong><br><small>{message}</small></div>'
+                # Make technical releases clickable with prominent expand symbol
+                line = f'<div class="bg-info text-white p-2 mb-2 rounded shadow-sm" style="cursor: pointer;" onclick="toggleCommits({current_release_id})" title="Click to expand/collapse commit details"><strong><span id="chevron-{current_release_id}" style="display: inline-block; transition: transform 0.2s;">▼</span> <i class="fas fa-cog"></i> {date} 🔧 {version} TECHNICAL RELEASE</strong><br><small>{message}</small></div>'
             else:
                 line = f'<div class="mb-2 p-2 border border-warning bg-warning-light"><span class="text-muted">{date}</span> <span class="text-warning font-weight-bold">[UNKNOWN]</span> {entry}</div>'
                 # Reset current release for grouping
