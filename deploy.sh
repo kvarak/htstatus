@@ -106,12 +106,13 @@ DEPLOYMENT_STEPS=(
   "git:Fetch updates:git fetch --all"
   "git:Reset to branch:git reset --hard $DEPLOY_GIT_BRANCH"
   "git:Pull changes:git pull"
+  "dep:Install system dependencies:Install jq for changelog generation"
+  "dep:Install uv:pip3 install uv"
+  "dep:Sync dependencies:uv sync"
   "release:Update release docs:make release-detect && { echo 'Updating release documentation...'; make release-docs || echo 'No release updates needed'; } || echo 'No version changes detected'"
   "script:Generate changelog:make changelog"
   "file:Touch routes:touch app/routes.py"
   "secret:Update SECRET_KEY in .env:(conditional)"
-  "dep:Install uv:pip3 install uv"
-  "dep:Sync dependencies:uv sync"
   "db:Apply migrations:make db-apply"
   "service:Restart service:sudo systemctl restart htstatus"
 )
@@ -225,6 +226,25 @@ git fetch --all
 git reset --hard $DEPLOY_GIT_BRANCH
 git pull
 
+# Install system dependencies first
+echo "=== Installing System Dependencies ==="
+echo "Installing system dependencies..."
+if command -v apt-get &> /dev/null; then
+    sudo apt-get update -qq && sudo apt-get install -y jq
+elif command -v yum &> /dev/null; then
+    sudo yum install -y jq
+elif command -v brew &> /dev/null; then
+    brew install jq
+else
+    echo "⚠️ Could not detect package manager - please install jq manually"
+fi
+
+# Ensure uv is available
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v uv &> /dev/null; then
+    pip3 install --user uv
+fi
+
 # Clean up any untracked migration files that could cause multiple heads
 find migrations/versions/ -name "*.py" -not -path "*/__pycache__/*" | while read -r file; do
     if ! git ls-files --error-unmatch "$file" >/dev/null 2>&1; then
@@ -259,26 +279,8 @@ SCRIPT
   fi
 
   cat >> command.sh << 'SCRIPT'
-# Ensure uv is available
-export PATH="$HOME/.local/bin:$PATH"
-if ! command -v uv &> /dev/null; then
-    pip3 install --user uv
-fi
-
 # Force clean dependency installation with consistent Python version
 echo "=== Installing Dependencies ==="
-
-# Install system dependencies first
-echo "Installing system dependencies..."
-if command -v apt-get &> /dev/null; then
-    sudo apt-get update -qq && sudo apt-get install -y jq
-elif command -v yum &> /dev/null; then
-    sudo yum install -y jq
-elif command -v brew &> /dev/null; then
-    brew install jq
-else
-    echo "⚠️ Could not detect package manager - please install jq manually"
-fi
 
 # Clear any cached virtual environment
 rm -rf .venv 2>/dev/null || true
