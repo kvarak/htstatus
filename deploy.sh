@@ -157,6 +157,16 @@ command -v python3 >/dev/null 2>&1 || { echo "ERROR: python3 not found"; exit 1;
 python3 --version
 echo "✓ Python environment available"
 
+# [4.5/7] System dependencies - validates: jq for changelog generation
+echo ""
+echo "[4.5/7] Checking system dependencies..."
+if command -v jq >/dev/null 2>&1; then
+  jq --version
+  echo "✓ jq is available"
+else
+  echo "! jq not found - would be installed during deployment"
+fi
+
 # [5/7] Package manager - validates: pip3 install uv, uv sync
 echo ""
 echo "[5/7] Checking uv package manager..."
@@ -257,6 +267,19 @@ fi
 
 # Force clean dependency installation with consistent Python version
 echo "=== Installing Dependencies ==="
+
+# Install system dependencies first
+echo "Installing system dependencies..."
+if command -v apt-get &> /dev/null; then
+    sudo apt-get update -qq && sudo apt-get install -y jq
+elif command -v yum &> /dev/null; then
+    sudo yum install -y jq
+elif command -v brew &> /dev/null; then
+    brew install jq
+else
+    echo "⚠️ Could not detect package manager - please install jq manually"
+fi
+
 # Clear any cached virtual environment
 rm -rf .venv 2>/dev/null || true
 # Use same Python version as development (3.14.2)
