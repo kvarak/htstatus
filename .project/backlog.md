@@ -4,7 +4,7 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (January 31, 2026): Completed FEAT-023 session cookie management implementation, added 4 critical review improvements from development analysis. **Active: 54 tasks | FEAT-023 completed with quality improvements identified**
+**Recent Organization** (February 1, 2026): Completed FEAT-019 timeline implementation removed due to browser extension conflicts, moved to P4 for potential retry. Quality gates: 5/7 passing (MODERATE deployment confidence). **Active: 54 tasks | REFACTOR-084, 085 promoted to P1**
 
 ---
 
@@ -14,13 +14,14 @@
 
 ## P1: Critical 🔥
 
-*All P1 critical issues resolved as of January 29, 2026*
+### Code Architecture Cleanup
+- **[REFACTOR-084]** Simplify Component CSS Architecture - Evaluate if 614-line consolidated CSS file creates more maintenance burden than individual template styles (30 min)
+- **[REFACTOR-085]** Simplify JavaScript Architecture - Evaluate consolidation vs separation of JS functionality across templates vs dedicated files like session-persistence.js (30 min)
 
 ## P2: Features 🎯
 
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
-- **[FEAT-019]** Player Skill Changes - 4 Week Timeline on Player Details Page → [Details](.project/tasks/FEAT-019.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
@@ -40,6 +41,13 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 1, 2026 - FEAT-019 Timeline Analysis)
+
+#### Feature Implementation Quality
+- **[FEAT-019]** Player Skill Changes - 4 Week Timeline on Player Details Page → [Details](.project/tasks/FEAT-019.md) - Retry implementation with better browser compatibility testing and simplified approach
+- **[REFACTOR-083]** Remove Orphaned Timeline Utility - Clean up `get_team_timeline()` function from utils.py if not needed for other features (15 min)
+- **[TEST-082]** Improve Test Coverage for Template Changes - Address test coverage regression to 41.7% from recent template modifications (45 min)
 
 ### Recent Critical Review Improvements (January 31, 2026 - FEAT-023 Session Management)
 

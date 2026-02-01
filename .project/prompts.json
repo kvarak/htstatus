@@ -131,9 +131,13 @@
       "title": "Generate innovative opportunities",
       "what to do": [
         "Scan backlog.md, goals.md for existing suggestions.",
+        "Try to put yourself in the shoes of a new user to the project. What would surprise or delight them?",
+        "What would make this project stand out in its field?",
+        "How could we make it fun for the users though gamification or unique interactions?",
+        "Reverse Thinking: What if we did the opposite of current approach?",
         "Simplification Challenge: What if we eliminated 50% of features?",
-        "Black Hat: Question 2-3 fundamental decisions. What could collapse the project?",
         "Techniques: Contrarian questions, industry analogies, radical simplification.",
+        "Black Hat: Question 2-3 fundamental decisions. What could collapse the project?",
         "Add high-value suggestions to backlog.md or goals.md as appropriate.",
         "Structure: # Innovation ## Assessment ## Challenges ## Opportunities"
       ]
