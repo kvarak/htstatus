@@ -418,3 +418,104 @@ db-upgrade: check-uv services ## Apply database upgrades
 db-apply: check-uv ## Apply database migrations using production-safe script
 	@echo "🗄️  Applying database migrations (production-safe)..."
 	@uv run python scripts/database/apply_migrations.py
+
+# Deployment Commands
+deploy-prepare: ## Prepare deployment environment (git, dependencies)
+	@echo "🚀 Preparing deployment environment..."
+	@echo "Installing system dependencies..."
+	@if command -v apt-get >/dev/null 2>&1; then \
+		sudo apt-get update -qq && sudo apt-get install -y jq; \
+	elif command -v yum >/dev/null 2>&1; then \
+		sudo yum install -y jq; \
+	elif command -v brew >/dev/null 2>&1; then \
+		brew install jq; \
+	else \
+		echo "⚠️  Could not detect package manager - please install jq manually"; \
+	fi
+	@echo "Installing uv..."
+	@export PATH="$$HOME/.local/bin:$$PATH"; \
+	if ! command -v uv >/dev/null 2>&1; then \
+		pip3 install --user uv; \
+	fi
+	@echo "Ensuring ~/.local/bin in PATH..."
+	@if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' ~/.bashrc 2>/dev/null; then \
+		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> ~/.bashrc; \
+		echo "✓ Added ~/.local/bin to PATH in ~/.bashrc"; \
+	fi
+	@echo "✅ Environment prepared"
+
+deploy-sync: check-uv ## Sync code and dependencies
+	@echo "🔄 Syncing code and dependencies..."
+	@git fetch --all
+	@git reset --hard origin/main
+	@git pull
+	@echo "Cleaning migration conflicts..."
+	@find migrations/versions/ -name "*.py" -not -path "*/__pycache__/*" | while read -r file; do \
+		if ! git ls-files --error-unmatch "$$file" >/dev/null 2>&1; then \
+			echo "Removing untracked migration file: $$file"; \
+			rm -f "$$file"; \
+		fi; \
+	done
+	@export PATH="$$HOME/.local/bin:$$PATH"; \
+	rm -rf .venv 2>/dev/null || true; \
+	uv sync --python 3.14; \
+	uv pip install requests requests-oauthlib
+	@echo "✅ Code and dependencies synced"
+
+deploy-docs: ## Update release documentation and changelog
+	@echo "📚 Updating documentation..."
+	@if $(MAKE) release-detect 2>/dev/null; then \
+		echo "Version changes detected - updating release documentation..."; \
+		$(MAKE) release-docs || echo "Release update failed, continuing..."; \
+	else \
+		echo "No version changes detected"; \
+	fi
+	@$(MAKE) changelog
+	@echo "✅ Documentation updated"
+
+deploy-migrate: check-uv ## Apply database migrations safely
+	@echo "🗄️  Applying database migrations..."
+	@export PATH="$$HOME/.local/bin:$$PATH"; \
+	uv run python scripts/database/apply_migrations.py
+	@echo "✅ Database migrations completed"
+
+deploy-finalize: ## Finalize deployment (restart service, cleanup)
+	@echo "🏁 Finalizing deployment..."
+	@find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
+	@touch app/routes.py
+	@sudo systemctl restart htstatus
+	@if [ $$? -eq 0 ]; then \
+		echo "✅ Service restarted successfully"; \
+		sudo systemctl status htstatus --no-pager -l | head -10; \
+	else \
+		echo "❌ Service restart failed!"; \
+		exit 1; \
+	fi
+	@echo "✅ Deployment completed successfully"
+
+deploy: ## Smart deployment: --run if pushed, --dry-run if not (override with FORCE_DEPLOY=true)
+	@echo "🚀 Preparing deployment..."
+	@if [ "$${FORCE_DEPLOY}" = "true" ]; then \
+		echo "🔓 FORCE_DEPLOY=true - skipping git push check"; \
+		chmod +x scripts/deployment/deploy.sh; \
+		./scripts/deployment/deploy.sh --run; \
+	elif git diff --quiet && git diff --cached --quiet; then \
+		if git log --oneline @{u}.. 2>/dev/null | grep -q .; then \
+			echo "⚠️  WARNING: Local commits not pushed to remote"; \
+			echo "   Use 'git push' first or set FORCE_DEPLOY=true"; \
+			echo "   Running dry-run instead..."; \
+			chmod +x scripts/deployment/deploy.sh; \
+			./scripts/deployment/deploy.sh --run --dry-run; \
+		else \
+			echo "✅ Working directory clean and up to date with remote"; \
+			chmod +x scripts/deployment/deploy.sh; \
+			./scripts/deployment/deploy.sh --run; \
+		fi; \
+	else \
+		echo "⚠️  WARNING: Uncommitted changes detected"; \
+		echo "   Commit and push changes first or set FORCE_DEPLOY=true"; \
+		echo "   Running dry-run instead..."; \
+		chmod +x scripts/deployment/deploy.sh; \
+		./scripts/deployment/deploy.sh --run --dry-run; \
+	fi

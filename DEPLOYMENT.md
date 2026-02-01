@@ -225,6 +225,46 @@ docker-compose ps
 
 ## Deployment Steps
 
+### Automated Deployment (Recommended)
+
+The deployment system follows a **separation of concerns** pattern:
+- **Makefile**: Contains deployment logic as reusable targets
+- **deploy.sh**: Orchestrates deployment by calling make targets remotely
+
+This design provides:
+- **Single source of truth**: All deployment logic in Makefile
+- **Reusable steps**: Individual deployment phases can be run independently
+- **Clean orchestration**: deploy.sh focuses on SSH execution and error reporting
+- **Development consistency**: Same targets available locally and in deployment
+
+#### Quick Deployment
+
+```bash
+# Smart deployment (recommended)
+make deploy                           # Auto-detects if ready to deploy
+
+# Force deployment regardless of git status
+FORCE_DEPLOY=true make deploy        # Skips git push checks
+
+# Manual deployment script access
+./scripts/deployment/deploy.sh --run                # Direct deployment
+./scripts/deployment/deploy.sh --run --dry-run      # Preview only
+./scripts/deployment/deploy.sh --run --major        # Major release
+```
+
+#### Manual Deployment Steps
+
+For manual deployment or troubleshooting, you can run individual Makefile targets:
+
+```bash
+# On the server
+make deploy-prepare    # Git operations, install dependencies
+make deploy-sync       # Update dependencies and environment
+make deploy-docs       # Generate changelog and release notes
+make deploy-migrate    # Apply database migrations
+make deploy-finalize   # Restart service and cleanup
+```
+
 ### Initial Deployment
 
 ```bash
