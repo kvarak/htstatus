@@ -333,7 +333,7 @@ cp environments/.env.development.example .env
 # Edit .env with your settings
 
 # Invalid configuration values:
-python -c "
+uv run python -c "
 import os
 print('FLASK_ENV:', os.getenv('FLASK_ENV'))
 print('DATABASE_URL:', os.getenv('DATABASE_URL'))
@@ -448,12 +448,12 @@ make db-upgrade
 **Problem: Flask app won't start**
 ```bash
 # Check for syntax errors:
-python -m py_compile app/__init__.py
-python -m py_compile models.py
-python -m py_compile config.py
+uv run python -m py_compile app/__init__.py
+uv run python -m py_compile models.py
+uv run python -m py_compile config.py
 
 # Verify imports:
-python -c "from app.factory import create_app; print('App imports successfully')"
+uv run python -c "from app.factory import create_app; print('App imports successfully')"
 
 # Check for circular imports:
 # Review import statements in app/__init__.py and models.py
@@ -475,7 +475,7 @@ print('Static folder:', app.static_folder)
 **Problem: Route not found (404 errors)**
 ```bash
 # List all registered routes:
-python -c "
+uv run python -c "
 from app.factory import create_app
 app = create_app()
 for rule in app.url_map.iter_rules():
@@ -491,7 +491,7 @@ for rule in app.url_map.iter_rules():
 **Problem: SQLAlchemy model errors**
 ```bash
 # Check model definitions:
-python -c "from models import User, Players, Match; print('Models import successfully')"
+uv run python -c "from models import User, Players, Match; print('Models import successfully')"
 
 # Test database schema:
 python -c "
@@ -651,7 +651,7 @@ When encountering issues, follow this systematic approach:
 
 2. **Basic Connectivity**
    - [ ] Database accessible: `make db-upgrade`
-   - [ ] Python imports working: `python -c "from app.factory import create_app"`
+   - [ ] Python imports working: `uv run python -c "from app.factory import create_app"`
    - [ ] Tests passing: `make test`
 
 3. **Application Health**

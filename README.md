@@ -107,7 +107,7 @@ Run `make help` to see all available commands:
 - `make reset` - Clean and rebuild environment
 - `make changelog` - Generate changelog
 
-For detailed change history, see [CHANGELOG.md](CHANGELOG.md).
+For detailed change history, see [CHANGELOG.md](CHANGELOG.md). For user-focused release summaries, see [RELEASES.md](RELEASES.md).
 
 ## Development with AI Assistance
 
@@ -132,7 +132,8 @@ To get started with AI-assisted development, use `@htplanner-ai-agent` in VS Cod
 - **[README.md](README.md)** - This file: Project overview and local development setup
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide and operations procedures
 - **[TECHNICAL.md](TECHNICAL.md)** - Technical architecture and implementation details
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history and release notes
+- **[CHANGELOG.md](CHANGELOG.md)** - Detailed technical changes and version history
+- **[RELEASES.md](RELEASES.md)** - User-focused feature summaries and release highlights
 
 ### Legacy Commands (Deprecated but Functional)
 
@@ -392,7 +393,7 @@ uv run python manage.py db upgrade
 ```
 *On problems*
 ```
-python manage.py db stamp head
+uv run python manage.py db stamp head
 ```
 
 ### Postgres

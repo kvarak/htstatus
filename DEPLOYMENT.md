@@ -88,7 +88,7 @@ DEBUG_LEVEL=0  # No debug output in production
 
 ```bash
 # Generate 64-character random secret key
-python -c 'import secrets; print(secrets.token_hex(32))'
+uv run python -c 'import secrets; print(secrets.token_hex(32))'
 ```
 
 ### 4. Validate Configuration
