@@ -1,0 +1,17 @@
+{"source": "internal_releases", "entries": [
+{"date": "2026-02-01 09:17:53", "version": "v3.12", "period": "February 2026", "message": "Extracted reusable team timeline utility for better code organization", "type": "internal_release"},
+{"date": "2026-01-31 22:39:05", "version": "v3.11", "period": "February 2026", "message": "Implemented PWA session persistence with enhanced state management", "type": "internal_release"},
+{"date": "2026-01-30 17:33:14", "version": "v3.10", "period": "February 2026", "message": "Added admin feedback navigation indicators with conditional display logic", "type": "internal_release"},
+{"date": "2026-01-30 11:01:27", "version": "v3.9", "period": "January 2026", "message": "Implemented feedback archiving system with database schema updates", "type": "internal_release"},
+{"date": "2026-01-30 10:26:21", "version": "v3.8", "period": "January 2026", "message": "Built comprehensive user feedback system with voting mechanism", "type": "internal_release"},
+{"date": "2026-01-29 21:19:31", "version": "v3.7", "period": "January 2026", "message": "Developed formation testing system with tactical validation", "type": "internal_release"},
+{"date": "2026-01-29 17:27:15", "version": "v3.6", "period": "January 2026", "message": "Enhanced database management with automated backup scripts", "type": "internal_release"},
+{"date": "2026-01-29 17:26:50", "version": "v3.5", "period": "January 2026", "message": "Implemented automatic default player group creation system", "type": "internal_release"},
+{"date": "2026-01-29 15:58:17", "version": "v3.4", "period": "January 2026", "message": "Added group color support to timeline feature with CSS integration", "type": "internal_release"},
+{"date": "2026-01-28 23:08:36", "version": "v3.3", "period": "January 2026", "message": "Implemented architectural improvement framework", "type": "internal_release"},
+{"date": "2026-01-28 17:50:29", "version": "v3.2", "period": "January 2026", "message": "Unified UI component classes across Flask templates", "type": "internal_release"},
+{"date": "2026-01-27 20:38:39", "version": "v3.1", "period": "January 2026", "message": "Extracted reusable team timeline utility for better code organization", "type": "internal_release"},
+{"date": "2026-01-27 07:44:30", "version": "v3.0", "period": "January 2026", "message": "Fixed critical Hattrick API integration issues with pychpp updates", "type": "internal_release"},
+{"date": "2025-12-21 17:50:22", "version": "v2.0", "period": "December 2025", "message": "Complete architectural redesign with modern development stack", "type": "internal_release"},
+{"date": "2023-02-26 13:03:14", "version": "v1.0", "period": "February 2023", "message": "Initial Flask application architecture with SQLAlchemy ORM", "type": "internal_release"},
+{"date": "2020-06-03 14:24:39", "version": "v0.0", "period": "June 2020", "message": "Project inception and repository initialization", "type": "internal_release"}]}
