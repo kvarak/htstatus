@@ -8,6 +8,21 @@
 
 ---
 
+## 3.14 - February 2026
+
+**User Analytics & Activity Tracking**
+- Enhanced comprehensive activity tracking system with 5 new user behavior counters (settings, changes, feedback, formation, stats)
+- Added 15 interactive Chart.js dashboards for detailed user engagement analysis
+- Implemented database migrations for expanded activity tracking schema
+- Created comprehensive debug page with admin filtering and real-time data visualization
+- Added activity tracking to all blueprint routes for complete user journey mapping
+
+**Technical Infrastructure**
+- Enhanced User model with specialized activity tracking methods
+- Expanded database schema with new tracking fields and proper migrations
+- Improved version format consistency across all release documentation
+- Enhanced test coverage with improved test logic for automation scripts
+
 ## 3.13 - February 2026
 
 **Infrastructure & Automation**

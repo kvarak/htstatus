@@ -1,4 +1,5 @@
 {"source": "internal_releases", "entries": [
+{"date": "2026-02-01 14:00:17", "version": "3.14", "period": "February 2026", "message": "Enhanced comprehensive activity tracking system with 5 new user behavior counters (settings, changes, feedback, formation, stats)", "type": "internal_release"},
 {"date": "2026-02-01 12:45:22", "version": "3.13", "period": "February 2026", "message": "Added comprehensive release automation system with version detection", "type": "internal_release"},
 {"date": "2026-02-01 09:17:53", "version": "3.12", "period": "February 2026", "message": "Extracted reusable team timeline utility for better code organization", "type": "internal_release"},
 {"date": "2026-01-31 22:39:05", "version": "3.11", "period": "February 2026", "message": "Implemented PWA session persistence with enhanced state management", "type": "internal_release"},
@@ -11,7 +12,7 @@
 {"date": "2026-01-29 15:58:17", "version": "3.4", "period": "January 2026", "message": "Added group color support to timeline feature with CSS integration", "type": "internal_release"},
 {"date": "2026-01-28 23:08:36", "version": "3.3", "period": "January 2026", "message": "Implemented architectural improvement framework", "type": "internal_release"},
 {"date": "2026-01-28 17:50:29", "version": "3.2", "period": "January 2026", "message": "Unified UI component classes across Flask templates", "type": "internal_release"},
-{"date": "2026-01-27 20:38:39", "version": "3.1", "period": "January 2026", "message": "Added comprehensive release automation system with version detection", "type": "internal_release"},
+{"date": "2026-01-27 20:38:39", "version": "3.1", "period": "January 2026", "message": "Enhanced comprehensive activity tracking system with 5 new user behavior counters (settings, changes, feedback, formation, stats)", "type": "internal_release"},
 {"date": "2026-01-27 07:44:30", "version": "3.0", "period": "January 2026", "message": "Fixed critical Hattrick API integration issues with pychpp updates", "type": "internal_release"},
 {"date": "2025-12-21 17:50:22", "version": "2.0", "period": "December 2025", "message": "Complete architectural redesign with modern development stack", "type": "internal_release"},
 {"date": "2023-02-26 13:03:14", "version": "1.0", "period": "February 2023", "message": "Initial Flask application architecture with SQLAlchemy ORM", "type": "internal_release"},
