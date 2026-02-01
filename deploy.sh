@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 #
 # DEPLOYMENT AUTOMATION SCRIPT
 # Purpose: Generates command.sh and executes remote deployment using environment variables
@@ -106,12 +106,13 @@ DEPLOYMENT_STEPS=(
   "git:Fetch updates:git fetch --all"
   "git:Reset to branch:git reset --hard $DEPLOY_GIT_BRANCH"
   "git:Pull changes:git pull"
-  "script:Generate changelog:./scripts/changelog.sh || ./changelog.sh"
+  "release:Update release docs:make release-detect && { echo 'Updating release documentation...'; make release-docs || echo 'No release updates needed'; } || echo 'No version changes detected'"
+  "script:Generate changelog:make changelog"
   "file:Touch routes:touch app/routes.py"
   "secret:Update SECRET_KEY in .env:(conditional)"
   "dep:Install uv:pip3 install uv"
   "dep:Sync dependencies:uv sync"
-  "db:Apply migrations:uv run python scripts/database/apply_migrations.py"
+  "db:Apply migrations:make db-apply"
   "service:Restart service:sudo systemctl restart htstatus"
 )
 
@@ -222,7 +223,15 @@ find migrations/versions/ -name "*.py" -not -path "*/__pycache__/*" | while read
     fi
 done
 
-./scripts/changelog.sh || ./changelog.sh
+# Update release documentation if deploying a tagged version
+if make release-detect 2>/dev/null; then
+    echo "Version changes detected - updating release documentation..."
+    make release-docs || echo "Release update failed, continuing..."
+else
+    echo "No version changes detected"
+fi
+
+make changelog
 
 # Clear Python bytecode cache to force reload of updated code
 find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

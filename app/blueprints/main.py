@@ -1,20 +1,29 @@
 """Main and admin routes blueprint for HT Status application."""
 
+import json
+import os
 import re
-from datetime import date, datetime, timedelta
+from datetime import date
 
 from dateutil.relativedelta import relativedelta
-from flask import Blueprint, redirect, render_template, request, session, url_for
+from flask import (
+    Blueprint,
+    current_app,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 from sqlalchemy import text
 
 from app.auth_utils import get_current_user_id, require_authentication
 from app.model_registry import (
     get_group_model,
     get_player_setting_model,
-    get_players_model,
     get_user_model,
 )
-from app.utils import create_page, diff_month, dprint, player_diff
+from app.utils import create_page, diff_month, dprint
 
 # Create Blueprint for main routes
 main_bp = Blueprint("main", __name__)
@@ -35,6 +44,36 @@ def setup_main_blueprint(db_instance, cols, all_cols, group_order=99):
     default_group_order = group_order
 
 
+def get_releases_data():
+    """Load recent user releases from JSON for display on main page."""
+    try:
+        # Use the same JSON system as the debug page for consistency
+        releases_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'releases.json')
+        with open(releases_path, encoding='utf-8') as f:
+            releases_data = json.load(f)
+
+        releases = []
+        entries = releases_data.get('entries', [])
+
+        # Get recent releases (already sorted newest first in JSON)
+        for entry in entries:
+            version = entry.get('version', '')
+            period = entry.get('period', '')  # This is the formatted date
+            message = entry.get('message', '')
+
+            # Format for main page display (keep existing structure for templates)
+            releases.append({
+                'version': version,
+                'date': period,
+                'features': [message]  # Single feature message per release
+            })
+
+        return releases[:6]  # Show max 6 recent releases
+    except Exception as e:
+        dprint(1, f"Error reading releases JSON: {e}")
+        return [{'version': 'v3.8', 'date': 'January 2026', 'features': ['Latest updates available']}]
+
+
 @main_bp.route("/")
 @main_bp.route("/index")
 def index():
@@ -50,6 +89,7 @@ def index():
             title="Home",
             usercount=len(allusers),
             activeusers=len(activeusers),
+            releases=get_releases_data(),
         )
 
     # Check if session has team data (may be missing if CHPP failed during login)
@@ -99,6 +139,7 @@ def index():
         usercount=len(allusers),
         activeusers=len(activeusers),
         updated=updated,
+        releases=get_releases_data(),
     )
 
 
@@ -257,7 +298,6 @@ def admin():
     """Admin dashboard for user management."""
     # Get model classes from registry
     User = get_user_model()
-    Players = get_players_model()
 
     error = ""
 
@@ -319,67 +359,98 @@ def admin():
         }
         users.append(thisuser)
 
-    # Get recent player changes for administrative visibility
+# Get comprehensive changes for administrative visibility
     changelogfull = []
     try:
-        # Get all players updated in the last 7 days across all users
-        cutoff_date = datetime.now() - timedelta(days=7)
+        import json
 
-        recent_players = (
-            db.session.query(Players)
-            .filter(Players.data_date >= cutoff_date)
-            .order_by(text("data_date desc"))
-            .limit(100)  # Limit to most recent 100 player updates for performance
-            .all()
-        )
+        all_entries = []
 
-        # Track which players we've already processed to avoid duplicates
-        processed_players = set()
+        # Read commits JSON
+        commits_path = os.path.join(current_app.static_folder, 'changelog.json')
+        try:
+            with open(commits_path, encoding='utf-8') as f:
+                commits_data = json.load(f)
+                all_entries.extend(commits_data.get('entries', []))
+        except Exception as e:
+            dprint(1, f"Error reading commits JSON: {e}")
 
-        for player in recent_players:
-            if player.ht_id not in processed_players:
-                processed_players.add(player.ht_id)
+        # Read user releases JSON
+        releases_path = os.path.join(current_app.static_folder, 'releases.json')
+        try:
+            with open(releases_path, encoding='utf-8') as f:
+                releases_data = json.load(f)
+                all_entries.extend(releases_data.get('entries', []))
+        except Exception as e:
+            dprint(1, f"Error reading releases JSON: {e}")
 
-                # Get changes for this player over the last 7 days
-                changes = player_diff(player.ht_id, 7)
+        # Read internal releases JSON
+        internal_path = os.path.join(current_app.static_folder, 'releases-internal.json')
+        try:
+            with open(internal_path, encoding='utf-8') as f:
+                internal_data = json.load(f)
+                all_entries.extend(internal_data.get('entries', []))
+        except Exception as e:
+            dprint(1, f"Error reading internal releases JSON: {e}")
 
-                if changes:
-                    # Format each change as a readable string
-                    for change in changes:
-                        try:
-                            # Defensive programming: ensure change has expected structure
-                            if not change or len(change) < 6:
-                                dprint(2, f"Skipping malformed change data: {change}")
-                                continue
+        # Sort all entries by date (newest first) with commit priority
+        # When timestamps are equal, commits should appear before releases
+        def sort_key(entry):
+            entry_type = entry.get('type', 'unknown')
+            date_val = entry.get('date') or ''
 
-                            # change format: [team_name, first_name, last_name, skill, old_value, new_value]
-                            team_name = change[0] if change[0] else "Unknown Team"
-                            player_name = f"{change[1] or 'Unknown'} {change[2] or 'Player'}"
-                            skill = change[3] if change[3] else "Unknown Skill"
-                            old_val = change[4] if change[4] is not None else 0
-                            new_val = change[5] if change[5] is not None else 0
+            # Convert date to make it sortable, then invert priority logic
+            # We want commits to appear BEFORE releases when dates are equal
+            # So commits get priority 0 (lower) and releases get priority 1 (higher)
+            # With reverse=True, commits (0) will come before releases (1)
+            type_priority = {'commit': 0, 'user_release': 1, 'internal_release': 1}
+            priority = type_priority.get(entry_type, 1)
 
-                            # Format with color indication
-                            if new_val > old_val:
-                                arrow = "↑"
-                                color = "green"
-                            else:
-                                arrow = "↓"
-                                color = "red"
+            return (date_val, priority)
 
-                        except (IndexError, TypeError) as change_error:
-                            dprint(1, f"Error processing individual change for player {player.ht_id}: {change_error}")
-                            dprint(2, f"Problematic change data: {change}")
-                            continue
+        # Sort by date descending, then commits before releases for same dates
+        all_entries.sort(key=sort_key, reverse=True)
 
-                        change_str = f'<font color="{color}">{team_name}: {player_name} - {skill}: {old_val} → {new_val} {arrow}</font>'
-                        changelogfull.append(change_str)
+        # Format entries for display and group commits with releases
+        current_release_id = None
+        release_counter = 0
 
-        dprint(2, f"Found {len(changelogfull)} player changes in last 7 days")
+        for _i, entry in enumerate(all_entries):
+            entry_type = entry.get('type', 'unknown')
+            full_date = entry.get('date', '')
+            date = full_date.split(' ')[0]  # Get just the date part for display
+
+            if entry_type == 'commit':
+                hash_part = entry.get('hash', 'unknown')
+                message = entry.get('message', '')
+                # Add data attributes to group commits with their release
+                commit_class = f'commit-group-{current_release_id}' if current_release_id else ''
+                line = f'<div class="mb-1 py-1 px-2 border-left border-success bg-light {commit_class}" style="border-left-width: 3px !important; font-size: 0.9rem;"><small class="text-muted mr-2">{date}</small><code class="text-success small mr-2">{hash_part}</code><span class="text-dark">{message}</span></div>'
+            elif entry_type == 'user_release':
+                version = entry.get('version', '')
+                message = entry.get('message', '')
+                line = f'<div class="bg-success text-white p-3 mb-2 rounded shadow-sm"><strong><i class="fas fa-rocket"></i> {date} 🎉 {version} USER RELEASE</strong><br><small>{message}</small></div>'
+                # Reset current release for grouping
+                current_release_id = None
+            elif entry_type == 'internal_release':
+                version = entry.get('version', '')
+                message = entry.get('message', '')
+                release_counter += 1
+                current_release_id = release_counter
+                # Make technical releases clickable
+                line = f'<div class="bg-info text-white p-3 mb-2 rounded shadow-sm" style="cursor: pointer;" onclick="toggleCommits({current_release_id})" title="Click to show/hide commits"><strong><i class="fas fa-cog"></i> {date} 🔧 {version} TECHNICAL RELEASE <i class="fas fa-chevron-down ml-2" id="chevron-{current_release_id}"></i></strong><br><small>{message}</small></div>'
+            else:
+                line = f'<div class="mb-2 p-2 border border-warning bg-warning-light"><span class="text-muted">{date}</span> <span class="text-warning font-weight-bold">[UNKNOWN]</span> {entry}</div>'
+                # Reset current release for grouping
+                current_release_id = None
+
+            changelogfull.append(line)
+
+        dprint(2, f"Loaded {len(changelogfull)} combined changelog entries")
 
     except Exception as e:
-        dprint(1, f"Error calculating player changes: {e}")
-        changelogfull = []
+        dprint(1, f"Error reading changelog JSON files: {e}")
+        changelogfull = ["Error loading changelog - run 'make changelog' to generate JSON files"]
 
     return create_page(
         template="debug.html",

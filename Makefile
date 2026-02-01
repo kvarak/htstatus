@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog db-migrate db-upgrade check-uv
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-notes release-tag release-docs db-migrate db-upgrade db-apply check-uv
 
 # Variables
 PYTHON := uv run python
@@ -61,14 +61,15 @@ setup: check-uv ## Initialize development environment (UV sync, Docker setup)
 	@echo "✅ Development environment ready!"
 	@echo "   Next: 'make dev' to start development server"
 
-dev: check-uv services ## Start development server (equivalent to run.sh)
+
+dev: check-uv services changelog ## Start development server (equivalent to run.sh)
 	@echo "🌐 Starting HT Status development server..."
 	@$(PYTHON) run.py
 
 stop: ## Stop dev server and Docker Compose services
 	@echo "🛑 Stopping HT Status development services..."
 	@$(DOCKER_COMPOSE) stop 2>&1 | tee -a /tmp/docker-stop.log || docker compose stop 2>&1 | tee -a /tmp/docker-stop.log || true
-	@pkill -f "python.*run.py" 2>&1 | tee -a /tmp/flask-stop.log || true
+	@pkill -f "uv run python.*run.py" 2>&1 | tee -a /tmp/flask-stop.log || true
 	@pkill -f "flask run" 2>&1 | tee -a /tmp/flask-stop.log || true
 	@echo "✅ Services stopped (Flask, Docker Compose)"
 
@@ -374,6 +375,30 @@ changelog: ## Generate changelog (from scripts/changelog.sh)
 	@echo "📝 Generating changelog..."
 	@bash scripts/changelog.sh
 
+# Release Commands
+release-detect: ## Detect if changes warrant a version release
+	@echo "🔍 Detecting release-worthy changes..."
+	@chmod +x scripts/release/detect_version_changes.sh
+	@./scripts/release/detect_version_changes.sh
+
+release-notes: ## Generate release notes (usage: make release-notes VERSION=1.2)
+	@test -n "$(VERSION)" || { echo "❌ Usage: make release-notes VERSION=1.2"; exit 1; }
+	@echo "📝 Generating release notes for version $(VERSION)..."
+	@chmod +x scripts/release/update_releases.sh
+	@./scripts/release/update_releases.sh $(VERSION)
+
+release-tag: ## Create git tag (usage: make release-tag VERSION=1.2 MESSAGE="Release description")
+	@test -n "$(VERSION)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
+	@test -n "$(MESSAGE)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
+	@echo "🏷️  Creating git tag v$(VERSION)..."
+	@git tag v$(VERSION) -m "Release v$(VERSION) - $(MESSAGE)"
+	@echo "✅ Tag v$(VERSION) created"
+
+release-docs: ## Update all release documentation after tagging
+	@echo "📚 Updating release documentation..."
+	@$(MAKE) changelog
+	@echo "✅ Release documentation updated"
+
 # Database Commands
 db-migrate: check-uv ## Create database migration (usage: make db-migrate MESSAGE="description")
 	@echo "🗄️  Creating database migration..."
@@ -389,3 +414,7 @@ db-migrate: check-uv ## Create database migration (usage: make db-migrate MESSAG
 db-upgrade: check-uv services ## Apply database upgrades
 	@echo "🗄️  Applying database upgrades..."
 	@./scripts/database/upgrade_local_database.sh --force
+
+db-apply: check-uv ## Apply database migrations using production-safe script
+	@echo "🗄️  Applying database migrations (production-safe)..."
+	@uv run python scripts/database/apply_migrations.py

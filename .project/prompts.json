@@ -72,6 +72,13 @@
         "For feature commits: Add unique identifier suffix like [feat-abc123] or [feature-xyz] to enable version counting.",
         "Feature detection patterns: FEAT- task completion, Add feature, Implement, new functionality.",
         "Stage and commit. Don't push.",
+        "AFTER commits are created: Check if 'make release-detect' finds release-worthy changes.",
+        "If version changes detected: Manually determine new version number (increment minor for features, patch for fixes).",
+        "Create git tag: 'make release-tag VERSION=X.Y MESSAGE=\"brief description\"'.",
+        "Generate user-facing release notes: 'make release-notes VERSION=X.Y' to update RELEASES.md.",
+        "Manually update RELEASES-INTERNAL.md with technical changes following the same date/version format.",
+        "Update all release documentation: 'make release-docs' to regenerate changelog JSON and timeline display.",
+        "Commit any release documentation updates with message 'docs: update releases for version X.Y'.",
         "git status should be clean after."
       ]
     },
