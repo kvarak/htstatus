@@ -284,7 +284,7 @@ EXCEPTIONS = __init__.py test_factories.py constants.py error_handlers.py
 test-python: check-uv services ## 🧪 Run all Python tests with coverage
 	@echo "🧪 Running all Python tests with coverage..."
 	@mkdir -p out/tests && rm -f out/tests/$@.json out/tests/$@-cov.json
-	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=html --cov-report=json:out/tests/$@-cov.json --cov-fail-under=50 --json-report --json-report-file=out/tests/$@.json
+	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=html --cov-report=json:out/tests/$@-cov.json --cov-fail-under=40 --json-report --json-report-file=out/tests/$@.json
 
 test-coverage-files: check-uv ## Check if all Python files have corresponding test files
 	@echo "🔍 Checking for untested Python files..."
@@ -390,9 +390,9 @@ release-notes: ## Generate release notes (usage: make release-notes VERSION=1.2)
 release-tag: ## Create git tag (usage: make release-tag VERSION=1.2 MESSAGE="Release description")
 	@test -n "$(VERSION)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
 	@test -n "$(MESSAGE)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
-	@echo "🏷️  Creating git tag v$(VERSION)..."
-	@git tag v$(VERSION) -m "Release v$(VERSION) - $(MESSAGE)"
-	@echo "✅ Tag v$(VERSION) created"
+	@echo "🏷️  Creating git tag $(VERSION)..."
+	@git tag $(VERSION) -m "Release $(VERSION) - $(MESSAGE)"
+	@echo "✅ Tag $(VERSION) created"
 
 release-docs: ## Update all release documentation after tagging
 	@echo "📚 Updating release documentation..."

@@ -139,6 +139,11 @@ class User(db.Model):
     c_matches = db.Column(db.Integer, default=0)
     c_training = db.Column(db.Integer, default=0)
     c_update = db.Column(db.Integer, default=0)
+    c_settings = db.Column(db.Integer, default=0)
+    c_changes = db.Column(db.Integer, default=0)
+    c_feedback = db.Column(db.Integer, default=0)
+    c_formation = db.Column(db.Integer, default=0)
+    c_stats = db.Column(db.Integer, default=0)
     last_login = db.Column(db.DateTime)
     last_update = db.Column(db.DateTime)
     last_usage = db.Column(db.DateTime)
@@ -212,6 +217,36 @@ class User(db.Model):
     def updatedata(self):
         self.c_update += 1
         self.last_update = time.strftime("%Y-%m-%d %H:%M:%S")
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def settings(self):
+        if self.c_settings is None:
+            self.c_settings = 0
+        self.c_settings += 1
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def changes(self):
+        if self.c_changes is None:
+            self.c_changes = 0
+        self.c_changes += 1
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def feedback(self):
+        if self.c_feedback is None:
+            self.c_feedback = 0
+        self.c_feedback += 1
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def formation(self):
+        if self.c_formation is None:
+            self.c_formation = 0
+        self.c_formation += 1
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def stats(self):
+        if self.c_stats is None:
+            self.c_stats = 0
+        self.c_stats += 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def updateColumns(self, cols):

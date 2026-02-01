@@ -25,11 +25,11 @@ def stats():
     """Display team statistics."""
     from app.model_registry import get_user_model
 
-    # Track user activity (team-related page)
+    # Track user activity (stats page)
     User = get_user_model()
     current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
     if current_user:
-        current_user.team()
+        current_user.stats()
         db.session.commit()
 
     teamid = request.values.get("id")

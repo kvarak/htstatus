@@ -104,11 +104,11 @@ def formations():
     from app.model_registry import get_user_model
     from models import Players
 
-    # Track user activity (team-related page)
+    # Track user activity (formation page)
     User = get_user_model()
     current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
     if current_user:
-        current_user.team()
+        current_user.formation()
         db.session.commit()
 
     teamid = request.values.get("id")

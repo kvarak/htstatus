@@ -16,6 +16,11 @@ if [ -z "$version" ]; then
     version=$(echo "$version" | sed 's/-[0-9]*-g[a-f0-9]*$//')
 fi
 
+# Ensure version has v prefix for consistency
+if [[ ! "$version" =~ ^v ]]; then
+    version="v$version"
+fi
+
 # Get the last tag for comparison
 last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 

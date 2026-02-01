@@ -47,6 +47,13 @@ def list_feedback():
     if "access_key" not in session or "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
+    # Track feedback page access
+    current_user_id = session["current_user_id"]
+    current_user = db.session.query(User).filter_by(ht_id=current_user_id).first()
+    if current_user:
+        current_user.feedback()
+        db.session.commit()
+
     # Get user from database (no CHPP API call)
     user_id = session["current_user_id"]
     user = User.query.filter_by(ht_id=user_id).first()

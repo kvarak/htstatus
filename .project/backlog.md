@@ -16,7 +16,7 @@
 
 ### Code Architecture Cleanup
 - **[REFACTOR-084]** Simplify Component CSS Architecture - Evaluate if 614-line consolidated CSS file creates more maintenance burden than individual template styles (30 min)
-- **[REFACTOR-085]** Simplify JavaScript Architecture - Evaluate consolidation vs separation of JS functionality across templates vs dedicated files like session-persistence.js (30 min)
+- **[REFACTOR-085]** Simplify JavaScript Architecture - Evaluate consolidation vs separation of JS functionality across templates vs dedicated files like session-persistence.js, consolidate Chart.js version to 4.x (30 min)
 
 ## P2: Features 🎯
 

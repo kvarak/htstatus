@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-code-branch"></i> Changes & Development History
+          </h5>
+          <p class="card-text text-muted">
+            Complete timeline of all changes, features, and improvements to HattrickPlanner.
+            <strong class="text-success">🎉 User Releases</strong> highlight features that directly improve your experience.
+            <strong class="text-info">🔧 Technical Releases</strong> show behind-the-scenes improvements and infrastructure updates.
+          </p>
+
+          <div class="mb-3">
+            <button id="toggleAllBtn" class="btn btn-sm btn-outline-secondary" onclick="toggleAllCommits()">
+              <i class="fas fa-expand-arrows-alt"></i> <span id="toggleAllText">Expand All</span>
+            </button>
+            <small class="text-muted ml-2">Click technical releases to show/hide individual commit details</small>
+          </div>
+
+          <hr>
+          <div class="text-sm13">
+            {% for c in changelogfull %}
+            {{ c|safe }}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.commit-entry {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 100px; /* Default expanded height */
+    opacity: 1;
+}
+
+.commit-entry.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border: none !important;
+}
+
+.chevron-icon {
+    transition: transform 0.2s ease-in-out;
+}
+
+.chevron-icon.rotated {
+    transform: rotate(-90deg);
+}
+</style>
+
+<script>
+// Interactive collapse/expand of commits under technical releases
+function toggleCommits(releaseId) {
+    const commits = document.querySelectorAll(`.commit-group-${releaseId}`);
+    const chevron = document.getElementById(`chevron-${releaseId}`);
+
+    // Check if we found any commits for this release
+    if (commits.length === 0) {
+        console.log(`No commits found for release ${releaseId}`);
+        return;
+    }
+
+    // Determine current state based on first commit
+    const isCurrentlyCollapsed = commits[0].classList.contains('collapsed');
+
+    // Toggle all commits
+    commits.forEach(commit => {
+        if (isCurrentlyCollapsed) {
+            commit.classList.remove('collapsed');
+        } else {
+            commit.classList.add('collapsed');
+        }
+    });
+
+    // Toggle chevron if it exists
+    if (chevron) {
+        if (isCurrentlyCollapsed) {
+            chevron.style.transform = 'rotate(0deg)';
+        } else {
+            chevron.style.transform = 'rotate(-90deg)';
+        }
+    }
+
+    // Update the toggle all button state after individual toggle
+    updateToggleButtonState();
+}
+
+// Toggle all technical releases at once
+function toggleAllCommits() {
+    const allCommitGroups = document.querySelectorAll('[class*="commit-group-"]');
+    const allChevrons = document.querySelectorAll('[id*="chevron-"]');
+    const toggleBtn = document.getElementById('toggleAllBtn');
+    const toggleText = document.getElementById('toggleAllText');
+    const toggleIcon = toggleBtn.querySelector('i');
+
+    // Determine current state - check if any commits are visible
+    let anyExpanded = false;
+    allCommitGroups.forEach(commit => {
+        if (!commit.classList.contains('collapsed')) {
+            anyExpanded = true;
+        }
+    });
+
+    if (anyExpanded) {
+        // Collapse all
+        allCommitGroups.forEach(commit => {
+            commit.classList.add('collapsed');
+        });
+        allChevrons.forEach(chevron => {
+            chevron.style.transform = 'rotate(-90deg)';
+        });
+        toggleText.textContent = 'Expand All';
+        toggleIcon.className = 'fas fa-expand-arrows-alt';
+    } else {
+        // Expand all
+        allCommitGroups.forEach(commit => {
+            commit.classList.remove('collapsed');
+        });
+        allChevrons.forEach(chevron => {
+            chevron.style.transform = 'rotate(0deg)';
+        });
+        toggleText.textContent = 'Collapse All';
+        toggleIcon.className = 'fas fa-compress-arrows-alt';
+    }
+}
+
+// Update the toggle button text based on current state
+function updateToggleButtonState() {
+    const allCommitGroups = document.querySelectorAll('[class*="commit-group-"]');
+    const toggleText = document.getElementById('toggleAllText');
+    const toggleIcon = document.querySelector('#toggleAllBtn i');
+
+    let anyExpanded = false;
+    allCommitGroups.forEach(commit => {
+        if (!commit.classList.contains('collapsed')) {
+            anyExpanded = true;
+        }
+    });
+
+    if (anyExpanded) {
+        toggleText.textContent = 'Collapse All';
+        toggleIcon.className = 'fas fa-compress-arrows-alt';
+    } else {
+        toggleText.textContent = 'Expand All';
+        toggleIcon.className = 'fas fa-expand-arrows-alt';
+    }
+}
+
+// Auto-hide commits initially to reduce clutter
+document.addEventListener('DOMContentLoaded', function() {
+    // Add the commit-entry class to all commit groups for animation
+    const allCommitGroups = document.querySelectorAll('[class*="commit-group-"]');
+    allCommitGroups.forEach(commit => {
+        commit.classList.add('commit-entry');
+    });
+
+    // Find all technical releases by looking for elements with onclick handlers
+    const technicalReleases = document.querySelectorAll('[onclick*="toggleCommits"]');
+
+    // For each technical release, collapse its associated commits initially
+    technicalReleases.forEach(release => {
+        // Extract the release ID from the onclick attribute
+        const onclickAttr = release.getAttribute('onclick');
+        const match = onclickAttr.match(/toggleCommits\((\d+)\)/);
+
+        if (match) {
+            const releaseId = match[1];
+            const commits = document.querySelectorAll(`.commit-group-${releaseId}`);
+            const chevron = document.getElementById(`chevron-${releaseId}`);
+
+            // Start with commits collapsed for cleaner view
+            commits.forEach(commit => {
+                commit.classList.add('collapsed');
+            });
+
+            // Rotate chevron to indicate collapsed state
+            if (chevron) {
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+    });
+
+    // Initialize the toggle button state
+    updateToggleButtonState();
+});
+</script>
+
+{% endblock %}

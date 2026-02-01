@@ -99,8 +99,18 @@
                 </div>
               {% endfor %}
             </div>
+            <div class="mt-3">
+              <a href="{{ url_for('main.changes') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-eye"></i> View Complete Development History
+              </a>
+            </div>
           {% else %}
             <p class="text-sm11">Release information not available.</p>
+            <div class="mt-3">
+              <a href="{{ url_for('main.changes') }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-eye"></i> View Development History
+              </a>
+            </div>
           {% endif %}
         </div>
       </div>

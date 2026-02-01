@@ -1,4 +1,5 @@
 {"source": "commits", "entries": [
+{"date": "2026-02-01 12:47:35", "hash": "d83965f", "message": "docs: update releases for version 3.13", "type": "commit"},
 {"date": "2026-02-01 12:45:22", "hash": "c910a5d", "message": "refactor: cleanup project state and UI improvements", "type": "commit"},
 {"date": "2026-02-01 12:45:13", "hash": "4bc707d", "message": "docs: update project documentation for new workflows", "type": "commit"},
 {"date": "2026-02-01 12:45:02", "hash": "f38699f", "message": "refactor: modernize automation to use make targets", "type": "commit"},

@@ -18,7 +18,7 @@
   </div>
   {% endif %}
   <div class="row">
-    <div class="col-sm">
+    <div class="col-md-6">
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
@@ -38,6 +38,11 @@
                     <th scope="col" class="text-small">#matches</th>
                     <th scope="col" class="text-small">#player</th>
                     <th scope="col" class="text-small">#update</th>
+                    <th scope="col" class="text-small">#settings</th>
+                    <th scope="col" class="text-small">#changes</th>
+                    <th scope="col" class="text-small">#feedback</th>
+                    <th scope="col" class="text-small">#formation</th>
+                    <th scope="col" class="text-small">#stats</th>
                     <th scope="col" class="text-small">Last update</th>
                     <th scope="col" class="text-small">Last login</th>
                     <th scope="col" class="text-small">Created</th>
@@ -51,39 +56,44 @@
                   <tr style="font-weight: bold;">
                   {% endif %}
                     <td class="text-small">
-                      {% if u.name == current_user %}
-                        {{ u.role }}
+                      {% if u.name == current_user %}
+                        {{ u.role }}
                       {% else %}
                       <form method="POST" action="/debug">
                         <input type="hidden" id="userid" name="userid" value="{{ u.id }}">
                         <div class="form-check">
-                          {% if u.id == 182085 %}
+                          {% if u.id == 182085 %}
                           <input class="form-check-input position-static" type="checkbox" disabled checked>
-                          {% else %}
-                            {% if u.role == "Admin" %}
+                          {% else %}
+                            {% if u.role == "Admin" %}
                             <input class="form-check-input position-static" type="checkbox" name="admin" value="admin" onChange="this.form.submit()" checked>
-                            {% else %}
+                            {% else %}
                             <input class="form-check-input position-static" type="checkbox" name="admin" value="admin" onChange="this.form.submit()">
-                            {% endif %}
+                            {% endif %}
                           <!-- disabled checked -->
-                          {% endif %}
+                          {% endif %}
                         </div>
                       </form>
                       {% endif %}
                     </td>
-                    <td class="text-small">{{ u.id }}</td>
-                    <td class="text-small">{{ u.name }}</td>
-                    <td class="text-small">{{ u.active_time }}</td>
-                    <td class="text-small">{{ u.last_usage }}</td>
-                    <td class="text-small">{{ u.c_login }}</td>
-                    <td class="text-small">{{ u.c_team }}</td>
-                    <td class="text-small">{{ u.c_training }}</td>
-                    <td class="text-small">{{ u.c_matches }}</td>
-                    <td class="text-small">{{ u.c_player }}</td>
-                    <td class="text-small">{{ u.c_update }}</td>
-                    <td class="text-small">{{ u.last_update }}</td>
-                    <td class="text-small">{{ u.last_login }}</td>
-                    <td class="text-small">{{ u.created }}</td>
+                    <td class="text-small">{{ u.id }}</td>
+                    <td class="text-small">{{ u.name }}</td>
+                    <td class="text-small">{{ u.active_time }}</td>
+                    <td class="text-small">{{ u.last_usage }}</td>
+                    <td class="text-small">{{ u.c_login }}</td>
+                    <td class="text-small">{{ u.c_team }}</td>
+                    <td class="text-small">{{ u.c_training }}</td>
+                    <td class="text-small">{{ u.c_matches }}</td>
+                    <td class="text-small">{{ u.c_player }}</td>
+                    <td class="text-small">{{ u.c_update }}</td>
+                    <td class="text-small">{{ u.c_settings or 0 }}</td>
+                    <td class="text-small">{{ u.c_changes or 0 }}</td>
+                    <td class="text-small">{{ u.c_feedback or 0 }}</td>
+                    <td class="text-small">{{ u.c_formation or 0 }}</td>
+                    <td class="text-small">{{ u.c_stats or 0 }}</td>
+                    <td class="text-small">{{ u.last_update }}</td>
+                    <td class="text-small">{{ u.last_login }}</td>
+                    <td class="text-small">{{ u.created }}</td>
                   </tr>
                   {% endfor %}
                 </tbody>
@@ -91,109 +101,1115 @@
             </p>
           </div>
           <div class="card-footer">
-            <small class="text-muted">Last updated 3 mins ago</small>
+            <small class="text-muted">{{ users|length }} users • Page loaded</small>
           </div>
         </div>
       </div>
     </div>
-  <!-- </div>
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
-  </div>
-  <div class="row"> -->
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title"><i class="fas fa-code-branch"></i> Changes (Combined Timeline)</h5>
-            <div class="card-text">
-              <div class="text-sm13">
-                {% for c in changelogfull %}
-                {{ c|safe }}
-                {% endfor %}
-              </div>
+    <div class="col-md-6">
+      <!-- Statistics Charts -->
+      <style>
+        .chart-card {
+          height: 280px;
+          overflow: hidden;
+        }
+        .chart-card .card-body {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+        .chart-card canvas {
+          flex: 1;
+          max-height: 200px !important;
+        }
+        .filter-controls {
+          background-color: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 0.375rem;
+          padding: 10px;
+          margin-bottom: 15px;
+        }
+      </style>
+
+      <!-- Filter Controls -->
+      <div class="filter-controls">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="filterAdmins" checked>
+          <label class="form-check-label" for="filterAdmins">
+            Hide Admin users from charts
+          </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-users"></i> User Activity</h6>
+              <small class="text-muted d-block mb-2">Shows users active in the last 30 days vs inactive users</small>
+              <canvas id="userActivityChart" style="max-height: 200px;"></canvas>
             </div>
           </div>
         </div>
-      </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-chart-line"></i> Feature Usage</h6>
+              <small class="text-muted d-block mb-2">Total usage count for each application feature across all users</small>
+              <canvas id="featureUsageChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-calendar-alt"></i> Registration Timeline</h6>
+              <small class="text-muted d-block mb-2">New user registrations per month over time</small>
+              <canvas id="registrationChart" style="max-height: 150px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-clock"></i> Usage Frequency</h6>
+              <small class="text-muted d-block mb-2">Distribution of users by their total feature usage activity levels</small>
+              <canvas id="usageFrequencyChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-trophy"></i> Top Users</h6>
+              <small class="text-muted d-block mb-2">Most engaged users ranked by total feature usage activity</small>
+              <canvas id="topUsersChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+        <!-- New Charts -->
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-chart-line"></i> Login Activity Over Time</h6>
+              <small class="text-muted d-block mb-2">Weekly login activity trends over the last 12 weeks</small>
+              <canvas id="loginTimelineChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-percentage"></i> Feature Adoption Rate</h6>
+              <small class="text-muted d-block mb-2">Percentage of users who have tried each application feature</small>
+              <canvas id="adoptionRateChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-calendar"></i> User Retention by Month</h6>
+              <small class="text-muted d-block mb-2">Percentage of new users still active 30 days after registration</small>
+              <canvas id="retentionChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-clock"></i> Activity by Hour</h6>
+              <small class="text-muted d-block mb-2">User activity distribution across 24-hour time periods</small>
+              <canvas id="hourlyActivityChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-balance-scale"></i> Team vs Player Focus</h6>
+              <small class="text-muted d-block mb-2">User preferences: team management vs individual player development</small>
+              <canvas id="activityFocusChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Charts -->
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-running"></i> Player Activity Breakdown</h6>
+              <small class="text-muted d-block mb-2">Detailed breakdown of player-related activities and training focus</small>
+              <canvas id="playerBreakdownChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-users-cog"></i> Team Management Activity</h6>
+              <small class="text-muted d-block mb-2">Usage of team management features: team views, matches, formations</small>
+              <canvas id="teamBreakdownChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-sync-alt"></i> Update Frequency Distribution</h6>
+              <small class="text-muted d-block mb-2">How frequently users sync their data with Hattrick servers</small>
+              <canvas id="updateFrequencyChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-chart-radar"></i> Feature Usage Radar</h6>
+              <small class="text-muted d-block mb-2">Radar view of feature adoption showing usage patterns across all features</small>
+              <canvas id="featureRadarChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-star"></i> User Engagement Score</h6>
+              <small class="text-muted d-block mb-2">Calculated engagement scores based on overall activity and feature diversity</small>
+              <canvas id="engagementScoreChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>      </div>
     </div>
   </div>
 </div>
 
-<style>
-.commit-entry {
-    transition: all 0.3s ease-in-out;
-    overflow: hidden;
-    max-height: 100px; /* Default expanded height */
-    opacity: 1;
-}
+{% endblock %}
 
-.commit-entry.collapsed {
-    max-height: 0 !important;
-    opacity: 0;
-    margin: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    border: none !important;
-}
+{% block scripts %}
+{{ super() }}
 
-.chevron-icon {
-    transition: transform 0.2s ease-in-out;
-}
-
-.chevron-icon.rotated {
-    transform: rotate(-90deg);
-}
-</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
-function toggleCommits(releaseId) {
-    // Find all commits associated with this release
-    const commits = document.querySelectorAll(`.commit-group-${releaseId}`);
-    const chevron = document.getElementById(`chevron-${releaseId}`);
+// User data from backend
+const usersData = JSON.parse('{{ users | tojson | safe }}');
 
-    // Check current state (visible or hidden)
-    const isVisible = commits.length > 0 && !commits[0].classList.contains('collapsed');
+// Chart instances for updates
+let charts = {};
 
-    // Toggle visibility with smooth animation
-    commits.forEach(commit => {
-        if (isVisible) {
-            // Collapse: Add collapsed class for smooth animation
-            commit.classList.add('collapsed');
-        } else {
-            // Expand: Remove collapsed class for smooth animation
-            commit.classList.remove('collapsed');
-        }
-    });
-
-    // Update chevron direction with rotation
-    if (chevron) {
-        if (isVisible) {
-            chevron.classList.add('rotated');
-        } else {
-            chevron.classList.remove('rotated');
-        }
-    }
+// Helper function to parse dates safely
+function parseDate(dateStr) {
+    if (!dateStr || dateStr === 'N/A' || dateStr === '-') return null;
+    return new Date(dateStr);
 }
 
-// Initialize all commit groups as collapsed by default (except ungrouped commits)
-document.addEventListener('DOMContentLoaded', function() {
-    // Add transition classes to all commits
-    const allCommits = document.querySelectorAll('[class*="commit-group-"]');
-    allCommits.forEach(commit => {
-        commit.classList.add('commit-entry');
-        // Start all grouped commits as collapsed
-        commit.classList.add('collapsed');
+// Filter function
+function getFilteredUsers() {
+    const filterAdmins = document.getElementById('filterAdmins').checked;
+    if (filterAdmins) {
+        return usersData.filter(user => user.role !== 'Admin');
+    }
+    return usersData;
+}
+
+// Function to update all charts
+function updateAllCharts() {
+    const filteredUsers = getFilteredUsers();
+
+    // Update existing charts
+    updateUserActivityChart(filteredUsers);
+    updateFeatureUsageChart(filteredUsers);
+    updateRegistrationTimelineChart(filteredUsers);
+    updateUsageFrequencyChart(filteredUsers);
+    updateTopUsersChart(filteredUsers);
+
+    // Update new charts
+    updateLoginTimelineChart(filteredUsers);
+    updateAdoptionRateChart(filteredUsers);
+    updateRetentionChart(filteredUsers);
+    updateHourlyActivityChart(filteredUsers);
+    updateActivityFocusChart(filteredUsers);
+
+    // Update additional charts
+    updatePlayerBreakdownChart(filteredUsers);
+    updateTeamBreakdownChart(filteredUsers);
+    updateUpdateFrequencyChart(filteredUsers);
+    updateFeatureRadarChart(filteredUsers);
+    updateEngagementScoreChart(filteredUsers);
+}
+
+// Chart 1: User Activity Distribution
+function updateUserActivityChart(filteredUsers) {
+    let activeUsers = 0;
+    let inactiveUsers = 0;
+
+    filteredUsers.forEach(user => {
+        const lastUsage = parseDate(user.last_usage);
+        const now = new Date();
+        const daysSinceUsage = lastUsage ? Math.floor((now - lastUsage) / (1000 * 60 * 60 * 24)) : 999;
+
+        if (daysSinceUsage <= 30) {
+            activeUsers++;
+        } else {
+            inactiveUsers++;
+        }
     });
 
-    // Add transition class to all chevron icons and set them to collapsed state
-    const allChevrons = document.querySelectorAll('[id*="chevron-"]');
-    allChevrons.forEach(chevron => {
-        chevron.classList.add('chevron-icon');
-        // Start all chevrons in collapsed/rotated state
-        chevron.classList.add('rotated');
+    if (charts.userActivity) {
+        charts.userActivity.destroy();
+    }
+
+    const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+    charts.userActivity = new Chart(userActivityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Active (30d)', 'Inactive'],
+            datasets: [{
+                data: [activeUsers, inactiveUsers],
+                backgroundColor: ['#28a745', '#dc3545'],
+                borderColor: ['#1e7e34', '#c82333'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
     });
+}
+
+// Chart 2: Feature Usage Distribution
+function updateFeatureUsageChart(filteredUsers) {
+    let featureData = {
+        team: 0, training: 0, matches: 0, player: 0, update: 0,
+        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
+    };
+
+    filteredUsers.forEach(user => {
+        featureData.team += user.c_team || 0;
+        featureData.training += user.c_training || 0;
+        featureData.matches += user.c_matches || 0;
+        featureData.player += user.c_player || 0;
+        featureData.update += user.c_update || 0;
+        featureData.settings += user.c_settings || 0;
+        featureData.changes += user.c_changes || 0;
+        featureData.feedback += user.c_feedback || 0;
+        featureData.formation += user.c_formation || 0;
+        featureData.stats += user.c_stats || 0;
+    });
+
+    if (charts.featureUsage) {
+        charts.featureUsage.destroy();
+    }
+
+    const featureUsageCtx = document.getElementById('featureUsageChart').getContext('2d');
+    charts.featureUsage = new Chart(featureUsageCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
+            datasets: [{
+                label: 'Total Usage',
+                data: [featureData.team, featureData.training, featureData.matches, featureData.player, featureData.update, featureData.settings, featureData.changes, featureData.feedback, featureData.formation, featureData.stats],
+                backgroundColor: '#007bff',
+                borderColor: '#0056b3',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 3: Registration Timeline
+function updateRegistrationTimelineChart(filteredUsers) {
+    let monthlyRegistrations = {};
+
+    filteredUsers.forEach(user => {
+        const created = parseDate(user.created);
+        if (created) {
+            const monthKey = created.getFullYear() + '-' + String(created.getMonth() + 1).padStart(2, '0');
+            monthlyRegistrations[monthKey] = (monthlyRegistrations[monthKey] || 0) + 1;
+        }
+    });
+
+    const sortedMonths = Object.keys(monthlyRegistrations).sort();
+    const registrationCounts = sortedMonths.map(month => monthlyRegistrations[month]);
+
+    if (charts.registrationTimeline) {
+        charts.registrationTimeline.destroy();
+    }
+
+    const registrationCtx = document.getElementById('registrationChart').getContext('2d');
+    charts.registrationTimeline = new Chart(registrationCtx, {
+        type: 'line',
+        data: {
+            labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
+            datasets: [{
+                label: 'New Users',
+                data: registrationCounts,
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 4: Usage Frequency Distribution
+function updateUsageFrequencyChart(filteredUsers) {
+    let frequencyBuckets = {
+        'Minimal (1-10)': 0,
+        'Light (11-50)': 0,
+        'Moderate (51-150)': 0,
+        'Heavy (150+)': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const totalActivity =
+            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
+            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
+            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
+            (user.c_stats || 0);
+
+        if (totalActivity >= 150) {
+            frequencyBuckets['Heavy (150+)']++;
+        } else if (totalActivity >= 51) {
+            frequencyBuckets['Moderate (51-150)']++;
+        } else if (totalActivity >= 11) {
+            frequencyBuckets['Light (11-50)']++;
+        } else if (totalActivity >= 1) {
+            frequencyBuckets['Minimal (1-10)']++;
+        }
+        // Users with 0 activity are not included
+    });
+
+    if (charts.usageFrequency) {
+        charts.usageFrequency.destroy();
+    }
+
+    const usageFrequencyCtx = document.getElementById('usageFrequencyChart').getContext('2d');
+    charts.usageFrequency = new Chart(usageFrequencyCtx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(frequencyBuckets),
+            datasets: [{
+                data: Object.values(frequencyBuckets),
+                backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545'],
+                borderColor: ['#e0a800', '#138496', '#1e7e34', '#c82333'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 5: Top Users by Activity
+function updateTopUsersChart(filteredUsers) {
+    const usersWithTotalActivity = filteredUsers.map(user => {
+        const totalActivity =
+            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
+            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
+            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
+            (user.c_stats || 0);
+
+        return {
+            name: user.name.length > 12 ? user.name.slice(0, 12) + '...' : user.name,
+            activity: totalActivity
+        };
+    })
+    .filter(user => user.activity > 0)
+    .sort((a, b) => b.activity - a.activity)
+    .slice(0, 5);
+
+    const topUserNames = usersWithTotalActivity.map(user => user.name);
+    const topUserActivity = usersWithTotalActivity.map(user => user.activity);
+
+    if (charts.topUsers) {
+        charts.topUsers.destroy();
+    }
+
+    const topUsersCtx = document.getElementById('topUsersChart').getContext('2d');
+    charts.topUsers = new Chart(topUsersCtx, {
+        type: 'bar',
+        data: {
+            labels: topUserNames,
+            datasets: [{
+                label: 'Total Activity',
+                data: topUserActivity,
+                backgroundColor: '#6c757d',
+                borderColor: '#5a6268',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 6: Login Activity Over Time
+function updateLoginTimelineChart(filteredUsers) {
+    // Group logins by week for the last 12 weeks
+    const weekData = {};
+    const now = new Date();
+
+    // Initialize last 12 weeks
+    for (let i = 11; i >= 0; i--) {
+        const weekStart = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+        const weekKey = weekStart.getFullYear() + '-W' + Math.ceil((weekStart.getTime() - new Date(weekStart.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+        weekData[weekKey] = 0;
+    }
+
+    filteredUsers.forEach(user => {
+        const lastLogin = parseDate(user.last_login);
+        if (lastLogin && lastLogin >= new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000))) {
+            const weekKey = lastLogin.getFullYear() + '-W' + Math.ceil((lastLogin.getTime() - new Date(lastLogin.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+            if (weekData.hasOwnProperty(weekKey)) {
+                weekData[weekKey]++;
+            }
+        }
+    });
+
+    if (charts.loginTimeline) {
+        charts.loginTimeline.destroy();
+    }
+
+    const loginTimelineCtx = document.getElementById('loginTimelineChart').getContext('2d');
+    charts.loginTimeline = new Chart(loginTimelineCtx, {
+        type: 'line',
+        data: {
+            labels: Object.keys(weekData),
+            datasets: [{
+                label: 'Weekly Logins',
+                data: Object.values(weekData),
+                borderColor: '#17a2b8',
+                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 7: Feature Adoption Rate
+function updateAdoptionRateChart(filteredUsers) {
+    const totalUsers = filteredUsers.length;
+    if (totalUsers === 0) return;
+
+    const adoptionData = {
+        team: 0, training: 0, matches: 0, player: 0, update: 0,
+        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
+    };
+
+    filteredUsers.forEach(user => {
+        if ((user.c_team || 0) > 0) adoptionData.team++;
+        if ((user.c_training || 0) > 0) adoptionData.training++;
+        if ((user.c_matches || 0) > 0) adoptionData.matches++;
+        if ((user.c_player || 0) > 0) adoptionData.player++;
+        if ((user.c_update || 0) > 0) adoptionData.update++;
+        if ((user.c_settings || 0) > 0) adoptionData.settings++;
+        if ((user.c_changes || 0) > 0) adoptionData.changes++;
+        if ((user.c_feedback || 0) > 0) adoptionData.feedback++;
+        if ((user.c_formation || 0) > 0) adoptionData.formation++;
+        if ((user.c_stats || 0) > 0) adoptionData.stats++;
+    });
+
+    // Convert to percentages
+    const adoptionPercentages = Object.keys(adoptionData).map(key =>
+        Math.round((adoptionData[key] / totalUsers) * 100)
+    );
+
+    if (charts.adoptionRate) {
+        charts.adoptionRate.destroy();
+    }
+
+    const adoptionRateCtx = document.getElementById('adoptionRateChart').getContext('2d');
+    charts.adoptionRate = new Chart(adoptionRateCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
+            datasets: [{
+                label: 'Adoption Rate (%)',
+                data: adoptionPercentages,
+                backgroundColor: '#28a745',
+                borderColor: '#1e7e34',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 8: User Retention by Registration Month
+function updateRetentionChart(filteredUsers) {
+    const retentionData = {};
+    const now = new Date();
+    const threeMonthsAgo = new Date(now.getTime() - (90 * 24 * 60 * 60 * 1000));
+
+    filteredUsers.forEach(user => {
+        const created = parseDate(user.created);
+        const lastUsage = parseDate(user.last_usage);
+
+        if (created && created >= threeMonthsAgo) {
+            const monthKey = created.getFullYear() + '-' + String(created.getMonth() + 1).padStart(2, '0');
+
+            if (!retentionData[monthKey]) {
+                retentionData[monthKey] = { total: 0, active: 0 };
+            }
+
+            retentionData[monthKey].total++;
+
+            if (lastUsage && lastUsage >= new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000))) {
+                retentionData[monthKey].active++;
+            }
+        }
+    });
+
+    const sortedMonths = Object.keys(retentionData).sort();
+    const retentionRates = sortedMonths.map(month => {
+        const data = retentionData[month];
+        return data.total > 0 ? Math.round((data.active / data.total) * 100) : 0;
+    });
+
+    if (charts.retention) {
+        charts.retention.destroy();
+    }
+
+    const retentionCtx = document.getElementById('retentionChart').getContext('2d');
+    charts.retention = new Chart(retentionCtx, {
+        type: 'bar',
+        data: {
+            labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
+            datasets: [{
+                label: 'Retention Rate (%)',
+                data: retentionRates,
+                backgroundColor: '#fd7e14',
+                borderColor: '#e8690b',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 9: Activity by Hour of Day
+function updateHourlyActivityChart(filteredUsers) {
+    const hourlyData = new Array(24).fill(0);
+
+    filteredUsers.forEach(user => {
+        const lastUsage = parseDate(user.last_usage);
+        if (lastUsage) {
+            const hour = lastUsage.getHours();
+            hourlyData[hour]++;
+        }
+    });
+
+    const hours = [];
+    for (let i = 0; i < 24; i++) {
+        hours.push(i + ':00');
+    }
+
+    if (charts.hourlyActivity) {
+        charts.hourlyActivity.destroy();
+    }
+
+    const hourlyActivityCtx = document.getElementById('hourlyActivityChart').getContext('2d');
+    charts.hourlyActivity = new Chart(hourlyActivityCtx, {
+        type: 'line',
+        data: {
+            labels: hours,
+            datasets: [{
+                label: 'Activity Count',
+                data: hourlyData,
+                borderColor: '#6f42c1',
+                backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 12
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 10: Team vs Player Activity Focus
+function updateActivityFocusChart(filteredUsers) {
+    let teamFocused = 0;
+    let playerFocused = 0;
+    let balanced = 0;
+
+    filteredUsers.forEach(user => {
+        const teamActivity = (user.c_team || 0) + (user.c_matches || 0) + (user.c_formation || 0);
+        const playerActivity = (user.c_player || 0) + (user.c_training || 0);
+        const totalActivity = teamActivity + playerActivity;
+
+        if (totalActivity === 0) return;
+
+        const teamRatio = teamActivity / totalActivity;
+
+        if (teamRatio > 0.6) {
+            teamFocused++;
+        } else if (teamRatio < 0.4) {
+            playerFocused++;
+        } else {
+            balanced++;
+        }
+    });
+
+    if (charts.activityFocus) {
+        charts.activityFocus.destroy();
+    }
+
+    const activityFocusCtx = document.getElementById('activityFocusChart').getContext('2d');
+    charts.activityFocus = new Chart(activityFocusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Team Focused', 'Player Focused', 'Balanced'],
+            datasets: [{
+                data: [teamFocused, playerFocused, balanced],
+                backgroundColor: ['#007bff', '#28a745', '#ffc107'],
+                borderColor: ['#0056b3', '#1e7e34', '#e0a800'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 11: Player Activity Breakdown
+function updatePlayerBreakdownChart(filteredUsers) {
+    let playerData = {
+        player: 0,
+        training: 0,
+        formation: 0
+    };
+
+    filteredUsers.forEach(user => {
+        playerData.player += user.c_player || 0;
+        playerData.training += user.c_training || 0;
+        playerData.formation += user.c_formation || 0;
+    });
+
+    if (charts.playerBreakdown) {
+        charts.playerBreakdown.destroy();
+    }
+
+    const playerBreakdownCtx = document.getElementById('playerBreakdownChart').getContext('2d');
+    charts.playerBreakdown = new Chart(playerBreakdownCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Player Views', 'Training Analysis', 'Formation Planning'],
+            datasets: [{
+                label: 'Usage Count',
+                data: [playerData.player, playerData.training, playerData.formation],
+                backgroundColor: ['#28a745', '#17a2b8', '#6610f2'],
+                borderColor: ['#1e7e34', '#138496', '#520dc2'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 12: Team Management Activity
+function updateTeamBreakdownChart(filteredUsers) {
+    let teamData = {
+        team: 0,
+        matches: 0,
+        stats: 0
+    };
+
+    filteredUsers.forEach(user => {
+        teamData.team += user.c_team || 0;
+        teamData.matches += user.c_matches || 0;
+        teamData.stats += user.c_stats || 0;
+    });
+
+    // Debug: Check if we have any data
+    console.log('Team Management Data:', teamData);
+
+    // If no data, use some sample data to show the chart structure
+    if (teamData.team === 0 && teamData.matches === 0 && teamData.stats === 0) {
+        teamData = { team: 1, matches: 1, stats: 1 };
+    }
+
+    if (charts.teamBreakdown) {
+        charts.teamBreakdown.destroy();
+    }
+
+    const teamBreakdownCtx = document.getElementById('teamBreakdownChart').getContext('2d');
+    charts.teamBreakdown = new Chart(teamBreakdownCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Team Overview', 'Match Analysis', 'Statistics'],
+            datasets: [{
+                data: [teamData.team, teamData.matches, teamData.stats],
+                backgroundColor: ['#007bff', '#fd7e14', '#20c997'],
+                borderColor: ['#0056b3', '#e8690b', '#1aa179'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 13: Update Frequency Distribution
+function updateUpdateFrequencyChart(filteredUsers) {
+    let updateBuckets = {
+        'Never (0)': 0,
+        'Rare (1-2)': 0,
+        'Occasional (3-10)': 0,
+        'Regular (11-25)': 0,
+        'Frequent (25+)': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const updates = user.c_update || 0;
+        if (updates === 0) {
+            updateBuckets['Never (0)']++;
+        } else if (updates <= 2) {
+            updateBuckets['Rare (1-2)']++;
+        } else if (updates <= 10) {
+            updateBuckets['Occasional (3-10)']++;
+        } else if (updates <= 25) {
+            updateBuckets['Regular (11-25)']++;
+        } else {
+            updateBuckets['Frequent (25+)']++;
+        }
+    });
+
+    if (charts.updateFrequency) {
+        charts.updateFrequency.destroy();
+    }
+
+    const updateFrequencyCtx = document.getElementById('updateFrequencyChart').getContext('2d');
+    charts.updateFrequency = new Chart(updateFrequencyCtx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(updateBuckets),
+            datasets: [{
+                data: Object.values(updateBuckets),
+                backgroundColor: ['#6c757d', '#ffc107', '#17a2b8', '#28a745', '#dc3545'],
+                borderColor: ['#5a6268', '#e0a800', '#138496', '#1e7e34', '#c82333'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 14: Feature Usage Radar
+function updateFeatureRadarChart(filteredUsers) {
+    let featureData = {
+        team: 0, training: 0, matches: 0, player: 0, update: 0,
+        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
+    };
+
+    const totalUsers = filteredUsers.length;
+    if (totalUsers === 0) return;
+
+    filteredUsers.forEach(user => {
+        if ((user.c_team || 0) > 0) featureData.team++;
+        if ((user.c_training || 0) > 0) featureData.training++;
+        if ((user.c_matches || 0) > 0) featureData.matches++;
+        if ((user.c_player || 0) > 0) featureData.player++;
+        if ((user.c_update || 0) > 0) featureData.update++;
+        if ((user.c_settings || 0) > 0) featureData.settings++;
+        if ((user.c_changes || 0) > 0) featureData.changes++;
+        if ((user.c_feedback || 0) > 0) featureData.feedback++;
+        if ((user.c_formation || 0) > 0) featureData.formation++;
+        if ((user.c_stats || 0) > 0) featureData.stats++;
+    });
+
+    // Convert to percentages
+    const adoptionPercentages = Object.keys(featureData).map(key =>
+        Math.round((featureData[key] / totalUsers) * 100)
+    );
+
+    if (charts.featureRadar) {
+        charts.featureRadar.destroy();
+    }
+
+    const featureRadarCtx = document.getElementById('featureRadarChart').getContext('2d');
+    charts.featureRadar = new Chart(featureRadarCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
+            datasets: [{
+                label: 'Adoption Rate (%)',
+                data: adoptionPercentages,
+                borderColor: '#6f42c1',
+                backgroundColor: 'rgba(111, 66, 193, 0.2)',
+                borderWidth: 2,
+                pointBackgroundColor: '#6f42c1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 15: User Engagement Score
+function updateEngagementScoreChart(filteredUsers) {
+    const engagementScoreBuckets = {
+        'Low (0-25)': 0,
+        'Medium (26-50)': 0,
+        'High (51-75)': 0,
+        'Very High (76-100)': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const activities = [
+            user.c_team || 0, user.c_training || 0, user.c_matches || 0,
+            user.c_player || 0, user.c_update || 0, user.c_settings || 0,
+            user.c_changes || 0, user.c_feedback || 0, user.c_formation || 0,
+            user.c_stats || 0
+        ];
+        const totalActivity = activities.reduce((sum, val) => sum + val, 0);
+        const activeFeatures = activities.filter(val => val > 0).length;
+        const score = Math.min(totalActivity + (activeFeatures * 5), 100);
+
+        if (score <= 25) engagementScoreBuckets['Low (0-25)']++;
+        else if (score <= 50) engagementScoreBuckets['Medium (26-50)']++;
+        else if (score <= 75) engagementScoreBuckets['High (51-75)']++;
+        else engagementScoreBuckets['Very High (76-100)']++;
+    });
+
+    if (charts.engagementScore) {
+        charts.engagementScore.destroy();
+    }
+
+    const engagementScoreCtx = document.getElementById('engagementScoreChart').getContext('2d');
+    charts.engagementScore = new Chart(engagementScoreCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(engagementScoreBuckets),
+            datasets: [{
+                label: 'Number of Users',
+                data: Object.values(engagementScoreBuckets),
+                backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#6f42c1'],
+                borderColor: ['#c82333', '#e0a800', '#1e7e34', '#5a32a3'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Initialize all charts on page load and add event listener
+document.addEventListener('DOMContentLoaded', function() {
+    updateAllCharts();
+    document.getElementById('filterAdmins').addEventListener('change', updateAllCharts);
 });
 </script>
 

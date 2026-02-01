@@ -152,6 +152,13 @@ def settings():
     Group = get_group_model()
     PlayerSetting = get_player_setting_model()
 
+    # Track settings page access
+    current_user_id = get_current_user_id()
+    user = db.session.query(User).filter_by(ht_id=current_user_id).first()
+    if user:
+        user.settings()
+        db.session.commit()
+
     error = ""
 
     groupname = request.form.get("groupname")
@@ -292,74 +299,17 @@ def settings():
     )
 
 
-@main_bp.route("/debug", methods=["GET", "POST"])
-@require_authentication
-def admin():
-    """Admin dashboard for user management."""
-    # Get model classes from registry
-    User = get_user_model()
-
-    error = ""
-
-    try:
-        user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-        role = user.getRole() if user else "User"
-        if role != "Admin":
-            return render_template("_forward.html", url="/")
-    except Exception:
-        return render_template("_forward.html", url="/")
-
-    adminchecked = request.form.get("admin")
-    userid = request.form.get("userid")
-
-    dprint(2, "Checkbox: ", adminchecked)
-    dprint(2, userid)
-
-    if userid:
-        try:
-            user = db.session.query(User).filter_by(ht_id=userid).first()
-            updateto = "Admin" if adminchecked else "User"
-
-            dprint(2, updateto)
-
-            if user:
-                user.setRole(updateto)
+@main_bp.route("/changes")
+def changes():
+    """Public changes and changelog page."""
+    # Track changes page access for authenticated users
+    if "current_user_id" in session:
+        User = get_user_model()
+        current_user_id = get_current_user_id()
+        user = db.session.query(User).filter_by(ht_id=current_user_id).first()
+        if user:
+            user.changes()
             db.session.commit()
-
-        except Exception:
-            error = "couldn't change user"
-
-    allusers = db.session.query(User).order_by(text("last_usage desc")).all()
-    users = []
-    for user in allusers:
-        if (user.last_update - user.created).days < 1:
-            active_time = "< 1 day"
-        elif (user.last_update - user.created).days == 1:
-            active_time = "1 day"
-        elif diff_month(user.last_update, user.created) < 2:
-            active_time = str((user.last_update - user.created).days) + " days"
-        else:
-            active_time = str(diff_month(user.last_update, user.created)) + " months"
-
-        thisuser = {
-            "id": user.ht_id,
-            "name": user.ht_user,
-            "role": user.role,
-            "c_team": user.c_team,
-            "c_training": user.c_training,
-            "c_player": user.c_player,
-            "c_matches": user.c_matches,
-            "c_login": user.c_login,
-            "c_update": user.c_update,
-            "last_update": user.last_update,
-            "last_usage": user.last_usage,
-            "last_login": user.last_login,
-            "created": user.created,
-            "active_time": active_time,
-        }
-        users.append(thisuser)
-
-# Get comprehensive changes for administrative visibility
     changelogfull = []
     try:
         import json
@@ -453,9 +403,87 @@ def admin():
         changelogfull = ["Error loading changelog - run 'make changelog' to generate JSON files"]
 
     return create_page(
+        template="changes.html",
+        title="Changes & Development History",
+        changelogfull=changelogfull,
+    )
+
+
+@main_bp.route("/debug", methods=["GET", "POST"])
+@require_authentication
+def admin():
+    """Admin dashboard for user management."""
+    # Get model classes from registry
+    User = get_user_model()
+
+    error = ""
+
+    try:
+        user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
+        role = user.getRole() if user else "User"
+        if role != "Admin":
+            return render_template("_forward.html", url="/")
+    except Exception:
+        return render_template("_forward.html", url="/")
+
+    adminchecked = request.form.get("admin")
+    userid = request.form.get("userid")
+
+    dprint(2, "Checkbox: ", adminchecked)
+    dprint(2, userid)
+
+    if userid:
+        try:
+            user = db.session.query(User).filter_by(ht_id=userid).first()
+            updateto = "Admin" if adminchecked else "User"
+
+            dprint(2, updateto)
+
+            if user:
+                user.setRole(updateto)
+            db.session.commit()
+
+        except Exception:
+            error = "couldn't change user"
+
+    allusers = db.session.query(User).order_by(text("last_usage desc")).all()
+    users = []
+    for user in allusers:
+        if (user.last_update - user.created).days < 1:
+            active_time = "< 1 day"
+        elif (user.last_update - user.created).days == 1:
+            active_time = "1 day"
+        elif diff_month(user.last_update, user.created) < 2:
+            active_time = str((user.last_update - user.created).days) + " days"
+        else:
+            active_time = str(diff_month(user.last_update, user.created)) + " months"
+
+        thisuser = {
+            "id": user.ht_id,
+            "name": user.ht_user,
+            "role": user.role,
+            "c_team": user.c_team,
+            "c_training": user.c_training,
+            "c_player": user.c_player,
+            "c_matches": user.c_matches,
+            "c_login": user.c_login,
+            "c_update": user.c_update,
+            "c_settings": user.c_settings or 0,
+            "c_changes": user.c_changes or 0,
+            "c_feedback": user.c_feedback or 0,
+            "c_formation": user.c_formation or 0,
+            "c_stats": user.c_stats or 0,
+            "last_update": user.last_update,
+            "last_usage": user.last_usage,
+            "last_login": user.last_login,
+            "created": user.created,
+            "active_time": active_time,
+        }
+        users.append(thisuser)
+
+    return create_page(
         template="debug.html",
         title="Debug",
         users=users,
-        changelogfull=changelogfull,
         error=error,
     )

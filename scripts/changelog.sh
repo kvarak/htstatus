@@ -23,7 +23,7 @@ echo ']}' >> app/static/changelog.json
 echo '{"source": "user_releases", "entries": [' > app/static/releases.json
 first_entry=true
 while IFS= read -r line; do
-    if [[ $line =~ ^##\ v([0-9]+\.[0-9]+)\ -\ (.+)$ ]]; then
+    if [[ $line =~ ^##\ ([0-9]+\.[0-9]+)\ -\ (.+)$ ]]; then
         version="${BASH_REMATCH[1]}"
         date_str="${BASH_REMATCH[2]}"
 
@@ -50,7 +50,7 @@ while IFS= read -r line; do
                 first_feature=$(echo "$first_feature" | sed 's/\*\*[^*]*\*\*: *//' | sed 's/\*\*//g')
                 break
             fi
-        done <<< "$(grep -A 10 "^## v$version" RELEASES.md | tail -n +2)"
+        done <<< "$(grep -A 10 "^## $version" RELEASES.md | tail -n +2)"
 
         if [ "$first_entry" = true ]; then
             first_entry=false
@@ -58,7 +58,7 @@ while IFS= read -r line; do
             echo ',' >> app/static/releases.json
         fi
 
-        echo -n "{\"date\": \"$sort_date\", \"version\": \"v$version\", \"period\": \"$date_str\", \"message\": \"$first_feature\", \"type\": \"user_release\"}" >> app/static/releases.json
+        echo -n "{\"date\": \"$sort_date\", \"version\": \"$version\", \"period\": \"$date_str\", \"message\": \"$first_feature\", \"type\": \"user_release\"}" >> app/static/releases.json
     fi
 done < RELEASES.md
 echo ']}' >> app/static/releases.json
@@ -67,7 +67,7 @@ echo ']}' >> app/static/releases.json
 echo '{"source": "internal_releases", "entries": [' > app/static/releases-internal.json
 first_entry=true
 while IFS= read -r line; do
-    if [[ $line =~ ^##\ v([0-9]+\.[0-9]+)\ -\ (.+)$ ]]; then
+    if [[ $line =~ ^##\ ([0-9]+\.[0-9]+)\ -\ (.+)$ ]]; then
         version="${BASH_REMATCH[1]}"
         date_str="${BASH_REMATCH[2]}"
 
@@ -99,7 +99,7 @@ while IFS= read -r line; do
                 first_detail="${BASH_REMATCH[1]}"
                 break
             fi
-        done <<< "$(grep -A 10 "^## v$version" RELEASES-INTERNAL.md | tail -n +2)"
+        done <<< "$(grep -A 10 "^## $version" RELEASES-INTERNAL.md | tail -n +2)"
 
         if [ "$first_entry" = true ]; then
             first_entry=false
@@ -107,7 +107,7 @@ while IFS= read -r line; do
             echo ',' >> app/static/releases-internal.json
         fi
 
-        echo -n "{\"date\": \"$sort_date\", \"version\": \"v$version\", \"period\": \"$date_str\", \"message\": \"$first_detail\", \"type\": \"internal_release\"}" >> app/static/releases-internal.json
+        echo -n "{\"date\": \"$sort_date\", \"version\": \"$version\", \"period\": \"$date_str\", \"message\": \"$first_detail\", \"type\": \"internal_release\"}" >> app/static/releases-internal.json
     fi
 done < RELEASES-INTERNAL.md
 echo ']}' >> app/static/releases-internal.json
