@@ -110,6 +110,7 @@ generate_deployment_script() {
 # Setup environment
 [ -f ~/.bashrc ] && source ~/.bashrc
 export PATH="\$HOME/.local/bin:\$PATH"
+export DEPLOY_GIT_BRANCH="$DEPLOY_GIT_BRANCH"
 cd $DEPLOY_REPO_PATH || { echo "❌ Repository not found"; exit 1; }
 
 echo "🚀 Starting HattrickPlanner Deployment"
