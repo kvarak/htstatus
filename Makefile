@@ -467,9 +467,9 @@ deploy-docs: ## Update release documentation and changelog
 		echo "Version changes detected - updating release documentation..."; \
 		$(MAKE) release-docs || echo "Release update failed, continuing..."; \
 	else \
-		echo "No version changes detected"; \
+		echo "No version changes detected - generating changelog only..."; \
+		$(MAKE) changelog; \
 	fi
-	@$(MAKE) changelog
 	@echo "✅ Documentation updated"
 
 deploy-migrate: check-uv ## Apply database migrations safely
@@ -491,7 +491,7 @@ deploy-finalize: ## Finalize deployment (restart service, cleanup)
 		echo "❌ Service restart failed!"; \
 		exit 1; \
 	fi
-	@echo "✅ Deployment completed successfully"
+	@echo "✅ Finalization completed"
 
 deploy: ## Smart deployment: --run if pushed, --dry-run if not (override with FORCE_DEPLOY=true)
 	@echo "🚀 Preparing deployment..."
