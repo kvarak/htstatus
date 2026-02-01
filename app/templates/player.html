@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 
-
 {% block scripts %}
-
 {{ super() }}
 
 <script>
@@ -230,12 +228,10 @@
         </div>
       </div>
     </div>
-  <!-- </div>
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
   </div>
-  <div class="row"> -->
+
+  <!-- Player Detail Sections (Collapsible) -->
+  <div class="row">
     {% for group in group_data %}
     {% set theplayers = grouped_players[group.id] %}
     {% for p in theplayers %}
@@ -276,8 +272,10 @@
               {% endif %}
 
             </h5>
+        </div>
 
-            {% if p['nick_name'] != "None" %}
+        <div class="player-content">
+          {% if p['nick_name'] != "None" %}
             <p class="card-text">
               <i>"{{ p['nick_name'] }}"</i>
             </p>
@@ -406,12 +404,12 @@
                   </td>
                 </tr>
               </table>
-            </p>
-          </div>
-          <div class="card-body">
-            <canvas id="myLineChart{{ p['ht_id'] }}" width="400" height="250"></canvas>
-          </div>
-          <div class="card-body">
+
+            <div class="player-chart" style="margin: 1rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 0.25rem;">
+              <canvas id="myLineChart{{ p['ht_id'] }}" width="400" height="250"></canvas>
+            </div>
+
+            <div class="player-actions" style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid hsl(120, 20%, 85%);">
             <form method="POST" action="/player">
               <input type="hidden" id="playerid" name="playerid" value="{{ p['ht_id'] }}">
               <input type="hidden" id="id" name="id" value="{{ teamid }}">
@@ -444,14 +442,10 @@
           </div>
         </div>
       </div>
-    </div>
     {% endfor %}
     {% endfor %}
   </div>
-  <div class="row">
-    <div class="col-sm"><p></p>
-    </div>
-  </div>
+
 </div>
 
 {% endblock %}
