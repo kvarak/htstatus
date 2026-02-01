@@ -1548,3 +1548,93 @@ def get_formation_list():
         {"key": key, "name": template["name"], "description": template["description"]}
         for key, template in FORMATION_TEMPLATES.items()
     ]
+
+
+def get_team_timeline(team_id):
+    """Get 4-week timeline of skill changes for a specific team.
+
+    Extracted from team.py update route for reuse in player pages.
+
+    Args:
+        team_id: Hattrick team ID to filter players by
+
+    Returns:
+        dict: Timeline changes structured by week with format:
+        {
+            "week_1": {
+                "week_label": "Week 1",
+                "is_current": True,
+                "days_ago_start": 7,
+                "days_ago_end": 0,
+                "changes": [player_changes...]
+            },
+            ...
+        }
+    """
+    try:
+        from flask import current_app
+
+        from models import Players
+
+        # Get db from current Flask app context if not set globally
+        current_db = db if db is not None else current_app.extensions['sqlalchemy'].db
+
+        # Get all players for this team from current roster
+        latest_players = (
+            current_db.session.query(Players.ht_id)
+            .filter_by(owner=team_id)
+            .distinct()
+            .all()
+        )
+
+        players_fromht = [p.ht_id for p in latest_players]
+
+        if not players_fromht:
+            return {}
+
+        # Collect changes for 4-week timeline - simplified
+        timeline_changes = {}
+
+        for week_num in range(1, 5):  # Weeks 1-4
+            week_start_days = week_num * 7  # Start of week (older)
+            week_end_days = (week_num - 1) * 7  # End of week (newer)
+
+            timeline_changes[f"week_{week_num}"] = {
+                "week_label": f"Week {week_num}",
+                "is_current": week_num == 1,
+                "days_ago_start": week_start_days,
+                "days_ago_end": week_end_days,
+                "changes": [],
+            }
+
+            # Get all changes for all players in this week period
+            for player_id in players_fromht:
+                player_changes = get_player_changes(
+                    player_id, week_start_days, week_end_days
+                )
+
+                for change in player_changes:
+                    timeline_changes[f"week_{week_num}"]["changes"].append(change)
+
+            # Sort changes by group order (None last), then by player name
+            def sort_changes_key(change):
+                player_data = change[0]  # First element is player display data
+                if isinstance(player_data, dict):
+                    # Sort by group order (None values last), then by player name
+                    group_order = player_data.get('group_order')
+                    if group_order is None:
+                        group_order = 9999  # Put players without groups at the end
+                    player_name = player_data.get('name', '')
+                    return (group_order, player_name)
+                else:
+                    # Legacy string format - use as is
+                    return (9999, str(player_data))
+
+            timeline_changes[f"week_{week_num}"]["changes"].sort(key=sort_changes_key)
+
+        return timeline_changes
+
+    except Exception as e:
+        dprint(1, f"Error in get_team_timeline: {e}")
+        return {}
+

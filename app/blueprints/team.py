@@ -9,7 +9,7 @@ from flask import Blueprint, render_template, session
 from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
 from app.chpp_utilities import fetch_user_teams, get_chpp_client
 from app.model_registry import get_user_model
-from app.utils import create_page, diff, dprint, get_player_changes
+from app.utils import create_page, diff, dprint
 
 # Create Blueprint for team routes
 team_bp = Blueprint("team", __name__)
@@ -360,45 +360,9 @@ def update():
 
             players_fromht.append(thisplayer["ht_id"])
 
-        # Collect changes for 4-week timeline - simplified
-        timeline_changes = {}
-
-        for week_num in range(1, 5):  # Weeks 1-4
-            week_start_days = week_num * 7  # Start of week (older)
-            week_end_days = (week_num - 1) * 7  # End of week (newer)
-
-            timeline_changes[f"week_{week_num}"] = {
-                "week_label": f"Week {week_num}",
-                "is_current": week_num == 1,
-                "days_ago_start": week_start_days,
-                "days_ago_end": week_end_days,
-                "changes": [],
-            }
-
-            # Get all changes for all players in this week period
-            for player_id in players_fromht:
-                player_changes = get_player_changes(
-                    player_id, week_start_days, week_end_days
-                )
-
-                for change in player_changes:
-                    timeline_changes[f"week_{week_num}"]["changes"].append(change)
-
-            # Sort changes by group order (None last), then by player name
-            def sort_changes_key(change):
-                player_data = change[0]  # First element is player display data
-                if isinstance(player_data, dict):
-                    # Sort by group order (None values last), then by player name
-                    group_order = player_data.get('group_order')
-                    if group_order is None:
-                        group_order = 9999  # Put players without groups at the end
-                    player_name = player_data.get('name', '')
-                    return (group_order, player_name)
-                else:
-                    # Legacy string format - use as is
-                    return (9999, str(player_data))
-
-            timeline_changes[f"week_{week_num}"]["changes"].sort(key=sort_changes_key)
+        # Get 4-week timeline using shared utility
+        from app.utils import get_team_timeline
+        timeline_changes = get_team_timeline(teamid)
 
         updated[teamid].append("/player?id=" + str(teamid))
         updated[teamid].append("players")

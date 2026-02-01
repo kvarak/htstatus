@@ -96,6 +96,10 @@ def player():
     if not is_valid:
         return handle_error(TeamAccessError(error_msg))
 
+    # Get 4-week timeline for this team
+    from app.utils import get_team_timeline
+    timeline_changes = get_team_timeline(teamid)
+
     if updategroup and playerid and groupid:
         if int(groupid) < 0:
             theconnection = (
@@ -306,5 +310,6 @@ def player():
         playernames=playernames,
         allplayerids=allplayerids,
         allplayers=allplayers,
+        timeline_changes=timeline_changes,
         last_update=user.last_update if user else None,
     )

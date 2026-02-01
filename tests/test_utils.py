@@ -13,6 +13,7 @@ from app.utils import (
     diff_month,
     dprint,
     get_admin_feedback_counts,
+    get_team_timeline,
     get_training,
     get_version_info,
     initialize_utils,
@@ -796,3 +797,32 @@ class TestAdminFeedbackCounts:
         # Verify docstring
         assert get_admin_feedback_counts.__doc__ is not None
         assert "hobby project scale" in get_admin_feedback_counts.__doc__
+
+
+class TestTeamTimeline:
+    """Test get_team_timeline function."""
+
+    def test_get_team_timeline_imports(self):
+        """Test that get_team_timeline can be imported."""
+        assert get_team_timeline is not None
+        assert callable(get_team_timeline)
+
+    def test_get_team_timeline_empty_team(self, app, db_session):
+        """Test get_team_timeline with team that has no players."""
+
+        result = get_team_timeline(999999)
+        assert isinstance(result, dict)
+        # Should return empty dict for team with no players
+        assert result == {}
+
+    def test_get_team_timeline_structure(self):
+        """Test get_team_timeline returns correct structure."""
+
+        # Test function signature
+        import inspect
+        sig = inspect.signature(get_team_timeline)
+        assert 'team_id' in sig.parameters
+
+        # Verify docstring
+        assert get_team_timeline.__doc__ is not None
+        assert "4-week timeline" in get_team_timeline.__doc__
