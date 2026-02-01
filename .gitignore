@@ -48,6 +48,11 @@ out/
 *.swo
 *~
 
+# Generated files (created by scripts)
+app/static/changelog.json
+app/static/releases.json
+app/static/releases-internal.json
+
 # Docker volumes and data
 docker-compose.override.yml
 .docker/
