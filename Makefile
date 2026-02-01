@@ -447,8 +447,7 @@ deploy-prepare: ## Prepare deployment environment (git, dependencies)
 deploy-sync: check-uv ## Sync code and dependencies
 	@echo "🔄 Syncing code and dependencies..."
 	@git fetch --all
-	@git reset --hard $${DEPLOY_GIT_BRANCH:-main}
-	@git pull
+	@git reset --hard $${DEPLOY_GIT_BRANCH:-next/main}
 	@echo "Cleaning migration conflicts..."
 	@find migrations/versions/ -name "*.py" -not -path "*/__pycache__/*" | while read -r file; do \
 		if ! git ls-files --error-unmatch "$$file" >/dev/null 2>&1; then \
