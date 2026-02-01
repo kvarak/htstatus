@@ -68,7 +68,7 @@ def get_releases_data():
                 'features': [message]  # Single feature message per release
             })
 
-        return releases[:6]  # Show max 6 recent releases
+        return releases  # Show all user releases
     except Exception as e:
         dprint(1, f"Error reading releases JSON: {e}")
         return [{'version': 'v3.8', 'date': 'January 2026', 'features': ['Latest updates available']}]
