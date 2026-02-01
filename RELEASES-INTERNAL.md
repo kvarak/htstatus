@@ -8,6 +8,24 @@
 
 ---
 
+## 3.15 - February 2026
+
+**Deployment Architecture Simplification**
+- Refactored deployment system to follow separation of concerns pattern
+- Moved deploy.sh from root to scripts/deployment/ directory for better organization
+- Created 5 reusable Makefile deployment targets: deploy-prepare, deploy-sync, deploy-docs, deploy-migrate, deploy-finalize
+- Added intelligent make deploy target with git-aware behavior (dry-run if not pushed, force override with FORCE_DEPLOY=true)
+- Applied simplification hierarchy achieving 70% code reduction (400+ lines → 120 lines)
+- Enhanced DEPLOYMENT.md with comprehensive deployment architecture documentation
+- Achieved single source of truth for deployment logic in Makefile
+
+**Development Workflow Improvements**
+- Restructured commit workflow in prompts.json from 14-step list to 7-phase structure
+- Separated internal vs user-facing release documentation workflows
+- Always update RELEASES-INTERNAL.md for all tagged releases
+- Only update RELEASES.md for user-visible features (UI, new functionality, workflow improvements)
+- Eliminated redundant instructions and improved workflow clarity
+
 ## 3.14 - February 2026
 
 **User Analytics & Activity Tracking**
