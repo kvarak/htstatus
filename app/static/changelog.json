@@ -1,4 +1,8 @@
 {"source": "commits", "entries": [
+{"date": "2026-02-01 12:45:22", "hash": "c910a5d", "message": "refactor: cleanup project state and UI improvements", "type": "commit"},
+{"date": "2026-02-01 12:45:13", "hash": "4bc707d", "message": "docs: update project documentation for new workflows", "type": "commit"},
+{"date": "2026-02-01 12:45:02", "hash": "f38699f", "message": "refactor: modernize automation to use make targets", "type": "commit"},
+{"date": "2026-02-01 12:44:47", "hash": "79ab74c", "message": "feat: add automated release management system [feat-infra84]", "type": "commit"},
 {"date": "2026-02-01 09:18:17", "hash": "edd7f4a", "message": "docs: update project organization and fix minor issues", "type": "commit"},
 {"date": "2026-02-01 09:17:53", "hash": "9342955", "message": "feat: extract reusable team timeline utility function", "type": "commit"},
 {"date": "2026-02-01 09:17:43", "hash": "9d7e12c", "message": "remove: timeline feature from player page due to browser conflicts", "type": "commit"},

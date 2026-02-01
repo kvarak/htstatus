@@ -8,6 +8,27 @@
 
 ---
 
+## 3.13 - February 2026
+
+**Infrastructure & Automation**
+- Added comprehensive release automation system with version detection
+- Implemented automated git tagging and release documentation generation
+- Created make targets for standardized release workflow (release-detect, release-notes, release-tag)
+- Enhanced deployment automation with make target integration
+- Modernized all script calls to use unified make-based workflow
+
+**Development Workflow**
+- Added db-apply make target for production-safe database migrations
+- Updated commit prompt workflow to use make commands instead of direct scripts
+- Enhanced project documentation with new automation procedures
+- Improved error messages and help text to reference standardized commands
+
+**Technical Improvements**
+- Generated JSON timeline data for releases and changelog integration
+- Created dual documentation system (user-facing RELEASES.md + technical RELEASES-INTERNAL.md)
+- Enhanced UI consistency and component cleanup
+- Various utility and test coverage improvements
+
 ## v3.12 - February 2026
 
 - Extracted reusable team timeline utility for better code organization
