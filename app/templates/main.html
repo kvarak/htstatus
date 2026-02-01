@@ -33,48 +33,75 @@
 </div> -->
 
   <div class="row">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <p class="card-text">
-              Welcome and thanks for checking this tools out. I'm hoping that it can help you organize
-              your team, players, matches and training. It's always under development and still ongoing
-              changes now and then, so expect changes.
-            </p>
-            <p class="card-text">
-              Start by clicking "Update data" and then you can view your players in the players section.
-              Don't forget to go to "Settings" to add groups, so that you can arrange your players in a much
-              nicer player view.
-            </p>
-          </div>
+    <div class="col-md-7">
+      <div class="card mb-3">
+        <div class="card-body">
+          <p class="card-text">
+            Welcome to HattrickPlanner! This tool helps you organize and analyze your Hattrick teams with detailed player statistics, formation testing, and training tracking.
+          </p>
+
+          <p class="card-text">
+            <strong>Getting Started:</strong> Click "Update data" to sync your latest team and player information from Hattrick.
+          </p>
+
+          <p class="card-text">
+            <strong>Players:</strong> View detailed player statistics, skill development, and organize players into custom groups. Use "Settings" to create groups like "Main Squad" or "Youth Academy".
+          </p>
+
+          <p class="card-text">
+            <strong>Formations:</strong> Formation testing tools (work in progress) - coming soon to help you experiment with different tactical setups.
+          </p>
+
+          <p class="card-text">
+            <strong>Training & Stats:</strong> Track training progress and analyze team statistics to optimize player development.
+          </p>
+
+          <p class="card-text">
+            <strong>Feedback:</strong> Share suggestions and vote on features you'd like to see added to the tool.
+          </p>
         </div>
-        <div class="card">
-          <div class="card-body">
-            <p class="card-text text-sm11"><b>Thanks to</b><br>
-              - <a href="http://www.hattrick.org/">Hattrick</a><br>
-              - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
-            </p>
-            <!-- <p class="card-text text-sm11"><b>Beta testers</b><br>
-              - <a href="https://www.hattrick.org/en/Club/Manager/?userId=10507783">Skjoldar</a><br>
-              - <a href="https://www.hattrick.org/en/Club/Manager/?userId=2570032">cassiolaw</a><br>
-            </p> -->
-            <!-- <p class="card-text text-sm11"><b>Source code</b><br>
-              - <a href="https://github.com/kvarak/htstatus">github/kvarak/htstatus</a><br>
-            </p> -->
-            <p class="card-text text-sm11"><b>Users</b><br>
-              - Total users: {{ usercount }}<br>
-              - Active users: {{ activeusers }}
-            </p>
-            <p class="card-text text-sm11"><b>Full version</b><br>
-              - {{ fullversion }}
-            </p>
-            <p class="card-text text-sm11"><b>Note</b><br>
-    If you have any issues with not being able to <i>Update data</i>, try to
-    logout and then login again to reset the sessiondata. This can happen for instance if you
-    rename a team, remove a team, etc.
-            </p>
-          </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <p class="card-text text-sm11"><b>Thanks to</b><br>
+            - <a href="http://www.hattrick.org/">Hattrick</a><br>
+            - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
+          </p>
+          <p class="card-text text-sm11"><b>Users</b><br>
+            - Total users: {{ usercount }}<br>
+            - Active users: {{ activeusers }}
+          </p>
+          <p class="card-text text-sm11"><b>Full version</b><br>
+            - {{ fullversion }}
+          </p>
+          <p class="card-text text-sm11"><b>Note</b><br>
+            If you have any issues with not being able to <i>Update data</i>, try to
+            logout and then login again to reset the sessiondata. This can happen for instance if you
+            rename a team, remove a team, etc.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-rocket"></i> What's New
+          </h5>
+          {% if releases %}
+            <div class="text-sm11">
+              {% for release in releases %}
+                <div class="mb-2 pb-2" style="border-bottom: 1px solid #e9ecef;">
+                  <h6 class="mb-1 text-primary">{{ release.version }} <small class="text-muted">{{ release.date }}</small></h6>
+                  {% for feature in release.features %}
+                    <div class="text-sm10 mb-1">• {{ feature|safe }}</div>
+                  {% endfor %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-sm11">Release information not available.</p>
+          {% endif %}
         </div>
       </div>
     </div>

@@ -106,19 +106,95 @@
       <div class="card-deck">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Changes</h5>
-            <p class="card-text">
-              <p class="text-sm13">
+            <h5 class="card-title"><i class="fas fa-code-branch"></i> Changes (Combined Timeline)</h5>
+            <div class="card-text">
+              <div class="text-sm13">
                 {% for c in changelogfull %}
-                {{ c }}</br>
+                {{ c|safe }}
                 {% endfor %}
-              </p>
-            </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+.commit-entry {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 100px; /* Default expanded height */
+    opacity: 1;
+}
+
+.commit-entry.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border: none !important;
+}
+
+.chevron-icon {
+    transition: transform 0.2s ease-in-out;
+}
+
+.chevron-icon.rotated {
+    transform: rotate(-90deg);
+}
+</style>
+
+<script>
+function toggleCommits(releaseId) {
+    // Find all commits associated with this release
+    const commits = document.querySelectorAll(`.commit-group-${releaseId}`);
+    const chevron = document.getElementById(`chevron-${releaseId}`);
+
+    // Check current state (visible or hidden)
+    const isVisible = commits.length > 0 && !commits[0].classList.contains('collapsed');
+
+    // Toggle visibility with smooth animation
+    commits.forEach(commit => {
+        if (isVisible) {
+            // Collapse: Add collapsed class for smooth animation
+            commit.classList.add('collapsed');
+        } else {
+            // Expand: Remove collapsed class for smooth animation
+            commit.classList.remove('collapsed');
+        }
+    });
+
+    // Update chevron direction with rotation
+    if (chevron) {
+        if (isVisible) {
+            chevron.classList.add('rotated');
+        } else {
+            chevron.classList.remove('rotated');
+        }
+    }
+}
+
+// Initialize all commit groups as collapsed by default (except ungrouped commits)
+document.addEventListener('DOMContentLoaded', function() {
+    // Add transition classes to all commits
+    const allCommits = document.querySelectorAll('[class*="commit-group-"]');
+    allCommits.forEach(commit => {
+        commit.classList.add('commit-entry');
+        // Start all grouped commits as collapsed
+        commit.classList.add('collapsed');
+    });
+
+    // Add transition class to all chevron icons and set them to collapsed state
+    const allChevrons = document.querySelectorAll('[id*="chevron-"]');
+    allChevrons.forEach(chevron => {
+        chevron.classList.add('chevron-icon');
+        // Start all chevrons in collapsed/rotated state
+        chevron.classList.add('rotated');
+    });
+});
+</script>
 
 {% endblock %}

@@ -57,7 +57,7 @@ def audit_user_data(user_id, team_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python audit_user_data.py <user_id> <team_id>")
+        print("Usage: uv run python audit_user_data.py <user_id> <team_id>")
         sys.exit(1)
 
     user_id = int(sys.argv[1])

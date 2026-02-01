@@ -290,8 +290,8 @@ def cleanup_user_data(user_id, team_id):
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Enhanced Database Cleanup Script")
-        print("Usage: python cleanup_user_data.py <user_id> <team_id>")
-        print("Example: python cleanup_user_data.py 182085 9838")
+        print("Usage: uv run python cleanup_user_data.py <user_id> <team_id>")
+        print("Example: uv run python cleanup_user_data.py 182085 9838")
         print("\nThis script will remove:")
         print("- All player records (including historical)")
         print("- All user groups and settings")

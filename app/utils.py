@@ -72,72 +72,33 @@ def diff(first, second):
 
 
 def get_version_info():
-    """Get version information with feature-based minor versioning.
+    """Get version information using git tags.
 
     Returns dict with version, fullversion, versionstr for consistent use across app.
-    - Major version from git tags (e.g., "3.0")
-    - Minor version = count of features implemented since last major version
-    - Patch version from git describe build number
-    - Git hash for identification
+    Uses git describe --tags directly since we now tag all minor releases.
     """
     import subprocess
 
     try:
-        # Get git describe output
+        # Get git describe output - this will show the current version
         versionstr_raw = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
-        versionstr_parts = versionstr_raw.split("-")
 
-        if len(versionstr_parts) >= 3:
-            major_version_tag = versionstr_parts[0]  # e.g., "3.0"
-            build_number = versionstr_parts[1]       # e.g., "16"
-            git_hash = versionstr_parts[2]           # e.g., "gb9fb21c"
+        # Parse the git describe output
+        if "-" in versionstr_raw:
+            # Format: "3.12-1-gedd7f4a" (commits ahead of tag)
+            parts = versionstr_raw.split("-")
+            tag_version = parts[0]  # "3.12"
+            # Skip commits_ahead and git_hash as they're not needed
 
-            # Extract major version number (3 from "3.0")
-            major_number = major_version_tag.split('.')[0]  # "3"
-
-            # Count features since last major version tag
-            try:
-                # Get commit messages since the last major version tag
-                feature_commits = subprocess.check_output([
-                    "git", "log", f"{major_version_tag}..HEAD", "--oneline", "--grep=FEAT-", "--grep=Add feature", "--grep=Implement"
-                ]).strip().decode()
-
-                # Count feature commits (non-empty lines)
-                feature_count = len([line for line in feature_commits.split('\n') if line.strip()]) if feature_commits.strip() else 0
-
-                # Count commits since last feature commit
-                if feature_commits.strip():
-                    # Get the hash of the most recent feature commit
-                    recent_feature_lines = feature_commits.strip().split('\n')
-                    most_recent_feature_hash = recent_feature_lines[0].split()[0]  # First word is the commit hash
-
-                    # Count commits since that feature commit
-                    commits_since_feature = subprocess.check_output([
-                        "git", "rev-list", "--count", f"{most_recent_feature_hash}..HEAD"
-                    ]).strip().decode()
-
-                    patch_count = int(commits_since_feature) if commits_since_feature.isdigit() else 0
-                else:
-                    # No feature commits, count all commits since major version tag
-                    commits_since_major = subprocess.check_output([
-                        "git", "rev-list", "--count", f"{major_version_tag}..HEAD"
-                    ]).strip().decode()
-                    patch_count = int(commits_since_major) if commits_since_major.isdigit() else 0
-
-            except subprocess.CalledProcessError:
-                # Fallback: use build number if git log fails
-                feature_count = int(build_number) if build_number.isdigit() else 0
-                patch_count = 0
-
-            # Semantic versioning format: major.minor.patch-ghash where minor = feature count, patch = commits since last feature
-            version = f"{major_number}.{feature_count}"
-            fullversion = f"{major_number}.{feature_count}.{patch_count}-{git_hash}"
-            versionstr = fullversion
-        else:
-            # Simple tag without build info
+            version = tag_version
             fullversion = versionstr_raw
-            version = versionstr_raw
             versionstr = versionstr_raw
+        else:
+            # Exact tag match (no commits ahead)
+            version = versionstr_raw
+            fullversion = versionstr_raw
+            versionstr = versionstr_raw
+
     except (subprocess.CalledProcessError, FileNotFoundError, IndexError):
         # Fallback for development environment
         fullversion = "2.0.0-dev"

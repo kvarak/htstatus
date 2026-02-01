@@ -4,7 +4,7 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (February 1, 2026): Completed FEAT-019 timeline implementation removed due to browser extension conflicts, moved to P4 for potential retry. Quality gates: 5/7 passing (MODERATE deployment confidence). **Active: 54 tasks | REFACTOR-084, 085 promoted to P1**
+**Recent Organization** (February 1, 2026): Completed INFRA-083 release automation system. Quality gates: 5/7 passing (MODERATE deployment confidence). **Active: 54 tasks | Focus: P1 critical cleanup and P2 feature development**
 
 ---
 
@@ -20,6 +20,7 @@
 
 ## P2: Features 🎯
 
+- **[TEST-010]** Address Test Coverage Gap - Increase test coverage from 41.1% to 50% minimum requirement, focus on blueprint routes with lowest coverage: auth (19%), main (10%), team (11%) (120 min)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
@@ -41,6 +42,16 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 1, 2026 - Changelog System Over-Engineering Analysis)
+
+#### Test Coverage & Quality Priority
+- **[INFRA-084]** Resolve Dependency Security Warnings - Address 13 dependency warnings identified in security scan, update vulnerable packages or document acceptable risk (60 min)
+
+#### Simplification Opportunities
+- **[REFACTOR-028]** Simplify Changelog System - Replace JSON-based changelog with static CHANGELOG.md, remove bash generation scripts and debug page complexity (30 min)
+- **[REFACTOR-085]** Remove Unused Script Arguments - Fix broken usage instructions in scripts/ directory (`python` → `uv run python`) and remove dead debugging code (15 min)
+- **[REFACTOR-086]** Eliminate Changelog Animation Complexity - Replace 80+ lines of CSS transitions and JavaScript for debug page with simple show/hide toggle (20 min)
 
 ### Recent Critical Review Improvements (February 1, 2026 - FEAT-019 Timeline Analysis)
 

@@ -31,8 +31,8 @@ def trigger_groups_for_user(user_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python trigger_default_groups.py <user_id>")
-        print("Example: python trigger_default_groups.py 182085")
+        print("Usage: uv run python trigger_default_groups.py <user_id>")
+        print("Example: uv run python trigger_default_groups.py 182085")
         sys.exit(1)
 
     try:
