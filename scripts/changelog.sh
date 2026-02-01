@@ -12,9 +12,13 @@ git log --format='%ci|%h|%s' | while IFS='|' read -r date hash message; do
     fi
     # Strip timezone from date to match release format
     clean_date=$(echo "$date" | sed 's/ +[0-9]*//' | sed 's/ -[0-9]*//')
+    # Get version for this commit using git describe and format it properly
+    version_raw=$(git describe --tags "$hash" 2>/dev/null || echo "unknown")
+    # Convert format from "3.15-8-g5015d35" to "3.15.8-g5015d35" (replace first hyphen with dot)
+    version=$(echo "$version_raw" | sed 's/-/./')
     # Escape JSON strings
     message_escaped=$(echo "$message" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
-    echo -n "{\"date\": \"$clean_date\", \"hash\": \"$hash\", \"message\": \"$message_escaped\", \"type\": \"commit\"}" >> app/static/changelog.json
+    echo -n "{\"date\": \"$clean_date\", \"hash\": \"$hash\", \"version\": \"$version\", \"message\": \"$message_escaped\", \"type\": \"commit\"}" >> app/static/changelog.json
 done
 echo '' >> app/static/changelog.json
 echo ']}' >> app/static/changelog.json

@@ -91,8 +91,9 @@ def get_version_info():
             # Skip commits_ahead and git_hash as they're not needed
 
             version = tag_version
-            fullversion = versionstr_raw
-            versionstr = versionstr_raw
+            # Convert format from "3.15-8-g5015d35" to "3.15.8-g5015d35" (replace first hyphen with dot)
+            fullversion = versionstr_raw.replace("-", ".", 1)
+            versionstr = fullversion
         else:
             # Exact tag match (no commits ahead)
             version = versionstr_raw
