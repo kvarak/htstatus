@@ -371,7 +371,6 @@ def changes():
             date = full_date.split(' ')[0]  # Get just the date part for display
 
             if entry_type == 'commit':
-                hash_part = entry.get('hash', 'unknown')
                 version = entry.get('version', 'unknown')
                 message = entry.get('message', '')
                 # Add data attributes to group commits with their release
@@ -417,7 +416,7 @@ def admin():
     # Get model classes from registry
     User = get_user_model()
 
-    error = ""
+    form_error = ""
 
     try:
         user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
@@ -445,7 +444,7 @@ def admin():
             db.session.commit()
 
         except Exception:
-            error = "couldn't change user"
+            form_error = "couldn't change user"
 
     allusers = db.session.query(User).order_by(text("last_usage desc")).all()
     users = []
@@ -482,9 +481,27 @@ def admin():
         }
         users.append(thisuser)
 
+    # Get recent errors for display
+    from models import ErrorLog
+    recent_errors = db.session.query(ErrorLog).order_by(ErrorLog.timestamp.desc()).limit(10).all()
+
+    errors = []
+    for error in recent_errors:
+        error_data = {
+            "id": error.id,
+            "timestamp": error.timestamp,
+            "error_type": error.error_type,
+            "message": error.message[:100] + "..." if error.message and len(error.message) > 100 else error.message or "No message",
+            "user_id": error.user_id,
+            "request_path": error.request_path,
+            "environment": error.environment
+        }
+        errors.append(error_data)
+
     return create_page(
         template="debug.html",
         title="Debug",
         users=users,
-        error=error,
+        errors=errors,
+        form_error=form_error,
     )

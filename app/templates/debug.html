@@ -12,11 +12,82 @@
       </nav>
     </div>
   </div>
-  {% if error %}
+  {% if form_error %}
   <div class="alert alert-danger" role="alert">
-    {{ error }}
+    {{ form_error }}
   </div>
   {% endif %}
+
+  <!-- Production Errors Table -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-exclamation-triangle text-warning mr-2"></i>Recent Production Errors
+            <small class="text-muted">(Last 10 errors)</small>
+          </h5>
+          {% if errors %}
+          <div class="table-responsive">
+            <table class="table-custom table-scroll sortable">
+              <thead>
+                <tr>
+                  <th scope="col" class="text-small">ID</th>
+                  <th scope="col" class="text-small">Time</th>
+                  <th scope="col" class="text-small">Type</th>
+                  <th scope="col" class="text-small">Message</th>
+                  <th scope="col" class="text-small">User</th>
+                  <th scope="col" class="text-small">Path</th>
+                  <th scope="col" class="text-small">Env</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for error in errors %}
+                <tr>
+                  <td class="text-small">{{ error.id }}</td>
+                  <td class="text-small">{{ error.timestamp.strftime('%m/%d %H:%M') }}</td>
+                  <td class="text-small">
+                    {% if error.error_type == '500' %}
+                      <span class="badge badge-danger">{{ error.error_type }}</span>
+                    {% elif error.error_type == '404' %}
+                      <span class="badge badge-warning">{{ error.error_type }}</span>
+                    {% else %}
+                      <span class="badge badge-secondary">{{ error.error_type }}</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-small" title="{{ error.message }}">
+                    {{ error.message if error.message else 'No message' }}
+                  </td>
+                  <td class="text-small">
+                    {% if error.user_id %}
+                      {{ error.user_id }}
+                    {% else %}
+                      <span class="text-muted">Anonymous</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-small">
+                    <code>{{ error.request_path if error.request_path else '/' }}</code>
+                  </td>
+                  <td class="text-small">
+                    <small class="text-muted">{{ error.environment }}</small>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="card-text">
+            <span class="text-success">
+              <i class="fas fa-check-circle mr-2"></i>No production errors found! System is healthy.
+            </span>
+          </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-md-6">
       <div class="card-deck">
