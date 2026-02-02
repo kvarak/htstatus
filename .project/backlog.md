@@ -4,13 +4,13 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (February 1, 2026): Completed INFRA-083 release automation system. Quality gates: 5/7 passing (MODERATE deployment confidence). **Active: 54 tasks | Focus: P1 critical cleanup and P2 feature development**
+**Recent Organization** (February 2, 2026): INFRA-085 production error logging completed and moved to history. Quality gates: 5/7 passing (MODERATE deployment confidence). Focus: P1 architecture cleanup, P2 test coverage improvement. **Active: 58 tasks**
 
 ---
 
 ## P0: Production-Breaking 🚨
 
-*All P0 production-breaking issues resolved as of January 28, 2026*
+- **[BUG-075]** Fix Integration Test Failures - Resolve 3 failing tests (template and version issues) preventing quality gate success (30 min)
 
 ## P1: Critical 🔥
 
@@ -20,7 +20,7 @@
 
 ## P2: Features 🎯
 
-- **[TEST-010]** Address Test Coverage Gap - Increase test coverage from 41.1% to 50% minimum requirement, focus on blueprint routes with lowest coverage: auth (19%), main (10%), team (11%) (120 min)
+- **[TEST-010]** Address Test Coverage Gap - Increase test coverage from 41.1% to 50% minimum, focus on blueprint routes with lowest coverage: auth (19%), main (10%), team (11%), and add missing error logging test coverage (165 min)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
@@ -42,6 +42,16 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 2, 2026 - INFRA-085 Error Logging Analysis)
+
+#### Error Logging Simplification & Quality
+- **[REFACTOR-087]** Simplify Error Logging Model - Reduce ErrorLog model from 9 fields to essential fields only (timestamp, message, stack_trace) to eliminate over-engineering (15 min)
+- **[INFRA-086]** Add Error Log Rotation/Cleanup - Implement automatic cleanup mechanism to prevent unbounded database growth in production (30 min)
+- **[REFACTOR-088]** Split Debug Route Responsibilities - Separate user administration from error management to improve separation of concerns (/admin/errors route) (30 min)
+- **[TEST-083]** Add Error Logging Test Coverage - Comprehensive test coverage for error logging functionality missing from recent implementation (45 min) → **CONSOLIDATED INTO TEST-010**
+- **[FEAT-024]** Error Rate Limiting/Deduplication - Add protection against log flooding from same error to prevent database abuse (20 min)
+- **[REFACTOR-089]** Replace Production Environment Check - Use configurable logging levels instead of hard-coded production-only activation (15 min)
 
 ### Recent Critical Review Improvements (February 1, 2026 - Changelog System Over-Engineering Analysis)
 
