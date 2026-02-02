@@ -286,6 +286,25 @@ test-python: check-uv services ## 🧪 Run all Python tests with coverage
 	@mkdir -p out/tests && rm -f out/tests/$@.json out/tests/$@-cov.json
 	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=html --cov-report=json:out/tests/$@-cov.json --cov-fail-under=40 --json-report --json-report-file=out/tests/$@.json
 
+coverage-report: check-uv ## 📊 Generate detailed coverage analysis and testing priorities
+	@echo "📊 Generating coverage analysis for test prioritization..."
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@$(PYTHON) scripts/coverage_report.py --json > /tmp/coverage-analysis.json
+	@coverage_pct=$$(jq -r '.total_coverage' /tmp/coverage-analysis.json); \
+	gap_pct=$$(jq -r '.gap_to_target' /tmp/coverage-analysis.json); \
+	priority_files=$$(jq -r '.priority_files | length' /tmp/coverage-analysis.json); \
+	if [ "$$gap_pct" != "null" ] && [ $$(echo "$$gap_pct > 0" | bc -l) -eq 1 ]; then \
+		printf "⚠️  Coverage: %.1f%% (%.1f%% below 50%% target)\n" "$$coverage_pct" "$$gap_pct"; \
+		scripts/qi-json.sh out/tests/$@.json "Test Coverage Analysis" "make coverage-report" ISSUES 0 $$priority_files "$$priority_files priority files" "$$(printf "%.1f%% coverage, %.1f%% gap to target" "$$coverage_pct" "$$gap_pct")"; \
+	else \
+		printf "✅ Coverage: %.1f%% (target met)\n" "$$coverage_pct"; \
+		scripts/qi-json.sh out/tests/$@.json "Test Coverage Analysis" "make coverage-report" PASSED 0 0 "coverage target met" "$$(printf "%.1f%% coverage exceeds 50%% target" "$$coverage_pct")"; \
+	fi
+	@$(PYTHON) scripts/coverage_report.py
+
+coverage-json: check-uv ## 📊 Generate coverage analysis in JSON format
+	@$(PYTHON) scripts/coverage_report.py --json
+
 test-coverage-files: check-uv ## Check if all Python files have corresponding test files
 	@echo "🔍 Checking for untested Python files..."
 	@mkdir -p out/tests && rm -f out/tests/$@.json
@@ -336,7 +355,7 @@ check-chpp: ## Check CHPP API usage policy compliance
 	@chmod +x scripts/check-chpp-usage.sh
 	@./scripts/check-chpp-usage.sh
 
-GATES = fileformat lint security-bandit security-deps test-coverage-files check-chpp
+GATES = fileformat lint security-bandit security-deps test-coverage-files coverage-report check-chpp
 
 test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"

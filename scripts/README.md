@@ -29,6 +29,29 @@ Generates the next sequential task ID for a given task type by analyzing git his
 ./scripts/get-next-task-id.sh TEST    # Returns next TEST task ID
 ```
 
+## Quality Intelligence & Testing
+
+### coverage_report.py
+Generates detailed coverage analysis with actionable testing recommendations.
+
+```bash
+# Basic usage (via Makefile - preferred)
+make coverage-report                  # Detailed analysis with recommendations
+make coverage-json                    # JSON output for automation
+
+# Direct usage
+uv run python scripts/coverage_report.py          # Default: top 10 files
+uv run python scripts/coverage_report.py -l 15   # Show top 15 files
+uv run python scripts/coverage_report.py --json  # JSON output
+```
+
+**Features**:
+- Identifies highest-impact files for test coverage improvement
+- Categorizes files by type (blueprints, utils, models, CHPP)
+- Provides specific recommendations for reaching coverage targets
+- Calculates impact scores (low coverage × high line count = high priority)
+- Integrates with Quality Intelligence reporting pipeline
+
 ### count_tasks_by_priority.py
 Analyzes the project backlog and counts tasks by priority level.
 
