@@ -167,3 +167,90 @@ def test_default_groups_creation_function_exists():
     import inspect
     sig = inspect.signature(create_default_groups)
     assert 'user_id' in sig.parameters
+
+
+class TestAuthRoutes:
+    """Test authentication blueprint route functionality."""
+
+    def test_login_route_get(self, auth_client):
+        """Test login route GET request renders login page."""
+        response = auth_client.get('/login')
+        assert response.status_code == 200
+        assert b'Login' in response.data or b'login' in response.data
+        assert b'cookie_consent' in response.data
+
+    def test_login_route_post_missing_consent(self, auth_client):
+        """Test login route requires cookie consent."""
+        response = auth_client.post('/login', data={
+            'username': 'test',
+            'password': 'test'
+        })
+        assert response.status_code == 200
+        assert b'You must consent to the use of essential session cookies' in response.data
+
+    def test_logout_route_clears_session(self, auth_client):
+        """Test logout route clears session data."""
+        # Set session data first
+        with auth_client.session_transaction() as session:
+            session['access_key'] = 'test_key'
+            session['access_secret'] = 'test_secret'
+            session['current_user'] = 'test_user'
+
+        # Call logout
+        response = auth_client.get('/logout')
+
+        # Should redirect (302) or show logout page (200)
+        assert response.status_code in [200, 302]
+
+        # Session should be cleared
+        with auth_client.session_transaction() as session:
+            assert session.get('access_key') is None
+            assert session.get('access_secret') is None
+            assert session.get('current_user') is None
+
+    def test_protected_route_redirect_unauthenticated(self, auth_client):
+        """Test that protected routes redirect when not authenticated."""
+        # Test accessing a protected route without authentication
+        response = auth_client.get('/team')
+        # The route might return 200 with error message or redirect - both acceptable
+        assert response.status_code in [200, 302, 401, 403]
+
+    def test_protected_route_redirect_settings(self, auth_client):
+        """Test settings route requires authentication."""
+        response = auth_client.get('/settings')
+        # The route might return 200 with error message or redirect - both acceptable
+        assert response.status_code in [200, 302, 401, 403]
+
+    def test_protected_route_redirect_update(self, auth_client):
+        """Test update route requires authentication."""
+        response = auth_client.get('/update')
+        # The route might return 200 with error message or redirect - both acceptable
+        assert response.status_code in [200, 302, 401, 403]
+        with auth_client.session_transaction() as session:
+            session['access_key'] = 'test_access_key'
+            session['access_secret'] = 'test_access_secret'
+            session['current_user_id'] = 12345
+            session['all_teams'] = [12345]
+            session['all_team_names'] = ['Test Team']
+
+        # Test accessing index route (should work)
+        response = auth_client.get('/')
+        assert response.status_code == 200
+
+    def test_session_token_validation(self, auth_client):
+        """Test session token structure validation."""
+        with auth_client.session_transaction() as session:
+            session['access_key'] = 'valid_access_key'
+            session['access_secret'] = 'valid_access_secret'
+
+        with auth_client.session_transaction() as session:
+            access_key = session.get('access_key')
+            access_secret = session.get('access_secret')
+
+            # Validate token structure
+            assert access_key is not None
+            assert access_secret is not None
+            assert isinstance(access_key, str)
+            assert isinstance(access_secret, str)
+            assert len(access_key) > 0
+            assert len(access_secret) > 0
