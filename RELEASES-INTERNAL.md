@@ -170,6 +170,28 @@
 - Core web interface implementation with Bootstrap styling
 - Basic CHPP API integration for data synchronization
 
+## 0.3 - January 2021
+
+- Enhanced changelog display on start page for better user experience
+- Added match data integration and display functionality
+- Improved user interface with refined layout and navigation
+- Extended player data handling and presentation features
+
+## 0.2 - June 2020
+
+- Development server configuration and deployment improvements
+- Enhanced stability and testing infrastructure
+- Refined authentication and session management
+- Core functionality stabilization and bug fixes
+
+## 0.1 - June 2020
+
+- First alpha release ready for public testing
+- Basic Hattrick API integration established with pychpp library
+- Initial player data retrieval and display functionality
+- Foundation web interface with authentication flow
+- Core database structure for player and team management
+
 ## 0.0 - June 2020
 
 - Project inception and repository initialization
