@@ -642,3 +642,36 @@ class Team(db.Model):
         db.session.commit()
 
 # --------------------------------------------------------------------------------
+
+
+class ErrorLog(db.Model):
+    """Log production errors and crashes for debugging purposes."""
+
+    __tablename__ = "error_log"
+
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    error_type = db.Column(db.String(50), nullable=False)  # '500', '404', 'Exception'
+    message = db.Column(db.Text)
+    stack_trace = db.Column(db.Text)
+    user_id = db.Column(db.Integer, nullable=True)  # From session if available
+    request_path = db.Column(db.String(500))
+    request_method = db.Column(db.String(10))
+    user_agent = db.Column(db.String(500))
+    environment = db.Column(db.String(50), default='production')
+
+    def __init__(self, error_type, message=None, stack_trace=None, user_id=None,
+                 request_path=None, request_method=None, user_agent=None, environment='production'):
+        self.error_type = error_type
+        self.message = message
+        self.stack_trace = stack_trace
+        self.user_id = user_id
+        self.request_path = request_path
+        self.request_method = request_method
+        self.user_agent = user_agent
+        self.environment = environment
+
+    def __repr__(self):
+        return f"<ErrorLog {self.error_type}: {self.message[:50]}... at {self.timestamp}>"
+
+# --------------------------------------------------------------------------------
