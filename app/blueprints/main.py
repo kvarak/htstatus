@@ -68,7 +68,7 @@ def get_releases_data():
                 'features': features  # All features from RELEASES.md
             })
 
-        return releases[:6]  # Show recent 6 releases on main page
+        return releases  # Show all user releases on main page
     except Exception as e:
         dprint(1, f"Error reading releases-full JSON: {e}")
 
