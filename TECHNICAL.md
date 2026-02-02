@@ -216,6 +216,85 @@ HattrickPlanner uses a **logical component CSS architecture** organized by featu
 - Group related styles: layout + styling + interactions together
 - Use consistent spacing and color tokens from design system
 - Apply progressive enhancement for responsive and interactive features
+
+## JavaScript Architecture
+
+HattrickPlanner uses a **hybrid JavaScript architecture** optimized for hobby project simplicity while maintaining clean separation of concerns.
+
+### Architecture Overview
+
+**Libraries & Dependencies**:
+- **Chart.js v4.4.0**: Consistent charting via CDN (unified version across all templates)
+- **session-persistence.js**: Dedicated PWA session management (195 lines, isolated functionality)
+- **chart-utils.js**: Centralized Chart.js configuration utilities and common patterns
+- **sorttable.js**: Lightweight table sorting functionality
+- **Sortable.js**: Drag-and-drop for settings interface
+- **jSuites**: Color picker components for settings
+
+**Organization Principles**:
+- **Separation by Purpose**: PWA logic isolated from chart utilities from table interactions
+- **Consolidated Configuration**: Common chart patterns centralized in utilities
+- **Version Consistency**: Single Chart.js v4.4.0 across all pages (no version conflicts)
+- **Template Integration**: Chart initialization embedded in templates for server-side data binding
+
+### Chart.js Architecture
+
+**Centralized Configuration** (`app/static/js/chart-utils.js`):
+- `HattrickCharts` class with football green color scheme
+- Standardized chart types: skill progression, multi-skill comparison, statistics
+- Responsive design patterns and accessibility features
+- Consistent legend positioning and interaction patterns
+
+**Template Integration Pattern**:
+```javascript
+// Use consolidated utilities
+const chartInstance = window.hattrickCharts.createSkillChart(
+  'canvasId', playerData, 'skillName'
+);
+
+// Backward compatibility functions available
+window.createPlayerChart(canvasId, playerData, skillName);
+```
+
+**Chart Types Supported**:
+- **Player Skill Charts**: Multi-skill progression with filtered datasets (training.html)
+- **Statistics Charts**: Admin dashboard with 15+ chart types (debug.html)
+- **Responsive Design**: Automatic scaling and mobile optimization
+
+### PWA Session Management
+
+**Isolated Functionality** (`app/static/js/session-persistence.js`):
+- PWA detection and session persistence across app installations
+- localStorage synchronization with Flask server sessions
+- 195-line dedicated module with clear PWA boundary concerns
+- **Kept Separate**: Distinct functionality from chart/UI logic, different lifecycle needs
+
+### Integration Points
+
+**Base Template Loading** (`base.html`):
+```html
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="{{url_for('static', filename='js/chart-utils.js')}}"></script>
+<script src="{{url_for('static', filename='js/session-persistence.js')}}"></script>
+```
+
+**Chart Implementation Pattern**:
+- Server-side data injection via Jinja2 template loops
+- Client-side chart creation using consolidated utilities
+- Automatic skill filtering (remove unchanged skills from display)
+- Football theme color scheme with semantic skill colors
+
+### Performance Optimizations
+
+**Removed Unnecessary Libraries**:
+- Eliminated Chart.js v2.9.4/v4.4.0 version conflicts (was loading both)
+- Removed unused Plotly.js library (3.4MB savings)
+- Consolidated chart configuration to reduce template duplication
+
+**Loading Strategy**:
+- Essential libraries loaded in base template for caching
+- Template-specific logic embedded inline for server-side data access
+- Utilities provide reusable patterns without forcing API patterns
 1. Audit for duplication across templates
 2. Extract common patterns to `components.css`
 3. Maintain clear component boundaries
