@@ -1,0 +1,33 @@
+/* Layout Components - Grid systems, positioning, containers */
+/* Used for page structure and component arrangement */
+
+/* Empty State Displays */
+.empty-state {
+    color: hsl(120, 15%, 50%);
+    font-style: italic;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    background: hsl(120, 8%, 97%);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+/* Responsive Containers */
+.container-fluid {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0 0.5rem;
+    }
+}

@@ -1,0 +1,234 @@
+/* Timeline Components - Player Update Timeline UI */
+/* Used in: update_timeline.html */
+
+/* Update Page Layout */
+.update-content {
+    padding: 0.5rem 0;
+}
+
+.page-title-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-title-box .breadcrumb-item {
+    color: hsl(120, 45%, 25%);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* Status Messages */
+.status-message {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.25rem;
+}
+
+.status-success {
+    color: hsl(120, 70%, 35%);
+}
+
+.status-error {
+    color: hsl(0, 84%, 60%);
+}
+
+.status-warning {
+    color: hsl(45, 90%, 55%);
+}
+
+/* Timeline Layout - 4 Column Grid */
+.timeline-container {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* Week Containers */
+.week-container {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    height: fit-content;
+}
+
+.week-container.current-week {
+    border-color: #28a745;
+    border-width: 2px;
+}
+
+.week-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.week-container.current-week .week-header {
+    background: #28a745;
+    color: white;
+}
+
+.week-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 0.2rem;
+}
+
+.week-subtitle {
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.week-container.current-week .week-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.current-week-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.2rem;
+    font-size: 0.65rem;
+    margin-top: 0.2rem;
+    display: inline-block;
+}
+
+.week-content {
+    padding: 0.75rem;
+}
+
+/* Timeline Content */
+.week-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.day-group {
+    padding-left: 0.5rem;
+    border-left: 2px solid #28a745;
+    margin-bottom: 0.5rem;
+}
+
+.day-header {
+    font-size: 0.75rem;
+    color: #28a745;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    padding: 0.2rem 0;
+}
+
+.player-entry {
+    padding: 0.4rem;
+    background: #f8f9fa;
+    border-radius: 0.2rem;
+    margin-bottom: 0.35rem;
+}
+
+.player-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.8rem;
+    margin-bottom: 0.2rem;
+}
+
+/* Change Types */
+.skill-item {
+    font-size: 0.75rem;
+    padding: 0.15rem 0;
+}
+
+.skill-up {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.skill-down {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.money-change {
+    color: #007bff;
+    font-weight: 500;
+}
+
+.age-change {
+    color: #6f42c1;
+    font-weight: 500;
+}
+
+.other-change {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.change-item {
+    font-size: 0.75rem;
+    padding: 0.15rem 0;
+}
+
+.no-changes {
+    color: #666;
+    font-style: italic;
+    font-size: 0.8rem;
+    padding: 0.75rem;
+    text-align: center;
+    background: #f8f9fa;
+}
+
+/* Updated Teams */
+.updated-teams-box {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid hsl(120, 20%, 85%);
+    border-radius: 0.4rem;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.team-link {
+    color: hsl(120, 45%, 25%);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.team-link:hover {
+    background: hsl(120, 45%, 95%);
+    text-decoration: none;
+    color: hsl(120, 55%, 20%);
+}
+
+.divider {
+    border: none;
+    border-top: 2px solid hsl(120, 20%, 85%);
+    margin: 1rem 0;
+}

@@ -1,0 +1,268 @@
+/* Formation Components - Tactical formation and player positioning UI */
+/* Used in: formations.html */
+
+/* Formation System Base */
+.position-slot {
+    min-width: 60px;
+    min-height: 40px;
+    border: 2px dashed rgba(0,0,0,0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 2px;
+}
+
+/* Position Type Styling */
+.position-slot.goalkeeper-slot {
+    background: rgba(255,193,7,0.3);
+    border-color: rgba(255,193,7,0.6);
+    min-width: 80px;
+    min-height: 50px;
+}
+
+.position-slot.defender-slot {
+    background: rgba(0,123,255,0.3);
+    border-color: rgba(0,123,255,0.6);
+}
+
+.position-slot.midfielder-slot {
+    background: rgba(40,167,69,0.3);
+    border-color: rgba(40,167,69,0.6);
+}
+
+.position-slot.forward-slot {
+    background: rgba(220,53,69,0.3);
+    border-color: rgba(220,53,69,0.6);
+}
+
+.position-slot.occupied {
+    background: rgba(76, 175, 80, 0.9) !important;
+    border-color: rgba(76, 175, 80, 1) !important;
+    border-style: solid;
+}
+
+.position-slot.drag-over {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Position Labels */
+.position-label {
+    font-size: 0.7rem;
+    color: rgba(0,0,0,0.7);
+    font-weight: bold;
+    pointer-events: none;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Positioned Players */
+.positioned-player {
+    background: rgba(255,255,255,0.95);
+    color: #333;
+    border: 2px solid #28a745;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: grab;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    padding: 2px 6px;
+}
+
+.positioned-player:active {
+    cursor: grabbing;
+}
+
+.positioned-player.dragging {
+    opacity: 0.5;
+    transform: translate(-50%, -50%) scale(0.9);
+}
+
+/* Player Pool */
+#player-pool {
+    min-height: 60px;
+    border: 2px dashed rgba(0,123,255,0.5);
+    border-radius: 8px;
+    padding: 10px;
+    background: rgba(248,249,250,0.8);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Legacy Compatibility Classes */
+.defender-slot, .midfielder-slot, .forward-slot {
+    background: rgba(0,123,255,0.3);
+    border: 2px dashed rgba(0,123,255,0.6);
+}
+
+.midfielder-slot {
+    background: rgba(23,162,184,0.3);
+    border: 2px dashed rgba(23,162,184,0.6);
+}
+
+.forward-slot {
+    background: rgba(220,53,69,0.3);
+    border: 2px dashed rgba(220,53,69,0.6);
+}
+
+/* Work in Progress Sticker */
+.wip-sticker {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    transform: rotate(8deg);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    z-index: 1000;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    animation: gentle-pulse 3s infinite;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: default;
+    user-select: none;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% {
+        transform: rotate(8deg) scale(1);
+    }
+    50% {
+        transform: rotate(8deg) scale(1.02);
+    }
+}
+
+.wip-sticker:hover {
+    transform: rotate(12deg) scale(1.05);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.6);
+}
+
+.wip-sticker::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    border-radius: 12px;
+    pointer-events: none;
+}
+
+/* Player Elements */
+.position-player {
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.position-player:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.player-card .player-name {
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    margin-bottom: 2px;
+    font-size: 0.8rem;
+}
+
+.player-stats {
+    display: flex;
+    justify-content: space-between;
+    color: #ccc;
+}
+
+.position-player.dragging {
+    opacity: 0.6;
+    transform: rotate(5deg) scale(1.1);
+    z-index: 1000;
+}
+
+.available-player {
+    background: white;
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: grab;
+    font-size: 0.8rem;
+    margin: 2px 0;
+    border: 1px solid #ddd;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.available-player:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.available-player:active {
+    cursor: grabbing;
+}
+
+/* Tooltips for Player Stats */
+.player-tooltip {
+    position: absolute;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    min-width: 200px;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.tooltip-name {
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #4CAF50;
+}
+
+.tooltip-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    font-size: 0.7rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat-label {
+    color: #ccc;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: white;
+}

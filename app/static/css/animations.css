@@ -1,0 +1,28 @@
+/* Animation Components - UI transitions and effects */
+/* Used in: changes.html */
+
+/* Commit Entry Transitions */
+.commit-entry {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 100px; /* Default expanded height */
+    opacity: 1;
+}
+
+.commit-entry.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+    margin: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    border: none !important;
+}
+
+/* Chevron Icon Animations */
+.chevron-icon {
+    transition: transform 0.2s ease-in-out;
+}
+
+.chevron-icon.rotated {
+    transform: rotate(-90deg);
+}
