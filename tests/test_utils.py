@@ -157,13 +157,13 @@ class TestVersionInfo:
     def test_get_version_info_with_git_tags(self, mock_subprocess):
         """Test get_version_info with git tag output."""
         # Mock git describe output - commits ahead of tag
-        mock_subprocess.return_value = b"3.12-1-gedd7f4a"
+        mock_subprocess.return_value = b"3.12.1-gedd7f4a"
 
         result = get_version_info()
 
         assert result["version"] == "3.12"
-        assert result["fullversion"] == "3.12-1-gedd7f4a"
-        assert result["versionstr"] == "3.12-1-gedd7f4a"
+        assert result["fullversion"] == "3.12.1-gedd7f4a"
+        assert result["versionstr"] == "3.12.1-gedd7f4a"
 
     @patch('subprocess.check_output')
     def test_get_version_info_no_features(self, mock_subprocess):
