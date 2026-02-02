@@ -8,6 +8,15 @@
 
 ---
 
+## 3.17 - February 2026
+
+**Enhanced Main Page Content System**
+- Implemented releases-full.json generation with comprehensive feature extraction from RELEASES.md
+- Enhanced main page "What's New" section to display complete feature descriptions instead of single-line summaries
+- Added proper gitignore management for generated JSON files
+- Improved user experience with richer, more detailed release information on homepage
+- Streamlined changelog generation workflow to support multiple output formats
+
 ## 3.16 - January 2026
 
 **Production Error Logging System**

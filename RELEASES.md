@@ -8,6 +8,11 @@
 
 ---
 
+## 3.17 - February 2026
+
+- **Enhanced What's New Section**: The main page now shows complete feature descriptions for each release instead of just brief summaries
+- **Richer Release Information**: Get a full picture of what's new when you visit the homepage - see all the features and improvements in detail
+
 ## 3.13 - February 2026
 
 - **Improved Development Workflow**: Enhanced automation behind the scenes for faster updates and better reliability
