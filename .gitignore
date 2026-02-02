@@ -52,6 +52,7 @@ out/
 app/static/changelog.json
 app/static/releases.json
 app/static/releases-internal.json
+app/static/releases-full.json
 
 # Docker volumes and data
 docker-compose.override.yml

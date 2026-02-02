@@ -47,8 +47,8 @@ def setup_main_blueprint(db_instance, cols, all_cols, group_order=99):
 def get_releases_data():
     """Load recent user releases from JSON for display on main page."""
     try:
-        # Use the same JSON system as the debug page for consistency
-        releases_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'releases.json')
+        # Use releases-full.json which contains all features per release
+        releases_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'releases-full.json')
         with open(releases_path, encoding='utf-8') as f:
             releases_data = json.load(f)
 
@@ -59,19 +59,18 @@ def get_releases_data():
         for entry in entries:
             version = entry.get('version', '')
             period = entry.get('period', '')  # This is the formatted date
-            message = entry.get('message', '')
+            features = entry.get('features', [])  # Full list of features
 
-            # Format for main page display (keep existing structure for templates)
+            # Format for main page display
             releases.append({
                 'version': version,
                 'date': period,
-                'features': [message]  # Single feature message per release
+                'features': features  # All features from RELEASES.md
             })
 
-        return releases  # Show all user releases
+        return releases[:6]  # Show recent 6 releases on main page
     except Exception as e:
-        dprint(1, f"Error reading releases JSON: {e}")
-        return [{'version': 'v3.8', 'date': 'January 2026', 'features': ['Latest updates available']}]
+        dprint(1, f"Error reading releases-full JSON: {e}")
 
 
 @main_bp.route("/")
