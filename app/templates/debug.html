@@ -349,13 +349,11 @@
 {% block scripts %}
 {{ super() }}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <script>
 // User data from backend
 const usersData = JSON.parse('{{ users | tojson | safe }}');
 
-// Chart instances for updates
+// Chart instances for updates - using HattrickCharts utility
 let charts = {};
 
 // Helper function to parse dates safely

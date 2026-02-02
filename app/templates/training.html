@@ -1,157 +1,70 @@
 {% extends 'base.html' %}
 
 {% block scripts %}
-
 {{ super() }}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
 <script>
-  // Initialize data for skill charts
+  // Initialize data for skill charts using HattrickCharts utility
   const playerCharts = {};
+  const skillNames = ['Keeper', 'Defender', 'Playmaker', 'Winger', 'Passing', 'Scoring', 'Set Pieces'];
 
   {% for ht_id in allplayerids %}
-    var rawDatasets{{ ht_id }} = [
+    // Prepare skill data for player {{ ht_id }}
+    const skillData{{ ht_id }} = [
       {
-        label: "Keeper",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
-        borderColor: "rgba(59, 130, 246, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[0] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Keeper',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[0] }},{% endfor %}]
       },
       {
-        label: "Defender",
-        backgroundColor: "rgba(239, 68, 68, 0.1)",
-        borderColor: "rgba(239, 68, 68, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[1] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Defender',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[1] }},{% endfor %}]
       },
       {
-        label: "Playmaker",
-        backgroundColor: "rgba(139, 92, 246, 0.1)",
-        borderColor: "rgba(139, 92, 246, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[2] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Playmaker',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[2] }},{% endfor %}]
       },
       {
-        label: "Winger",
-        backgroundColor: "rgba(236, 72, 153, 0.1)",
-        borderColor: "rgba(236, 72, 153, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[3] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Winger',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[3] }},{% endfor %}]
       },
       {
-        label: "Passing",
-        backgroundColor: "rgba(20, 184, 166, 0.1)",
-        borderColor: "rgba(20, 184, 166, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[4] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Passing',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[4] }},{% endfor %}]
       },
       {
-        label: "Scoring",
-        backgroundColor: "rgba(245, 158, 11, 0.1)",
-        borderColor: "rgba(245, 158, 11, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[5] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Scoring',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[5] }},{% endfor %}]
       },
       {
-        label: "Set Pieces",
-        backgroundColor: "rgba(99, 102, 241, 0.1)",
-        borderColor: "rgba(99, 102, 241, 1)",
-        data: [
-          {% for (dat, skills) in allplayers[ht_id] %}
-          {{ skills[6] }},
-          {% endfor %}
-        ],
-        tension: 0.3,
-        fill: true
+        name: 'Set Pieces',
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[6] }},{% endfor %}]
       }
     ];
 
-    // Filter out datasets with no changes (all values the same)
-    var filteredDatasets{{ ht_id }} = rawDatasets{{ ht_id }}.filter(function(dataset) {
-      var firstValue = dataset.data[0];
-      return dataset.data.some(function(value) {
+    const playerData{{ ht_id }} = {
+      weeks: [
+        {% for (dat, skills) in allplayers[ht_id] %}
+        "{{ dat.strftime('%Y-%m-%d') }}",
+        {% endfor %}
+      ]
+    };
+
+    // Filter out skills with no changes (all values the same)
+    const activeSkills{{ ht_id }} = skillData{{ ht_id }}.filter(function(skill) {
+      const firstValue = skill.values[0];
+      return skill.values.some(function(value) {
         return value !== firstValue;
       });
     });
 
-    var data{{ ht_id }} = {
-      labels: [
-        {% for (dat, skills) in allplayers[ht_id] %}
-        "{{ dat.strftime('%Y-%m-%d') }}",
-        {% endfor %}
-      ],
-      datasets: filteredDatasets{{ ht_id }}
-    };
-
-    var ctx{{ ht_id }} = document.getElementById('playerChart{{ ht_id }}');
-    if (ctx{{ ht_id }}) {
-      playerCharts[{{ ht_id }}] = new Chart(ctx{{ ht_id }}, {
-        type: 'line',
-        data: data{{ ht_id }},
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                boxWidth: 12,
-                font: { size: 11 }
-              }
-            },
-            title: {
-              display: false
-            }
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              min: 0,
-              max: 20,
-              grid: {
-                drawBorder: false
-              }
-            },
-            x: {
-              grid: {
-                display: false
-              }
-            }
-          }
-        }
-      });
+    // Create chart using consolidated utility
+    const ctx{{ ht_id }} = document.getElementById('playerChart{{ ht_id }}');
+    if (ctx{{ ht_id }} && activeSkills{{ ht_id }}.length > 0) {
+      playerCharts[{{ ht_id }}] = window.hattrickCharts.createMultiSkillChart(
+        'playerChart{{ ht_id }}',
+        playerData{{ ht_id }},
+        activeSkills{{ ht_id }}
+      );
     }
   {% endfor %}
 

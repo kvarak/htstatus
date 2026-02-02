@@ -570,9 +570,8 @@ $('.toast').toast('show')
 
 </script>
 
-<script src="{{url_for('static', filename='plotly-latest.min.js')}}"></script>
 <script src="{{url_for('static', filename='sorttable.js')}}"></script>
-<script src="{{url_for('static', filename='Chart.bundle.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="{{url_for('static', filename='Sortable.js')}}"></script>
 
 <!-- https://jsuites.net/v3/color-picker -->
@@ -581,6 +580,9 @@ $('.toast').toast('show')
 
 <!-- PWA Session Persistence -->
 <script src="{{url_for('static', filename='js/session-persistence.js')}}"></script>
+
+<!-- Chart.js Utilities -->
+<script src="{{url_for('static', filename='js/chart-utils.js')}}"></script>
 
 <script type="text/javascript">// <![CDATA[
   function loading(){
