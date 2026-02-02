@@ -122,7 +122,62 @@ while IFS= read -r line; do
 done < RELEASES-INTERNAL.md
 echo ']}' >> app/static/releases-internal.json
 
-echo "Generated 3 JSON files:"
+# 4. Generate full user releases JSON from RELEASES.md with all features
+echo '{"source": "user_releases_full", "entries": [' > app/static/releases-full.json
+first_entry=true
+while IFS= read -r line; do
+    if [[ $line =~ ^##\ ([0-9]+\.[0-9]+)\ -\ (.+)$ ]]; then
+        version="${BASH_REMATCH[1]}"
+        date_str="${BASH_REMATCH[2]}"
+
+        # Convert date for sorting - use actual git commit timestamp for the tag
+        commit_hash=$(git rev-list -n 1 "$version" 2>/dev/null)
+        if [ -n "$commit_hash" ]; then
+            sort_date=$(git log -1 --format="%ci" "$commit_hash" 2>/dev/null | sed 's/ [+-][0-9]*$//')
+        else
+            # Fallback for manual mapping if git commands fail
+            case "$date_str" in
+                *"January 2026"*) sort_date="2026-01-15 06:00:00" ;;
+                *"February 2026"*) sort_date="2026-02-01 06:00:00" ;;
+                *"December 2025"*) sort_date="2025-12-15 06:00:00" ;;
+                *"February 2023"*) sort_date="2023-02-15 06:00:00" ;;
+                *) sort_date="2026-01-01 06:00:00" ;;
+            esac
+        fi
+
+        # Get ALL features for this release
+        features_json="["
+        feature_count=0
+        while IFS= read -r feature_line; do
+            if [[ $feature_line =~ ^-\ (.+)$ ]]; then
+                feature="${BASH_REMATCH[1]}"
+                # Clean up markdown formatting but keep more detail
+                feature=$(echo "$feature" | sed 's/\*\*//g' | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+                if [ $feature_count -gt 0 ]; then
+                    features_json+=", "
+                fi
+                features_json+="\"$feature\""
+                ((feature_count++))
+            elif [[ $feature_line =~ ^##\ [0-9] ]]; then
+                # Stop at next release header
+                break
+            fi
+        done <<< "$(grep -A 50 "^## $version" RELEASES.md | tail -n +2)"
+        features_json+="]"
+
+        if [ "$first_entry" = true ]; then
+            first_entry=false
+        else
+            echo ',' >> app/static/releases-full.json
+        fi
+
+        echo -n "{\"date\": \"$sort_date\", \"version\": \"$version\", \"period\": \"$date_str\", \"features\": $features_json, \"type\": \"user_release\"}" >> app/static/releases-full.json
+    fi
+done < RELEASES.md
+echo ']}' >> app/static/releases-full.json
+
+echo "Generated 4 JSON files:"
 echo "- changelog.json: $(jq '.entries | length' app/static/changelog.json) commits"
 echo "- releases.json: $(jq '.entries | length' app/static/releases.json) user releases"
 echo "- releases-internal.json: $(jq '.entries | length' app/static/releases-internal.json) internal releases"
+echo "- releases-full.json: $(jq '.entries | length' app/static/releases-full.json) full user releases"
