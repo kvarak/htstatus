@@ -71,6 +71,10 @@ def create_app(config_object=None, include_routes=True):
     if include_routes:
         setup_routes(app, db)
 
+    # Register error handlers for production monitoring
+    from app.error_handlers import register_error_handlers
+    register_error_handlers(app)
+
     # Display configuration status after everything is set up
     with app.app_context():
         _display_startup_status()
