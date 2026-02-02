@@ -71,7 +71,7 @@ def handle_error(error, **context_vars):
         # Handle string errors or generic exceptions
         message = str(error) if error else "An unexpected error occurred"
         return create_page(
-            template="main.html", title="Error", error=message, **context_vars
+            template="error.html", title="Error", error=message, **context_vars
         )
 
 

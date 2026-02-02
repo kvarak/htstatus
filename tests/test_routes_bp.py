@@ -50,10 +50,9 @@ class TestRoutesBlueprintObject:
 class TestInitializeRoutes:
     """Test initialize_routes function."""
 
-    @patch('app.routes_bp.Bootstrap')
     @patch('app.utils.get_version_info')
     @patch('app.routes_bp.time')
-    def test_initialize_routes_sets_globals(self, mock_time, mock_get_version, mock_bootstrap):
+    def test_initialize_routes_sets_globals(self, mock_time, mock_get_version):
         """Test initialize_routes sets all global variables."""
         # Mock app with config
         mock_app = Mock()
@@ -80,9 +79,6 @@ class TestInitializeRoutes:
         # Call initialize_routes
         initialize_routes(mock_app, mock_db)
 
-        # Verify Bootstrap initialized
-        mock_bootstrap.assert_called_once_with(mock_app)
-
         # Verify version detection was called
         mock_get_version.assert_called_once()
 
@@ -104,8 +100,7 @@ class TestInitializeRoutes:
 
         mock_db = Mock()
 
-        with patch('app.routes_bp.Bootstrap'), \
-             patch('app.utils.get_version_info') as mock_version, \
+        with patch('app.utils.get_version_info') as mock_version, \
              patch('app.routes_bp.time') as mock_time:
 
             mock_version.return_value = {"versionstr": "dev", "fullversion": "dev", "version": "dev"}

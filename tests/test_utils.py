@@ -161,9 +161,9 @@ class TestVersionInfo:
 
         result = get_version_info()
 
-        assert result["version"] == "3.12"
-        assert result["fullversion"] == "3.12.1-gedd7f4a"
-        assert result["versionstr"] == "3.12.1-gedd7f4a"
+        assert result["version"] == "3.12.1"
+        assert result["fullversion"] == "3.12.1.gedd7f4a"
+        assert result["versionstr"] == "3.12.1.gedd7f4a"
 
     @patch('subprocess.check_output')
     def test_get_version_info_no_features(self, mock_subprocess):

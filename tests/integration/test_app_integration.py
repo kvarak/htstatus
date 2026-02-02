@@ -51,11 +51,12 @@ def test_uv_environment_integration():
 @pytest.mark.integration
 def test_flask_app_request_context(client):
     """Test that Flask request context works in testing."""
-    # Test basic route that should exist (even if it redirects)
-    response = client.get("/")
+    # Test that the client can make a request without hanging
+    # Since routes are disabled in testing, expect 404 but test context works
+    response = client.get("/nonexistent-route")
 
-    # Should get some kind of response (200, 302, etc.)
-    assert response.status_code in [200, 302, 404]
+    # Should get 404 since no routes are registered in test mode
+    assert response.status_code == 404
 
     # Should have response headers
     assert "Content-Type" in response.headers
@@ -67,8 +68,8 @@ def test_session_cookie_integration(client):
     with client.session_transaction() as session:
         session["test_key"] = "test_value"
 
-    # Make a request to trigger session handling
-    _ = client.get("/")
+    # Make a request to test session handling (expect 404 but session should work)
+    _ = client.get("/test-session")
 
     # Check that session persists
     with client.session_transaction() as session:

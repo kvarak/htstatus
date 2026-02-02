@@ -154,7 +154,7 @@ class TestHandleError:
 
         assert result == "error_page"
         mock_create_page.assert_called_once_with(
-            template="main.html",
+            template="error.html",
             title="Error",
             error="Simple error message"
         )
@@ -169,7 +169,7 @@ class TestHandleError:
 
         assert result == "error_page"
         mock_create_page.assert_called_once_with(
-            template="main.html",
+            template="error.html",
             title="Error",
             error="Value error message"
         )
@@ -183,7 +183,7 @@ class TestHandleError:
 
         assert result == "error_page"
         mock_create_page.assert_called_once_with(
-            template="main.html",
+            template="error.html",
             title="Error",
             error="An unexpected error occurred"
         )

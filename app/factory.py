@@ -5,6 +5,7 @@ import pkgutil
 
 from dotenv import load_dotenv
 from flask import Flask
+from flask_bootstrap import Bootstrap
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -23,6 +24,7 @@ load_dotenv()
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
+bootstrap = Bootstrap()
 
 
 def create_app(config_object=None, include_routes=True):
@@ -49,6 +51,7 @@ def create_app(config_object=None, include_routes=True):
     # Initialize extensions with app
     db.init_app(app)
     migrate.init_app(app, db)
+    bootstrap.init_app(app)
 
     # Import models after db is initialized to avoid circular imports
 

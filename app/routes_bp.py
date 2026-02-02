@@ -4,13 +4,11 @@
 import time
 
 from flask import Blueprint
-from flask_bootstrap import Bootstrap
 
 # Create Blueprint for routes (helper blueprint, not registered directly)
 routes_bp = Blueprint("routes", __name__)
 
 # Initialize these after app is created
-bootstrap = None
 consumer_key = None
 consumer_secret = None
 versionstr = None
@@ -23,7 +21,6 @@ debug_level = None
 def initialize_routes(app, _db_instance):
     """Initialize routes module with app and db instances."""
     global \
-        bootstrap, \
         consumer_key, \
         consumer_secret, \
         versionstr, \
@@ -37,9 +34,6 @@ def initialize_routes(app, _db_instance):
 
     global db
     db = factory_db
-
-    # Initialize Flask-Bootstrap
-    bootstrap = Bootstrap(app)
 
     # Set consumer_key and consumer_secret provided for your app by Hattrick
     consumer_key = app.config.get("CONSUMER_KEY", "dev_key")
