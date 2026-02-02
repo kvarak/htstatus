@@ -99,6 +99,7 @@ HattrickPlanner uses a modern Flask blueprint architecture with clean separation
 - `/models.py`: SQLAlchemy database models
 - `/src/`: React frontend (modern SPA)
 - `/app/templates/`: Jinja2 templates (legacy Flask frontend)
+- `/app/static/css/`: CSS architecture (see CSS Architecture below)
 - `/scripts/`: Development utilities and debugging tools
 - `/environments/`: Environment configuration templates
 - `/configs/`: Docker Compose configurations and build tools
@@ -147,6 +148,84 @@ find . -name ".DS_Store" -delete
 ```
 
 See `.gitignore` for complete exclusion patterns.
+
+## CSS Architecture
+
+HattrickPlanner uses a **logical component CSS architecture** organized by feature and reusability patterns.
+
+### Architecture Decision
+
+**Chosen Approach**: Feature-based logical organization with component separation
+- **Entry Point**: `/app/static/css/components.css` - Main CSS loader using @import statements
+- **Core Components**: Reusable UI elements organized by logical concern and function
+- **Feature Components**: Domain-specific CSS for complex features (timeline, formations)
+- **Design System**: `/app/templates/base.html` - Global design tokens and CSS variables
+
+**Rationale**: Organizes CSS by logical feature and reusability rather than page location. Reusable components can be found easily and maintained independently while preserving load performance.
+
+### CSS Module Structure
+
+**Core Components** (`/app/static/css/`):
+- `components.css` - Main entry point with @import statements (11 lines)
+- `ui-components.css` - Reusable interface elements (sections, containers, comments) (85+ lines)
+- `utilities.css` - Helper classes for spacing, colors, display utilities (50+ lines)
+- `layout.css` - Grid systems, positioning, empty states (25+ lines)
+- `charts.css` - Chart.js styling and data visualization (30+ lines)
+- `animations.css` - UI transitions and interactive effects (25 lines)
+
+**Feature-Specific Components**:
+- `timeline.css` - Player update timeline UI components (235+ lines)
+- `formations.css` - Tactical formation builder and positioning (280+ lines)
+
+### CSS Organization Guidelines
+
+**Component Organization Principles**:
+- **By Feature**: Complex domain logic (timeline, formations) gets dedicated files
+- **By Reusability**: Common UI patterns (ui-components, utilities) shared across templates
+- **By Function**: Specialized concerns (charts, animations, layout) separated for maintainability
+
+**When to create new component file**:
+- ✅ Domain-specific feature with significant complexity (100+ lines)
+- ✅ Specialized functional concern (charts, forms, animations)
+- ✅ Reusable component pattern used across multiple templates
+
+**When to add to existing files**:
+- ✅ UI components → `ui-components.css` (buttons, cards, sections, containers)
+- ✅ Helper classes → `utilities.css` (spacing, colors, display, flexbox)
+- ✅ Layout patterns → `layout.css` (grids, positioning, responsive containers)
+- ✅ Chart styling → `charts.css` (Chart.js, data visualization)
+- ✅ Transitions → `animations.css` (hover effects, state changes)
+
+**File Organization Benefits**:
+- **Easy Discovery**: Developers can find styles by logical function rather than page location
+- **Better Reusability**: Common UI patterns centralized in ui-components.css
+- **Maintainability**: Feature components can evolve independently
+- **Performance**: Single entry point maintains load efficiency while achieving modular organization
+
+### Maintenance Guidelines
+
+**Adding New Styles**:
+1. Identify logical component domain (UI element, layout, chart, etc.)
+2. Add styles to appropriate existing component file
+3. Use semantic naming that describes component purpose, not page location
+4. Group related styles together with clear section headers
+5. Update this documentation if creating new component files
+
+**Component Development Patterns**:
+- Name classes by purpose: `.section-title`, `.chart-card`, `.filter-controls`
+- Group related styles: layout + styling + interactions together
+- Use consistent spacing and color tokens from design system
+- Apply progressive enhancement for responsive and interactive features
+1. Audit for duplication across templates
+2. Extract common patterns to `components.css`
+3. Maintain clear component boundaries
+4. Test visual appearance after extraction
+
+**Quality Standards**:
+- No duplicate style rules across files
+- Clear component boundaries and semantic naming
+- Source template documented in comments
+- Responsive design principles maintained
 
 ## Development Scripts
 
