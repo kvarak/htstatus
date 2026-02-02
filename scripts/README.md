@@ -29,4 +29,14 @@ Generates the next sequential task ID for a given task type by analyzing git his
 ./scripts/get-next-task-id.sh TEST    # Returns next TEST task ID
 ```
 
+### count_tasks_by_priority.py
+Analyzes the project backlog and counts tasks by priority level.
+
+```bash
+uv run python scripts/count_tasks_by_priority.py                 # Summary view
+uv run python scripts/count_tasks_by_priority.py --detailed      # Detailed breakdown with task IDs
+uv run python scripts/count_tasks_by_priority.py --line          # One-line format for backlog.md updates
+uv run python scripts/count_tasks_by_priority.py --summary-only  # Just the counts
+```
+
 Use this when creating new backlog tasks to ensure sequential numbering.

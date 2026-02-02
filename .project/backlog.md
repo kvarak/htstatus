@@ -3,8 +3,9 @@
 **Purpose**: Active development tasks in priority order
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
+**Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 2, 2026): BUG-075 integration test failures resolved, quality gates improved from 5/7 to 6/7 passing (HIGH deployment confidence). Focus: P1 architecture cleanup, P2 test coverage improvement. **Active: 61 tasks**
+**Recent Organization** (February 2, 2026): REFACTOR-084 CSS logical architecture completed, quality gates stable at 6/7 passing (HIGH deployment confidence). Focus: P1 remaining architecture cleanup, P2 test coverage improvement. **Active: 83 tasks**
 
 ---
 
@@ -15,7 +16,6 @@
 ## P1: Critical 🔥
 
 ### Code Architecture Cleanup
-- **[REFACTOR-084]** Simplify Component CSS Architecture - Evaluate if 614-line consolidated CSS file creates more maintenance burden than individual template styles (30 min)
 - **[REFACTOR-085]** Simplify JavaScript Architecture - Evaluate consolidation vs separation of JS functionality across templates vs dedicated files like session-persistence.js, consolidate Chart.js version to 4.x (30 min)
 
 ## P2: Features 🎯
@@ -42,6 +42,13 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 2, 2026 - CSS Logical Architecture Analysis)
+
+#### CSS Architecture Simplification & Quality
+- **[REFACTOR-093]** Evaluate CSS Architecture Simplification - Consider consolidating ui-components.css, utilities.css, and layout.css into a single reusable-components.css file to reduce file count while preserving logical organization for complex features (15 min)
+- **[REFACTOR-094]** CSS Pattern Consolidation - Standardize color, spacing, and border patterns across all component files using CSS variables and shared utility patterns to eliminate duplication (30 min)
+- **[REFACTOR-095]** CSS Architecture Simplification Experiment - Create a 3-file alternative (commons.css, timeline.css, formations.css) and compare maintenance overhead vs organizational benefits for hobby project context (45 min)
 
 ### Recent Critical Review Improvements (February 2, 2026 - INFRA-085 Error Logging Analysis)
 
