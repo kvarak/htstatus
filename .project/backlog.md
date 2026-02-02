@@ -5,7 +5,7 @@
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 2, 2026): REFACTOR-084 CSS logical architecture completed, quality gates stable at 6/7 passing (HIGH deployment confidence). Focus: P1 remaining architecture cleanup, P2 test coverage improvement. **Active: 83 tasks**
+**Recent Organization** (February 2, 2026): REFACTOR-085 JavaScript architecture completed, quality gates stable at 6/7 passing (HIGH deployment confidence). Focus: P1 test coverage priority, P2 feature development, JavaScript architecture refinement. **Active: 85 tasks** (P0=0, P1=1, P2=4, P3=8, P4=72)
 
 ---
 
@@ -15,12 +15,11 @@
 
 ## P1: Critical 🔥
 
-### Code Architecture Cleanup
-- **[REFACTOR-085]** Simplify JavaScript Architecture - Evaluate consolidation vs separation of JS functionality across templates vs dedicated files like session-persistence.js, consolidate Chart.js version to 4.x (30 min)
+### Test Coverage Priority
+- **[TEST-010]** Address Test Coverage Gap - Increase test coverage from 41.1% to 50% minimum, focus on blueprint routes with lowest coverage: auth (19%), main (10%), team (11%), and add missing error logging test coverage (165 min)
 
 ## P2: Features 🎯
 
-- **[TEST-010]** Address Test Coverage Gap - Increase test coverage from 41.1% to 50% minimum, focus on blueprint routes with lowest coverage: auth (19%), main (10%), team (11%), and add missing error logging test coverage (165 min)
 - **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
@@ -42,6 +41,13 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 2, 2026 - JavaScript Architecture Analysis)
+
+#### JavaScript Architecture Quality & Simplification
+- **[REFACTOR-096]** Simplify Chart Utilities Architecture - Evaluate if HattrickCharts class is necessary or if simple configuration objects/functions would reduce complexity while maintaining DRY benefits (30 min)
+- **[REFACTOR-097]** Backend Chart Data Preparation - Move repetitive skill data preparation loops from templates to view layer, returning pre-formatted chart data structures (45 min)
+- **[REFACTOR-098]** JavaScript Architecture Simplification Study - Compare current multi-file approach vs single app.js with modules for maintainability and loading performance in hobby project context (30 min)
 
 ### Recent Critical Review Improvements (February 2, 2026 - CSS Logical Architecture Analysis)
 
@@ -135,7 +141,6 @@
 - **[REFACTOR-050]** Authentication Flow Analysis - Investigate why authenticated sessions reference non-existent users (root cause of BUG-011)
 - **[REFACTOR-051]** Systematic User Query Audit - Review all User.filter_by() patterns for consistency and safety
 - **[FEAT-018]** Automatic User Creation Strategy - Ensure user records exist for all authenticated sessions
-- **[TEST-010]** Authentication Test Environment - Fix test setup to properly create user records for authenticated clients
 - **[REFACTOR-052]** Consolidate Repetitive File Processing Patterns - Merge fileformat and fileformat-fix rule processing loops
 - **[REFACTOR-053]** Make Coverage Thresholds Configurable - Replace hardcoded 50% with environment-specific settings
 - **[REFACTOR-054]** Unified Quality Gate Architecture - Merge test-coverage-files and test-python into single comprehensive test gate
