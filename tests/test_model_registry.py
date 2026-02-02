@@ -60,7 +60,11 @@ class TestModelRegistry:
 
     def test_lazy_initialization(self):
         """Test lazy initialization imports and registers models."""
-        # Trigger lazy initialization
+        # Clear registry state to ensure we test initialization
+        ModelRegistry._initialized = False
+        ModelRegistry._models.clear()
+
+        # Trigger lazy initialization by getting a model
         result = ModelRegistry.get("User")
 
         # Check initialization occurred
