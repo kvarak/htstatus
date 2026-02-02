@@ -40,10 +40,12 @@
         "Structure: ## What Was Done ## Critical Analysis ## Missed Opportunities ## Questions",
         "What Was Done: 3-4 bullet points max. Facts only, no praise.",
         "Critical Analysis: What could have been simpler? What seems over-engineered? What creates new dependencies or complexity?",
+        "- Suggest ONE improvement task to backlog based on critical analysis.",
         "Missed Opportunities: What obvious improvements were skipped? What cleanup was ignored?",
+        "- Suggest ONE improvement task to backlog based on missed opportunities.",
         "Questions: Challenge 2-3 decisions. Why this approach vs alternatives? What are the downsides?",
+        "- Suggest ONE improvement task to backlog based on the challenges.",
         "Test: `make test-all` - note failures and quality regressions.",
-        "Add specific improvement tasks to backlog based on identified issues.",
         "Do not commit code."
       ]
     },

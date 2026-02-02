@@ -4,13 +4,13 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 
-**Recent Organization** (February 2, 2026): INFRA-085 production error logging completed and moved to history. Quality gates: 5/7 passing (MODERATE deployment confidence). Focus: P1 architecture cleanup, P2 test coverage improvement. **Active: 58 tasks**
+**Recent Organization** (February 2, 2026): BUG-075 integration test failures resolved, quality gates improved from 5/7 to 6/7 passing (HIGH deployment confidence). Focus: P1 architecture cleanup, P2 test coverage improvement. **Active: 61 tasks**
 
 ---
 
 ## P0: Production-Breaking 🚨
 
-- **[BUG-075]** Fix Integration Test Failures - Resolve 3 failing tests (template and version issues) preventing quality gate success (30 min)
+*No active P0 issues*
 
 ## P1: Critical 🔥
 
@@ -52,6 +52,13 @@
 - **[TEST-083]** Add Error Logging Test Coverage - Comprehensive test coverage for error logging functionality missing from recent implementation (45 min) → **CONSOLIDATED INTO TEST-010**
 - **[FEAT-024]** Error Rate Limiting/Deduplication - Add protection against log flooding from same error to prevent database abuse (20 min)
 - **[REFACTOR-089]** Replace Production Environment Check - Use configurable logging levels instead of hard-coded production-only activation (15 min)
+
+### Recent Critical Review Improvements (February 2, 2026 - BUG-075 Template Architecture Analysis)
+
+#### Template Architecture & Flask-Bootstrap Improvements
+- **[REFACTOR-090]** Consolidate Error Template Pattern - Remove error.html template and modify main.html to conditionally render route-dependent elements only when routes are available, eliminating template duplication (20 min)
+- **[REFACTOR-091]** Isolate Flask-Bootstrap Dependency - Move Flask-Bootstrap initialization to a conditional plugin pattern so the core app can function without it during testing (30 min)
+- **[REFACTOR-092]** Template Architecture Audit - Systematic review of all Jinja2 templates for inheritance optimization, duplicate content elimination, and consistent component patterns (45 min)
 
 ### Recent Critical Review Improvements (February 1, 2026 - Changelog System Over-Engineering Analysis)
 
