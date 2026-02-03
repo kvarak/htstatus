@@ -228,6 +228,7 @@ HattrickPlanner uses a **hybrid JavaScript architecture** optimized for hobby pr
 - **JavaScript**: Bootstrap 4.x collapse, dropdown, tooltip functionality
 - **Integration**: Direct CDN loading with custom CSS extensions
 - **Templates**: Standard Jinja2 templates using Bootstrap 4.x syntax
+- **CRITICAL**: Use Bootstrap 4.x data-* attributes (NOT Bootstrap 5.x data-bs-* attributes)
 
 **Libraries & Dependencies**:
 - **Chart.js v4.4.0**: Consistent charting via CDN (unified version across all templates)
@@ -282,20 +283,20 @@ if (currentPath.includes('/player') && !completed['player-management']) {
 **Syntax Requirements** (enforced as of February 2026):
 ```html
 <!-- Collapse/Accordion Components -->
-<a data-bs-toggle="collapse" data-bs-target="#targetId" role="button">Trigger</a>
+<a data-toggle="collapse" href="#targetId" role="button">Trigger</a>
 <div class="collapse" id="targetId">Content</div>
 
 <!-- Tooltips -->
-<button data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip text">Button</button>
+<button data-toggle="tooltip" data-placement="top" title="Tooltip text">Button</button>
 
 <!-- Dropdowns -->
-<button data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
+<button data-toggle="dropdown" aria-expanded="false">Dropdown</button>
 ```
 
 **Critical Patterns**:
-- Use `data-bs-*` attributes (not `data-*` from Bootstrap 3.x)
-- Use `data-bs-target="#id"` instead of `href="#id"` for collapse triggers
-- Initialize tooltips with `$('[data-bs-toggle="tooltip"]').tooltip()`
+- Use `data-toggle` attributes (NOT `data-bs-toggle` from Bootstrap 5.x)
+- Use `href="#id"` for collapse triggers (NOT `data-target="#id"` or `data-bs-target="#id"`)
+- Initialize tooltips with `$('[data-toggle="tooltip"]').tooltip()`
 - Ensure `class="collapse"` on all collapsible target elements
 
 **Migration Notes**:
@@ -303,6 +304,7 @@ if (currentPath.includes('/player') && !completed['player-management']) {
 - Player details, matches, navigation, and settings templates standardized
 - Flask-Bootstrap dependency scheduled for removal (REFACTOR-103)
 - Custom CSS classes maintain visual consistency during Bootstrap upgrades
+- **LESSON LEARNED**: Bootstrap version must match between CSS/JS files and data-* attributes
 
 **Visual Enhancements**:
 - Player name links include hover effects and visual feedback
