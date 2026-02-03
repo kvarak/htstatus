@@ -144,6 +144,17 @@ class User(db.Model):
     c_feedback = db.Column(db.Integer, default=0)
     c_formation = db.Column(db.Integer, default=0)
     c_stats = db.Column(db.Integer, default=0)
+    # Tour-specific tracking
+    c_welcome_complete = db.Column(db.Integer, default=0)  # Welcome tour completions
+    c_welcome_skip = db.Column(db.Integer, default=0)      # Welcome tour skips
+    c_welcome_help = db.Column(db.Integer, default=0)      # Welcome tour help clicks
+    c_player_complete = db.Column(db.Integer, default=0)   # Player management tour completions
+    c_player_skip = db.Column(db.Integer, default=0)       # Player management tour skips
+    c_player_help = db.Column(db.Integer, default=0)       # Player management tour help clicks
+    c_update_complete = db.Column(db.Integer, default=0)   # Data update tour completions
+    c_update_skip = db.Column(db.Integer, default=0)       # Data update tour skips
+    c_update_help = db.Column(db.Integer, default=0)       # Data update tour help clicks
+    c_tutorial_reset = db.Column(db.Integer, default=0)    # Tutorial progress resets
     last_login = db.Column(db.DateTime)
     last_update = db.Column(db.DateTime)
     last_usage = db.Column(db.DateTime)
@@ -164,6 +175,17 @@ class User(db.Model):
         self.c_matches = 0
         self.c_training = 0
         self.c_update = 0
+        # Initialize tour-specific counters
+        self.c_welcome_complete = 0
+        self.c_welcome_skip = 0
+        self.c_welcome_help = 0
+        self.c_player_complete = 0
+        self.c_player_skip = 0
+        self.c_player_help = 0
+        self.c_update_complete = 0
+        self.c_update_skip = 0
+        self.c_update_help = 0
+        self.c_tutorial_reset = 0
         self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_update = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -673,5 +695,42 @@ class ErrorLog(db.Model):
 
     def __repr__(self):
         return f"<ErrorLog {self.error_type}: {self.message[:50]}... at {self.timestamp}>"
+
+# --------------------------------------------------------------------------------
+
+
+class TutorialAnalytics(db.Model):
+    """Track tutorial usage analytics for debugging and optimization."""
+    __tablename__ = "tutorial_analytics"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=True)  # Nullable for anonymous users
+    session_id = db.Column(db.String(255), nullable=False)  # Browser session identifier
+    event_type = db.Column(db.String(50), nullable=False)  # 'start', 'complete', 'skip', 'exit', 'help_click', 'reset'
+    tour_id = db.Column(db.String(50), nullable=False)  # 'welcome', 'player-management', 'data-update'
+    step_number = db.Column(db.Integer, nullable=True)  # Which step (for skips/exits)
+    step_duration_seconds = db.Column(db.Float, nullable=True)  # Time spent on step
+    total_duration_seconds = db.Column(db.Float, nullable=True)  # Total time in tour
+    page_path = db.Column(db.String(255), nullable=False)  # URL path where event occurred
+    user_agent = db.Column(db.Text, nullable=True)  # Browser info
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationship to User
+    user = db.relationship('User', backref='tutorial_events', lazy=True)
+
+    def __init__(self, session_id, event_type, tour_id, page_path, user_id=None,
+                 step_number=None, step_duration_seconds=None, total_duration_seconds=None, user_agent=None):
+        self.user_id = user_id
+        self.session_id = session_id
+        self.event_type = event_type
+        self.tour_id = tour_id
+        self.step_number = step_number
+        self.step_duration_seconds = step_duration_seconds
+        self.total_duration_seconds = total_duration_seconds
+        self.page_path = page_path
+        self.user_agent = user_agent
+
+    def __repr__(self):
+        return f"<TutorialAnalytics {self.event_type} {self.tour_id} by user {self.user_id} at {self.timestamp}>"
 
 # --------------------------------------------------------------------------------
