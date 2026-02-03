@@ -38,16 +38,16 @@
       <div class="card-deck">
         <div class="card">
           <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#matchtype-league">
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-league">
               League
             </button>
-            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#matchtype-cup">
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-cup">
               Cup
             </button>
-            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#matchtype-friendly">
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-friendly">
               Friendly
             </button>
-            <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#matchtype-other">
+            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-other">
                 Other
             </button>
           </div>
@@ -92,11 +92,11 @@
                 </td>
                 <td style="font-size: x-small;">
                   {% if m.home_team_name == teamname %}
-                  <a data-bs-toggle="collapse" data-bs-target="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
                     {{ m.away_team_name }}
                   </a>
                   {% else %}
-                  <a data-bs-toggle="collapse" data-bs-target="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
                     {{ m.home_team_name }}
                   </a>
                   {% endif %}
@@ -129,7 +129,7 @@
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">
-                  <a data-bs-toggle="collapse" data-bs-target="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
+                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
                     {{ m.home_team_name }} - {{ m.away_team_name }} {{ m.home_goals }}-{{ m.away_goals }}
                   </a>
                 </h5>
