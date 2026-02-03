@@ -5,7 +5,7 @@
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 3, 2026): BUG-077 Player Details Bootstrap Fix COMPLETED - Fixed Bootstrap version mismatch causing player detail collapse functionality to fail. Standardized all templates to Bootstrap 4.x syntax with enhanced visual feedback. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 98 tasks** (P0=0, P1=0, P2=10, P3=8, P4=80)
+**Recent Organization** (February 3, 2026): Player Modal Layout Enhancement COMPLETED - Removed "None" value clutter, restructured layout to two-column Bootstrap grid, eliminated duplicate group dropdown, optimized chart sizing. Added Chart.js responsive configuration fixes. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 101 tasks** (P0=0, P1=0, P2=10, P3=8, P4=83)
 
 ---
 
@@ -46,6 +46,13 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 3, 2026 - Player Modal Layout Enhancement Analysis)
+
+#### Template Architecture Quality & Simplification
+- **[REFACTOR-104]** Extract Player Field Display Logic - Replace repeated conditional display logic (nick_name, statement, owner_notes) with reusable Jinja2 macros to eliminate DRY violations (15 min)
+- **[UI-018]** Standardize Modal Content Width Constraints - Replace inline max-width styles (450px) with CSS classes following established logical component architecture (30 min)
+- **[REFACTOR-105]** Audit Chart.js Responsive Configuration - Standardize Chart.js responsive settings across all implementations to prevent sizing inconsistencies and reduce configuration drift (45 min)
 
 ### Recent Critical Review Improvements (February 3, 2026 - BUG-077 Bootstrap Fix Analysis)
 
