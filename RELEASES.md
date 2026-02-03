@@ -8,6 +8,13 @@
 
 ---
 
+## 3.21 - February 3, 2026
+
+- **Fixed Player Details**: Player names now properly expand to show detailed information when clicked
+- **Better Visual Feedback**: Enhanced hover effects and animations make it clearer when buttons and links are interactive
+- **Series League Table**: New route for viewing complete league standings with tactical insights for upcoming matches
+- **Improved Interface Consistency**: All dropdown menus, tooltips, and collapsible sections now work consistently across the application
+
 ## 3.20 - February 3, 2026
 
 - **Interactive Tutorial System**: New users get a guided tour of HattrickPlanner's features

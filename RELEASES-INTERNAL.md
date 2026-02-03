@@ -8,6 +8,25 @@
 
 ---
 
+## 3.21 - February 3, 2026
+
+**Bootstrap 4.x Migration and Series Route**
+- **BUG-077 COMPLETED**: Fixed Bootstrap version conflict causing player detail collapse functionality failure
+- Standardized all templates to Bootstrap 4.x syntax (data-bs-toggle, data-bs-target, data-bs-placement)
+- Updated 4 template files: base.html, player.html, matches.html, settings.html for consistent Bootstrap 4.x patterns
+- Added visual enhancements: player name hover effects, smooth collapse animations, improved user feedback
+- **FEAT-030 COMMITTED**: Series route with league insights for complete standings and tactical analysis
+- Updated TECHNICAL.md with Bootstrap 4.x standards, migration patterns, and development guidelines
+- Created REFACTOR-103 task for complete Flask-Bootstrap dependency cleanup (technical debt resolution)
+- Consolidated duplicate UI-013 task in backlog, updated task distribution to 98 active tasks
+- Quality gates: 7/8 passing (HIGH deployment confidence), 51.6% test coverage maintained
+
+**Technical Improvements**:
+- Bootstrap framework consistency across all interactive components (tooltips, dropdowns, collapse)
+- Template syntax standardization eliminates version conflicts between Flask-Bootstrap 3.x and CDN 4.x
+- Enhanced user experience with CSS animations and visual feedback on interactive elements
+- Documentation alignment between implementation and standards for future development
+
 ## 3.20 - February 3, 2026
 
 **Interactive Tutorial System Complete**
