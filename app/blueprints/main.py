@@ -468,6 +468,17 @@ def admin():
             "c_login": user.c_login,
             "c_update": user.c_update,
             "c_settings": user.c_settings or 0,
+            # Tour-specific fields
+            "c_welcome_complete": user.c_welcome_complete or 0,
+            "c_welcome_skip": user.c_welcome_skip or 0,
+            "c_welcome_help": user.c_welcome_help or 0,
+            "c_player_complete": user.c_player_complete or 0,
+            "c_player_skip": user.c_player_skip or 0,
+            "c_player_help": user.c_player_help or 0,
+            "c_update_complete": user.c_update_complete or 0,
+            "c_update_skip": user.c_update_skip or 0,
+            "c_update_help": user.c_update_help or 0,
+            "c_tutorial_reset": user.c_tutorial_reset or 0,
             "c_changes": user.c_changes or 0,
             "c_feedback": user.c_feedback or 0,
             "c_formation": user.c_formation or 0,
@@ -504,3 +515,87 @@ def admin():
         errors=errors,
         form_error=form_error,
     )
+
+
+@main_bp.route("/api/tutorial-analytics", methods=["POST"])
+def tutorial_analytics():
+    """Record tutorial analytics events."""
+    try:
+        from flask import jsonify
+
+        from models import TutorialAnalytics
+
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+
+        # Get current user ID if available
+        user_id = get_current_user_id()
+
+        # Extract session ID (fallback to a simple hash if not provided)
+        session_id = data.get('session_id', str(hash(request.remote_addr + str(session.get('_csrf_token', '')))))
+
+        # Validate required fields
+        required_fields = ['event_type', 'tour_id', 'page_path']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({"error": f"Missing required field: {field}"}), 400
+
+        # Create analytics record
+        analytics = TutorialAnalytics(
+            user_id=user_id,
+            session_id=session_id,
+            event_type=data['event_type'],
+            tour_id=data['tour_id'],
+            page_path=data['page_path'],
+            step_number=data.get('step_number'),
+            step_duration_seconds=data.get('step_duration_seconds'),
+            total_duration_seconds=data.get('total_duration_seconds'),
+            user_agent=request.headers.get('User-Agent')
+        )
+
+        # Save to database
+        db.session.add(analytics)
+
+        # Increment specific tour counter if user is logged in
+        if user_id:
+            user = get_user_model().query.filter_by(ht_id=user_id).first()
+            if user:
+                # Map tour_id to field prefix
+                tour_field_map = {
+                    'welcome': 'welcome',
+                    'player-management': 'player',
+                    'data-update': 'update'
+                }
+
+                # Map event_type to field suffix
+                event_field_map = {
+                    'complete': 'complete',
+                    'skip': 'skip',
+                    'help_click': 'help'
+                }
+
+                tour_prefix = tour_field_map.get(data['tour_id'])
+                event_suffix = event_field_map.get(data['event_type'])
+
+                # Handle reset events (global, affects all tours)
+                if data['event_type'] == 'reset':
+                    current_value = user.c_tutorial_reset or 0
+                    user.c_tutorial_reset = current_value + 1
+                    dprint(2, f"Incremented c_tutorial_reset to {current_value + 1} for user {user_id}")
+                elif tour_prefix and event_suffix:
+                    field_name = f"c_{tour_prefix}_{event_suffix}"
+                    if hasattr(user, field_name):
+                        current_value = getattr(user, field_name) or 0
+                        setattr(user, field_name, current_value + 1)
+                        dprint(2, f"Incremented {field_name} to {current_value + 1} for user {user_id}")
+
+        db.session.commit()
+
+        dprint(2, f"Tutorial analytics recorded: {data['event_type']} for {data['tour_id']} by user {user_id}")
+
+        return jsonify({"status": "success"}), 200
+
+    except Exception as e:
+        dprint(1, f"Error recording tutorial analytics: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500

@@ -110,6 +110,13 @@
                     <th scope="col" class="text-small">#player</th>
                     <th scope="col" class="text-small">#update</th>
                     <th scope="col" class="text-small">#settings</th>
+                    <th scope="col" class="text-small">Welcome✓</th>
+                    <th scope="col" class="text-small">Welcome⏭</th>
+                    <th scope="col" class="text-small">Player✓</th>
+                    <th scope="col" class="text-small">Player⏭</th>
+                    <th scope="col" class="text-small">Update✓</th>
+                    <th scope="col" class="text-small">Reset</th>
+                    <th scope="col" class="text-small">Help?</th>
                     <th scope="col" class="text-small">#changes</th>
                     <th scope="col" class="text-small">#feedback</th>
                     <th scope="col" class="text-small">#formation</th>
@@ -158,6 +165,13 @@
                     <td class="text-small">{{ u.c_player }}</td>
                     <td class="text-small">{{ u.c_update }}</td>
                     <td class="text-small">{{ u.c_settings or 0 }}</td>
+                    <td class="text-small">{{ u.c_welcome_complete or 0 }}</td>
+                    <td class="text-small">{{ u.c_welcome_skip or 0 }}</td>
+                    <td class="text-small">{{ u.c_player_complete or 0 }}</td>
+                    <td class="text-small">{{ u.c_player_skip or 0 }}</td>
+                    <td class="text-small">{{ u.c_update_complete or 0 }}</td>
+                    <td class="text-small">{{ u.c_tutorial_reset or 0 }}</td>
+                    <td class="text-small">{{ (u.c_welcome_help or 0) + (u.c_player_help or 0) + (u.c_update_help or 0) }}</td>
                     <td class="text-small">{{ u.c_changes or 0 }}</td>
                     <td class="text-small">{{ u.c_feedback or 0 }}</td>
                     <td class="text-small">{{ u.c_formation or 0 }}</td>
@@ -190,6 +204,37 @@
         </div>
       </div>
       <div class="row">
+        <!-- Tutorial Analytics Charts -->
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-graduation-cap"></i> Tutorial Completion Rates</h6>
+              <small class="text-muted d-block mb-2">Completion vs skip rates for each tutorial tour</small>
+              <canvas id="tutorialCompletionChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-question-circle"></i> Tutorial Help Usage</h6>
+              <small class="text-muted d-block mb-2">Help button clicks across different tutorial tours</small>
+              <canvas id="tutorialHelpChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-3">
+          <div class="card chart-card">
+            <div class="card-body">
+              <h6 class="card-title mb-1"><i class="fas fa-redo-alt"></i> Tutorial Reset Behavior</h6>
+              <small class="text-muted d-block mb-2">Tutorial reset frequency and user re-learning patterns</small>
+              <canvas id="tutorialResetChart" style="max-height: 200px;"></canvas>
+            </div>
+          </div>
+        </div>
+
         <div class="col-12 mb-3">
           <div class="card chart-card">
             <div class="card-body">
@@ -375,6 +420,11 @@ function getFilteredUsers() {
 function updateAllCharts() {
     const filteredUsers = getFilteredUsers();
 
+    // Update tutorial charts
+    updateTutorialCompletionChart(filteredUsers);
+    updateTutorialHelpChart(filteredUsers);
+    updateTutorialResetChart(filteredUsers);
+
     // Update existing charts
     updateUserActivityChart(filteredUsers);
     updateFeatureUsageChart(filteredUsers);
@@ -395,6 +445,161 @@ function updateAllCharts() {
     updateUpdateFrequencyChart(filteredUsers);
     updateFeatureRadarChart(filteredUsers);
     updateEngagementScoreChart(filteredUsers);
+}
+
+// Tutorial Chart 1: Tutorial Completion Rates
+function updateTutorialCompletionChart(filteredUsers) {
+    let tutorialData = {
+        welcome_complete: 0,
+        welcome_skip: 0,
+        player_complete: 0,
+        player_skip: 0,
+        update_complete: 0,
+        update_skip: 0
+    };
+
+    filteredUsers.forEach(user => {
+        tutorialData.welcome_complete += user.c_welcome_complete || 0;
+        tutorialData.welcome_skip += user.c_welcome_skip || 0;
+        tutorialData.player_complete += user.c_player_complete || 0;
+        tutorialData.player_skip += user.c_player_skip || 0;
+        tutorialData.update_complete += user.c_update_complete || 0;
+        tutorialData.update_skip += user.c_update_skip || 0;
+    });
+
+    if (charts.tutorialCompletion) {
+        charts.tutorialCompletion.destroy();
+    }
+
+    const tutorialCompletionCtx = document.getElementById('tutorialCompletionChart').getContext('2d');
+    charts.tutorialCompletion = new Chart(tutorialCompletionCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
+            datasets: [{
+                label: 'Completed',
+                data: [tutorialData.welcome_complete, tutorialData.player_complete, tutorialData.update_complete],
+                backgroundColor: '#28a745',
+                borderColor: '#1e7e34',
+                borderWidth: 1
+            }, {
+                label: 'Skipped',
+                data: [tutorialData.welcome_skip, tutorialData.player_skip, tutorialData.update_skip],
+                backgroundColor: '#ffc107',
+                borderColor: '#e0a800',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });
+}
+
+// Tutorial Chart 2: Tutorial Help Usage
+function updateTutorialHelpChart(filteredUsers) {
+    let helpData = {
+        welcome_help: 0,
+        player_help: 0,
+        update_help: 0
+    };
+
+    filteredUsers.forEach(user => {
+        helpData.welcome_help += user.c_welcome_help || 0;
+        helpData.player_help += user.c_player_help || 0;
+        helpData.update_help += user.c_update_help || 0;
+    });
+
+    if (charts.tutorialHelp) {
+        charts.tutorialHelp.destroy();
+    }
+
+    const tutorialHelpCtx = document.getElementById('tutorialHelpChart').getContext('2d');
+    charts.tutorialHelp = new Chart(tutorialHelpCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
+            datasets: [{
+                data: [helpData.welcome_help, helpData.player_help, helpData.update_help],
+                backgroundColor: ['#007bff', '#17a2b8', '#6f42c1'],
+                borderColor: ['#0056b3', '#138496', '#59359a'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Tutorial Chart 3: Tutorial Reset Behavior
+function updateTutorialResetChart(filteredUsers) {
+    let resetBuckets = {
+        'No Resets': 0,
+        '1 Reset': 0,
+        '2-3 Resets': 0,
+        '4+ Resets': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const resets = user.c_tutorial_reset || 0;
+        if (resets === 0) {
+            resetBuckets['No Resets']++;
+        } else if (resets === 1) {
+            resetBuckets['1 Reset']++;
+        } else if (resets <= 3) {
+            resetBuckets['2-3 Resets']++;
+        } else {
+            resetBuckets['4+ Resets']++;
+        }
+    });
+
+    if (charts.tutorialReset) {
+        charts.tutorialReset.destroy();
+    }
+
+    const tutorialResetCtx = document.getElementById('tutorialResetChart').getContext('2d');
+    charts.tutorialReset = new Chart(tutorialResetCtx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(resetBuckets),
+            datasets: [{
+                data: Object.values(resetBuckets),
+                backgroundColor: ['#28a745', '#ffc107', '#fd7e14', '#dc3545'],
+                borderColor: ['#1e7e34', '#e0a800', '#e8650e', '#c82333'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
 }
 
 // Chart 1: User Activity Distribution
