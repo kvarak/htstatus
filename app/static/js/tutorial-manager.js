@@ -629,6 +629,35 @@ class TutorialManager {
         });
 
         document.body.appendChild(helpBtn);
+
+        // Hide help button on main page when navigation is collapsed
+        this.updateHelpButtonVisibility(helpBtn);
+
+        // Listen for window resize to update visibility
+        window.addEventListener('resize', () => {
+            this.updateHelpButtonVisibility(helpBtn);
+        });
+    }
+
+    /**
+     * Update help button visibility based on navigation state
+     */
+    updateHelpButtonVisibility(helpBtn) {
+        if (!helpBtn) return;
+
+        // Only hide on main page when navigation is collapsed
+        const isMainPage = window.location.pathname === '/';
+        if (!isMainPage) {
+            helpBtn.style.display = 'block';
+            return;
+        }
+
+        // Check if navbar is collapsed by looking at navbar-toggler visibility
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        if (navbarToggler) {
+            const isCollapsed = window.getComputedStyle(navbarToggler).display !== 'none';
+            helpBtn.style.display = isCollapsed ? 'none' : 'block';
+        }
     }
 
     /**
@@ -749,7 +778,7 @@ class TutorialManager {
             return; // No tour available for this page
         }
 
-        // Create and add help button
+        // Create and add help button with responsive visibility
         this.addHelpButton(availableTour);
     }
 
