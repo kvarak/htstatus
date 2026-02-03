@@ -254,3 +254,50 @@ class TestAuthRoutes:
             assert isinstance(access_secret, str)
             assert len(access_key) > 0
             assert len(access_secret) > 0
+
+
+class TestSessionValidationAPI:
+    """Test the new session validation API endpoint for PWA support."""
+
+    def test_validate_session_no_session(self, app_with_routes):
+        """Test session validation with no active session."""
+        client = app_with_routes.test_client()
+        response = client.get('/validate-session')
+
+        assert response.status_code == 401
+        data = response.get_json()
+        assert data['valid'] is False
+        assert data['reason'] == 'no_session'
+
+    def test_validate_session_incomplete_session(self, app_with_routes):
+        """Test session validation with incomplete session data."""
+        client = app_with_routes.test_client()
+
+        with client.session_transaction() as session:
+            session['current_user_id'] = 12345
+            # Missing access_key, access_secret, current_user
+
+        response = client.get('/validate-session')
+
+        assert response.status_code == 401
+        data = response.get_json()
+        assert data['valid'] is False
+        assert data['reason'] == 'incomplete_session'
+
+    def test_validate_session_valid_session(self, app_with_routes):
+        """Test session validation with complete session data."""
+        client = app_with_routes.test_client()
+
+        with client.session_transaction() as session:
+            session['current_user_id'] = 12345
+            session['access_key'] = 'test_access_key'
+            session['access_secret'] = 'test_access_secret'
+            session['current_user'] = 'testuser'
+
+        response = client.get('/validate-session')
+
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data['valid'] is True
+        assert data['user_id'] == 12345
+        assert data['user'] == 'testuser'

@@ -138,10 +138,14 @@ def create_test_user(db_session, user_id=12345, username='testuser'):
 
     user = User(
         ht_id=user_id,
-        name=username,
-        email=f'{username}@example.com',
-        role='user'
+        ht_user=username,
+        username=username,
+        password='test_password',
+        access_key='test_access_key',
+        access_secret='test_access_secret'
     )
+
+    user.role = 'user'  # Set role after creation
 
     db_session.add(user)
     db_session.commit()
