@@ -5,7 +5,7 @@
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 3, 2026): DOC-021 New Player Tutorial COMPLETED - Comprehensive interactive onboarding system with tutorial analytics charts, tour-specific tracking, and reset behavior monitoring. Review identified chart creation pattern duplication needing consolidation. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 98 tasks** (P0=0, P1=0, P2=10, P3=8, P4=80)
+**Recent Organization** (February 3, 2026): BUG-077 Player Details Bootstrap Fix COMPLETED - Fixed Bootstrap version mismatch causing player detail collapse functionality to fail. Standardized all templates to Bootstrap 4.x syntax with enhanced visual feedback. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 98 tasks** (P0=0, P1=0, P2=10, P3=8, P4=80)
 
 ---
 
@@ -47,11 +47,15 @@
 
 ## P4: Possibilities 🔮
 
+### Recent Critical Review Improvements (February 3, 2026 - BUG-077 Bootstrap Fix Analysis)
+
+#### Bootstrap Architecture & Technical Debt Cleanup
+- **[REFACTOR-103]** Complete Bootstrap 4.x Migration and Flask-Bootstrap Cleanup - Remove Flask-Bootstrap dependency entirely, standardize all templates to Bootstrap 4.x syntax, eliminate version conflicts discovered during player details fix (2 hours)
+
 ### Recent Critical Review Improvements (February 3, 2026 - Responsive Tutorial Help Button Analysis)
 
 #### Responsive Design & Architecture Simplification
 - **[REFACTOR-086]** Replace Responsive JavaScript with CSS-Only Solution - Replace 24-line JavaScript resize listeners and navbar-toggler detection with simple CSS media queries matching Bootstrap breakpoints (20 min)
-- **[UI-013]** Implement CSS-Only Responsive Help Button - Use CSS media queries and display rules for responsive behavior, eliminate JavaScript event handling performance concerns (15 min)
 - **[DOC-028]** Document Responsive Design Decision Rationale - Record responsive design approach decisions and alternative CSS/JavaScript approaches considered for future reference (15 min)
 
 ### Recent Critical Review Improvements (February 3, 2026 - Tutorial Analytics Implementation Review)
