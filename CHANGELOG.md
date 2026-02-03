@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Interactive Tutorial System** - Comprehensive user onboarding and feature discovery
+  - Welcome tour for new users introducing key navigation and features
+  - Context-aware feature tours for Players, Training, and Data Updates
+  - Progressive disclosure: tours appear automatically based on page visits and user progress
+  - Persistent progress tracking with localStorage and version-aware feature alerts
+  - Floating help button for easy access to tutorials and help menu
+  - Full accessibility support with keyboard navigation and screen reader compatibility
+  - Built with Intro.js for professional guided tour experience
 - **Default Player Groups for New Users** - Automatically create 7 sensible player groups when users first sign up
   - Groups: Goalkeepers, Defenders, Midfielders, Wingers, Forwards, Youth/Development, Veterans
   - Football-themed color scheme with proper spacing for user customization (order 10, 20, 30, etc.)
@@ -16,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Integration test resolution task (TEST-002) in project backlog
 
 ### Changed
+- Enhanced navbar with tutorial target IDs for guided tours
+- Player table includes tutorial integration with ID targeting
+- App version meta tag added for tutorial feature detection
 - Project documentation updated with completion status and metrics
 - Backlog dependencies updated to reflect infrastructure readiness
 

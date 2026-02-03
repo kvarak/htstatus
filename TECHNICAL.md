@@ -225,7 +225,9 @@ HattrickPlanner uses a **hybrid JavaScript architecture** optimized for hobby pr
 
 **Libraries & Dependencies**:
 - **Chart.js v4.4.0**: Consistent charting via CDN (unified version across all templates)
+- **Intro.js**: Interactive tutorial and guided tours for user onboarding
 - **session-persistence.js**: Dedicated PWA session management (195 lines, isolated functionality)
+- **tutorial-manager.js**: Comprehensive user onboarding and feature discovery system
 - **chart-utils.js**: Centralized Chart.js configuration utilities and common patterns
 - **sorttable.js**: Lightweight table sorting functionality
 - **Sortable.js**: Drag-and-drop for settings interface
@@ -233,9 +235,41 @@ HattrickPlanner uses a **hybrid JavaScript architecture** optimized for hobby pr
 
 **Organization Principles**:
 - **Separation by Purpose**: PWA logic isolated from chart utilities from table interactions
+- **User Onboarding**: Tutorial system provides guided tours without disrupting core functionality
 - **Consolidated Configuration**: Common chart patterns centralized in utilities
 - **Version Consistency**: Single Chart.js v4.4.0 across all pages (no version conflicts)
 - **Template Integration**: Chart initialization embedded in templates for server-side data binding
+
+### Tutorial System Architecture
+
+**Interactive Onboarding** (`app/static/js/tutorial-manager.js`):
+- **Welcome Tour**: Multi-step guided introduction for new users
+- **Feature-Specific Tours**: Contextual help for Players, Training, and Data Updates
+- **Progressive Disclosure**: Tours appear contextually based on user progress and page visits
+- **Persistent State**: Progress tracking via localStorage with version-aware feature alerts
+- **Accessibility**: Full keyboard navigation and screen reader support via Intro.js
+
+**Implementation Pattern**:
+```javascript
+// Tutorial manager initializes automatically
+const tutorialManager = new TutorialManager();
+
+// Context-aware tours trigger based on current page
+if (currentPath.includes('/player') && !completed['player-management']) {
+    tutorialManager.startFeatureTour('player-management');
+}
+```
+
+**Storage Structure**:
+- localStorage key: `ht_tutorial_progress`
+- Tracks: welcome completion, feature tours completed, app version for new feature alerts
+- Non-destructive: Won't interfere with PWA session persistence or other browser storage
+
+**Tour Content**:
+- **Welcome Tour**: Navigation overview, key features, Update workflow importance
+- **Player Management**: Table sorting, skill analysis, player detail views
+- **Training Analysis**: Development tracking and training effectiveness
+- **Data Updates**: CHPP sync workflow and timing recommendations
 
 ### Chart.js Architecture
 
@@ -266,8 +300,15 @@ window.createPlayerChart(canvasId, playerData, skillName);
 **Isolated Functionality** (`app/static/js/session-persistence.js`):
 - PWA detection and session persistence across app installations
 - localStorage synchronization with Flask server sessions
-- 195-line dedicated module with clear PWA boundary concerns
+- Infinite loop prevention with restoration attempt counters and timeouts
+- Backend session validation via `/validate-session` API endpoint
 - **Kept Separate**: Distinct functionality from chart/UI logic, different lifecycle needs
+
+**Session Validation API** (`/validate-session`):
+- Returns JSON with session validity status for PWA mobile apps
+- Checks for complete session data (user_id, access_key, access_secret, current_user)
+- Provides fallback for PWA session restoration without infinite loops
+- Mobile-optimized with proper error handling and timeout mechanisms
 
 ### Integration Points
 

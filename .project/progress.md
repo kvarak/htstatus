@@ -2,12 +2,12 @@
 
 # Project Progress
 
-**Current State**: P0 production bugs complete ✅ → P1 Critical tasks complete ✅ → **Test coverage priority complete ✅** → P2 Feature development ready
+**Current State**: P0 production bugs complete ✅ → P1 Critical tasks complete ✅ → **Test coverage priority complete ✅** → **Tutorial system complete ✅** → P2 Feature development ready
 
 ## Status Summary
 - **Quality**: 7/8 quality gates passing (HIGH deployment confidence)
-- **Coverage**: 51.8% test coverage (EXCEEDS 50% target by 1.8%) - ✅ COMPLETE
-- **Testing**: All 364 tests passing (0 failures)
+- **Coverage**: 51.6% test coverage (EXCEEDS 50% target by 1.6%) - ✅ COMPLETE
+- **Testing**: All 381 tests passing (0 failures) - added tutorial system tests
 - **Security**: 0 CVE vulnerabilities, 13 dependency warnings (non-critical), 0 code issues
 - **Environment**: Production data restored (26,004 players) - fresh production backup January 29, 2026
 - **Architecture**: Blueprint migration complete, Flask-only frontend, comprehensive activity tracking
@@ -16,22 +16,33 @@
 - **Production Monitoring**: ✅ COMPLETE - Error logging system with database storage, web interface, and command-line tools
 - **Integration Tests**: ✅ FIXED - All Flask-Bootstrap template failures resolved
 - **JavaScript Architecture**: ✅ COMPLETE - Chart.js unified to v4.4.0, chart utilities consolidated, 3.4MB Plotly removed (February 2, 2026)
-- **Test Coverage**: ✅ COMPLETE - Comprehensive test infrastructure with 51.8% coverage (February 2, 2026)
+- **Test Coverage**: ✅ COMPLETE - Comprehensive test infrastructure with 51.6% coverage (February 2, 2026)
+- **Tutorial System**: ✅ COMPLETE - Interactive onboarding with analytics tracking and debug charts (February 3, 2026)
 
 ## Current Focus
-**P2 Feature Development Ready**: All P1 critical tasks complete, focus on P2 features and maintaining quality
-- **TEST-010 COMPLETED**: Coverage achieved 51.8% (exceeds 50% target by 1.8%), all 364 tests passing
+**P2 Feature Development Ready**: All P1 critical tasks complete, tutorial system complete with analytics, focus on P2 features and maintaining quality
+- **DOC-021 COMPLETED**: Tutorial system with tour-specific analytics, debug charts, and reset tracking implemented (February 3, 2026)
 - **Quality Gate Status**: HIGH deployment confidence (7/8 passing), only 13 non-critical dependency warnings remain
-- **Test Infrastructure**: Comprehensive coverage with identified areas for consolidation and simplification
-- **Next Priority**: P2 features (DOC-021 New Player Tutorial, FEAT-008 Next Game Analyser) and technical debt cleanup
-- **Critical Review**: Recent coverage expansion created technical debt requiring consolidation (3 new improvement tasks identified)
+- **Tutorial Analytics**: Comprehensive tracking system with 3 debug charts showing completion rates, help usage, and reset behavior patterns
+- **Next Priority**: P2 features (FEAT-008 Next Game Analyser) and technical debt cleanup from recent implementations
+- **Critical Review**: Tutorial implementation created chart duplication patterns requiring consolidation (3 new improvement tasks identified)
 
-## Recent Completions (February 1-2, 2026)
+## Recent Completions (February 1-3, 2026)
+
+### Tutorial System Complete ✅ (February 3, 2026)
+- **DOC-021 Complete**: Interactive onboarding system with comprehensive analytics tracking
+  - Implemented tour-specific tracking: completion, skip, and help behavior for welcome, player, and update tours
+  - Added tutorial reset functionality with global reset counter for re-learning pattern analysis
+  - Created 3 specialized debug charts: completion rates, help usage distribution, and reset behavior patterns
+  - Integrated analytics API endpoint mapping JavaScript events to database counters
+  - Enhanced debug table with meaningful columns (Welcome✓, Player✓, Reset, Help?) for admin analysis
+  - Database migrations successfully applied: 10 tour-specific tracking fields replace generic counter
+  - Critical review identified chart creation pattern duplication needing consolidation
 
 ### Test Coverage Priority Complete ✅ (February 2, 2026)
-- **TEST-010 Complete**: Comprehensive test infrastructure with 51.8% coverage
-  - Achieved target coverage of 50% and exceeded by 1.8%
-  - All 364 tests passing (0 failures) - complete test stability
+- **TEST-010 Complete**: Comprehensive test infrastructure with 51.6% coverage
+  - Achieved target coverage of 50% and exceeded by 1.6%
+  - All 381 tests passing (0 failures) - complete test stability with tutorial system tests
   - Added comprehensive CHPP parser testing with XML validation
   - Expanded utility function test coverage across all major modules
   - Integrated coverage analysis infrastructure with Quality Intelligence platform

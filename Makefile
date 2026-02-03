@@ -284,7 +284,7 @@ EXCEPTIONS = __init__.py test_factories.py constants.py error_handlers.py
 test-python: check-uv services ## 🧪 Run all Python tests with coverage
 	@echo "🧪 Running all Python tests with coverage..."
 	@mkdir -p out/tests && rm -f out/tests/$@.json out/tests/$@-cov.json
-	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=html --cov-report=json:out/tests/$@-cov.json --cov-fail-under=40 --json-report --json-report-file=out/tests/$@.json
+	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov=app --cov=models --cov=config --cov-report=term-missing --cov-report=html --cov-report=json:out/tests/$@-cov.json --cov-fail-under=50 --json-report --json-report-file=out/tests/$@.json
 
 coverage-report: check-uv ## 📊 Generate detailed coverage analysis and testing priorities
 	@echo "📊 Generating coverage analysis for test prioritization..."
@@ -357,7 +357,7 @@ check-chpp: ## Check CHPP API usage policy compliance
 
 GATES = fileformat lint security-bandit security-deps test-coverage-files coverage-report check-chpp
 
-test-all: check-uv services fileformat-fix lint-fix ## 🧪 Run complete quality gate validation
+test-all: check-uv services fileformat-fix lint-fix  ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"
 	@mkdir -p out/tests && rm -f out/tests/*.json
 	@count=1; \

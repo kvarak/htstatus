@@ -5,7 +5,7 @@
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 2, 2026): TEST-010 test coverage COMPLETED (51.8% achieved, EXCEEDING 50% target by 1.8%). All 364 tests passing with HIGH deployment confidence. Critical review identified technical debt from recent coverage expansion that needs consolidation. Quality gates: 7/8 passing. Focus: Consolidate test infrastructure improvements, clean up over-engineered solutions. **Active: 87 tasks** (P0=0, P1=0, P2=4, P3=8, P4=75)
+**Recent Organization** (February 3, 2026): DOC-021 New Player Tutorial COMPLETED - Comprehensive interactive onboarding system with tutorial analytics charts, tour-specific tracking, and reset behavior monitoring. Review identified chart creation pattern duplication needing consolidation. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 89 tasks** (P0=0, P1=0, P2=3, P3=8, P4=78)
 
 ---
 
@@ -19,7 +19,6 @@
 
 ## P2: Features 🎯
 
-- **[DOC-021]** New Player Tutorial → [Details](.project/tasks/DOC-021.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
@@ -40,6 +39,13 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 3, 2026 - Tutorial Analytics Implementation Review)
+
+#### Tutorial System Quality & Architecture
+- **[REFACTOR-102]** Consolidate Chart Creation Patterns - Replace repetitive Chart.js implementations in debug.html with factory pattern to eliminate ~70% of JavaScript duplication (45 min)
+- **[TEST-012]** Add Unit Tests for Tutorial Analytics - Create test coverage for tutorial tracking logic, analytics calculations, and event mapping missing from recent implementation (60 min)
+- **[DOC-029]** Document Tutorial Analytics Data Model - Define tutorial analytics data model and intended usage patterns to guide future development and prevent schema drift (30 min)
 
 ### Recent Critical Review Improvements (February 2, 2026 - TEST-010 Coverage Expansion Analysis)
 
