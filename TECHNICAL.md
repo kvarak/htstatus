@@ -24,7 +24,7 @@ Critical understanding for working with Hattrick's data model:
 
 ## Key Technologies
 - **Backend**: Python (Flask), SQLAlchemy ORM
-- **Frontend**: Jinja2 templates, Flask-Bootstrap 3.x, CSS
+- **Frontend**: Jinja2 templates, Bootstrap 4.x (via CDN), CSS
 - **Database**: PostgreSQL
 - **API Integration**: Custom CHPP client (app/chpp/) with pychpp 0.5.10 fallback
 - **Dev Tools**: UV (Python deps), Docker Compose, Makefile, pytest, ruff, mypy
@@ -223,6 +223,12 @@ HattrickPlanner uses a **hybrid JavaScript architecture** optimized for hobby pr
 
 ### Architecture Overview
 
+**Frontend Framework**: Bootstrap 4.x (loaded via StackPath CDN)
+- **CSS**: Bootstrap 4.5.0 for responsive grid, components, utilities
+- **JavaScript**: Bootstrap 4.x collapse, dropdown, tooltip functionality
+- **Integration**: Direct CDN loading with custom CSS extensions
+- **Templates**: Standard Jinja2 templates using Bootstrap 4.x syntax
+
 **Libraries & Dependencies**:
 - **Chart.js v4.4.0**: Consistent charting via CDN (unified version across all templates)
 - **Intro.js**: Interactive tutorial and guided tours for user onboarding
@@ -270,6 +276,38 @@ if (currentPath.includes('/player') && !completed['player-management']) {
 - **Player Management**: Table sorting, skill analysis, player detail views
 - **Training Analysis**: Development tracking and training effectiveness
 - **Data Updates**: CHPP sync workflow and timing recommendations
+
+### Bootstrap 4.x Development Standards
+
+**Syntax Requirements** (enforced as of February 2026):
+```html
+<!-- Collapse/Accordion Components -->
+<a data-bs-toggle="collapse" data-bs-target="#targetId" role="button">Trigger</a>
+<div class="collapse" id="targetId">Content</div>
+
+<!-- Tooltips -->
+<button data-bs-toggle="tooltip" data-bs-placement="top" title="Tooltip text">Button</button>
+
+<!-- Dropdowns -->
+<button data-bs-toggle="dropdown" aria-expanded="false">Dropdown</button>
+```
+
+**Critical Patterns**:
+- Use `data-bs-*` attributes (not `data-*` from Bootstrap 3.x)
+- Use `data-bs-target="#id"` instead of `href="#id"` for collapse triggers
+- Initialize tooltips with `$('[data-bs-toggle="tooltip"]').tooltip()`
+- Ensure `class="collapse"` on all collapsible target elements
+
+**Migration Notes**:
+- All templates updated from Bootstrap 3.x/Flask-Bootstrap to Bootstrap 4.x (BUG-077)
+- Player details, matches, navigation, and settings templates standardized
+- Flask-Bootstrap dependency scheduled for removal (REFACTOR-103)
+- Custom CSS classes maintain visual consistency during Bootstrap upgrades
+
+**Visual Enhancements**:
+- Player name links include hover effects and visual feedback
+- Collapse animations use CSS transitions for smooth interactions
+- Responsive design maintained across Bootstrap version transition
 
 ### Chart.js Architecture
 
