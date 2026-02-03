@@ -5,7 +5,7 @@
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 3, 2026): DOC-021 New Player Tutorial COMPLETED - Comprehensive interactive onboarding system with tutorial analytics charts, tour-specific tracking, and reset behavior monitoring. Review identified chart creation pattern duplication needing consolidation. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 97 tasks** (P0=0, P1=0, P2=9, P3=8, P4=80)
+**Recent Organization** (February 3, 2026): DOC-021 New Player Tutorial COMPLETED - Comprehensive interactive onboarding system with tutorial analytics charts, tour-specific tracking, and reset behavior monitoring. Review identified chart creation pattern duplication needing consolidation. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 98 tasks** (P0=0, P1=0, P2=10, P3=8, P4=80)
 
 ---
 
@@ -21,6 +21,7 @@
 
 - **[FEAT-029]** Matches System Integration and Archive - Restore matches functionality with recent/upcoming match downloads and on-demand archive system → [Details](.project/tasks/FEAT-029.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
+- **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
 - **[FEAT-010]** Player Comparison Tool (Connected to GitHub Issue #15 - User-requested feature for viewing multiple players side-by-side for comparison analysis) → [Details](.project/tasks/FEAT-010.md)
 - **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
 - **[FEAT-026]** Batch Player Group Management (Connected to GitHub Issue #23 - Enable bulk group assignment operations for multiple players) → [Details](.project/tasks/FEAT-026.md)
