@@ -5,7 +5,7 @@
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 
-**Recent Organization** (February 3, 2026): DOC-021 New Player Tutorial COMPLETED - Comprehensive interactive onboarding system with tutorial analytics charts, tour-specific tracking, and reset behavior monitoring. Review identified chart creation pattern duplication needing consolidation. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 92 tasks** (P0=0, P1=0, P2=3, P3=8, P4=81)
+**Recent Organization** (February 3, 2026): DOC-021 New Player Tutorial COMPLETED - Comprehensive interactive onboarding system with tutorial analytics charts, tour-specific tracking, and reset behavior monitoring. Review identified chart creation pattern duplication needing consolidation. Quality gates: 7/8 passing (HIGH deployment confidence). Focus: P2 feature development continues. **Active: 97 tasks** (P0=0, P1=0, P2=9, P3=8, P4=80)
 
 ---
 
@@ -19,7 +19,13 @@
 
 ## P2: Features 🎯
 
+- **[FEAT-029]** Matches System Integration and Archive - Restore matches functionality with recent/upcoming match downloads and on-demand archive system → [Details](.project/tasks/FEAT-029.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
+- **[FEAT-010]** Player Comparison Tool (Connected to GitHub Issue #15 - User-requested feature for viewing multiple players side-by-side for comparison analysis) → [Details](.project/tasks/FEAT-010.md)
+- **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
+- **[FEAT-026]** Batch Player Group Management (Connected to GitHub Issue #23 - Enable bulk group assignment operations for multiple players) → [Details](.project/tasks/FEAT-026.md)
+- **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](.project/tasks/FEAT-027.md)
+- **[FEAT-028]** Player Table Filtering System (Connected to GitHub Issue #10 - Add filtering capabilities to complement existing table sorting) → [Details](.project/tasks/FEAT-028.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
@@ -185,7 +191,6 @@
 ### Core Hattrick Features (Aligned with Geek Audience)
 - **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics → [Details](.project/tasks/FEAT-016.md)
 - **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences to avoid future rejections → [Details](.project/tasks/FEAT-017.md)
-- **[FEAT-010]** Player Comparison Tool → [Details](.project/tasks/FEAT-010.md)
 - **[FEAT-011]** Training Camp Planner → [Details](.project/tasks/FEAT-011.md)
 
 ### Simple Improvements
