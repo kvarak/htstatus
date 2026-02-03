@@ -8,6 +8,13 @@
 
 ---
 
+## 3.20 - February 3, 2026
+
+- **Interactive Tutorial System**: New users get a guided tour of HattrickPlanner's features
+- Smart activation based on what page you're viewing - tutorials appear when they're actually useful
+- Progressive disclosure: learn features step-by-step without overwhelming information dumps
+- Reset option available in Settings if you want to replay tutorials or missed something
+
 ## 3.17 - February 2026
 
 - **Enhanced What's New Section**: The main page now shows complete feature descriptions for each release instead of just brief summaries
