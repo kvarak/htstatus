@@ -47,6 +47,18 @@ function saveorder(){
   document.getElementById('columnsorder').value = columnfilter.innerHTML;
 }
 
+function resetTutorialProgress() {
+  if (confirm('Reset all tutorial progress? This will show all tutorials again on your next visit to various pages.')) {
+    // Check if TutorialManager is available
+    if (window.tutorialManager) {
+      window.tutorialManager.resetAllProgress();
+    } else {
+      // Fallback: manually clear localStorage
+      localStorage.removeItem('ht_tutorial_progress');
+    }
+  }
+}
+
 </script>
 
 {% endblock %}
@@ -62,6 +74,25 @@ function saveorder(){
           <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
         </ol>
       </nav>
+    </div>
+  </div>
+
+  <!-- Tutorial Reset Section -->
+  <div class="row mb-3">
+    <div class="col-sm">
+      <div class="card">
+        <div class="card-body py-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="card-title mb-1">Tutorial & Help</h6>
+              <p class="text-muted mb-0 small">Reset your tutorial progress to see all guided tours again</p>
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="resetTutorialProgress()">
+              <i class="fas fa-redo-alt"></i> Reset Tutorial
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

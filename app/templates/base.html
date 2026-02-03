@@ -10,6 +10,7 @@
 <link rel="manifest" href="{{url_for('static', filename='manifest.json')}}">
 <meta name="theme-color" content="#1f2937">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="app-version" content="{{ version }}">
 
 <!-- Bootstrap: Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -584,6 +585,98 @@ $('.toast').toast('show')
 <!-- Chart.js Utilities -->
 <script src="{{url_for('static', filename='js/chart-utils.js')}}"></script>
 
+<!-- Intro.js Tutorial Library -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
+<script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+
+<!-- Tutorial Custom Styles - Must load AFTER intro.js CSS -->
+<style>
+/* Tutorial System Overrides - Maximum specificity to override intro.js defaults */
+.introjs-tooltip.introjs-custom-tooltip {
+    max-width: 400px !important;
+    min-width: 250px !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-header {
+    padding: 4px 16px !important;
+    background: hsl(120, 45%, 25%) !important;
+    border-radius: 0.375rem 0.375rem 0 0 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltiptext {
+    padding: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-buttons {
+    padding: 0.75rem 1rem !important;
+    border-top: 1px solid hsl(120, 20%, 90%) !important;
+    text-align: right !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button {
+    padding: 0.375rem 0.75rem !important;
+    margin: 0 !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid hsl(120, 20%, 75%) !important;
+    background: white !important;
+    color: hsl(120, 45%, 25%) !important;
+    transition: all 0.2s ease !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button:hover {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton:hover {
+    background: hsl(120, 45%, 20%) !important;
+    border-color: hsl(120, 45%, 20%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton {
+    padding: 2px 16px !important;
+    font-size: 0.75rem !important;
+    color: hsl(120, 15%, 50%) !important;
+    border: none !important;
+    background: transparent !important;
+    white-space: nowrap !important;
+    min-width: 80px !important;
+    line-height: 1.2 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton:hover {
+    color: hsl(120, 45%, 25%) !important;
+    background: hsl(120, 8%, 97%) !important;
+}
+
+.introjs-helperNumberLayer.introjs-custom-highlight {
+    border: 3px solid hsl(120, 70%, 45%) !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 0 0 4px hsla(120, 70%, 45%, 0.3) !important;
+}
+</style>
+
+<!-- Tutorial Manager -->
+<script src="{{url_for('static', filename='js/tutorial-manager.js')}}"></script>
+
 <script type="text/javascript">// <![CDATA[
   function loading(){
     $("#loading").show();
@@ -654,7 +747,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav">
+    <ul class="navbar-nav" id="navbar-authenticated">
       <li>
         <img height="30" src="{{url_for('static', filename='chpp.png')}}">&nbsp;&nbsp;&nbsp;
       </li>
@@ -665,21 +758,21 @@ window.addEventListener('beforeinstallprompt', (e) => {
         {% if all_teams %}
         {% for team in range(all_teams|length) %}
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#" id="navbar-team-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             {{ all_team_names[team-1] }}
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team-1] }}">Team</a> -->
-            <a class="dropdown-item" href="/player?id={{ all_teams[team-1] }}" onclick="loading();">Players</a>
+            <a id="navbar-players-link" class="dropdown-item" href="/player?id={{ all_teams[team-1] }}" onclick="loading();">Players</a>
             <a class="dropdown-item" href="/formations?id={{ all_teams[team-1] }}" onclick="loading();">Formations</a>
             <!-- <a class="dropdown-item" href="/matches?id={{ all_teams[team-1] }}" onclick="loading();">Matches</a> -->
-            <a class="dropdown-item" href="/training?id={{ all_teams[team-1] }}" onclick="loading();">Training</a>
-            <a class="dropdown-item" href="/stats?id={{ all_teams[team-1] }}" onclick="loading();">Statistics</a>
+            <a id="navbar-training-link" class="dropdown-item" href="/training?id={{ all_teams[team-1] }}" onclick="loading();">Training</a>
+            <a id="navbar-stats-link" class="dropdown-item" href="/stats?id={{ all_teams[team-1] }}" onclick="loading();">Statistics</a>
           </div>
         </li>
         {% endfor %}
-        <a class="nav-link" href="/update" onclick="loading();">Update data</a>
-        <a class="nav-link" href="/settings" onclick="loading();">Settings</a>
+        <a id="navbar-update-link" class="nav-link" href="/update" onclick="loading();">Update data</a>
+        <a id="navbar-settings-link" class="nav-link" href="/settings" onclick="loading();">Settings</a>
         <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
         {% if role == "Admin" %}
         <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>

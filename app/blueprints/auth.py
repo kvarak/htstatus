@@ -574,6 +574,35 @@ def handle_oauth_callback(oauth_verifier):
         )
 
 
+@auth_bp.route("/validate-session")
+def validate_session():
+    """API endpoint to validate current session for PWA."""
+    try:
+        # Check if user is logged in
+        user_id = session.get("current_user_id")
+        if not user_id:
+            return {"valid": False, "reason": "no_session"}, 401
+
+        # Check if session data is complete
+        required_keys = ["access_key", "access_secret", "current_user"]
+        missing_keys = [key for key in required_keys if not session.get(key)]
+
+        if missing_keys:
+            dprint(2, f"Session missing keys: {missing_keys}")
+            return {"valid": False, "reason": "incomplete_session"}, 401
+
+        # Session appears valid
+        return {
+            "valid": True,
+            "user_id": user_id,
+            "user": session.get("current_user")
+        }, 200
+
+    except Exception as e:
+        dprint(1, f"Session validation error: {e}")
+        return {"valid": False, "reason": "error"}, 500
+
+
 @auth_bp.route("/logout")
 def logout():
     """Handle user logout and session clearing."""

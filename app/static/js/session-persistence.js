@@ -7,6 +7,10 @@ class SessionPersistence {
     constructor() {
         this.isPWA = this.detectPWA();
         this.sessionKey = 'ht_session_data';
+        this.restorationAttempts = 0;
+        this.maxRestorationAttempts = 3;
+        this.restorationInProgress = false;
+        this.restorationTimeout = 10000; // 10 seconds
         this.init();
     }
 
@@ -121,11 +125,115 @@ class SessionPersistence {
      * Prompt user to restore their session
      */
     promptSessionRestore(sessionData) {
+        // Prevent infinite loops - check if restoration already attempted
+        if (this.restorationInProgress) {
+            console.log('SessionPersistence: Restoration already in progress, skipping');
+            return;
+        }
+
+        if (this.restorationAttempts >= this.maxRestorationAttempts) {
+            console.log('SessionPersistence: Max restoration attempts reached, disabling auto-restore');
+            this.clearStoredSession();
+            return;
+        }
+
+        this.restorationInProgress = true;
+        this.restorationAttempts++;
+
+        // Set timeout to prevent hanging restoration attempts
+        const timeoutId = setTimeout(() => {
+            this.restorationInProgress = false;
+            console.log('SessionPersistence: Restoration attempt timed out');
+        }, this.restorationTimeout);
+
         const message = `You were previously logged in as ${sessionData.currentUser || 'a user'}. Would you like to restore your session?`;
 
         if (confirm(message)) {
-            // Redirect to a session restore endpoint or reload to trigger server-side session check
-            window.location.href = '/';
+            // Instead of redirecting to /, try to validate session first
+            this.attemptSessionValidation(sessionData, timeoutId);
+        } else {
+            // User declined restoration
+            clearTimeout(timeoutId);
+            this.restorationInProgress = false;
+            this.clearStoredSession();
+        }
+    }
+
+    /**
+     * Attempt to validate session with backend
+     */
+    async attemptSessionValidation(sessionData, timeoutId) {
+        try {
+            // Use the new session validation endpoint
+            const response = await fetch('/validate-session', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                if (result.valid) {
+                    // Session is valid, reload to show authenticated content
+                    console.log('SessionPersistence: Session validation successful');
+                    window.location.reload();
+                } else {
+                    // Session invalid, clear stored data
+                    console.log(`SessionPersistence: Session validation failed - ${result.reason}`);
+                    this.clearStoredSession();
+                    window.location.href = '/login';
+                }
+            } else {
+                // Validation endpoint not available or error, fall back to old method
+                console.log('SessionPersistence: Validation endpoint failed, trying fallback method');
+                await this.fallbackSessionValidation(sessionData);
+            }
+        } catch (error) {
+            console.error('SessionPersistence: Session validation failed', error);
+            // On error, try fallback method
+            await this.fallbackSessionValidation(sessionData);
+        } finally {
+            clearTimeout(timeoutId);
+            this.restorationInProgress = false;
+        }
+    }
+
+    /**
+     * Fallback session validation using homepage content parsing
+     */
+    async fallbackSessionValidation(sessionData) {
+        try {
+            const response = await fetch('/', {
+                method: 'GET',
+                credentials: 'include',
+                headers: {
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+                }
+            });
+
+            if (response.ok) {
+                const text = await response.text();
+                // Check if response contains login form (indicating not logged in)
+                if (text.includes('action="/login"') || text.includes('href="/login"')) {
+                    // Not logged in, session invalid
+                    console.log('SessionPersistence: Fallback validation - not logged in');
+                    this.clearStoredSession();
+                    window.location.href = '/login';
+                } else {
+                    // Appears logged in, reload page to show content
+                    console.log('SessionPersistence: Fallback validation successful');
+                    window.location.reload();
+                }
+            } else {
+                throw new Error(`HTTP ${response.status}`);
+            }
+        } catch (error) {
+            console.error('SessionPersistence: Fallback validation failed', error);
+            // On complete failure, go to login
+            this.clearStoredSession();
+            window.location.href = '/login';
         }
     }
 
@@ -181,8 +289,20 @@ class SessionPersistence {
             isPWA: this.isPWA,
             userLoggedIn: this.isUserLoggedIn(),
             storedSession: localStorage.getItem(this.sessionKey),
-            currentUser: this.getCurrentUserFromDOM()
+            currentUser: this.getCurrentUserFromDOM(),
+            restorationAttempts: this.restorationAttempts,
+            restorationInProgress: this.restorationInProgress,
+            maxRestorationAttempts: this.maxRestorationAttempts
         };
+    }
+
+    /**
+     * Reset restoration attempts (for debugging/testing)
+     */
+    resetRestorationAttempts() {
+        this.restorationAttempts = 0;
+        this.restorationInProgress = false;
+        console.log('SessionPersistence: Restoration attempts reset');
     }
 }
 
