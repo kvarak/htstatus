@@ -2,6 +2,13 @@
 
 **Dependencies**: CHPP API integration (completed), Match models (completed), matches blueprint (exists but disabled) | **Strategic Value**: Match analysis, tactical preparation, historical data access
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [matches-basic](../../docs/chpp/api-reference-matches-basic.md) - Recent/upcoming matches
+- [matchesarchive](../../docs/chpp/api-reference-matchesarchive.md) - Historical match data
+- [teamdetails](../../docs/chpp/api-reference-teamdetails.md) - Team context
+
 ## Problem Statement
 
 The matches functionality in HattrickPlanner is currently disabled and incomplete. The matches blueprint exists (`app/blueprints/matches.py`) and shows basic match data, but the feature is commented out in navigation and lacks comprehensive match data management. Users need access to:

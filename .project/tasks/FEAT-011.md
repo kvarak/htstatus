@@ -3,6 +3,12 @@
 **Status**: 🔮 Future | **Effort**: 15-20 hours | **Priority**: P4 | **Impact**: Long-term player development optimization
 **Dependencies**: Player statistics (completed), training recommendations (FEAT-006) | **Strategic Value**: Strategic planning, player development
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [training](../../docs/chpp/api-reference-training.md) - Training information and effectiveness analysis
+- [players](../../docs/chpp/api-reference-players.md) - Player skill data for training planning
+
 ## Problem Statement
 Hattrick managers need to plan training camps effectively to:
 - Maximize skill improvements for targeted players

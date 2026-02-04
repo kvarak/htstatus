@@ -2,6 +2,16 @@
 
 **Dependencies**: CHPP API integration (completed), Team models (completed), Matches system (FEAT-029 recommended) | **Strategic Value**: League context awareness, competitive intelligence, strategic planning
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [leaguedetails](../../docs/chpp/api-reference-leaguedetails.md) - Complete league standings
+- [leaguefixtures](../../docs/chpp/api-reference-leaguefixtures.md) - Upcoming fixtures and form analysis
+- [teamdetails](../../docs/chpp/api-reference-teamdetails.md) - Team information
+
+**Could benefit from undocumented APIs:**
+- `matchdetails` (not yet documented) - Detailed form analysis from recent matches
+
 ## Problem Statement
 
 Currently, HattrickPlanner lacks a league table view that provides strategic context for the user's position in their series. Users need a comprehensive series overview that combines current league standings with tactical insights for upcoming matches. This feature would enable users to:

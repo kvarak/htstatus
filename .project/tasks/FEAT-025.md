@@ -3,6 +3,16 @@
 **GitHub Issue**: [#27](https://github.com/kvarak/htstatus/issues/27) - "Spelare - transfer - aktuellt bud"
 **Dependencies**: Player statistics (completed), CHPP API integration (completed) | **Strategic Value**: Transfer market management, real-time bidding insights
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [currentbids](../../docs/chpp/api-reference-currentbids.md) - Current transfer activity
+- [playerdetails](../../docs/chpp/api-reference-playerdetails.md) - Player information for bids
+
+**Could benefit from undocumented APIs:**
+- `transfersearch` (not yet documented) - Enhanced transfer market analysis
+- `transfersplayer` (not yet documented) - Player transfer history
+
 ## Problem Statement
 
 Currently, players being sold through the Hattrick transfer system do not display the current bid amount in the player overview. Users need to manually navigate to Hattrick to check bid status, creating a fragmented workflow for transfer market management.

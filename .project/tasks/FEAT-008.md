@@ -3,6 +3,17 @@
 **Status**: 🎯 Ready to Execute | **Effort**: 12-16 hours | **Priority**: P3 | **Impact**: Tactical preparation and competitive intelligence
 **Dependencies**: Match history (completed), CHPP integration (completed), Team Statistics (FEAT-005 recommended) | **Strategic Value**: Strategic planning, opponent analysis
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [matchorders](../../docs/chpp/api-reference-matchorders.md) - Tactical lineup for next match
+- [leaguedetails](../../docs/chpp/api-reference-leaguedetails.md) - League standings and context
+- [players](../../docs/chpp/api-reference-players.md) - Current squad analysis
+- [leaguefixtures](../../docs/chpp/api-reference-leaguefixtures.md) - Upcoming fixtures
+
+**Could benefit from undocumented APIs:**
+- `matchdetails` (not yet documented) - Detailed opponent analysis from recent matches
+
 ## Problem Statement
 Users need a way to prepare tactically for upcoming matches by analyzing their opponent's historical patterns and getting strategic recommendations. Currently, users must manually research opponents on external sites. A "Next Game Analyser" would allow users to:
 - Select an upcoming fixture from their match schedule

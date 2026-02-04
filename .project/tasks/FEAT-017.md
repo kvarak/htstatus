@@ -3,6 +3,11 @@
 **Status**: 🎯 Ready to Execute | **Effort**: 60 min | **Priority**: P2 | **Impact**: Prevent future feature rejection cycles
 **Dependencies**: None | **Strategic Value**: Enable user-driven feature development
 
+## CHPP API Support ✅
+
+**Could benefit from documented APIs:**
+- [managercompendium](../../docs/chpp/api-reference-managercompendium.md) - User profile and preferences context
+
 ## Problem Statement
 Recent development cycle showed user rejecting multiple complex chart implementations, leading to wasted development time and cleanup work. Need system to capture user preferences early to guide feature development and avoid building unwanted features.
 

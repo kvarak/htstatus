@@ -3,6 +3,11 @@
 **GitHub Issue**: [#13](https://github.com/kvarak/htstatus/issues/13) - "Translate to the language in hattrick"
 **Dependencies**: UI framework (completed), user preferences system (FEAT-017) | **Strategic Value**: International user accessibility, authentic Hattrick experience
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [translations](../../docs/chpp/api-reference-translations.md) - Translations for the denominations in the game
+
 ## Problem Statement
 
 Currently, HattrickPlanner is only available in English, while Hattrick itself supports multiple languages including Swedish, German, Spanish, French, and others. Users who play Hattrick in their native language experience a disconnect when using HattrickPlanner in English.

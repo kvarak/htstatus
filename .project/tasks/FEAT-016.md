@@ -3,6 +3,12 @@
 **Status**: 🎯 Ready to Execute | **Effort**: 30 min | **Priority**: P2 | **Impact**: User value without complexity
 **Dependencies**: None | **Strategic Value**: Replace rejected complex visualizations
 
+## CHPP API Support ✅
+
+**Could benefit from documented APIs:**
+- [players](../../docs/chpp/api-reference-players.md) - Player leadership skill data
+- [stafflist](../../docs/chpp/api-reference-stafflist.md) - Trainer leadership information
+
 ## Problem Statement
 User rejected complex leadership visualizations (radar charts, bubble charts, timelines) but may still want basic leadership insights. Need simple, text-based leadership indicators that provide value without visual complexity.
 

@@ -3,6 +3,12 @@
 **Status**: 🎯 Ready to Execute | **Effort**: 8-10 hours | **Priority**: P3 | **Impact**: Strategic decision-making and team optimization
 **Dependencies**: Player statistics (completed), Chart.js (completed) | **Strategic Value**: Transfer market decisions, tactical planning
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [players](../../docs/chpp/api-reference-players.md) - Player roster data
+- [playerdetails](../../docs/chpp/api-reference-playerdetails.md) - Detailed player analysis
+
 ## Problem Statement
 Hattrick managers need to make informed decisions about:
 - Which players to buy or sell in the transfer market

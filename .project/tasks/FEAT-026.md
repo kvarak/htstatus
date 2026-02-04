@@ -3,6 +3,11 @@
 **GitHub Issue**: [#23](https://github.com/kvarak/htstatus/issues/23) - "Spelare - Grupper - Ändra på flera samtidigt"
 **Dependencies**: Player groups system (completed), group UI (completed) | **Strategic Value**: Bulk operations efficiency, team organization workflow
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [players](../../docs/chpp/api-reference-players.md) - Complete player roster for bulk operations
+
 ## Problem Statement
 
 Currently, users must change player groups one by one, which becomes time-consuming when reorganizing multiple players into new groups. The original request from VilijamRigo (June 2020) asked for the ability to change multiple players' groups simultaneously to improve team organization efficiency.

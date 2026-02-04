@@ -1,5 +1,14 @@
 # FEAT-019: Player Skill Changes - 4 Week Timeline on Player Details Page
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [players](../../docs/chpp/api-reference-players.md) - Current player skill data
+- [playerdetails](../../docs/chpp/api-reference-playerdetails.md) - Detailed player information
+
+**Could benefit from undocumented APIs:**
+- `trainingevents` (not yet documented) - Historical training events for timeline
+
 ## Problem Statement
 Currently, users can only view the "Player Skill Changes - 4 Week Timeline" on the update page after performing an update. This timeline is not available on the individual player details page (`/player?id=XXX`), making it difficult for users to review recent skill changes for a specific player without running a full update.
 

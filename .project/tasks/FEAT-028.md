@@ -3,6 +3,11 @@
 **GitHub Issue**: [#10](https://github.com/kvarak/htstatus/issues/10) - "Spelare - Filter på tabellen"
 **Dependencies**: Player tables (completed), sorting functionality (completed) | **Strategic Value**: Team analysis efficiency, player discovery workflow
 
+## CHPP API Support ✅
+
+**Fully supported by documented APIs:**
+- [players](../../docs/chpp/api-reference-players.md) - Player data for filtering operations
+
 ## Problem Statement
 
 Currently, the player table only supports sorting but lacks filtering capabilities. Users managing large teams (25+ players) struggle to find specific players or analyze subsets of their squad. The original request from VilijamRigo (June 2020) asked for table filtering to complement the existing sorting functionality.

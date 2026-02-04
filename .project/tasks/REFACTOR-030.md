@@ -3,6 +3,12 @@
 **Status**: 🎯 Ready to Execute | **Effort**: 2-3 hours | **Priority**: P3 | **Impact**: Production stability and compliance
 **Dependencies**: CHPP client (completed) | **Strategic Value**: Prevents API violations, improves reliability
 
+## CHPP API Support ✅
+
+**Benefits from documented APIs:**
+- All documented CHPP APIs (18 total) - Rate limiting applies to all CHPP requests
+- See [CHPP API Reference](../../docs/chpp/README.md) for complete list and implementation patterns
+
 ## Problem Statement
 Hattrick's CHPP API has rate limits that need to be respected to avoid account suspensions and ensure stable operation. Currently, the application makes CHPP requests without proper rate limiting, which could lead to:
 - Account suspension from excessive API calls
