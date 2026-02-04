@@ -20,21 +20,24 @@ fi
 
 echo "Last tag: $last_tag" >&2
 
-# Check for feature commits since last tag
+# Check for feature commits since last tag for user-facing releases
 feature_commits=$(git log --oneline --grep="\[feat-" "$last_tag..HEAD" 2>/dev/null || echo "")
 if [ -n "$feature_commits" ]; then
     echo "Feature commits found since $last_tag:" >&2
     echo "$feature_commits" >&2
     exit 0
+else
+    echo "No feature commits found since $last_tag, so skip user-facing release" >&2
+    exit 1
 fi
 
-# Check for commits that indicate new features or significant changes
-significant_commits=$(git log --oneline --grep="feat:" --grep="add:" --grep="implement" --grep="Add " --grep="Implement " -i "$last_tag..HEAD" 2>/dev/null || echo "")
-if [ -n "$significant_commits" ]; then
-    echo "Significant commits found since $last_tag:" >&2
-    echo "$significant_commits" >&2
-    exit 0
-fi
+# # Check for commits that indicate new features or significant changes for technical releases
+# significant_commits=$(git log --oneline --grep="feat:" --grep="add:" --grep="implement" --grep="Add " --grep="Implement " -i "$last_tag..HEAD" 2>/dev/null || echo "")
+# if [ -n "$significant_commits" ]; then
+#     echo "Significant commits found since $last_tag:" >&2
+#     echo "$significant_commits" >&2
+#     exit 0
+# fi
 
-echo "No feature or significant commits found since $last_tag" >&2
-exit 1
+# echo "No feature or significant commits found since $last_tag" >&2
+# exit 1
