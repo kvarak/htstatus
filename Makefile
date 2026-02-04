@@ -352,7 +352,6 @@ test-coverage-files: check-uv ## Check if all Python files have corresponding te
 
 check-chpp: ## Check CHPP API usage policy compliance
 	@echo "🔍 Checking CHPP API usage policy..."
-	@chmod +x scripts/check-chpp-usage.sh
 	@./scripts/check-chpp-usage.sh
 
 GATES = fileformat lint security-bandit security-deps test-coverage-files coverage-report check-chpp
@@ -397,13 +396,11 @@ changelog: ## Generate changelog (from scripts/changelog.sh)
 # Release Commands
 release-detect: ## Detect if changes warrant a version release
 	@echo "🔍 Detecting release-worthy changes..."
-	@chmod +x scripts/release/detect_version_changes.sh
 	@./scripts/release/detect_version_changes.sh
 
 release-notes: ## Generate release notes (usage: make release-notes VERSION=1.2)
 	@test -n "$(VERSION)" || { echo "❌ Usage: make release-notes VERSION=1.2"; exit 1; }
 	@echo "📝 Generating release notes for version $(VERSION)..."
-	@chmod +x scripts/release/update_releases.sh
 	@./scripts/release/update_releases.sh $(VERSION)
 
 release-tag: ## Create git tag (usage: make release-tag VERSION=1.2 MESSAGE="Release description")
@@ -516,24 +513,20 @@ deploy: ## Smart deployment: --run if pushed, --dry-run if not (override with FO
 	@echo "🚀 Preparing deployment..."
 	@if [ "$${FORCE_DEPLOY}" = "true" ]; then \
 		echo "🔓 FORCE_DEPLOY=true - skipping git push check"; \
-		chmod +x scripts/deployment/deploy.sh; \
 		./scripts/deployment/deploy.sh --run; \
 	elif git diff --quiet && git diff --cached --quiet; then \
 		if git log --oneline @{u}.. 2>/dev/null | grep -q .; then \
 			echo "⚠️  WARNING: Local commits not pushed to remote"; \
 			echo "   Use 'git push' first or set FORCE_DEPLOY=true"; \
 			echo "   Running dry-run instead..."; \
-			chmod +x scripts/deployment/deploy.sh; \
 			./scripts/deployment/deploy.sh --run --dry-run; \
 		else \
 			echo "✅ Working directory clean and up to date with remote"; \
-			chmod +x scripts/deployment/deploy.sh; \
 			./scripts/deployment/deploy.sh --run; \
 		fi; \
 	else \
 		echo "⚠️  WARNING: Uncommitted changes detected"; \
 		echo "   Commit and push changes first or set FORCE_DEPLOY=true"; \
 		echo "   Running dry-run instead..."; \
-		chmod +x scripts/deployment/deploy.sh; \
 		./scripts/deployment/deploy.sh --run --dry-run; \
 	fi
