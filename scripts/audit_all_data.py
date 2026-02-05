@@ -65,9 +65,14 @@ def audit_all_data():
         total_matches = Match.query.count()
         print(f'\n--- MATCHES (Total: {total_matches}) ---')
         if total_matches > 0:
-            matches_by_team = db.session.query(Match.home_team_id, db.func.count(Match.id)).group_by(Match.home_team_id).all()
+            matches_by_team = db.session.query(Match.home_team_id, db.func.count(Match.ht_id)).group_by(Match.home_team_id).all()
             for team_id, count in matches_by_team:
                 print(f'  Team {team_id} (home): {count} matches')
+
+            # Also show actual match details for debugging
+            all_matches = Match.query.limit(10).all()
+            for match in all_matches:
+                print(f'    Match {match.ht_id}: {match.home_team_name} vs {match.away_team_name} (Teams: {match.home_team_id} vs {match.away_team_id})')
 
         # MatchPlay
         total_matchplay = MatchPlay.query.count()

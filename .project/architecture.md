@@ -123,6 +123,7 @@ Users ──┐
 - **Authentication**: OAuth 1.0 flow with request/access tokens
 - **Data Sources**: Players, matches, team info, match lineups
 - **Rate Limits**: Managed by pyCHPP library
+- **📚 API Documentation**: Comprehensive CHPP API reference available in [docs/chpp/](../docs/chpp/) with 21+ documented endpoints, implementation examples, and integration patterns
 
 ## Data Flow
 

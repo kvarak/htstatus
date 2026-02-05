@@ -166,3 +166,15 @@ declare -a ALLOWED_FILES=(
 2. **Route Testing with Mocks** - pytest-mock spy to detect runtime CHPP calls (TEST-037)
 3. **CI/CD Integration** - GitHub Actions quality gate
 4. **Decorator Enforcement** - `@chpp_required` decorator to whitelist allowed routes
+
+## Recent Improvements
+
+### Historical Data Filtering (February 4, 2026)
+**Problem**: CHPP `matchesarchive` endpoint with season parameters was returning confusing historical data from inactive team periods (e.g., 2005 "Root Brothers FC" data mixed with current "Dalby Stenbrotters FC" data).
+
+**Solution**: Modified `downloadMatches()` function in `app/utils.py` to:
+- Use date-based filtering instead of season numbers
+- Limit archive downloads to last 12 months only
+- Prevent retrieval of historical data from team ID reuse scenarios
+
+**Result**: Clean match history aligned with CHPP's performance limits and current team activity.

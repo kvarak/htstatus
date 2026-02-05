@@ -52,6 +52,7 @@ dev = [
     "black>=23.0.0",
     "isort>=5.12.0",
     "mypy>=1.0.0",
+    "djlint>=1.34.0",
 
     # Security
     "bandit>=1.7.0",
@@ -74,6 +75,7 @@ lint = [
     "black>=23.0.0",
     "isort>=5.12.0",
     "mypy>=1.0.0",
+    "djlint>=1.34.0",
 ]
 
 [project.urls]
@@ -225,10 +227,25 @@ skips = ["B101"] # Skip assert_used test
 [tool.bandit.assert_used]
 skips = ["*_test.py", "test_*.py"]
 
+[tool.djlint]
+profile = "jinja"
+extension = "html"
+indent = 2
+max_line_length = 120
+format_css = false
+format_js = false
+# Ignore certain rules that are too strict for our use case
+ignore = [
+    "H006",  # Img tag should have alt, height and width attributes
+    "H030",  # Consider adding a lang attribute
+    "H031",  # Consider adding meta description
+]
+
 [dependency-groups]
 dev = [
     "bandit>=1.8.6",
     "black>=25.11.0",
+    "djlint>=1.36.4",
     "mypy>=1.19.1",
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",

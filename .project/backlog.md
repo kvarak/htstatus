@@ -4,8 +4,9 @@
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
+**📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 4, 2026): CHPP API Documentation Foundation COMPLETED - Created comprehensive reference for 18/79 CHPP APIs with implementation examples, authentication patterns, and strategic usage guidelines. All P2 features now have complete API coverage: matches-basic, matchorders, leaguedetails, players, playerdetails, currentbids, translations. Ready for confident P2 implementation without API research delays. Quality gates: 7/8 passing (HIGH deployment confidence). **Active: 101 tasks** (P0=0, P1=0, P2=10, P3=8, P4=83)
+**Recent Organization** (February 5, 2026): CHPP API Documentation Foundation COMPLETED - Created comprehensive reference for 21/79 CHPP APIs with implementation examples, authentication patterns, and strategic usage guidelines. All P2 features now have complete API coverage: matches-basic, matchorders, leaguedetails, players, playerdetails, currentbids, translations, matchdetails, matchlineup, playerevents, leaguelevels. Ready for confident P2 implementation without API research delays. Quality gates: 8/9 passing (HIGH deployment confidence). **Active: 102 tasks** (P0=0, P1=0, P2=11, P3=8, P4=83)
 
 ---
 
@@ -20,6 +21,7 @@
 ## P2: Features 🎯
 
 - **[FEAT-029]** Matches System Integration and Archive - Restore matches functionality with recent/upcoming match downloads and on-demand archive system → [Details](.project/tasks/FEAT-029.md)
+- **[FEAT-031]** Enhanced Match Analytics Through CHPP API - Implement comprehensive match statistics, player performance tracking, and tactical insights using matchdetails, matchlineup, and playerevents APIs → [Details](.project/tasks/FEAT-031.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
 - **[FEAT-010]** Player Comparison Tool (Connected to GitHub Issue #15 - User-requested feature for viewing multiple players side-by-side for comparison analysis) → [Details](.project/tasks/FEAT-010.md)

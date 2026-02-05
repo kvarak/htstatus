@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-notes release-tag release-docs db-migrate db-upgrade db-apply check-uv
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-notes release-tag release-docs db-migrate db-upgrade db-apply check-uv lint-templates lint-templates-fix
 
 # Variables
 PYTHON := uv run python
@@ -153,6 +153,24 @@ lint-fix: check-uv ## Auto-fix linting issues using ruff
 	@echo "🔧 Auto-fixing linting issues..."
 	@$(UV) run ruff check . --fix
 	@echo "✅ Linting auto-fix completed"
+
+lint-templates: check-uv ## Check Jinja2 template syntax and formatting
+	@mkdir -p out/tests && rm -f out/tests/$@.json
+	@echo "🔍 Running djlint template linting..."
+	@error_count=0; \
+	if ! $(UV) run djlint app/templates/ --check --statistics; then \
+		error_count=$$($(UV) run djlint app/templates/ --check --statistics 2>&1 | grep -o '[0-9]\+ error' | head -1 | grep -o '[0-9]\+' || echo "0"); \
+		echo "❌ Template linting failed with $$error_count errors"; \
+		scripts/qi-json.sh out/tests/$@.json "Template Linting" "make lint-templates" FAILED 0 $$error_count "$$error_count template errors" "fix with make lint-templates-fix"; \
+		exit 1; \
+	fi
+	@echo "✅ Template linting passed"
+	@scripts/qi-json.sh out/tests/$@.json "Template Linting" "make lint-templates" PASSED 0 0 "0 errors" "all templates valid"
+
+lint-templates-fix: check-uv ## Auto-fix template formatting issues
+	@echo "🔧 Auto-fixing template formatting..."
+	@$(UV) run djlint app/templates/ --reformat || true
+	@echo "✅ Template auto-fix completed"
 
 fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 	@mkdir -p out/tests && rm -f out/tests/$@.json
@@ -354,9 +372,9 @@ check-chpp: ## Check CHPP API usage policy compliance
 	@echo "🔍 Checking CHPP API usage policy..."
 	@./scripts/check-chpp-usage.sh
 
-GATES = fileformat lint security-bandit security-deps test-coverage-files coverage-report check-chpp
+GATES = fileformat lint lint-templates security-bandit security-deps test-coverage-files coverage-report check-chpp
 
-test-all: check-uv services fileformat-fix lint-fix  ## 🧪 Run complete quality gate validation
+test-all: check-uv services fileformat-fix lint-fix lint-templates-fix  ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"
 	@mkdir -p out/tests && rm -f out/tests/*.json
 	@count=1; \
