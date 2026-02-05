@@ -8,6 +8,56 @@
 
 ---
 
+## 3.22 - February 5, 2026
+
+**Comprehensive Match Analytics Integration**
+- **FEAT-031 COMPLETED**: Enhanced match analytics through CHPP matchdetails and matchlineup API integration
+- **FEAT-029 COMPLETED**: Matches system with archive download and enhanced data visualization
+- Added 68 new Match model fields: possession by halves (4), chance breakdown (10), positional ratings (16), set pieces (4), arena capacity (4), officials (6), team details (8), formations/tactics (4), weather/metadata (4)
+- Implemented fetch_enhanced_match_data() and _process_matches_enhanced() for automatic analytics enrichment on match download
+- Added Match model properties: home_team_possession, home_team_total_chances, has_enhanced_data() for simplified data access
+- Updated downloadRecentMatches() and downloadMatches() to fetch enhanced data for finished matches automatically
+- Created 4 sequential database migrations documenting API discovery evolution (5dfd6c919450 → 75ec6d294370 → f03b862df0b3 → 831d57cb541f)
+- Added User activity tracking: c_matches_archive, last_matches_archive for feature usage analytics
+
+**UI Redesign and Visualization**
+- Complete matches.html rebuild: sidebar match list + detailed analytics panel with responsive layout
+- Implemented visual analytics: possession bars, chance distribution, color-coded positional ratings with gradient backgrounds
+- Added WIP sticker component for work-in-progress feature indicators
+- Enhanced debug.html analytics table: vertical headers, matches_archive column, improved readability
+- Card-based match list with W/D/L badges replacing table view for better mobile experience
+- Opponent history filtering for upcoming matches enabling tactical preparation
+
+**CHPP Integration Enhancement**
+- Updated CHPP client with matchdetails/matchlineup parsing support for comprehensive match data
+- Enhanced parsers to extract possession by halves, chance breakdown by position, detailed ratings structure
+- Added support for arena metadata (capacity breakdown), weather conditions, referee information
+- Integrated formation strings and tactical details (tactic type/skill) from matchlineup API
+
+**Test Coverage and Quality**
+- Added comprehensive Match model tests covering enhanced fields, properties, and data availability checks
+- Test coverage regression: 51.6% → 49.79% due to large feature addition without proportional test expansion
+- Quality gates: 7/9 MODERATE (test coverage below 50% threshold requires attention)
+- Created TEST-010 task to address 16-file test coverage gap identified during feature development
+
+**Documentation and Technical Debt**
+- Created match-analytics-migrations.md documenting 4-migration evolution and rationale for sequential approach
+- **REFACTOR-107 OBSOLETE**: Migration consolidation cannot be done safely per Database Protection Rule
+- Fixed 4 CHPP API documentation files missing trailing newlines (leaguelevels, matchdetails, matchlineup, playerevents)
+- Added query_match_data.py debugging utility for inspecting match records during development
+- Created 2 database backups (92 matches) before implementing feature per safety protocols
+
+**Backlog Maintenance**
+- Removed 3 completed/obsolete tasks: FEAT-029, FEAT-031, REFACTOR-107
+- Updated task counts: 102 → 99 active tasks (P2: 11→9, P4: 83→82)
+- Deleted task files for completed features (git preserves full history)
+
+**Lessons Learned**
+- Should explore full CHPP API structure before creating migrations (avoided with better API documentation review)
+- Sequential migrations acceptable when documenting rationale - production safety > cleaner history
+- Large feature additions require proportional test coverage planning - need TEST-010 execution
+- Database Protection Rule correctly prevented unsafe migration consolidation attempt
+
 ## 3.21 - February 3, 2026
 
 **Bootstrap 4.x Migration and Series Route**
