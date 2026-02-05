@@ -10,7 +10,7 @@ This directory contains comprehensive documentation for Hattrick Community Premi
 
 ## Documentation Status
 
-### ✅ Documented APIs (18/79 total)
+### ✅ Documented APIs (21/79 total)
 These APIs have comprehensive documentation with implementation examples, authentication patterns, and strategic usage guidelines:
 
 - **[avatars](api-reference-avatars.md)** - Avatars for all players of user's team
@@ -20,11 +20,15 @@ These APIs have comprehensive documentation with implementation examples, authen
 - **[fans](api-reference-fans.md)** - Fanclub information
 - **[leaguedetails](api-reference-leaguedetails.md)** - Information about a League Level Unit (series)
 - **[leaguefixtures](api-reference-leaguefixtures.md)** - Fixtures for a League Level Unit (series)
+- **[leaguelevels](api-reference-leaguelevels.md)** - League structure information including division levels, promotion/demotion slots, and series organization
 - **[managercompendium](api-reference-managercompendium.md)** - The manager compendium of the logged in user
 - **[matches-basic](api-reference-matches-basic.md)** - The most recent and upcoming matches for a particular team
+- **[matchdetails](api-reference-matchdetails.md)** - Detailed match information including statistics, events, possession, and analytics
 - **[matchesarchive](api-reference-matchesarchive.md)** - Matches Archive
+- **[matchlineup](api-reference-matchlineup.md)** - Detailed lineup information for finished matches including starting lineup, substitutions, and player ratings
 - **[matchorders](api-reference-matchorders.md)** - Match orders for upcoming matches
 - **[playerdetails](api-reference-playerdetails.md)** - Detailed information for a player
+- **[playerevents](api-reference-playerevents.md)** - Individual player event history including goals, assists, cards, injuries, and career milestones
 - **[players](api-reference-players.md)** - Players roster information
 - **[staffavatars](api-reference-staffavatars.md)** - Avatars for all staff members
 - **[stafflist](api-reference-stafflist.md)** - A list of all staff members
@@ -32,7 +36,7 @@ These APIs have comprehensive documentation with implementation examples, authen
 - **[training](api-reference-training.md)** - Training information
 - **[translations](api-reference-translations.md)** - Translations for the denominations in the game
 
-### 🔮 Available But Not Yet Documented (61/79 remaining)
+### 🔮 Available But Not Yet Documented (58/79 remaining)
 These APIs are available on request for future features:
 
 #### Core Team Management
@@ -46,13 +50,9 @@ These APIs are available on request for future features:
 #### Match & Competition Data
 - **cupmatches** - Information about cup matches
 - **live** - Get (live) match ticker
-- **matchdetails** - Detailed match information
-- **matchlineup** - Match lineup for finished matches
-- **playerevents** - Player events
 - **trainingevents** - Get training events for a player
 
 #### League & Tournament System
-- **leaguelevels** - Shows league level units (series) information for a specific league
 - **ladderdetails** - Information about teams in the ladder and positions in it
 - **ladderlist** - Information about ladder that the user is currently playing in
 - **tournamentdetails** - Information about a tournament
