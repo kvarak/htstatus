@@ -1,320 +1,1117 @@
 {% extends 'base.html' %}
-
 {% block content %}
-
-<div class="container">
-  <div class="row">
-
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#">{{ teamname }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-        </ol>
-      </nav>
-    </div>
-
-    <!-- <div class="col-sm">
-      {% if not(error) %}
-      <form method="POST" action="/matches" style="text-align: center; width:100%;">
-        <input type="hidden" id="id" name="id" value="{{ teamid }}">
-        < !-- <button type="submit" name="updatebutton" value="updatelatest" class="btn btn-primary"  aria-label="Text input">Get latest match</button> -- >
-        < !-- <button type="submit" name="updatebutton" value="update" class="btn btn-primary"  aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Be careful! This could take a few minutes." onclick="loading();">Get all matches</button> -- >
-        <button type="submit" name="updatebutton" value="update" class="btn-primary-custom"  aria-label="Text input" onclick="loading();">Get all matches</button>
-      </form>
-      {% endif %}
-    </div> -->
-
-  </div>
-
-  {% if error %}
-    <div class="alert alert-danger" role="alert">
-      {{ error }}
-    </div>
-  {% endif %}
-
-  <div class="row">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-league">
-              League
-            </button>
-            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-cup">
-              Cup
-            </button>
-            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-friendly">
-              Friendly
-            </button>
-            <button type="button" class="btn btn-secondary" data-toggle="collapse" data-target="#matchtype-other">
-                Other
-            </button>
-          </div>
-          <!-- <div class="card-body"> -->
-            <table>
-              {% for m in matches %}
-
-              {# league: 1 #}
-              {# cup: 2 #}
-              {# friendly: 4, 5, 8, 9 #}
-              {# other: else #}
-
-              {% if m.matchtype == 1 %}
-                {% set matchtype = "league" %}
-              {% elif m.matchtype == 3 %}
-                {% set matchtype = "cup" %}
-              {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %}
-                {% set matchtype = "friendly" %}
-              {% else %}
-                {% set matchtype = "other" %}
-              {% endif %}
-
-              {% set matchcolor = "#eeeeee" %}
-              {% if m.home_team_name == teamname %}
-                {% if m.home_goals > m.away_goals %}
-                  {% set matchcolor = "#f1f8e9" %}
-                {% elif m.home_goals < m.away_goals %}
-                  {% set matchcolor = "#ffebee" %}
-                {% endif %}
-              {% else %}
-                {% if m.home_goals > m.away_goals %}
-                  {% set matchcolor = "#ffebee" %}
-                {% elif m.home_goals < m.away_goals %}
-                  {% set matchcolor = "#f1f8e9" %}
-                {% endif %}
-              {% endif %}
-
-              <tr class="collapse show" id="matchtype-{{ matchtype }}" style="background-color: {{ matchcolor }};">
-                <td class="text-nowrap" style="font-size: x-small;">
-
-                  {{ m.home_goals }}-{{ m.away_goals }}
-                </td>
-                <td style="font-size: x-small;">
-                  {% if m.home_team_name == teamname %}
-                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
-                    {{ m.away_team_name }}
-                  </a>
-                  {% else %}
-                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
-                    {{ m.home_team_name }}
-                  </a>
-                  {% endif %}
-                </td>
-                <td style="font-size: x-small;">
-                  <i>({{ matchtype }})</i>
-                </td>
-              </tr>
-              {% endfor %}
-            </table>
-
-          <!-- </div> -->
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#">{{ teamname }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+          </ol>
+        </nav>
+      </div>
+      <div class="col-sm">
+        {% if not(error) %}
+          <form method="POST"
+                action="/matches"
+                style="text-align: center;
+                       width:100%">
+            <input type="hidden" id="id" name="id" value="{{ teamid }}">
+            <button type="submit"
+                    name="updatebutton"
+                    value="archive"
+                    class="btn-primary-custom"
+                    aria-label="Download Archive"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title="2 seasons back"
+                    onclick="loading();">Download Archive</button>
+          </form>
+        {% endif %}
       </div>
     </div>
-  {# </div> #}
-
-    <div class="col-9">
-
-      {% for m in matches %}
-
-      {% if m.ht_id == matchidtoshow %}
-      <div class="row collapse.show" id="all-match-details-{{ m.ht_id }}">
-      {% else %}
-      <div class="row collapse" id="all-match-details-{{ m.ht_id }}">
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'success' if category == 'info' else category }}"
+               role="alert">{{ message }}</div>
+        {% endfor %}
       {% endif %}
-
-        <div class="col">
-          <div class="card-deck">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">
-                  <a data-toggle="collapse" href="#all-match-details-{{ m.ht_id}}" role="button" aria-expanded="false" aria-controls="all-match-details-{{ m.ht_id}}">
-                    {{ m.home_team_name }} - {{ m.away_team_name }} {{ m.home_goals }}-{{ m.away_goals }}
-                  </a>
-                </h5>
-                <p class="text-small">{{ m.datetime }}<br>
-                  {{ HTmatchtype[m.matchtype] }}<br>
-                  {# {{ m.context_id }} #}
-                </p>
-                <table class="table-custom">
-                  <tr>
-                    <td class="text-small" style="text-align: center"></td>
-                    <td class="text-small" style="text-align: center"></td>
-                    <td class="text-small" style="text-align: center">Keeper<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 100 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center"></td>
-                    <td class="text-small" style="text-align: center"></td>
-                  </tr>
-                  <tr>
-                    <td class="text-small" style="text-align: center">Right back<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 101 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Right central defender<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 102 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Middle central defender<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 103 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Left central defender<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 104 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Left back<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 105 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="text-small" style="text-align: center">Right winger<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 106 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Right inner midfield<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 107 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Middle inner midfield<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 108 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Left inner midfield<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 109 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Left winger<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 110 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td class="text-small" style="text-align: center"></td>
-                    <td class="text-small" style="text-align: center">Right forward<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 111 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Middle forward<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 112 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center">Left forward<br>
-                    {% for p in matchplays[m.ht_id] %}
-                      {% if p.role_id == 113 %}
-                        {{ p.first_name }} {{ p.last_name }}<br>
-                        {{ p.rating_stars }} / {{ p.rating_stars_eom }}<br>
-                        {{ HTmatchbehaviour[p.behaviour] }}
-                      {% endif %}
-                    {% endfor %}
-                    </td>
-                    <td class="text-small" style="text-align: center"></td>
-                  </tr>
-                </table>
-<!--
-               <table class="table table-sm table-scroll sortable">
+    {% endwith %}
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+      <!-- Matches List Sidebar -->
+      <div class="col-12 col-lg-4">
+        {# Upcoming Matches #}
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Upcoming Matches</h5>
+            <div class="btn-group btn-group-sm mt-2"
+                 role="group"
+                 aria-label="Upcoming match type filter">
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn active"
+                      data-filter="all"
+                      data-target="upcoming">All</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="league"
+                      data-target="upcoming">League</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="cup"
+                      data-target="upcoming">Cup</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="friendly"
+                      data-target="upcoming">Friendly</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="other"
+                      data-target="upcoming">Other</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table-custom table-hover" id="upcoming-matches">
                 <thead>
                   <tr>
-                    <th scope="col" class="text-small">Role</td>
-                    <th scope="col" class="text-small">Name</td>
-                    {# <th scope="col" class="text-small">Stars</td>
-                    <th scope="col" class="text-small">Stars eom</td>
-                    <th scope="col" class="text-small">Behaviour</td> #}
+                    <th>Date</th>
+                    <th>Opponent</th>
+                    <th>Type</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for p in matchplays[m.ht_id] %}
-                  {% if p.role_id > 113 %}
-                  <tr>
-                    <td class="text-small">{{ HTmatchrole[p.role_id] }} ({{ p.role_id }})</td>
-                    <td class="text-small">{{ p.first_name }} {{ p.last_name }}</td>
-                    {# <td class="text-small">{{ p.rating_stars }}</td>
-                    <td class="text-small">{{ p.rating_stars_eom }}</td>
-                    <td class="text-small">{{ HTmatchbehaviour[p.behaviour] }}</td> #}
-                  </tr>
-                  {% endif %}
+                  {# Display upcoming matches - already sorted chronologically by backend #}
+                  {% for m in upcoming_matches %}
+                    {# Set match type #}
+                    {% if m.matchtype == 1 %}
+                      {% set matchtype = "league" %}
+                    {% elif m.matchtype == 3 %}
+                      {% set matchtype = "cup" %}
+                    {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %}
+                      {% set matchtype = "friendly" %}
+                    {% else %}
+                      {% set matchtype = "other" %}
+                    {% endif %}
+                    <tr class="match-row upcoming-match" data-matchtype="{{ matchtype }}">
+                      <td class="text-nowrap" style="font-size: x-small;">{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</td>
+                      <td style="font-size: small;">
+                        {% if m.home_team_name == teamname %}
+                          {{ m.away_team_name }}
+                        {% else %}
+                          {{ m.home_team_name }}
+                        {% endif %}
+                      </td>
+                      <td style="font-size: x-small;">
+                        <span class="badge badge-secondary">{{ matchtype|title }}</span>
+                      </td>
+                    </tr>
                   {% endfor %}
+                  {% if not has_upcoming %}
+                    <tr>
+                      <td colspan="3" class="text-center text-muted">No upcoming matches found</td>
+                    </tr>
+                  {% endif %}
                 </tbody>
               </table>
--->
+            </div>
+          </div>
+        </div>
+        {# Match History #}
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Match History</h5>
+            <div class="btn-group btn-group-sm mt-2"
+                 role="group"
+                 aria-label="History match type filter">
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn active"
+                      data-filter="all"
+                      data-target="history">All</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="league"
+                      data-target="history">League</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="cup"
+                      data-target="history">Cup</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="friendly"
+                      data-target="history">Friendly</button>
+              <button type="button"
+                      class="btn btn-outline-secondary filter-btn"
+                      data-filter="other"
+                      data-target="history">Other</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="match-list" style="max-height: 500px; overflow-y: auto;">
+              {% for m in history_matches %}
+                {% if m.home_goals is not none %}
+                  {# Set match type #}
+                  {% if m.matchtype == 1 %}
+                    {% set matchtype = "league" %}
+                  {% elif m.matchtype == 3 %}
+                    {% set matchtype = "cup" %}
+                  {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %}
+                    {% set matchtype = "friendly" %}
+                  {% else %}
+                    {% set matchtype = "other" %}
+                  {% endif %}
+                  {# Set match result color and button variant #}
+                  {% set btn_variant = "btn-outline-secondary" %}
+                  {% if m.home_team_name == teamname %}
+                    {% if m.home_goals > m.away_goals %}
+                      {% set btn_variant = "btn-outline-success" %}
+                    {% elif m.home_goals < m.away_goals %}
+                      {% set btn_variant = "btn-outline-danger" %}
+                    {% else %}
+                      {% set btn_variant = "btn-outline-warning" %}
+                    {% endif %}
+                  {% else %}
+                    {% if m.home_goals > m.away_goals %}
+                      {% set btn_variant = "btn-outline-danger" %}
+                    {% elif m.home_goals < m.away_goals %}
+                      {% set btn_variant = "btn-outline-success" %}
+                    {% else %}
+                      {% set btn_variant = "btn-outline-warning" %}
+                    {% endif %}
+                  {% endif %}
+                  <button type="button"
+                          class="w-100 btn btn-sm {{ btn_variant }} text-start mb-2 p-2 d-flex justify-content-between align-items-center match-row"
+                          id="matchItem{{ m.ht_id }}"
+                          data-match-item
+                          data-matchtype="{{ matchtype }}"
+                          onclick="selectMatch({{ m.ht_id }})"
+                          style="border-radius: 0.375rem">
+                    <div class="d-flex flex-column text-truncate">
+                      <span class="small fw-semibold">
+                        {% if m.home_team_name == teamname %}
+                          vs {{ m.away_team_name }}
+                        {% else %}
+                          vs {{ m.home_team_name }}
+                        {% endif %}
+                      </span>
+                      <span class="text-muted" style="font-size: 0.75rem;">{{ m.datetime.strftime("%Y-%m-%d") }}</span>
+                    </div>
+                    <div class="d-flex flex-column align-items-end flex-shrink-0">
+                      <span class="badge bg-secondary text-white mb-1">{{ matchtype|title }}</span>
+                      <span class="small fw-bold">
+                        {% if m.home_team_name == teamname %}
+                          {{ m.home_goals }}-{{ m.away_goals }}
+                        {% else %}
+                          {{ m.away_goals }}-{{ m.home_goals }}
+                        {% endif %}
+                      </span>
+                    </div>
+                  </button>
+                {% endif %}
+              {% endfor %}
+              {% if not history_matches %}<p class="text-muted small">No matches recorded</p>{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Match Details -->
+      <div class="col-12 col-lg-8">
+        <div class="row g-4">
+          {% for m in history_matches %}
+            {% if m.home_goals is not none %}
+              <div class="col-12"
+                   id="matchCard{{ m.ht_id }}"
+                   data-match-card
+                   style="display: none">
+                <!-- Match Overview -->
+                <div class="row g-4 mb-4">
+                  <!-- Match Info -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">{{ m.home_team_name }} vs {{ m.away_team_name }}</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Date</strong>
+                              </td>
+                              <td class="text-small text-center">{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Type</strong>
+                              </td>
+                              <td class="text-small text-center">{{ HTmatchtype[m.matchtype] }}</td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Result</strong>
+                              </td>
+                              <td class="text-small text-center font-weight-bold">{{ m.home_goals }}-{{ m.away_goals }}</td>
+                            </tr>
+                            {% if m.home_team_name == teamname %}
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>Home/Away</strong>
+                                </td>
+                                <td class="text-small text-center">Home</td>
+                              </tr>
+                            {% else %}
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>Home/Away</strong>
+                                </td>
+                                <td class="text-small text-center">Away</td>
+                              </tr>
+                            {% endif %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Match Statistics -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Team Performance</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Opponent</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_team_name == teamname %}
+                                  {{ m.away_team_name }}
+                                {% else %}
+                                  {{ m.home_team_name }}
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Goals Scored</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_team_name == teamname %}
+                                  {{ m.home_goals }}
+                                {% else %}
+                                  {{ m.away_goals }}
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Goals Conceded</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_team_name == teamname %}
+                                  {{ m.away_goals }}
+                                {% else %}
+                                  {{ m.home_goals }}
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Result</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_team_name == teamname %}
+                                  {% if m.home_goals > m.away_goals %}
+                                    <span class="text-success font-weight-bold">Win</span>
+                                  {% elif m.home_goals < m.away_goals %}
+                                    <span class="text-danger font-weight-bold">Loss</span>
+                                  {% else %}
+                                    <span class="text-warning font-weight-bold">Draw</span>
+                                  {% endif %}
+                                {% else %}
+                                  {% if m.away_goals > m.home_goals %}
+                                    <span class="text-success font-weight-bold">Win</span>
+                                  {% elif m.away_goals < m.home_goals %}
+                                    <span class="text-danger font-weight-bold">Loss</span>
+                                  {% else %}
+                                    <span class="text-warning font-weight-bold">Draw</span>
+                                  {% endif %}
+                                {% endif %}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Match Analytics & Details -->
+                <div class="row g-4 mb-4">
+                  <!-- Match Analytics -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Match Analytics</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Goal Difference</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_team_name == teamname %}
+                                  {% set goals_diff = m.home_goals - m.away_goals %}
+                                {% else %}
+                                  {% set goals_diff = m.away_goals - m.home_goals %}
+                                {% endif %}
+                                {% if goals_diff > 0 %}
+                                  <span class="text-success font-weight-bold">+{{ goals_diff }}</span>
+                                {% elif goals_diff < 0 %}
+                                  <span class="text-danger font-weight-bold">{{ goals_diff }}</span>
+                                {% else %}
+                                  <span class="text-warning font-weight-bold">0</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Performance Rating</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if matchplays.get(m.ht_id) %}
+                                  {% set total_rating = 0 %}
+                                  {% set rating_count = 0 %}
+                                  {% for p in matchplays[m.ht_id] %}
+                                    {% if p.rating_stars and p.rating_stars > 0 %}
+                                      {% set total_rating = total_rating + p.rating_stars %}
+                                      {% set rating_count = rating_count + 1 %}
+                                    {% endif %}
+                                  {% endfor %}
+                                  {% if rating_count > 0 %}
+                                    {% set avg_rating = (total_rating / rating_count) | round(1) %}
+                                    {{ avg_rating }} ⭐ ({{ rating_count }} players)
+                                  {% else %}
+                                    <span class="text-muted">No ratings available</span>
+                                  {% endif %}
+                                {% else %}
+                                  <span class="text-muted">No lineup data</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Match Status</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_goals is not none and m.away_goals is not none %}
+                                  <span class="badge bg-success">Played</span>
+                                {% else %}
+                                  <span class="badge bg-secondary">Scheduled</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Match ID</strong>
+                              </td>
+                              <td class="text-small text-center">{{ m.ht_id }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Team Comparison -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Team Comparison</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <thead>
+                            <tr>
+                              <th class="text-small text-center" style="width: 40%;">{{ m.home_team_name }}</th>
+                              <th class="text-small text-center" style="width: 20%;"></th>
+                              <th class="text-small text-center" style="width: 40%;">{{ m.away_team_name }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small text-center">{{ m.home_goals if m.home_goals is not none else '-' }}</td>
+                              <td class="text-small text-center">
+                                <strong>Goals</strong>
+                              </td>
+                              <td class="text-small text-center">{{ m.away_goals if m.away_goals is not none else '-' }}</td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small text-center">
+                                {% if m.home_team_name == teamname %}
+                                  <span class="text-primary">Home</span>
+                                {% else %}
+                                  Away
+                                {% endif %}
+                              </td>
+                              <td class="text-small text-center">
+                                <strong>Venue</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.away_team_name == teamname %}
+                                  <span class="text-primary">Away</span>
+                                {% else %}
+                                  Home
+                                {% endif %}
+                              </td>
+                            </tr>
+                            {% if matchplays.get(m.ht_id) %}
+                              <tr style="height: 25px;">
+                                <td class="text-small text-center">
+                                  {% set home_players = 0 %}
+                                  {% for p in matchplays[m.ht_id] %}
+                                    {% if p.role_id <= 113 %}
+                                      {% set home_players = home_players + 1 %}
+                                    {% endif %}
+                                  {% endfor %}
+                                  {{ home_players }}
+                                </td>
+                                <td class="text-small text-center">
+                                  <strong>Players</strong>
+                                </td>
+                                <td class="text-small text-center">{{ home_players }}</td>
+                              </tr>
+                            {% endif %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Historical Context & Data Status -->
+                <div class="row g-4 mb-4">
+                  <!-- Historical Context -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Historical Context</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Match Age</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% set days_ago = (current_time.date() - m.datetime.date()).days %}
+                                {% if days_ago == 0 %}
+                                  Today
+                                {% elif days_ago == 1 %}
+                                  Yesterday
+                                {% elif days_ago > 0 %}
+                                  {{ days_ago }} days ago
+                                {% else %}
+                                  {% set days_until = -days_ago %}
+                                  {% if days_until == 1 %}
+                                    Tomorrow
+                                  {% else %}
+                                    In {{ days_until }} days
+                                  {% endif %}
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Season Context</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.matchtype == 1 %}
+                                  League Match
+                                {% elif m.matchtype == 3 %}
+                                  Cup Competition
+                                {% elif m.matchtype in [4, 5, 8, 9] %}
+                                  Friendly
+                                {% else %}
+                                  Special Match
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Competition Level</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.cup_level %}
+                                  Cup Level {{ m.cup_level }}
+                                {% elif m.context_id %}
+                                  League {{ m.context_id }}
+                                {% else %}
+                                  <span class="text-muted">Unknown</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Data Availability -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Available Data</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Match Result</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if m.home_goals is not none and m.away_goals is not none %}
+                                  <span class="badge bg-success text-white">✓ Available</span>
+                                {% else %}
+                                  <span class="badge bg-warning text-dark">⏳ Pending</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Lineup Data</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if matchplays.get(m.ht_id) %}
+                                  <span class="badge bg-success text-white">✓ Available</span>
+                                {% else %}
+                                  <span class="badge bg-danger text-white">✗ Missing</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Player Ratings</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                {% if matchplays.get(m.ht_id) %}
+                                  {% set has_ratings = false %}
+                                  {% for p in matchplays[m.ht_id] %}
+                                    {% if p.rating_stars and p.rating_stars > 0 %}
+                                      {% set has_ratings = true %}
+                                    {% endif %}
+                                  {% endfor %}
+                                  {% if has_ratings %}
+                                    <span class="badge bg-success text-white">✓ Available</span>
+                                  {% else %}
+                                    <span class="badge bg-danger text-white">✗ Missing</span>
+                                  {% endif %}
+                                {% else %}
+                                  <span class="badge bg-danger text-white">✗ Missing</span>
+                                {% endif %}
+                              </td>
+                            </tr>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Enhanced Details</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                <span class="badge bg-warning text-dark">⏳ Upgrade Available</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        {% if not matchplays.get(m.ht_id) or not (matchplays[m.ht_id] | selectattr('rating_stars') | list) %}
+                          <div class="mt-2 p-2 bg-light rounded">
+                            <small class="text-muted">
+                              <strong>📈 Enhanced Data Available:</strong>
+                              <br>
+                              Download detailed match data including tactics, events, and statistics by using the "Update Data" feature.
+                            </small>
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Formation/Lineup -->
+                {% if matchplays.get(m.ht_id) %}
+                  <div class="row g-4">
+                    <div class="col-12">
+                      <div class="card">
+                        <div class="card-header">
+                          <h6 class="mb-0">Lineup</h6>
+                        </div>
+                        <div class="card-body">
+                          <!-- Formation Grid -->
+                          <div class="formation-grid">
+                            <table class="table table-borderless text-center"
+                                   style="width: 100%;
+                                          table-layout: fixed">
+                              <tr>
+                                <td style="width: 20%;"></td>
+                                <td style="width: 20%;" class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id == 100 %}
+                                        <div class="player-position">
+                                          <strong>GK</strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td style="width: 20%;"></td>
+                                <td style="width: 20%;"></td>
+                                <td style="width: 20%;"></td>
+                              </tr>
+                              <tr>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id == 101 %}
+                                        <div class="player-position">
+                                          <strong>RB</strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id in [102, 103, 104] %}
+                                        <div class="player-position mb-2">
+                                          <strong>
+                                            {% if p.role_id == 102 %}
+                                              RCD
+                                            {% elif p.role_id == 103 %}
+                                              CD
+                                            {% else %}
+                                              LCD
+                                            {% endif %}
+                                          </strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id == 105 %}
+                                        <div class="player-position">
+                                          <strong>LB</strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <!-- Midfield positions -->
+                              <tr>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id == 106 %}
+                                        <div class="player-position">
+                                          <strong>RM</strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id in [107, 108, 109] %}
+                                        <div class="player-position mb-2">
+                                          <strong>
+                                            {% if p.role_id == 107 %}
+                                              RCM
+                                            {% elif p.role_id == 108 %}
+                                              CM
+                                            {% else %}
+                                              LCM
+                                            {% endif %}
+                                          </strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id == 110 %}
+                                        <div class="player-position">
+                                          <strong>LM</strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                              <!-- Forward positions -->
+                              <tr>
+                                <td></td>
+                                <td class="text-small">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% for p in matchplays[m.ht_id] %}
+                                      {% if p.role_id in [111, 112, 113] %}
+                                        <div class="player-position mb-2">
+                                          <strong>
+                                            {% if p.role_id == 111 %}
+                                              RF
+                                            {% elif p.role_id == 112 %}
+                                              CF
+                                            {% else %}
+                                              LF
+                                            {% endif %}
+                                          </strong>
+                                          <br>
+                                          {{ p.first_name }} {{ p.last_name }}
+                                          {% if p.rating_stars %}
+                                            <br>
+                                            <small class="text-muted">{{ p.rating_stars }} ⭐</small>
+                                          {% endif %}
+                                        </div>
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                            </table>
+                          </div>
+                          <!-- Substitutes -->
+                          {% set substitutes = [] %}
+                          {% if matchplays.get(m.ht_id) %}
+                            {% for p in matchplays[m.ht_id] %}
+                              {% if p.role_id > 113 %}
+                                {% set _ = substitutes.append(p) %}
+                              {% endif %}
+                            {% endfor %}
+                          {% endif %}
+                          {% if substitutes %}
+                            <hr>
+                            <h6 class="mt-3 mb-2">Substitutes</h6>
+                            <div class="row">
+                              {% for p in substitutes %}
+                                <div class="col-md-4 mb-2">
+                                  <div class="small">
+                                    <strong>{{ HTmatchrole[p.role_id] if p.role_id in HTmatchrole else 'Unknown' }}</strong>
+                                    <br>
+                                    {{ p.first_name }} {{ p.last_name }}
+                                  </div>
+                                </div>
+                              {% endfor %}
+                            </div>
+                          {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Match Events & Statistics (Enhanced Data) -->
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Match Events & Statistics</h6>
+                        <small class="text-muted">Enhanced CHPP Data</small>
+                      </div>
+                      <div class="card-body">
+                        {% if m.home_goals is not none and m.away_goals is not none %}
+                          <!-- Match has been played - show available statistics -->
+                          <div class="row g-3">
+                            <div class="col-md-4">
+                              <div class="text-center p-3 bg-light rounded">
+                                <h5 class="mb-1">{{ m.home_goals + m.away_goals }}</h5>
+                                <small class="text-muted">Total Goals</small>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="text-center p-3 bg-light rounded">
+                                <h5 class="mb-1">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {{ matchplays[m.ht_id] | length }}
+                                  {% else %}
+                                    0
+                                  {% endif %}
+                                </h5>
+                                <small class="text-muted">Players Tracked</small>
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="text-center p-3 bg-light rounded">
+                                <h5 class="mb-1">
+                                  {% if matchplays.get(m.ht_id) %}
+                                    {% set rated_players = matchplays[m.ht_id] | selectattr('rating_stars') | list | length %}
+                                    {{ rated_players }}
+                                  {% else %}
+                                    0
+                                  {% endif %}
+                                </h5>
+                                <small class="text-muted">Rated Players</small>
+                              </div>
+                            </div>
+                          </div>
+                          {% if not matchplays.get(m.ht_id) %}
+                            <!-- No lineup data available -->
+                            <div class="alert alert-warning mt-3" role="alert">
+                              <h6 class="alert-heading">⚠️ Limited Match Data</h6>
+                              <p class="mb-2">
+                                This match only has basic result information. Enhanced data including lineup, player ratings, events, and detailed statistics is available through the CHPP API.
+                              </p>
+                              <hr>
+                              <p class="mb-0">
+                                <strong>To get enhanced match data:</strong> Click "Update Data" to download detailed match information including formations, player performances, and match events.
+                              </p>
+                            </div>
+                          {% endif %}
+                        {% else %}
+                          <!-- Upcoming match - show preparation info -->
+                          <div class="alert alert-info" role="alert">
+                            <h6 class="alert-heading">🔮 Upcoming Match</h6>
+                            <p class="mb-2">
+                              This match is scheduled for <strong>{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</strong>. Match statistics and events will be available after the match is played.
+                            </p>
+                            <hr>
+                            <p class="mb-0">
+                              <strong>Preparation:</strong> Use the Formation Tester to plan your tactics for this match, and check opponent history in your league standings.
+                            </p>
+                          </div>
+                        {% endif %}
+                        <!-- Enhanced Data Features -->
+                        <div class="mt-3">
+                          <h6 class="mb-2">📊 Available Through Enhanced Data Download:</h6>
+                          <div class="row g-2">
+                            <div class="col-md-6">
+                              <ul class="list-unstyled mb-0 small">
+                                <li>
+                                  🎯 <strong>Match Events:</strong> Goals, cards, substitutions with timestamps
+                                </li>
+                                <li>
+                                  📈 <strong>Player Ratings:</strong> Individual performance ratings and positions
+                                </li>
+                                <li>
+                                  ⚽ <strong>Detailed Statistics:</strong> Possession, shots, tackles, passes
+                                </li>
+                                <li>
+                                  🏟️ <strong>Venue Information:</strong> Attendance and weather conditions
+                                </li>
+                              </ul>
+                            </div>
+                            <div class="col-md-6">
+                              <ul class="list-unstyled mb-0 small">
+                                <li>
+                                  🎭 <strong>Formations & Tactics:</strong> Team setups and tactical changes
+                                </li>
+                                <li>
+                                  ⏱️ <strong>Match Timeline:</strong> Key events throughout the game
+                                </li>
+                                <li>
+                                  📊 <strong>Advanced Analytics:</strong> Expected goals, heat maps
+                                </li>
+                                <li>
+                                  🔄 <strong>Head-to-Head:</strong> Historical match comparisons
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <!-- No lineup data at all -->
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Match Data Unavailable</h6>
+                      </div>
+                      <div class="card-body text-center">
+                        <div class="alert alert-warning" role="alert">
+                          <h5 class="alert-heading">📥 No Match Data Downloaded</h5>
+                          <p>This match does not have lineup or detailed information in the database.</p>
+                          <hr>
+                          <p class="mb-3">
+                            <strong>To get complete match data:</strong>
+                            <br>
+                            Click the "Update Data" button to download recent matches with full lineups, player ratings, and match events from the Hattrick CHPP API.
+                          </p>
+                          <a href="{{ url_for('team.update', id=teamid) }}"
+                             class="btn btn-primary-custom">📥 Update Match Data</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+            <!-- No match selected message -->
+            <div class="col-12" id="noMatchSelected" data-no-match>
+              <div class="card">
+                <div class="card-body text-center">
+                  <h5 class="text-muted">Select a match to view details</h5>
+                  <p class="text-muted">Click on any match from the history to see detailed information, lineup, and statistics.</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="row collapse" id="all-match-details-{{ m.ht_id }}"><div class="col"><p></p></div></div>
-    {% endfor %}
-  </div>
-</div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Match filter functionality
+    const filterButtons = document.querySelectorAll('.filter-btn');
 
-</div>
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            const target = this.getAttribute('data-target');
 
-{% endblock %}
+            // Remove active class from siblings
+            const siblings = this.parentNode.querySelectorAll('.filter-btn');
+            siblings.forEach(sibling => sibling.classList.remove('active'));
+
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Filter matches based on target (upcoming or history)
+            if (target === 'history') {
+                const matchItems = document.querySelectorAll('[data-match-item]');
+                matchItems.forEach(item => {
+                    const matchType = item.getAttribute('data-matchtype');
+                    if (filter === 'all' || matchType === filter) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            } else {
+                // For upcoming matches (still uses table structure)
+                const rows = document.querySelectorAll('#upcoming-matches .match-row');
+                rows.forEach(row => {
+                    const matchType = row.getAttribute('data-matchtype');
+                    if (filter === 'all' || matchType === filter) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        });
+    });
+
+    // Match selection functionality
+    window.selectMatch = function(matchId) {
+        // Hide all match cards
+        document.querySelectorAll('[data-match-card]').forEach(card => {
+            card.style.display = 'none';
+        });
+
+        // Hide no match selected message
+        const noMatchElement = document.getElementById('noMatchSelected');
+        if (noMatchElement) noMatchElement.style.display = 'none';
+
+        // Remove active class from all match items
+        document.querySelectorAll('[data-match-item]').forEach(item => {
+            item.classList.remove('active', 'bg-blue-50', 'border-blue-300');
+        });
+
+        // Show selected match card
+        const selectedCard = document.getElementById('matchCard' + matchId);
+        if (selectedCard) selectedCard.style.display = 'block';
+
+        // Add active class to selected match item
+        const selectedItem = document.getElementById('matchItem' + matchId);
+        if (selectedItem) {
+            selectedItem.classList.add('active', 'bg-blue-50', 'border-blue-300');
+        }
+    };
+
+    // Initialize with first match if available
+    {% if history_matches %}
+      {% for m in history_matches %}
+        {% if m.home_goals is not none and loop.first %}
+          selectMatch({{ m.ht_id }});
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+});
+    </script>
+    <style>
+.player-position {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    margin: 0.25rem;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.formation-grid table td {
+    vertical-align: middle;
+    padding: 0.5rem;
+}
+    </style>
+  {% endblock %}

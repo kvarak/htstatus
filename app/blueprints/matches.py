@@ -1,5 +1,7 @@
 """Matches routes blueprint for HT Status application."""
 
+from datetime import datetime
+
 from flask import Blueprint, request, session
 from sqlalchemy import text
 
@@ -62,6 +64,13 @@ def matches():
     matchid = int(matchid) if matchid else request.form.get("m")
     all_teams = session["all_teams"]
 
+# Handle archive download request - redirect to update route
+    updatebutton = request.form.get("updatebutton")
+    if updatebutton == "archive":
+        # Redirect to update route with archive parameter and team ID
+        from flask import redirect, url_for
+        return redirect(url_for('team.update', archive=1, id=teamid))
+
     error = ""
     if teamid not in all_teams:
         error = "Wrong teamid, try the links."
@@ -71,12 +80,24 @@ def matches():
     teamname = all_team_names[all_teams.index(teamid)]
 
     # Get all registered matches
+    # Sort by datetime desc for history (recent first), but we'll handle upcoming separately
     dbmatches = (
         db.session.query(Match)
         .filter((Match.away_team_id == teamid) | (Match.home_team_id == teamid))
         .order_by(text("datetime desc"))
         .all()
     )
+
+    # Split matches into upcoming and history for proper sorting
+    current_time = datetime.now()
+    upcoming_matches = [m for m in dbmatches if m.datetime > current_time]
+    history_matches = [m for m in dbmatches if m.datetime <= current_time]
+
+    # Sort upcoming matches chronologically (earliest first)
+    upcoming_matches.sort(key=lambda x: x.datetime)
+
+    # Combine back: upcoming first (chronological), then history (reverse chronological)
+    dbmatches = upcoming_matches + history_matches
     dbmatchplays = {}
     for m in dbmatches:
         dbmatch = db.session.query(MatchPlay).filter_by(match_id=m.ht_id).all()
@@ -86,6 +107,9 @@ def matches():
         template="matches.html",
         error=error,
         matches=dbmatches,
+        upcoming_matches=upcoming_matches,
+        history_matches=history_matches,
+        has_upcoming=len(upcoming_matches) > 0,
         matchplays=dbmatchplays,
         matchidtoshow=matchid,
         teamname=teamname,
@@ -93,6 +117,7 @@ def matches():
         HTmatchtype=HTmatchtype,
         HTmatchrole=HT_MATCH_ROLE,
         HTmatchbehaviour=HTmatchbehaviour,
+        current_time=datetime.now(),
         title="Matches",
     )
 
