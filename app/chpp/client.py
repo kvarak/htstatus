@@ -377,14 +377,24 @@ class CHPP:
         print(f"[DEBUG] API 3.1 request for player {id_}")
         return parse_player(root)
 
-    def matches_archive(self, id_: int, is_youth: bool = False) -> list["CHPPMatch"]:
+    def matches_archive(self, id_: int, is_youth: bool = False, season: int = None,
+                       first_match_date: str = None, last_match_date: str = None) -> list["CHPPMatch"]:
         """Get match history for a team.
 
-        Fetches match archive from matchesarchive endpoint.
+        Fetches match archive from matchesarchive endpoint with date/season filtering.
 
         Args:
             id_: Hattrick team ID
             is_youth: Whether to fetch youth team matches (default: False)
+            season: Season number to fetch (overrides date parameters, senior teams only)
+            first_match_date: Start date (YYYY-MM-DD format), defaults to 3 months ago
+            last_match_date: End date (YYYY-MM-DD format), defaults to yesterday
+
+        Note:
+            - Maximum interval of 2 seasons back due to CHPP performance limits
+            - Default without parameters is 3 months of recent matches
+            - season parameter overrides first_match_date/last_match_date
+            - For maximum coverage, use season parameter for last 2 seasons
 
         Returns:
             List of CHPPMatch objects representing team's match history
@@ -394,12 +404,52 @@ class CHPP:
             CHPPAPIError: If CHPP API returns error (e.g., unknown team ID)
 
         Example:
-            >>> matches = chpp.matches_archive(id_=123456)
-            >>> for match in matches:
-            ...     print(f"{match.home_team_name} {match.home_goals}-{match.away_goals}")
+            >>> matches = chpp.matches_archive(id_=123456)  # 3 months default
+            >>> matches = chpp.matches_archive(id_=123456, season=82)  # Season 82
+            >>> matches = chpp.matches_archive(id_=123456,
+            ...                              first_match_date="2023-01-01",
+            ...                              last_match_date="2023-12-31")
         """
         from app.chpp.parsers import parse_matches
 
-        # Use matchesarchive endpoint with teamID parameter (GET request)
-        root = self.request("matchesarchive", "1.5", teamID=id_, isYouthTeam=is_youth)
+        # Build parameters
+        params = {"teamID": id_, "isYouthTeam": is_youth}
+
+        if season is not None:
+            params["season"] = season
+        else:
+            if first_match_date:
+                params["FirstMatchDate"] = first_match_date
+            if last_match_date:
+                params["LastMatchDate"] = last_match_date
+
+        # Use matchesarchive endpoint with enhanced parameters
+        root = self.request("matchesarchive", "1.5", **params)
+        return parse_matches(root)
+
+    def matches(self, id_: int, is_youth: bool = False) -> list["CHPPMatch"]:
+        """Get recent and upcoming matches for a team.
+
+        Fetches recent and upcoming matches from matches endpoint.
+
+        Args:
+            id_: Hattrick team ID
+            is_youth: Whether to fetch youth team matches (default: False)
+
+        Returns:
+            List of CHPPMatch objects representing team's recent/upcoming matches
+
+        Raises:
+            CHPPAuthError: If not authenticated
+            CHPPAPIError: If CHPP API returns error (e.g., unknown team ID)
+
+        Example:
+            >>> matches = chpp.matches(id_=123456)
+            >>> for match in matches:
+            ...     print(f"{match.home_team_name} vs {match.away_team_name} on {match.datetime}")
+        """
+        from app.chpp.parsers import parse_matches
+
+        # Use matches endpoint with teamID parameter (GET request)
+        root = self.request("matches", "2.6", teamID=id_, isYouth=is_youth)
         return parse_matches(root)

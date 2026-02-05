@@ -5,8 +5,6 @@ from datetime import datetime
 
 from flask import current_app, render_template, session
 
-from app.chpp import CHPP
-
 # Global variables - will be initialized by initialize_utils()
 db = None
 debug_level = None
@@ -1092,83 +1090,263 @@ def get_team_match_statistics(teamid):
 # =============================================================================
 
 
-def downloadMatches(teamid):
-    """Download and process match data for a team."""
+def downloadRecentMatches(teamid, chpp=None):
+    """Download recent and upcoming matches for a team.
 
-    from flask import current_app
+    Downloads recent and upcoming matches using CHPP matches endpoint.
+    This is different from downloadMatches which handles historical archive.
 
+    Args:
+        teamid: Hattrick team ID
+        chpp: CHPP client (optional, will create if not provided)
+
+    Returns:
+        dict with 'success', 'recent_count', 'upcoming_count', 'count', 'message' keys
+    """
+    from datetime import datetime
+
+    from flask import current_app, session
+
+    try:
+        # Use provided CHPP client or create one
+        if chpp is None:
+            from app.chpp import CHPP
+            consumer_key = current_app.config.get("CONSUMER_KEY")
+            consumer_secret = current_app.config.get("CONSUMER_SECRETS")
+
+            if not consumer_key or not consumer_secret:
+                return {
+                    "success": False,
+                    "error": "CHPP configuration missing",
+                    "recent_count": 0,
+                    "upcoming_count": 0,
+                    "count": 0,
+                    "message": "CHPP configuration missing"
+                }
+
+            chpp = CHPP(
+                consumer_key, consumer_secret,
+                session["access_key"], session["access_secret"]
+            )
+
+        dprint(2, f"Fetching recent/upcoming matches for team {teamid}")
+
+        # Fetch recent and upcoming matches
+        matches = chpp.matches(id_=teamid, is_youth=False)
+
+        # Process matches and separate recent vs upcoming
+        recent_count = 0
+        upcoming_count = 0
+        total_added = 0
+        current_time = datetime.now()
+
+        for match in matches:
+            try:
+                # Parse match datetime
+                match_datetime = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
+
+                # Check if match has been played (recent) or is upcoming
+                if match_datetime < current_time and match.home_goals is not None:
+                    recent_count += 1
+                elif match_datetime > current_time:
+                    upcoming_count += 1
+
+                # Save match to database (use existing _process_matches helper)
+                added, updated = _process_matches([match])
+                total_added += added
+
+            except Exception as e:
+                dprint(2, f"Warning: Could not process match {match.ht_id}: {str(e)}")
+                continue
+
+        message = f"Recent matches download complete: {recent_count} recent, {upcoming_count} upcoming, {total_added} new matches saved"
+        dprint(2, message)
+
+        return {
+            "success": True,
+            "recent_count": recent_count,
+            "upcoming_count": upcoming_count,
+            "count": total_added,
+            "message": message
+        }
+
+    except Exception as e:
+        error_msg = f"Error downloading recent matches for team {teamid}: {str(e)}"
+        dprint(1, error_msg)
+        return {
+            "success": False,
+            "error": str(e),
+            "recent_count": 0,
+            "upcoming_count": 0,
+            "count": 0,
+            "message": error_msg
+        }
+
+
+def downloadMatches(teamid, chpp=None):
+    """Download match archive for a team (recent matches only).
+
+    Downloads recent matches using CHPP matchesarchive endpoint.
+    Filters out matches older than 1 year to avoid historical data contamination
+    from team ID reuse or inactive periods.
+
+    Args:
+        teamid: Hattrick team ID
+        chpp: CHPP client (optional, will create if not provided)
+
+    Returns:
+        dict with 'success', 'count', 'updated', 'message' keys
+    """
+    from flask import current_app, session
+
+    try:
+        # Use provided CHPP client or create one
+        if chpp is None:
+            from app.chpp import CHPP
+            consumer_key = current_app.config.get("CONSUMER_KEY")
+            consumer_secret = current_app.config.get("CONSUMER_SECRETS")
+
+            chpp = CHPP(
+                consumer_key, consumer_secret,
+                session["access_key"], session["access_secret"]
+            )
+
+        dprint(1, f"Downloading recent match archive for team {teamid}")
+
+        # Get matches using default CHPP behavior (recent matches)
+        # This is simpler and more reliable than season-based detection
+        try:
+            matches_data = chpp.matches_archive(id_=teamid)
+
+            # Filter out matches older than 1 year to avoid historical contamination
+            if matches_data:
+                from datetime import timedelta
+                cutoff_date = datetime.now() - timedelta(days=365)
+                recent_matches = []
+
+                for match in matches_data:
+                    try:
+                        if hasattr(match.datetime, 'year'):
+                            match_date = match.datetime
+                        elif match.datetime:
+                            from dateutil import parser
+                            match_date = parser.parse(str(match.datetime))
+                        else:
+                            continue
+
+                        if match_date >= cutoff_date:
+                            recent_matches.append(match)
+
+                    except Exception:
+                        # Skip matches with invalid dates
+                        continue
+
+                matches_data = recent_matches
+                dprint(2, f"Filtered to {len(matches_data)} recent matches (last 1 year)")
+
+        except Exception as e:
+            dprint(1, f"Warning: Could not fetch matches: {str(e)}")
+            matches_data = []
+
+        # Process matches
+        added, updated = _process_matches(matches_data)
+
+        message = f"Archive download complete: {added} new, {updated} updated"
+        dprint(1, message)
+
+        return {
+            "success": True,
+            "count": added,
+            "updated": updated,
+            "message": message
+        }
+
+    except Exception as e:
+        dprint(1, f"Error downloading match archive for team {teamid}: {str(e)}")
+        if 'db' in locals():
+            db.session.rollback()
+        return {
+            "success": False,
+            "error": str(e),
+            "count": 0,
+            "message": f"Archive download failed: {str(e)}"
+        }
+
+
+def _process_matches(matches):
+    """Process a list of matches and add/update them in the database.
+
+    Args:
+        matches: List of CHPPMatch objects
+
+    Returns:
+        tuple: (added_count, updated_count)
+    """
     from models import Match
 
-    # Get CHPP credentials from app config
-    consumer_key = current_app.config.get("CONSUMER_KEY")
-    consumer_secret = current_app.config.get("CONSUMER_SECRETS")
+    added = 0
+    updated = 0
 
-    chpp = CHPP(
-        consumer_key, consumer_secret, session["access_key"], session["access_secret"]
-    )
+    for match in matches:
+        try:
+            # Parse match datetime
+            if hasattr(match.datetime, 'year'):
+                thedate = datetime(
+                    match.datetime.year, match.datetime.month, match.datetime.day,
+                    match.datetime.hour, match.datetime.minute,
+                )
+            elif match.datetime:
+                try:
+                    from dateutil import parser
+                    thedate = parser.parse(match.datetime)
+                except Exception:
+                    thedate = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
+            else:
+                dprint(2, f"No datetime for match {match.ht_id}, skipping")
+                continue
 
-    the_matches = chpp.matches_archive(id_=teamid, is_youth=False)
+            dprint(3, f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}")
 
-    for match in the_matches:
-        dprint(2, "---------------")
+            # Check if match already exists
+            dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
 
-        # TODO: get more details about the match like below
-        # the_match = chpp.match(ht_id=match.ht_id)
+            if dbmatch:
+                # Update existing match
+                dbmatch.home_goals = match.home_goals
+                dbmatch.away_goals = match.away_goals
+                dbmatch.home_team_name = match.home_team_name
+                dbmatch.away_team_name = match.away_team_name
+                updated += 1
+            else:
+                # Create new match record
+                thismatch = {
+                    "ht_id": match.ht_id,
+                    "home_team_id": match.home_team_id,
+                    "home_team_name": match.home_team_name,
+                    "away_team_id": match.away_team_id,
+                    "away_team_name": match.away_team_name,
+                    "datetime": thedate,
+                    "matchtype": match.matchtype,
+                    "context_id": match.context_id,
+                    "rule_id": match.rule_id,
+                    "cup_level": match.cup_level,
+                    "cup_level_index": match.cup_level_index,
+                    "home_goals": match.home_goals,
+                    "away_goals": match.away_goals,
+                }
 
-        thedate = datetime(
-            match.datetime.year,
-            match.datetime.month,
-            match.datetime.day,
-            match.datetime.hour,
-            match.datetime.minute,
-        )
+                newmatch = Match(thismatch)
+                db.session.add(newmatch)
+                added += 1
 
-        dprint(2, "Adding match ", match.ht_id, " to database.")
-
-        dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
-
-        if dbmatch:
-            dprint(1, "WARNING: This match already exists.")
-        else:
-            thismatch = {}
-            thismatch["ht_id"] = match.ht_id
-            thismatch["home_team_id"] = match.home_team_id
-            thismatch["home_team_name"] = match.home_team_name
-            thismatch["away_team_id"] = match.away_team_id
-            thismatch["away_team_name"] = match.away_team_name
-            thismatch["datetime"] = thedate
-            thismatch["matchtype"] = match.type
-            thismatch["context_id"] = match.context_id
-            thismatch["rule_id"] = match.rule_id
-            thismatch["cup_level"] = match.cup_level
-            thismatch["cup_level_index"] = match.cup_level_index
-            thismatch["home_goals"] = match.home_goals
-            thismatch["away_goals"] = match.away_goals
-
-            newmatch = Match(thismatch)
-            db.session.add(newmatch)
             db.session.commit()
 
-            matchlineup = chpp.match_lineup(match_id=match.ht_id, team_id=teamid)
-            for p in matchlineup.lineup_players:
-                dprint(2, " - Adding ", p.first_name, " ", p.last_name, " to database")
-                thismatchlineup = {}
-                thismatchlineup["match_id"] = match.ht_id
-                thismatchlineup["player_id"] = p.id
-                thismatchlineup["datetime"] = thedate
-                thismatchlineup["role_id"] = p.role_id
-                thismatchlineup["first_name"] = p.first_name
-                thismatchlineup["nick_name"] = p.nick_name
-                thismatchlineup["last_name"] = p.last_name
-                thismatchlineup["rating_stars"] = p.rating_stars
-                thismatchlineup["rating_stars_eom"] = p.rating_stars_eom
-                thismatchlineup["behaviour"] = p.behaviour
+        except Exception as e:
+            dprint(2, f"Error processing match {match.ht_id}: {str(e)}")
+            db.session.rollback()
+            continue
 
-                from models import MatchPlay
-
-                newmatchlineup = MatchPlay(thismatchlineup)
-                db.session.add(newmatchlineup)
-                db.session.commit()
+    return added, updated
 
 
 def count_clicks(page):

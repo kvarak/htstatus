@@ -555,8 +555,15 @@ def parse_matches(root: ET.Element) -> list[CHPPMatch]:
     """
     matches = []
 
-    # Navigate to match list (API returns under HattrickData/Team/MatchList/Match)
+    # Navigate to match list - handle different endpoint structures
+    # matchesarchive v1.5: HattrickData/Team/MatchList/Match
+    # matches v2.6: Could be different structure
     match_elements = root.findall(".//Team/MatchList/Match")
+    if not match_elements:
+        # Try alternative structures for different endpoint versions
+        match_elements = root.findall(".//MatchList/Match")
+    if not match_elements:
+        match_elements = root.findall(".//Match")
 
     for match_elem in match_elements:
         # Extract match fields using safe_find_* helpers
@@ -567,11 +574,23 @@ def parse_matches(root: ET.Element) -> list[CHPPMatch]:
         # Keep as string for compatibility with existing code
         # (existing code calls match.datetime.year, month, day - will need conversion)
 
-        home_team_id = safe_find_int(match_elem, "HomeTeamID")
-        home_team_name = safe_find_text(match_elem, "HomeTeamName", "")
-        away_team_id = safe_find_int(match_elem, "AwayTeamID")
-        away_team_name = safe_find_text(match_elem, "AwayTeamName", "")
+# Team information: different structures for different CHPP endpoint versions
+        # matches v2.6: HomeTeam/HomeTeamID and AwayTeam/AwayTeamID
+        # matchesarchive v1.5: HomeTeamID and AwayTeamID directly under Match
+        home_team_id = safe_find_int(match_elem, "HomeTeam/HomeTeamID")
+        home_team_name = safe_find_text(match_elem, "HomeTeam/HomeTeamName", "")
+        away_team_id = safe_find_int(match_elem, "AwayTeam/AwayTeamID")
+        away_team_name = safe_find_text(match_elem, "AwayTeam/AwayTeamName", "")
 
+        # Fallback for matchesarchive v1.5 structure (direct under Match)
+        if not home_team_name:
+            home_team_name = safe_find_text(match_elem, "HomeTeamName", "")
+        if not home_team_id:
+            home_team_id = safe_find_int(match_elem, "HomeTeamID")
+        if not away_team_name:
+            away_team_name = safe_find_text(match_elem, "AwayTeamName", "")
+        if not away_team_id:
+            away_team_id = safe_find_int(match_elem, "AwayTeamID")
         home_goals = safe_find_int(match_elem, "HomeGoals")
         away_goals = safe_find_int(match_elem, "AwayGoals")
 
