@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 5, 2026): CHPP API Documentation Foundation COMPLETED - Created comprehensive reference for 21/79 CHPP APIs with implementation examples, authentication patterns, and strategic usage guidelines. All P2 features now have complete API coverage: matches-basic, matchorders, leaguedetails, players, playerdetails, currentbids, translations, matchdetails, matchlineup, playerevents, leaguelevels. Ready for confident P2 implementation without API research delays. Quality gates: 8/9 passing (HIGH deployment confidence). **Active: 102 tasks** (P0=0, P1=0, P2=11, P3=8, P4=83)
+**Recent Organization** (February 5, 2026): CHPP API Documentation Foundation COMPLETED - Created comprehensive reference for 21/79 CHPP APIs with implementation examples, authentication patterns, and strategic usage guidelines. All P2 features now have complete API coverage: matches-basic, matchorders, leaguedetails, players, playerdetails, currentbids, translations, matchdetails, matchlineup, playerevents, leaguelevels. Ready for confident P2 implementation without API research delays. Quality gates: 7/9 passing (MODERATE deployment confidence). **Active: 99 tasks** (P0=0, P1=0, P2=9, P3=8, P4=82)
 
 ---
 
@@ -20,8 +20,6 @@
 
 ## P2: Features 🎯
 
-- **[FEAT-029]** Matches System Integration and Archive - Restore matches functionality with recent/upcoming match downloads and on-demand archive system → [Details](.project/tasks/FEAT-029.md)
-- **[FEAT-031]** Enhanced Match Analytics Through CHPP API - Implement comprehensive match statistics, player performance tracking, and tactical insights using matchdetails, matchlineup, and playerevents APIs → [Details](.project/tasks/FEAT-031.md)
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
 - **[FEAT-010]** Player Comparison Tool (Connected to GitHub Issue #15 - User-requested feature for viewing multiple players side-by-side for comparison analysis) → [Details](.project/tasks/FEAT-010.md)
@@ -48,6 +46,12 @@
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 5, 2026 - Match Analytics & Vertical Text Review)
+
+#### Match Model Architecture Simplification
+- **[REFACTOR-106]** Simplify Match Model Schema with Analytics Table - Refactor Match model into lean core table (teams, datetime, score, type) with separate MatchAnalytics table for optional enhanced data (possession, chances, ratings), reducing database bloat from 78 nullable columns and improving query performance for non-analytics queries (90 min)
+- **[INFRA-087]** Add Match Analytics Database Indexes - Create indexes on Match.attendance, Match.weather_id, Match.home_team_formation and benchmark query performance impact of 78 nullable columns on typical queries (30 min)
 
 ### Recent Critical Review Improvements (February 3, 2026 - Player Modal Layout Enhancement Analysis)
 
