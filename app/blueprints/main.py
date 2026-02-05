@@ -483,9 +483,11 @@ def admin():
             "c_feedback": user.c_feedback or 0,
             "c_formation": user.c_formation or 0,
             "c_stats": user.c_stats or 0,
+            "c_matches_archive": user.c_matches_archive or 0,
             "last_update": user.last_update,
             "last_usage": user.last_usage,
             "last_login": user.last_login,
+            "last_matches_archive": user.last_matches_archive,
             "created": user.created,
             "active_time": active_time,
         }
