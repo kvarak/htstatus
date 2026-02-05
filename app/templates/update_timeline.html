@@ -1,178 +1,208 @@
 {% extends 'base.html' %}
-
-{% block scripts %}
-{{ super() }}
-{% endblock %}
-
+{% block scripts %}{{ super() }}{% endblock %}
 {% block content %}
-
-<div class="update-content">
-  <div class="container">
-    <!-- Breadcrumb/Title -->
-    <div class="page-title-box">
-      <nav aria-label="breadcrumb" class="mb-0">
-        <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 0;">
-          <li class="breadcrumb-item active">Update Complete - Player Change Timeline</li>
-        </ol>
-      </nav>
-    </div>
-
-    <!-- Status Messages -->
-    {% if request.args.get('success') %}
-      <div class="status-message status-success">
-        ✓ Data downloaded successfully
+  <div class="update-content">
+    <div class="container">
+      <!-- Breadcrumb/Title -->
+      <div class="page-title-box">
+        <nav aria-label="breadcrumb" class="mb-0">
+          <ol class="breadcrumb"
+              style="background: transparent;
+                     padding: 0;
+                     margin: 0">
+            <li class="breadcrumb-item active">Update Complete - Player Change Timeline</li>
+          </ol>
+        </nav>
       </div>
-    {% endif %}
-
-    <!-- Players Left -->
-    {% if left_players %}
-      <div class="status-message status-warning">
-        ⚠ Players left team:
-        {% for lplayer in left_players %}
-          {{ lplayer[1] }}{% if not loop.last %}, {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <!-- New Players -->
-    {% if new_players %}
-      <div class="status-message status-success">
-        ✓ New players:
-        {% for nplayer in new_players %}
-          {{ nplayer[1] }}{% if not loop.last %}, {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    <!-- Updated Teams Links -->
-    {% if updated %}
-      <div class="updated-teams-box">
-        {% for teamid, team_data in updated.items() %}
-          <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-            <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ team_data[0] }}:</span>
-            <a href="{{ team_data[1] }}" class="team-link">{{ team_data[2] }}</a>
-          </p>
-        {% endfor %}
-      </div>
-
-      <hr class="divider">
-    {% endif %}
-
-    <!-- 4-Week Player Change Timeline -->
-    {% if timeline_changes %}
-      <div class="timeline-container">
-        <div class="timeline-title">Player Skill Changes - 4 Week Timeline</div>
-
-        <div class="timeline">
-          {% for week_key in ['week_1', 'week_2', 'week_3', 'week_4'] %}
-            {% set week = timeline_changes[week_key] %}
-            <div class="week-container{% if week.is_current %} current-week{% endif %}">
-              <div class="week-header">
-                <div class="week-title">
-                  {% if week.is_current %}
-                    This Week
-                  {% else %}
-                    {{ week_key.replace('week_', '') }} Week{{ 's' if week_key != 'week_2' else '' }} Ago
-                  {% endif %}
-                </div>
-                <div class="week-subtitle">
-                  {% if week.is_current %}
-                    Today through 6 days ago
-                  {% else %}
-                    {{ week.days_ago_end }}-{{ week.days_ago_start }} days ago
-                  {% endif %}
-                </div>
-                {% if week.is_current %}
-                  <span class="current-week-badge">Current</span>
-                {% endif %}
-              </div>
-
-              <div class="week-content">
-                {% if week.changes %}
-                  <div class="week-changes">
-                    {# Group changes by player data #}
-                    {% set player_changes = {} %}
-                    {% for change in week.changes %}
-                      {% set player_data = change[0] %}
-                      {% set player_key = player_data.name if player_data is mapping else player_data %}
-                      {% if player_key not in player_changes %}
-                        {% set _ = player_changes.update({player_key: {'data': player_data, 'changes': []}}) %}
-                      {% endif %}
-                      {% set _ = player_changes[player_key]['changes'].append(change) %}
-                    {% endfor %}
-
-                    {% for player_key, player_info in player_changes.items() %}
-                      <div class="player-entry">
-                        {% set player_data = player_info.data %}
-                        {% if player_data is mapping and player_data.text_color and player_data.bg_color %}
-                          <div class="player-name" style="color: {{ player_data.text_color }}; background-color: {{ player_data.bg_color }}; padding: 0.2rem 0.4rem; border-radius: 0.2rem; display: inline-block;">
-                            {{ player_data.name }}
-                          </div>
-                        {% else %}
-                          <div class="player-name">
-                            {{ player_data.name if player_data is mapping else player_data }}
-                          </div>
-                        {% endif %}
-                        {% for change in player_info.changes %}
-                          <div class="change-item">
-                            {% if change[4] == 'skill' %}
-                              {% if change[3] > change[2] %}
-                                <span class="skill-up">📈 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
-                              {% else %}
-                                <span class="skill-down">📉 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
-                              {% endif %}
-                            {% elif change[4] == 'cards' %}
-                              {% if change[3] == 3 %}
-                                <span class="skill-down"><img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Red card received</span>
-                              {% elif change[3] == 2 %}
-                                <span class="other-change"><img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> 2 yellow cards</span>
-                              {% elif change[3] == 1 %}
-                                <span class="other-change"><img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Yellow card</span>
-                              {% elif change[3] == 0 and change[2] > 0 %}
-                                <span class="skill-up">✓ Cards cleared</span>
-                              {% else %}
-                                <span class="other-change">🟨 Cards: {{ change[2] }} → {{ change[3] }}</span>
-                              {% endif %}
-                            {% elif change[4] == 'injury' %}
-                              {% set old_level = change[2] %}
-                              {% set new_level = change[3] %}
-                              {% if new_level > 0 %}
-                                <span class="skill-down"><img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Injured ({{ new_level }} weeks)</span>
-                              {% elif new_level == 0 %}
-                                {% if old_level > 0 %}
-                                  <span class="skill-up"><img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Injury improved to bruised</span>
-                                {% elif old_level == -1 %}
-                                  <span class="skill-down"><img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);"> Got bruised</span>
-                                {% endif %}
-                              {% elif new_level == -1 %}
-                                {% if old_level >= 0 %}
-                                  <span class="skill-up">✓ Fully healed</span>
-                                {% endif %}
-                              {% endif %}
-                            {% elif change[4] == 'money' %}
-                              <span class="money-change">💰 {{ change[1] }}: {{ "{:,}".format(change[2]) }} → {{ "{:,}".format(change[3]) }}</span>
-                            {% elif change[4] == 'age' %}
-                              <span class="age-change">🎂 {{ change[1] }}: {{ change[2] }} → {{ change[3] }} years</span>
-                            {% else %}
-                              <span class="other-change">🔄 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
-                            {% endif %}
-                          </div>
-                        {% endfor %}
-                      </div>
-                    {% endfor %}
-                  </div>
-                {% else %}
-                  <div class="no-changes">No changes recorded for this period</div>
-                {% endif %}
-              </div>
-            </div>
+      <!-- Status Messages -->
+      {% if request.args.get('success') %}
+        <div class="status-message status-success">✓ Data downloaded successfully</div>
+      {% endif %}
+      <!-- Players Left -->
+      {% if left_players %}
+        <div class="status-message status-warning">
+          ⚠ Players left team:
+          {% for lplayer in left_players %}
+            {{ lplayer[1] }}
+            {% if not loop.last %},{% endif %}
           {% endfor %}
         </div>
-      </div>
-    {% else %}
-      <div class="no-changes">No player change data available</div>
-    {% endif %}
+      {% endif %}
+      <!-- New Players -->
+      {% if new_players %}
+        <div class="status-message status-success">
+          ✓ New players:
+          {% for nplayer in new_players %}
+            {{ nplayer[1] }}
+            {% if not loop.last %},{% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      <!-- Matches Results -->
+      {% if total_recent_matches > 0 or total_upcoming_matches > 0 %}
+        <div class="status-message status-info">
+          📅 Matches updated: {{ total_recent_matches }} recent, {{ total_upcoming_matches }} upcoming
+        </div>
+      {% elif matches_results %}
+        {% for teamid, result in matches_results.items() %}
+          {% if not result.success %}
+            <div class="status-message status-warning">
+              ⚠ Failed to fetch matches for team {{ teamid }}: {{ result.get('error', 'Unknown error') }}
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      <!-- Updated Teams Links -->
+      {% if updated %}
+        <div class="updated-teams-box">
+          {% for teamid, team_data in updated.items() %}
+            <p style="margin: 0.5rem 0; font-size: 0.9rem;">
+              <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ team_data[0] }}:</span>
+              <a href="{{ team_data[1] }}" class="team-link">{{ team_data[2] }}</a>
+            </p>
+          {% endfor %}
+        </div>
+        <hr class="divider">
+      {% endif %}
+      <!-- 4-Week Player Change Timeline -->
+      {% if timeline_changes %}
+        {% for team_id, team_timeline in timeline_changes.items() %}
+          {% if team_timeline %}
+            <div class="timeline-container">
+              <div class="timeline-title">
+                Player Skill Changes - 4 Week Timeline
+                {% if updated and team_id in updated %}<span class="team-indicator">- {{ updated[team_id][0] }}</span>{% endif %}
+              </div>
+              <div class="timeline">
+                {% for week_key in ['week_1', 'week_2', 'week_3', 'week_4'] %}
+                  {% set week = team_timeline[week_key] %}
+                  <div class="week-container{% if week.is_current %} current-week{% endif %}">
+                    <div class="week-header">
+                      <div class="week-title">
+                        {% if week.is_current %}
+                          This Week
+                        {% else %}
+                          {{ week_key.replace('week_', '') }} Week{{ 's' if week_key != 'week_2' else '' }} Ago
+                        {% endif %}
+                      </div>
+                      <div class="week-subtitle">
+                        {% if week.is_current %}
+                          Today through 6 days ago
+                        {% else %}
+                          {{ week.days_ago_end }}-{{ week.days_ago_start }} days ago
+                        {% endif %}
+                      </div>
+                      {% if week.is_current %}<span class="current-week-badge">Current</span>{% endif %}
+                    </div>
+                    <div class="week-content">
+                      {% if week.changes %}
+                        <div class="week-changes">
+                          {# Group changes by player data #}
+                          {% set player_changes = {} %}
+                          {% for change in week.changes %}
+                            {% set player_data = change[0] %}
+                            {% set player_key = player_data.name if player_data is mapping else player_data %}
+                            {% if player_key not in player_changes %}
+                              {% set _ = player_changes.update({player_key: {'data': player_data, 'changes': []}}) %}
+                            {% endif %}
+                            {% set _ = player_changes[player_key]['changes'].append(change) %}
+                          {% endfor %}
+                          {% for player_key, player_info in player_changes.items() %}
+                            <div class="player-entry">
+                              {% set player_data = player_info.data %}
+                              {% if player_data is mapping and player_data.text_color and player_data.bg_color %}
+                                <div class="player-name"
+                                     style="color: {{ player_data.text_color }};
+                                            background-color: {{ player_data.bg_color }};
+                                            padding: 0.2rem 0.4rem;
+                                            border-radius: 0.2rem;
+                                            display: inline-block">{{ player_data.name }}</div>
+                              {% else %}
+                                <div class="player-name">{{ player_data.name if player_data is mapping else player_data }}</div>
+                              {% endif %}
+                              {% for change in player_info.changes %}
+                                <div class="change-item">
+                                  {% if change[4] == 'skill' %}
+                                    {% if change[3] > change[2] %}
+                                      <span class="skill-up">📈 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
+                                    {% else %}
+                                      <span class="skill-down">📉 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
+                                    {% endif %}
+                                  {% elif change[4] == 'cards' %}
+                                    {% if change[3] == 3 %}
+                                      <span class="skill-down">
+                                        <img src="{{ url_for('static', filename='ico-red.png') }}"
+                                             height="13"
+                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                      Red card received</span>
+                                    {% elif change[3] == 2 %}
+                                      <span class="other-change">
+                                        <img src="{{ url_for('static', filename='ico-yellow-2.png') }}"
+                                             height="13"
+                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                      2 yellow cards</span>
+                                    {% elif change[3] == 1 %}
+                                      <span class="other-change">
+                                        <img src="{{ url_for('static', filename='ico-yellow-1.png') }}"
+                                             height="13"
+                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                      Yellow card</span>
+                                    {% elif change[3] == 0 and change[2] > 0 %}
+                                      <span class="skill-up">✓ Cards cleared</span>
+                                    {% else %}
+                                      <span class="other-change">🟨 Cards: {{ change[2] }} → {{ change[3] }}</span>
+                                    {% endif %}
+                                  {% elif change[4] == 'injury' %}
+                                    {% set old_level = change[2] %}
+                                    {% set new_level = change[3] %}
+                                    {% if new_level > 0 %}
+                                      <span class="skill-down">
+                                        <img src="{{ url_for('static', filename='ico-injury.png') }}"
+                                             height="13"
+                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                      Injured ({{ new_level }} weeks)</span>
+                                    {% elif new_level == 0 %}
+                                      {% if old_level > 0 %}
+                                        <span class="skill-up">
+                                          <img src="{{ url_for('static', filename='ico-damage.png') }}"
+                                               height="13"
+                                               style="background-color:rgba(255, 255, 255, 0.5)">
+                                        Injury improved to bruised</span>
+                                      {% elif old_level == -1 %}
+                                        <span class="skill-down">
+                                          <img src="{{ url_for('static', filename='ico-damage.png') }}"
+                                               height="13"
+                                               style="background-color:rgba(255, 255, 255, 0.5)">
+                                        Got bruised</span>
+                                      {% endif %}
+                                    {% elif new_level == -1 %}
+                                      {% if old_level >= 0 %}<span class="skill-up">✓ Fully healed</span>{% endif %}
+                                    {% endif %}
+                                  {% elif change[4] == 'money' %}
+                                    <span class="money-change">💰 {{ change[1] }}: {{ "{:,}".format(change[2]) }} → {{ "{:,}".format(change[3]) }}</span>
+                                  {% elif change[4] == 'age' %}
+                                    <span class="age-change">🎂 {{ change[1] }}: {{ change[2] }} → {{ change[3] }} years</span>
+                                  {% else %}
+                                    <span class="other-change">🔄 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
+                                  {% endif %}
+                                </div>
+                              {% endfor %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% else %}
+                        <div class="no-changes">No changes recorded for this period</div>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        <div class="no-changes">No player change data available</div>
+      {% endif %}
+    </div>
   </div>
-</div>
-
 {% endblock %}

@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
-
 {% block content %}
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <div class="jumbotron">
-        <img src="{{url_for('static', filename='team.jpg')}}" class="rounded float-right img-fluid-2" height="200">
-        <div class="container">
-          <h1 class="display-4">{{ team }}</h1>
-          <p class="lead">{{ current_user }}</p>
-          <hr class="my-4">
-          <p><i>Under construction</i></p>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <div class="jumbotron">
+          <img src="{{ url_for('static', filename='team.jpg') }}"
+               class="rounded float-right img-fluid-2"
+               height="200">
+          <div class="container">
+            <h1 class="display-4">{{ team }}</h1>
+            <p class="lead">{{ current_user }}</p>
+            <hr class="my-4">
+            <p>
+              <i>Under construction</i>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
 {% endblock %}

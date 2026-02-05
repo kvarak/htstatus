@@ -1,25 +1,17 @@
-
 {% extends 'base.html' %}
-
 {% block content %}
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item active" aria-current="page">Hattrick Planner</li>
-        </ol>
-      </nav>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Hattrick Planner</li>
+          </ol>
+        </nav>
+      </div>
     </div>
-  </div>
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    {{ error }}
-  </div>
-  {% endif %}
-
-  <!-- <div class="alert alert-warning" role="alert">
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    <!-- <div class="alert alert-warning" role="alert">
     <p class="card-text">
       Welcome and thanks for checking this tools out. I'm hoping that it can help you organize
       your team, players, matches and training. It's always under development and still ongoing
@@ -31,107 +23,108 @@
       nicer player view.
     </p>
 </div> -->
-
-  <div class="row">
-    <div class="col-md-7">
-      <div class="card mb-3">
-        <div class="card-body">
-          <p class="card-text">
-            Welcome to HattrickPlanner! This tool helps you organize and analyze your Hattrick teams with detailed player statistics, formation testing, and training tracking.
-          </p>
-
-          <p class="card-text">
-            <strong>Getting Started:</strong> Click "Update data" to sync your latest team and player information from Hattrick.
-          </p>
-
-          <p class="card-text">
-            <strong>Players:</strong> View detailed player statistics, skill development, and organize players into custom groups. Use "Settings" to create groups like "Main Squad" or "Youth Academy".
-          </p>
-
-          <p class="card-text">
-            <strong>Formations:</strong> Formation testing tools (work in progress) - coming soon to help you experiment with different tactical setups.
-          </p>
-
-          <p class="card-text">
-            <strong>Training & Stats:</strong> Track training progress and analyze team statistics to optimize player development.
-          </p>
-
-          <!-- Disable feedback for now
+    <div class="row">
+      <div class="col-md-7">
+        <div class="card mb-3">
+          <div class="card-body">
+            <p class="card-text">
+              Welcome to HattrickPlanner! This tool helps you organize and analyze your Hattrick teams with detailed player statistics, formation testing, and training tracking.
+            </p>
+            <p class="card-text">
+              <strong>Getting Started:</strong> Click "Update data" to sync your latest team and player information from Hattrick.
+            </p>
+            <p class="card-text">
+              <strong>Players:</strong> View detailed player statistics, skill development, and organize players into custom groups. Use "Settings" to create groups like "Main Squad" or "Youth Academy".
+            </p>
+            <p class="card-text">
+              <strong>Formations:</strong> Formation testing tools (work in progress) - coming soon to help you experiment with different tactical setups.
+            </p>
+            <p class="card-text">
+              <strong>Training & Stats:</strong> Track training progress and analyze team statistics to optimize player development.
+            </p>
+            <!-- Disable feedback for now
           <p class="card-text">
             <strong>Feedback:</strong> Share suggestions and vote on features you'd like to see added to the tool.
           </p>
           -->
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <p class="card-text text-sm11">
+              <b>Thanks to</b>
+              <br>
+              - <a href="http://www.hattrick.org/">Hattrick</a>
+              <br>
+              - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
+            </p>
+            <p class="card-text text-sm11">
+              <b>Users</b>
+              <br>
+              - Total users: {{ usercount }}
+              <br>
+              - Active users: {{ activeusers }}
+            </p>
+            <p class="card-text text-sm11">
+              <b>Full version</b>
+              <br>
+              - {{ fullversion }}
+            </p>
+            <p class="card-text text-sm11">
+              <b>Note</b>
+              <br>
+              If you have any issues with not being able to <i>Update data</i>, try to
+              logout and then login again to reset the sessiondata. This can happen for instance if you
+              rename a team, remove a team, etc.
+            </p>
+          </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-body">
-          <p class="card-text text-sm11"><b>Thanks to</b><br>
-            - <a href="http://www.hattrick.org/">Hattrick</a><br>
-            - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
-          </p>
-          <p class="card-text text-sm11"><b>Users</b><br>
-            - Total users: {{ usercount }}<br>
-            - Active users: {{ activeusers }}
-          </p>
-          <p class="card-text text-sm11"><b>Full version</b><br>
-            - {{ fullversion }}
-          </p>
-          <p class="card-text text-sm11"><b>Note</b><br>
-            If you have any issues with not being able to <i>Update data</i>, try to
-            logout and then login again to reset the sessiondata. This can happen for instance if you
-            rename a team, remove a team, etc.
-          </p>
+      <div class="col-md-5">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-rocket"></i> What's New
+            </h5>
+            {% if releases %}
+              <div class="text-sm11">
+                {% for release in releases %}
+                  <div class="mb-2 pb-2" style="border-bottom: 1px solid #e9ecef;">
+                    <h6 class="mb-1 text-primary">
+                      {{ release.version }} <small class="text-muted">{{ release.date }}</small>
+                    </h6>
+                    {% for feature in release.features %}<div class="text-sm10 mb-1">• {{ feature|safe }}</div>{% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+              <div class="mt-3">
+                <a href="{{ url_for('main.changes') }}"
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-eye"></i> View Complete Development History
+                </a>
+              </div>
+            {% else %}
+              <p class="text-sm11">Release information not available.</p>
+              <div class="mt-3">
+                <a href="{{ url_for('main.changes') }}"
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-eye"></i> View Development History
+                </a>
+              </div>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-5">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">
-            <i class="fas fa-rocket"></i> What's New
-          </h5>
-          {% if releases %}
-            <div class="text-sm11">
-              {% for release in releases %}
-                <div class="mb-2 pb-2" style="border-bottom: 1px solid #e9ecef;">
-                  <h6 class="mb-1 text-primary">{{ release.version }} <small class="text-muted">{{ release.date }}</small></h6>
-                  {% for feature in release.features %}
-                    <div class="text-sm10 mb-1">• {{ feature|safe }}</div>
-                  {% endfor %}
-                </div>
-              {% endfor %}
-            </div>
-            <div class="mt-3">
-              <a href="{{ url_for('main.changes') }}" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-eye"></i> View Complete Development History
-              </a>
-            </div>
-          {% else %}
-            <p class="text-sm11">Release information not available.</p>
-            <div class="mt-3">
-              <a href="{{ url_for('main.changes') }}" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-eye"></i> View Development History
-              </a>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Break -->
-  <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
-
-  <!-- <div class="alert alert-warning" role="alert">
+    <!-- Break -->
+    <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
+    <!-- <div class="alert alert-warning" role="alert">
     <b>Note:</b> Match retrievals have temporarily been put on hold, they take too much
     bandwidth, maybe they'll come back in the future.
-  </div> -->
-
-  <!-- Break -->
-  <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
-
-  <!-- <div class="row"> -->
+</div> -->
+    <!-- Break -->
+    <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
+    <!-- <div class="row"> -->
     <!-- {% if current_user and changesteams %}
     {% for id, team in changesteams.items() %}
     <div class="col-sm">
@@ -165,8 +158,7 @@
       </div>
     </div>
     {% endfor %}
-    {% endif %} -->
-
+{% endif %} -->
     <!-- <div class="col-sm">
       <div class="card-deck">
         <div class="card">
@@ -193,12 +185,12 @@
         </div>
       </div>
     </div> -->
-  <!-- </div> -->
-
-  <!-- Break -->
-  <div class="row"><div class="col-sm"><p></p></div></div>
-
-</div>
-
-
+    <!-- </div> -->
+    <!-- Break -->
+    <div class="row">
+      <div class="col-sm">
+        <p></p>
+      </div>
+    </div>
+  </div>
 {% endblock %}

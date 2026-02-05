@@ -1,89 +1,90 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <div class="card card-custom">
-        <div class="card-header">
-          <h3 class="mb-0">Submit Feedback</h3>
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card card-custom">
+          <div class="card-header">
+            <h3 class="mb-0">Submit Feedback</h3>
+          </div>
+          <div class="card-body">
+            <!-- Flash Messages -->
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+              <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show"
+                   role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            {% endfor %}
+            <form method="POST" action="{{ url_for('feedback.new_feedback') }}">
+              <div class="form-group">
+                <label for="title" class="form-label">Title *</label>
+                <input type="text"
+                       class="form-control"
+                       id="title"
+                       name="title"
+                       maxlength="255"
+                       required
+                       value="{{ request.form.title or '' }}">
+                <small class="form-text text-muted">Brief, descriptive title for your feedback</small>
+              </div>
+              <div class="form-group">
+                <label for="feedback_type" class="form-label">Type *</label>
+                <select class="form-control" id="feedback_type" name="feedback_type" required>
+                  <option value="">Select feedback type</option>
+                  <option value="bug"
+                          {% if request.form.feedback_type == 'bug' %}selected{% endif %}>
+                    🐛 Bug Report - Something is broken
+                  </option>
+                  <option value="feature"
+                          {% if request.form.feedback_type == 'feature' %}selected{% endif %}>
+                    ✨ Feature Request - New functionality
+                  </option>
+                  <option value="idea"
+                          {% if request.form.feedback_type == 'idea' %}selected{% endif %}>
+                    💡 Idea - General improvement or suggestion
+                  </option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="description" class="form-label">Description *</label>
+                <textarea class="form-control"
+                          id="description"
+                          name="description"
+                          rows="6"
+                          required
+                          placeholder="Provide detailed information about your feedback...">{{ request.form.description or '' }}</textarea>
+                <small class="form-text text-muted">
+                  Please be specific and include steps to reproduce (for bugs) or use cases (for features)
+                </small>
+              </div>
+              <div class="d-flex justify-content-between">
+                <a href="{{ url_for('feedback.list_feedback') }}"
+                   class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary-custom">Submit Feedback</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div class="card-body">
-          <!-- Flash Messages -->
-          {% for category, message in get_flashed_messages(with_categories=true) %}
-            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-          {% endfor %}
-
-          <form method="POST" action="{{ url_for('feedback.new_feedback') }}">
-            <div class="form-group">
-              <label for="title" class="form-label">Title *</label>
-              <input type="text"
-                     class="form-control"
-                     id="title"
-                     name="title"
-                     maxlength="255"
-                     required
-                     value="{{ request.form.title or '' }}">
-              <small class="form-text text-muted">Brief, descriptive title for your feedback</small>
-            </div>
-
-            <div class="form-group">
-              <label for="feedback_type" class="form-label">Type *</label>
-              <select class="form-control" id="feedback_type" name="feedback_type" required>
-                <option value="">Select feedback type</option>
-                <option value="bug" {% if request.form.feedback_type == 'bug' %}selected{% endif %}>
-                  🐛 Bug Report - Something is broken
-                </option>
-                <option value="feature" {% if request.form.feedback_type == 'feature' %}selected{% endif %}>
-                  ✨ Feature Request - New functionality
-                </option>
-                <option value="idea" {% if request.form.feedback_type == 'idea' %}selected{% endif %}>
-                  💡 Idea - General improvement or suggestion
-                </option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="description" class="form-label">Description *</label>
-              <textarea class="form-control"
-                        id="description"
-                        name="description"
-                        rows="6"
-                        required
-                        placeholder="Provide detailed information about your feedback...">{{ request.form.description or '' }}</textarea>
-              <small class="form-text text-muted">
-                Please be specific and include steps to reproduce (for bugs) or use cases (for features)
-              </small>
-            </div>
-
-            <div class="d-flex justify-content-between">
-              <a href="{{ url_for('feedback.list_feedback') }}" class="btn btn-secondary">
-                Cancel
-              </a>
-              <button type="submit" class="btn btn-primary-custom">
-                Submit Feedback
-              </button>
-            </div>
-          </form>
+        <div class="mt-4">
+          <h5>Guidelines for Good Feedback</h5>
+          <ul class="text-muted small">
+            <li>
+              <strong>Bug Reports:</strong> Include steps to reproduce, expected vs actual behavior
+            </li>
+            <li>
+              <strong>Feature Requests:</strong> Explain the problem you're trying to solve
+            </li>
+            <li>
+              <strong>Ideas:</strong> Describe how it would improve your Hattrick experience
+            </li>
+            <li>Search existing feedback before submitting to avoid duplicates</li>
+            <li>Be respectful and constructive in your feedback</li>
+          </ul>
         </div>
-      </div>
-
-      <div class="mt-4">
-        <h5>Guidelines for Good Feedback</h5>
-        <ul class="text-muted small">
-          <li><strong>Bug Reports:</strong> Include steps to reproduce, expected vs actual behavior</li>
-          <li><strong>Feature Requests:</strong> Explain the problem you're trying to solve</li>
-          <li><strong>Ideas:</strong> Describe how it would improve your Hattrick experience</li>
-          <li>Search existing feedback before submitting to avoid duplicates</li>
-          <li>Be respectful and constructive in your feedback</li>
-        </ul>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}

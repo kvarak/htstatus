@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
-
 {% block scripts %}
-{{ super() }}
-<script>
+  {{ super() }}
+  <script>
 // Formation Tester with Drag & Drop JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     // Player assignments storage
@@ -219,8 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="col-8">
                         <div class="progress" style="height: 12px;">
-                            <div class="progress-bar ${colorClass}"
-                                 style="width: ${percentage}%">
+                            <div class="progress-bar ${colorClass}" style="width: ${percentage}%">
                                 <small style="font-size: 0.6rem; line-height: 12px;">${score.toFixed(1)}</small>
                             </div>
                         </div>
@@ -761,260 +759,317 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-</script>
+  </script>
 {% endblock %}
-
 {% block content %}
-
-<!-- Work in Progress Sticker -->
-<div class="wip-sticker">
-  <span>🚧 Work in Progress</span>
-</div>
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">{{ teamname }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-        </ol>
-      </nav>
+  <!-- Work in Progress Sticker -->
+  <div class="wip-sticker">
+    <span>🚧 Work in Progress</span>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="/">{{ teamname }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+          </ol>
+        </nav>
+      </div>
     </div>
-  </div>
-
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    {{ error }}
-  </div>
-  {% endif %}
-
-<!-- Two Column Layout: Formation Layout | Live Analysis -->
-  <div class="row mb-4">
-    {% if selected_formation and formation_templates[selected_formation] %}
-    <!-- Formation Interactive Field - Main Content -->
-    <div class="col-lg-8 col-md-7">
-      <div class="card-custom">
-        <div class="card-custom-header">
-          <p class="text-muted-custom mb-0 small">Drag & drop players between positions | Maximum 11 players (1 GK + 10 outfield)</p>
-        </div>
-        <div class="card-custom-body p-3">
-          <!-- Player Assignment Info -->
-          <div class="mb-3 text-center">
-            <span id="player-count-display" class="badge bg-primary text-white me-2">Players: 0/11</span>
-            <span id="formation-status" class="badge bg-info text-white">{{ selected_formation }}</span>
-          </div>
-
-          <!-- Football Pitch Visual -->
-          <div class="position-relative bg-success" style="background: linear-gradient(90deg, #228B22 0%, #32CD32 50%, #228B22 100%);
-                                                            border-radius: 8px; padding: 20px; min-height: 400px;">
-            <div class="text-center text-white">
-              <!-- Available Players Pool -->
-              <div class="mb-4">
-                <h6 class="mb-2">🏃 Available Players</h6>
-                <div id="player-pool" class="d-flex justify-content-center flex-wrap gap-2" style="min-height: 50px; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 10px;">
-                  {% for player in current_players %}
-                  <div class="position-player available-player"
-                       draggable="true"
-                       data-player-id="{{ player.ht_id }}"
-                       data-player-number="{{ player.number or '#' }}"
-                       data-player-name="{{ player.first_name }} {{ player.last_name }}"
-                       data-player-data='{"ht_id": {{ player.ht_id }}, "keeper": {{ player.keeper or 0 }}, "defender": {{ player.defender or 0 }}, "playmaker": {{ player.playmaker or 0 }}, "winger": {{ player.winger or 0 }}, "passing": {{ player.passing or 0 }}, "scorer": {{ player.scorer or 0 }}, "set_pieces": {{ player.set_pieces or 0 }}, "form": {{ player.form or 7 }}, "experience": {{ player.experience or 0 }}, "loyalty": {{ player.loyalty or 0 }}, "specialty": {{ player.specialty or 0 }}}'
-                       style="background: white; color: #333; padding: 4px 8px; border-radius: 4px; cursor: grab; font-size: 0.8rem; font-weight: bold;">
-                    {% if player.number %}
-                      #{{ player.number }}
-                    {% else %}
-                      {{ (player.first_name[:1] + player.last_name[:1]) if player.first_name and player.last_name else '?' }}
-                    {% endif %}
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    <!-- Two Column Layout: Formation Layout | Live Analysis -->
+    <div class="row mb-4">
+      {% if selected_formation and formation_templates[selected_formation] %}
+        <!-- Formation Interactive Field - Main Content -->
+        <div class="col-lg-8 col-md-7">
+          <div class="card-custom">
+            <div class="card-custom-header">
+              <p class="text-muted-custom mb-0 small">
+                Drag & drop players between positions | Maximum 11 players (1 GK + 10 outfield)
+              </p>
+            </div>
+            <div class="card-custom-body p-3">
+              <!-- Player Assignment Info -->
+              <div class="mb-3 text-center">
+                <span id="player-count-display" class="badge bg-primary text-white me-2">Players: 0/11</span>
+                <span id="formation-status" class="badge bg-info text-white">{{ selected_formation }}</span>
+              </div>
+              <!-- Football Pitch Visual -->
+              <div class="position-relative bg-success"
+                   style="background: linear-gradient(90deg, #228B22 0%, #32CD32 50%, #228B22 100%);
+                          border-radius: 8px;
+                          padding: 20px;
+                          min-height: 400px">
+                <div class="text-center text-white">
+                  <!-- Available Players Pool -->
+                  <div class="mb-4">
+                    <h6 class="mb-2">🏃 Available Players</h6>
+                    <div id="player-pool"
+                         class="d-flex justify-content-center flex-wrap gap-2"
+                         style="min-height: 50px;
+                                background: rgba(255,255,255,0.1);
+                                border-radius: 8px;
+                                padding: 10px">
+                      {% for player in current_players %}
+                        <div class="position-player available-player"
+                             draggable="true"
+                             data-player-id="{{ player.ht_id }}"
+                             data-player-number="{{ player.number or '#' }}"
+                             data-player-name="{{ player.first_name }} {{ player.last_name }}"
+                             data-player-data='{"ht_id": {{ player.ht_id }}, "keeper": {{ player.keeper or 0 }}, "defender": {{ player.defender or 0 }}, "playmaker": {{ player.playmaker or 0 }}, "winger": {{ player.winger or 0 }}, "passing": {{ player.passing or 0 }}, "scorer": {{ player.scorer or 0 }}, "set_pieces": {{ player.set_pieces or 0 }}, "form": {{ player.form or 7 }}, "experience": {{ player.experience or 0 }}, "loyalty": {{ player.loyalty or 0 }}, "specialty": {{ player.specialty or 0 }}}'
+                             style="background: white;
+                                    color: #333;
+                                    padding: 4px 8px;
+                                    border-radius: 4px;
+                                    cursor: grab;
+                                    font-size: 0.8rem;
+                                    font-weight: bold">
+                          {% if player.number %}
+                            #{{ player.number }}
+                          {% else %}
+                            {{ (player.first_name[:1] + player.last_name[:1]) if player.first_name and player.last_name else '?' }}
+                          {% endif %}
+                        </div>
+                      {% endfor %}
+                    </div>
                   </div>
+                  <!-- Formation Positions -->
+                  <div class="row justify-content-center">
+                    <!-- Goalkeeper Row -->
+                    <div class="col-12 mb-4">
+                      <div class="d-flex justify-content-center">
+                        <div class="position-slot goalkeeper-slot"
+                             data-position-id="100"
+                             data-position-name="Goalkeeper"
+                             data-position-type="GK"
+                             style="min-width: 80px;
+                                    min-height: 50px;
+                                    background: rgba(255,193,7,0.3);
+                                    border: 2px dashed rgba(255,193,7,0.6);
+                                    border-radius: 8px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin: 5px">
+                          <span class="position-label">GK</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Defenders Row (All 5 positions) -->
+                    <div class="col-12 mb-4">
+                      <div class="d-flex justify-content-center flex-wrap gap-2">
+                        <div class="position-slot defender-slot"
+                             data-position-id="101"
+                             data-position-name="Right Back"
+                             data-position-type="DEF"
+                             style="min-width: 60px;
+                                    min-height: 40px;
+                                    background: rgba(0,123,255,0.3);
+                                    border: 2px dashed rgba(0,123,255,0.6);
+                                    border-radius: 6px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin: 2px">
+                          <span class="position-label small">RB</span>
+                        </div>
+                        <div class="position-slot defender-slot"
+                             data-position-id="102"
+                             data-position-name="Right Centre Back"
+                             data-position-type="DEF">
+                          <span class="position-label small">RCB</span>
+                        </div>
+                        <div class="position-slot defender-slot"
+                             data-position-id="103"
+                             data-position-name="Centre Back"
+                             data-position-type="DEF">
+                          <span class="position-label small">CB</span>
+                        </div>
+                        <div class="position-slot defender-slot"
+                             data-position-id="104"
+                             data-position-name="Left Centre Back"
+                             data-position-type="DEF">
+                          <span class="position-label small">LCB</span>
+                        </div>
+                        <div class="position-slot defender-slot"
+                             data-position-id="105"
+                             data-position-name="Left Back"
+                             data-position-type="DEF">
+                          <span class="position-label small">LB</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Midfielders Row (All 5 positions) -->
+                    <div class="col-12 mb-4">
+                      <div class="d-flex justify-content-center flex-wrap gap-2">
+                        <div class="position-slot midfielder-slot"
+                             data-position-id="106"
+                             data-position-name="Right Winger"
+                             data-position-type="MID">
+                          <span class="position-label small">RW</span>
+                        </div>
+                        <div class="position-slot midfielder-slot"
+                             data-position-id="107"
+                             data-position-name="Right Inner Mid"
+                             data-position-type="MID">
+                          <span class="position-label small">RIM</span>
+                        </div>
+                        <div class="position-slot midfielder-slot"
+                             data-position-id="108"
+                             data-position-name="Centre Mid"
+                             data-position-type="MID">
+                          <span class="position-label small">CM</span>
+                        </div>
+                        <div class="position-slot midfielder-slot"
+                             data-position-id="109"
+                             data-position-name="Left Inner Mid"
+                             data-position-type="MID">
+                          <span class="position-label small">LIM</span>
+                        </div>
+                        <div class="position-slot midfielder-slot"
+                             data-position-id="110"
+                             data-position-name="Left Winger"
+                             data-position-type="MID">
+                          <span class="position-label small">LW</span>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- Forwards Row (All 3 positions) -->
+                    <div class="col-12">
+                      <div class="d-flex justify-content-center flex-wrap gap-2">
+                        <div class="position-slot forward-slot"
+                             data-position-id="111"
+                             data-position-name="Right Forward"
+                             data-position-type="FWD">
+                          <span class="position-label small">RF</span>
+                        </div>
+                        <div class="position-slot forward-slot"
+                             data-position-id="112"
+                             data-position-name="Centre Forward"
+                             data-position-type="FWD">
+                          <span class="position-label small">CF</span>
+                        </div>
+                        <div class="position-slot forward-slot"
+                             data-position-id="113"
+                             data-position-name="Left Forward"
+                             data-position-type="FWD">
+                          <span class="position-label small">LF</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Live Formation Analysis - Right Column -->
+        <div class="col-lg-4 col-md-5">
+          <div class="card-custom h-100">
+            <div class="card-custom-header">
+              <h6 class="card-custom-title mb-0">📊 Live Formation Analysis</h6>
+            </div>
+            <div class="card-custom-body p-3">
+              <div id="live-analysis">
+                <!-- Overall Rating -->
+                <div class="text-center p-3 bg-muted-custom rounded mb-3">
+                  <h3 class="text-primary-custom mb-1" id="overall-rating">0.0</h3>
+                  <p class="text-muted-custom mb-0 small">
+                    <strong>Overall Rating</strong>
+                  </p>
+                </div>
+                <!-- Position Effectiveness -->
+                <div>
+                  <h6 class="mb-2 small">Position Effectiveness</h6>
+                  <div id="position-analysis">
+                    <p class="text-muted-custom small text-center">Assign players to see analysis</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <!-- No Formation Selected State -->
+        <div class="col-12">
+          <div class="card-custom text-center p-5">
+            <h5 class="text-muted-custom mb-3">⚽ Select a Formation</h5>
+            <p class="text-muted-custom mb-4">Choose a formation to start building your lineup</p>
+            <form method="GET" action="/formations" class="d-inline">
+              <input type="hidden" name="id" value="{{ teamid }}">
+              <select name="formation"
+                      onchange="this.form.submit();"
+                      class="form-select form-select-lg mx-auto"
+                      style="max-width: 300px">
+                <option value="">Choose Formation...</option>
+                {% for formation in formation_list %}<option value="{{ formation.key }}">{{ formation.name }}</option>{% endfor %}
+              </select>
+            </form>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+    <!-- Analysis Results - Full Width when available -->
+    {% if formation_analysis %}
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card-custom">
+            <div class="card-custom-header">
+              <h5 class="card-custom-title">📈 Formation Analysis Results</h5>
+            </div>
+            <div class="card-custom-body">
+              <div class="row">
+                <!-- Overall Rating -->
+                <div class="col-lg-3 col-md-4 mb-4">
+                  <div class="text-center p-4 bg-muted-custom rounded">
+                    <h2 class="text-primary-custom mb-2">{{ "%.1f"|format(formation_analysis.average_score) }}</h2>
+                    <p class="text-muted-custom mb-0">
+                      <strong>Overall Rating</strong>
+                    </p>
+                    <small class="text-muted-custom">out of 20.0</small>
+                  </div>
+                </div>
+                <!-- Position Effectiveness -->
+                <div class="col-lg-9 col-md-8">
+                  <h6 class="mb-3">Position Effectiveness</h6>
+                  {% for position_id, score_data in formation_analysis.position_scores.items() %}
+                    <div class="row align-items-center mb-3">
+                      <div class="col-md-4">
+                        <span class="badge {% if position_id == 100 %}bg-warning text-dark{% elif position_id <= 105 %}bg-primary{% elif position_id <= 110 %}bg-info{% else %}bg-danger{% endif %} me-2">
+                          {{ position_id }}
+                        </span>
+                        <strong>{{ score_data.position_name }}</strong>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="progress" style="height: 20px;">
+                          <div class="progress-bar {% if score_data.contribution >= 12 %}bg-success{% elif score_data.contribution >= 8 %}bg-warning{% else %}bg-danger{% endif %}"
+                               style="width: {% if score_data.contribution > 0 %}{{ (score_data.contribution / 20) * 100 }}{% else %}5{% endif %}%">
+                            <small class="text-white"><strong>{{ "%.1f"|format(score_data.contribution) }}</strong></small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-2 text-end">
+                        <small class="text-muted-custom">
+                          {% if score_data.contribution >= 12 %}
+                            <span class="text-success-custom">Excellent</span>
+                          {% elif score_data.contribution >= 8 %}
+                            <span class="text-warning-custom">Good</span>
+                          {% else %}
+                            <span class="text-destructive-custom">Poor</span>
+                          {% endif %}
+                        </small>
+                      </div>
+                    </div>
                   {% endfor %}
                 </div>
               </div>
-
-              <!-- Formation Positions -->
-              <div class="row justify-content-center">
-                <!-- Goalkeeper Row -->
-                <div class="col-12 mb-4">
-                  <div class="d-flex justify-content-center">
-                    <div class="position-slot goalkeeper-slot"
-                         data-position-id="100"
-                         data-position-name="Goalkeeper"
-                         data-position-type="GK"
-                         style="min-width: 80px; min-height: 50px; background: rgba(255,193,7,0.3); border: 2px dashed rgba(255,193,7,0.6); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 5px;">
-                      <span class="position-label">GK</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Defenders Row (All 5 positions) -->
-                <div class="col-12 mb-4">
-                  <div class="d-flex justify-content-center flex-wrap gap-2">
-                    <div class="position-slot defender-slot" data-position-id="101" data-position-name="Right Back" data-position-type="DEF"
-                         style="min-width: 60px; min-height: 40px; background: rgba(0,123,255,0.3); border: 2px dashed rgba(0,123,255,0.6); border-radius: 6px; display: flex; align-items: center; justify-content: center; margin: 2px;">
-                      <span class="position-label small">RB</span>
-                    </div>
-                    <div class="position-slot defender-slot" data-position-id="102" data-position-name="Right Centre Back" data-position-type="DEF">
-                      <span class="position-label small">RCB</span>
-                    </div>
-                    <div class="position-slot defender-slot" data-position-id="103" data-position-name="Centre Back" data-position-type="DEF">
-                      <span class="position-label small">CB</span>
-                    </div>
-                    <div class="position-slot defender-slot" data-position-id="104" data-position-name="Left Centre Back" data-position-type="DEF">
-                      <span class="position-label small">LCB</span>
-                    </div>
-                    <div class="position-slot defender-slot" data-position-id="105" data-position-name="Left Back" data-position-type="DEF">
-                      <span class="position-label small">LB</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Midfielders Row (All 5 positions) -->
-                <div class="col-12 mb-4">
-                  <div class="d-flex justify-content-center flex-wrap gap-2">
-                    <div class="position-slot midfielder-slot" data-position-id="106" data-position-name="Right Winger" data-position-type="MID">
-                      <span class="position-label small">RW</span>
-                    </div>
-                    <div class="position-slot midfielder-slot" data-position-id="107" data-position-name="Right Inner Mid" data-position-type="MID">
-                      <span class="position-label small">RIM</span>
-                    </div>
-                    <div class="position-slot midfielder-slot" data-position-id="108" data-position-name="Centre Mid" data-position-type="MID">
-                      <span class="position-label small">CM</span>
-                    </div>
-                    <div class="position-slot midfielder-slot" data-position-id="109" data-position-name="Left Inner Mid" data-position-type="MID">
-                      <span class="position-label small">LIM</span>
-                    </div>
-                    <div class="position-slot midfielder-slot" data-position-id="110" data-position-name="Left Winger" data-position-type="MID">
-                      <span class="position-label small">LW</span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Forwards Row (All 3 positions) -->
-                <div class="col-12">
-                  <div class="d-flex justify-content-center flex-wrap gap-2">
-                    <div class="position-slot forward-slot" data-position-id="111" data-position-name="Right Forward" data-position-type="FWD">
-                      <span class="position-label small">RF</span>
-                    </div>
-                    <div class="position-slot forward-slot" data-position-id="112" data-position-name="Centre Forward" data-position-type="FWD">
-                      <span class="position-label small">CF</span>
-                    </div>
-                    <div class="position-slot forward-slot" data-position-id="113" data-position-name="Left Forward" data-position-type="FWD">
-                      <span class="position-label small">LF</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Live Formation Analysis - Right Column -->
-    <div class="col-lg-4 col-md-5">
-      <div class="card-custom h-100">
-        <div class="card-custom-header">
-          <h6 class="card-custom-title mb-0">📊 Live Formation Analysis</h6>
-        </div>
-        <div class="card-custom-body p-3">
-          <div id="live-analysis">
-            <!-- Overall Rating -->
-            <div class="text-center p-3 bg-muted-custom rounded mb-3">
-              <h3 class="text-primary-custom mb-1" id="overall-rating">0.0</h3>
-              <p class="text-muted-custom mb-0 small"><strong>Overall Rating</strong></p>
-            </div>
-
-            <!-- Position Effectiveness -->
-            <div>
-              <h6 class="mb-2 small">Position Effectiveness</h6>
-              <div id="position-analysis">
-                <p class="text-muted-custom small text-center">Assign players to see analysis</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% else %}
-    <!-- No Formation Selected State -->
-    <div class="col-12">
-      <div class="card-custom text-center p-5">
-        <h5 class="text-muted-custom mb-3">⚽ Select a Formation</h5>
-        <p class="text-muted-custom mb-4">Choose a formation to start building your lineup</p>
-        <form method="GET" action="/formations" class="d-inline">
-          <input type="hidden" name="id" value="{{ teamid }}">
-          <select name="formation" onchange="this.form.submit();" class="form-select form-select-lg mx-auto" style="max-width: 300px;">
-            <option value="">Choose Formation...</option>
-            {% for formation in formation_list %}
-            <option value="{{ formation.key }}">{{ formation.name }}</option>
-            {% endfor %}
-          </select>
-        </form>
-      </div>
-    </div>
     {% endif %}
   </div>
-
-  <!-- Analysis Results - Full Width when available -->
-  {% if formation_analysis %}
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card-custom">
-        <div class="card-custom-header">
-          <h5 class="card-custom-title">📈 Formation Analysis Results</h5>
-        </div>
-        <div class="card-custom-body">
-          <div class="row">
-            <!-- Overall Rating -->
-            <div class="col-lg-3 col-md-4 mb-4">
-              <div class="text-center p-4 bg-muted-custom rounded">
-                <h2 class="text-primary-custom mb-2">{{ "%.1f"|format(formation_analysis.average_score) }}</h2>
-                <p class="text-muted-custom mb-0"><strong>Overall Rating</strong></p>
-                <small class="text-muted-custom">out of 20.0</small>
-              </div>
-            </div>
-
-            <!-- Position Effectiveness -->
-            <div class="col-lg-9 col-md-8">
-              <h6 class="mb-3">Position Effectiveness</h6>
-              {% for position_id, score_data in formation_analysis.position_scores.items() %}
-              <div class="row align-items-center mb-3">
-                <div class="col-md-4">
-                  <span class="badge {% if position_id == 100 %}bg-warning text-dark{% elif position_id <= 105 %}bg-primary{% elif position_id <= 110 %}bg-info{% else %}bg-danger{% endif %} me-2">
-                    {{ position_id }}
-                  </span>
-                  <strong>{{ score_data.position_name }}</strong>
-                </div>
-                <div class="col-md-6">
-                  <div class="progress" style="height: 20px;">
-                    <div class="progress-bar {% if score_data.contribution >= 12 %}bg-success{% elif score_data.contribution >= 8 %}bg-warning{% else %}bg-danger{% endif %}"
-                         style="width: {% if score_data.contribution > 0 %}{{ (score_data.contribution / 20) * 100 }}{% else %}5{% endif %}%">
-                      <small class="text-white"><strong>{{ "%.1f"|format(score_data.contribution) }}</strong></small>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2 text-end">
-                  <small class="text-muted-custom">
-                    {% if score_data.contribution >= 12 %}
-                    <span class="text-success-custom">Excellent</span>
-                    {% elif score_data.contribution >= 8 %}
-                    <span class="text-warning-custom">Good</span>
-                    {% else %}
-                    <span class="text-destructive-custom">Poor</span>
-                    {% endif %}
-                  </small>
-                </div>
-              </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {% endif %}
-
-
-
-</div>
 {% endblock %}

@@ -1,24 +1,22 @@
 {% extends 'bootstrap/base.html' %}
-
 ##########################
 ## Styling
 ##########################
 {% block styles %}
-
-<meta charset="utf-8">
-<link rel="icon" href="{{url_for('static', filename='ico.jpg')}}">
-<link rel="manifest" href="{{url_for('static', filename='manifest.json')}}">
-<meta name="theme-color" content="#1f2937">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="app-version" content="{{ version }}">
-
-<!-- Bootstrap: Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-
-<!-- HattrickPlanner Component Styles -->
-<link rel="stylesheet" href="{{url_for('static', filename='css/components.css')}}">
-
-<style>
+  <meta charset="utf-8">
+  <link rel="icon" href="{{ url_for('static', filename='ico.jpg') }}">
+  <link rel="manifest"
+        href="{{ url_for('static', filename='manifest.json') }}">
+  <meta name="theme-color" content="#1f2937">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="app-version" content="{{ version }}">
+  <!-- Bootstrap: Latest compiled and minified CSS -->
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <!-- HattrickPlanner Component Styles -->
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/components.css') }}">
+  <style>
   /* ========================================
      HattrickPlanner Design System
      Football-themed unified design tokens
@@ -549,19 +547,22 @@
     font-size: 14px;
   }
 
-</style>
+  </style>
 {% endblock %}
-
 ##########################
 ## Java script
 ##########################
 {% block scripts %}
-
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
-
-<script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+          integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+          crossorigin="anonymous"></script>
+  <script>
 $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
@@ -569,28 +570,26 @@ $(function () {
 // Fix undefined option variable - initialize toasts properly
 $('.toast').toast('show')
 
-</script>
-
-<script src="{{url_for('static', filename='sorttable.js')}}"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="{{url_for('static', filename='Sortable.js')}}"></script>
-
-<!-- https://jsuites.net/v3/color-picker -->
-<link rel="stylesheet" href="{{url_for('static', filename='jsuites.css')}}" media="screen">
-<script type="text/javascript" src="{{url_for('static', filename='jsuites.js')}}"></script>
-
-<!-- PWA Session Persistence -->
-<script src="{{url_for('static', filename='js/session-persistence.js')}}"></script>
-
-<!-- Chart.js Utilities -->
-<script src="{{url_for('static', filename='js/chart-utils.js')}}"></script>
-
-<!-- Intro.js Tutorial Library -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
-<script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
-
-<!-- Tutorial Custom Styles - Must load AFTER intro.js CSS -->
-<style>
+  </script>
+  <script src="{{url_for('static', filename='sorttable.js')}}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="{{url_for('static', filename='Sortable.js')}}"></script>
+  <!-- https://jsuites.net/v3/color-picker -->
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='jsuites.css') }}"
+        media="screen">
+  <script type="text/javascript"
+          src="{{url_for('static', filename='jsuites.js')}}"></script>
+  <!-- PWA Session Persistence -->
+  <script src="{{url_for('static', filename='js/session-persistence.js')}}"></script>
+  <!-- Chart.js Utilities -->
+  <script src="{{url_for('static', filename='js/chart-utils.js')}}"></script>
+  <!-- Intro.js Tutorial Library -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+  <!-- Tutorial Custom Styles - Must load AFTER intro.js CSS -->
+  <style>
 /* Tutorial System Overrides - Maximum specificity to override intro.js defaults */
 .introjs-tooltip.introjs-custom-tooltip {
     max-width: 400px !important;
@@ -672,20 +671,18 @@ $('.toast').toast('show')
     border-radius: 0.25rem !important;
     box-shadow: 0 0 0 4px hsla(120, 70%, 45%, 0.3) !important;
 }
-</style>
-
-<!-- Tutorial Manager -->
-<script src="{{url_for('static', filename='js/tutorial-manager.js')}}"></script>
-
-<script type="text/javascript">// <![CDATA[
+  </style>
+  <!-- Tutorial Manager -->
+  <script src="{{url_for('static', filename='js/tutorial-manager.js')}}"></script>
+  <script type="text/javascript">// <![CDATA[
   function loading(){
     $("#loading").show();
     $("#content").hide();
   }
-// ]]></script>
-
-<!-- PWA Service Worker Registration -->
-<script>
+// ]]>
+  </script>
+  <!-- PWA Service Worker Registration -->
+  <script>
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/static/sw.js')
@@ -733,95 +730,123 @@ window.addEventListener('beforeinstallprompt', (e) => {
     });
   }
 });
-</script>
-
+  </script>
 {% endblock %}
-
 ##########################
 ## Navbar
 ##########################
 {% block navbar %}
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-    <ul class="navbar-nav" id="navbar-authenticated">
-      <li>
-        <img height="30" src="{{url_for('static', filename='chpp.png')}}">&nbsp;&nbsp;&nbsp;
-      </li>
-      <li class="nav-item active">
-        <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        {% if all_teams %}
-        {% for team in range(all_teams|length) %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbar-team-dropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            {{ all_team_names[team-1] }}
-          </a>
-          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team-1] }}">Team</a> -->
-            <a id="navbar-players-link" class="dropdown-item" href="/player?id={{ all_teams[team-1] }}" onclick="loading();">Players</a>
-            <a class="dropdown-item" href="/formations?id={{ all_teams[team-1] }}" onclick="loading();">Formations</a>
-            <!-- <a class="dropdown-item" href="/matches?id={{ all_teams[team-1] }}" onclick="loading();">Matches</a> -->
-            <a id="navbar-training-link" class="dropdown-item" href="/training?id={{ all_teams[team-1] }}" onclick="loading();">Training</a>
-            <a id="navbar-stats-link" class="dropdown-item" href="/stats?id={{ all_teams[team-1] }}" onclick="loading();">Statistics</a>
-          </div>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav" id="navbar-authenticated">
+        <li>
+          <img height="30" src="{{ url_for('static', filename='chpp.png') }}">
+          &nbsp;&nbsp;&nbsp;
         </li>
-        {% endfor %}
-        <a id="navbar-update-link" class="nav-link" href="/update" onclick="loading();">Update data</a>
-        <a id="navbar-settings-link" class="nav-link" href="/settings" onclick="loading();">Settings</a>
-        <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
-        {% if role == "Admin" %}
-        <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
-        {% endif %}
-        <!-- Disable feedback for now
+        <li class="nav-item active">
+          <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          {% if all_teams %}
+            {% for team in range(all_teams|length) %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="navbar-team-dropdown"
+                   role="button"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">{{ all_team_names[team-1] }}</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team-1] }}">Team</a> -->
+                  <a id="navbar-players-link"
+                     class="dropdown-item"
+                     href="/player?id={{ all_teams[team-1] }}"
+                     onclick="loading();">Players</a>
+                  <a class="dropdown-item"
+                     href="/formations?id={{ all_teams[team-1] }}"
+                     onclick="loading();">Formations</a>
+                  <a id="navbar-matches-link"
+                     class="dropdown-item"
+                     href="/matches?id={{ all_teams[team-1] }}"
+                     onclick="loading();">Matches</a>
+                  <a id="navbar-training-link"
+                     class="dropdown-item"
+                     href="/training?id={{ all_teams[team-1] }}"
+                     onclick="loading();">Training</a>
+                  <a id="navbar-stats-link"
+                     class="dropdown-item"
+                     href="/stats?id={{ all_teams[team-1] }}"
+                     onclick="loading();">Statistics</a>
+                </div>
+              </li>
+            {% endfor %}
+            <a id="navbar-update-link"
+               class="nav-link"
+               href="/update"
+               onclick="loading();">Update data</a>
+            <a id="navbar-settings-link"
+               class="nav-link"
+               href="/settings"
+               onclick="loading();">Settings</a>
+            <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
+            {% if role == "Admin" %}<a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>{% endif %}
+            <!-- Disable feedback for now
         {% if admin_feedback_counts and (admin_feedback_counts.no_replies > 0 or admin_feedback_counts.needs_followup > 0) %}
         <a class="nav-link" href="/feedback" onclick="loading();">Feedback ({{ admin_feedback_counts.no_replies }} unanswered / {{ admin_feedback_counts.needs_followup }} new replies)</a>
         {% else %}
         <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
         {% endif %}
         -->
-      {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+          {% endif %}
         </li>
-      {% endif %}
-    </li>
-    </ul>
-  </div>
-</nav>
-
-<!-- PWA Install Button and Session Persistence -->
-<button id="install-pwa" title="Install HTStatus as an app" style="display: none;">
-  📱 Install App
-</button>
-
-<!-- Password Migration Notice -->
-{% if password_migration_needed %}
-<div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin: 20px;">
-  <h5 class="alert-heading">⚠️ Password Security Update Required</h5>
-  <p>Your password needs to be updated for enhanced security.</p>
-  <p><strong>Action required:</strong> <a href="/login/oauth" class="alert-link btn btn-warning">Re-authenticate with Hattrick to update password</a></p>
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-</div>
-{% endif %}
-
-<div class="container"{% if current_user %} data-current-user="{{ current_user }}"{% endif %}>
-  <div class="row">
-    <div class="col-sm"><p></p>
+      </ul>
+    </div>
+  </nav>
+  <!-- PWA Install Button and Session Persistence -->
+  <button id="install-pwa"
+          title="Install HTStatus as an app"
+          style="display: none">📱 Install App</button>
+  <!-- Password Migration Notice -->
+  {% if password_migration_needed %}
+    <div class="alert alert-warning alert-dismissible fade show"
+         role="alert"
+         style="margin: 20px">
+      <h5 class="alert-heading">⚠️ Password Security Update Required</h5>
+      <p>Your password needs to be updated for enhanced security.</p>
+      <p>
+        <strong>Action required:</strong> <a href="/login/oauth" class="alert-link btn btn-warning">Re-authenticate with Hattrick to update password</a>
+      </p>
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endif %}
+  <div class="container"
+       {% if current_user %}data-current-user="{{ current_user }}"{% endif %}>
+    <div class="row">
+      <div class="col-sm">
+        <p></p>
+      </div>
     </div>
   </div>
-</div>
-
-<!-- <div class="parent">
+  <!-- <div class="parent">
   <h8 class="ribbon">Beta version {{ version }}</h8>
 </div> -->
-
-<div class="loader" id="loading"><img src="{{url_for('static', filename='soccer_ball.png')}}" width="100"></div>
-
+  <div class="loader" id="loading">
+    <img src="{{ url_for('static', filename='soccer_ball.png') }}" width="100">
+  </div>
 {% endblock %}

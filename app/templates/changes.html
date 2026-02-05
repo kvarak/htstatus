@@ -1,52 +1,48 @@
 {% extends 'base.html' %}
-
 {% block content %}
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-        </ol>
-      </nav>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="{{ url_for('main.index') }}">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+          </ol>
+        </nav>
+      </div>
     </div>
-  </div>
-
-  <div class="row">
-    <div class="col-sm">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">
-            <i class="fas fa-code-branch"></i> Changes & Development History
-          </h5>
-          <p class="card-text text-muted">
-            Complete timeline of all changes, features, and improvements to HattrickPlanner.
-            <strong class="text-success">🎉 User Releases</strong> highlight features that directly improve your experience.
-            <strong class="text-info">🔧 Technical Releases</strong> show behind-the-scenes improvements and infrastructure updates.
-          </p>
-
-          <div class="mb-3">
-            <button id="toggleAllBtn" class="btn btn-sm btn-outline-secondary" onclick="toggleAllCommits()">
-              <i class="fas fa-expand-arrows-alt"></i> <span id="toggleAllText">Expand All</span>
-            </button>
-            <small class="text-muted ml-2">Click technical releases to show/hide individual commit details</small>
-          </div>
-
-          <hr>
-          <div class="text-sm13">
-            {% for c in changelogfull %}
-            {{ c|safe }}
-            {% endfor %}
+    <div class="row">
+      <div class="col-sm">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-code-branch"></i> Changes & Development History
+            </h5>
+            <p class="card-text text-muted">
+              Complete timeline of all changes, features, and improvements to HattrickPlanner.
+              <strong class="text-success">🎉 User Releases</strong> highlight features that directly improve your experience.
+              <strong class="text-info">🔧 Technical Releases</strong> show behind-the-scenes improvements and infrastructure updates.
+            </p>
+            <div class="mb-3">
+              <button id="toggleAllBtn"
+                      class="btn btn-sm btn-outline-secondary"
+                      onclick="toggleAllCommits()">
+                <i class="fas fa-expand-arrows-alt"></i> <span id="toggleAllText">Expand All</span>
+              </button>
+              <small class="text-muted ml-2">Click technical releases to show/hide individual commit details</small>
+            </div>
+            <hr>
+            <div class="text-sm13">
+              {% for c in changelogfull %}{{ c|safe }}{% endfor %}
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
-<script>
+  <script>
 // Interactive collapse/expand of commits under technical releases
 function toggleCommits(releaseId) {
     const commits = document.querySelectorAll(`.commit-group-${releaseId}`);
@@ -181,6 +177,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize the toggle button state
     updateToggleButtonState();
 });
-</script>
-
+  </script>
 {% endblock %}

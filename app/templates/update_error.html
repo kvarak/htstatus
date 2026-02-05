@@ -1,127 +1,108 @@
 {% extends 'base.html' %}
-
-{% block scripts %}
-{{ super() }}
+{% block scripts %}{{ super() }}{% endblock %}
 {% endblock %}
-{% endblock %}
-
 {% block content %}
-
-<div class="update-content">
-  <div class="container">
-    <!-- Breadcrumb/Title -->
-    <div class="page-title-box">
-      <nav aria-label="breadcrumb" class="mb-0">
-        <ol class="breadcrumb" style="background: transparent; padding: 0; margin: 0;">
-          <li class="breadcrumb-item active">{{ title }}</li>
-        </ol>
-      </nav>
-    </div>
-
-    <!-- Status Messages -->
-    {% if error %}
-      <div class="status-message status-error">
-        <strong>{{ error }}</strong>
-        <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">{{ timenow }} • {{ fullversion }}</p>
+  <div class="update-content">
+    <div class="container">
+      <!-- Breadcrumb/Title -->
+      <div class="page-title-box">
+        <nav aria-label="breadcrumb" class="mb-0">
+          <ol class="breadcrumb"
+              style="background: transparent;
+                     padding: 0;
+                     margin: 0">
+            <li class="breadcrumb-item active">{{ title }}</li>
+          </ol>
+        </nav>
       </div>
-    {% else %}
-      <div class="status-message status-success">
-        ✓ Data downloaded successfully
-      </div>
-    {% endif %}
-
-    <!-- Players Left -->
-    {% if left_players %}
-      {% for pl in left_players %}
-        <div class="status-message status-warning">
-          ⚠ {{ pl[1] }} is no longer in {{ pl[0] }}
+      <!-- Status Messages -->
+      {% if error %}
+        <div class="status-message status-error">
+          <strong>{{ error }}</strong>
+          <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">{{ timenow }} • {{ fullversion }}</p>
         </div>
-      {% endfor %}
-    {% endif %}
-
-    <!-- New Players -->
-    {% if new_players %}
-      {% for pl in new_players %}
-        <div class="status-message status-success">
-          ✓ {{ pl[1] }} is now playing for {{ pl[0] }}
-        </div>
-      {% endfor %}
-    {% endif %}
-
-    <!-- Changes Report -->
-    {% if not(error) %}
-      {% if updated %}
-        <!-- Updated Teams -->
-        <div class="updated-teams-box">
-          {% for key, value in updated.items() %}
-            <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-              <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ value[0] }}:</span>
-              <a href="{{ value[1] }}" class="team-link">{{ value[2] }}</a>
-            </p>
-          {% endfor %}
-        </div>
-
-        <hr class="divider">
-
-        <!-- Changes Container -->
-        {% if changes_week or changes_day %}
-          <div class="changes-container">
-            <div class="changes-container-title">Changes</div>
-
-            <!-- Changes Since Yesterday -->
-            {% if changes_day %}
-              <div class="changes-section">
-                <div class="changes-section-label">Since yesterday (or previous update)</div>
-                <div class="changes-box">
-                  {% for cplayer in changes_day %}
-                    <div class="player-entry">
-                      <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
-                      {% for c in cplayer[1:] %}
-                        <div class="skill-item">
-                          {% if c[5] > c[4] %}
-                            <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                          {% else %}
-                            <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                          {% endif %}
-                        </div>
-                      {% endfor %}
-                    </div>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endif %}
-
-            <!-- Changes Since One Week Ago -->
-            {% if changes_week %}
-              <div class="changes-section">
-                <div class="changes-section-label">Since a week ago (or earlier)</div>
-                <div class="changes-box">
-                  {% for cplayer in changes_week %}
-                    <div class="player-entry">
-                      <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
-                      {% for c in cplayer[1:] %}
-                        <div class="skill-item">
-                          {% if c[5] > c[4] %}
-                            <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                          {% else %}
-                            <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                          {% endif %}
-                        </div>
-                      {% endfor %}
-                    </div>
-                  {% endfor %}
-                </div>
-              </div>
-            {% else %}
-              {% if not changes_day %}
-                <div class="empty-state">No player changes recorded</div>
-              {% endif %}
-            {% endif %}
+      {% else %}
+        <div class="status-message status-success">✓ Data downloaded successfully</div>
+      {% endif %}
+      <!-- Players Left -->
+      {% if left_players %}
+        {% for pl in left_players %}
+          <div class="status-message status-warning">⚠ {{ pl[1] }} is no longer in {{ pl[0] }}</div>
+        {% endfor %}
+      {% endif %}
+      <!-- New Players -->
+      {% if new_players %}
+        {% for pl in new_players %}
+          <div class="status-message status-success">✓ {{ pl[1] }} is now playing for {{ pl[0] }}</div>
+        {% endfor %}
+      {% endif %}
+      <!-- Changes Report -->
+      {% if not(error) %}
+        {% if updated %}
+          <!-- Updated Teams -->
+          <div class="updated-teams-box">
+            {% for key, value in updated.items() %}
+              <p style="margin: 0.5rem 0; font-size: 0.9rem;">
+                <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ value[0] }}:</span>
+                <a href="{{ value[1] }}" class="team-link">{{ value[2] }}</a>
+              </p>
+            {% endfor %}
           </div>
+          <hr class="divider">
+          <!-- Changes Container -->
+          {% if changes_week or changes_day %}
+            <div class="changes-container">
+              <div class="changes-container-title">Changes</div>
+              <!-- Changes Since Yesterday -->
+              {% if changes_day %}
+                <div class="changes-section">
+                  <div class="changes-section-label">Since yesterday (or previous update)</div>
+                  <div class="changes-box">
+                    {% for cplayer in changes_day %}
+                      <div class="player-entry">
+                        <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
+                        {% for c in cplayer[1:] %}
+                          <div class="skill-item">
+                            {% if c[5] > c[4] %}
+                              <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                            {% else %}
+                              <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+              <!-- Changes Since One Week Ago -->
+              {% if changes_week %}
+                <div class="changes-section">
+                  <div class="changes-section-label">Since a week ago (or earlier)</div>
+                  <div class="changes-box">
+                    {% for cplayer in changes_week %}
+                      <div class="player-entry">
+                        <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
+                        {% for c in cplayer[1:] %}
+                          <div class="skill-item">
+                            {% if c[5] > c[4] %}
+                              <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                            {% else %}
+                              <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
+                            {% endif %}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% else %}
+                {% if not changes_day %}<div class="empty-state">No player changes recorded</div>{% endif %}
+              {% endif %}
+            </div>
+          {% endif %}
         {% endif %}
       {% endif %}
-    {% endif %}
+    </div>
   </div>
-</div>
-
 {% endblock %}

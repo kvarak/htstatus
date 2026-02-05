@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
-
 {% block scripts %}
-{{ super() }}
-
-<script>
+  {{ super() }}
+  <script>
   // Initialize data for skill charts using HattrickCharts utility
   const playerCharts = {};
   const skillNames = ['Keeper', 'Defender', 'Playmaker', 'Winger', 'Passing', 'Scoring', 'Set Pieces'];
@@ -101,293 +99,325 @@
       selectPlayer({{ allplayerids[0] }});
     {% endif %}
   });
-</script>
-
+  </script>
 {% endblock %}
-
 {% block content %}
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/">{{ teamname }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-        </ol>
-      </nav>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="/">{{ teamname }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+          </ol>
+        </nav>
+      </div>
     </div>
-  </div>
-
-  {% if error %}
-  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ error }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endif %}
-
-  <!-- Main Content Grid -->
-  <div class="row g-4">
-    <!-- Player List Sidebar -->
-    <div class="col-12 col-lg-3">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title mb-0">Players</h5>
-        </div>
-        <div class="card-body">
-          <div class="player-list" style="max-height: 500px; overflow-y: auto;">
-            {% if allplayerids %}
-              {% for ht_id in allplayerids %}
-              <button
-                type="button"
-                class="w-100 btn btn-sm btn-outline-primary text-start mb-2 p-2 d-flex justify-content-between align-items-center"
-                id="playerItem{{ ht_id }}"
-                data-player-item
-                onclick="selectPlayer({{ ht_id }})"
-                style="border-radius: 0.375rem;"
-              >
-                <span class="small fw-semibold text-truncate">{{ playernames[ht_id] }}</span>
-                {% if increases.get(ht_id) %}
-                  <span class="badge {% if increases[ht_id] > 0 %}bg-success{% else %}bg-danger{% endif %} text-white ms-2 flex-shrink-0">
-                    {% if increases[ht_id] > 0 %}+{% endif %}{{ increases[ht_id] }}
-                  </span>
-                {% endif %}
-              </button>
-              {% endfor %}
-            {% else %}
-            <p class="text-muted small">No players recorded</p>
-            {% endif %}
+    {% if error %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ error }}
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"></button>
+      </div>
+    {% endif %}
+    <!-- Main Content Grid -->
+    <div class="row g-4">
+      <!-- Player List Sidebar -->
+      <div class="col-12 col-lg-3">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title mb-0">Players</h5>
+          </div>
+          <div class="card-body">
+            <div class="player-list" style="max-height: 500px; overflow-y: auto;">
+              {% if allplayerids %}
+                {% for ht_id in allplayerids %}
+                  <button type="button"
+                          class="w-100 btn btn-sm btn-outline-primary text-start mb-2 p-2 d-flex justify-content-between align-items-center"
+                          id="playerItem{{ ht_id }}"
+                          data-player-item
+                          onclick="selectPlayer({{ ht_id }})"
+                          style="border-radius: 0.375rem">
+                    <span class="small fw-semibold text-truncate">{{ playernames[ht_id] }}</span>
+                    {% if increases.get(ht_id) %}
+                      <span class="badge {% if increases[ht_id] > 0 %}bg-success{% else %}bg-danger{% endif %} text-white ms-2 flex-shrink-0">
+                        {% if increases[ht_id] > 0 %}+{% endif %}
+                        {{ increases[ht_id] }}
+                      </span>
+                    {% endif %}
+                  </button>
+                {% endfor %}
+              {% else %}
+                <p class="text-muted small">No players recorded</p>
+              {% endif %}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Player Details -->
-    <div class="col-12 col-lg-9">
-      <div class="row g-4">
-        {% for ht_id in allplayerids %}
-        <div class="col-12" id="playerCard{{ ht_id }}" data-player-card style="display: none;">
-          <!-- Player Overview -->
-          <div class="row g-4 mb-4">
-            {% if allplayers[ht_id] %}
-              {% set latest = allplayers[ht_id][-1] %}
-              {% set earliest = allplayers[ht_id][0] %}
-
-              <!-- Player Info -->
-              <div class="col-md-6">
-                <div class="card">
-                  <div class="card-header">
-                    <h6 class="mb-0">{{ playernames[ht_id] }}</h6>
-                  </div>
-                  <div class="card-body p-2">
-                    <table class="table-custom">
-                      <tbody>
-                        <tr style="height: 25px;">
-                          <td class="text-small"></td>
-                          <td class="text-small text-center"><strong>{{ earliest[0].strftime('%Y-%m-%d') }}</strong></td>
-                          <td class="text-small text-center"><strong>Current</strong></td>
-                        </tr>
-                        {% if player_info[ht_id] and player_info[ht_id]['first'] and player_info[ht_id]['latest'] %}
-                        {% set first_player = player_info[ht_id]['first'] %}
-                        {% set latest_player = player_info[ht_id]['latest'] %}
-                        <tr style="height: 25px;">
-                          <td class="text-small"><strong>Age</strong></td>
-                          <td class="text-small text-center">{{ first_player.age_years }}y {{ first_player.age_days }}d</td>
-                          <td class="text-small text-center">{{ latest_player.age_years }}y {{ latest_player.age_days }}d</td>
-                        </tr>
-                        <tr style="height: 25px;">
-                          <td class="text-small"><strong>TSI</strong></td>
-                          <td class="text-small text-center">{{ first_player.tsi|default(0) }}</td>
-                          <td class="text-small text-center">
-                            {% set tsi_change = latest_player.tsi - first_player.tsi %}
-                            <span class="{% if tsi_change > 0 %}text-success{% elif tsi_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                              {{ latest_player.tsi|default(0) }}
-                              {% if tsi_change != 0 %}({% if tsi_change > 0 %}+{% endif %}{{ tsi_change }}){% endif %}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr style="height: 25px;">
-                          <td class="text-small"><strong>Salary</strong></td>
-                          <td class="text-small text-center">{{ (first_player.salary or 0) // 1000 }}k</td>
-                          <td class="text-small text-center">
-                            {% set salary_change = latest_player.salary - first_player.salary %}
-                            <span class="{% if salary_change > 0 %}text-success{% elif salary_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                              {{ (latest_player.salary or 0) // 1000 }}k
-                              {% if salary_change != 0 %}({% if salary_change > 0 %}+{% endif %}{{ salary_change // 1000 }}k){% endif %}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr style="height: 25px;">
-                          <td class="text-small"><strong>Experience</strong></td>
-                          <td class="text-small text-center">{{ first_player.experience|default(0) }}</td>
-                          <td class="text-small text-center">
-                            {% set exp_change = latest_player.experience - first_player.experience %}
-                            <span class="{% if exp_change > 0 %}text-success{% elif exp_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                              {{ latest_player.experience|default(0) }}
-                              {% if exp_change != 0 %}({% if exp_change > 0 %}+{% endif %}{{ exp_change }}){% endif %}
-                            </span>
-                          </td>
-                        </tr>
-                        <tr style="height: 25px;">
-                          <td class="text-small"><strong>Career Goals</strong></td>
-                          <td class="text-small text-center">{{ first_player.career_goals|default(0) }}</td>
-                          <td class="text-small text-center">
-                            {% set goals_change = latest_player.career_goals - first_player.career_goals %}
-                            <span class="{% if goals_change > 0 %}text-success{% elif goals_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                              {{ latest_player.career_goals|default(0) }}
-                              {% if goals_change != 0 %}({% if goals_change > 0 %}+{% endif %}{{ goals_change }}){% endif %}
-                            </span>
-                          </td>
-                        </tr>
-                        {% endif %}
-                        <tr style="height: 25px;">
-                          <td class="text-small"><strong>Skill Changes</strong></td>
-                          <td class="text-small text-center">-</td>
-                          <td class="text-small text-center">
-                            {% if increases.get(ht_id) %}
-                              <span class="{% if increases[ht_id] > 0 %}text-success{% elif increases[ht_id] < 0 %}text-danger{% else %}text-muted{% endif %}">
-                                {% if increases[ht_id] > 0 %}+{% endif %}{{ increases[ht_id] }}
-                              </span>
-                            {% else %}
-                              <span class="text-muted">0</span>
+      <!-- Player Details -->
+      <div class="col-12 col-lg-9">
+        <div class="row g-4">
+          {% for ht_id in allplayerids %}
+            <div class="col-12"
+                 id="playerCard{{ ht_id }}"
+                 data-player-card
+                 style="display: none">
+              <!-- Player Overview -->
+              <div class="row g-4 mb-4">
+                {% if allplayers[ht_id] %}
+                  {% set latest = allplayers[ht_id][-1] %}
+                  {% set earliest = allplayers[ht_id][0] %}
+                  <!-- Player Info -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">{{ playernames[ht_id] }}</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            <tr style="height: 25px;">
+                              <td class="text-small"></td>
+                              <td class="text-small text-center">
+                                <strong>{{ earliest[0].strftime("%Y-%m-%d") }}</strong>
+                              </td>
+                              <td class="text-small text-center">
+                                <strong>Current</strong>
+                              </td>
+                            </tr>
+                            {% if player_info[ht_id] and player_info[ht_id]['first'] and player_info[ht_id]['latest'] %}
+                              {% set first_player = player_info[ht_id]['first'] %}
+                              {% set latest_player = player_info[ht_id]['latest'] %}
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>Age</strong>
+                                </td>
+                                <td class="text-small text-center">{{ first_player.age_years }}y {{ first_player.age_days }}d</td>
+                                <td class="text-small text-center">{{ latest_player.age_years }}y {{ latest_player.age_days }}d</td>
+                              </tr>
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>TSI</strong>
+                                </td>
+                                <td class="text-small text-center">{{ first_player.tsi|default(0) }}</td>
+                                <td class="text-small text-center">
+                                  {% set tsi_change = latest_player.tsi - first_player.tsi %}
+                                  <span class="{% if tsi_change > 0 %}text-success{% elif tsi_change < 0 %}text-danger{% else %}text-muted{% endif %}">
+                                    {{ latest_player.tsi|default(0) }}
+                                    {% if tsi_change != 0 %}
+                                      (
+                                      {% if tsi_change > 0 %}+{% endif %}
+                                      {{ tsi_change }})
+                                    {% endif %}
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>Salary</strong>
+                                </td>
+                                <td class="text-small text-center">{{ (first_player.salary or 0) // 1000 }}k</td>
+                                <td class="text-small text-center">
+                                  {% set salary_change = latest_player.salary - first_player.salary %}
+                                  <span class="{% if salary_change > 0 %}text-success{% elif salary_change < 0 %}text-danger{% else %}text-muted{% endif %}">
+                                    {{ (latest_player.salary or 0) // 1000 }}k
+                                    {% if salary_change != 0 %}
+                                      (
+                                      {% if salary_change > 0 %}+{% endif %}
+                                      {{ salary_change // 1000 }}k)
+                                    {% endif %}
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>Experience</strong>
+                                </td>
+                                <td class="text-small text-center">{{ first_player.experience|default(0) }}</td>
+                                <td class="text-small text-center">
+                                  {% set exp_change = latest_player.experience - first_player.experience %}
+                                  <span class="{% if exp_change > 0 %}text-success{% elif exp_change < 0 %}text-danger{% else %}text-muted{% endif %}">
+                                    {{ latest_player.experience|default(0) }}
+                                    {% if exp_change != 0 %}
+                                      (
+                                      {% if exp_change > 0 %}+{% endif %}
+                                      {{ exp_change }})
+                                    {% endif %}
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr style="height: 25px;">
+                                <td class="text-small">
+                                  <strong>Career Goals</strong>
+                                </td>
+                                <td class="text-small text-center">{{ first_player.career_goals|default(0) }}</td>
+                                <td class="text-small text-center">
+                                  {% set goals_change = latest_player.career_goals - first_player.career_goals %}
+                                  <span class="{% if goals_change > 0 %}text-success{% elif goals_change < 0 %}text-danger{% else %}text-muted{% endif %}">
+                                    {{ latest_player.career_goals|default(0) }}
+                                    {% if goals_change != 0 %}
+                                      (
+                                      {% if goals_change > 0 %}+{% endif %}
+                                      {{ goals_change }})
+                                    {% endif %}
+                                  </span>
+                                </td>
+                              </tr>
                             {% endif %}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Current Skills -->
-              <div class="col-md-6">
-                <div class="card">
-                  <div class="card-header">
-                    <h6 class="mb-0">Current Skills</h6>
-                  </div>
-                  <div class="card-body p-2">
-                    <table class="table-custom">
-                      <tbody>
-                        {% set skill_names = ['Keeper', 'Defender', 'Playmaker', 'Winger', 'Passing', 'Scorer', 'Set Pieces'] %}
-                        {% for i in range(7) %}
-                          {% set current_skill = latest[1][i] %}
-                          {% set change = latest[1][i] - earliest[1][i] %}
-                          <tr style="height: 25px;">
-                            <td class="text-small text-capitalize">{{ skill_names[i].lower() }}</td>
-                            <td class="text-small">
-                              {{ current_skill }}
-                              {% if change != 0 %}
-                                <small class="{% if change > 0 %}text-success{% else %}text-danger{% endif %}">
-                                  ({% if change > 0 %}+{% endif %}{{ change }})
-                                </small>
-                              {% endif %}
-                            </td>
-                            <td class="text-small" style="width: 60%">
-                              <div class="progress" style="height: 13px;">
-                                {% if change > 0 %}
-                                  <!-- For positive change: grey base + green progress -->
-                                  <div class="progress-bar bg-secondary"
-                                       role="progressbar"
-                                       style="width: {{ (earliest[1][i] * 5) }}%"
-                                       aria-valuenow="{{ (earliest[1][i] * 5) }}"
-                                       aria-valuemin="0"
-                                       aria-valuemax="100">
-                                  </div>
-                                  <div class="progress-bar bg-success"
-                                       role="progressbar"
-                                       style="width: {{ (change * 5) }}%"
-                                       aria-valuenow="{{ (change * 5) }}"
-                                       aria-valuemin="0"
-                                       aria-valuemax="100">
-                                  </div>
+                            <tr style="height: 25px;">
+                              <td class="text-small">
+                                <strong>Skill Changes</strong>
+                              </td>
+                              <td class="text-small text-center">-</td>
+                              <td class="text-small text-center">
+                                {% if increases.get(ht_id) %}
+                                  <span class="{% if increases[ht_id] > 0 %}text-success{% elif increases[ht_id] < 0 %}text-danger{% else %}text-muted{% endif %}">
+                                    {% if increases[ht_id] > 0 %}+{% endif %}
+                                    {{ increases[ht_id] }}
+                                  </span>
                                 {% else %}
-                                  <!-- For negative or no change: keep original bar -->
-                                  <div class="progress-bar {% if change < 0 %}bg-danger{% else %}bg-secondary{% endif %}"
-                                       role="progressbar"
-                                       style="width: {{ (current_skill * 5) }}%"
-                                       aria-valuenow="{{ (current_skill * 5) }}"
-                                       aria-valuemin="0"
-                                       aria-valuemax="100">
-                                  </div>
+                                  <span class="text-muted">0</span>
                                 {% endif %}
-                              </div>
-                            </td>
-                          </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Current Skills -->
+                  <div class="col-md-6">
+                    <div class="card">
+                      <div class="card-header">
+                        <h6 class="mb-0">Current Skills</h6>
+                      </div>
+                      <div class="card-body p-2">
+                        <table class="table-custom">
+                          <tbody>
+                            {% set skill_names = ["Keeper", "Defender", "Playmaker", "Winger", "Passing", "Scorer", "Set Pieces"] %}
+                            {% for i in range(7) %}
+                              {% set current_skill = latest[1][i] %}
+                              {% set change = latest[1][i] - earliest[1][i] %}
+                              <tr style="height: 25px;">
+                                <td class="text-small text-capitalize">{{ skill_names[i].lower() }}</td>
+                                <td class="text-small">
+                                  {{ current_skill }}
+                                  {% if change != 0 %}
+                                    <small class="{% if change > 0 %}text-success{% else %}text-danger{% endif %}">
+                                      (
+                                      {% if change > 0 %}+{% endif %}
+                                      {{ change }})
+                                    </small>
+                                  {% endif %}
+                                </td>
+                                <td class="text-small" style="width: 60%">
+                                  <div class="progress" style="height: 13px;">
+                                    {% if change > 0 %}
+                                      <!-- For positive change: grey base + green progress -->
+                                      <div class="progress-bar bg-secondary"
+                                           role="progressbar"
+                                           style="width: {{ (earliest[1][i] * 5) }}%"
+                                           aria-valuenow="{{ (earliest[1][i] * 5) }}"
+                                           aria-valuemin="0"
+                                           aria-valuemax="100"></div>
+                                      <div class="progress-bar bg-success"
+                                           role="progressbar"
+                                           style="width: {{ (change * 5) }}%"
+                                           aria-valuenow="{{ (change * 5) }}"
+                                           aria-valuemin="0"
+                                           aria-valuemax="100"></div>
+                                    {% else %}
+                                      <!-- For negative or no change: keep original bar -->
+                                      <div class="progress-bar {% if change < 0 %}bg-danger{% else %}bg-secondary{% endif %}"
+                                           role="progressbar"
+                                           style="width: {{ (current_skill * 5) }}%"
+                                           aria-valuenow="{{ (current_skill * 5) }}"
+                                           aria-valuemin="0"
+                                           aria-valuemax="100"></div>
+                                    {% endif %}
+                                  </div>
+                                </td>
+                              </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+              <!-- Skill Progression Chart -->
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">Skill Progression</h5>
+                </div>
+                <div class="card-body">
+                  <div style="position: relative; height: 300px;">
+                    <canvas id="playerChart{{ ht_id }}"
+                            role="img"
+                            aria-label="Skill progression chart"></canvas>
                   </div>
                 </div>
               </div>
-            {% endif %}
-          </div>
-
-          <!-- Skill Progression Chart -->
-          <div class="card mb-4">
-            <div class="card-header">
-              <h5 class="card-title mb-0">Skill Progression</h5>
+              <!-- Training History Table -->
+              {% if allplayers[ht_id] %}
+                <div class="card">
+                  <div class="card-header">
+                    <h5 class="card-title mb-0">Training History</h5>
+                  </div>
+                  <div class="card-body p-0">
+                    <div class="table-responsive">
+                      <table class="table-custom table-hover mb-0">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Date</th>
+                            <th class="text-end">Keeper</th>
+                            <th class="text-end">Defender</th>
+                            <th class="text-end">Playmaker</th>
+                            <th class="text-end">Winger</th>
+                            <th class="text-end">Passing</th>
+                            <th class="text-end">Scoring</th>
+                            <th class="text-end">Set Pieces</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for (date, skills, changes) in skill_changes[ht_id] %}
+                            <tr>
+                              <td>
+                                <small>{{ date.strftime("%Y-%m-%d") }}</small>
+                              </td>
+                              {% for i in range(7) %}
+                                {% set val = skills[i] %}
+                                {% set change = changes[i] %}
+                                <td class="text-end">
+                                  <small>
+                                    {% if change > 0 %}
+                                      <span style="color: #22c55e; font-weight: bold;">↑</span>
+                                    {% elif change < 0 %}
+                                      <span style="color: #ef4444; font-weight: bold;">↓</span>
+                                    {% else %}
+                                      <span style="color: #999;"></span>
+                                    {% endif %}
+                                    {{ val }}
+                                  </small>
+                                </td>
+                              {% endfor %}
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
             </div>
-            <div class="card-body">
-              <div style="position: relative; height: 300px;">
-                <canvas id="playerChart{{ ht_id }}" role="img" aria-label="Skill progression chart"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <!-- Training History Table -->
-          {% if allplayers[ht_id] %}
-          <div class="card">
-            <div class="card-header">
-              <h5 class="card-title mb-0">Training History</h5>
-            </div>
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table-custom table-hover mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th>Date</th>
-                      <th class="text-end">Keeper</th>
-                      <th class="text-end">Defender</th>
-                      <th class="text-end">Playmaker</th>
-                      <th class="text-end">Winger</th>
-                      <th class="text-end">Passing</th>
-                      <th class="text-end">Scoring</th>
-                      <th class="text-end">Set Pieces</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for (date, skills, changes) in skill_changes[ht_id] %}
-                    <tr>
-                      <td><small>{{ date.strftime('%Y-%m-%d') }}</small></td>
-                      {% for i in range(7) %}
-                        {% set val = skills[i] %}
-                        {% set change = changes[i] %}
-                        <td class="text-end">
-                          <small>
-                            {% if change > 0 %}
-                              <span style="color: #22c55e; font-weight: bold;">↑</span>
-                            {% elif change < 0 %}
-                              <span style="color: #ef4444; font-weight: bold;">↓</span>
-                            {% else %}
-                              <span style="color: #999;"> </span>
-                            {% endif %}
-                            {{ val }}
-                          </small>
-                        </td>
-                      {% endfor %}
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          {% endif %}
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
     </div>
   </div>
-</div>
-
 {% endblock %}

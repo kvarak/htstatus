@@ -1,138 +1,136 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-12">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url_for('feedback.list_feedback') }}">Feedback</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ feedback.title }}</li>
-        </ol>
-      </nav>
-
-      <div class="card card-custom mb-4">
-        <div class="card-header">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <h2 class="mb-2">{{ feedback.title }}</h2>
-              <div class="mb-2">
-                <span class="badge
-                  {% if feedback.feedback_type == 'bug' %}badge-danger
-                  {% elif feedback.feedback_type == 'feature' %}badge-success
-                  {% else %}badge-info{% endif %} mr-2">
-                  {{ feedback.feedback_type.title() }}
-                </span>
-                <span class="badge badge-secondary">{{ feedback.status.title() }}</span>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="{{ url_for('feedback.list_feedback') }}">Feedback</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ feedback.title }}</li>
+          </ol>
+        </nav>
+        <div class="card card-custom mb-4">
+          <div class="card-header">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h2 class="mb-2">{{ feedback.title }}</h2>
+                <div class="mb-2">
+                  <span class="badge {% if feedback.feedback_type == 'bug' %}badge-danger {% elif feedback.feedback_type == 'feature' %}badge-success {% else %}badge-info{% endif %} mr-2">
+                    {{ feedback.feedback_type.title() }}
+                  </span>
+                  <span class="badge badge-secondary">{{ feedback.status.title() }}</span>
+                </div>
+                <small class="text-muted">
+                  by {{ feedback.author.username }} • {{ feedback.created_at.strftime("%B %d, %Y at %I:%M %p") }}
+                </small>
               </div>
-              <small class="text-muted">
-                by {{ feedback.author.username }} • {{ feedback.created_at.strftime('%B %d, %Y at %I:%M %p') }}
-              </small>
+              <div class="vote-controls">
+                <div class="btn-group-vertical" role="group">
+                  <button type="button"
+                          class="btn {% if user_vote == 'up' %}btn-success{% else %}btn-outline-success{% endif %}"
+                          onclick="vote({{ feedback.id }}, 'up')"
+                          title="{% if user_vote == 'up' %}Remove your upvote{% else %}Upvote this feedback{% endif %}">
+                    ↑ <i class="fas fa-thumbs-up"></i>
+                    {% if user_vote == 'up' %}
+                      Remove Upvote
+                    {% else %}
+                      Upvote
+                    {% endif %}
+                  </button>
+                  <span class="btn btn-light vote-score" id="score-{{ feedback.id }}">{{ feedback.vote_score }}</span>
+                </div>
+              </div>
             </div>
-
-            <div class="vote-controls">
-              <div class="btn-group-vertical" role="group">
-                <button type="button"
-                        class="btn {% if user_vote == 'up' %}btn-success{% else %}btn-outline-success{% endif %}"
-                        onclick="vote({{ feedback.id }}, 'up')"
-                        title="{% if user_vote == 'up' %}Remove your upvote{% else %}Upvote this feedback{% endif %}">
-                  ↑ <i class="fas fa-thumbs-up"></i> {% if user_vote == 'up' %}Remove Upvote{% else %}Upvote{% endif %}
+          </div>
+          <div class="card-body">
+            <div class="feedback-description">{{ feedback.description|nl2br|safe }}</div>
+          </div>
+        </div>
+        {% if user_context.user and user_context.user.is_admin() %}
+          <div class="card card-custom mb-4">
+            <div class="card-header">
+              <h5 class="mb-0">Admin Controls</h5>
+            </div>
+            <div class="card-body">
+              <form method="POST"
+                    action="{{ url_for('feedback.update_status', id=feedback.id) }}"
+                    class="form-inline">
+                <label for="status" class="mr-2">Status:</label>
+                <select class="form-control mr-3" id="status" name="status">
+                  <option value="open" {% if feedback.status == 'open' %}selected{% endif %}>Open</option>
+                  <option value="planned"
+                          {% if feedback.status == 'planned' %}selected{% endif %}>Planned</option>
+                  <option value="in-progress"
+                          {% if feedback.status == 'in-progress' %}selected{% endif %}>In Progress</option>
+                  <option value="completed"
+                          {% if feedback.status == 'completed' %}selected{% endif %}>Completed</option>
+                  <option value="wont-do"
+                          {% if feedback.status == 'wont-do' %}selected{% endif %}>Won't Do</option>
+                </select>
+                <button type="submit" class="btn btn-primary-custom">Update Status</button>
+              </form>
+              <hr class="my-3">
+              <form method="POST"
+                    action="{{ url_for('feedback.toggle_archive', id=feedback.id) }}"
+                    class="form-inline">
+                <label class="mr-2">Archive:</label>
+                <button type="submit"
+                        class="btn btn-sm {% if feedback.archived %}btn-warning{% else %}btn-secondary{% endif %}">
+                  {% if feedback.archived %}
+                    <i class="fas fa-box-open"></i> Unarchive
+                  {% else %}
+                    <i class="fas fa-archive"></i> Archive
+                  {% endif %}
                 </button>
-                <span class="btn btn-light vote-score" id="score-{{ feedback.id }}">
-                  {{ feedback.vote_score }}
-                </span>
-              </div>
+              </form>
             </div>
           </div>
-        </div>
-        <div class="card-body">
-          <div class="feedback-description">
-            {{ feedback.description|nl2br|safe }}
+        {% endif %}
+        <div class="card card-custom">
+          <div class="card-header">
+            <h5 class="mb-0">Comments ({{ comments|length }})</h5>
           </div>
-        </div>
-      </div>
-
-      {% if user_context.user and user_context.user.is_admin() %}
-      <div class="card card-custom mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">Admin Controls</h5>
-        </div>
-        <div class="card-body">
-          <form method="POST" action="{{ url_for('feedback.update_status', id=feedback.id) }}" class="form-inline">
-            <label for="status" class="mr-2">Status:</label>
-            <select class="form-control mr-3" id="status" name="status">
-              <option value="open" {% if feedback.status == 'open' %}selected{% endif %}>Open</option>
-              <option value="planned" {% if feedback.status == 'planned' %}selected{% endif %}>Planned</option>
-              <option value="in-progress" {% if feedback.status == 'in-progress' %}selected{% endif %}>In Progress</option>
-              <option value="completed" {% if feedback.status == 'completed' %}selected{% endif %}>Completed</option>
-              <option value="wont-do" {% if feedback.status == 'wont-do' %}selected{% endif %}>Won't Do</option>
-            </select>
-            <button type="submit" class="btn btn-primary-custom">Update Status</button>
-          </form>
-
-          <hr class="my-3">
-
-          <form method="POST" action="{{ url_for('feedback.toggle_archive', id=feedback.id) }}" class="form-inline">
-            <label class="mr-2">Archive:</label>
-            <button type="submit" class="btn btn-sm {% if feedback.archived %}btn-warning{% else %}btn-secondary{% endif %}">
-              {% if feedback.archived %}
-                <i class="fas fa-box-open"></i> Unarchive
-              {% else %}
-                <i class="fas fa-archive"></i> Archive
-              {% endif %}
-            </button>
-          </form>
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="card card-custom">
-        <div class="card-header">
-          <h5 class="mb-0">Comments ({{ comments|length }})</h5>
-        </div>
-        <div class="card-body">
-          {% if comments %}
-            {% for comment in comments %}
-              <div class="comment mb-3 p-3 {% if comment.is_admin %}bg-light border-left border-success{% else %}bg-white border-left border-secondary{% endif %}">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <strong>
-                    {{ comment.author.username }}
-                    {% if comment.is_admin %}<span class="badge badge-success ml-2">Admin</span>{% endif %}
-                  </strong>
-                  <small class="text-muted">{{ comment.created_at.strftime('%b %d, %Y at %I:%M %p') }}</small>
+          <div class="card-body">
+            {% if comments %}
+              {% for comment in comments %}
+                <div class="comment mb-3 p-3 {% if comment.is_admin %}bg-light border-left border-success{% else %}bg-white border-left border-secondary{% endif %}">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <strong>
+                      {{ comment.author.username }}
+                      {% if comment.is_admin %}<span class="badge badge-success ml-2">Admin</span>{% endif %}
+                    </strong>
+                    <small class="text-muted">{{ comment.created_at.strftime("%b %d, %Y at %I:%M %p") }}</small>
+                  </div>
+                  <div class="comment-content">{{ comment.content|nl2br|safe }}</div>
                 </div>
-                <div class="comment-content">
-                  {{ comment.content|nl2br|safe }}
-                </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-muted text-center py-4">No comments yet. Be the first to comment!</p>
+            {% endif %}
+            <hr>
+            <form method="POST"
+                  action="{{ url_for('feedback.add_comment', id=feedback.id) }}">
+              <div class="form-group">
+                <label for="content" class="form-label">Add Comment</label>
+                <textarea class="form-control"
+                          id="content"
+                          name="content"
+                          rows="3"
+                          required
+                          placeholder="Share your thoughts, additional information, or ask questions..."></textarea>
               </div>
-            {% endfor %}
-          {% else %}
-            <p class="text-muted text-center py-4">No comments yet. Be the first to comment!</p>
-          {% endif %}
-
-          <hr>
-
-          <form method="POST" action="{{ url_for('feedback.add_comment', id=feedback.id) }}">
-            <div class="form-group">
-              <label for="content" class="form-label">Add Comment</label>
-              <textarea class="form-control"
-                        id="content"
-                        name="content"
-                        rows="3"
-                        required
-                        placeholder="Share your thoughts, additional information, or ask questions..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary-custom">
-              <i class="fas fa-comment"></i> Add Comment
-            </button>
-          </form>
+              <button type="submit" class="btn btn-primary-custom">
+                <i class="fas fa-comment"></i> Add Comment
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
-
-<script>
+  <script>
 function vote(feedbackId, voteType) {
   fetch(`/feedback/${feedbackId}/vote`, {
     method: 'POST',
@@ -168,5 +166,5 @@ function vote(feedbackId, voteType) {
     console.error('Error:', error);
   });
 }
-</script>
+  </script>
 {% endblock %}

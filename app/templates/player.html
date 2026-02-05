@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block styles %}
-{{ super() }}
-<style>
+  {{ super() }}
+  <style>
 .player-name-link {
   text-decoration: none !important;
   cursor: pointer;
@@ -11,14 +11,12 @@
   text-decoration: underline !important;
   opacity: 0.8;
 }
-</style>
-</style>
+  </style>
+  </style>
 {% endblock %}
 {% block scripts %}
-{{ super() }}
-
-<script>
-
+  {{ super() }}
+  <script>
   // Data
 
   {% for ht_id in allplayerids %}
@@ -84,397 +82,447 @@
   });
   {% endfor %}
 
-</script>
-
-
+  </script>
 {% endblock %}
-
 {% block content %}
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#">{{ title }}</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Players</li>
-        </ol>
-      </nav>
-    </div>
-  </div>
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    {{ error }}
-  </div>
-  {% endif %}
-  <div class="row">
-    <div class="col-12">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Players</h5>
-            <p class="card-text">
-              <table id="player-table" class="table-custom table-rotated table-scroll sortable">
-
-                <thead>
-                  <tr>
-                    {% for (title, val) in columns %}
-                      {% if val in calccolumns %}
-                        <th scope="col" class="text-small vertical"><div class="vertical">{{ val }}</div></th>
-                      {% else %}
-                        <th scope="col" class="text-small vertical"><div class="vertical">{{ title }}</div></th>
-                        {% if val in tracecolumns %}
-                          <th scope="col" class="text-small"></th>
-                        {% endif %}
-                      {% endif %}
-                    {% endfor %}
-                  </tr>
-                </thead>
-                <tbody>
-
-                  {% for group in group_data %}
-
-                  {% set theplayers = grouped_players[group.id] %}
-
-                  {% if theplayers %}
-
-                  {% for p in theplayers %}
-                  <tr style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
-
-                    {% for (title, val) in columns %}
-
-                      {% if val in tracecolumns %}
-                        <td class="text-small" align="right">{{ p[val] }}</td>
-                        <td class="text-small">
-                          {% if players_oldest[p['ht_id']][val] < p[val] %}
-                            (+{{ p[val] - players_oldest[p['ht_id']][val]  }})
-                          {% endif %}
-                          {% if players_oldest[p['ht_id']][val] > p[val] %}
-                            ({{ p[val] - players_oldest[p['ht_id']][val]  }})
-                          {% endif %}
-                        </td>
-
-                      {% elif val in calccolumns %}
-                        <td class="text-small">{{ p[val] }}</td>
-
-                      {% elif val == "group" %}
-                        <td class="text-small">{{ group.name }}</td>
-
-                      {% elif val == "number" %}
-                        {% if p['number'] == 100 %}
-                        <td class="text-small">-</td>
-                        {% else %}
-                        <td class="text-small">{{ p['number'] }}</td>
-                        {% endif %}
-
-                      {% elif val == "specialty" %}
-                        <td class="text-small">
-                          {% if p['specialty'] and p['specialty'] > 0 %}
-                            {% set pngnr = p['specialty'] | string() %}
-                            {% set pngname = 'ico-sp-' + pngnr + '.png' %}
-                            <img src="{{url_for('static', filename=pngname)}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% endif %}
-                        </td>
-
-                      {% elif val == "name" %}
-                        <td class="text-small" scope="row">
-                          <a class="player-name-link" data-toggle="modal" href="#player-modal-{{ p['ht_id']}}" role="button" style="color: {{ group.textcolor }};">
-                            {{ p['first_name'] }} {{ p['last_name'] }}
-                          </a>
-                        </td>
-
-                      {% elif val == "status" %}
-                        <td class="text-small" align="center">
-                          {% if p.mother_club_bonus %}
-                            <img src="{{url_for('static', filename='ico-homegrown.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% endif %}
-
-                          {% if p['is_transfer_listed'] %}
-                            <img src="{{url_for('static', filename='ico-forsale.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% endif %}
-
-                          {% if p['cards'] == 1 %}
-                            <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% elif p['cards'] == 2 %}
-                            <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% elif p['cards'] == 3 %}
-                            <img src="{{url_for('static', filename='ico-red.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% endif %}
-
-                          {% if p['injury_level'] == 0 %}
-                          <img src="{{url_for('static', filename='ico-damage.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">
-                          {% elif p['injury_level'] and p['injury_level'] > 0 %}
-                            <img src="{{url_for('static', filename='ico-injury.png')}}" height="13" style="background-color:rgba(255, 255, 255, 0.5);">{{ p['injury_level'] }}
-                          {% endif %}
-                        </td>
-
-                      {% elif val == "firstseen" %}
-                        {% set olddate = players_oldest[p['ht_id']].data_date | string() %}
-                        {% set thedate = olddate[:10] %}
-                        <td class="text-small" align="center">{{ thedate }}</td>
-
-                      {% elif val == "last_stars" %}
-                        <td class="text-small" align="center"><a href="/matches?id={{ teamid }}&m={{ p['last_stars_match_id'] }}" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">{{ p['last_stars'] }}</a></td>
-
-                      {% elif val == "max_stars" %}
-                        <td class="text-small" align="center"><a href="/matches?id={{ teamid }}&m={{ p['max_stars_match_id'] }}" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">{{ p['max_stars'] }}</a></td>
-
-                      {% else %}
-                        {% if p[val] == "None" %}
-                        <td class="text-small" align="center">&nbsp;</td>
-                        {% else %}
-                        <td class="text-small" align="center">{{ p[val] }}</td>
-                        {% endif %}
-
-                      {% endif %}
-
-                    {% endfor %}
-
-                  </tr>
-                  {% endfor %}
-                  {% endif %}
-                  {% endfor %}
-                  </tbody>
-              </table>
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted">Last updated {{ last_update }}</small>
-          </div>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a href="#">{{ title }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Players</li>
+          </ol>
+        </nav>
       </div>
     </div>
-
-  <!-- Player Details Modals -->
-  {% for group in group_data %}
-  {% set theplayers = grouped_players[group.id] %}
-  {% for p in theplayers %}
-  <div class="modal fade" id="player-modal-{{ p['ht_id'] }}" tabindex="-1" role="dialog" aria-labelledby="player-modal-label-{{ p['ht_id'] }}" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="player-modal-label-{{ p['ht_id'] }}">
-            {% if p['number'] < 100 %}
-            {{ p['number'] }}.
-            {% endif %}
-            {{ p['first_name'] }} {{ p['last_name'] }}
-
-              {% if p['specialty'] and p['specialty'] > 0 %}
-                {% set pngnr = p['specialty'] | string() %}
-                {% set pngname = 'ico-sp-' + pngnr + '.png' %}
-                <img src="{{url_for('static', filename=pngname)}}" height="25">
-              {% endif %}
-
-              {% if p['is_transfer_listed'] %}
-              <img src="{{url_for('static', filename='ico-forsale.png')}}" height="25">
-              {% endif %}
-
-              {% if p['cards'] == 1 %}
-                <img src="{{url_for('static', filename='ico-yellow-1.png')}}" height="25">
-              {% elif p['cards'] == 2 %}
-                <img src="{{url_for('static', filename='ico-yellow-2.png')}}" height="25">
-              {% elif p['cards'] == 3 %}
-                <img src="{{url_for('static', filename='ico-red.png')}}" height="25">
-              {% endif %}
-
-              {% if p['injury_level'] == 0 %}
-              <img src="{{url_for('static', filename='ico-damage.png')}}" height="25">
-              {% elif p['injury_level'] and p['injury_level'] > 0 %}
-                <img src="{{url_for('static', filename='ico-injury.png')}}" height="25">{{ p['injury_level'] }}
-              {% endif %}
-          </h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <!-- Group Management Section -->
-          <div class="row mb-3" style="max-width: 450px;">
-            <div class="col-md-4">
-              <form method="POST" action="/player" class="mb-0">
-                <input type="hidden" id="playerid" name="playerid" value="{{ p['ht_id'] }}">
-                <input type="hidden" id="id" name="id" value="{{ teamid }}">
-                <div class="form-row align-items-center">
-                  <div class="col-12 mb-2">
-                    <label class="mr-sm-2" for="inlineFormCustomSelect">Player Group:</label>
-                    <select class="custom-select" name="groupid">
-                      {% if not(group.name) %}
-                      <option selected>Select group</option>
-                      {% endif %}
-                      {% for g in group_data %}
-                        {% if g.id %}
-                        <option {% if group.name == g.name %}selected{% endif %} value="{{ g.id }}" id="groupid">{{ g.name }}</option>
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    <div class="row">
+      <div class="col-12">
+        <div class="card-deck">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Players</h5>
+              <p class="card-text">
+                <table id="player-table"
+                       class="table-custom table-rotated table-scroll sortable">
+                  <thead>
+                    <tr>
+                      {% for (title, val) in columns %}
+                        {% if val in calccolumns %}
+                          <th scope="col" class="text-small vertical">
+                            <div class="vertical">{{ val }}</div>
+                          </th>
+                        {% else %}
+                          <th scope="col" class="text-small vertical">
+                            <div class="vertical">{{ title }}</div>
+                          </th>
+                          {% if val in tracecolumns %}<th scope="col" class="text-small"></th>{% endif %}
                         {% endif %}
                       {% endfor %}
-                      <option value="-1" id="groupid">Clear group</option>
-                    </select>
-                  </div>
-                  <div class="col-12">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="updategroup" value="updatebutton">Update Group</button>
-                  </div>
-                  {% set nrofgroups = group_data | length %}
-                  {% if nrofgroups == 1 %}
-                  <div class="col-12 mt-2">
-                    <p class="card-text text-sm11 mb-0">
-                      You haven't specified any groups, you add groups in <a href="/profile">the profile page</a>.
-                    </p>
-                  </div>
-                  {% endif %}
-                </div>
-              </form>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for group in group_data %}
+                      {% set theplayers = grouped_players[group.id] %}
+                      {% if theplayers %}
+                        {% for p in theplayers %}
+                          <tr style="color: {{ group.textcolor }}; background: {{ group.bgcolor }}">
+                            {% for (title, val) in columns %}
+                              {% if val in tracecolumns %}
+                                <td class="text-small" align="right">{{ p[val] }}</td>
+                                <td class="text-small">
+                                  {% if players_oldest[p['ht_id']][val] < p[val] %}(+{{ p[val] - players_oldest[p['ht_id']][val] }}){% endif %}
+                                  {% if players_oldest[p['ht_id']][val] > p[val] %}({{ p[val] - players_oldest[p['ht_id']][val] }}){% endif %}
+                                </td>
+                              {% elif val in calccolumns %}
+                                <td class="text-small">{{ p[val]  }}</td>
+                              {% elif val == "group" %}
+                                <td class="text-small">{{ group.name }}</td>
+                              {% elif val == "number" %}
+                                {% if p['number'] == 100 %}
+                                  <td class="text-small">-</td>
+                                {% else %}
+                                  <td class="text-small">{{ p['number'] }}</td>
+                                {% endif %}
+                              {% elif val == "specialty" %}
+                                <td class="text-small">
+                                  {% if p['specialty'] and p['specialty'] > 0 %}
+                                    {% set pngnr = p['specialty'] | string() %}
+                                    {% set pngname = 'ico-sp-' + pngnr + '.png' %}
+                                    <img src="{{ url_for('static', filename=pngname) }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {% endif %}
+                                  </td>
+                                {% elif val == "name" %}
+                                  <td class="text-small" scope="row">
+                                    <a class="player-name-link"
+                                       data-toggle="modal"
+                                       href="#player-modal-{{ p['ht_id'] }}"
+                                       role="button"
+                                       style="color: {{ group.textcolor }}">
+                                      {{ p['first_name'] }} {{ p['last_name'] }}
+                                    </a>
+                                  </td>
+                                {% elif val == "status" %}
+                                  <td class="text-small" align="center">
+                                    {% if p.mother_club_bonus %}
+                                    <img src="{{ url_for('static', filename='ico-homegrown.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {% endif %}
+                                    {% if p['is_transfer_listed'] %}
+                                    <img src="{{ url_for('static', filename='ico-forsale.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {% endif %}
+                                    {% if p['cards'] == 1 %}
+                                    <img src="{{ url_for('static', filename='ico-yellow-1.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {% elif p['cards'] == 2 %}
+                                    <img src="{{ url_for('static', filename='ico-yellow-2.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {% elif p['cards'] == 3 %}
+                                    <img src="{{ url_for('static', filename='ico-red.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {% endif %}
+                                    {% if p['injury_level'] == 0 %}
+                                    <img src="{{ url_for('static', filename='ico-damage.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                  {% elif p['injury_level'] and p['injury_level'] > 0 %}
+                                    <img src="{{ url_for('static', filename='ico-injury.png') }}"
+                                         height="13"
+                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                    {{ p['injury_level'] }}
+                                    {% endif %}
+                                  </td>
+                                {% elif val == "firstseen" %}
+                                  {% set olddate = players_oldest[p['ht_id']].data_date | string() %}
+                                  {% set thedate = olddate[:10] %}
+                                  <td class="text-small" align="center">{{ thedate }}</td>
+                                {% elif val == "last_stars" %}
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id={{ teamid }}&m={{ p['last_stars_match_id'] }}"
+                                       style="color: {{ group.textcolor }};
+                                              background: {{ group.bgcolor }}">{{ p['last_stars'] }}</a>
+                                  </td>
+                                {% elif val == "max_stars" %}
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id={{ teamid }}&m={{ p['max_stars_match_id'] }}"
+                                       style="color: {{ group.textcolor }};
+                                              background: {{ group.bgcolor }}">{{ p['max_stars'] }}</a>
+                                  </td>
+                                {% else %}
+                                  {% if p[val] == "None" %}
+                                  <td class="text-small" align="center">&nbsp;</td>
+                                {% else %}
+                                  <td class="text-small" align="center">{{ p[val] }}</td>
+                                {% endif %}
+                              {% endif %}
+                            {% endfor %}
+                          </tr>
+                        {% endfor %}
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </p>
             </div>
-            <div class="col-md-8">
-              <!-- Player Description Section -->
-              {% if p['nick_name'] and p['nick_name'] != "None" and p['nick_name'].strip() %}
-                <p class="card-text">
-                  <i>"{{ p['nick_name'] }}"</i>
-                </p>
-              {% endif %}
-
-              {% if p['statement'] and p['statement'] != "None" and p['statement'].strip() %}
-                <p class="card-text">
-                  <i>"{{ p['statement'] }}"</i>
-                </p>
-              {% endif %}
-
-              {% if p['owner_notes'] and p['owner_notes'] != "None" and p['owner_notes'].strip() %}
-                <p class="card-text">
-                  <i>"{{ p['owner_notes'] }}"</i>
-                </p>
-              {% endif %}
-
-            <p class="card-text text-sm11">
-              {{ p.first_name }} is {{ p['age'] }}. He
-              has played <b>{{ p['current_team_matches'] }}</b> matches
-              and scored <b>{{ p['current_team_goals'] }}</b> goals for
-              {{ teamname }} since {{ p['arrival_date'] }}.
-              In his career, {{ p.first_name }} has scored {{ p['career_goals'] }}
-              goal{% if p['career_goals'] != 1 %}s{% endif %}
-              and made {{ p['career_hattricks'] }}
-              hattrick{% if p['career_hattricks'] != 1 %}s{% endif %}.
-              {% if p['caps'] and p['caps'] > 0 %}
-                He has played {{ p['caps'] }} international league
-                game{% if p['caps'] != 1 %}s{% endif %}.
-              {% endif %}
-              {% if p['caps_u20'] and p['caps_u20'] > 0 %}
-                Additionally, {{ p.first_name }} attended {{ p['caps_u20'] }} international U20
-                league game{% if p['caps_u20'] != 1 %}s{% endif %}.
-              {% endif %}
-            </p>
-            <p class="card-text text-sm11">
-              Leadership: {{ p['leadership'] }},
-              Agreeability: {{ p['agreeability'] }},
-              Aggressiveness: {{ p['aggressiveness'] }},
-              Honesty: {{ p['honesty'] }},
-              Experience: {{ p['experience'] }},
-              Loyalty: {{ p['loyalty'] }}</br>
-              TSI: {{ p['tsi'] }},
-              Salary: {{ p['salary'] }}
-            </p>
+            <div class="card-footer">
+              <small class="text-muted">Last updated {{ last_update }}</small>
             </div>
           </div>
-              <table class="table-custom" style="max-width: 450px;">
-                <tr>
-                  <td class="text-small">Keeper</td>
-                  <td class="text-small">{{ p['keeper'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['keeper'] * 5 }}%" aria-valuenow="{{ p['keeper'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+      <!-- Player Details Modals -->
+      {% for group in group_data %}
+        {% set theplayers = grouped_players[group.id] %}
+        {% for p in theplayers %}
+          <div class="modal fade"
+               id="player-modal-{{ p['ht_id'] }}"
+               tabindex="-1"
+               role="dialog"
+               aria-labelledby="player-modal-label-{{ p['ht_id'] }}"
+               aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="player-modal-label-{{ p['ht_id'] }}">
+                    {% if p['number'] < 100 %}{{ p['number'] }}.{% endif %}
+                    {{ p['first_name'] }} {{ p['last_name'] }}
+                    {% if p['specialty'] and p['specialty'] > 0 %}
+                      {% set pngnr = p['specialty'] | string() %}
+                      {% set pngname = 'ico-sp-' + pngnr + '.png' %}
+                      <img src="{{ url_for('static', filename=pngname) }}" height="25">
+                      {% endif %}
+                      {% if p['is_transfer_listed'] %}
+                      <img src="{{ url_for('static', filename='ico-forsale.png') }}" height="25">
+                      {% endif %}
+                      {% if p['cards'] == 1 %}
+                      <img src="{{ url_for('static', filename='ico-yellow-1.png') }}"
+                           height="25">
+                      {% elif p['cards'] == 2 %}
+                      <img src="{{ url_for('static', filename='ico-yellow-2.png') }}"
+                           height="25">
+                      {% elif p['cards'] == 3 %}
+                      <img src="{{ url_for('static', filename='ico-red.png') }}" height="25">
+                      {% endif %}
+                      {% if p['injury_level'] == 0 %}
+                      <img src="{{ url_for('static', filename='ico-damage.png') }}" height="25">
+                    {% elif p['injury_level'] and p['injury_level'] > 0 %}
+                      <img src="{{ url_for('static', filename='ico-injury.png') }}" height="25">
+                      {{ p['injury_level'] }}
+                      {% endif %}
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Group Management Section -->
+                    <div class="row mb-3" style="max-width: 450px;">
+                      <div class="col-md-4">
+                        <form method="POST" action="/player" class="mb-0">
+                          <input type="hidden" id="playerid" name="playerid" value="{{ p['ht_id'] }}">
+                          <input type="hidden" id="id" name="id" value="{{ teamid }}">
+                          <div class="form-row align-items-center">
+                            <div class="col-12 mb-2">
+                              <label class="mr-sm-2" for="inlineFormCustomSelect">Player Group:</label>
+                              <select class="custom-select" name="groupid">
+                                {% if not(group.name) %}<option selected>Select group</option>{% endif %}
+                                {% for g in group_data %}
+                                  {% if g.id %}
+                                    <option {% if group.name == g.name %}selected{% endif %}
+                                            value="{{ g.id }}"
+                                            id="groupid">{{ g.name }}</option>
+                                  {% endif %}
+                                {% endfor %}
+                                <option value="-1" id="groupid">Clear group</option>
+                              </select>
+                            </div>
+                            <div class="col-12">
+                              <button type="submit"
+                                      class="btn btn-outline-secondary btn-sm"
+                                      name="updategroup"
+                                      value="updatebutton">Update Group</button>
+                            </div>
+                            {% set nrofgroups = group_data | length %}
+                            {% if nrofgroups == 1 %}
+                              <div class="col-12 mt-2">
+                                <p class="card-text text-sm11 mb-0">
+                                  You haven't specified any groups, you add groups in <a href="/profile">the profile page</a>.
+                                </p>
+                              </div>
+                            {% endif %}
+                          </div>
+                        </form>
+                      </div>
+                      <div class="col-md-8">
+                        <!-- Player Description Section -->
+                        {% if p['nick_name'] and p['nick_name'] != "None" and p['nick_name'].strip() %}
+                          <p class="card-text">
+                            <i>"{{ p['nick_name'] }}"</i>
+                          </p>
+                        {% endif %}
+                        {% if p['statement'] and p['statement'] != "None" and p['statement'].strip() %}
+                          <p class="card-text">
+                            <i>"{{ p['statement'] }}"</i>
+                          </p>
+                        {% endif %}
+                        {% if p['owner_notes'] and p['owner_notes'] != "None" and p['owner_notes'].strip() %}
+                          <p class="card-text">
+                            <i>"{{ p['owner_notes'] }}"</i>
+                          </p>
+                        {% endif %}
+                        <p class="card-text text-sm11">
+                          {{ p.first_name }} is {{ p['age'] }}. He
+                          has played <b>{{ p['current_team_matches'] }}</b> matches
+                          and scored <b>{{ p['current_team_goals'] }}</b> goals for
+                          {{ teamname }} since {{ p['arrival_date'] }}.
+                          In his career, {{ p.first_name }} has scored {{ p['career_goals'] }}
+                          goal
+                          {% if p['career_goals'] != 1 %}s{% endif %}
+                          and made {{ p['career_hattricks'] }}
+                          hattrick
+                          {% if p['career_hattricks'] != 1 %}s{% endif %}
+                          .
+                          {% if p['caps'] and p['caps'] > 0 %}
+                            He has played {{ p['caps'] }} international league
+                            game
+                            {% if p['caps'] != 1 %}s{% endif %}
+                            .
+                          {% endif %}
+                          {% if p['caps_u20'] and p['caps_u20'] > 0 %}
+                            Additionally, {{ p.first_name }} attended {{ p['caps_u20'] }} international U20
+                            league game
+                            {% if p['caps_u20'] != 1 %}s{% endif %}
+                            .
+                          {% endif %}
+                        </p>
+                        <p class="card-text text-sm11">
+                          Leadership: {{ p['leadership'] }},
+                          Agreeability: {{ p['agreeability'] }},
+                          Aggressiveness: {{ p['aggressiveness'] }},
+                          Honesty: {{ p['honesty'] }},
+                          Experience: {{ p['experience'] }},
+                          Loyalty: {{ p['loyalty'] }}
+                        </br>
+                        TSI: {{ p['tsi'] }},
+                        Salary: {{ p['salary'] }}
+                      </p>
                     </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Defender</td>
-                  <td class="text-small">{{ p['defender'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['defender'] * 5 }}%" aria-valuenow="{{ p['defender'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Playmaker</td>
-                  <td class="text-small">{{ p['playmaker'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['playmaker'] * 5 }}%" aria-valuenow="{{ p['playmaker'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Winger</td>
-                  <td class="text-small">{{ p['winger'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['winger'] * 5 }}%" aria-valuenow="{{ p['winger'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Passing</td>
-                  <td class="text-small">{{ p['passing'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['passing'] * 5 }}%" aria-valuenow="{{ p['passing'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Scorer</td>
-                  <td class="text-small">{{ p['scorer'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['scorer'] * 5 }}%" aria-valuenow="{{ p['scorer'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Set pieces</td>
-                  <td class="text-small">{{ p['set_pieces'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['set_pieces'] * 5 }}%" aria-valuenow="{{ p['set_pieces'] * 5 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Form</td>
-                  <td class="text-small">{{ p['form'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['form'] / 8 * 100 }}%" aria-valuenow="{{ p['form'] / 8 * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-small">Stamina</td>
-                  <td class="text-small">{{ p['stamina'] }}</td>
-                  <td class="text-small" style="width: 80%">
-                    <div class="progress" style="height: 13px;">
-                      <div class="progress-bar" role="progressbar" style="width: {{ p['stamina'] / 9 * 100 }}%" aria-valuenow="{{ p['stamina'] / 9 * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-
-            <div class="player-chart" style="margin: 1rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 0.25rem; max-width: 470px; max-height: 320px;">
-              <canvas id="myLineChart{{ p['ht_id'] }}" width="450" height="300"></canvas>
+                  </div>
+                  <table class="table-custom" style="max-width: 450px;">
+                    <tr>
+                      <td class="text-small">Keeper</td>
+                      <td class="text-small">{{ p['keeper'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['keeper'] * 5 }}%"
+                               aria-valuenow="{{ p['keeper'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Defender</td>
+                      <td class="text-small">{{ p['defender'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['defender'] * 5 }}%"
+                               aria-valuenow="{{ p['defender'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Playmaker</td>
+                      <td class="text-small">{{ p['playmaker'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['playmaker'] * 5 }}%"
+                               aria-valuenow="{{ p['playmaker'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Winger</td>
+                      <td class="text-small">{{ p['winger'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['winger'] * 5 }}%"
+                               aria-valuenow="{{ p['winger'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Passing</td>
+                      <td class="text-small">{{ p['passing'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['passing'] * 5 }}%"
+                               aria-valuenow="{{ p['passing'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Scorer</td>
+                      <td class="text-small">{{ p['scorer'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['scorer'] * 5 }}%"
+                               aria-valuenow="{{ p['scorer'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Set pieces</td>
+                      <td class="text-small">{{ p['set_pieces'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['set_pieces'] * 5 }}%"
+                               aria-valuenow="{{ p['set_pieces'] * 5 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Form</td>
+                      <td class="text-small">{{ p['form'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['form'] / 8 * 100 }}%"
+                               aria-valuenow="{{ p['form'] / 8 * 100 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="text-small">Stamina</td>
+                      <td class="text-small">{{ p['stamina'] }}</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: {{ p['stamina'] / 9 * 100 }}%"
+                               aria-valuenow="{{ p['stamina'] / 9 * 100 }}"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                  <div class="player-chart"
+                       style="margin: 1rem 0;
+                              padding: 0.5rem;
+                              background: #f8f9fa;
+                              border-radius: 0.25rem;
+                              max-width: 470px;
+                              max-height: 320px">
+                    <canvas id="myLineChart{{ p['ht_id'] }}" width="450" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
             </div>
-
-
-
-
-
-
+          </div>
         </div>
       </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    {% endfor %}
   {% endfor %}
-  {% endfor %}
-
 </div>
-
 {% endblock %}

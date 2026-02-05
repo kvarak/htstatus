@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
-
 {% block scripts %}
-
-{{ super() }}
-
-<script>
+  {{ super() }}
+  <script>
   var color = jSuites.color(document.getElementById('color-picker-bg-new'), {
       closeOnChange: true,
   });
@@ -26,11 +23,8 @@
     {% endif %}
   {% endfor %}
 
-</script>
-
-
-<script>
-
+  </script>
+  <script>
 var columnfilter = document.getElementById('columnfilter');
 new Sortable(columnfilter, {
     filter: '.filtered', // 'filtered' class is not draggable
@@ -59,151 +53,239 @@ function resetTutorialProgress() {
   }
 }
 
-</script>
-
+  </script>
 {% endblock %}
-
 {% block content %}
-
-<div class="container">
-
-  <div class="row">
-    <div class="col-sm">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-        </ol>
-      </nav>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+          </ol>
+        </nav>
+      </div>
     </div>
-  </div>
-
-  <!-- Tutorial Reset Section -->
-  <div class="row mb-3">
-    <div class="col-sm">
-      <div class="card">
-        <div class="card-body py-3">
-          <div class="d-flex align-items-center justify-content-between">
-            <div>
-              <h6 class="card-title mb-1">Tutorial & Help</h6>
-              <p class="text-muted mb-0 small">Reset your tutorial progress to see all guided tours again</p>
+    <!-- Tutorial Reset Section -->
+    <div class="row mb-3">
+      <div class="col-sm">
+        <div class="card">
+          <div class="card-body py-3">
+            <div class="d-flex align-items-center justify-content-between">
+              <div>
+                <h6 class="card-title mb-1">Tutorial & Help</h6>
+                <p class="text-muted mb-0 small">Reset your tutorial progress to see all guided tours again</p>
+              </div>
+              <button type="button"
+                      class="btn btn-outline-primary btn-sm"
+                      onclick="resetTutorialProgress()">
+                <i class="fas fa-redo-alt"></i> Reset Tutorial
+              </button>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm" onclick="resetTutorialProgress()">
-              <i class="fas fa-redo-alt"></i> Reset Tutorial
-            </button>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  {% if error %}
-  <div class="alert alert-danger" role="alert">
-    {{ error }}
-  </div>
-  {% endif %}
-
-  <div class="row">
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <div id="filter" class="row">
-
-              <div id="filter" class="col">
-                <h5 class="card-title">Player columns</h5>
-                <p class="text-sm13 card-text">Select what columns you want to show in your player table.</p>
-                    <form method="POST" action="/settings">
-                  <input type="hidden" id="columnsorder" name="columnsorder" value="empty">
-                  <button type="submit" class="btn btn-outline-secondary btn-sm" name="savecolumns" value="savecolumns" onclick="saveorder();">Save</button>
-                  <button type="submit" class="btn btn-outline-secondary btn-sm" name="defaultcolumns" value="defaultcolumns">Show default</button>
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    <div class="row">
+      <div class="col-sm">
+        <div class="card-deck">
+          <div class="card">
+            <div class="card-body">
+              <div id="filter" class="row">
+                <div id="filter" class="col">
+                  <h5 class="card-title">Player columns</h5>
+                  <p class="text-sm13 card-text">Select what columns you want to show in your player table.</p>
+                  <form method="POST" action="/settings">
+                    <input type="hidden" id="columnsorder" name="columnsorder" value="empty">
+                    <button type="submit"
+                            class="btn btn-outline-secondary btn-sm"
+                            name="savecolumns"
+                            value="savecolumns"
+                            onclick="saveorder();">Save</button>
+                    <button type="submit"
+                            class="btn btn-outline-secondary btn-sm"
+                            name="defaultcolumns"
+                            value="defaultcolumns">Show default</button>
+                  </form>
+                  {% if showdefaultcolumns %}
+                    <p class="text-sm13 card-text" style="color: red; font-size: xx-small;">
+                      Just showing the default columns, you need to click save to save it.
+                    </p>
+                  {% endif %}
+                </div>
+                <div id="columnfilter" class="list-group col">
+                  {% for (n, c) in columns %}<div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>{% endfor %}
+                  <div class="list-group-item text-sm13 bg-roundup filtered">
+                    <b>▼ Hidden columns ▼</b>
+                  </div>
+                  {% for (n, c) in hiddencolumns %}<div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>{% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm">
+        <div class="card-deck">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Player groups</h5>
+              <p class="card-text">
+                <form method="POST" action="/settings">
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <button type="submit"
+                              class="btn btn-outline-secondary btn-sm"
+                              name="addgroup"
+                              value="addbutton">Add</button>
+                    </div>
+                    <input type="text"
+                           name="groupname"
+                           class="form-control form-control-sm"
+                           placeholder="Group name"
+                           aria-label="Text input with segmented dropdown button">
+                    <input type="number"
+                           name="grouporder"
+                           class="form-control form-control-sm"
+                           placeholder="Order"
+                           aria-label="Number input"
+                           data-toggle="tooltip"
+                           data-placement="top"
+                           title="The lowest order value will be first in the player table.">
+                    <input type="text"
+                           id="color-picker-bg-new"
+                           name="bgcolor"
+                           class="form-control form-control-sm"
+                           placeholder="#bgcolor"
+                           aria-label="Text input"
+                           data-toggle="tooltip"
+                           data-placement="top"
+                           title="Background color">
+                    <input type="text"
+                           id="color-picker-text-new"
+                           name="textcolor"
+                           class="form-control form-control-sm"
+                           placeholder="#textcolor"
+                           aria-label="Text input"
+                           data-toggle="tooltip"
+                           data-placement="top"
+                           title="Text color">
+                  </div>
                 </form>
-                {% if showdefaultcolumns %}
-                <p class="text-sm13 card-text" style="color: red; font-size: xx-small;">Just showing the default columns, you need to click save to save it.</p>
-                {% endif %}
-              </div>
-
-              <div id="columnfilter" class="list-group col">
-                {% for (n, c) in columns %}
-                <div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>
+                {% for group in group_data %}
+                  {% if group.name == "<default>" %}
+                    <form method="POST" action="/settings">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <button type="submit"
+                                  class="btn btn-outline-secondary btn-sm"
+                                  name="updategroup"
+                                  value="updatebutton"
+                                  disabled>Update</button>
+                        </div>
+                        <input type="text"
+                               name="groupname"
+                               class="form-control form-control-sm"
+                               value="{{ group.name }}"
+                               aria-label="Text input with segmented dropdown button"
+                               style="color: {{ group.textcolor }};
+                                      background: {{ group.bgcolor }}"
+                               disabled>
+                        <input type="number"
+                               name="grouporder"
+                               class="form-control form-control-sm"
+                               value="{{ group.order }}"
+                               aria-label="Number input"
+                               disabled>
+                        <input type="text"
+                               name="bgcolor"
+                               class="form-control form-control-sm"
+                               value="{{ group.bgcolor }}"
+                               aria-label="Text input"
+                               disabled>
+                        <input type="text"
+                               name="textcolor"
+                               class="form-control form-control-sm"
+                               value="{{ group.textcolor }}"
+                               aria-label="Text input"
+                               disabled>
+                        <div class="input-group-append">
+                          <button type="submit"
+                                  class="btn btn-outline-secondary btn-sm"
+                                  name="deletegroup"
+                                  value="deletebutton"
+                                  disabled>
+                            <font color="red">Delete</font>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  {% else %}
+                    <form method="POST" action="/settings">
+                      <input type="hidden" id="groupid" name="groupid" value="{{ group.id }}">
+                      <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <button type="submit"
+                                  class="btn btn-outline-secondary btn-sm"
+                                  name="updategroup"
+                                  value="updatebutton">Update</button>
+                        </div>
+                        <input type="text"
+                               name="groupname"
+                               class="form-control form-control-sm"
+                               value="{{ group.name }}"
+                               aria-label="Text input with segmented dropdown button"
+                               style="color: {{ group.textcolor }};
+                                      background: {{ group.bgcolor }}">
+                        <input type="number"
+                               name="grouporder"
+                               class="form-control form-control-sm"
+                               value="{{ group.order }}"
+                               aria-label="Number input"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="The lowest order value will be first in the player table.">
+                        <input type="text"
+                               id="color-picker-bg-{{ group.id }}"
+                               name="bgcolor"
+                               class="form-control form-control-sm"
+                               value="{{ group.bgcolor }}"
+                               aria-label="Text input"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Background color">
+                        <input type="text"
+                               id="color-picker-text-{{ group.id }}"
+                               name="textcolor"
+                               class="form-control form-control-sm"
+                               value="{{ group.textcolor }}"
+                               aria-label="Text input"
+                               data-toggle="tooltip"
+                               data-placement="top"
+                               title="Text color">
+                        <div class="input-group-append">
+                          <button type="submit"
+                                  class="btn btn-outline-secondary btn-sm"
+                                  name="deletegroup"
+                                  value="deletebutton">
+                            <font color="red">Delete</font>
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  {% endif %}
                 {% endfor %}
-                <div class="list-group-item text-sm13 bg-roundup filtered"><b>▼ Hidden columns ▼</b></div>
-                {% for (n, c) in hiddencolumns %}
-                <div class="list-group-item text-sm11" id="{{ c }}">{{ n }}</div>
-                {% endfor %}
-              </div>
-
+              </p>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Player groups</h5>
-            <p class="card-text">
-
-              <form method="POST" action="/settings">
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="addgroup" value="addbutton">Add</button>
-                  </div>
-                  <input type="text" name="groupname" class="form-control form-control-sm" placeholder="Group name" aria-label="Text input with segmented dropdown button">
-                  <input type="number" name="grouporder" class="form-control form-control-sm" placeholder="Order" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
-                  <input type="text" id="color-picker-bg-new" name="bgcolor" class="form-control form-control-sm" placeholder="#bgcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Background color">
-                  <input type="text" id="color-picker-text-new" name="textcolor" class="form-control form-control-sm" placeholder="#textcolor" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Text color">
-                </div>
-              </form>
-
-              {% for group in group_data %}
-              {% if group.name == "<default>" %}
-              <form method="POST" action="/settings">
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="updategroup" value="updatebutton" disabled>Update</button>
-                  </div>
-                  <input type="text" name="groupname" class="form-control form-control-sm" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};" disabled>
-                  <input type="number" name="grouporder" class="form-control form-control-sm" value="{{ group.order }}" aria-label="Number input" disabled>
-                  <input type="text" name="bgcolor" class="form-control form-control-sm" value="{{ group.bgcolor }}" aria-label="Text input" disabled>
-                  <input type="text" name="textcolor" class="form-control form-control-sm" value="{{ group.textcolor }}" aria-label="Text input" disabled>
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm"  name="deletegroup" value="deletebutton" disabled><font color="red">Delete</font></button>
-                  </div>
-                </div>
-              </form>
-              {% else %}
-              <form method="POST" action="/settings">
-                <input type="hidden" id="groupid" name="groupid" value="{{ group.id }}">
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm" name="updategroup" value="updatebutton">Update</button>
-                  </div>
-                  <input type="text" name="groupname" class="form-control form-control-sm" value="{{ group.name }}" aria-label="Text input with segmented dropdown button" style="color: {{ group.textcolor }}; background: {{ group.bgcolor }};">
-                  <input type="number" name="grouporder" class="form-control form-control-sm" value="{{ group.order }}" aria-label="Number input" data-toggle="tooltip" data-placement="top" title="The lowest order value will be first in the player table.">
-                  <input type="text" id="color-picker-bg-{{ group.id }}" name="bgcolor" class="form-control form-control-sm" value="{{ group.bgcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Background color">
-                  <input type="text" id="color-picker-text-{{ group.id }}" name="textcolor" class="form-control form-control-sm" value="{{ group.textcolor }}" aria-label="Text input" data-toggle="tooltip" data-placement="top" title="Text color">
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-outline-secondary btn-sm"  name="deletegroup" value="deletebutton"><font color="red">Delete</font></button>
-                  </div>
-                </div>
-              </form>
-
-              {% endif %}
-              {% endfor %}
-
-            </p>
-          </div>
-        </div>
-        <!-- <div class="card">
+          <!-- <div class="card">
           <div class="card-body">
             <p></p>
           </div>
         </div> -->
+        </div>
       </div>
     </div>
   </div>
-</div>
-
 {% endblock %}
