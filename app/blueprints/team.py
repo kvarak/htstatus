@@ -119,7 +119,6 @@ def update():
             archive_team_id = int(archive_team_id)
             if archive_team_id in all_teams:
                 # Track archive usage
-                from app.model_registry import get_user_model
                 from app.utils import downloadMatches
                 User = get_user_model()
                 current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
