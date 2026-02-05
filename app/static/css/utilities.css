@@ -41,6 +41,56 @@
 .pt-2 { padding-top: 0.5rem !important; }
 .pt-3 { padding-top: 1rem !important; }
 
+/* Background Color Utilities */
+.bg-blue-50 {
+    background-color: #42a5f5 !important; /* Much darker blue */
+}
+
+.bg-blue-100 {
+    background-color: #42a5f5 !important; /* Same as bg-blue-50 */
+}
+
+/* Border Color Utilities */
+.border-blue-300 {
+    border-color: #1565c0 !important; /* Very dark blue border */
+}
+
+.border-blue-400 {
+    border-color: #1565c0 !important; /* Same as border-blue-300 */
+}
+
+/* Interactive Element Styling */
+[data-player-item]:hover,
+[data-match-item]:hover {
+    background-color: #42a5f5 !important;
+    border-color: #1565c0 !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+    color: white !important;
+}
+
+[data-player-item]:hover *,
+[data-match-item]:hover * {
+    color: white !important;
+}
+
+[data-player-item].active,
+[data-match-item].active,
+[data-player-item].bg-blue-50,
+[data-match-item].bg-blue-50 {
+    background-color: #42a5f5 !important;
+    border-color: #1565c0 !important;
+    box-shadow: 0 2px 4px rgba(21, 101, 192, 0.3);
+    color: white !important;
+}
+
+[data-player-item].active *,
+[data-match-item].active *,
+[data-player-item].bg-blue-50 *,
+[data-match-item].bg-blue-50 * {
+    color: white !important;
+}
+
 /* Display Utilities */
 .d-none { display: none !important; }
 .d-block { display: block !important; }

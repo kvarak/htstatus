@@ -96,3 +96,41 @@
     white-space: pre-wrap;
     line-height: 1.5;
 }
+
+/* Bootstrap Tooltip Override */
+.tooltip .tooltip-inner {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Match Tables */
+.table-custom thead th {
+    background-color: hsl(120, 8%, 97%);
+    border-bottom: 2px solid hsl(120, 20%, 85%);
+    font-weight: 600;
+    color: hsl(120, 45%, 25%);
+    font-size: 0.875rem;
+}
+
+.match-row {
+    transition: background-color 0.15s ease-in-out;
+}
+
+.match-row:hover {
+    background-color: hsl(120, 8%, 97%) !important;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+/* Filter Buttons */
+.filter-btn {
+    transition: all 0.15s ease-in-out;
+}
+
+.filter-btn.active {
+    background-color: hsl(120, 45%, 25%) !important;
+    border-color: hsl(120, 45%, 25%) !important;
+    color: white !important;
+}

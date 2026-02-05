@@ -42,6 +42,10 @@
     color: hsl(45, 90%, 55%);
 }
 
+.status-info {
+    color: hsl(210, 70%, 45%);
+}
+
 /* Timeline Layout - 4 Column Grid */
 .timeline-container {
     background: white;
