@@ -116,30 +116,51 @@ def update():
 
     if archive_request and archive_team_id:
         try:
+            # Convert team ID with specific error handling
             archive_team_id = int(archive_team_id)
-            if archive_team_id in all_teams:
+        except (ValueError, TypeError):
+            dprint(1, f"Archive team ID conversion failed for: '{archive_team_id}'")
+            flash("Invalid team ID format for archive download", "error")
+            return redirect(url_for('matches.matches', id=request.args.get('id', '')))
+
+        dprint(1, f"Archive request: archive={archive_request}, id={archive_team_id} (type: {type(archive_team_id)})")
+
+        if archive_team_id in all_teams:
+            try:
+                dprint(1, f"Team {archive_team_id} found in all_teams: {all_teams}")
                 # Track archive usage
+                dprint(1, "Importing downloadMatches...")
                 from app.utils import downloadMatches
+                dprint(1, "Getting user model...")
                 User = get_user_model()
+                dprint(1, "Querying current user...")
                 current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
                 if current_user:
+                    dprint(1, "Updating user matches_archive counter...")
                     current_user.matches_archive()
+                    dprint(1, "Committing user update...")
                     db.session.commit()
+                    dprint(1, "User update committed successfully")
+                else:
+                    dprint(1, "Warning: Current user not found in database")
 
                 dprint(1, f"Archive download requested for team {archive_team_id}")
                 result = downloadMatches(archive_team_id, chpp)
+                dprint(1, f"downloadMatches result: {result}")
 
                 if result["success"]:
+                    dprint(1, f"Archive download successful: {result['message']}")
                     flash(result["message"], "success")
                 else:
+                    dprint(1, f"Archive download failed: {result.get('message', 'Archive download failed')}")
                     flash(result.get("message", "Archive download failed"), "error")
-            else:
-                flash("Invalid team ID for archive download", "error")
 
-        except (ValueError, TypeError):
-            flash("Invalid team ID format for archive download", "error")
-        except Exception as e:
-            flash(f"Archive download failed: {str(e)}", "error")
+            except Exception as e:
+                dprint(1, f"Archive download error: {str(e)}")
+                flash(f"Archive download failed: {str(e)}", "error")
+        else:
+            dprint(1, f"Team {archive_team_id} not found in all_teams: {all_teams}")
+            flash("Invalid team ID for archive download", "error")
 
         # Redirect back to matches page after archive download
         return redirect(url_for('matches.matches', id=archive_team_id))

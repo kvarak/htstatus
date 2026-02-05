@@ -101,17 +101,18 @@ def matches():
 
         all_teams = session["all_teams"]
 
+        # Validate team ID before proceeding
+        error = ""
+        if not teamid or teamid not in all_teams:
+            error = "Wrong teamid, try the links."
+            return create_page(template="matches.html", error=error, title="Matches")
+
         # Handle archive download request - redirect to update route
         updatebutton = request.form.get("updatebutton")
         if updatebutton == "archive":
             # Redirect to update route with archive parameter and team ID
             from flask import redirect, url_for
             return redirect(url_for('team.update', archive=1, id=teamid))
-
-        error = ""
-        if not teamid or teamid not in all_teams:
-            error = "Wrong teamid, try the links."
-            return create_page(template="matches.html", error=error, title="Matches")
 
         if "all_team_names" not in session or not session["all_team_names"]:
             dprint(1, "No team names in session")
