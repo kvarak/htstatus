@@ -8,7 +8,16 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 from typing import Any
 
-from app.chpp.models import CHPPMatch, CHPPPlayer, CHPPTeam, CHPPUser
+from app.chpp.models import (
+    CHPPMatch,
+    CHPPMatchDetails,
+    CHPPMatchLineup,
+    CHPPMatchLineupPlayer,
+    CHPPPlayer,
+    CHPPPlayerEvent,
+    CHPPTeam,
+    CHPPUser,
+)
 
 
 def safe_find_text(root: ET.Element, xpath: str, default: Any = None) -> Any:
@@ -28,7 +37,7 @@ def safe_find_text(root: ET.Element, xpath: str, default: Any = None) -> Any:
     return default
 
 
-def safe_find_int(root: ET.Element, xpath: str, default: int = 0) -> int:
+def safe_find_int(root: ET.Element, xpath: str, default: int | None = 0) -> int | None:
     """Extract integer from XML element.
 
     Args:
@@ -619,3 +628,298 @@ def parse_matches(root: ET.Element) -> list[CHPPMatch]:
         matches.append(match)
 
     return matches
+
+
+def parse_matchdetails(root: ET.Element) -> "CHPPMatchDetails":
+    """Parse matchdetails XML response into CHPPMatchDetails object.
+
+    Args:
+        root: XML root element from matchdetails endpoint
+
+    Returns:
+        CHPPMatchDetails object with comprehensive match statistics
+    """
+    from app.chpp.models import CHPPMatchDetails
+
+    # Extract match ID
+    ht_id = safe_find_int(root, ".//Match/MatchID")
+
+    # Extract team statistics - possession split by halves (at Match level)
+    possession_first_half_home = safe_find_int(root, ".//PossessionFirstHalfHome", None)
+    possession_first_half_away = safe_find_int(root, ".//PossessionFirstHalfAway", None)
+    possession_second_half_home = safe_find_int(root, ".//PossessionSecondHalfHome", None)
+    possession_second_half_away = safe_find_int(root, ".//PossessionSecondHalfAway", None)
+
+    # CHPP API provides 5 chance types per team (added in v3.1, March 2022)
+    # Path: HattrickData → Match → HomeTeam → NrOfChances*
+    home_team_chances_left = safe_find_int(root, ".//Match/HomeTeam/NrOfChancesLeft", None)
+    home_team_chances_center = safe_find_int(root, ".//Match/HomeTeam/NrOfChancesCenter", None)
+    home_team_chances_right = safe_find_int(root, ".//Match/HomeTeam/NrOfChancesRight", None)
+    home_team_chances_special = safe_find_int(root, ".//Match/HomeTeam/NrOfChancesSpecialEvents", None)
+    home_team_chances_other = safe_find_int(root, ".//Match/HomeTeam/NrOfChancesOther", None)
+
+    away_team_chances_left = safe_find_int(root, ".//Match/AwayTeam/NrOfChancesLeft", None)
+    away_team_chances_center = safe_find_int(root, ".//Match/AwayTeam/NrOfChancesCenter", None)
+    away_team_chances_right = safe_find_int(root, ".//Match/AwayTeam/NrOfChancesRight", None)
+    away_team_chances_special = safe_find_int(root, ".//Match/AwayTeam/NrOfChancesSpecialEvents", None)
+    away_team_chances_other = safe_find_int(root, ".//Match/AwayTeam/NrOfChancesOther", None)
+
+    # Team ratings - midfield (primary)
+    home_team_rating = safe_find_float(root, ".//HomeTeam/RatingMidfield", None)
+    away_team_rating = safe_find_float(root, ".//AwayTeam/RatingMidfield", None)
+
+    # Team ratings - defense by position
+    home_team_rating_right_def = safe_find_float(root, ".//HomeTeam/RatingRightDef", None)
+    home_team_rating_mid_def = safe_find_float(root, ".//HomeTeam/RatingMidDef", None)
+    home_team_rating_left_def = safe_find_float(root, ".//HomeTeam/RatingLeftDef", None)
+    away_team_rating_right_def = safe_find_float(root, ".//AwayTeam/RatingRightDef", None)
+    away_team_rating_mid_def = safe_find_float(root, ".//AwayTeam/RatingMidDef", None)
+    away_team_rating_left_def = safe_find_float(root, ".//AwayTeam/RatingLeftDef", None)
+
+    # Team ratings - attack by position
+    home_team_rating_right_att = safe_find_float(root, ".//HomeTeam/RatingRightAtt", None)
+    home_team_rating_mid_att = safe_find_float(root, ".//HomeTeam/RatingMidAtt", None)
+    home_team_rating_left_att = safe_find_float(root, ".//HomeTeam/RatingLeftAtt", None)
+    away_team_rating_right_att = safe_find_float(root, ".//AwayTeam/RatingRightAtt", None)
+    away_team_rating_mid_att = safe_find_float(root, ".//AwayTeam/RatingMidAtt", None)
+    away_team_rating_left_att = safe_find_float(root, ".//AwayTeam/RatingLeftAtt", None)
+
+    # Set pieces ratings
+    home_team_rating_set_pieces_def = safe_find_float(root, ".//HomeTeam/RatingIndirectSetPiecesDef", None)
+    home_team_rating_set_pieces_att = safe_find_float(root, ".//HomeTeam/RatingIndirectSetPiecesAtt", None)
+    away_team_rating_set_pieces_def = safe_find_float(root, ".//AwayTeam/RatingIndirectSetPiecesDef", None)
+    away_team_rating_set_pieces_att = safe_find_float(root, ".//AwayTeam/RatingIndirectSetPiecesAtt", None)
+
+    # Arena data
+    attendance = safe_find_int(root, ".//Arena/SoldTotal", None)
+    arena_capacity_terraces = safe_find_int(root, ".//Arena/SoldTerraces", None)
+    arena_capacity_basic = safe_find_int(root, ".//Arena/SoldBasic", None)
+    arena_capacity_roof = safe_find_int(root, ".//Arena/SoldRoof", None)
+    arena_capacity_vip = safe_find_int(root, ".//Arena/SoldVIP", None)
+    weather_id = safe_find_int(root, ".//Arena/WeatherID", None)
+    added_minutes = safe_find_int(root, ".//Match/AddedMinutes", None)
+
+    # Match officials (primary referee)
+    referee_id = safe_find_int(root, ".//MatchOfficials/Referee/RefereeId", None)
+    referee_name = safe_find_text(root, ".//MatchOfficials/Referee/RefereeName", "")
+    referee_country_id = safe_find_int(root, ".//MatchOfficials/Referee/RefereeCountryId", None)
+    referee_country = safe_find_text(root, ".//MatchOfficials/Referee/RefereeCountryName", "")
+    referee_team_id = safe_find_int(root, ".//MatchOfficials/Referee/RefereeTeamId", None)
+    referee_team_name = safe_find_text(root, ".//MatchOfficials/Referee/RefereeTeamname", "")
+
+    # Team details
+    home_team_dress_uri = safe_find_text(root, ".//HomeTeam/DressURI", "")
+    away_team_dress_uri = safe_find_text(root, ".//AwayTeam/DressURI", "")
+    home_team_attitude = safe_find_int(root, ".//HomeTeam/TeamAttitude", None)
+    away_team_attitude = safe_find_int(root, ".//AwayTeam/TeamAttitude", None)
+    home_team_tactic_type = safe_find_int(root, ".//HomeTeam/TacticType", None)
+    home_team_tactic_skill = safe_find_int(root, ".//HomeTeam/TacticSkill", None)
+    away_team_tactic_type = safe_find_int(root, ".//AwayTeam/TacticType", None)
+    away_team_tactic_skill = safe_find_int(root, ".//AwayTeam/TacticSkill", None)
+
+    # Parse scorers (goals)
+    scorers = []
+    for goal in root.findall(".//Scorers/Goal"):
+        scorer_data = {
+            "player_id": safe_find_int(goal, "ScorerPlayerID"),
+            "player_name": safe_find_text(goal, "ScorerPlayerName", ""),
+            "team_id": safe_find_int(goal, "ScorerTeamID"),
+            "minute": safe_find_int(goal, "ScorerMinute"),
+            "home_goals": safe_find_int(goal, "ScorerHomeGoals"),
+            "away_goals": safe_find_int(goal, "ScorerAwayGoals"),
+        }
+        scorers.append(scorer_data)
+
+    # Parse bookings (yellow/red cards)
+    bookings = []
+    for booking in root.findall(".//Bookings/Booking"):
+        booking_data = {
+            "player_id": safe_find_int(booking, "BookingPlayerID"),
+            "player_name": safe_find_text(booking, "BookingPlayerName", ""),
+            "team_id": safe_find_int(booking, "BookingTeamID"),
+            "booking_type": safe_find_int(booking, "BookingType"),  # 1=yellow, 2=red
+            "minute": safe_find_int(booking, "BookingMinute"),
+        }
+        bookings.append(booking_data)
+
+    # Parse injuries
+    injuries = []
+    for injury in root.findall(".//Injuries/Injury"):
+        injury_data = {
+            "player_id": safe_find_int(injury, "InjuryPlayerID"),
+            "player_name": safe_find_text(injury, "InjuryPlayerName", ""),
+            "team_id": safe_find_int(injury, "InjuryTeamID"),
+            "injury_type": safe_find_int(injury, "InjuryType"),  # 1=bruise, 2=injury
+            "minute": safe_find_int(injury, "InjuryMinute"),
+        }
+        injuries.append(injury_data)
+
+    return CHPPMatchDetails(
+        ht_id=ht_id,
+        possession_first_half_home=possession_first_half_home,
+        possession_first_half_away=possession_first_half_away,
+        possession_second_half_home=possession_second_half_home,
+        possession_second_half_away=possession_second_half_away,
+        home_team_chances_left=home_team_chances_left,
+        home_team_chances_center=home_team_chances_center,
+        home_team_chances_right=home_team_chances_right,
+        home_team_chances_special=home_team_chances_special,
+        home_team_chances_other=home_team_chances_other,
+        away_team_chances_left=away_team_chances_left,
+        away_team_chances_center=away_team_chances_center,
+        away_team_chances_right=away_team_chances_right,
+        away_team_chances_special=away_team_chances_special,
+        away_team_chances_other=away_team_chances_other,
+        home_team_rating=home_team_rating,
+        away_team_rating=away_team_rating,
+        home_team_rating_right_def=home_team_rating_right_def,
+        home_team_rating_mid_def=home_team_rating_mid_def,
+        home_team_rating_left_def=home_team_rating_left_def,
+        away_team_rating_right_def=away_team_rating_right_def,
+        away_team_rating_mid_def=away_team_rating_mid_def,
+        away_team_rating_left_def=away_team_rating_left_def,
+        home_team_rating_right_att=home_team_rating_right_att,
+        home_team_rating_mid_att=home_team_rating_mid_att,
+        home_team_rating_left_att=home_team_rating_left_att,
+        away_team_rating_right_att=away_team_rating_right_att,
+        away_team_rating_mid_att=away_team_rating_mid_att,
+        away_team_rating_left_att=away_team_rating_left_att,
+        home_team_rating_set_pieces_def=home_team_rating_set_pieces_def,
+        home_team_rating_set_pieces_att=home_team_rating_set_pieces_att,
+        away_team_rating_set_pieces_def=away_team_rating_set_pieces_def,
+        away_team_rating_set_pieces_att=away_team_rating_set_pieces_att,
+        attendance=attendance,
+        arena_capacity_terraces=arena_capacity_terraces,
+        arena_capacity_basic=arena_capacity_basic,
+        arena_capacity_roof=arena_capacity_roof,
+        arena_capacity_vip=arena_capacity_vip,
+        weather_id=weather_id,
+        added_minutes=added_minutes,
+        referee_id=referee_id,
+        referee_name=referee_name,
+        referee_country_id=referee_country_id,
+        referee_country=referee_country,
+        referee_team_id=referee_team_id,
+        referee_team_name=referee_team_name,
+        home_team_dress_uri=home_team_dress_uri,
+        away_team_dress_uri=away_team_dress_uri,
+        home_team_attitude=home_team_attitude,
+        away_team_attitude=away_team_attitude,
+        home_team_tactic_type=home_team_tactic_type,
+        home_team_tactic_skill=home_team_tactic_skill,
+        away_team_tactic_type=away_team_tactic_type,
+        away_team_tactic_skill=away_team_tactic_skill,
+        scorers=scorers,
+        bookings=bookings,
+        injuries=injuries
+    )
+
+
+def parse_matchlineup(root: ET.Element) -> "CHPPMatchLineup":
+    """Parse matchlineup XML response into CHPPMatchLineup object.
+
+    Args:
+        root: XML root element from matchlineup endpoint
+
+    Returns:
+        CHPPMatchLineup object with lineup and player rating data
+    """
+    from app.chpp.models import CHPPMatchLineup
+
+    # Extract match ID
+    ht_id = safe_find_int(root, ".//Match/MatchID")
+
+    # Extract formations
+    home_team_formation = safe_find_text(root, ".//HomeTeam/Formation", "")
+    away_team_formation = safe_find_text(root, ".//AwayTeam/Formation", "")
+
+    # Extract tactics
+    home_team_tactic = safe_find_text(root, ".//HomeTeam/TacticType", "")
+    away_team_tactic = safe_find_text(root, ".//AwayTeam/TacticType", "")
+
+    # Parse home team players
+    home_team_players = []
+    for player_elem in root.findall(".//HomeTeam/StartingLineup/Player"):
+        player = CHPPMatchLineupPlayer(
+            player_id=safe_find_int(player_elem, "PlayerID"),
+            name=safe_find_text(player_elem, "PlayerName", ""),
+            rating_stars=safe_find_float(player_elem, "RatingStars", 0.0),
+            rating_stars_eom=safe_find_float(player_elem, "RatingStarsEndOfMatch", 0.0),
+            role_id=safe_find_int(player_elem, "RoleID"),
+            behaviour=safe_find_int(player_elem, "Behaviour"),
+            minutes_played=90  # Default for starting players, actual substitution logic could be more complex
+        )
+        home_team_players.append(player)
+
+    # Parse away team players
+    away_team_players = []
+    for player_elem in root.findall(".//AwayTeam/StartingLineup/Player"):
+        player = CHPPMatchLineupPlayer(
+            player_id=safe_find_int(player_elem, "PlayerID"),
+            name=safe_find_text(player_elem, "PlayerName", ""),
+            rating_stars=safe_find_float(player_elem, "RatingStars", 0.0),
+            rating_stars_eom=safe_find_float(player_elem, "RatingStarsEndOfMatch", 0.0),
+            role_id=safe_find_int(player_elem, "RoleID"),
+            behaviour=safe_find_int(player_elem, "Behaviour"),
+            minutes_played=90
+        )
+        away_team_players.append(player)
+
+    return CHPPMatchLineup(
+        ht_id=ht_id,
+        home_team_formation=home_team_formation,
+        away_team_formation=away_team_formation,
+        home_team_players=home_team_players,
+        away_team_players=away_team_players,
+        home_team_tactic=home_team_tactic,
+        away_team_tactic=away_team_tactic
+    )
+
+
+def parse_playerevents(root: ET.Element) -> list["CHPPPlayerEvent"]:
+    """Parse playerevents XML response into list of CHPPPlayerEvent objects.
+
+    Args:
+        root: XML root element from playerevents endpoint
+
+    Returns:
+        List of CHPPPlayerEvent objects representing player career events
+    """
+    from app.chpp.models import CHPPPlayerEvent
+
+    events = []
+    for event_elem in root.findall(".//PlayerEvent"):
+        event = CHPPPlayerEvent(
+            player_id=safe_find_int(event_elem, "PlayerID"),
+            match_id=safe_find_int(event_elem, "MatchID"),
+            event_type=safe_find_text(event_elem, "EventType", ""),
+            minute=safe_find_int(event_elem, "Minute"),
+            team_id=safe_find_int(event_elem, "TeamID"),
+            opponent_team_id=safe_find_int(event_elem, "OpponentTeamID"),
+            event_text=safe_find_text(event_elem, "EventText", ""),
+            season=safe_find_int(event_elem, "Season"),
+            match_date=safe_find_text(event_elem, "MatchDate", "")
+        )
+        events.append(event)
+
+    return events
+
+
+def safe_find_float(root: ET.Element, xpath: str, default: float | None = 0.0) -> float | None:
+    """Extract float from XML element.
+
+    Args:
+        root: XML element to search
+        xpath: XPath query string
+        default: Value to return if element not found or not a float
+
+    Returns:
+        Float value if found and valid, otherwise default
+    """
+    text = safe_find_text(root, xpath)
+    if text:
+        try:
+            return float(text)
+        except (ValueError, TypeError):
+            return default
+    return default

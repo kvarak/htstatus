@@ -1138,12 +1138,26 @@ def downloadRecentMatches(teamid, chpp=None):
         recent_count = 0
         upcoming_count = 0
         total_added = 0
+        total_enhanced = 0
         current_time = datetime.now()
 
         for match in matches:
             try:
-                # Parse match datetime
-                match_datetime = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
+                # Parse match datetime - handle both string and datetime objects
+                if hasattr(match.datetime, 'year'):
+                    # Already a datetime object
+                    match_datetime = match.datetime
+                elif match.datetime:
+                    # String datetime - try multiple formats
+                    try:
+                        match_datetime = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
+                    except ValueError:
+                        from dateutil import parser
+                        match_datetime = parser.parse(match.datetime)
+                else:
+                    # No datetime available - skip this match
+                    dprint(3, f"Skipping match {match.ht_id} - no datetime")
+                    continue
 
                 # Check if match has been played (recent) or is upcoming
                 if match_datetime < current_time and match.home_goals is not None:
@@ -1151,15 +1165,20 @@ def downloadRecentMatches(teamid, chpp=None):
                 elif match_datetime > current_time:
                     upcoming_count += 1
 
-                # Save match to database (use existing _process_matches helper)
-                added, updated = _process_matches([match])
+                # Save match to database (use enhanced processing)
+                added, updated, enhanced = _process_matches_enhanced([match], chpp, fetch_enhanced=True)
                 total_added += added
+                total_enhanced += enhanced
 
             except Exception as e:
                 dprint(2, f"Warning: Could not process match {match.ht_id}: {str(e)}")
+                import traceback
+                dprint(3, f"Match processing error details: {traceback.format_exc()}")
                 continue
 
         message = f"Recent matches download complete: {recent_count} recent, {upcoming_count} upcoming, {total_added} new matches saved"
+        if total_enhanced > 0:
+            message += f", {total_enhanced} enhanced with analytics"
         dprint(2, message)
 
         return {
@@ -1167,6 +1186,7 @@ def downloadRecentMatches(teamid, chpp=None):
             "recent_count": recent_count,
             "upcoming_count": upcoming_count,
             "count": total_added,
+            "enhanced_count": total_enhanced,
             "message": message
         }
 
@@ -1249,15 +1269,18 @@ def downloadMatches(teamid, chpp=None):
             matches_data = []
 
         # Process matches
-        added, updated = _process_matches(matches_data)
+        added, updated, enhanced = _process_matches_enhanced(matches_data, chpp, fetch_enhanced=True)
 
         message = f"Archive download complete: {added} new, {updated} updated"
+        if enhanced > 0:
+            message += f", {enhanced} enhanced with analytics"
         dprint(1, message)
 
         return {
             "success": True,
             "count": added,
             "updated": updated,
+            "enhanced_count": enhanced,
             "message": message
         }
 
@@ -1347,6 +1370,289 @@ def _process_matches(matches):
             continue
 
     return added, updated
+
+
+def fetch_enhanced_match_data(match_id, chpp=None):
+    """Fetch enhanced match data (statistics, lineup, events) for a finished match.
+
+    Args:
+        match_id: Hattrick match ID
+        chpp: CHPP client (optional, will create if not provided)
+
+    Returns:
+        dict: Enhanced match data or empty dict if unavailable
+    """
+
+    from flask import current_app, session
+
+    if chpp is None:
+        from app.chpp import CHPP
+        consumer_key = current_app.config.get("CONSUMER_KEY")
+        consumer_secret = current_app.config.get("CONSUMER_SECRETS")
+
+        if not consumer_key or not consumer_secret:
+            return {}
+
+        chpp = CHPP(
+            consumer_key, consumer_secret,
+            session["access_key"], session["access_secret"]
+        )
+
+    enhanced_data = {}
+
+    try:
+        # Fetch match details for comprehensive statistics
+        dprint(3, f"Fetching match details for match {match_id}")
+        details = chpp.matchdetails(id_=match_id, match_events=True)
+
+        # Calculate average possession for debug output
+        home_poss_avg = None
+        away_poss_avg = None
+        if (details.possession_first_half_home is not None and
+            details.possession_second_half_home is not None):
+            home_poss_avg = (details.possession_first_half_home + details.possession_second_half_home) / 2
+        if (details.possession_first_half_away is not None and
+            details.possession_second_half_away is not None):
+            away_poss_avg = (details.possession_first_half_away + details.possession_second_half_away) / 2
+
+        # Calculate total chances for debug output
+        home_total = sum(filter(None, [
+            details.home_team_chances_left,
+            details.home_team_chances_center,
+            details.home_team_chances_right,
+            details.home_team_chances_special,
+            details.home_team_chances_other
+        ]))
+        away_total = sum(filter(None, [
+            details.away_team_chances_left,
+            details.away_team_chances_center,
+            details.away_team_chances_right,
+            details.away_team_chances_special,
+            details.away_team_chances_other
+        ]))
+
+        # Debug: Check what we actually got from CHPP
+        dprint(3, f"  CHPP returned - possession: {home_poss_avg}/{away_poss_avg}, "
+               f"chances: {home_total}/{away_total}, "
+               f"attendance: {details.attendance}")
+
+        enhanced_data.update({
+            "possession_first_half_home": details.possession_first_half_home,
+            "possession_first_half_away": details.possession_first_half_away,
+            "possession_second_half_home": details.possession_second_half_home,
+            "possession_second_half_away": details.possession_second_half_away,
+            "home_team_chances_left": details.home_team_chances_left,
+            "home_team_chances_center": details.home_team_chances_center,
+            "home_team_chances_right": details.home_team_chances_right,
+            "home_team_chances_special": details.home_team_chances_special,
+            "home_team_chances_other": details.home_team_chances_other,
+            "away_team_chances_left": details.away_team_chances_left,
+            "away_team_chances_center": details.away_team_chances_center,
+            "away_team_chances_right": details.away_team_chances_right,
+            "away_team_chances_special": details.away_team_chances_special,
+            "away_team_chances_other": details.away_team_chances_other,
+            "home_team_rating": details.home_team_rating,
+            "away_team_rating": details.away_team_rating,
+            "home_team_rating_right_def": details.home_team_rating_right_def,
+            "home_team_rating_mid_def": details.home_team_rating_mid_def,
+            "home_team_rating_left_def": details.home_team_rating_left_def,
+            "away_team_rating_right_def": details.away_team_rating_right_def,
+            "away_team_rating_mid_def": details.away_team_rating_mid_def,
+            "away_team_rating_left_def": details.away_team_rating_left_def,
+            "home_team_rating_right_att": details.home_team_rating_right_att,
+            "home_team_rating_mid_att": details.home_team_rating_mid_att,
+            "home_team_rating_left_att": details.home_team_rating_left_att,
+            "away_team_rating_right_att": details.away_team_rating_right_att,
+            "away_team_rating_mid_att": details.away_team_rating_mid_att,
+            "away_team_rating_left_att": details.away_team_rating_left_att,
+            "home_team_rating_set_pieces_def": details.home_team_rating_set_pieces_def,
+            "home_team_rating_set_pieces_att": details.home_team_rating_set_pieces_att,
+            "away_team_rating_set_pieces_def": details.away_team_rating_set_pieces_def,
+            "away_team_rating_set_pieces_att": details.away_team_rating_set_pieces_att,
+            "attendance": details.attendance,
+            "arena_capacity_terraces": details.arena_capacity_terraces,
+            "arena_capacity_basic": details.arena_capacity_basic,
+            "arena_capacity_roof": details.arena_capacity_roof,
+            "arena_capacity_vip": details.arena_capacity_vip,
+            "weather_id": details.weather_id,
+            "added_minutes": details.added_minutes,
+            "referee_id": details.referee_id,
+            "referee_name": details.referee_name,
+            "referee_country_id": details.referee_country_id,
+            "referee_country": details.referee_country,
+            "referee_team_id": details.referee_team_id,
+            "referee_team_name": details.referee_team_name,
+            "home_team_dress_uri": details.home_team_dress_uri,
+            "away_team_dress_uri": details.away_team_dress_uri,
+            "home_team_attitude": details.home_team_attitude,
+            "away_team_attitude": details.away_team_attitude,
+            "home_team_tactic_type": details.home_team_tactic_type,
+            "home_team_tactic_skill": details.home_team_tactic_skill,
+            "away_team_tactic_type": details.away_team_tactic_type,
+            "away_team_tactic_skill": details.away_team_tactic_skill,
+        })
+
+        # Fetch match lineup for formation and tactical data
+        dprint(3, f"Fetching match lineup for match {match_id}")
+        lineup = chpp.matchlineup(id_=match_id)
+
+        enhanced_data.update({
+            "home_team_formation": lineup.home_team_formation,
+            "away_team_formation": lineup.away_team_formation,
+            "home_team_tactic": lineup.home_team_tactic,
+            "away_team_tactic": lineup.away_team_tactic,
+        })
+
+        # Filter out None values - only save fields that have actual data
+        enhanced_data = {k: v for k, v in enhanced_data.items() if v is not None}
+
+        if enhanced_data:
+            dprint(2, f"Successfully fetched enhanced data for match {match_id}: {len(enhanced_data)} fields")
+        else:
+            dprint(2, f"No enhanced data available for match {match_id}")
+
+    except Exception as e:
+        dprint(2, f"Could not fetch enhanced data for match {match_id}: {str(e)}")
+        # Return partial data if available
+        enhanced_data = {k: v for k, v in enhanced_data.items() if v is not None}
+
+    return enhanced_data
+
+
+def update_match_with_enhanced_data(match_id, enhanced_data):
+    """Update existing match record with enhanced analytics data.
+
+    Args:
+        match_id: Hattrick match ID
+        enhanced_data: Dictionary of enhanced match data
+
+    Returns:
+        bool: True if successfully updated, False otherwise
+    """
+    from models import Match
+
+    try:
+        dbmatch = db.session.query(Match).filter_by(ht_id=match_id).first()
+
+        if not dbmatch:
+            dprint(2, f"Match {match_id} not found in database for enhanced data update")
+            return False
+
+        # Update with enhanced data
+        for field, value in enhanced_data.items():
+            if hasattr(dbmatch, field) and value is not None:
+                setattr(dbmatch, field, value)
+
+        db.session.commit()
+        dprint(3, f"Updated match {match_id} with enhanced data")
+        return True
+
+    except Exception as e:
+        dprint(2, f"Error updating match {match_id} with enhanced data: {str(e)}")
+        db.session.rollback()
+        return False
+
+
+def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
+    """Process matches and optionally fetch enhanced analytics data.
+
+    Args:
+        matches: List of CHPPMatch objects
+        chpp: CHPP client for enhanced data fetching
+        fetch_enhanced: Whether to fetch enhanced data for finished matches
+
+    Returns:
+        tuple: (added_count, updated_count, enhanced_count)
+    """
+    from datetime import datetime
+
+    from models import Match
+
+    added = 0
+    updated = 0
+    enhanced = 0
+
+    for match in matches:
+        try:
+            # Parse match datetime
+            if hasattr(match.datetime, 'year'):
+                thedate = datetime(
+                    match.datetime.year, match.datetime.month, match.datetime.day,
+                    match.datetime.hour, match.datetime.minute,
+                )
+            elif match.datetime:
+                try:
+                    from dateutil import parser
+                    thedate = parser.parse(match.datetime)
+                except Exception:
+                    thedate = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
+            else:
+                dprint(2, f"No datetime for match {match.ht_id}, skipping")
+                continue
+
+            dprint(3, f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}")
+
+            # Check if match already exists
+            dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
+
+            # Determine if match is finished (has goals scored)
+            is_finished = (match.home_goals is not None and match.away_goals is not None)
+
+            if dbmatch:
+                # Update existing match
+                dbmatch.home_goals = match.home_goals
+                dbmatch.away_goals = match.away_goals
+                dbmatch.home_team_name = match.home_team_name
+                dbmatch.away_team_name = match.away_team_name
+                updated += 1
+
+                # Fetch enhanced data if match is finished
+                # Always fetch to ensure we have the most complete data available
+                if fetch_enhanced and is_finished and chpp:
+                    enhanced_data = fetch_enhanced_match_data(match.ht_id, chpp)
+                    if enhanced_data:
+                        for field, value in enhanced_data.items():
+                            if hasattr(dbmatch, field):
+                                setattr(dbmatch, field, value)
+                        enhanced += 1
+
+            else:
+                # Create new match record
+                thismatch = {
+                    "ht_id": match.ht_id,
+                    "home_team_id": match.home_team_id,
+                    "home_team_name": match.home_team_name,
+                    "away_team_id": match.away_team_id,
+                    "away_team_name": match.away_team_name,
+                    "datetime": thedate,
+                    "matchtype": match.matchtype,
+                    "context_id": match.context_id,
+                    "rule_id": match.rule_id,
+                    "cup_level": match.cup_level,
+                    "cup_level_index": match.cup_level_index,
+                    "home_goals": match.home_goals,
+                    "away_goals": match.away_goals,
+                }
+
+                # Add enhanced data if available and match is finished
+                if fetch_enhanced and is_finished and chpp:
+                    enhanced_data = fetch_enhanced_match_data(match.ht_id, chpp)
+                    thismatch.update(enhanced_data)
+                    if enhanced_data:
+                        enhanced += 1
+
+                newmatch = Match(thismatch)
+                db.session.add(newmatch)
+                added += 1
+
+            db.session.commit()
+
+        except Exception as e:
+            dprint(2, f"Error processing match {match.ht_id}: {str(e)}")
+            db.session.rollback()
+            continue
+
+    return added, updated, enhanced
 
 
 def count_clicks(page):

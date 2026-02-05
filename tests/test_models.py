@@ -226,6 +226,96 @@ class TestMatchModel:
         match = Match(match_data)
         assert str(match) == "Test FC - Sample United: 111222"
 
+    def test_match_comprehensive_fields(self):
+        """Test Match model with comprehensive enhanced fields."""
+        match_data = {
+            "ht_id": 999888,
+            "home_team_id": 1111,
+            "home_team_name": "Home FC",
+            "away_team_id": 2222,
+            "away_team_name": "Away FC",
+            "datetime": datetime(2024, 5, 1, 20, 0),
+            "matchtype": 1, "context_id": 0, "rule_id": 0,
+            "cup_level": 0, "cup_level_index": 0,
+            "home_goals": 2, "away_goals": 1,
+            # Possession by halves
+            "possession_first_half_home": 55,
+            "possession_first_half_away": 45,
+            "possession_second_half_home": 50,
+            "possession_second_half_away": 50,
+            # Chances
+            "home_team_chances_left": 2,
+            "home_team_chances_center": 3,
+            "home_team_chances_right": 1,
+            "home_team_chances_special": 0,
+            "home_team_chances_other": 1,
+            # Ratings
+            "home_team_rating": 25.0,
+            "away_team_rating": 22.0,
+            "home_team_rating_right_def": 30.0,
+            "home_team_rating_mid_def": 35.0,
+            "home_team_rating_left_def": 28.0,
+            "home_team_rating_set_pieces_att": 15.0,
+            # Arena & Officials
+            "attendance": 12500,
+            "arena_capacity_terraces": 8000,
+            "arena_capacity_basic": 3000,
+            "arena_capacity_roof": 1200,
+            "arena_capacity_vip": 300,
+            "weather_id": 2,
+            "added_minutes": 3,
+            "referee_name": "Test Referee",
+            "referee_country": "Sweden",
+            # Team details
+            "home_team_formation": "4-4-2",
+            "home_team_tactic_type": 1,
+            "home_team_tactic_skill": 7,
+        }
+
+        match = Match(match_data)
+
+        # Test calculated properties
+        assert match.home_team_possession == 52.5  # (55+50)/2
+        assert match.away_team_possession == 47.5  # (45+50)/2
+        assert match.home_team_total_chances == 7  # 2+3+1+0+1
+        assert match.has_enhanced_data() is True
+
+        # Test comprehensive fields
+        assert match.home_team_rating == 25.0
+        assert match.home_team_rating_right_def == 30.0
+        assert match.home_team_rating_set_pieces_att == 15.0
+        assert match.attendance == 12500
+        assert match.arena_capacity_terraces == 8000
+        assert match.weather_id == 2
+        assert match.added_minutes == 3
+        assert match.referee_name == "Test Referee"
+        assert match.referee_country == "Sweden"
+        assert match.home_team_formation == "4-4-2"
+        assert match.home_team_tactic_type == 1
+
+    def test_match_properties_none_handling(self):
+        """Test Match property calculations handle None values correctly."""
+        match_data = {
+            "ht_id": 777666,
+            "home_team_id": 1111,
+            "home_team_name": "Home FC",
+            "away_team_id": 2222,
+            "away_team_name": "Away FC",
+            "datetime": datetime(2024, 5, 1, 20, 0),
+            "matchtype": 1, "context_id": 0, "rule_id": 0,
+            "cup_level": 0, "cup_level_index": 0,
+            "home_goals": 1, "away_goals": 1,
+        }
+
+        match = Match(match_data)
+
+        # Properties should handle None values
+        assert match.home_team_possession is None
+        assert match.away_team_possession is None
+        assert match.home_team_total_chances is None
+        assert match.away_team_total_chances is None
+        assert match.has_enhanced_data() is False
+
 
 class TestMatchPlayModel:
     """Test MatchPlay model functionality."""

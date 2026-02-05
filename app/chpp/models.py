@@ -278,3 +278,194 @@ class CHPPMatch:
     def __getitem__(self, key: str) -> Any:
         """Support dict-like access: match['ht_id']."""
         return getattr(self, key)
+
+
+@dataclass
+class CHPPMatchDetails:
+    """Enhanced match details with comprehensive statistics from CHPP matchdetails endpoint.
+
+    Attributes:
+        ht_id: Hattrick match ID
+        possession_first_half_home: Home team possession % in first half
+        possession_first_half_away: Away team possession % in first half
+        possession_second_half_home: Home team possession % in second half
+        possession_second_half_away: Away team possession % in second half
+        home_team_chances_left: Home team chances on left side
+        home_team_chances_center: Home team chances in center
+        home_team_chances_right: Home team chances on right side
+        home_team_chances_special: Home team special event chances
+        home_team_chances_other: Home team other chances
+        away_team_chances_left: Away team chances on left side
+        away_team_chances_center: Away team chances in center
+        away_team_chances_right: Away team chances on right side
+        away_team_chances_special: Away team special event chances
+        away_team_chances_other: Away team other chances
+        home_team_rating: Home team midfield rating
+        away_team_rating: Away team midfield rating
+        attendance: Match attendance
+        weather: Weather conditions ID
+        referee_name: Referee full name
+        referee_country: Referee country
+        scorers: List of goal scorers with details
+        bookings: List of bookings (yellow/red cards)
+        injuries: List of injuries during match
+    """
+
+    ht_id: int
+    possession_first_half_home: int | None = None
+    possession_first_half_away: int | None = None
+    possession_second_half_home: int | None = None
+    possession_second_half_away: int | None = None
+    home_team_chances_left: int | None = None
+    home_team_chances_center: int | None = None
+    home_team_chances_right: int | None = None
+    home_team_chances_special: int | None = None
+    home_team_chances_other: int | None = None
+    away_team_chances_left: int | None = None
+    away_team_chances_center: int | None = None
+    away_team_chances_right: int | None = None
+    away_team_chances_special: int | None = None
+    away_team_chances_other: int | None = None
+    # Ratings - midfield (primary)
+    home_team_rating: float | None = None
+    away_team_rating: float | None = None
+    # Ratings - defense by position
+    home_team_rating_right_def: float | None = None
+    home_team_rating_mid_def: float | None = None
+    home_team_rating_left_def: float | None = None
+    away_team_rating_right_def: float | None = None
+    away_team_rating_mid_def: float | None = None
+    away_team_rating_left_def: float | None = None
+    # Ratings - attack by position
+    home_team_rating_right_att: float | None = None
+    home_team_rating_mid_att: float | None = None
+    home_team_rating_left_att: float | None = None
+    away_team_rating_right_att: float | None = None
+    away_team_rating_mid_att: float | None = None
+    away_team_rating_left_att: float | None = None
+    # Set pieces
+    home_team_rating_set_pieces_def: float | None = None
+    home_team_rating_set_pieces_att: float | None = None
+    away_team_rating_set_pieces_def: float | None = None
+    away_team_rating_set_pieces_att: float | None = None
+    # Arena
+    attendance: int | None = None
+    arena_capacity_terraces: int | None = None
+    arena_capacity_basic: int | None = None
+    arena_capacity_roof: int | None = None
+    arena_capacity_vip: int | None = None
+    weather_id: int | None = None
+    added_minutes: int | None = None
+    # Match officials
+    referee_id: int | None = None
+    referee_name: str = ""
+    referee_country_id: int | None = None
+    referee_country: str = ""
+    referee_team_id: int | None = None
+    referee_team_name: str = ""
+    # Team details
+    home_team_dress_uri: str = ""
+    away_team_dress_uri: str = ""
+    home_team_attitude: int | None = None
+    away_team_attitude: int | None = None
+    home_team_tactic_type: int | None = None
+    home_team_tactic_skill: int | None = None
+    away_team_tactic_type: int | None = None
+    away_team_tactic_skill: int | None = None
+    # Match events
+    scorers: list = field(default_factory=list)
+    bookings: list = field(default_factory=list)
+    injuries: list = field(default_factory=list)
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access."""
+        return getattr(self, key)
+
+
+@dataclass
+class CHPPMatchLineupPlayer:
+    """Player in match lineup with ratings and position.
+
+    Attributes:
+        player_id: Hattrick player ID
+        name: Player full name
+        rating_stars: Player match rating in stars
+        rating_stars_eom: End of match rating
+        role_id: Position role ID (100=GK, 101=RB, etc.)
+        behaviour: Player behaviour setting
+        minutes_played: Minutes played in match
+        substituted_in: Minute substituted in (if applicable)
+        substituted_out: Minute substituted out (if applicable)
+    """
+
+    player_id: int
+    name: str
+    rating_stars: float = 0.0
+    rating_stars_eom: float = 0.0
+    role_id: int = 0
+    behaviour: int = 0
+    minutes_played: int = 0
+    substituted_in: int | None = None
+    substituted_out: int | None = None
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access."""
+        return getattr(self, key)
+
+
+@dataclass
+class CHPPMatchLineup:
+    """Complete match lineup with formations and player data.
+
+    Attributes:
+        ht_id: Hattrick match ID
+        home_team_formation: Home team formation (e.g., "4-4-2")
+        away_team_formation: Away team formation
+        home_team_players: List of home team players with ratings
+        away_team_players: List of away team players with ratings
+        home_team_tactic: Home team tactical setup
+        away_team_tactic: Away team tactical setup
+    """
+
+    ht_id: int
+    home_team_formation: str = ""
+    away_team_formation: str = ""
+    home_team_players: list[CHPPMatchLineupPlayer] = field(default_factory=list)
+    away_team_players: list[CHPPMatchLineupPlayer] = field(default_factory=list)
+    home_team_tactic: str = ""
+    away_team_tactic: str = ""
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access."""
+        return getattr(self, key)
+
+
+@dataclass
+class CHPPPlayerEvent:
+    """Individual player event for career tracking.
+
+    Attributes:
+        player_id: Hattrick player ID
+        match_id: Match where event occurred
+        event_type: Type of event (goal, assist, card, injury)
+        minute: Match minute when event occurred
+        team_id: Team player was playing for
+        opponent_team_id: Opponent team ID
+        event_text: Description of the event
+        season: Season when event occurred
+        match_date: Date of the match
+    """
+
+    player_id: int
+    match_id: int
+    event_type: str
+    minute: int
+    team_id: int
+    opponent_team_id: int = 0
+    event_text: str = ""
+    season: int = 0
+    match_date: str = ""
+
+    def __getitem__(self, key: str) -> Any:
+        """Support dict-like access."""
+        return getattr(self, key)

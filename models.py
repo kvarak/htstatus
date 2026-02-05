@@ -58,6 +58,84 @@ class Match(db.Model):
     home_goals = db.Column(db.Integer)
     away_goals = db.Column(db.Integer)
 
+    # Enhanced analytics fields from CHPP matchdetails (nullable for backward compatibility)
+    # Possession - stored by half as CHPP provides (at Match level, not inside teams)
+    possession_first_half_home = db.Column(db.Integer, nullable=True)
+    possession_first_half_away = db.Column(db.Integer, nullable=True)
+    possession_second_half_home = db.Column(db.Integer, nullable=True)
+    possession_second_half_away = db.Column(db.Integer, nullable=True)
+
+    # Chances breakdown (CHPP v3.1, March 2022 - inside HomeTeam/AwayTeam)
+    home_team_chances_left = db.Column(db.Integer, nullable=True)
+    home_team_chances_center = db.Column(db.Integer, nullable=True)
+    home_team_chances_right = db.Column(db.Integer, nullable=True)
+    home_team_chances_special = db.Column(db.Integer, nullable=True)
+    home_team_chances_other = db.Column(db.Integer, nullable=True)
+    away_team_chances_left = db.Column(db.Integer, nullable=True)
+    away_team_chances_center = db.Column(db.Integer, nullable=True)
+    away_team_chances_right = db.Column(db.Integer, nullable=True)
+    away_team_chances_special = db.Column(db.Integer, nullable=True)
+    away_team_chances_other = db.Column(db.Integer, nullable=True)
+
+    # Team ratings - midfield (primary overall rating)
+    home_team_rating = db.Column(db.Float, nullable=True)
+    away_team_rating = db.Column(db.Float, nullable=True)
+
+    # Team ratings - defense by position
+    home_team_rating_right_def = db.Column(db.Float, nullable=True)
+    home_team_rating_mid_def = db.Column(db.Float, nullable=True)
+    home_team_rating_left_def = db.Column(db.Float, nullable=True)
+    away_team_rating_right_def = db.Column(db.Float, nullable=True)
+    away_team_rating_mid_def = db.Column(db.Float, nullable=True)
+    away_team_rating_left_def = db.Column(db.Float, nullable=True)
+
+    # Team ratings - attack by position
+    home_team_rating_right_att = db.Column(db.Float, nullable=True)
+    home_team_rating_mid_att = db.Column(db.Float, nullable=True)
+    home_team_rating_left_att = db.Column(db.Float, nullable=True)
+    away_team_rating_right_att = db.Column(db.Float, nullable=True)
+    away_team_rating_mid_att = db.Column(db.Float, nullable=True)
+    away_team_rating_left_att = db.Column(db.Float, nullable=True)
+
+    # Set pieces ratings
+    home_team_rating_set_pieces_def = db.Column(db.Float, nullable=True)
+    home_team_rating_set_pieces_att = db.Column(db.Float, nullable=True)
+    away_team_rating_set_pieces_def = db.Column(db.Float, nullable=True)
+    away_team_rating_set_pieces_att = db.Column(db.Float, nullable=True)
+
+    # Arena data
+    attendance = db.Column(db.Integer, nullable=True)
+    arena_capacity_terraces = db.Column(db.Integer, nullable=True)
+    arena_capacity_basic = db.Column(db.Integer, nullable=True)
+    arena_capacity_roof = db.Column(db.Integer, nullable=True)
+    arena_capacity_vip = db.Column(db.Integer, nullable=True)
+    weather_id = db.Column(db.Integer, nullable=True)
+    added_minutes = db.Column(db.Integer, nullable=True)
+
+    # Match officials
+    referee_id = db.Column(db.Integer, nullable=True)
+    referee_name = db.Column(db.String(100), nullable=True)
+    referee_country_id = db.Column(db.Integer, nullable=True)
+    referee_country = db.Column(db.String(50), nullable=True)
+    referee_team_id = db.Column(db.Integer, nullable=True)
+    referee_team_name = db.Column(db.String(100), nullable=True)
+
+    # Team details
+    home_team_dress_uri = db.Column(db.String(200), nullable=True)
+    away_team_dress_uri = db.Column(db.String(200), nullable=True)
+    home_team_attitude = db.Column(db.Integer, nullable=True)
+    away_team_attitude = db.Column(db.Integer, nullable=True)
+    home_team_tactic_type = db.Column(db.Integer, nullable=True)
+    home_team_tactic_skill = db.Column(db.Integer, nullable=True)
+    away_team_tactic_type = db.Column(db.Integer, nullable=True)
+    away_team_tactic_skill = db.Column(db.Integer, nullable=True)
+
+    # Formation data from matchlineup
+    home_team_formation = db.Column(db.String(20), nullable=True)
+    away_team_formation = db.Column(db.String(20), nullable=True)
+    home_team_tactic = db.Column(db.String(50), nullable=True)
+    away_team_tactic = db.Column(db.String(50), nullable=True)
+
     def __init__(self, matchdata):
         self.ht_id = matchdata["ht_id"]
         self.home_team_id = matchdata["home_team_id"]
@@ -72,6 +150,121 @@ class Match(db.Model):
         self.cup_level_index = matchdata["cup_level_index"]
         self.home_goals = matchdata["home_goals"]
         self.away_goals = matchdata["away_goals"]
+
+        # Enhanced analytics (optional fields)
+        self.possession_first_half_home = matchdata.get("possession_first_half_home")
+        self.possession_first_half_away = matchdata.get("possession_first_half_away")
+        self.possession_second_half_home = matchdata.get("possession_second_half_home")
+        self.possession_second_half_away = matchdata.get("possession_second_half_away")
+        self.home_team_chances_left = matchdata.get("home_team_chances_left")
+        self.home_team_chances_center = matchdata.get("home_team_chances_center")
+        self.home_team_chances_right = matchdata.get("home_team_chances_right")
+        self.home_team_chances_special = matchdata.get("home_team_chances_special")
+        self.home_team_chances_other = matchdata.get("home_team_chances_other")
+        self.away_team_chances_left = matchdata.get("away_team_chances_left")
+        self.away_team_chances_center = matchdata.get("away_team_chances_center")
+        self.away_team_chances_right = matchdata.get("away_team_chances_right")
+        self.away_team_chances_special = matchdata.get("away_team_chances_special")
+        self.away_team_chances_other = matchdata.get("away_team_chances_other")
+        self.home_team_rating = matchdata.get("home_team_rating")
+        self.away_team_rating = matchdata.get("away_team_rating")
+        self.home_team_rating_right_def = matchdata.get("home_team_rating_right_def")
+        self.home_team_rating_mid_def = matchdata.get("home_team_rating_mid_def")
+        self.home_team_rating_left_def = matchdata.get("home_team_rating_left_def")
+        self.away_team_rating_right_def = matchdata.get("away_team_rating_right_def")
+        self.away_team_rating_mid_def = matchdata.get("away_team_rating_mid_def")
+        self.away_team_rating_left_def = matchdata.get("away_team_rating_left_def")
+        self.home_team_rating_right_att = matchdata.get("home_team_rating_right_att")
+        self.home_team_rating_mid_att = matchdata.get("home_team_rating_mid_att")
+        self.home_team_rating_left_att = matchdata.get("home_team_rating_left_att")
+        self.away_team_rating_right_att = matchdata.get("away_team_rating_right_att")
+        self.away_team_rating_mid_att = matchdata.get("away_team_rating_mid_att")
+        self.away_team_rating_left_att = matchdata.get("away_team_rating_left_att")
+        self.home_team_rating_set_pieces_def = matchdata.get("home_team_rating_set_pieces_def")
+        self.home_team_rating_set_pieces_att = matchdata.get("home_team_rating_set_pieces_att")
+        self.away_team_rating_set_pieces_def = matchdata.get("away_team_rating_set_pieces_def")
+        self.away_team_rating_set_pieces_att = matchdata.get("away_team_rating_set_pieces_att")
+        self.attendance = matchdata.get("attendance")
+        self.arena_capacity_terraces = matchdata.get("arena_capacity_terraces")
+        self.arena_capacity_basic = matchdata.get("arena_capacity_basic")
+        self.arena_capacity_roof = matchdata.get("arena_capacity_roof")
+        self.arena_capacity_vip = matchdata.get("arena_capacity_vip")
+        self.weather_id = matchdata.get("weather_id")
+        self.added_minutes = matchdata.get("added_minutes")
+        self.referee_id = matchdata.get("referee_id")
+        self.referee_name = matchdata.get("referee_name")
+        self.referee_country_id = matchdata.get("referee_country_id")
+        self.referee_country = matchdata.get("referee_country")
+        self.referee_team_id = matchdata.get("referee_team_id")
+        self.referee_team_name = matchdata.get("referee_team_name")
+        self.home_team_dress_uri = matchdata.get("home_team_dress_uri")
+        self.away_team_dress_uri = matchdata.get("away_team_dress_uri")
+        self.home_team_attitude = matchdata.get("home_team_attitude")
+        self.away_team_attitude = matchdata.get("away_team_attitude")
+        self.home_team_tactic_type = matchdata.get("home_team_tactic_type")
+        self.home_team_tactic_skill = matchdata.get("home_team_tactic_skill")
+        self.away_team_tactic_type = matchdata.get("away_team_tactic_type")
+        self.away_team_tactic_skill = matchdata.get("away_team_tactic_skill")
+        self.home_team_formation = matchdata.get("home_team_formation")
+        self.away_team_formation = matchdata.get("away_team_formation")
+        self.home_team_tactic = matchdata.get("home_team_tactic")
+        self.away_team_tactic = matchdata.get("away_team_tactic")
+
+    @property
+    def home_team_possession(self):
+        """Calculate average possession for home team from both halves."""
+        if (self.possession_first_half_home is not None and
+            self.possession_second_half_home is not None):
+            return (self.possession_first_half_home + self.possession_second_half_home) / 2
+        return None
+
+    @property
+    def away_team_possession(self):
+        """Calculate average possession for away team from both halves."""
+        if (self.possession_first_half_away is not None and
+            self.possession_second_half_away is not None):
+            return (self.possession_first_half_away + self.possession_second_half_away) / 2
+        return None
+
+    @property
+    def home_team_total_chances(self):
+        """Calculate total chances for home team (sum of all chance types)."""
+        chances = [
+            self.home_team_chances_left,
+            self.home_team_chances_center,
+            self.home_team_chances_right,
+            self.home_team_chances_special,
+            self.home_team_chances_other
+        ]
+        if all(c is not None for c in chances):
+            return sum(chances)
+        return None
+
+    @property
+    def away_team_total_chances(self):
+        """Calculate total chances for away team (sum of all chance types)."""
+        chances = [
+            self.away_team_chances_left,
+            self.away_team_chances_center,
+            self.away_team_chances_right,
+            self.away_team_chances_special,
+            self.away_team_chances_other
+        ]
+        if all(c is not None for c in chances):
+            return sum(chances)
+        return None
+
+    def has_enhanced_data(self):
+        """Check if this match has enhanced analytics data.
+
+        Returns True if ANY enhanced field is available.
+        Note: CHPP added NrOfChances in v3.1 (March 2022).
+        """
+        return (self.possession_first_half_home is not None or
+                self.home_team_chances_left is not None or
+                self.attendance is not None or
+                self.home_team_formation or  # Empty string is falsy
+                self.home_team_rating is not None)
 
     def __repr__(self):
         return f"{self.home_team_name} - {self.away_team_name}: {self.ht_id}"
@@ -137,6 +330,7 @@ class User(db.Model):
     c_team = db.Column(db.Integer, default=0)
     c_player = db.Column(db.Integer, default=0)
     c_matches = db.Column(db.Integer, default=0)
+    c_matches_archive = db.Column(db.Integer, default=0)
     c_training = db.Column(db.Integer, default=0)
     c_update = db.Column(db.Integer, default=0)
     c_settings = db.Column(db.Integer, default=0)
@@ -158,6 +352,7 @@ class User(db.Model):
     last_login = db.Column(db.DateTime)
     last_update = db.Column(db.DateTime)
     last_usage = db.Column(db.DateTime)
+    last_matches_archive = db.Column(db.DateTime)
     created = db.Column(db.DateTime)
     role = db.Column(db.String(100))
     player_columns = db.Column(db.PickleType())
@@ -173,6 +368,7 @@ class User(db.Model):
         self.c_team = 0
         self.c_player = 0
         self.c_matches = 0
+        self.c_matches_archive = 0
         self.c_training = 0
         self.c_update = 0
         # Initialize tour-specific counters
@@ -226,6 +422,11 @@ class User(db.Model):
 
     def matches(self):
         self.c_matches += 1
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def matches_archive(self):
+        self.c_matches_archive += 1
+        self.last_matches_archive = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def team(self):

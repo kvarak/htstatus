@@ -118,7 +118,14 @@ def update():
         try:
             archive_team_id = int(archive_team_id)
             if archive_team_id in all_teams:
+                # Track archive usage
+                from app.model_registry import get_user_model
                 from app.utils import downloadMatches
+                User = get_user_model()
+                current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+                if current_user:
+                    current_user.matches_archive()
+                    db.session.commit()
 
                 dprint(1, f"Archive download requested for team {archive_team_id}")
                 result = downloadMatches(archive_team_id, chpp)
@@ -498,7 +505,8 @@ def update():
         error_details = traceback.format_exc()
         dprint(1, f"ERROR: Match download failed: {str(e)}")
         dprint(1, f"Match download error traceback: {error_details}")
-        raise
+        # Continue with update process even if match download fails
+        dprint(1, "Continuing with update process despite match download error")
 
     # Update user's last_update timestamp using model method
     try:

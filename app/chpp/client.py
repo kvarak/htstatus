@@ -21,7 +21,15 @@ from app.chpp.constants import (
     RETRY_TOTAL,
 )
 from app.chpp.exceptions import CHPPAPIError, CHPPAuthError
-from app.chpp.models import CHPPMatch, CHPPPlayer, CHPPTeam, CHPPUser
+from app.chpp.models import (
+    CHPPMatch,
+    CHPPMatchDetails,
+    CHPPMatchLineup,
+    CHPPPlayer,
+    CHPPPlayerEvent,
+    CHPPTeam,
+    CHPPUser,
+)
 from app.chpp.parsers import parse_players, parse_team, parse_user
 
 logger = logging.getLogger(__name__)
@@ -453,3 +461,86 @@ class CHPP:
         # Use matches endpoint with teamID parameter (GET request)
         root = self.request("matches", "2.6", teamID=id_, isYouth=is_youth)
         return parse_matches(root)
+
+    def matchdetails(self, id_: int, match_events: bool = True) -> "CHPPMatchDetails":
+        """Get comprehensive match details and statistics.
+
+        Fetches detailed match information including statistics, events, possession,
+        team ratings, and match officials from matchdetails endpoint.
+
+        Args:
+            id_: Hattrick match ID
+            match_events: Include match events in response (default: True)
+
+        Returns:
+            CHPPMatchDetails object with comprehensive match data
+
+        Raises:
+            CHPPAuthError: If not authenticated
+            CHPPAPIError: If CHPP API returns error (e.g., unknown match ID)
+
+        Example:
+            >>> details = chpp.matchdetails(id_=656789123)
+            >>> print(f"Possession: {details.home_team_possession}% - {details.away_team_possession}%")
+            >>> print(f"Shots: {details.home_team_shots} - {details.away_team_shots}")
+        """
+        from app.chpp.parsers import parse_matchdetails
+
+        # Use matchdetails endpoint v3.1 with matchID parameter (v3.1 added NrOfChances fields in March 2022)
+        root = self.request("matchdetails", "3.1", matchID=id_, matchEvents=match_events)
+        return parse_matchdetails(root)
+
+    def matchlineup(self, id_: int, is_youth: bool = False) -> "CHPPMatchLineup":
+        """Get detailed match lineup with player ratings and formations.
+
+        Fetches complete lineup information for finished matches including
+        player ratings, positions, substitutions, and formation data.
+
+        Args:
+            id_: Hattrick match ID
+            is_youth: Youth team flag (default: False)
+
+        Returns:
+            CHPPMatchLineup object with lineup and rating data
+
+        Raises:
+            CHPPAuthError: If not authenticated
+            CHPPAPIError: If CHPP API returns error or match not finished
+
+        Example:
+            >>> lineup = chpp.matchlineup(id_=656789123)
+            >>> for player in lineup.home_team_players:
+            ...     print(f"{player.name}: {player.rating_stars}⭐ at {player.position}")
+        """
+        from app.chpp.parsers import parse_matchlineup
+
+        # Use matchlineup endpoint with matchID parameter
+        root = self.request("matchlineup", "1.3", matchID=id_, isYouth=is_youth)
+        return parse_matchlineup(root)
+
+    def playerevents(self, id_: int) -> list["CHPPPlayerEvent"]:
+        """Get player event history for career tracking.
+
+        Fetches individual player events including goals, assists, cards,
+        injuries, and career milestones from playerevents endpoint.
+
+        Args:
+            id_: Hattrick player ID
+
+        Returns:
+            List of CHPPPlayerEvent objects representing player's career events
+
+        Raises:
+            CHPPAuthError: If not authenticated
+            CHPPAPIError: If CHPP API returns error (e.g., unknown player ID)
+
+        Example:
+            >>> events = chpp.playerevents(id_=123456789)
+            >>> goals = [e for e in events if e.event_type == 'goal']
+            >>> print(f"Career goals: {len(goals)}")
+        """
+        from app.chpp.parsers import parse_playerevents
+
+        # Use playerevents endpoint with playerID parameter
+        root = self.request("playerevents", "1.1", playerID=id_)
+        return parse_playerevents(root)
