@@ -407,69 +407,59 @@ class User(db.Model):
         self.password = password
         self.access_key = access_key
         self.access_secret = access_secret
-        self.c_login += 1
+        self.c_login = (self.c_login or 0) + 1
         self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def login(self):
-        self.c_login += 1
+        self.c_login = (self.c_login or 0) + 1
         self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def player(self):
-        self.c_player += 1
+        self.c_player = (self.c_player or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def matches(self):
-        self.c_matches += 1
+        self.c_matches = (self.c_matches or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def matches_archive(self):
-        self.c_matches_archive += 1
+        self.c_matches_archive = (self.c_matches_archive or 0) + 1
         self.last_matches_archive = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def team(self):
-        self.c_team = self.c_team + 1
+        self.c_team = (self.c_team or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def training(self):
-        self.c_training += 1
+        self.c_training = (self.c_training or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def updatedata(self):
-        self.c_update += 1
+        self.c_update = (self.c_update or 0) + 1
         self.last_update = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def settings(self):
-        if self.c_settings is None:
-            self.c_settings = 0
-        self.c_settings += 1
+        self.c_settings = (self.c_settings or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def changes(self):
-        if self.c_changes is None:
-            self.c_changes = 0
-        self.c_changes += 1
+        self.c_changes = (self.c_changes or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def feedback(self):
-        if self.c_feedback is None:
-            self.c_feedback = 0
-        self.c_feedback += 1
+        self.c_feedback = (self.c_feedback or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def formation(self):
-        if self.c_formation is None:
-            self.c_formation = 0
-        self.c_formation += 1
+        self.c_formation = (self.c_formation or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def stats(self):
-        if self.c_stats is None:
-            self.c_stats = 0
-        self.c_stats += 1
+        self.c_stats = (self.c_stats or 0) + 1
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def updateColumns(self, cols):
