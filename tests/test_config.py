@@ -34,7 +34,7 @@ class TestConfigClass:
             config_instance = config.Config()
             assert (
                 config_instance.SECRET_KEY
-                == "PtJmVHW5nx1P4pMmsoGrovp31uyflU9E5RjAx3zoEEg6nB2GF6Lp4LSGW58azPoMJ"
+                == "test-default-secret-key-for-development-only"
             )
 
     def test_custom_secret_key_from_env(self):
