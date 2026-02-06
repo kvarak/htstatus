@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): Player Table Enhancement Suite COMPLETED - Delivered unified solution combining FEAT-026 (batch group management), FEAT-028 (filtering), and FEAT-010 (player comparison) with pill-based UI, 8-player comparison, and API endpoints. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires improvement. **Active: 103 tasks** (P0=0, P1=0, P2=6, P3=9, P4=88)
+**Recent Organization** (February 6, 2026): INFRA-033 Database Protection Enhancement COMPLETED - Deployed comprehensive backup system with daily automated backups from glader.local to kloker.local, smart retention policy, and production-ready restoration procedures. Player Table Enhancement Suite COMPLETED - Delivered unified solution combining FEAT-026 (batch group management), FEAT-028 (filtering), and FEAT-010 (player comparison) with pill-based UI, 8-player comparison, and API endpoints. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires improvement. **Active: 102 tasks** (P0=0, P1=0, P2=6, P3=8, P4=88)
 
 ---
 
@@ -30,7 +30,6 @@
 ## P3: Maintenance 🔧
 
 ### Database Protection (Highest Priority)
-- **[INFRA-033]** Database Protection Enhancement - Implement hobby-focused backup automation and safety checks → [Details](.project/tasks/INFRA-033.md)
 - **[REFACTOR-034]** Database Script Consolidation → [Details](.project/tasks/REFACTOR-034.md)
 
 ### Hobby Project Simplification

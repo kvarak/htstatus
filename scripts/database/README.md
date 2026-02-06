@@ -1,8 +1,8 @@
-# Database Backup Directory
+# Database Management Scripts
 
-This directory contains backups created by database maintenance scripts.
+This directory contains database backup, restoration, and maintenance scripts for HattrickPlanner.
 
-## Current Backups
+## Backup System (INFRA-033)
 
 - **Full Database Backups**: Created by `backup_database.py` (INFRA-033)
   - Format: `htstatus_full_backup_YYYYMMDD_HHMMSS.sql`
@@ -69,9 +69,28 @@ crontab -e
 3. **Deployment Integration**:
 The deployment script automatically creates backups before updates.
 
-### Backup Retention
-- **Automated**: 30 days retention on kloker.local (automatic cleanup)
-- **Manual**: Keep critical backups longer by copying to external storage
+### kloker.local Backup Storage
+
+kloker.local maintains automated backup retention with smart monthly archival:
+
+1. **Storage Location**: `~/backup/[project]/` (e.g., `~/backup/htstatus/`, `~/backup/htplanner/`)
+
+2. **Retention Policy** (automated via `trim-archive.sh`):
+   - **Recent backups**: Keep all files newer than 1 month
+   - **Archive period**: For files older than 1 month, keep only the newest backup per month
+   - **Cleanup schedule**: Runs daily at 4 AM via cron
+
+3. **Manual Operations**:
+```bash
+# List backups on kloker.local
+ssh kloker.local "ls -la ~/backup/htstatus/"
+
+# Run retention cleanup manually
+ssh kloker.local "/home/kvarak/backup/trim-archive.sh"
+
+# Download backup from kloker.local
+scp kloker.local:~/backup/htstatus/backup_YYYYMMDD_HHMMSS.sql ./
+```
 
 ## Rollback Procedures
 

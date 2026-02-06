@@ -77,7 +77,7 @@ make db-backup-auto              # Automated backup to kloker.local
 
 - **[TECHNICAL.md](TECHNICAL.md)** - Architecture and implementation details
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment procedures
-- **[scripts/database/backups/README.md](scripts/database/backups/README.md)** - Database backup and restore procedures
+- **[scripts/database/README.md](scripts/database/README.md)** - Database management, backup and restore procedures
 - **[CHANGELOG.md](CHANGELOG.md)** - Technical changes and commits
 - **[RELEASES.md](RELEASES.md)** - User-focused feature releases
 
