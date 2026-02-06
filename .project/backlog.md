@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires immediate attention. **Active: 89 tasks** (P1=0, P2=6, P3=83)
+**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 48.2% after test infrastructure creation. **Active: 91 tasks** (P1=0, P2=6, P3=85)
 
 ---
 
@@ -54,10 +54,12 @@
 ### **EPIC-004: Test Infrastructure & Security** 🎯
 *Goal: Essential testing foundation and security for hobby project*
 
-- **[REFACTOR-112]** Immediate Test Coverage Restoration - Execute existing coverage improvement tasks before adding new analysis tasks, address 47.8% vs 50% gap (45 min)
+- **[REFACTOR-113]** Replace Skipped Test Infrastructure with Simple Integration Tests - Remove all @pytest.mark.skip decorators and replace with straightforward tests that don't require complex mocking, focusing on 2.2% coverage gap closure using real database fixtures (30 min)
 - **[TEST-011]** Fix Failing Test Infrastructure - Resolve 500 errors in main/team routes, fix model registry issues, address template rendering problems (60 min)
 - **[REFACTOR-099]** Consolidate Authentication Test Fixtures - Move all authentication fixtures to conftest.py, eliminate per-file duplication (20 min)
 - **[TEST-037]** Add Blueprint Route Testing - Enhance conftest.py for blueprint testing, add route tests for feedback routes (60 min)
+- **[REFACTOR-114]** Test Pattern Standardization - Analyze existing working tests (test_db_utils, test_training_utils) and establish consistent patterns for new test creation, eliminate environment-specific failures (45 min)
+- **[TEST-116]** Strategic Coverage Gap Analysis - Identify specific functions/branches representing the 2.2% gap between 48.2% and 50% threshold, prioritize by implementation complexity (15 min)
 - **[REFACTOR-100]** Test Strategy Realignment - Establish quality thresholds over quantity metrics, fix infrastructure before expanding coverage (30 min)
 - **[REFACTOR-108]** Implement Consistent API Validation Patterns - Add comprehensive input validation, rate limiting, and consistent error responses across all new API endpoints to prevent bypass vulnerabilities (90 min)
 
