@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): INFRA-033 Database Protection Enhancement COMPLETED - Deployed comprehensive backup system with daily automated backups from glader.local to kloker.local, smart retention policy, and production-ready restoration procedures. Player Table Enhancement Suite COMPLETED - Delivered unified solution combining FEAT-026 (batch group management), FEAT-028 (filtering), and FEAT-010 (player comparison) with pill-based UI, 8-player comparison, and API endpoints. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires improvement. **Active: 102 tasks** (P0=0, P1=0, P2=6, P3=8, P4=88)
+**Recent Organization** (February 6, 2026): INFRA-033 Database Protection Enhancement COMPLETED - Deployed comprehensive backup system with daily automated backups from glader.local to kloker.local, smart retention policy, and production-ready restoration procedures. Player Table Enhancement Suite COMPLETED - Delivered unified solution combining FEAT-026 (batch group management), FEAT-028 (filtering), and FEAT-010 (player comparison) with pill-based UI, 8-player comparison, and API endpoints. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires improvement. **Active: 102 tasks** (P0=0, P1=0, P2=6, P3=7, P4=89)
 
 ---
 
@@ -30,7 +30,6 @@
 ## P3: Maintenance 🔧
 
 ### Database Protection (Highest Priority)
-- **[REFACTOR-034]** Database Script Consolidation → [Details](.project/tasks/REFACTOR-034.md)
 
 ### Hobby Project Simplification
 - **[REFACTOR-049]** Comprehensive Hobby Project Simplification - Consolidate documentation, assets, and configuration (Consolidates REFACTOR-045, 046, 047, 048, DOC-024) → [Details](.project/tasks/REFACTOR-049.md)
@@ -43,6 +42,11 @@
 - **[UI-019]** Formation Page Visual and Interaction Enhancements - Add hover tooltips to assigned players, fix overall rating calculation to include empty positions, and color-code position effectiveness → [Details](.project/tasks/UI-019.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 6, 2026 - REFACTOR-034 Database Consolidation Analysis)
+
+#### Database Consolidation Quality & Architecture
+- **[TEST-113]** Restore Database Test Coverage - Add comprehensive tests for db_utils.py module and database scripts to restore 50%+ coverage threshold lost during consolidation (60 min)
 
 ### Recent Critical Review Improvements (February 6, 2026 - Player Table Enhancement Suite Analysis)
 
