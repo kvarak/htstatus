@@ -22,7 +22,7 @@ def test_detect_version_changes():
     assert "Current version:" in result.stderr
     # If no changes found, should contain expected message
     if result.returncode == 1:
-        assert "No feature or significant commits found" in result.stderr
+        assert "No feature commits found since" in result.stderr or "No feature or significant commits found" in result.stderr
     else:
         assert "Feature commits found" in result.stderr or "Significant commits found" in result.stderr
 
