@@ -24,47 +24,9 @@ from pathlib import Path
 import click
 from dotenv import load_dotenv
 
-
-def parse_database_url(database_url):
-    """Parse DATABASE_URL into connection components."""
-    # Example: postgresql://user:password@host:port/database
-    if not database_url.startswith('postgresql://'):
-        raise ValueError(f"Invalid DATABASE_URL format: {database_url}")
-
-    # Remove postgresql:// prefix
-    url_part = database_url[13:]
-
-    # Split into auth@host/database
-    if '@' not in url_part:
-        raise ValueError("Invalid DATABASE_URL format: missing auth")
-
-    auth_part, host_db_part = url_part.split('@', 1)
-
-    # Parse auth (user:password)
-    if ':' in auth_part:
-        user, password = auth_part.split(':', 1)
-    else:
-        user, password = auth_part, None
-
-    # Parse host and database
-    if '/' not in host_db_part:
-        raise ValueError("Invalid DATABASE_URL format: missing database")
-
-    host_port, database = host_db_part.split('/', 1)
-
-    # Parse host and port
-    if ':' in host_port:
-        host, port = host_port.split(':', 1)
-    else:
-        host, port = host_port, '5432'
-
-    return {
-        'host': host,
-        'port': port,
-        'user': user,
-        'password': password,
-        'database': database
-    }
+# Add the current directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent))
+from db_utils import load_database_config
 
 
 def confirm_restore(backup_file: str, target_db: str) -> bool:
@@ -108,7 +70,7 @@ def restore_database_backup(backup_file: str, target_db: str = None) -> bool:
         return False
 
     try:
-        db_config = parse_database_url(database_url)
+        db_config = load_database_config()
 
         # Use target database if specified, otherwise use configured database
         if target_db:
