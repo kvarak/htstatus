@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 5, 2026): CHPP API Documentation Foundation COMPLETED - Created comprehensive reference for 21/79 CHPP APIs with implementation examples, authentication patterns, and strategic usage guidelines. All P2 features now have complete API coverage: matches-basic, matchorders, leaguedetails, players, playerdetails, currentbids, translations, matchdetails, matchlineup, playerevents, leaguelevels. Ready for confident P2 implementation without API research delays. Quality gates: 7/9 passing (MODERATE deployment confidence). **Active: 99 tasks** (P0=0, P1=0, P2=9, P3=8, P4=82)
+**Recent Organization** (February 6, 2026): Player Table Enhancement Suite COMPLETED - Delivered unified solution combining FEAT-026 (batch group management), FEAT-028 (filtering), and FEAT-010 (player comparison) with pill-based UI, 8-player comparison, and API endpoints. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires improvement. **Active: 103 tasks** (P0=0, P1=0, P2=6, P3=9, P4=88)
 
 ---
 
@@ -22,11 +22,8 @@
 
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
-- **[FEAT-010]** Player Comparison Tool (Connected to GitHub Issue #15 - User-requested feature for viewing multiple players side-by-side for comparison analysis) → [Details](.project/tasks/FEAT-010.md)
 - **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
-- **[FEAT-026]** Batch Player Group Management (Connected to GitHub Issue #23 - Enable bulk group assignment operations for multiple players) → [Details](.project/tasks/FEAT-026.md)
 - **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](.project/tasks/FEAT-027.md)
-- **[FEAT-028]** Player Table Filtering System (Connected to GitHub Issue #10 - Add filtering capabilities to complement existing table sorting) → [Details](.project/tasks/FEAT-028.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
@@ -44,8 +41,16 @@
 ### User Interface (Hobby-Focused)
 - **[UI-013]** Implement Loading States for CHPP Operations → [Details](.project/tasks/UI-013.md)
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
+- **[UI-019]** Formation Page Visual and Interaction Enhancements - Add hover tooltips to assigned players, fix overall rating calculation to include empty positions, and color-code position effectiveness → [Details](.project/tasks/UI-019.md)
 
 ## P4: Possibilities 🔮
+
+### Recent Critical Review Improvements (February 6, 2026 - Player Table Enhancement Suite Analysis)
+
+#### Player Table Architecture & Over-Engineering
+- **[REFACTOR-107]** Extract Player Table Features into Focused Modules - Separate bulk operations, filtering, and comparison into distinct, composable JavaScript modules that can be independently developed and tested (60 min)
+- **[UI-020]** Implement Progressive Enhancement for Player Table - Add server-side filtering fallbacks, persistent filter preferences, and graceful degradation for basic table functionality without JavaScript (45 min)
+- **[REFACTOR-108]** Implement Consistent API Validation Patterns - Add comprehensive input validation, rate limiting, and consistent error responses across all new API endpoints to prevent bypass vulnerabilities (90 min)
 
 ### Recent Critical Review Improvements (February 5, 2026 - Match Analytics & Vertical Text Review)
 
