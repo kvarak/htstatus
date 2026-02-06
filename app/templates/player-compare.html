@@ -1,0 +1,296 @@
+{% extends 'base.html' %}
+{% block styles %}
+  {{ super() }}
+  <style>
+    .comparison-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .skill-comparison-table th {
+      background-color: hsl(var(--primary));
+      color: hsl(var(--primary-foreground));
+      text-align: center;
+    }
+
+    .skill-value {
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .skill-best {
+      background-color: hsl(var(--success) / 0.1);
+      color: hsl(var(--success));
+    }
+
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin: 20px 0;
+    }
+
+    .player-summary {
+      background-color: hsl(var(--muted));
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+  </style>
+{% endblock %}
+{% block scripts %}
+  {{ super() }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Radar chart for skill comparison
+      const ctx = document.getElementById('skillsChart').getContext('2d');
+      const chartData = {{ chart_data | tojson }};
+
+      new Chart(ctx, {
+        type: 'radar',
+        data: chartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Player Skills Comparison'
+            },
+            legend: {
+              position: 'bottom'
+            }
+          },
+          scales: {
+            r: {
+              angleLines: {
+                display: true
+              },
+              suggestedMin: 0,
+              suggestedMax: 20
+            }
+          }
+        }
+      });
+    });
+  </script>
+{% endblock %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1>Player Comparison</h1>
+          <a href="/player?id={{ team_id }}" class="btn btn-outline-secondary">← Back to Players</a>
+        </div>
+      </div>
+    </div>
+    <!-- Player Summary Cards -->
+    <div class="row">
+      {% for player in players_data %}
+        <div class="col-lg-3 col-md-6 mb-3">
+          <div class="player-summary">
+            <h5 class="mb-2">
+              {% if player.number and player.number < 100 %}{{ player.number }}.{% endif %}
+              {{ player.first_name }} {{ player.last_name }}
+            </h5>
+            <div class="row text-center">
+              <div class="col-4">
+                <small class="text-muted">Age</small>
+                <br>
+                <strong>{{ player.age or 'N/A' }}</strong>
+              </div>
+              <div class="col-4">
+                <small class="text-muted">TSI</small>
+                <br>
+                <strong>{{ "{:,}".format(player.tsi) if player.tsi else 'N/A' }}</strong>
+              </div>
+              <div class="col-4">
+                <small class="text-muted">Salary</small>
+                <br>
+                <strong>{{ "{:,}".format(player.salary) if player.salary else 'N/A' }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <!-- Skills Radar Chart -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card comparison-card">
+          <div class="card-header">
+            <h5 class="mb-0">Skills Overview</h5>
+          </div>
+          <div class="card-body">
+            <div class="chart-container">
+              <canvas id="skillsChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Detailed Skills Comparison Table -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card comparison-card">
+          <div class="card-header">
+            <h5 class="mb-0">Detailed Skills Comparison</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-custom skill-comparison-table">
+                <thead>
+                  <tr>
+                    <th>Skill</th>
+                    {% for player in players_data %}
+                      <th class="text-center">
+                        {% if player.number and player.number < 100 %}{{ player.number }}.{% endif %}
+                        {{ player.first_name }} {{ player.last_name }}
+                      </th>
+                    {% endfor %}
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for skill in skill_names %}
+                    <tr>
+                      <td>
+                        <strong>{{ skill.replace('_', ' ').title() }}</strong>
+                      </td>
+                      {% set skill_values = [] %}
+                      {% for player in players_data %}
+                        {% set value = player[skill] %}
+                        {% set _ = skill_values.append(value) %}
+                      {% endfor %}
+                      {% set max_value = skill_values | max %}
+                      {% for player in players_data %}
+                        {% set value = player[skill] %}
+                        {% set oldest_value = players_oldest.get(player.ht_id, {}).get(skill, 0) %}
+                        <td class="skill-value {% if value == max_value and value > 0 %}skill-best{% endif %}">
+                          {{ value or 0 }}
+                          {% if oldest_value and oldest_value != value %}
+                            {% if value > oldest_value %}
+                              <small class="text-success">(+{{ value - oldest_value }})</small>
+                            {% elif value < oldest_value %}
+                              <small class="text-danger">({{ value - oldest_value }})</small>
+                            {% endif %}
+                          {% endif %}
+                        </td>
+                      {% endfor %}
+                    </tr>
+                  {% endfor %}
+                  <!-- Additional stats -->
+                  <tr>
+                    <td>
+                      <strong>Form</strong>
+                    </td>
+                    {% for player in players_data %}<td class="skill-value">{{ player.form or 'N/A' }}</td>{% endfor %}
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>Stamina</strong>
+                    </td>
+                    {% for player in players_data %}<td class="skill-value">{{ player.stamina or 'N/A' }}</td>{% endfor %}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Value Analysis (if data available) -->
+    {% if players_data[0].tsi %}
+      <div class="row">
+        <div class="col-12">
+          <div class="card comparison-card">
+            <div class="card-header">
+              <h5 class="mb-0">Value Analysis</h5>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-custom">
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Age</th>
+                      <th>Loyalty</th>
+                      <th>Best Position</th>
+                      <th>Group</th>
+                      <th>TSI</th>
+                      <th>Salary</th>
+                      <th>TSI/Salary Ratio</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for player in players_data %}
+                      <tr>
+                        <td>
+                          {% if player.number and player.number < 100 %}{{ player.number }}.{% endif %}
+                          {{ player.first_name }} {{ player.last_name }}
+                        </td>
+                        <td>{{ player.age if player.age else 'N/A' }}</td>
+                        <td>{{ player.loyalty if player.loyalty else 'N/A' }}</td>
+                        <td>{{ player.best_position }}</td>
+                        <td>{{ player.group_name }}</td>
+                        <td>{{ "{:,}".format(player.tsi) if player.tsi else 'N/A' }}</td>
+                        <td>{{ "{:,}".format(player.salary) if player.salary else 'N/A' }}</td>
+                        <td>
+                          {% if player.tsi and player.salary %}
+                            {{ "%.1f" | format(player.tsi / player.salary) }}
+                          {% else %}
+                            N/A
+                          {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    <!-- Export Options -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="text-center">
+          <button class="btn btn-outline-primary" onclick="window.print()">📄 Print Comparison</button>
+          <button class="btn btn-outline-secondary ml-2" onclick="exportToCSV()">📊 Export to CSV</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  function exportToCSV() {
+    const players = {{ players_data | tojson }};
+    const skills = {{ skill_names | tojson }};
+
+    let csv = 'Player,Age,TSI,Salary,' + skills.join(',') + ',Form,Stamina\n';
+
+    players.forEach(player => {
+      const name = `"${player.first_name} ${player.last_name}"`;
+      const row = [
+        name,
+        player.age || '',
+        player.tsi || '',
+        player.salary || '',
+        ...skills.map(skill => player[skill] || 0),
+        player.form || '',
+        player.stamina || ''
+      ];
+      csv += row.join(',') + '\n';
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'player_comparison.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+  </script>
+{% endblock %}

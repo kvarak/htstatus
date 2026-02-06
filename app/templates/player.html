@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block styles %}
   {{ super() }}
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/player-table-enhanced.css') }}">
   <style>
 .player-name-link {
   text-decoration: none !important;
@@ -83,6 +85,15 @@
   {% endfor %}
 
   </script>
+  <!-- Enhanced Player Table with Filtering and Bulk Actions -->
+  <script src="{{ url_for('static', filename='js/player-table-enhanced.js') }}"></script>
+  <script>
+    // Initialize the enhanced player table
+    document.addEventListener('DOMContentLoaded', function() {
+        const playerTable = new PlayerTableEnhanced();
+        console.log('Player table enhanced features initialized');
+    });
+  </script>
 {% endblock %}
 {% block content %}
   <div class="container">
@@ -105,11 +116,70 @@
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Players</h5>
+              <!-- Filter Toolbar -->
+              <div id="filter-toolbar" class="mb-3">
+                <div class="row">
+                  <div class="col-md-3">
+                    <input type="text"
+                           id="name-filter"
+                           class="form-control form-control-sm"
+                           placeholder="Filter by name...">
+                  </div>
+                  <div class="col-md-9">
+                    <div id="group-filter-container" class="d-flex flex-wrap gap-2">
+                      <label class="group-filter-item">
+                        <input type="checkbox" class="group-checkbox" value="" checked>
+                        <span class="group-pill">All Groups</span>
+                      </label>
+                      {% for group in group_data %}
+                        {% if group.name %}
+                          <label class="group-filter-item">
+                            <input type="checkbox" class="group-checkbox" value="{{ group.id }}">
+                            <span class="group-pill"
+                                  style="background-color: {{ group.bgcolor }};
+                                         color: {{ group.textcolor }}">{{ group.name }}</span>
+                          </label>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Bulk Action Toolbar -->
+              <div id="bulk-toolbar" class="mb-3">
+                <div class="row">
+                  <div class="col-md-5">
+                    <small id="selection-count" class="text-muted">Select players to assign to groups or compare (max 8)</small>
+                  </div>
+                  <div class="col-md-3">
+                    <select id="bulk-group-select" class="form-control form-control-sm">
+                      <option value="">Assign to Group...</option>
+                      {% for group in group_data %}
+                        {% if group.name %}<option value="{{ group.id }}">{{ group.name }}</option>{% endif %}
+                      {% endfor %}
+                      <option value="-1">Remove from Group</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button"
+                            id="bulk-assign-btn"
+                            class="btn btn-primary-custom btn-sm mr-2"
+                            disabled>Apply</button>
+                    <button type="button"
+                            id="compare-players-btn"
+                            class="btn btn-outline-primary btn-sm"
+                            disabled>Compare</button>
+                  </div>
+                </div>
+              </div>
               <p class="card-text">
                 <table id="player-table"
                        class="table-custom table-rotated table-scroll sortable">
                   <thead>
                     <tr>
+                      <th scope="col" class="text-small">
+                        <input type="checkbox" id="select-all" title="Select All">
+                      </th>
                       {% for (title, val) in columns %}
                         {% if val in calccolumns %}
                           <th scope="col" class="text-small vertical">
@@ -129,7 +199,17 @@
                       {% set theplayers = grouped_players[group.id] %}
                       {% if theplayers %}
                         {% for p in theplayers %}
-                          <tr style="color: {{ group.textcolor }}; background: {{ group.bgcolor }}">
+                          <tr class="player-row"
+                              data-player-id="{{ p['ht_id'] }}"
+                              data-player-name="{{ (p['first_name'] or '') }} {{ (p['last_name'] or '') }}"
+                              data-player-group-id="{{ group.id }}"
+                              data-player-group-name="{{ group.name or '' }}"
+                              data-player-position="{{ p.get('best_position', '') or '' }}"
+                              style="color: {{ group.textcolor }};
+                                     background: {{ group.bgcolor }}">
+                            <td class="text-small">
+                              <input type="checkbox" class="player-checkbox" value="{{ p['ht_id'] }}">
+                            </td>
                             {% for (title, val) in columns %}
                               {% if val in tracecolumns %}
                                 <td class="text-small" align="right">{{ p[val] }}</td>

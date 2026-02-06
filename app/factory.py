@@ -100,7 +100,9 @@ def setup_routes(app_instance, db_instance):
     init_routes_bp(app_instance, db_instance)
 
     # Import blueprint functions and blueprints
+    from app.api.players import api_bp, setup_api_blueprint
     from app.blueprints.auth import auth_bp, setup_auth_blueprint
+    from app.blueprints.compare import compare_bp, setup_compare_blueprint
     from app.blueprints.feedback import feedback_bp, setup_feedback_blueprint
     from app.blueprints.main import (
         main_bp,
@@ -169,6 +171,12 @@ def setup_routes(app_instance, db_instance):
 
     setup_training_blueprint(db_instance, TRACE_COLUMNS)
 
+    # Setup API blueprint
+    setup_api_blueprint(db_instance)
+
+    # Setup comparison blueprint
+    setup_compare_blueprint(db_instance)
+
     # Register blueprints with Flask
     app_instance.register_blueprint(main_bp)
     app_instance.register_blueprint(auth_bp)
@@ -178,6 +186,8 @@ def setup_routes(app_instance, db_instance):
     app_instance.register_blueprint(matches_bp)
     app_instance.register_blueprint(stats_bp)
     app_instance.register_blueprint(training_bp)
+    app_instance.register_blueprint(api_bp)
+    app_instance.register_blueprint(compare_bp)
 
 
 def _display_startup_status():
