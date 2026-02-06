@@ -8,6 +8,22 @@
 
 ---
 
+## 3.23 - February 6, 2026
+
+- **Enhanced Player Management**: Complete overhaul of player management with powerful new tools
+  - **Bulk Player Actions**: Select multiple players and assign them to teams or roles simultaneously
+  - **Advanced Player Filtering**: Find exactly the players you want with position, skill level, and team filters
+  - **Player Comparison Tool**: Compare multiple players side-by-side with visual skill charts
+  - **Smart Table Interactions**: Enhanced player table with sorting, filtering, and bulk selection
+  - **Real-time Search**: Instantly filter through your players as you type
+- **Improved User Experience**: Streamlined workflows for managing large player rosters
+  - Loading indicators and error handling for smooth operation
+  - Form validation to prevent common mistakes
+  - Responsive design that works on all screen sizes
+- **Visual Analytics**: Radar charts help you quickly compare player skills and make informed decisions
+
+*Perfect for managers with large squads who need efficient player management tools*
+
 ## 3.22 - February 5, 2026
 
 - **Comprehensive Match Analytics**: Deep dive into your match performance with detailed statistics
