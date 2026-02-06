@@ -12,7 +12,8 @@ This directory contains detailed specifications for individual development tasks
 ├── UI-001.md      # User interface tasks
 ├── DOC-001.md     # Documentation tasks
 ├── INFRA-001.md   # Infrastructure tasks
-└── TEST-001.md    # Testing tasks
+├── TEST-001.md    # Testing tasks
+└── EPIC-001.md    # Epic groupings (P3 maintenance only)
 ```
 
 ## Task File Format
@@ -21,7 +22,7 @@ Each task file contains:
 
 - **Status**: Current task status (🎯 Ready, 🚀 Active, etc.)
 - **Effort**: Time estimate
-- **Priority**: Priority level (P0-P6)
+- **Priority**: Priority level (P1-P3)
 - **Impact**: Expected impact description
 - **Dependencies**: Prerequisites or blockers
 - **Strategic Value**: Business/technical value

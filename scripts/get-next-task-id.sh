@@ -21,7 +21,7 @@ if ! [[ "$TASK_TYPE" =~ ^[A-Z]+$ ]]; then
 fi
 
 # Search git history for task IDs in both backlog.md and .project/tasks/
-# Look for patterns like FEAT-123, DOC-456, etc.
+# Look for patterns like FEAT-123, DOC-456, EPIC-007, etc.
 PATTERN="${TASK_TYPE}-[0-9]+"
 
 # Get all matching task IDs from git history
@@ -31,7 +31,13 @@ TASK_IDS=$(git log --all --grep="$PATTERN" --oneline 2>/dev/null | grep -oE "$PA
 FILE_TASK_IDS=$(git log --all -p .project/backlog.md .project/tasks/ 2>/dev/null | grep -oE "$PATTERN" || true)
 
 # Search current files (uncommitted changes)
-CURRENT_BACKLOG=$(grep -E "^\s*-.*$PATTERN" .project/backlog.md 2>/dev/null | grep -oE "$PATTERN" || true)
+if [ "$TASK_TYPE" = "EPIC" ]; then
+    # EPICs are section headers, not task lines
+    CURRENT_BACKLOG=$(grep -oE "EPIC-[0-9]+" .project/backlog.md 2>/dev/null || true)
+else
+    # Regular tasks are in task lines starting with -
+    CURRENT_BACKLOG=$(grep -E "^\s*-.*$PATTERN" .project/backlog.md 2>/dev/null | grep -oE "$PATTERN" || true)
+fi
 CURRENT_TASKS=$(find .project/tasks/ -name "*.md" -exec grep -oE "$PATTERN" {} \; 2>/dev/null || true)
 
 # Combine all sources

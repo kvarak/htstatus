@@ -14,6 +14,7 @@
         "Read .github/agents/htplanner-ai-agent.md, .project/ docs for context. Use `make help` and `uv run`.",
         "Take holistic view: consolidate, eliminate duplication, reduce waste.",
         "Scout mindset: Do not be afraid to take a step back and fix fix more than in the task",
+        "EPIC Context: If planning a task under an EPIC (EPIC-XXX), review ALL other tasks under the same EPIC for context, dependencies, and potential consolidation opportunities, even if they won't be executed now.",
         "Structure: # Plan ## Analysis ## Solution ## Steps ## Testing",
         "Break large tasks into sub-tasks. Simplify ruthlessly.",
         "Do not code in this step."
@@ -53,7 +54,8 @@
       "name": "update",
       "title": "Update project status and planning",
       "what to do": [
-        "Add suggestions from the 'review' prompt to backlog.md under 'P4: Possibilities' unless already present or can be merged.",
+        "CRITICAL: All P3 maintenance tasks must be under numbered EPICs (EPIC-XXX). Create new EPICs using ./scripts/get-next-task-id.sh EPIC if needed.",
+        "Add suggestions from the 'review' prompt to backlog.md under 'P3: Maintenance' unless already present or can be merged.",
         "STEP 1: Read .project/backlog.md and identify ALL completed tasks (marked ✅ COMPLETE or OBSOLETE).",
         "STEP 2: For EACH completed and obsolete task found, DELETE the completed task from backlog.md (git preserves history).",
         "STEP 3: DELETE the corresponding task file from .project/tasks/<taskid>.md for each completed task (git preserves history).",
@@ -93,26 +95,12 @@
       ]
     },
     {
-      "name": "execute-backlog-item",
-      "title": "Plan and execute a specific backlog item with simplification focus",
-      "what to do": [
-        "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Challenge if task can be simplified.",
-        "Read detailed requirements from .project/tasks/<taskid>.md file.",
-        "Scout mindset: fix lint errors, cleanup nearby code while executing.",
-        "Execute with `uv run`. Test against acceptance criteria.",
-        "Update docs. Mark completed in backlog (✅ COMPLETED with completion notes).",
-        "IMPORTANT: After marking complete, immediately delete the completed task from backlog.md to keep backlog clean.",
-        "DELETE the task file .project/tasks/<taskid>.md (git preserves history).",
-        "Structure: # Execution: [TASK-ID] ## Plan ## Steps ## Summary"
-      ]
-    },
-    {
       "name": "analyze-project",
       "title": "Repository analysis for simplification and complexity reduction",
       "what to do": [
         "Use list_dir and file_search to analyze repository structure with focus on simplification.",
         "Take a holistic view: identify duplication, waste, over-engineered solutions, and unnecessary complexity.",
-        "Review all docs (README.md, .project/*, DEPLOYMENT.md) for redundancy and outdated content.",
+        "Review all docs (README.md, .project/*, *.md) for redundancy and outdated content.",
         "Find opportunities to consolidate, merge, or eliminate redundant components and processes.",
         "Create backlog tasks for: simplification, deduplication, waste reduction, complexity reduction.",
         "Structure: # Analysis ## Simplification Opportunities ## Duplication & Waste ## Complexity Reduction ## Actions"
@@ -129,7 +117,8 @@
         "Respect separation of concerns: Don't merge tasks with different purposes.",
         "Consolidate duplicate tasks. Remove obsolete. Simplify complex tasks.",
         "Look for patterns: combine small tasks, simplify over-engineered solutions.",
-        "Fix dependencies/priorities to reduce cognitive load."
+        "Fix dependencies/priorities to reduce cognitive load.",
+        "CRITICAL: All P3 maintenance tasks must be under numbered EPICs (EPIC-XXX). Create new EPICs using ./scripts/get-next-task-id.sh EPIC if needed."
       ]
     },
     {

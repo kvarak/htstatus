@@ -178,13 +178,17 @@ players = team.players()  # Live data from Hattrick
 - **BUG-**: Bug fixes and functionality regressions
 - **FEAT-**: New features and functionality
 - **DOC-**: Documentation, guides, cleanup
+- **EPIC-**: Epic groupings for related maintenance tasks (P3 only)
 **Never invent new categories** - use existing numbering sequence for category
 
 **Task ID Generation**: Use `./scripts/get-next-task-id.sh <TYPE>` to get the next available task ID:
 ```bash
-./scripts/get-next-task-id.sh FEAT  # Returns FEAT-020
+./scripts/get-next-task-id.sh FEAT  # Returns FEAT-032
 ./scripts/get-next-task-id.sh DOC   # Returns DOC-027
+./scripts/get-next-task-id.sh EPIC  # Returns EPIC-011
 ```
+
+**Epic Rules**: All P3 maintenance tasks must be organized under numbered EPICs (EPIC-XXX). If no appropriate EPIC exists, create a new one.
 
 #### Project Documentation Structure
 
