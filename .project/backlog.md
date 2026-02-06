@@ -1,18 +1,14 @@
 # HattrickPlanner Backlog
 
-**Purpose**: Active development tasks in priority order
+**Task Organization**: Use **numbered Epic structure** (EPIC-XXX) for maintenance tasks - related tasks grouped under Epic goals (🎯) with smaller actionable increments (15-90 min). All P3 tasks must be under an Epic. This allows working toward bigger objectives while maintaining progress visibility and partial completion capability.
 **Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
-**Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-020`)
+**Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-032`, `./scripts/get-next-task-id.sh EPIC` → `EPIC-011`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): INFRA-033 Database Protection Enhancement COMPLETED - Deployed comprehensive backup system with daily automated backups from glader.local to kloker.local, smart retention policy, and production-ready restoration procedures. Player Table Enhancement Suite COMPLETED - Delivered unified solution combining FEAT-026 (batch group management), FEAT-028 (filtering), and FEAT-010 (player comparison) with pill-based UI, 8-player comparison, and API endpoints. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires improvement. **Active: 102 tasks** (P0=0, P1=0, P2=6, P3=7, P4=89)
+**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.8% requires immediate attention. **Active: 89 tasks** (P1=0, P2=6, P3=83)
 
 ---
-
-## P0: Production-Breaking 🚨
-
-*No active P0 issues*
 
 ## P1: Critical 🔥
 
@@ -29,218 +25,127 @@
 
 ## P3: Maintenance 🔧
 
-### Database Protection (Highest Priority)
+### **EPIC-001: Critical Database & Infrastructure** 🎯
+*Goal: Essential database protection and security foundation for hobby project*
 
-### Hobby Project Simplification
+- **[TEST-113]** Restore Database Test Coverage - Add comprehensive tests for db_utils.py module and database scripts to restore 50%+ coverage threshold (60 min)
+- **[INFRA-084]** Resolve Dependency Security Warnings - Address 13 dependency warnings identified in security scan, update vulnerable packages or document acceptable risk (60 min)
+- **[BUG-074]** Add Transaction Safety for Team Data Storage - Wrap team competition data updates in proper database transactions with rollback handling (30 min)
+
+### **EPIC-002: Hobby Project Simplification** 🎯
+*Goal: Consolidate documentation, assets, and configuration for hobby project maintainability*
+
 - **[REFACTOR-049]** Comprehensive Hobby Project Simplification - Consolidate documentation, assets, and configuration (Consolidates REFACTOR-045, 046, 047, 048, DOC-024) → [Details](.project/tasks/REFACTOR-049.md)
+- **[DOC-032]** Consolidate and Reduce Documentation Overhead - Reduce project docs from 66 to <40 files, preserve CHPP reference docs, merge setup instructions → [Details](.project/tasks/DOC-032.md)
+- **[REFACTOR-109]** Remove Test Stub Waste and TODO Overhead - Remove test files with only TODO comments, eliminate false coverage signals → [Details](.project/tasks/REFACTOR-109.md)
+- **[INFRA-088]** Simplify Configuration Complexity for Hobby Scale - Consolidate Docker configs, simplify environment variables, streamline Makefile targets → [Details](.project/tasks/INFRA-088.md)
+- **[REFACTOR-110]** Evaluate and Simplify Blueprint Architecture for Hobby Scale - Right-size blueprint patterns, error handling, and model access for hobby project complexity → [Details](.project/tasks/REFACTOR-110.md)
 - **[REFACTOR-030]** Implement Rate Limiting for CHPP Requests → [Details](.project/tasks/REFACTOR-030.md)
 - **[REFACTOR-031]** Clean Up Unused View Functions → [Details](.project/tasks/REFACTOR-031.md)
 - **[REFACTOR-032]** Optimize Database Query Performance → [Details](.project/tasks/REFACTOR-032.md)
-### User Interface (Hobby-Focused)
+
+### **EPIC-003: User Interface Enhancement** 🎯
+*Goal: Essential UI improvements focused on hobby project user experience*
+
 - **[UI-013]** Implement Loading States for CHPP Operations → [Details](.project/tasks/UI-013.md)
 - **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 - **[UI-019]** Formation Page Visual and Interaction Enhancements - Add hover tooltips to assigned players, fix overall rating calculation to include empty positions, and color-code position effectiveness → [Details](.project/tasks/UI-019.md)
 
-## P4: Possibilities 🔮
+### **EPIC-004: Test Infrastructure & Security** 🎯
+*Goal: Essential testing foundation and security for hobby project*
 
-### Recent Critical Review Improvements (February 6, 2026 - REFACTOR-034 Database Consolidation Analysis)
-
-#### Database Consolidation Quality & Architecture
-- **[TEST-113]** Restore Database Test Coverage - Add comprehensive tests for db_utils.py module and database scripts to restore 50%+ coverage threshold lost during consolidation (60 min)
-
-### Recent Critical Review Improvements (February 6, 2026 - Player Table Enhancement Suite Analysis)
-
-#### Player Table Architecture & Over-Engineering
-- **[REFACTOR-107]** Extract Player Table Features into Focused Modules - Separate bulk operations, filtering, and comparison into distinct, composable JavaScript modules that can be independently developed and tested (60 min)
-- **[UI-020]** Implement Progressive Enhancement for Player Table - Add server-side filtering fallbacks, persistent filter preferences, and graceful degradation for basic table functionality without JavaScript (45 min)
+- **[REFACTOR-112]** Immediate Test Coverage Restoration - Execute existing coverage improvement tasks before adding new analysis tasks, address 47.8% vs 50% gap (45 min)
+- **[TEST-011]** Fix Failing Test Infrastructure - Resolve 500 errors in main/team routes, fix model registry issues, address template rendering problems (60 min)
+- **[REFACTOR-099]** Consolidate Authentication Test Fixtures - Move all authentication fixtures to conftest.py, eliminate per-file duplication (20 min)
+- **[TEST-037]** Add Blueprint Route Testing - Enhance conftest.py for blueprint testing, add route tests for feedback routes (60 min)
+- **[REFACTOR-100]** Test Strategy Realignment - Establish quality thresholds over quantity metrics, fix infrastructure before expanding coverage (30 min)
 - **[REFACTOR-108]** Implement Consistent API Validation Patterns - Add comprehensive input validation, rate limiting, and consistent error responses across all new API endpoints to prevent bypass vulnerabilities (90 min)
 
-### Recent Critical Review Improvements (February 5, 2026 - Match Analytics & Vertical Text Review)
+### **EPIC-005: Database Optimization** 🎯
+*Goal: Optimize database architecture and queries for hobby project scale*
 
-#### Match Model Architecture Simplification
-- **[REFACTOR-106]** Simplify Match Model Schema with Analytics Table - Refactor Match model into lean core table (teams, datetime, score, type) with separate MatchAnalytics table for optional enhanced data (possession, chances, ratings), reducing database bloat from 78 nullable columns and improving query performance for non-analytics queries (90 min)
-- **[INFRA-087]** Add Match Analytics Database Indexes - Create indexes on Match.attendance, Match.weather_id, Match.home_team_formation and benchmark query performance impact of 78 nullable columns on typical queries (30 min)
+- **[REFACTOR-106]** Simplify Match Model Schema with Analytics Table - Refactor Match model into lean core table (teams, datetime, score, type) with separate MatchAnalytics table for optional enhanced data (90 min)
+- **[INFRA-087]** Add Match Analytics Database Indexes - Create indexes on Match.attendance, Match.weather_id, Match.home_team_formation (30 min)
+- **[REFACTOR-073]** Simplify Team Competition Data Storage - Replace 9-parameter update method with JSON field or upsert pattern (45 min)
+- **[REFACTOR-072]** Eliminate Circular Import Anti-Pattern - Restructure model imports to avoid `from models import Team` inside functions (30 min)
+- **[REFACTOR-057]** Replace Individual Group Queries with JOINs - Optimize performance with single JOIN queries (15 min)
+- **[REFACTOR-066]** Simplify Admin Feedback Count Queries - Replace complex SQLAlchemy exists() with COUNT/GROUP BY for <50 items (15 min)
+- **[REFACTOR-065]** Remove Feedback Vote Caching - Remove premature optimization, use simple query count for hobby scale (15 min)
+- **[REFACTOR-059]** Optimize Timeline Sorting - Evaluate SQL vs Python sorting for timeline changes (30 min)
 
-### Recent Critical Review Improvements (February 3, 2026 - Player Modal Layout Enhancement Analysis)
+### **EPIC-006: Frontend Simplification** 🎯
+*Goal: Consolidate templates, CSS/JS architecture for hobby project maintainability*
 
-#### Template Architecture Quality & Simplification
-- **[REFACTOR-104]** Extract Player Field Display Logic - Replace repeated conditional display logic (nick_name, statement, owner_notes) with reusable Jinja2 macros to eliminate DRY violations (15 min)
-- **[UI-018]** Standardize Modal Content Width Constraints - Replace inline max-width styles (450px) with CSS classes following established logical component architecture (30 min)
-- **[REFACTOR-105]** Audit Chart.js Responsive Configuration - Standardize Chart.js responsive settings across all implementations to prevent sizing inconsistencies and reduce configuration drift (45 min)
+- **[REFACTOR-103]** Complete Bootstrap 4.x Migration - Remove Flask-Bootstrap dependency, standardize templates to Bootstrap 4.x syntax (120 min)
+- **[REFACTOR-092]** Template Architecture Audit - Systematic review of all templates for inheritance optimization and consistent patterns (45 min)
+- **[REFACTOR-104]** Extract Player Field Display Logic - Replace repeated conditional logic with reusable Jinja2 macros (15 min)
+- **[REFACTOR-090]** Consolidate Error Template Pattern - Remove error.html template, modify main.html for conditional rendering (20 min)
+- **[UI-018]** Standardize Modal Content Width - Replace inline max-width styles with CSS classes (30 min)
+- **[REFACTOR-063]** Organize Template Directory Structure - Move legacy templates into logical subdirectories (30 min)
+- **[REFACTOR-107]** Extract Player Table Features - Separate bulk operations, filtering, and comparison into composable JavaScript modules (60 min)
+- **[UI-020]** Progressive Enhancement for Player Table - Add server-side filtering fallbacks and graceful degradation (45 min)
+- **[REFACTOR-093]** Evaluate CSS Architecture Simplification - Consider consolidating ui-components.css, utilities.css, layout.css (15 min)
+- **[REFACTOR-094]** CSS Pattern Consolidation - Standardize color, spacing, border patterns using CSS variables (30 min)
+- **[REFACTOR-086]** Replace Responsive JavaScript with CSS - Replace JS resize listeners with CSS media queries (20 min)
+- **[REFACTOR-096]** Simplify Chart Utilities Architecture - Evaluate HattrickCharts class vs simple configuration objects (30 min)
+- **[REFACTOR-102]** Consolidate Chart Creation Patterns - Replace repetitive Chart.js implementations with factory pattern (45 min)
+- **[REFACTOR-105]** Audit Chart.js Responsive Configuration - Standardize responsive settings across implementations (45 min)
 
-### Recent Critical Review Improvements (February 3, 2026 - BUG-077 Bootstrap Fix Analysis)
+### **EPIC-007: System Quality & Development Tools** 🎯
+*Goal: Essential error handling and simplified development tooling*
 
-#### Bootstrap Architecture & Technical Debt Cleanup
-- **[REFACTOR-103]** Complete Bootstrap 4.x Migration and Flask-Bootstrap Cleanup - Remove Flask-Bootstrap dependency entirely, standardize all templates to Bootstrap 4.x syntax, eliminate version conflicts discovered during player details fix (2 hours)
-
-### Recent Critical Review Improvements (February 3, 2026 - Responsive Tutorial Help Button Analysis)
-
-#### Responsive Design & Architecture Simplification
-- **[REFACTOR-086]** Replace Responsive JavaScript with CSS-Only Solution - Replace 24-line JavaScript resize listeners and navbar-toggler detection with simple CSS media queries matching Bootstrap breakpoints (20 min)
-- **[DOC-028]** Document Responsive Design Decision Rationale - Record responsive design approach decisions and alternative CSS/JavaScript approaches considered for future reference (15 min)
-
-### Recent Critical Review Improvements (February 3, 2026 - Tutorial Analytics Implementation Review)
-
-#### Tutorial System Quality & Architecture
-- **[REFACTOR-102]** Consolidate Chart Creation Patterns - Replace repetitive Chart.js implementations in debug.html with factory pattern to eliminate ~70% of JavaScript duplication (45 min)
-- **[TEST-012]** Add Unit Tests for Tutorial Analytics - Create test coverage for tutorial tracking logic, analytics calculations, and event mapping missing from recent implementation (60 min)
-- **[DOC-029]** Document Tutorial Analytics Data Model - Define tutorial analytics data model and intended usage patterns to guide future development and prevent schema drift (30 min)
-
-### Recent Critical Review Improvements (February 2, 2026 - TEST-010 Coverage Expansion Analysis)
-
-#### Test Infrastructure Over-Engineering & Quality Issues
-- **[REFACTOR-101]** Simplify Coverage Reporting - Replace 211-line coverage_report.py with simple Makefile targets using built-in coverage tools and basic shell commands (30 min)
-
-### Recent Critical Review Improvements (February 2, 2026 - TEST-010 Test Coverage Analysis)
-
-#### Test Infrastructure Quality & Consolidation
-- **[REFACTOR-099]** Consolidate Authentication Test Fixtures - Move all authentication fixtures to conftest.py, eliminate per-file duplication, use single app configuration pattern (20 min)
-- **[TEST-011]** Fix Failing Test Infrastructure (CONSOLIDATED: includes BUG-076) - Resolve actual 500 errors in main/team routes, fix model registry issues, address template rendering problems rather than masking with defensive test assertions (60 min)
-- **[REFACTOR-100]** Test Strategy Realignment - Shift focus from test volume to test value, fix infrastructure before expanding coverage, establish quality thresholds over quantity metrics (30 min)
-
-### Recent Critical Review Improvements (February 2, 2026 - JavaScript Architecture Analysis)
-
-#### JavaScript Architecture Quality & Simplification
-- **[REFACTOR-096]** Simplify Chart Utilities Architecture - Evaluate if HattrickCharts class is necessary or if simple configuration objects/functions would reduce complexity while maintaining DRY benefits (30 min)
-- **[REFACTOR-097]** Backend Chart Data Preparation - Move repetitive skill data preparation loops from templates to view layer, returning pre-formatted chart data structures (45 min)
-- **[REFACTOR-098]** JavaScript Architecture Simplification Study - Compare current multi-file approach vs single app.js with modules for maintainability and loading performance in hobby project context (30 min)
-
-### Recent Critical Review Improvements (February 2, 2026 - CSS Logical Architecture Analysis)
-
-#### CSS Architecture Simplification & Quality
-- **[REFACTOR-093]** Evaluate CSS Architecture Simplification - Consider consolidating ui-components.css, utilities.css, and layout.css into a single reusable-components.css file to reduce file count while preserving logical organization for complex features (15 min)
-- **[REFACTOR-094]** CSS Pattern Consolidation - Standardize color, spacing, and border patterns across all component files using CSS variables and shared utility patterns to eliminate duplication (30 min)
-- **[REFACTOR-095]** CSS Architecture Simplification Experiment - Create a 3-file alternative (commons.css, timeline.css, formations.css) and compare maintenance overhead vs organizational benefits for hobby project context (45 min)
-
-### Recent Critical Review Improvements (February 2, 2026 - INFRA-085 Error Logging Analysis)
-
-#### Error Logging Simplification & Quality
-- **[REFACTOR-087]** Simplify Error Logging Model - Reduce ErrorLog model from 9 fields to essential fields only (timestamp, message, stack_trace) to eliminate over-engineering (15 min)
-- **[INFRA-086]** Add Error Log Rotation/Cleanup - Implement automatic cleanup mechanism to prevent unbounded database growth in production (30 min)
-- **[REFACTOR-088]** Split Debug Route Responsibilities - Separate user administration from error management to improve separation of concerns (/admin/errors route) (30 min)
-- **[TEST-083]** Add Error Logging Test Coverage - Comprehensive test coverage for error logging functionality missing from recent implementation (45 min) → **CONSOLIDATED INTO TEST-010**
-- **[FEAT-024]** Error Rate Limiting/Deduplication - Add protection against log flooding from same error to prevent database abuse (20 min)
-- **[REFACTOR-089]** Replace Production Environment Check - Use configurable logging levels instead of hard-coded production-only activation (15 min)
-
-### Recent Critical Review Improvements (February 2, 2026 - BUG-075 Template Architecture Analysis)
-
-#### Template Architecture & Flask-Bootstrap Improvements
-- **[REFACTOR-090]** Consolidate Error Template Pattern - Remove error.html template and modify main.html to conditionally render route-dependent elements only when routes are available, eliminating template duplication (20 min)
-- **[REFACTOR-091]** Isolate Flask-Bootstrap Dependency - Move Flask-Bootstrap initialization to a conditional plugin pattern so the core app can function without it during testing (30 min)
-- **[REFACTOR-092]** Template Architecture Audit - Systematic review of all Jinja2 templates for inheritance optimization, duplicate content elimination, and consistent component patterns (45 min)
-
-### Recent Critical Review Improvements (February 1, 2026 - Changelog System Over-Engineering Analysis)
-
-#### Test Coverage & Quality Priority
-- **[INFRA-084]** Resolve Dependency Security Warnings - Address 13 dependency warnings identified in security scan, update vulnerable packages or document acceptable risk (60 min)
-
-#### Simplification Opportunities
-- **[REFACTOR-028]** Simplify Changelog System - Replace JSON-based changelog with static CHANGELOG.md, remove bash generation scripts and debug page complexity (30 min)
-- **[REFACTOR-085]** Remove Unused Script Arguments - Fix broken usage instructions in scripts/ directory (`python` → `uv run python`) and remove dead debugging code (15 min)
-- **[REFACTOR-086]** Eliminate Changelog Animation Complexity - Replace 80+ lines of CSS transitions and JavaScript for debug page with simple show/hide toggle (20 min)
-
-### Recent Critical Review Improvements (February 1, 2026 - FEAT-019 Timeline Analysis)
-
-#### Feature Implementation Quality
-- **[FEAT-019]** Player Skill Changes - 4 Week Timeline on Player Details Page → [Details](.project/tasks/FEAT-019.md) - Retry implementation with better browser compatibility testing and simplified approach
-- **[REFACTOR-083]** Remove Orphaned Timeline Utility - Clean up `get_team_timeline()` function from utils.py if not needed for other features (15 min)
-- **[TEST-082]** Improve Test Coverage for Template Changes - Address test coverage regression to 41.7% from recent template modifications (45 min)
-
-### Recent Critical Review Improvements (January 31, 2026 - FEAT-023 Session Management)
-
-#### Quality & Testing Improvements
-- **[REFACTOR-081]** Simplify PWA session persistence - Replace 195-line JavaScript solution with server-side session configuration investigation (30 min)
-- **[REFACTOR-082]** Evaluate Cookie Consent Necessity - Research if hobby project actually requires cookie consent for essential authentication cookies (15 min)
-- **[TEST-081]** Add PWA session persistence tests - Create proper test coverage for session management JavaScript (45 min)
-- **[INFRA-082]** Investigate Server-Side Session Configuration - Research Flask session cookie settings for PWA compatibility before complex client-side solutions (30 min)
-
-### Recent Critical Review Improvements (January 30, 2026 - Team Model Analysis)
-
-#### Architecture & Testing Quality
-- **[TEST-070]** Team Model Comprehensive Test Coverage - Add tests for Team model creation, competition data updates, error handling, and database constraints (60 min)
-- **[REFACTOR-072]** Eliminate Circular Import Anti-Pattern - Restructure model imports to avoid `from models import Team` inside functions in stats.py and team.py (30 min)
-- **[REFACTOR-073]** Simplify Team Competition Data Storage - Replace 9-parameter update method with JSON field or upsert pattern for simpler data management (45 min)
-- **[BUG-074]** Add Transaction Safety for Team Data Storage - Wrap team competition data updates in proper database transactions with rollback handling (30 min)
-
-### Recent Critical Review Improvements (January 30, 2026 - Consolidation)
-
-#### Simplification & Technical Debt (UI & Database)
-- **[REFACTOR-066]** Simplify Admin Feedback Count Queries - Replace complex SQLAlchemy exists() subqueries with simple COUNT/GROUP BY for hobby project scale <50 items (15 min)
-- **[REFACTOR-067]** Extract Navigation Component Logic - Move admin indicator conditional logic from Jinja2 templates to view layer for better testability (30 min)
-- **[REFACTOR-068]** Simplify Admin Feedback Test Mocking - Replace complex 15-line SQLAlchemy mocks with simple fake data for hobby project testing (20 min)
-- **[REFACTOR-065]** Simplify Feedback Vote Caching - Remove premature optimization (update_vote_score method); use simple query count for hobby project scale <50 items (15 min)
-
-#### Testing & Architecture Quality
-- **[TEST-037]** Add Blueprint Route Testing Infrastructure - Enhance conftest.py to support blueprint testing, add route tests for feedback routes (list, new, detail, vote, comment, status) - 0% coverage currently (60 min)
-- **[REFACTOR-063]** Organize Template Directory Structure - Move legacy templates into subdirectories for consistent organization (30 min)
-- **[DOC-028]** Consolidate CHPP Documentation - Merge 168-line CHPP-ENFORCEMENT.md into TECHNICAL.md to reduce documentation redundancy (30 min)
-
-### Recent Critical Review Improvements (January 29, 2026)
-
-#### Formation System & Architecture Improvements
-- **[REFACTOR-058]** Simplify calculateContribution Function - Normalize position inputs to single format, remove dual-mode complexity (45 min)
-- **[REFACTOR-059]** Extract Frontend Formation API - Replace JavaScript position calculations with API endpoints to eliminate code duplication (60 min)
-- **[REFACTOR-060]** Externalize Position Configuration - Move formation templates and skill weightings from hardcoded dictionaries to JSON/YAML config (30 min)
-- **[TEST-036]** Comprehensive calculateContribution Test Coverage - Add missing test coverage for position code mapping and tactical variations (45 min)
-- **[REFACTOR-061]** Blueprint Architecture Review - Systematic analysis of all blueprints for consistency and logical responsibility boundaries (90 min)
+- **[REFACTOR-087]** Simplify Error Logging Model - Reduce ErrorLog from 9 fields to essentials (timestamp, message, stack_trace) (15 min)
+- **[INFRA-086]** Add Error Log Rotation/Cleanup - Implement automatic cleanup to prevent database growth (30 min)
+- **[REFACTOR-088]** Split Debug Route Responsibilities - Separate user admin from error management (/admin/errors route) (30 min)
+- **[FEAT-024]** Error Rate Limiting/Deduplication - Protect against log flooding from same error (20 min)
+- **[REFACTOR-089]** Replace Production Environment Check - Use configurable logging levels vs hard-coded activation (15 min)
+- **[REFACTOR-101]** Simplify Coverage Reporting - Replace 211-line script with Makefile targets using built-in tools (30 min)
+- **[REFACTOR-028]** Simplify Changelog System - Replace JSON-based changelog with static CHANGELOG.md (30 min)
+- **[REFACTOR-085]** Remove Unused Script Arguments - Fix script usage docs, remove dead debugging code (15 min)
 - **[DOC-022]** Architecture Decision Records - Document rationale for blueprint separation, calculation approaches, and frontend business logic decisions (30 min)
+- **[TEST-115]** Database Utilities Test Coverage - Create comprehensive test suite for db_utils.py module to restore coverage threshold and validate consolidation benefits (60 min)
 
-### Previously Identified Improvements
+### **EPIC-008: Core Hattrick Features** 🎯
+*Goal: Essential player analysis and team management features*
 
-#### Test Isolation & Architecture (from simplification review)
-- **[REFACTOR-028]** Evaluate Model Registry Necessity - Assess whether the model registry pattern is justified for this hobby project or if simpler import restructuring would suffice (30 min) → [Details](.project/tasks/REFACTOR-028.md)
-- **[TEST-034]** Focus Coverage on Business Logic - Prioritize test coverage for blueprint routes (auth, main, team, matches, training) over utility functions (60 min)
-- **[REFACTOR-029]** Consolidate Model Import Patterns - Choose single approach (registry OR direct imports) to eliminate dual maintenance paths (45 min)
-- **[DOC-018]** Document Import Architecture Decision - Record why the model registry pattern was chosen over alternatives for future reference (15 min)
+- **[REFACTOR-058]** Simplify calculateContribution Function - Normalize position inputs to single format, remove dual-mode complexity (45 min)
+- **[REFACTOR-059]** Extract Frontend Formation API - Replace JavaScript calculations with API endpoints to eliminate duplication (60 min)
+- **[REFACTOR-060]** Externalize Position Configuration - Move formation templates and skill weightings from hardcoded dictionaries to JSON/YAML (30 min)
+- **[TEST-036]** Add calculateContribution Test Coverage - Cover position code mapping and tactical variations (45 min)
+- **[FEAT-019]** Player Skill Changes Timeline - 4-week timeline with better browser compatibility and simplified approach
+- **[REFACTOR-081]** Investigate Server-Side Session Config - Research Flask session settings vs 195-line PWA JavaScript solution (30 min)
+- **[REFACTOR-067]** Extract Navigation Component Logic - Move admin indicator logic from templates to view layer (30 min)
+- **[REFACTOR-068]** Simplify Admin Feedback Test Mocking - Replace complex mocks with simple fake data (20 min)
+- **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics
+- **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences
+- **[FEAT-011]** Training Camp Planner
 
-#### Authentication & User Session Issues
-- **[REFACTOR-050]** Authentication Flow Analysis - Investigate why authenticated sessions reference non-existent users (root cause of BUG-011)
-- **[REFACTOR-051]** Systematic User Query Audit - Review all User.filter_by() patterns for consistency and safety
-- **[FEAT-018]** Automatic User Creation Strategy - Ensure user records exist for all authenticated sessions
-- **[REFACTOR-052]** Consolidate Repetitive File Processing Patterns - Merge fileformat and fileformat-fix rule processing loops
-- **[REFACTOR-053]** Make Coverage Thresholds Configurable - Replace hardcoded 50% with environment-specific settings
-- **[REFACTOR-054]** Unified Quality Gate Architecture - Merge test-coverage-files and test-python into single comprehensive test gate
-- **[REFACTOR-055]** Optimize Quality Intelligence Script - Single-pass JSON parsing instead of multiple file reads per gate
-- **[REFACTOR-056]** Filesystem-First File Discovery - Replace git ls-files with filesystem discovery to eliminate existence checks
+### **EPIC-009: Application Architecture** 🎯
+*Goal: Simplify import patterns and essential authentication*
 
-### Radical Innovation Ideas (January 30, 2026 - Outside-the-Box Analysis)
+- **[REFACTOR-028]** Evaluate Model Registry Necessity - Assess if model registry is justified for hobby project vs simpler imports (30 min)
+- **[REFACTOR-029]** Consolidate Model Import Patterns - Choose single approach (registry OR direct imports) to eliminate dual paths (45 min)
+- **[REFACTOR-050]** Authentication Flow Analysis - Investigate why authenticated sessions reference non-existent users (30 min)
+- **[REFACTOR-051]** User Query Audit - Review all User.filter_by() patterns for consistency and safety (45 min)
+- **[REFACTOR-061]** Blueprint Architecture Review - Analyze all blueprints for logical responsibility boundaries (90 min)
+- **[FEAT-018]** Automatic User Creation Strategy - Ensure user records exist for all authenticated sessions (30 min)
+- **[REFACTOR-091]** Isolate Flask-Bootstrap Dependency - Conditional plugin pattern for core app functionality (30 min)
 
-#### Architecture Simplification Experiments
-- **[REFACTOR-075]** Blueprint Consolidation Experiment - Prototype merging 8 blueprints into 3 core modules (auth+main, hattrick data, community) to reduce complexity (90 min)
-- **[REFACTOR-076]** JSON Storage Feasibility Study - Analyze replacing database with file-based JSON storage for hobby project scale <100 players per user (60 min)
-- **[INFRA-077]** Static Site Generation Prototype - Experiment with daily HTML generation approach to eliminate deployment complexity (120 min)
+### **EPIC-010: Essential Testing & Quality** 🎯
+*Goal: Focus testing on business logic and modernize quality processes*
 
-#### Quality vs Velocity Balance
-- **[REFACTOR-078]** Essential Feature Audit - Systematic review of which features justify their maintenance burden in hobby project context (45 min)
-- **[INFRA-079]** Quality Gate Simplification - Consolidate 7 quality gates into essential-only checks to improve development velocity (30 min)
-
-### Core Hattrick Features (Aligned with Geek Audience)
-- **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics → [Details](.project/tasks/FEAT-016.md)
-- **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences to avoid future rejections → [Details](.project/tasks/FEAT-017.md)
-- **[FEAT-011]** Training Camp Planner → [Details](.project/tasks/FEAT-011.md)
-
-### Simple Improvements
-- **[REFACTOR-057]** Replace individual group queries with single JOIN query for performance optimization (15 min)
-- **[REFACTOR-059]** Evaluate SQL-level sorting vs Python-level sorting for timeline changes (30 min)
-- **[TEST-035]** Create shared test fixture for new player display data structure (20 min)
-- **[REFACTOR-038]** Simplify CSS Design System & UI Consistency (Consolidates UI-015, UI-016) → [Details](.project/tasks/REFACTOR-038.md)
-- **[REFACTOR-040]** Template Inheritance for Breadcrumb Pattern → [Details](.project/tasks/REFACTOR-040.md)
-- **[REFACTOR-041]** Consolidate Debug Scripts & Country Data Migration (Consolidates REFACTOR-039) → [Details](.project/tasks/REFACTOR-041.md)
-- **[TEST-008]** Test Coverage Quality Gates → [Details](.project/tasks/TEST-008.md)
+- **[TEST-070]** Team Model Comprehensive Coverage - Add tests for Team model creation, competition data updates, error handling (60 min)
+- **[TEST-034]** Business Logic Route Coverage - Prioritize blueprint routes (auth, main, team, matches, training) over utilities (60 min)
+- **[TEST-012]** Tutorial Analytics Test Coverage - Create coverage for tracking logic, calculations, event mapping (60 min)
+- **[TEST-082]** Template Changes Test Coverage - Address coverage regression to 41.7% from recent modifications (45 min)
+- **[TEST-035]** Shared Test Fixture Creation - Create shared fixture for new player display data structure (20 min)
+- **[REFACTOR-052]** Consolidate File Processing Patterns - Merge fileformat and fileformat-fix rule processing loops (30 min)
+- **[REFACTOR-053]** Configurable Coverage Thresholds - Replace hardcoded 50% with environment-specific settings (20 min)
+- **[REFACTOR-054]** Unified Quality Gate Architecture - Merge test-coverage-files and test-python into comprehensive gate (45 min)
+- **[REFACTOR-055]** Optimize Quality Intelligence Script - Single-pass JSON parsing vs multiple file reads (25 min)
+- **[REFACTOR-056]** Filesystem-First File Discovery - Replace git ls-files with filesystem discovery (30 min)
+- **[REFACTOR-038]** Simplify CSS Design System & UI Consistency (60 min)
+- **[REFACTOR-040]** Template Inheritance for Breadcrumb Pattern (45 min)
+- **[REFACTOR-041]** Debug Scripts & Country Data Migration (45 min)
 
 ---
-
-## Archived (Enterprise Features Removed)
-
-**Rationale**: Following hobby project philosophy redefinition, these tasks exceed hobby project complexity or don't align with Hattrick geek focus:
-
-- **FEAT-012** Mobile App Development - Major complexity addition not aligned with hobby project
-- **FEAT-014** Collaborative League Intelligence - Enterprise social features exceed scope
-- **FEAT-015** AI-Powered Training Optimization - Over-engineered for hobby project
-- **INFRA-030** Add Health Check Endpoints - Enterprise monitoring pattern
-- **INFRA-031** Application Metrics Collection - Enterprise observability
-- **INFRA-032** Multi-Region Deployment - Enterprise deployment pattern
-- **INFRA-037** Add Pre-commit Hooks - May add unnecessary complexity
-- **INFRA-024** Re-upgrade to pychpp 0.5.10 + Flask 3.1+ - Deferred until needed
-
-*These may be reconsidered if project scope changes, but currently don't align with hobby project simplicity goals.*
