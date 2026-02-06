@@ -66,10 +66,18 @@ cp config.py.template config.py  # Full config with documentation
 - Training progress monitoring
 - Interactive tutorials and onboarding
 
+**Database Protection** (INFRA-033):
+```bash
+make db-backup                    # Create full database backup
+make db-restore BACKUP_FILE=...   # Restore from backup
+make db-backup-auto              # Automated backup to kloker.local
+```
+
 ## Documentation
 
 - **[TECHNICAL.md](TECHNICAL.md)** - Architecture and implementation details
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment procedures
+- **[scripts/database/backups/README.md](scripts/database/backups/README.md)** - Database backup and restore procedures
 - **[CHANGELOG.md](CHANGELOG.md)** - Technical changes and commits
 - **[RELEASES.md](RELEASES.md)** - User-focused feature releases
 

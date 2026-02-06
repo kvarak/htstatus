@@ -453,6 +453,24 @@ db-apply: check-uv ## Apply database migrations using production-safe script
 	@echo "🗄️  Applying database migrations (production-safe)..."
 	@uv run python scripts/database/apply_migrations.py
 
+db-backup: check-uv ## Create full database backup
+	@echo "💾 Creating database backup..."
+	@uv run python scripts/database/backup_database.py
+
+db-restore: check-uv ## Restore database from backup file (usage: make db-restore BACKUP_FILE="path/to/backup.sql")
+	@echo "🔄 Restoring database from backup..."
+	@if [ -z "$(BACKUP_FILE)" ]; then \
+		echo "❌ Error: BACKUP_FILE parameter required"; \
+		echo "Usage: make db-restore BACKUP_FILE=\"path/to/backup.sql\""; \
+		echo "Alternative: uv run python scripts/database/restore_database.py backup.sql"; \
+		exit 1; \
+	fi
+	@uv run python scripts/database/restore_database.py "$(BACKUP_FILE)"
+
+db-backup-auto: check-uv ## Run automated backup to kloker.local (for cron/deployment)
+	@echo "🔄 Running automated backup to kloker.local..."
+	@./scripts/database/backup_to_kloker.sh
+
 # Deployment Commands
 deploy-prepare: ## Prepare deployment environment (git, dependencies)
 	@echo "🚀 Preparing deployment environment..."
