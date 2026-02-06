@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 48.2% after test infrastructure creation. **Active: 91 tasks** (P1=0, P2=6, P3=85)
+**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 48.2% after test infrastructure creation. **Active: 91 tasks** (P1=0, P2=7, P3=84)
 
 ---
 
@@ -20,6 +20,7 @@
 - **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
 - **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
 - **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](.project/tasks/FEAT-027.md)
+- **[UI-014]** Add Dark Mode Support - Implement theme switching between dark mode and light mode with user preference persistence → [Details](.project/tasks/UI-014.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 
@@ -48,7 +49,6 @@
 *Goal: Essential UI improvements focused on hobby project user experience*
 
 - **[UI-013]** Implement Loading States for CHPP Operations → [Details](.project/tasks/UI-013.md)
-- **[UI-014]** Add Dark Mode Support → [Details](.project/tasks/UI-014.md)
 - **[UI-019]** Formation Page Visual and Interaction Enhancements - Add hover tooltips to assigned players, fix overall rating calculation to include empty positions, and color-code position effectiveness → [Details](.project/tasks/UI-019.md)
 
 ### **EPIC-004: Test Infrastructure & Security** 🎯
