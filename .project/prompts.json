@@ -24,7 +24,8 @@
       "name": "execute",
       "title": "Execute the planned development task",
       "what to do": [
-        "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Use `uv run` and `make help`.",
+        "Read .github/agents/htplanner-ai-agent.md, .project/ docs. Run `make help` to see available commands. Use `uv run` for all python commands.",
+        "Run `make test-all` to see current test status and coverage before making changes. CRITICAL: Do not allow coverage loss. Always aim to improve coverage.",
         "Follow plan. Scout mindset: fix lint errors, fix file format standards issues, cleanup nearby code, remove waste while working, don't settle for the same code coverage but strive to improve it.",
         "Apply simplification hierarchy: Holistic view >> Separation of concerns >> Reduce complexity >> Reduce waste >> Consolidate duplication.",
         "Test: `make test-all` - no coverage loss or failures.",
@@ -72,7 +73,7 @@
       "title": "Create commits for changes since last commit following git guidelines",
       "what to do": [
         "PHASE 1 - Analyze Changes: Review git status and diff. Group related changes logically.",
-        "PHASE 2 - Create Commits: Factual messages <50 chars, imperative mood. For features: add [feat-xyz] suffix.",
+        "PHASE 2 - Create Commits: Factual messages <50 chars, imperative mood. For features: add [feat-xyz] suffix. Group the related changes together into fewer, more meaningful commits.",
         "PHASE 3 - Release Detection: Run 'make release-detect' to check for version-worthy changes.",
         "PHASE 4 - Version Release (if detected): Determine version (minor=features, patch=fixes), create tag with 'make release-tag VERSION=X.Y MESSAGE=\"description\"'.",
         "PHASE 5 - Documentation: ALWAYS update RELEASES-INTERNAL.md manually for all tagged releases with technical details.",

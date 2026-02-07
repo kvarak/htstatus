@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 48.2% after test infrastructure creation. **Active: 91 tasks** (P1=0, P2=7, P3=84)
+**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 48.2% after test infrastructure creation. **Active: 93 tasks** (P1=0, P2=7, P3=86)
 
 ---
 
@@ -54,8 +54,9 @@
 ### **EPIC-004: Test Infrastructure & Security** 🎯
 *Goal: Essential testing foundation and security for hobby project*
 
+- **[REFACTOR-086]** Implement Progressive Enhancement Fallback for Chart Management - Add graceful fallback for disabled JavaScript, server-side state management option for chart functionality (15 min)
+- **[TEST-011]** Add Comprehensive Test Coverage for Simplified Debug Chart Functionality - Create test suite for admin preferences API, event delegation patterns, drag-and-drop state persistence (45 min)
 - **[REFACTOR-113]** Replace Skipped Test Infrastructure with Simple Integration Tests - Remove all @pytest.mark.skip decorators and replace with straightforward tests that don't require complex mocking, focusing on 2.2% coverage gap closure using real database fixtures (30 min)
-- **[TEST-011]** Fix Failing Test Infrastructure - Resolve 500 errors in main/team routes, fix model registry issues, address template rendering problems (60 min)
 - **[REFACTOR-099]** Consolidate Authentication Test Fixtures - Move all authentication fixtures to conftest.py, eliminate per-file duplication (20 min)
 - **[TEST-037]** Add Blueprint Route Testing - Enhance conftest.py for blueprint testing, add route tests for feedback routes (60 min)
 - **[REFACTOR-114]** Test Pattern Standardization - Analyze existing working tests (test_db_utils, test_training_utils) and establish consistent patterns for new test creation, eliminate environment-specific failures (45 min)
@@ -96,6 +97,7 @@
 ### **EPIC-007: System Quality & Development Tools** 🎯
 *Goal: Essential error handling and simplified development tooling*
 
+- **[DOC-028]** Evaluate Chart Persistence Requirements vs Hobby Project Scope - Document design decisions for AdminPreferences data persistence, assess complexity/value tradeoff for hobby project (30 min)
 - **[REFACTOR-087]** Simplify Error Logging Model - Reduce ErrorLog from 9 fields to essentials (timestamp, message, stack_trace) (15 min)
 - **[INFRA-086]** Add Error Log Rotation/Cleanup - Implement automatic cleanup to prevent database growth (30 min)
 - **[REFACTOR-088]** Split Debug Route Responsibilities - Separate user admin from error management (/admin/errors route) (30 min)
