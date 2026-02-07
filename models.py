@@ -925,3 +925,73 @@ class TutorialAnalytics(db.Model):
         return f"<TutorialAnalytics {self.event_type} {self.tour_id} by user {self.user_id} at {self.timestamp}>"
 
 # --------------------------------------------------------------------------------
+
+
+class AdminPreferences(db.Model):
+    """Store admin-specific preferences for debug dashboard customization"""
+    __tablename__ = "admin_preferences"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False, unique=True)
+    chart_layout = db.Column(db.JSON, nullable=True)  # Chart order, positions, display modes
+    filter_settings = db.Column(db.JSON, nullable=True)  # Hide admin users, other filters
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship to User model
+    user = db.relationship('User', backref='admin_preferences')
+
+    def __init__(self, user_id, chart_layout=None, filter_settings=None):
+        self.user_id = user_id
+        self.chart_layout = chart_layout or self._default_chart_layout()
+        self.filter_settings = filter_settings or self._default_filter_settings()
+
+    def _default_chart_layout(self):
+        """Default chart layout configuration"""
+        return {
+            "chart_order": [
+                "tutorialCompletionChart",
+                "tutorialHelpChart",
+                "tutorialResetChart",
+                "userActivityChart",
+                "featureUsageChart",
+                "registrationChart",
+                "usageFrequencyChart"
+            ],
+            "chart_modes": {
+                "tutorialCompletionChart": "normal",
+                "tutorialHelpChart": "normal",
+                "tutorialResetChart": "normal",
+                "userActivityChart": "normal",
+                "featureUsageChart": "normal",
+                "registrationChart": "normal",
+                "usageFrequencyChart": "normal"
+            },
+            "grid_columns": 2
+        }
+
+    def _default_filter_settings(self):
+        """Default filter settings"""
+        return {
+            "hide_admin_users": True,
+            "activity_table_rows": 20
+        }
+
+    def update_chart_layout(self, layout_data):
+        """Update chart layout preferences"""
+        if layout_data:
+            self.chart_layout = layout_data
+            self.updated_at = datetime.utcnow()
+            db.session.commit()
+
+    def update_filter_settings(self, filter_data):
+        """Update filter preferences"""
+        if filter_data:
+            self.filter_settings = filter_data
+            self.updated_at = datetime.utcnow()
+            db.session.commit()
+
+    def __repr__(self):
+        return f"<AdminPreferences for user {self.user_id}>"
+
+# --------------------------------------------------------------------------------
