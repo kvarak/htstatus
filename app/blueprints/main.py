@@ -9,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from flask import (
     Blueprint,
     current_app,
+    jsonify,
     redirect,
     render_template,
     request,
@@ -600,4 +601,58 @@ def tutorial_analytics():
 
     except Exception as e:
         dprint(1, f"Error recording tutorial analytics: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@main_bp.route("/api/admin/preferences", methods=["GET", "POST"])
+@require_authentication
+def admin_preferences():
+    """Get or save admin dashboard preferences."""
+    from models import AdminPreferences
+
+    try:
+        user_id = get_current_user_id()
+        User = get_user_model()
+        user = db.session.query(User).filter_by(ht_id=user_id).first()
+
+        if not user or user.getRole() != "Admin":
+            return jsonify({"error": "Admin access required"}), 403
+
+        if request.method == "GET":
+            # Load preferences
+            prefs = db.session.query(AdminPreferences).filter_by(user_id=user_id).first()
+
+            if not prefs:
+                # Create default preferences
+                prefs = AdminPreferences(user_id=user_id)
+                db.session.add(prefs)
+                db.session.commit()
+
+            return jsonify({
+                "chart_layout": prefs.chart_layout,
+                "filter_settings": prefs.filter_settings
+            }), 200
+
+        elif request.method == "POST":
+            # Save preferences
+            data = request.get_json()
+            if not data:
+                return jsonify({"error": "No data provided"}), 400
+
+            prefs = db.session.query(AdminPreferences).filter_by(user_id=user_id).first()
+
+            if not prefs:
+                prefs = AdminPreferences(user_id=user_id)
+                db.session.add(prefs)
+
+            # Update preferences
+            if "chart_layout" in data:
+                prefs.update_chart_layout(data["chart_layout"])
+            if "filter_settings" in data:
+                prefs.update_filter_settings(data["filter_settings"])
+
+            return jsonify({"status": "success"}), 200
+
+    except Exception as e:
+        dprint(1, f"Error handling admin preferences: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
