@@ -89,336 +89,298 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card-deck">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Activity</h5>
-              <p class="card-text">
-                <table class="table-custom table-scroll sortable">
-                  <thead>
-                    <tr>
-                      <th scope="col" class="text-small">Admin</th>
-                      <th scope="col" class="text-small">ID</th>
-                      <th scope="col" class="text-small">Name</th>
-                      <th scope="col" class="text-small">Active time</th>
-                      <th scope="col" class="text-small">Last usage</th>
-                      <th scope="col" class="text-small vertical-text">#login</th>
-                      <th scope="col" class="text-small vertical-text">#team</th>
-                      <th scope="col" class="text-small vertical-text">#training</th>
-                      <th scope="col" class="text-small vertical-text">#matches</th>
-                      <th scope="col" class="text-small vertical-text">#matches_archive</th>
-                      <th scope="col" class="text-small vertical-text">#player</th>
-                      <th scope="col" class="text-small vertical-text">#update</th>
-                      <th scope="col" class="text-small vertical-text">#settings</th>
-                      <th scope="col" class="text-small vertical-text">#tour_welcome_ok</th>
-                      <th scope="col" class="text-small vertical-text">#tour_welcome_skip</th>
-                      <th scope="col" class="text-small vertical-text">#tour_player_ok</th>
-                      <th scope="col" class="text-small vertical-text">#tour_player_skip</th>
-                      <th scope="col" class="text-small vertical-text">#tour_update_ok</th>
-                      <th scope="col" class="text-small vertical-text">#tour_reset</th>
-                      <th scope="col" class="text-small vertical-text">#tour_help</th>
-                      <th scope="col" class="text-small vertical-text">#changes</th>
-                      <th scope="col" class="text-small vertical-text">#feedback</th>
-                      <th scope="col" class="text-small vertical-text">#formation</th>
-                      <th scope="col" class="text-small vertical-text">#stats</th>
-                      <th scope="col" class="text-small">Last update</th>
-                      <th scope="col" class="text-small">Last archive</th>
-                      <th scope="col" class="text-small">Last login</th>
-                      <th scope="col" class="text-small">Created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for u in users %}
-                      {% if u.active_time == "< 1 day" %}
-                        <tr>
-                        {% else %}
-                          <tr style="font-weight: bold;">
-                          {% endif %}
-                          <td class="text-small">
-                            {% if u.name == current_user %}
-                              {{ u.role }}
-                            {% else %}
-                              <form method="POST" action="/debug">
-                                <input type="hidden" id="userid" name="userid" value="{{ u.id }}">
-                                <div class="form-check">
-                                  {% if u.id == 182085 %}
+    <!-- Full-Width Activity Table -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-users mr-2"></i>User Activity Dashboard
+              <small class="text-muted">(All user interactions and admin management)</small>
+            </h5>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+              <table class="table-custom table-scroll sortable">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-small">Admin</th>
+                    <th scope="col" class="text-small">ID</th>
+                    <th scope="col" class="text-small">Name</th>
+                    <th scope="col" class="text-small">Active time</th>
+                    <th scope="col" class="text-small">Last usage</th>
+                    <th scope="col" class="text-small vertical-text">#login</th>
+                    <th scope="col" class="text-small vertical-text">#team</th>
+                    <th scope="col" class="text-small vertical-text">#training</th>
+                    <th scope="col" class="text-small vertical-text">#matches</th>
+                    <th scope="col" class="text-small vertical-text">#matches_archive</th>
+                    <th scope="col" class="text-small vertical-text">#player</th>
+                    <th scope="col" class="text-small vertical-text">#update</th>
+                    <th scope="col" class="text-small vertical-text">#settings</th>
+                    <th scope="col" class="text-small vertical-text">#tour_welcome_ok</th>
+                    <th scope="col" class="text-small vertical-text">#tour_welcome_skip</th>
+                    <th scope="col" class="text-small vertical-text">#tour_player_ok</th>
+                    <th scope="col" class="text-small vertical-text">#tour_player_skip</th>
+                    <th scope="col" class="text-small vertical-text">#tour_update_ok</th>
+                    <th scope="col" class="text-small vertical-text">#tour_reset</th>
+                    <th scope="col" class="text-small vertical-text">#tour_help</th>
+                    <th scope="col" class="text-small vertical-text">#changes</th>
+                    <th scope="col" class="text-small vertical-text">#feedback</th>
+                    <th scope="col" class="text-small vertical-text">#formation</th>
+                    <th scope="col" class="text-small vertical-text">#stats</th>
+                    <th scope="col" class="text-small">Last update</th>
+                    <th scope="col" class="text-small">Last archive</th>
+                    <th scope="col" class="text-small">Last login</th>
+                    <th scope="col" class="text-small">Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for u in users %}
+                    {% if u.active_time == "< 1 day" %}
+                      <tr>
+                      {% else %}
+                        <tr style="font-weight: bold;">
+                        {% endif %}
+                        <td class="text-small">
+                          {% if u.name == current_user %}
+                            {{ u.role }}
+                          {% else %}
+                            <form method="POST" action="/debug">
+                              <input type="hidden" id="userid" name="userid" value="{{ u.id }}">
+                              <div class="form-check">
+                                {% if u.id == 182085 %}
+                                  <input class="form-check-input position-static"
+                                         type="checkbox"
+                                         disabled
+                                         checked>
+                                {% else %}
+                                  {% if u.role == "Admin" %}
                                     <input class="form-check-input position-static"
                                            type="checkbox"
-                                           disabled
+                                           name="admin"
+                                           value="admin"
+                                           onChange="this.form.submit()"
                                            checked>
                                   {% else %}
-                                    {% if u.role == "Admin" %}
-                                      <input class="form-check-input position-static"
-                                             type="checkbox"
-                                             name="admin"
-                                             value="admin"
-                                             onChange="this.form.submit()"
-                                             checked>
-                                    {% else %}
-                                      <input class="form-check-input position-static"
-                                             type="checkbox"
-                                             name="admin"
-                                             value="admin"
-                                             onChange="this.form.submit()">
-                                    {% endif %}
-                                    <!-- disabled checked -->
+                                    <input class="form-check-input position-static"
+                                           type="checkbox"
+                                           name="admin"
+                                           value="admin"
+                                           onChange="this.form.submit()">
                                   {% endif %}
-                                </div>
-                              </form>
-                            {% endif %}
-                          </td>
-                          <td class="text-small">{{ u.id }}</td>
-                          <td class="text-small">{{ u.name }}</td>
-                          <td class="text-small">{{ u.active_time }}</td>
-                          <td class="text-small">{{ u.last_usage }}</td>
-                          <td class="text-small">{{ u.c_login }}</td>
-                          <td class="text-small">{{ u.c_team }}</td>
-                          <td class="text-small">{{ u.c_training }}</td>
-                          <td class="text-small">{{ u.c_matches }}</td>
-                          <td class="text-small">{{ u.c_matches_archive or 0 }}</td>
-                          <td class="text-small">{{ u.c_player }}</td>
-                          <td class="text-small">{{ u.c_update }}</td>
-                          <td class="text-small">{{ u.c_settings or 0 }}</td>
-                          <td class="text-small">{{ u.c_welcome_complete or 0 }}</td>
-                          <td class="text-small">{{ u.c_welcome_skip or 0 }}</td>
-                          <td class="text-small">{{ u.c_player_complete or 0 }}</td>
-                          <td class="text-small">{{ u.c_player_skip or 0 }}</td>
-                          <td class="text-small">{{ u.c_update_complete or 0 }}</td>
-                          <td class="text-small">{{ u.c_tutorial_reset or 0 }}</td>
-                          <td class="text-small">{{ (u.c_welcome_help or 0) + (u.c_player_help or 0) + (u.c_update_help or 0) }}</td>
-                          <td class="text-small">{{ u.c_changes or 0 }}</td>
-                          <td class="text-small">{{ u.c_feedback or 0 }}</td>
-                          <td class="text-small">{{ u.c_formation or 0 }}</td>
-                          <td class="text-small">{{ u.c_stats or 0 }}</td>
-                          <td class="text-small">{{ u.last_update }}</td>
-                          <td class="text-small">{{ u.last_matches_archive or '-' }}</td>
-                          <td class="text-small">{{ u.last_login }}</td>
-                          <td class="text-small">{{ u.created }}</td>
-                        </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </p>
+                                {% endif %}
+                              </div>
+                            </form>
+                          {% endif %}
+                        </td>
+                        <td class="text-small">{{ u.id }}</td>
+                        <td class="text-small">{{ u.name }}</td>
+                        <td class="text-small">{{ u.active_time }}</td>
+                        <td class="text-small">{{ u.last_usage }}</td>
+                        <td class="text-small">{{ u.c_login }}</td>
+                        <td class="text-small">{{ u.c_team }}</td>
+                        <td class="text-small">{{ u.c_training }}</td>
+                        <td class="text-small">{{ u.c_matches }}</td>
+                        <td class="text-small">{{ u.c_matches_archive or 0 }}</td>
+                        <td class="text-small">{{ u.c_player }}</td>
+                        <td class="text-small">{{ u.c_update }}</td>
+                        <td class="text-small">{{ u.c_settings or 0 }}</td>
+                        <td class="text-small">{{ u.c_welcome_complete or 0 }}</td>
+                        <td class="text-small">{{ u.c_welcome_skip or 0 }}</td>
+                        <td class="text-small">{{ u.c_player_complete or 0 }}</td>
+                        <td class="text-small">{{ u.c_player_skip or 0 }}</td>
+                        <td class="text-small">{{ u.c_update_complete or 0 }}</td>
+                        <td class="text-small">{{ u.c_tutorial_reset or 0 }}</td>
+                        <td class="text-small">{{ (u.c_welcome_help or 0) + (u.c_player_help or 0) + (u.c_update_help or 0) }}</td>
+                        <td class="text-small">{{ u.c_changes or 0 }}</td>
+                        <td class="text-small">{{ u.c_feedback or 0 }}</td>
+                        <td class="text-small">{{ u.c_formation or 0 }}</td>
+                        <td class="text-small">{{ u.c_stats or 0 }}</td>
+                        <td class="text-small">{{ u.last_update }}</td>
+                        <td class="text-small">{{ u.last_matches_archive or '-' }}</td>
+                        <td class="text-small">{{ u.last_login }}</td>
+                        <td class="text-small">{{ u.created }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
               <div class="card-footer">
-                <small class="text-muted">{{ users|length }} users • Page loaded</small>
+                <small class="text-muted">{{ users|length }} users • Full activity dashboard</small>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <!-- Statistics Charts -->
-          <!-- Filter Controls -->
-          <div class="filter-controls">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="filterAdmins" checked>
-              <label class="form-check-label" for="filterAdmins">Hide Admin users from charts</label>
+      </div>
+      <!-- Chart Control Bar -->
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                  <i class="fas fa-chart-bar mr-2"></i>Chart Controls
+                </h6>
+                <div class="d-flex align-items-center">
+                  <div class="form-check mr-4">
+                    <input class="form-check-input" type="checkbox" id="filterAdmins" checked>
+                    <label class="form-check-label" for="filterAdmins">Hide Admin users from charts</label>
+                  </div>
+                  <button type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          id="resetCharts">
+                    <i class="fas fa-undo mr-1"></i>Reset Charts
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="row">
-            <!-- Tutorial Analytics Charts -->
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-graduation-cap"></i> Tutorial Completion Rates
-                  </h6>
-                  <small class="text-muted d-block mb-2">Completion vs skip rates for each tutorial tour</small>
-                  <canvas id="tutorialCompletionChart" style="max-height: 200px;"></canvas>
+        </div>
+      </div>
+      <!-- Charts Section -->
+      <div class="row">
+        <div class="col-md-12">
+          <!-- Chart Configuration -->
+          {% set charts = [
+            {
+              "id": "tutorialCompletionChart",
+              "title": "Tutorial Completion Rates",
+              "icon": "fas fa-graduation-cap",
+              "description": "Completion vs skip rates for each tutorial tour"
+            },
+            {
+              "id": "tutorialHelpChart",
+              "title": "Tutorial Help Usage",
+              "icon": "fas fa-question-circle",
+              "description": "Help button clicks across different tutorial tours"
+            },
+            {
+              "id": "tutorialResetChart",
+              "title": "Tutorial Reset Behavior",
+              "icon": "fas fa-redo-alt",
+              "description": "Tutorial reset frequency and user re-learning patterns"
+            },
+            {
+              "id": "userActivityChart",
+              "title": "User Activity",
+              "icon": "fas fa-users",
+              "description": "Shows users active in the last 30 days vs inactive users"
+            },
+            {
+              "id": "featureUsageChart",
+              "title": "Feature Usage",
+              "icon": "fas fa-chart-line",
+              "description": "Total usage count for each application feature across all users"
+            },
+            {
+              "id": "registrationChart",
+              "title": "Registration Timeline",
+              "icon": "fas fa-calendar-alt",
+              "description": "New user registrations per month over time",
+              "height": "150px"
+            },
+            {
+              "id": "usageFrequencyChart",
+              "title": "Usage Frequency",
+              "icon": "fas fa-clock",
+              "description": "Distribution of users by their total feature usage activity levels"
+            },
+            {
+              "id": "topUsersChart",
+              "title": "Top Users",
+              "icon": "fas fa-trophy",
+              "description": "Most engaged users ranked by total feature usage activity"
+            },
+            {
+              "id": "loginTimelineChart",
+              "title": "Login Activity Over Time",
+              "icon": "fas fa-chart-line",
+              "description": "Weekly login activity trends over the last 12 weeks"
+            },
+            {
+              "id": "adoptionRateChart",
+              "title": "Feature Adoption Rate",
+              "icon": "fas fa-percentage",
+              "description": "Percentage of users who have tried each application feature"
+            },
+            {
+              "id": "retentionChart",
+              "title": "User Retention by Month",
+              "icon": "fas fa-calendar",
+              "description": "Percentage of new users still active 30 days after registration"
+            },
+            {
+              "id": "hourlyActivityChart",
+              "title": "Activity by Hour",
+              "icon": "fas fa-clock",
+              "description": "User activity distribution across 24-hour time periods"
+            },
+            {
+              "id": "activityFocusChart",
+              "title": "Team vs Player Focus",
+              "icon": "fas fa-balance-scale",
+              "description": "User preferences: team management vs individual player development"
+            },
+            {
+              "id": "playerBreakdownChart",
+              "title": "Player Activity Breakdown",
+              "icon": "fas fa-running",
+              "description": "Detailed breakdown of player-related activities and training focus"
+            },
+            {
+              "id": "teamBreakdownChart",
+              "title": "Team Management Activity",
+              "icon": "fas fa-users-cog",
+              "description": "Usage of team management features: team views, matches, formations"
+            },
+            {
+              "id": "updateFrequencyChart",
+              "title": "Update Frequency Distribution",
+              "icon": "fas fa-sync-alt",
+              "description": "How frequently users sync their data with Hattrick servers"
+            },
+            {
+              "id": "featureRadarChart",
+              "title": "Feature Usage Radar",
+              "icon": "fas fa-chart-radar",
+              "description": "Radar view of feature adoption showing usage patterns across all features"
+            },
+            {
+              "id": "engagementScoreChart",
+              "title": "User Engagement Score",
+              "icon": "fas fa-star",
+              "description": "Calculated engagement scores based on overall activity and feature diversity"
+            }
+          ] %}
+          <!-- Chart Rendering -->
+          <div class="row" id="chartsContainer">
+            {% for chart in charts %}
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="{{ chart.id }}">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle" style="cursor: move;">
+                        <i class="{{ chart.icon }}"></i> {{ chart.title }}
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary chart-expand" title="Expand">
+                          <i class="fas fa-expand-arrows-alt"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block">{{ chart.description }}</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="{{ chart.id }}"
+                            style="max-height: {{ chart.height | default("200px") }}"></canvas>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-question-circle"></i> Tutorial Help Usage
-                  </h6>
-                  <small class="text-muted d-block mb-2">Help button clicks across different tutorial tours</small>
-                  <canvas id="tutorialHelpChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-redo-alt"></i> Tutorial Reset Behavior
-                  </h6>
-                  <small class="text-muted d-block mb-2">Tutorial reset frequency and user re-learning patterns</small>
-                  <canvas id="tutorialResetChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-users"></i> User Activity
-                  </h6>
-                  <small class="text-muted d-block mb-2">Shows users active in the last 30 days vs inactive users</small>
-                  <canvas id="userActivityChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-chart-line"></i> Feature Usage
-                  </h6>
-                  <small class="text-muted d-block mb-2">Total usage count for each application feature across all users</small>
-                  <canvas id="featureUsageChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-calendar-alt"></i> Registration Timeline
-                  </h6>
-                  <small class="text-muted d-block mb-2">New user registrations per month over time</small>
-                  <canvas id="registrationChart" style="max-height: 150px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-clock"></i> Usage Frequency
-                  </h6>
-                  <small class="text-muted d-block mb-2">Distribution of users by their total feature usage activity levels</small>
-                  <canvas id="usageFrequencyChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-trophy"></i> Top Users
-                  </h6>
-                  <small class="text-muted d-block mb-2">Most engaged users ranked by total feature usage activity</small>
-                  <canvas id="topUsersChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <!-- New Charts -->
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-chart-line"></i> Login Activity Over Time
-                  </h6>
-                  <small class="text-muted d-block mb-2">Weekly login activity trends over the last 12 weeks</small>
-                  <canvas id="loginTimelineChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-percentage"></i> Feature Adoption Rate
-                  </h6>
-                  <small class="text-muted d-block mb-2">Percentage of users who have tried each application feature</small>
-                  <canvas id="adoptionRateChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-calendar"></i> User Retention by Month
-                  </h6>
-                  <small class="text-muted d-block mb-2">Percentage of new users still active 30 days after registration</small>
-                  <canvas id="retentionChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-clock"></i> Activity by Hour
-                  </h6>
-                  <small class="text-muted d-block mb-2">User activity distribution across 24-hour time periods</small>
-                  <canvas id="hourlyActivityChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-balance-scale"></i> Team vs Player Focus
-                  </h6>
-                  <small class="text-muted d-block mb-2">User preferences: team management vs individual player development</small>
-                  <canvas id="activityFocusChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <!-- Additional Charts -->
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-running"></i> Player Activity Breakdown
-                  </h6>
-                  <small class="text-muted d-block mb-2">Detailed breakdown of player-related activities and training focus</small>
-                  <canvas id="playerBreakdownChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-users-cog"></i> Team Management Activity
-                  </h6>
-                  <small class="text-muted d-block mb-2">Usage of team management features: team views, matches, formations</small>
-                  <canvas id="teamBreakdownChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-sync-alt"></i> Update Frequency Distribution
-                  </h6>
-                  <small class="text-muted d-block mb-2">How frequently users sync their data with Hattrick servers</small>
-                  <canvas id="updateFrequencyChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-chart-radar"></i> Feature Usage Radar
-                  </h6>
-                  <small class="text-muted d-block mb-2">Radar view of feature adoption showing usage patterns across all features</small>
-                  <canvas id="featureRadarChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
-            <div class="col-12 mb-3">
-              <div class="card chart-card">
-                <div class="card-body">
-                  <h6 class="card-title mb-1">
-                    <i class="fas fa-star"></i> User Engagement Score
-                  </h6>
-                  <small class="text-muted d-block mb-2">Calculated engagement scores based on overall activity and feature diversity</small>
-                  <canvas id="engagementScoreChart" style="max-height: 200px;"></canvas>
-                </div>
-              </div>
-            </div>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -426,6 +388,7 @@
   {% endblock %}
   {% block scripts %}
     {{ super() }}
+    <script src="{{ url_for('static', filename='js/debug-charts.js') }}"></script>
     <script>
 // User data from backend
 const usersData = JSON.parse('{{ users | tojson | safe }}');
@@ -1494,6 +1457,12 @@ function updateEngagementScoreChart(filteredUsers) {
 document.addEventListener('DOMContentLoaded', function() {
     updateAllCharts();
     document.getElementById('filterAdmins').addEventListener('change', updateAllCharts);
+
+    // Initialize chart manager for drag-and-drop functionality
+    if (typeof DebugChartManager !== 'undefined') {
+        window.chartManager = new DebugChartManager();
+        window.chartManager.init();
+    }
 });
     </script>
   {% endblock %}

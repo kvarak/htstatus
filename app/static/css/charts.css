@@ -5,6 +5,8 @@
 .chart-card {
     height: 280px;
     overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
 }
 
 .chart-card .card-body {
@@ -16,9 +18,149 @@
 .chart-card canvas {
     flex: 1;
     max-height: 200px !important;
+    transition: all 0.3s ease;
+}
+
+/* Drag and Drop Styles */
+.chart-drag-handle {
+    cursor: move;
+}
+
+.drag-over {
+    border: 2px dashed #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+[data-chart-id]:hover .chart-drag-handle {
+    color: #007bff;
+}
+
+/* Chart Display Modes */
+.chart-card[data-mode="minimized"] {
+    height: 60px;
+}
+
+.chart-card[data-mode="minimized"] .card-body {
+    padding: 0.5rem;
+    display: none; /* Hide body content in minimized mode */
+}
+
+.chart-card[data-mode="minimized"] canvas {
+    display: none !important;
+}
+
+.chart-card[data-mode="minimized"] .chart-content {
+    display: none !important;
+}
+
+.chart-card[data-mode="normal"] {
+    height: 280px;
+}
+
+.chart-card[data-mode="full"] {
+    height: 400px;
+}
+
+.chart-card[data-mode="full"] canvas {
+    max-height: 320px !important;
+}
+
+/* Chart container width controls */
+[data-chart-id].chart-minimized {
+    /* Force 1/4 width for minimized charts */
+    flex: 0 0 25% !important;
+    max-width: 25% !important;
+    width: 25% !important;
+}
+
+[data-chart-id].chart-normal {
+    /* 1/2 width for normal charts (default) */
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+    width: 50% !important;
+}
+
+[data-chart-id].chart-full-width {
+    /* Full width for expanded charts */
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+    width: 50% !important;
+}
+
+[data-chart-id].chart-full-width {
+    /* Full width for expanded charts */
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Full width charts - override the grid column span */
+[data-chart-id] .chart-card[data-mode="full"] {
+    position: relative;
+    z-index: 10;
+}
+
+/* Full width container class applied by JavaScript */
+[data-chart-id].chart-full-width {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
 }
 
 /* Chart Controls */
+.chart-controls {
+    display: flex;
+    gap: 2px;
+}
+
+/* Chart title hover - move cursor */
+.chart-card .card-header {
+    cursor: move;
+    cursor: -webkit-grab;
+    cursor: grab;
+}
+
+.chart-card .card-header:active {
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+}
+
+.chart-controls .btn {
+    padding: 0.25rem 0.375rem;
+    line-height: 1;
+}
+
+.chart-drag {
+    cursor: grab;
+}
+
+.chart-drag:active {
+    cursor: grabbing;
+}
+
+/* Chart Grid Container */
+#chartsContainer {
+    min-height: 200px;
+}
+
+#chartsContainer > div {
+    transition: all 0.3s ease;
+}
+
+/* Drag and Drop States */
+.chart-dragging {
+    opacity: 0.5;
+    transform: rotate(2deg);
+}
+
+.chart-drop-target {
+    background-color: rgba(0, 123, 255, 0.1);
+    border: 2px dashed #007bff;
+    border-radius: 0.375rem;
+}
+
+/* Filter Controls */
 .filter-controls {
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
@@ -28,6 +170,20 @@
 }
 
 /* Chart Responsiveness */
+@media (max-width: 992px) {
+    .chart-card[data-mode="normal"] {
+        height: 250px;
+    }
+
+    .chart-card[data-mode="full"] {
+        height: 350px;
+    }
+
+    .chart-card[data-mode="full"] canvas {
+        max-height: 270px !important;
+    }
+}
+
 @media (max-width: 768px) {
     .chart-card {
         height: 220px;
@@ -36,4 +192,46 @@
     .chart-card canvas {
         max-height: 150px !important;
     }
+
+    .chart-card[data-mode="normal"] {
+        height: 220px;
+    }
+
+    .chart-card[data-mode="full"] {
+        height: 300px;
+    }
+
+    .chart-card[data-mode="full"] canvas {
+        max-height: 220px !important;
+    }
+
+    .chart-controls {
+        flex-direction: column;
+        gap: 1px;
+    }
+}
+
+/* Activity Table Enhancements */
+.table-responsive {
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+}
+
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
