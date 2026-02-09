@@ -731,6 +731,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
   }
 });
   </script>
+  <!-- GoatCounter Analytics -->
+  <script data-goatcounter="https://stats.kvarak.net/count"
+          async
+          src="//stats.kvarak.net/count.js"></script>
 {% endblock %}
 ##########################
 ## Navbar
@@ -848,3 +852,4 @@ window.addEventListener('beforeinstallprompt', (e) => {
     <img src="{{ url_for('static', filename='soccer_ball.png') }}" width="100">
   </div>
 {% endblock %}
+{% block content %}<!-- Page content will be inserted here -->{% endblock %}
