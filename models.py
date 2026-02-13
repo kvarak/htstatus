@@ -974,7 +974,12 @@ class AdminPreferences(db.Model):
         """Default filter settings"""
         return {
             "hide_admin_users": True,
-            "activity_table_rows": 20
+            "activity_table_rows": 20,
+            "date_range": {
+                "default_months": 6,
+                "start_date": None,
+                "end_date": None
+            }
         }
 
     def update_chart_layout(self, layout_data):

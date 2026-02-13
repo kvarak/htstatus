@@ -231,6 +231,39 @@
                   </button>
                 </div>
               </div>
+              <!-- Date Range Filters -->
+              <div class="mt-3 chart-filters">
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="dateRangeStart" class="form-label text-small">Start Date</label>
+                    <input type="date"
+                           class="form-control form-control-sm"
+                           id="dateRangeStart"
+                           name="dateRangeStart">
+                  </div>
+                  <div class="col-md-4">
+                    <label for="dateRangeEnd" class="form-label text-small">End Date</label>
+                    <input type="date"
+                           class="form-control form-control-sm"
+                           id="dateRangeEnd"
+                           name="dateRangeEnd">
+                  </div>
+                  <div class="col-md-4 d-flex align-items-end">
+                    <div class="btn-group" role="group">
+                      <button type="button"
+                              class="btn btn-primary-custom btn-sm"
+                              onclick="updateChartsDateRange()">
+                        <i class="fas fa-sync mr-1"></i>Update Charts
+                      </button>
+                      <button type="button"
+                              class="btn btn-outline-secondary btn-sm"
+                              onclick="resetDateRangeToDefault()">
+                        <i class="fas fa-calendar mr-1"></i>6 Months
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -396,19 +429,151 @@ const usersData = JSON.parse('{{ users | tojson | safe }}');
 // Chart instances for updates - using HattrickCharts utility
 let charts = {};
 
+// Date range state
+let currentDateRange = {
+    start: null,
+    end: null,
+    defaultMonths: 6
+};
+
 // Helper function to parse dates safely
 function parseDate(dateStr) {
     if (!dateStr || dateStr === 'N/A' || dateStr === '-') return null;
     return new Date(dateStr);
 }
 
+// Helper function to format date for input
+function formatDateForInput(date) {
+    return date.toISOString().split('T')[0];
+}
+
+// Initialize default date range (6 months ago to now)
+function initializeDateRange() {
+    const now = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(now.getMonth() - 6);
+
+    currentDateRange.end = now;
+    currentDateRange.start = sixMonthsAgo;
+
+    // Set form inputs
+    document.getElementById('dateRangeStart').value = formatDateForInput(sixMonthsAgo);
+    document.getElementById('dateRangeEnd').value = formatDateForInput(now);
+}
+
+// Filter users by date range
+function filterUsersByDateRange(users, startDate, endDate) {
+    if (!startDate || !endDate) return users;
+
+    return users.filter(user => {
+        const userDate = parseDate(user.created || user.last_usage);
+        if (!userDate) return false;
+
+        return userDate >= startDate && userDate <= endDate;
+    });
+}
+
+// Update charts with date range
+function updateChartsDateRange() {
+    const startDateStr = document.getElementById('dateRangeStart').value;
+    const endDateStr = document.getElementById('dateRangeEnd').value;
+
+    if (!startDateStr || !endDateStr) {
+        alert('Please select both start and end dates');
+        return;
+    }
+
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    if (startDate >= endDate) {
+        alert('Start date must be before end date');
+        return;
+    }
+
+    currentDateRange.start = startDate;
+    currentDateRange.end = endDate;
+
+    // Update all charts with new date range
+    updateAllCharts();
+
+    // Save date range preference
+    saveDateRangePreference();
+}
+
+// Reset to default date range (6 months)
+function resetDateRangeToDefault() {
+    initializeDateRange();
+    updateAllCharts();
+    saveDateRangePreference();
+}
+
+// Save date range preference
+async function saveDateRangePreference() {
+    try {
+        const preferences = {
+            filter_settings: {
+                date_range: {
+                    start_date: currentDateRange.start?.toISOString(),
+                    end_date: currentDateRange.end?.toISOString(),
+                    default_months: currentDateRange.defaultMonths
+                },
+                hide_admin_users: document.getElementById('filterAdmins').checked
+            }
+        };
+
+        await fetch('/api/admin/preferences', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(preferences)
+        });
+    } catch (error) {
+        console.error('Error saving date range preference:', error);
+    }
+}
+
+// Load date range preference
+async function loadDateRangePreference() {
+    try {
+        const response = await fetch('/api/admin/preferences');
+        if (response.ok) {
+            const data = await response.json();
+            const dateRange = data.filter_settings?.date_range;
+
+            if (dateRange?.start_date && dateRange?.end_date) {
+                currentDateRange.start = new Date(dateRange.start_date);
+                currentDateRange.end = new Date(dateRange.end_date);
+
+                document.getElementById('dateRangeStart').value = formatDateForInput(currentDateRange.start);
+                document.getElementById('dateRangeEnd').value = formatDateForInput(currentDateRange.end);
+            } else {
+                initializeDateRange();
+            }
+        } else {
+            initializeDateRange();
+        }
+    } catch (error) {
+        console.error('Error loading date range preference:', error);
+        initializeDateRange();
+    }
+}
+
 // Filter function
 function getFilteredUsers() {
+    let filteredUsers = usersData;
+
+    // Apply admin filter
     const filterAdmins = document.getElementById('filterAdmins').checked;
     if (filterAdmins) {
-        return usersData.filter(user => user.role !== 'Admin');
+        filteredUsers = filteredUsers.filter(user => user.role !== 'Admin');
     }
-    return usersData;
+
+    // Apply date range filter if set
+    if (currentDateRange.start && currentDateRange.end) {
+        filteredUsers = filterUsersByDateRange(filteredUsers, currentDateRange.start, currentDateRange.end);
+    }
+
+    return filteredUsers;
 }
 
 // Function to update all charts
@@ -1455,7 +1620,11 @@ function updateEngagementScoreChart(filteredUsers) {
 
 // Initialize all charts on page load and add event listener
 document.addEventListener('DOMContentLoaded', function() {
-    updateAllCharts();
+    // Load date range preference first, then update charts
+    loadDateRangePreference().then(() => {
+        updateAllCharts();
+    });
+
     document.getElementById('filterAdmins').addEventListener('change', updateAllCharts);
 
     // Initialize chart manager for drag-and-drop functionality
