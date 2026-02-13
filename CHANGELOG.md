@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Debug Charts Date Range Selection** - Enhanced admin debugging with time-based filtering (FEAT-033)
+  - Date range controls in debug page Chart Controls section with 6-month default
+  - HTML5 date inputs with validation for start/end date relationships
+  - Client-side filtering for immediate responsiveness with filtered datasets
+  - Integration with existing AdminPreferences model for date range persistence
+  - Compatible with existing admin user filter for combined filtering
+  - Improved chart performance and focus on recent activity trends
 - **Interactive Tutorial System** - Comprehensive user onboarding and feature discovery
   - Welcome tour for new users introducing key navigation and features
   - Context-aware feature tours for Players, Training, and Data Updates

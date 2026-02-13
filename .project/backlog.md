@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 6, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 48.2% after test infrastructure creation. **Active: 93 tasks** (P1=0, P2=7, P3=86)
+**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 96 tasks** (P1=0, P2=10, P3=86)
 
 ---
 
@@ -18,11 +18,14 @@
 
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
+- **[FEAT-033]** ✅ COMPLETE Debug Charts Date Range Selection - Add date range controls to debug page charts with 6-month default for focused admin analysis
 - **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
 - **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](.project/tasks/FEAT-027.md)
 - **[UI-014]** Add Dark Mode Support - Implement theme switching between dark mode and light mode with user preference persistence → [Details](.project/tasks/UI-014.md)
 - **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
+- **[TEST-117]** Add Client-Side Date Filtering Tests - Create comprehensive tests for debug chart date range filtering logic and user interaction patterns (45 min)
+- **[UI-023]** Enhance Debug Chart Accessibility - Add screen reader support, keyboard navigation, and ARIA labels to debug charts and date range controls (30 min)
 
 ## P3: Maintenance 🔧
 
