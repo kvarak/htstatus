@@ -4,6 +4,7 @@ Tests for release automation scripts
 Purpose: Ensure release generation works correctly
 """
 
+import re
 import shutil
 import subprocess
 import tempfile
@@ -36,7 +37,9 @@ def test_generate_release_content():
 
     assert result.returncode == 0, f"Content generation failed: {result.stderr}"
     assert "## v3.1 - " in result.stdout
-    assert "February 2026" in result.stdout
+    # Check for valid month format (e.g., "January 2026", "February 2026", etc.)
+    assert re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December) 202\d', result.stdout), \
+        f"Expected month and year format not found in output: {result.stdout}"
     assert "-" in result.stdout  # Should have bullet points
 
 def test_update_releases():

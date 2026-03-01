@@ -375,7 +375,7 @@
                             <div class="row g-2 text-center small">
                               <div class="col-4">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_right_def is not none and m.away_team_rating_right_def is not none %}{% set home_pct = (m.home_team_rating_right_def / (m.home_team_rating_right_def + m.away_team_rating_right_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_right_def is not none and m.away_team_rating_right_def is not none and (m.home_team_rating_right_def + m.away_team_rating_right_def) > 0 %}{% set home_pct = (m.home_team_rating_right_def / (m.home_team_rating_right_def + m.away_team_rating_right_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -388,7 +388,7 @@
                               </div>
                               <div class="col-4">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_mid_def is not none and m.away_team_rating_mid_def is not none %}{% set home_pct = (m.home_team_rating_mid_def / (m.home_team_rating_mid_def + m.away_team_rating_mid_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_mid_def is not none and m.away_team_rating_mid_def is not none and (m.home_team_rating_mid_def + m.away_team_rating_mid_def) > 0 %}{% set home_pct = (m.home_team_rating_mid_def / (m.home_team_rating_mid_def + m.away_team_rating_mid_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -401,7 +401,7 @@
                               </div>
                               <div class="col-4">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_left_def is not none and m.away_team_rating_left_def is not none %}{% set home_pct = (m.home_team_rating_left_def / (m.home_team_rating_left_def + m.away_team_rating_left_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_left_def is not none and m.away_team_rating_left_def is not none and (m.home_team_rating_left_def + m.away_team_rating_left_def) > 0 %}{% set home_pct = (m.home_team_rating_left_def / (m.home_team_rating_left_def + m.away_team_rating_left_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -422,7 +422,7 @@
                             <div class="row g-2 text-center small">
                               <div class="col-4">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_right_att is not none and m.away_team_rating_right_att is not none %}{% set home_pct = (m.home_team_rating_right_att / (m.home_team_rating_right_att + m.away_team_rating_right_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_right_att is not none and m.away_team_rating_right_att is not none and (m.home_team_rating_right_att + m.away_team_rating_right_att) > 0 %}{% set home_pct = (m.home_team_rating_right_att / (m.home_team_rating_right_att + m.away_team_rating_right_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -435,7 +435,7 @@
                               </div>
                               <div class="col-4">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_mid_att is not none and m.away_team_rating_mid_att is not none %}{% set home_pct = (m.home_team_rating_mid_att / (m.home_team_rating_mid_att + m.away_team_rating_mid_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_mid_att is not none and m.away_team_rating_mid_att is not none and (m.home_team_rating_mid_att + m.away_team_rating_mid_att) > 0 %}{% set home_pct = (m.home_team_rating_mid_att / (m.home_team_rating_mid_att + m.away_team_rating_mid_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -448,7 +448,7 @@
                               </div>
                               <div class="col-4">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_left_att is not none and m.away_team_rating_left_att is not none %}{% set home_pct = (m.home_team_rating_left_att / (m.home_team_rating_left_att + m.away_team_rating_left_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_left_att is not none and m.away_team_rating_left_att is not none and (m.home_team_rating_left_att + m.away_team_rating_left_att) > 0 %}{% set home_pct = (m.home_team_rating_left_att / (m.home_team_rating_left_att + m.away_team_rating_left_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -469,7 +469,7 @@
                             <div class="row g-2 text-center small">
                               <div class="col-6">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_set_pieces_def is not none and m.away_team_rating_set_pieces_def is not none %}{% set home_pct = (m.home_team_rating_set_pieces_def / (m.home_team_rating_set_pieces_def + m.away_team_rating_set_pieces_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_set_pieces_def is not none and m.away_team_rating_set_pieces_def is not none and (m.home_team_rating_set_pieces_def + m.away_team_rating_set_pieces_def) > 0 %}{% set home_pct = (m.home_team_rating_set_pieces_def / (m.home_team_rating_set_pieces_def + m.away_team_rating_set_pieces_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"
@@ -482,7 +482,7 @@
                               </div>
                               <div class="col-6">
                                 <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_set_pieces_att is not none and m.away_team_rating_set_pieces_att is not none %}{% set home_pct = (m.home_team_rating_set_pieces_att / (m.home_team_rating_set_pieces_att + m.away_team_rating_set_pieces_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
+                                     style="{% if m.home_team_rating_set_pieces_att is not none and m.away_team_rating_set_pieces_att is not none and (m.home_team_rating_set_pieces_att + m.away_team_rating_set_pieces_att) > 0 %}{% set home_pct = (m.home_team_rating_set_pieces_att / (m.home_team_rating_set_pieces_att + m.away_team_rating_set_pieces_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
                                             color: white;
                                             {% endif %}">
                                   <div class="text-muted"

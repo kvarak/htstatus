@@ -171,11 +171,17 @@ class TestAuthBlueprintAdvanced:
                 error="You must consent to the use of essential session cookies to log in"
             )
 
+    @patch('models.User')
     @patch('app.blueprints.auth.create_page')
     @patch('app.blueprints.auth.dprint')
-    def test_login_post_password_too_short(self, mock_dprint, mock_create_page, mock_app, mock_db):
-        """Test login POST request with password too short."""
+    def test_login_post_password_too_short(self, mock_dprint, mock_create_page, mock_user_model, mock_app, mock_db):
+        """Test login POST request with password too short for NEW user signup."""
         mock_create_page.return_value = "error_page"
+
+        # Mock that no existing user is found (new signup scenario)
+        mock_query = MagicMock()
+        mock_query.filter_by.return_value.first.return_value = None
+        mock_user_model.query = mock_query
 
         setup_auth_blueprint(mock_app, mock_db, 'ck', 'cs')
 

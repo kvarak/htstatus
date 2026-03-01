@@ -86,13 +86,6 @@ def login():
             error="You must consent to the use of essential session cookies to log in"
         )
 
-    if len(password) < 8:
-        return create_page(
-            template="login.html",
-            title="Login / Signup",
-            error="Password must be at least 8 characters long",
-        )
-
     # Check for existing user
     existing_user = User.query.filter_by(username=username).first()
     dprint(
@@ -251,6 +244,14 @@ def login():
                 error="Invalid username or password",
             )
     else:
+        # New user signup - enforce password length requirement
+        if len(password) < 8:
+            return create_page(
+                template="login.html",
+                title="Login / Signup",
+                error="Password must be at least 8 characters long",
+            )
+
         # Store new user credentials and start OAuth flow
         session["username"] = username
         session["password"] = generate_password_hash(password)

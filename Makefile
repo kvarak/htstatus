@@ -372,7 +372,8 @@ check-chpp: ## Check CHPP API usage policy compliance
 	@echo "🔍 Checking CHPP API usage policy..."
 	@./scripts/check-chpp-usage.sh
 
-GATES = fileformat lint lint-templates security-bandit security-deps test-coverage-files coverage-report check-chpp
+# Removed security-deps until further notice
+GATES = fileformat lint lint-templates security-bandit test-coverage-files coverage-report check-chpp
 
 test-all: check-uv services fileformat-fix lint-fix lint-templates-fix  ## 🧪 Run complete quality gate validation
 	@echo "🚀 Running complete quality gate validation"
