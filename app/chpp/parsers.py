@@ -114,67 +114,125 @@ def parse_user(root: ET.Element) -> CHPPUser:
     )
 
 
-def parse_team(root: ET.Element) -> CHPPTeam:
+def parse_team(root: ET.Element, requested_team_id: int | None = None) -> CHPPTeam:
     """Parse teamdetails XML to CHPPTeam object.
+
+    IMPORTANT: The teamdetails API returns ALL teams for a user.
+    If requested_team_id is provided, we filter to that specific team.
+    Otherwise, we take the first team (legacy behavior).
 
     Args:
         root: XML root element from teamdetails response
+        requested_team_id: Optional team ID to filter by
 
     Returns:
         CHPPTeam instance with team info
 
+    Raises:
+        ValueError: If requested_team_id is provided but not found in response
+
     Example:
         >>> root = ET.fromstring(xml_response)
-        >>> team = parse_team(root)
+        >>> team = parse_team(root, requested_team_id=3243948)
         >>> print(team.name, team.team_id)
     """
-    # Extract required fields
-    team_id = safe_find_int(root, ".//Team/TeamID")
-    name = safe_find_text(root, ".//Team/TeamName", "")
-    short_name = safe_find_text(root, ".//Team/ShortTeamName", "")
+    # Find the correct team element
+    team_elem = None
 
-    # Extract optional fields
-    league_name = safe_find_text(root, ".//League/LeagueName")
-    league_level = safe_find_int(root, ".//League/LeagueLevel", None)
-    region_id = safe_find_int(root, ".//Team/RegionId", None)
-    founded_date = safe_find_text(root, ".//Team/FoundedDate")
-    arena_name = safe_find_text(root, ".//Arena/ArenaName")
-    arena_id = safe_find_int(root, ".//Arena/ArenaId", None)
+    if requested_team_id is not None:
+        # Search for the specific team by ID
+        for t in root.findall(".//Teams/Team"):
+            tid = safe_find_int(t, "TeamID")
+            if tid == requested_team_id:
+                team_elem = t
+                break
 
-    # Fan data
-    fanclub_size = safe_find_int(root, ".//FanClub/FanClubSize", None)
-    fans_mood = safe_find_text(root, ".//Fans/FansMood")
-    fans_match_attitude = safe_find_text(root, ".//Fans/FansMatchAttitude")
+        if team_elem is None:
+            raise ValueError(f"Team {requested_team_id} not found in CHPP response")
+    else:
+        # Legacy: just grab the first team
+        team_elem = root.find(".//Teams/Team")
+        if team_elem is None:
+            raise ValueError("No teams found in CHPP response")
+
+    # Extract required fields from the found team element
+    team_id = safe_find_int(team_elem, "TeamID")
+    name = safe_find_text(team_elem, "TeamName", "")
+    short_name = safe_find_text(team_elem, "ShortTeamName", "")
+
+    # Extract optional fields (need to search within team_elem AND root for nested data)
+    # Some fields like League, Arena are direct children of Team
+    league_name = safe_find_text(team_elem, "League/LeagueName")
+    league_level = safe_find_int(team_elem, "League/LeagueLevel", None)
+    region_id = safe_find_int(team_elem, "RegionId", None)
+    founded_date = safe_find_text(team_elem, "FoundedDate")
+    arena_name = safe_find_text(team_elem, "Arena/ArenaName")
+    arena_id = safe_find_int(team_elem, "Arena/ArenaId", None)
+
+    # Fan data - may be at team or root level
+    fanclub_size = safe_find_int(team_elem, "FanClub/FanClubSize", None)
+    if fanclub_size is None:
+        fanclub_size = safe_find_int(root, ".//FanClub/FanClubSize", None)
+
+    fans_mood = safe_find_text(team_elem, "Fans/FansMood")
+    if fans_mood is None:
+        fans_mood = safe_find_text(root, ".//Fans/FansMood")
+
+    fans_match_attitude = safe_find_text(team_elem, "Fans/FansMatchAttitude")
+    if fans_match_attitude is None:
+        fans_match_attitude = safe_find_text(root, ".//Fans/FansMatchAttitude")
 
     # Team colors (hex values)
-    dress_uri = safe_find_text(root, ".//Team/DressURI")
-    dress_alternate_uri = safe_find_text(root, ".//Team/DressAlternateURI")
+    dress_uri = safe_find_text(team_elem, "DressURI")
+    dress_alternate_uri = safe_find_text(team_elem, "DressAlternateURI")
 
     # INFRA-028: Extract missing critical data parity fields
-    logo_url = safe_find_text(root, ".//Team/LogoURL")
+    logo_url = safe_find_text(team_elem, "LogoURL")
 
     # Power rating information
-    power_rating = safe_find_int(root, ".//PowerRating/PowerRating", None)
-    power_rating_global_ranking = safe_find_int(root, ".//PowerRating/GlobalRanking", None)
-    power_rating_league_ranking = safe_find_int(root, ".//PowerRating/LeagueRanking", None)
-    power_rating_region_ranking = safe_find_int(root, ".//PowerRating/RegionRanking", None)
+    power_rating = safe_find_int(team_elem, "PowerRating/PowerRating", None)
+    if power_rating is None:
+        power_rating = safe_find_int(root, ".//PowerRating/PowerRating", None)
+
+    power_rating_global_ranking = safe_find_int(team_elem, "PowerRating/GlobalRanking", None)
+    if power_rating_global_ranking is None:
+        power_rating_global_ranking = safe_find_int(root, ".//PowerRating/GlobalRanking", None)
+
+    power_rating_league_ranking = safe_find_int(team_elem, "PowerRating/LeagueRanking", None)
+    if power_rating_league_ranking is None:
+        power_rating_league_ranking = safe_find_int(root, ".//PowerRating/LeagueRanking", None)
+
+    power_rating_region_ranking = safe_find_int(team_elem, "PowerRating/RegionRanking", None)
+    if power_rating_region_ranking is None:
+        power_rating_region_ranking = safe_find_int(root, ".//PowerRating/RegionRanking", None)
 
     # League level unit information
-    league_level_unit_id = safe_find_int(root, ".//LeagueLevelUnit/LeagueLevelUnitID", None)
-    league_level_unit_name = safe_find_text(root, ".//LeagueLevelUnit/LeagueLevelUnitName")
+    league_level_unit_id = safe_find_int(team_elem, "LeagueLevelUnit/LeagueLevelUnitID", None)
+    league_level_unit_name = safe_find_text(team_elem, "LeagueLevelUnit/LeagueLevelUnitName")
     # Override league_level with proper LeagueLevelUnit extraction
-    league_level_unit_level = safe_find_int(root, ".//LeagueLevelUnit/LeagueLevel", None)
+    league_level_unit_level = safe_find_int(team_elem, "LeagueLevelUnit/LeagueLevel", None)
     if league_level_unit_level is not None:
         league_level = league_level_unit_level
 
     # Cup information
-    cup_name = safe_find_text(root, ".//Cup/CupName")
-    cup_level = safe_find_int(root, ".//Cup/CupLevel", None)
-    still_in_cup = safe_find_bool(root, ".//Cup/StillInCup", False)
+    cup_name = safe_find_text(team_elem, "Cup/CupName")
+    if cup_name is None:
+        cup_name = safe_find_text(root, ".//Cup/CupName")
+
+    cup_level = safe_find_int(team_elem, "Cup/CupLevel", None)
+    if cup_level is None:
+        cup_level = safe_find_int(root, ".//Cup/CupLevel", None)
+
+    still_in_cup = safe_find_bool(team_elem, "Cup/StillInCup", False)
 
     # Team performance streaks
-    number_of_victories = safe_find_int(root, ".//NumberOfVictories", None)
-    number_of_undefeated = safe_find_int(root, ".//NumberOfUndefeated", None)
+    number_of_victories = safe_find_int(team_elem, "NumberOfVictories", None)
+    if number_of_victories is None:
+        number_of_victories = safe_find_int(root, ".//NumberOfVictories", None)
+
+    number_of_undefeated = safe_find_int(team_elem, "NumberOfUndefeated", None)
+    if number_of_undefeated is None:
+        number_of_undefeated = safe_find_int(root, ".//NumberOfUndefeated", None)
 
     return CHPPTeam(
         team_id=team_id,

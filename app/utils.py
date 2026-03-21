@@ -197,6 +197,41 @@ def get_admin_feedback_counts(user_id=None):
 # =============================================================================
 
 
+def disambiguate_team_names(team_ids, team_names):
+    """Add team IDs to duplicate team names for disambiguation.
+
+    Args:
+        team_ids: List of team IDs
+        team_names: List of corresponding team names
+
+    Returns:
+        List of disambiguated team names
+
+    Example:
+        >>> disambiguate_team_names([123, 456], ["Team A", "Team A"])
+        ["Team A (123)", "Team A (456)"]
+        >>> disambiguate_team_names([123, 456], ["Team A", "Team B"])
+        ["Team A", "Team B"]
+    """
+    if not team_ids or not team_names or len(team_ids) != len(team_names):
+        return team_names
+
+    # Count occurrences of each name
+    name_counts = {}
+    for name in team_names:
+        name_counts[name] = name_counts.get(name, 0) + 1
+
+    # Add team ID suffix for duplicate names
+    result = []
+    for team_id, name in zip(team_ids, team_names):
+        if name_counts[name] > 1:
+            result.append(f"{name} ({team_id})")
+        else:
+            result.append(name)
+
+    return result
+
+
 def create_page(template, title, **kwargs):
     """Create standardized page response with common template variables."""
     import time

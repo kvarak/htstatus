@@ -82,6 +82,36 @@ def update():
         try:
             test_user = chpp.user()
             dprint(1, f"API connectivity test successful, user ID: {test_user.ht_id}")
+
+            # MULTI-TEAM-001: Refresh team list to detect new teams acquired since login
+            dprint(1, "Checking for new teams acquired since login...")
+            current_teams = test_user._teams_ht_id
+            dprint(1, f"Teams from CHPP: {current_teams}")
+            dprint(1, f"Teams in session: {all_teams}")
+
+            if set(current_teams) != set(all_teams):
+                dprint(1, "⚠️ Team list has changed! Updating session...")
+                # Fetch names for all current teams
+                updated_team_names = []
+                for team_id in current_teams:
+                    try:
+                        team = chpp.team(ht_id=team_id)
+                        updated_team_names.append(team.name)
+                        dprint(1, f"Found team: {team.name} (ID: {team_id})")
+                    except Exception as e:
+                        dprint(1, f"Could not fetch name for team {team_id}: {e}")
+                        updated_team_names.append(f"Team {team_id}")
+
+                # Update session with new team list
+                session['all_teams'] = current_teams
+                session['all_team_names'] = updated_team_names
+                session.modified = True
+                all_teams = current_teams
+                all_team_names = updated_team_names
+                dprint(1, f"✅ Session updated with {len(current_teams)} teams: {updated_team_names}")
+            else:
+                dprint(1, "✓ Team list unchanged")
+
         except Exception as chpp_user_error:
             if "YouthTeamId" in str(chpp_user_error):
                 dprint(

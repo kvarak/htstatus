@@ -409,6 +409,110 @@ def changes():
     )
 
 
+@main_bp.route("/debug/session")
+@require_authentication
+def debug_session():
+    """Debug endpoint to show session data."""
+    User = get_user_model()
+    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
+
+    # Only allow admin users
+    if not user or user.getRole() != "Admin":
+        return jsonify({"error": "Admin access required"}), 403
+
+    # Return session data for debugging
+    session_data = {
+        "all_teams": session.get("all_teams", []),
+        "all_team_names": session.get("all_team_names", []),
+        "team_id": session.get("team_id"),
+        "current_user": session.get("current_user"),
+        "current_user_id": session.get("current_user_id"),
+    }
+    return jsonify(session_data)
+
+
+@main_bp.route("/debug/chpp_teams")
+@require_authentication
+def debug_chpp_teams():
+    """Debug endpoint to fetch team names directly from CHPP."""
+    from app.chpp_utilities import get_chpp_client
+
+    User = get_user_model()
+    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
+
+    # Only allow admin users
+    if not user or user.getRole() != "Admin":
+        return jsonify({"error": "Admin access required"}), 403
+
+    try:
+        chpp = get_chpp_client(session)
+        user_data = chpp.user()
+
+        teams_data = []
+        for team_id in user_data._teams_ht_id:
+            team = chpp.team(ht_id=team_id)
+            teams_data.append({
+                "id": team_id,
+                "name": team.name,
+                "short_name": team.short_team_name,
+                "league": team.league_name,
+            })
+
+        return jsonify({
+            "teams_from_chpp": teams_data,
+            "session_teams": session.get("all_teams", []),
+            "session_team_names": session.get("all_team_names", [])
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@main_bp.route("/debug/chpp_raw/<int:team_id>")
+@require_authentication
+def debug_chpp_raw(team_id):
+    """Debug endpoint to show raw CHPP XML for a team."""
+    import xml.etree.ElementTree as ET
+    from app.chpp_utilities import get_chpp_client
+
+    User = get_user_model()
+    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
+
+    # Only allow admin users
+    if not user or user.getRole() != "Admin":
+        return jsonify({"error": "Admin access required"}), 403
+
+    try:
+        chpp = get_chpp_client(session)
+
+        # Make the request and capture the response object
+        root = chpp.request("teamdetails", "3.7", teamID=team_id)
+
+        xml_str = ET.tostring(root, encoding='unicode')
+
+        # Extract ALL teams from the XML (not just the first one!)
+        all_teams_data = []
+        for team_elem in root.findall(".//Teams/Team"):
+            team_id_elem = team_elem.find("TeamID")
+            team_name_elem = team_elem.find("TeamName")
+            is_primary_elem = team_elem.find("IsPrimaryClub")
+
+            all_teams_data.append({
+                "team_id": team_id_elem.text if team_id_elem is not None else "NOT FOUND",
+                "team_name": team_name_elem.text if team_name_elem is not None else "NOT FOUND",
+                "is_primary": is_primary_elem.text if is_primary_elem is not None else "NOT FOUND"
+            })
+
+        return jsonify({
+            "requested_team_id": team_id,
+            "all_teams_in_response": all_teams_data,
+            "team_count": len(all_teams_data),
+            "note": "The teamdetails API returns ALL teams for a user, not just the requested one!",
+            "raw_xml_preview": xml_str[:2000] + "..." if len(xml_str) > 2000 else xml_str
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 @main_bp.route("/debug", methods=["GET", "POST"])
 @require_authentication
 def admin():
