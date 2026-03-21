@@ -61,8 +61,21 @@ setup: check-uv ## Initialize development environment (UV sync, Docker setup)
 	@echo "✅ Development environment ready!"
 	@echo "   Next: 'make dev' to start development server"
 
+check-venv: check-uv ## Verify virtual environment is healthy
+	@if [ -d .venv ]; then \
+		if ! .venv/bin/python --version >/dev/null 2>&1; then \
+			echo "❌ ERROR: Virtual environment is broken"; \
+			echo ""; \
+			echo "This usually happens after Python was upgraded via Homebrew."; \
+			echo ""; \
+			echo "🔧 Fix it by recreating the virtual environment:"; \
+			echo "  rm -rf .venv && uv sync --dev"; \
+			echo ""; \
+			exit 1; \
+		fi \
+	fi
 
-dev: check-uv services changelog ## Start development server (equivalent to run.sh)
+dev: check-uv check-venv services changelog ## Start development server (equivalent to run.sh)
 	@echo "🌐 Starting HT Status development server..."
 	@$(PYTHON) run.py
 
