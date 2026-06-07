@@ -138,6 +138,12 @@ update: check-uv ## Update dependencies and sync environment
 	@echo "🔄 Updating dependencies..."
 	@$(UV) sync --upgrade
 	@$(UV) lock --upgrade
+	@$(MAKE) requirements-txt
+
+requirements-txt: check-uv ## Generate requirements.txt from uv.lock for Dependabot
+	@echo "📝 Generating requirements.txt for Dependabot..."
+	@$(UV) pip compile pyproject.toml -o requirements.txt --quiet
+	@echo "✅ requirements.txt updated"
 
 shell: check-uv ## Open Python shell in UV environment
 	@echo "🐍 Opening Python shell..."
