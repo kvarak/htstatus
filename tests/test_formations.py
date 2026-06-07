@@ -3,8 +3,8 @@
 from unittest.mock import Mock
 
 from app.utils import (
-    FORMATION_TEMPLATES,
     calculate_formation_effectiveness,
+    FORMATION_TEMPLATES,
     get_formation_list,
 )
 
@@ -20,8 +20,16 @@ class TestFormationTemplates:
     def test_all_formations_present(self):
         """Test that all expected formations are defined."""
         expected_formations = [
-            "5-5-0", "5-4-1", "5-3-2", "5-2-3", "4-5-1",
-            "4-4-2", "4-3-3", "3-5-2", "3-4-3", "2-5-3"
+            "5-5-0",
+            "5-4-1",
+            "5-3-2",
+            "5-2-3",
+            "4-5-1",
+            "4-4-2",
+            "4-3-3",
+            "3-5-2",
+            "3-4-3",
+            "2-5-3",
         ]
         for formation in expected_formations:
             assert formation in FORMATION_TEMPLATES
@@ -52,7 +60,8 @@ class TestFormationTemplates:
         """Test that all formations include a goalkeeper (position 100)."""
         for formation in FORMATION_TEMPLATES.values():
             assert 100 in formation["positions"]
-            assert formation["positions"][100]["row"] == 1  # GK always in row 1
+            # GK always in row 1
+            assert formation["positions"][100]["row"] == 1
 
 
 class TestGetFormationList:
@@ -113,6 +122,7 @@ class TestCalculateFormationEffectiveness:
         """Test with player assignments."""
         # Mock calculateContribution to return a predictable value
         import app.utils
+
         original_calc = app.utils.calculateContribution
         app.utils.calculateContribution = Mock(return_value=8.5)
 
@@ -125,7 +135,9 @@ class TestCalculateFormationEffectiveness:
             result = calculate_formation_effectiveness("4-4-2", player_assignments)
 
             assert result["total_score"] == 17.0  # 2 players * 8.5 each
-            assert result["average_score"] == round(17.0 / 11, 2)  # Total / 11 positions
+            assert result["average_score"] == round(
+                17.0 / 11, 2
+            )  # Total / 11 positions
             assert len(result["position_scores"]) == 11
             assert result["formation_name"] == FORMATION_TEMPLATES["4-4-2"]["name"]
 
@@ -143,6 +155,7 @@ class TestCalculateFormationEffectiveness:
     def test_calculate_formation_effectiveness_all_positions(self):
         """Test with all positions assigned."""
         import app.utils
+
         original_calc = app.utils.calculateContribution
         app.utils.calculateContribution = Mock(return_value=7.2)
 
@@ -225,5 +238,7 @@ class TestFormationTemplateDetails:
 
             for position_data in formation["positions"].values():
                 grid_pos = (position_data["row"], position_data["col"])
-                assert grid_pos not in grid_positions, f"Duplicate grid position in {formation_key}: {grid_pos}"
+                assert (
+                    grid_pos not in grid_positions
+                ), f"Duplicate grid position in {formation_key}: {grid_pos}"
                 grid_positions.add(grid_pos)

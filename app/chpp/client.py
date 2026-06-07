@@ -5,8 +5,8 @@ Orchestrates OAuth, XML parsing, and data models.
 """
 
 import logging
-import xml.etree.ElementTree as ET
 from typing import Any
+import xml.etree.ElementTree as ET
 
 from requests.adapters import HTTPAdapter
 from requests_oauthlib import OAuth1Session
@@ -233,7 +233,9 @@ class CHPP:
 
         try:
             # Log request details for debugging OAuth issues
-            logger.debug(f"CHPP request: file={file}, version={version}, params={params}")
+            logger.debug(
+                f"CHPP request: file={file}, version={version}, params={params}"
+            )
             logger.debug(f"Full request params: {request_params}")
 
             # Make authenticated GET request
@@ -247,18 +249,18 @@ class CHPP:
             logger.debug(f"CHPP request headers: {dict(response.request.headers)}")
 
             # Log Authorization header details (without exposing signature)
-            auth_header = response.request.headers.get('Authorization', '')
+            auth_header = response.request.headers.get("Authorization", "")
             if isinstance(auth_header, bytes):
-                auth_header = auth_header.decode('utf-8', errors='replace')
+                auth_header = auth_header.decode("utf-8", errors="replace")
 
-            if auth_header.startswith('OAuth '):
+            if auth_header.startswith("OAuth "):
                 # Parse OAuth params (safe to log since it's public info)
                 oauth_params = {}
-                for part in auth_header[6:].split(', '):
-                    if '=' in part:
-                        key, val = part.split('=', 1)
+                for part in auth_header[6:].split(", "):
+                    if "=" in part:
+                        key, val = part.split("=", 1)
                         # Truncate long values but show structure
-                        display_val = val[:40] + '...' if len(val) > 40 else val
+                        display_val = val[:40] + "..." if len(val) > 40 else val
                         oauth_params[key] = display_val
                 logger.debug(f"OAuth parameters: {oauth_params}")
 
@@ -277,7 +279,9 @@ class CHPP:
                 error_code = int(error_code_elem.text)
                 error_message_elem = root.find(".//Error")
                 error_message = (
-                    error_message_elem.text if error_message_elem is not None else "Unknown error"
+                    error_message_elem.text
+                    if error_message_elem is not None
+                    else "Unknown error"
                 )
                 raise CHPPAPIError(error_code, error_message)
 
@@ -349,13 +353,16 @@ class CHPP:
                 detailed_players.append(detailed_player)
             except Exception as e:
                 # If individual player fetch fails, use basic info
-                logger.debug(f"Failed to fetch details for player {basic_player.player_id}: {e}")
+                logger.debug(
+                    f"Failed to fetch details for player {basic_player.player_id}: {e}"
+                )
                 detailed_players.append(basic_player)
 
         # Attach detailed players to team
         team._players = detailed_players
 
         return team
+
     def player(self, id_: int) -> "CHPPPlayer":
         """Get individual player details.
 
@@ -379,11 +386,19 @@ class CHPP:
 
         # Use playerdetails endpoint with playerID parameter (GET request)
         # Try latest version and include match info to ensure all goal fields are available
-        root = self.request("playerdetails", "3.1", playerID=id_, includeMatchInfo="true")
+        root = self.request(
+            "playerdetails", "3.1", playerID=id_, includeMatchInfo="true"
+        )
         return parse_player(root)
 
-    def matches_archive(self, id_: int, is_youth: bool = False, season: int = None,
-                       first_match_date: str = None, last_match_date: str = None) -> list["CHPPMatch"]:
+    def matches_archive(
+        self,
+        id_: int,
+        is_youth: bool = False,
+        season: int = None,
+        first_match_date: str = None,
+        last_match_date: str = None,
+    ) -> list["CHPPMatch"]:
         """Get match history for a team.
 
         Fetches match archive from matchesarchive endpoint with date/season filtering.
@@ -484,7 +499,9 @@ class CHPP:
         from app.chpp.parsers import parse_matchdetails
 
         # Use matchdetails endpoint v3.1 with matchID parameter (v3.1 added NrOfChances fields in March 2022)
-        root = self.request("matchdetails", "3.1", matchID=id_, matchEvents=match_events)
+        root = self.request(
+            "matchdetails", "3.1", matchID=id_, matchEvents=match_events
+        )
         return parse_matchdetails(root)
 
     def matchlineup(self, id_: int, is_youth: bool = False) -> "CHPPMatchLineup":

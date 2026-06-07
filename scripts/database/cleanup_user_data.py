@@ -3,8 +3,9 @@
 Database cleanup script for specific user and team data
 Used for testing default groups functionality on fresh user data
 """
-import sys
+
 from pathlib import Path
+import sys
 
 import psycopg2
 
@@ -12,12 +13,16 @@ import psycopg2
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+
 def read_config():
     """Read database configuration from config.py"""
     try:
         # Import the config module directly
         import importlib.util
-        spec = importlib.util.spec_from_file_location("config", project_root / "config.py")
+
+        spec = importlib.util.spec_from_file_location(
+            "config", project_root / "config.py"
+        )
         config_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(config_module)
 
@@ -33,38 +38,39 @@ def read_config():
 def parse_database_url(url):
     """Parse PostgreSQL URL into connection parameters"""
     # Format: postgresql://user:password@host:port/database
-    if not url.startswith('postgresql://'):
+    if not url.startswith("postgresql://"):
         raise ValueError("Invalid DATABASE_URL format")
 
-    url = url.replace('postgresql://', '')
+    url = url.replace("postgresql://", "")
 
-    if '@' in url:
-        credentials, host_part = url.split('@', 1)
-        if ':' in credentials:
-            user, password = credentials.split(':', 1)
+    if "@" in url:
+        credentials, host_part = url.split("@", 1)
+        if ":" in credentials:
+            user, password = credentials.split(":", 1)
         else:
-            user, password = credentials, ''
+            user, password = credentials, ""
     else:
-        user, password, host_part = '', '', url
+        user, password, host_part = "", "", url
 
-    if '/' in host_part:
-        host_port, database = host_part.rsplit('/', 1)
+    if "/" in host_part:
+        host_port, database = host_part.rsplit("/", 1)
     else:
-        host_port, database = host_part, ''
+        host_port, database = host_part, ""
 
-    if ':' in host_port:
-        host, port = host_port.rsplit(':', 1)
+    if ":" in host_port:
+        host, port = host_port.rsplit(":", 1)
         port = int(port)
     else:
         host, port = host_port, 5432
 
     return {
-        'host': host,
-        'port': port,
-        'database': database,
-        'user': user,
-        'password': password
+        "host": host,
+        "port": port,
+        "database": database,
+        "user": user,
+        "password": password,
     }
+
 
 def cleanup_user_data(user_id, team_id):
     """Clean up all data for specified user and team"""
@@ -76,15 +82,17 @@ def cleanup_user_data(user_id, team_id):
 
     try:
         db_params = parse_database_url(database_url)
-        print(f"Connecting to database: {db_params['host']}:{db_params['port']}/{db_params['database']}")
+        print(
+            f"Connecting to database: {db_params['host']}:{db_params['port']}/{db_params['database']}"
+        )
 
         # Connect to database
         conn = psycopg2.connect(
-            host=db_params['host'],
-            port=db_params['port'],
-            database=db_params['database'],
-            user=db_params['user'],
-            password=db_params['password']
+            host=db_params["host"],
+            port=db_params["port"],
+            database=db_params["database"],
+            user=db_params["user"],
+            password=db_params["password"],
         )
 
         conn.autocommit = False  # Use transaction
@@ -105,7 +113,10 @@ def cleanup_user_data(user_id, team_id):
         user_count = cur.fetchone()[0]
         print(f"Found {user_count} user records for user {user_id}")
 
-        cur.execute("SELECT COUNT(*) FROM match WHERE home_team_id = %s OR away_team_id = %s", (team_id, team_id))
+        cur.execute(
+            "SELECT COUNT(*) FROM match WHERE home_team_id = %s OR away_team_id = %s",
+            (team_id, team_id),
+        )
         match_count = cur.fetchone()[0]
         print(f"Found {match_count} matches involving team {team_id}")
 
@@ -116,8 +127,11 @@ def cleanup_user_data(user_id, team_id):
         matchplay_count = 0
         if player_ids:
             # Create placeholders for IN clause
-            placeholders = ','.join(['%s'] * len(player_ids))
-            cur.execute(f"SELECT COUNT(*) FROM matchplay WHERE player_id IN ({placeholders})", player_ids)
+            placeholders = ",".join(["%s"] * len(player_ids))
+            cur.execute(
+                f"SELECT COUNT(*) FROM matchplay WHERE player_id IN ({placeholders})",
+                player_ids,
+            )
             matchplay_count = cur.fetchone()[0]
         print(f"Found {matchplay_count} matchplay records for team players")
 
@@ -125,14 +139,19 @@ def cleanup_user_data(user_id, team_id):
         deleted_matchplay = 0
         if player_ids:
             print("Removing matchplay records for team players...")
-            placeholders = ','.join(['%s'] * len(player_ids))
-            cur.execute(f"DELETE FROM matchplay WHERE player_id IN ({placeholders})", player_ids)
+            placeholders = ",".join(["%s"] * len(player_ids))
+            cur.execute(
+                f"DELETE FROM matchplay WHERE player_id IN ({placeholders})", player_ids
+            )
             deleted_matchplay = cur.rowcount
             print(f"Deleted {deleted_matchplay} matchplay records")
 
         # Step 3: Delete match records involving this team
         print("Removing matches involving team...")
-        cur.execute("DELETE FROM match WHERE home_team_id = %s OR away_team_id = %s", (team_id, team_id))
+        cur.execute(
+            "DELETE FROM match WHERE home_team_id = %s OR away_team_id = %s",
+            (team_id, team_id),
+        )
         deleted_matches = cur.rowcount
         print(f"Deleted {deleted_matches} match records")
 
@@ -171,7 +190,7 @@ def cleanup_user_data(user_id, team_id):
 
         # Ask for confirmation
         response = input("\nDo you want to commit these changes? (yes/no): ").lower()
-        if response == 'yes':
+        if response == "yes":
             conn.commit()
             print("✅ Changes committed successfully!")
 
@@ -179,28 +198,33 @@ def cleanup_user_data(user_id, team_id):
             cur.execute("SELECT COUNT(*) FROM players WHERE team_id = %s", (team_id,))
             remaining_players = cur.fetchone()[0]
 
-            cur.execute("SELECT COUNT(*) FROM playergroup WHERE user_id = %s", (user_id,))
+            cur.execute(
+                "SELECT COUNT(*) FROM playergroup WHERE user_id = %s", (user_id,)
+            )
             remaining_groups = cur.fetchone()[0]
 
             cur.execute("SELECT COUNT(*) FROM users WHERE ht_id = %s", (user_id,))
             remaining_users = cur.fetchone()[0]
 
-            print(f"Verification - Remaining: {remaining_players} players, {remaining_groups} groups, {remaining_users} users")
+            print(
+                f"Verification - Remaining: {remaining_players} players, {remaining_groups} groups, {remaining_users} users"
+            )
             return False
 
     except psycopg2.Error as e:
         print(f"Database error: {e}")
-        if 'conn' in locals():
+        if "conn" in locals():
             conn.rollback()
         return False
     except Exception as e:
         print(f"Error: {e}")
-        if 'conn' in locals():
+        if "conn" in locals():
             conn.rollback()
         return False
     finally:
-        if 'conn' in locals():
+        if "conn" in locals():
             conn.close()
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

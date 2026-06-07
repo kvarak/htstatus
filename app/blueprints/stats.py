@@ -1,4 +1,5 @@
 """Team statistics routes blueprint for HT Status application."""
+
 import traceback
 
 from flask import Blueprint, request, session
@@ -27,7 +28,9 @@ def stats():
 
     # Track user activity (stats page)
     User = get_user_model()
-    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    current_user = (
+        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    )
     if current_user:
         current_user.stats()
         db.session.commit()
@@ -78,7 +81,9 @@ def stats():
     # Calculate skill averages for top 11 TSI players
     top_11_players = get_top_performers(current_players_list, limit=11)
     top_11_stats = calculate_team_statistics(top_11_players) if top_11_players else {}
-    top_11_skill_averages = top_11_stats.get('skill_averages', {}) if top_11_stats else {}
+    top_11_skill_averages = (
+        top_11_stats.get("skill_averages", {}) if top_11_stats else {}
+    )
 
     # Calculate age distribution for all players and top 11
     def calculate_age_distribution_unified(all_players, subset_players, min_age=16):
@@ -86,7 +91,7 @@ def stats():
         # Get all ages from all players to define the complete range
         all_ages = []
         for player in all_players:
-            age = getattr(player, 'age_years', 0)
+            age = getattr(player, "age_years", 0)
             if age >= min_age:
                 all_ages.append(age)
 
@@ -100,14 +105,14 @@ def stats():
         # Calculate distribution for all players
         all_age_counts = {}
         for player in all_players:
-            age = getattr(player, 'age_years', 0)
+            age = getattr(player, "age_years", 0)
             if age >= min_age:
                 all_age_counts[age] = all_age_counts.get(age, 0) + 1
 
         # Calculate distribution for subset players
         subset_age_counts = {}
         for player in subset_players:
-            age = getattr(player, 'age_years', 0)
+            age = getattr(player, "age_years", 0)
             if age >= min_age:
                 subset_age_counts[age] = subset_age_counts.get(age, 0) + 1
 
@@ -121,8 +126,7 @@ def stats():
         return all_distribution, subset_distribution
 
     age_distribution_all, age_distribution_top11 = calculate_age_distribution_unified(
-        current_players_list,
-        top_11_players if top_11_players else []
+        current_players_list, top_11_players if top_11_players else []
     )
 
     # Calculate country distribution for all players and top 11
@@ -133,46 +137,55 @@ def stats():
         # Calculate distribution for all players
         all_country_data = {}
         for player in all_players:
-            country_id = getattr(player, 'native_country_id', None)
+            country_id = getattr(player, "native_country_id", None)
             country_info = get_country_info(country_id)
             country_display = f"{country_info['flag']} {country_info['name']}"
             if country_display not in all_country_data:
                 all_country_data[country_display] = {
-                    'count': 0,
-                    'color': country_info['color'],
-                    'name': country_info['name']
+                    "count": 0,
+                    "color": country_info["color"],
+                    "name": country_info["name"],
                 }
-            all_country_data[country_display]['count'] += 1
+            all_country_data[country_display]["count"] += 1
 
         # Calculate distribution for subset players
         subset_country_data = {}
         for player in subset_players:
-            country_id = getattr(player, 'native_country_id', None)
+            country_id = getattr(player, "native_country_id", None)
             country_info = get_country_info(country_id)
             country_display = f"{country_info['flag']} {country_info['name']}"
             if country_display not in subset_country_data:
                 subset_country_data[country_display] = {
-                    'count': 0,
-                    'color': country_info['color'],
-                    'name': country_info['name']
+                    "count": 0,
+                    "color": country_info["color"],
+                    "name": country_info["name"],
                 }
-            subset_country_data[country_display]['count'] += 1
+            subset_country_data[country_display]["count"] += 1
 
         # Convert to list of tuples sorted by count, maintaining color info
         all_distribution = sorted(
-            [(country, data['count'], data['color']) for country, data in all_country_data.items()],
-            key=lambda x: x[1], reverse=True
+            [
+                (country, data["count"], data["color"])
+                for country, data in all_country_data.items()
+            ],
+            key=lambda x: x[1],
+            reverse=True,
         )
         subset_distribution = sorted(
-            [(country, data['count'], data['color']) for country, data in subset_country_data.items()],
-            key=lambda x: x[1], reverse=True
+            [
+                (country, data["count"], data["color"])
+                for country, data in subset_country_data.items()
+            ],
+            key=lambda x: x[1],
+            reverse=True,
         )
 
         return all_distribution, subset_distribution
 
-    country_distribution_all, country_distribution_top11 = calculate_country_distribution(
-        current_players_list,
-        top_11_players if top_11_players else []
+    country_distribution_all, country_distribution_top11 = (
+        calculate_country_distribution(
+            current_players_list, top_11_players if top_11_players else []
+        )
     )
 
     # Find max count for scaling the bars (use all players max for both charts)

@@ -3,7 +3,7 @@
 from flask import Blueprint, jsonify, request, session
 
 from app.auth_utils import get_team_info, get_user_teams, require_authentication
-from app.error_handlers import ValidationError, validate_team_id
+from app.error_handlers import validate_team_id, ValidationError
 from app.utils import dprint
 
 # Create Blueprint for API routes
@@ -12,10 +12,12 @@ api_bp = Blueprint("api", __name__, url_prefix="/api")
 # These will be set by setup_api_blueprint()
 db = None
 
+
 def setup_api_blueprint(db_instance):
     """Initialize API blueprint with database instance."""
     global db
     db = db_instance
+
 
 @api_bp.route("/players/bulk-assign", methods=["POST"])
 @require_authentication
@@ -52,7 +54,9 @@ def bulk_assign_players():
 
         # Validate team access using consolidated function
         all_teams, all_team_names = get_user_teams()
-        is_valid, teamname, error_msg = get_team_info(team_id, (all_teams, all_team_names))
+        is_valid, teamname, error_msg = get_team_info(
+            team_id, (all_teams, all_team_names)
+        )
 
         if not is_valid:
             return jsonify({"error": error_msg}), 403
@@ -60,6 +64,7 @@ def bulk_assign_players():
         # Import models using registry pattern for consistency
         try:
             from app.model_registry import get_group_model, get_player_setting_model
+
             PlayerSetting = get_player_setting_model()
             Group = get_group_model()
         except (ImportError, ValueError):
@@ -96,9 +101,15 @@ def bulk_assign_players():
                             group_id = int(group_id)
 
                             # Verify group belongs to current user
-                            group = db.session.query(Group).filter_by(id=group_id, user_id=current_user_id).first()
+                            group = (
+                                db.session.query(Group)
+                                .filter_by(id=group_id, user_id=current_user_id)
+                                .first()
+                            )
                             if not group:
-                                failed_players.append({"player_id": player_id, "error": "Invalid group"})
+                                failed_players.append(
+                                    {"player_id": player_id, "error": "Invalid group"}
+                                )
                                 continue
 
                             if existing_setting:
@@ -109,24 +120,29 @@ def bulk_assign_players():
                                 new_setting = PlayerSetting(
                                     player_id=player_id,
                                     user_id=current_user_id,
-                                    group_id=group_id
+                                    group_id=group_id,
                                 )
                                 db.session.add(new_setting)
                             success_count += 1
 
                     except ValueError:
-                        failed_players.append({"player_id": player_id, "error": "Invalid player ID"})
+                        failed_players.append(
+                            {"player_id": player_id, "error": "Invalid player ID"}
+                        )
                         continue
                     except Exception as e:
                         failed_players.append({"player_id": player_id, "error": str(e)})
                         continue
 
-            dprint(2, f"Bulk assignment completed: {success_count} successful, {len(failed_players)} failed")
+            dprint(
+                2,
+                f"Bulk assignment completed: {success_count} successful, {len(failed_players)} failed",
+            )
 
             result = {
                 "success_count": success_count,
                 "failed_count": len(failed_players),
-                "message": f"Successfully updated {success_count} player{'s' if success_count != 1 else ''}"
+                "message": f"Successfully updated {success_count} player{'s' if success_count != 1 else ''}",
             }
 
             if failed_players:
@@ -137,11 +153,15 @@ def bulk_assign_players():
         except Exception as e:
             db.session.rollback()
             dprint(1, f"Bulk assignment transaction failed: {e}")
-            return jsonify({"error": "Database transaction failed", "details": str(e)}), 500
+            return (
+                jsonify({"error": "Database transaction failed", "details": str(e)}),
+                500,
+            )
 
     except Exception as e:
         dprint(1, f"Bulk assignment error: {e}")
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
+
 
 @api_bp.route("/players/filter", methods=["GET"])
 @require_authentication
@@ -169,7 +189,9 @@ def filter_players():
 
         # Validate team access using consolidated function
         all_teams, all_team_names = get_user_teams()
-        is_valid, teamname, error_msg = get_team_info(team_id, (all_teams, all_team_names))
+        is_valid, teamname, error_msg = get_team_info(
+            team_id, (all_teams, all_team_names)
+        )
 
         if not is_valid:
             return jsonify({"error": error_msg}), 403
@@ -184,6 +206,7 @@ def filter_players():
         # Import models
         try:
             from app.model_registry import get_player_setting_model, get_players_model
+
             Players = get_players_model()
             PlayerSetting = get_player_setting_model()
         except (ImportError, ValueError):
@@ -201,16 +224,18 @@ def filter_players():
         # Apply filters (simplified for now - would need more sophisticated filtering)
         filtered_players = []
         for player in players_query.all():
-            player_name = f"{player.first_name or ''} {player.last_name or ''}".strip().lower()
+            player_name = (
+                f"{player.first_name or ''} {player.last_name or ''}".strip().lower()
+            )
 
             # Name filter
             if name_filter and name_filter not in player_name:
                 continue
 
             # Age filter (if age data available)
-            if min_age is not None and hasattr(player, 'age') and player.age < min_age:
+            if min_age is not None and hasattr(player, "age") and player.age < min_age:
                 continue
-            if max_age is not None and hasattr(player, 'age') and player.age > max_age:
+            if max_age is not None and hasattr(player, "age") and player.age > max_age:
                 continue
 
             # Group filter (check PlayerSetting)
@@ -224,20 +249,22 @@ def filter_players():
                     if player_setting and player_setting.group_id:
                         continue
                 else:
-                    if not player_setting or str(player_setting.group_id) != group_filter:
+                    if (
+                        not player_setting
+                        or str(player_setting.group_id) != group_filter
+                    ):
                         continue
 
-            filtered_players.append({
-                "id": player.ht_id,
-                "name": f"{player.first_name or ''} {player.last_name or ''}".strip(),
-                "age": getattr(player, 'age', None),
-                "number": player.number
-            })
+            filtered_players.append(
+                {
+                    "id": player.ht_id,
+                    "name": f"{player.first_name or ''} {player.last_name or ''}".strip(),
+                    "age": getattr(player, "age", None),
+                    "number": player.number,
+                }
+            )
 
-        return jsonify({
-            "players": filtered_players,
-            "count": len(filtered_players)
-        })
+        return jsonify({"players": filtered_players, "count": len(filtered_players)})
 
     except Exception as e:
         dprint(1, f"Player filtering error: {e}")

@@ -76,6 +76,7 @@ def create_app(config_object=None, include_routes=True):
 
     # Register error handlers for production monitoring
     from app.error_handlers import register_error_handlers
+
     register_error_handlers(app)
 
     # Display configuration status after everything is set up
@@ -134,6 +135,7 @@ def setup_routes(app_instance, db_instance):
 
     # Get version info using shared utility
     from app.utils import get_version_info
+
     version_info = get_version_info()
     version = version_info["version"]
     fullversion = version_info["fullversion"]
@@ -257,13 +259,16 @@ def _get_database_migration_status():
             # Try to get migration file name for more info
             try:
                 import os
+
                 migrations_dir = "migrations/versions"
                 if os.path.exists(migrations_dir):
                     for filename in os.listdir(migrations_dir):
                         if filename.startswith(version_short):
                             # Extract meaningful name from filename
-                            name_part = filename.replace(version_short + '_', '').replace('.py', '')
-                            if name_part and name_part != '_':
+                            name_part = filename.replace(
+                                version_short + "_", ""
+                            ).replace(".py", "")
+                            if name_part and name_part != "_":
                                 return f"✅ Database: {version_short} ({name_part.replace('_', ' ')})"
                             break
             except Exception:

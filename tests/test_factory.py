@@ -11,6 +11,7 @@ from app.factory import create_app, db, migrate, setup_routes
 def test_module_imports():
     """Test that factory module imports without errors."""
     import app.factory
+
     assert app.factory is not None
 
 
@@ -27,6 +28,7 @@ class TestCreateApp:
 
     def test_create_app_with_custom_config(self):
         """Test create_app with custom configuration."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -45,6 +47,7 @@ class TestCreateApp:
 
     def test_create_app_with_routes_disabled(self):
         """Test create_app with routes disabled for testing."""
+
         class MinimalConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -56,10 +59,11 @@ class TestCreateApp:
         # Should not have blueprint routes when routes disabled
         blueprint_names = list(app.blueprints.keys())
         assert len(blueprint_names) == 1  # Bootstrap blueprint registered
-        assert 'bootstrap' in blueprint_names  # Flask-Bootstrap blueprint
+        assert "bootstrap" in blueprint_names  # Flask-Bootstrap blueprint
 
     def test_create_app_database_initialization(self):
         """Test create_app initializes database properly."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -70,11 +74,12 @@ class TestCreateApp:
 
         with app.app_context():
             # Verify db is properly initialized
-            assert hasattr(db, 'engine')  # Check db is bound to app
+            assert hasattr(db, "engine")  # Check db is bound to app
             assert migrate is not None
 
     def test_create_app_error_handlers_registration(self):
         """Test create_app registers error handlers."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -90,6 +95,7 @@ class TestCreateApp:
     @patch.dict(os.environ, {"FLASK_ENV": "testing"})
     def test_create_app_environment_variables(self):
         """Test create_app respects environment variables."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -105,10 +111,13 @@ class TestCreateApp:
 class TestSetupRoutes:
     """Test setup_routes function."""
 
-    @patch('app.routes_bp.initialize_routes')
-    @patch('app.utils.initialize_utils')
-    def test_setup_routes_calls_initialize_routes(self, mock_init_utils, mock_init_routes):
+    @patch("app.routes_bp.initialize_routes")
+    @patch("app.utils.initialize_utils")
+    def test_setup_routes_calls_initialize_routes(
+        self, mock_init_utils, mock_init_routes
+    ):
         """Test setup_routes calls route initialization functions."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -125,10 +134,11 @@ class TestSetupRoutes:
             mock_init_utils.assert_called_once_with(app, db, 0)
             mock_init_routes.assert_called_once_with(app, db)
 
-    @patch('app.routes_bp.initialize_routes')
-    @patch('app.utils.initialize_utils')
+    @patch("app.routes_bp.initialize_routes")
+    @patch("app.utils.initialize_utils")
     def test_setup_routes_with_mock_db(self, mock_init_utils, mock_init_routes):
         """Test setup_routes with mock database."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -163,6 +173,7 @@ class TestDatabaseExtensions:
 
     def test_extensions_initialization(self):
         """Test extensions can be initialized with app."""
+
         class TestConfig:
             TESTING = True
             SECRET_KEY = "test-key"
@@ -175,7 +186,7 @@ class TestDatabaseExtensions:
             # Extensions should be properly bound to app
             assert db is not None
             assert migrate is not None
-            assert hasattr(db, 'engine')  # Check db is bound
+            assert hasattr(db, "engine")  # Check db is bound
 
 
 class TestPkgutilShim:
@@ -185,6 +196,7 @@ class TestPkgutilShim:
         """Test pkgutil.get_loader shim is available."""
         # After factory import, get_loader should be available
         import pkgutil
+
         assert hasattr(pkgutil, "get_loader")
         assert callable(pkgutil.get_loader)
 
@@ -206,6 +218,7 @@ class TestConfigurationLoading:
 
     def test_configuration_from_object(self):
         """Test loading configuration from object."""
+
         class CustomConfig:
             CUSTOM_VALUE = "test_value"
             SECRET_KEY = "custom-secret"
@@ -227,7 +240,7 @@ class TestConfigurationLoading:
         required_keys = [
             "SECRET_KEY",
             "SQLALCHEMY_DATABASE_URI",
-            "SQLALCHEMY_TRACK_MODIFICATIONS"
+            "SQLALCHEMY_TRACK_MODIFICATIONS",
         ]
 
         for key in required_keys:
@@ -243,6 +256,7 @@ class TestAppContextAndTeardown:
 
         with app.app_context():
             from flask import current_app
+
             assert current_app == app
 
     def test_app_teardown_handlers(self):

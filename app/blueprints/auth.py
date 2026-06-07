@@ -65,7 +65,10 @@ def login():
     password = request.form.get("password")
     cookie_consent = request.form.get("cookie_consent")
     dprint(1, f"Login attempt for username: {username}")
-    dprint(1, f"Password provided: {bool(password)}, length: {len(password) if password else 0}")
+    dprint(
+        1,
+        f"Password provided: {bool(password)}, length: {len(password) if password else 0}",
+    )
     dprint(1, f"Cookie consent provided: {bool(cookie_consent)}")
 
     # Validate form data
@@ -83,7 +86,7 @@ def login():
         return create_page(
             template="login.html",
             title="Login / Signup",
-            error="You must consent to the use of essential session cookies to log in"
+            error="You must consent to the use of essential session cookies to log in",
         )
 
     # Check for existing user
@@ -147,7 +150,10 @@ def login():
             # Track login activity
             existing_user.login()
             db.session.commit()
-            dprint(1, f"Updated login counter and timestamp for user: {existing_user.ht_user}")
+            dprint(
+                1,
+                f"Updated login counter and timestamp for user: {existing_user.ht_user}",
+            )
 
             # Setup team data from Hattrick API using OAuth tokens
             print("Setting up team data")
@@ -174,7 +180,10 @@ def login():
                     # YouthTeamId is optional but API treats it as required
                     # Work around by accessing teams data directly
                     if "YouthTeamId" in str(user_error):
-                        dprint(1, f"YouthTeamId parsing error (user has no youth team): {user_error}")
+                        dprint(
+                            1,
+                            f"YouthTeamId parsing error (user has no youth team): {user_error}",
+                        )
                         # Try to get teams by accessing the raw data directly
                         try:
                             # chpp.request() returns already-parsed ElementTree Element
@@ -182,14 +191,19 @@ def login():
 
                             # Extract team IDs from XML
                             team_nodes = root.findall(".//Team/TeamId")
-                            all_teams = [int(node.text) for node in team_nodes if node.text]
+                            all_teams = [
+                                int(node.text) for node in team_nodes if node.text
+                            ]
                             dprint(1, f"Extracted team IDs from XML: {all_teams}")
                         except Exception as xml_error:
                             dprint(1, f"Failed to extract teams from XML: {xml_error}")
                             dprint(1, f"XML error type: {type(xml_error)}")
                             import traceback
+
                             dprint(1, f"XML error traceback: {traceback.format_exc()}")
-                            raise Exception("Cannot get team IDs from CHPP - authentication failed") from None
+                            raise Exception(
+                                "Cannot get team IDs from CHPP - authentication failed"
+                            ) from None
                     else:
                         raise user_error
 
@@ -207,11 +221,14 @@ def login():
                 session["all_teams"] = all_teams
                 session["all_team_names"] = all_team_names
                 session["team_id"] = all_teams[0]
-                dprint(1, f"Team setup complete: {all_teams} with names: {all_team_names}")
+                dprint(
+                    1, f"Team setup complete: {all_teams} with names: {all_team_names}"
+                )
             except Exception as e:
                 dprint(1, f"Error fetching teams from Hattrick: {e}")
                 dprint(1, f"Error type: {type(e)}")
                 import traceback
+
                 dprint(1, f"Full traceback: {traceback.format_exc()}")
                 return create_page(
                     template="login.html",
@@ -257,7 +274,9 @@ def login():
         session["password"] = generate_password_hash(password)
         return start_oauth_flow()
 
-    print("ERROR: Reached end of login function without returning - this should not happen!")
+    print(
+        "ERROR: Reached end of login function without returning - this should not happen!"
+    )
 
 
 def start_oauth_flow():
@@ -323,7 +342,10 @@ def handle_oauth_callback(oauth_verifier):
             session["current_user_id"] = user_context["ht_id"]
             # Create current_user object from successful CHPP response
             current_user = user_context["user"]
-            dprint(1, f"Successfully got user from CHPP: {current_user.username} (ID: {current_user.ht_id})")
+            dprint(
+                1,
+                f"Successfully got user from CHPP: {current_user.username} (ID: {current_user.ht_id})",
+            )
 
             # Note: Don't call .login() here - current_user is CHPPUser object, not database User
             # Login activity tracking will be handled after database user is created/found
@@ -359,7 +381,10 @@ def handle_oauth_callback(oauth_verifier):
             # SECURITY FIX: Do NOT fall back to random legacy users!
             # If no user found by valid means, fail gracefully instead of session cross-contamination
             if not existing_user:
-                dprint(1, "SECURITY: No user found by valid OAuth tokens - failing safely instead of fallback")
+                dprint(
+                    1,
+                    "SECURITY: No user found by valid OAuth tokens - failing safely instead of fallback",
+                )
                 session.pop("current_user", None)
                 session.pop("current_user_id", None)
                 session.pop("access_key", None)
@@ -382,7 +407,10 @@ def handle_oauth_callback(oauth_verifier):
                 # Track login activity
                 existing_user.login()
                 db.session.commit()
-                dprint(1, f"Updated login counter and timestamp for user: {existing_user.ht_user}")
+                dprint(
+                    1,
+                    f"Updated login counter and timestamp for user: {existing_user.ht_user}",
+                )
 
                 # Create a minimal current_user object for the rest of the function
                 class MinimalUser:
@@ -413,7 +441,9 @@ def handle_oauth_callback(oauth_verifier):
 
         # Verify current_user is not None before proceeding
         if current_user is None:
-            dprint(1, "current_user is None after CHPP processing - authentication failed")
+            dprint(
+                1, "current_user is None after CHPP processing - authentication failed"
+            )
             session.pop("current_user", None)
             session.pop("current_user_id", None)
             return create_page(
@@ -491,10 +521,14 @@ def handle_oauth_callback(oauth_verifier):
         # Create default player groups for new users
         try:
             from app.utils import create_default_groups
+
             create_default_groups(current_user.ht_id)
             dprint(1, f"Created default groups for new user {current_user.ht_id}")
         except Exception as group_error:
-            dprint(1, f"Failed to create default groups for user {current_user.ht_id}: {group_error}")
+            dprint(
+                1,
+                f"Failed to create default groups for user {current_user.ht_id}: {group_error}",
+            )
             # Continue with login even if group creation fails
 
         # Setup team data with error handling
@@ -514,14 +548,21 @@ def handle_oauth_callback(oauth_verifier):
             session["all_teams"] = all_teams
             session["all_team_names"] = all_team_names
             session["team_id"] = all_teams[0]
-            dprint(1, f"OAuth callback team setup complete: {all_teams} with names: {all_team_names}")
+            dprint(
+                1,
+                f"OAuth callback team setup complete: {all_teams} with names: {all_team_names}",
+            )
         except Exception as team_setup_error:
             # YouthTeamId is optional but API treats it as required
             if "YouthTeamId" in str(team_setup_error):
-                dprint(1, f"YouthTeamId parsing error (user has no youth team): {team_setup_error}")
+                dprint(
+                    1,
+                    f"YouthTeamId parsing error (user has no youth team): {team_setup_error}",
+                )
                 try:
                     # Work around by accessing raw XML directly
                     import xml.etree.ElementTree as ET
+
                     user_xml = chpp.request(file="managercompendium", version="1.6")
                     root = ET.fromstring(user_xml)
 
@@ -542,7 +583,10 @@ def handle_oauth_callback(oauth_verifier):
                     session["all_teams"] = all_teams
                     session["all_team_names"] = all_team_names
                     session["team_id"] = all_teams[0]
-                    dprint(1, f"Team setup complete via XML: {all_teams} with names: {all_team_names}")
+                    dprint(
+                        1,
+                        f"Team setup complete via XML: {all_teams} with names: {all_team_names}",
+                    )
                 except Exception as xml_error:
                     dprint(1, f"Failed to extract teams from XML: {xml_error}")
                     # Clear session to prevent conflicting success/failure messages
@@ -596,7 +640,7 @@ def validate_session():
         return {
             "valid": True,
             "user_id": user_id,
-            "user": session.get("current_user")
+            "user": session.get("current_user"),
         }, 200
 
     except Exception as e:

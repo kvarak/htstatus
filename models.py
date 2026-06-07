@@ -1,6 +1,6 @@
+from datetime import datetime
 import pickle
 import time
-from datetime import datetime
 
 from app import db
 
@@ -180,10 +180,18 @@ class Match(db.Model):
         self.away_team_rating_right_att = matchdata.get("away_team_rating_right_att")
         self.away_team_rating_mid_att = matchdata.get("away_team_rating_mid_att")
         self.away_team_rating_left_att = matchdata.get("away_team_rating_left_att")
-        self.home_team_rating_set_pieces_def = matchdata.get("home_team_rating_set_pieces_def")
-        self.home_team_rating_set_pieces_att = matchdata.get("home_team_rating_set_pieces_att")
-        self.away_team_rating_set_pieces_def = matchdata.get("away_team_rating_set_pieces_def")
-        self.away_team_rating_set_pieces_att = matchdata.get("away_team_rating_set_pieces_att")
+        self.home_team_rating_set_pieces_def = matchdata.get(
+            "home_team_rating_set_pieces_def"
+        )
+        self.home_team_rating_set_pieces_att = matchdata.get(
+            "home_team_rating_set_pieces_att"
+        )
+        self.away_team_rating_set_pieces_def = matchdata.get(
+            "away_team_rating_set_pieces_def"
+        )
+        self.away_team_rating_set_pieces_att = matchdata.get(
+            "away_team_rating_set_pieces_att"
+        )
         self.attendance = matchdata.get("attendance")
         self.arena_capacity_terraces = matchdata.get("arena_capacity_terraces")
         self.arena_capacity_basic = matchdata.get("arena_capacity_basic")
@@ -213,17 +221,25 @@ class Match(db.Model):
     @property
     def home_team_possession(self):
         """Calculate average possession for home team from both halves."""
-        if (self.possession_first_half_home is not None and
-            self.possession_second_half_home is not None):
-            return (self.possession_first_half_home + self.possession_second_half_home) / 2
+        if (
+            self.possession_first_half_home is not None
+            and self.possession_second_half_home is not None
+        ):
+            return (
+                self.possession_first_half_home + self.possession_second_half_home
+            ) / 2
         return None
 
     @property
     def away_team_possession(self):
         """Calculate average possession for away team from both halves."""
-        if (self.possession_first_half_away is not None and
-            self.possession_second_half_away is not None):
-            return (self.possession_first_half_away + self.possession_second_half_away) / 2
+        if (
+            self.possession_first_half_away is not None
+            and self.possession_second_half_away is not None
+        ):
+            return (
+                self.possession_first_half_away + self.possession_second_half_away
+            ) / 2
         return None
 
     @property
@@ -234,7 +250,7 @@ class Match(db.Model):
             self.home_team_chances_center,
             self.home_team_chances_right,
             self.home_team_chances_special,
-            self.home_team_chances_other
+            self.home_team_chances_other,
         ]
         if all(c is not None for c in chances):
             return sum(chances)
@@ -248,7 +264,7 @@ class Match(db.Model):
             self.away_team_chances_center,
             self.away_team_chances_right,
             self.away_team_chances_special,
-            self.away_team_chances_other
+            self.away_team_chances_other,
         ]
         if all(c is not None for c in chances):
             return sum(chances)
@@ -260,11 +276,13 @@ class Match(db.Model):
         Returns True if ANY enhanced field is available.
         Note: CHPP added NrOfChances in v3.1 (March 2022).
         """
-        return (self.possession_first_half_home is not None or
-                self.home_team_chances_left is not None or
-                self.attendance is not None or
-                self.home_team_formation or  # Empty string is falsy
-                self.home_team_rating is not None)
+        return (
+            self.possession_first_half_home is not None
+            or self.home_team_chances_left is not None
+            or self.attendance is not None
+            or self.home_team_formation  # Empty string is falsy
+            or self.home_team_rating is not None
+        )
 
     def __repr__(self):
         return f"{self.home_team_name} - {self.away_team_name}: {self.ht_id}"
@@ -323,7 +341,8 @@ class User(db.Model):
     ht_id = db.Column(db.Integer, primary_key=True, unique=True)
     ht_user = db.Column(db.String(100), unique=True, nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(255))  # Increased from 100 to 255 for modern hashing
+    # Increased from 100 to 255 for modern hashing
+    password = db.Column(db.String(255))
     access_key = db.Column(db.String(100))
     access_secret = db.Column(db.String(100))
     c_login = db.Column(db.Integer, default=1)
@@ -340,15 +359,24 @@ class User(db.Model):
     c_stats = db.Column(db.Integer, default=0)
     # Tour-specific tracking
     c_welcome_complete = db.Column(db.Integer, default=0)  # Welcome tour completions
-    c_welcome_skip = db.Column(db.Integer, default=0)      # Welcome tour skips
-    c_welcome_help = db.Column(db.Integer, default=0)      # Welcome tour help clicks
-    c_player_complete = db.Column(db.Integer, default=0)   # Player management tour completions
-    c_player_skip = db.Column(db.Integer, default=0)       # Player management tour skips
-    c_player_help = db.Column(db.Integer, default=0)       # Player management tour help clicks
-    c_update_complete = db.Column(db.Integer, default=0)   # Data update tour completions
-    c_update_skip = db.Column(db.Integer, default=0)       # Data update tour skips
-    c_update_help = db.Column(db.Integer, default=0)       # Data update tour help clicks
-    c_tutorial_reset = db.Column(db.Integer, default=0)    # Tutorial progress resets
+    c_welcome_skip = db.Column(db.Integer, default=0)  # Welcome tour skips
+    # Welcome tour help clicks
+    c_welcome_help = db.Column(db.Integer, default=0)
+    c_player_complete = db.Column(
+        db.Integer, default=0
+    )  # Player management tour completions
+    # Player management tour skips
+    c_player_skip = db.Column(db.Integer, default=0)
+    c_player_help = db.Column(
+        db.Integer, default=0
+    )  # Player management tour help clicks
+    # Data update tour completions
+    c_update_complete = db.Column(db.Integer, default=0)
+    c_update_skip = db.Column(db.Integer, default=0)  # Data update tour skips
+    # Data update tour help clicks
+    c_update_help = db.Column(db.Integer, default=0)
+    # Tutorial progress resets
+    c_tutorial_reset = db.Column(db.Integer, default=0)
     last_login = db.Column(db.DateTime)
     last_update = db.Column(db.DateTime)
     last_usage = db.Column(db.DateTime)
@@ -664,22 +692,31 @@ class Players(db.Model):
 
 class Feedback(db.Model):
     """User feedback submissions for bugs, features, and ideas."""
+
     __tablename__ = "feedback"
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=False)
     feedback_type = db.Column(db.String(20), nullable=False)  # bug/feature/idea
-    status = db.Column(db.String(20), default='open')  # open/planned/in-progress/completed/wont-do
-    archived = db.Column(db.Boolean, default=False)  # separate archiving from status
-    author_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
+    status = db.Column(
+        db.String(20), default="open"
+    )  # open/planned/in-progress/completed/wont-do
+    # separate archiving from status
+    archived = db.Column(db.Boolean, default=False)
+    author_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    vote_score = db.Column(db.Integer, default=0)  # cached vote total for performance
+    # cached vote total for performance
+    vote_score = db.Column(db.Integer, default=0)
 
     # Relationships
-    author = db.relationship('User', backref='feedback_submissions')
-    comments = db.relationship('FeedbackComment', backref='feedback', cascade='all, delete-orphan')
-    votes = db.relationship('FeedbackVote', backref='feedback', cascade='all, delete-orphan')
+    author = db.relationship("User", backref="feedback_submissions")
+    comments = db.relationship(
+        "FeedbackComment", backref="feedback", cascade="all, delete-orphan"
+    )
+    votes = db.relationship(
+        "FeedbackVote", backref="feedback", cascade="all, delete-orphan"
+    )
 
     def __init__(self, title, description, feedback_type, author_id, archived=False):
         self.title = title
@@ -687,33 +724,38 @@ class Feedback(db.Model):
         self.feedback_type = feedback_type
         self.author_id = author_id
         self.archived = archived
-        self.status = 'open'  # Set default status explicitly
-        self.vote_score = 0   # Set default vote score explicitly
+        self.status = "open"  # Set default status explicitly
+        self.vote_score = 0  # Set default vote score explicitly
 
     def __repr__(self):
         return f"<Feedback {self.id}: {self.title[:50]}>"
 
     def update_vote_score(self):
         """Update cached vote score from actual votes."""
-        up_votes = FeedbackVote.query.filter_by(feedback_id=self.id, vote_type='up').count()
-        down_votes = FeedbackVote.query.filter_by(feedback_id=self.id, vote_type='down').count()
+        up_votes = FeedbackVote.query.filter_by(
+            feedback_id=self.id, vote_type="up"
+        ).count()
+        down_votes = FeedbackVote.query.filter_by(
+            feedback_id=self.id, vote_type="down"
+        ).count()
         self.vote_score = up_votes - down_votes
         db.session.commit()
 
 
 class FeedbackComment(db.Model):
     """Comments on feedback items."""
+
     __tablename__ = "feedback_comment"
 
     id = db.Column(db.Integer, primary_key=True)
-    feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
+    feedback_id = db.Column(db.Integer, db.ForeignKey("feedback.id"), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"), nullable=False)
     content = db.Column(db.Text, nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     # Relationships
-    author = db.relationship('User', backref='feedback_comments')
+    author = db.relationship("User", backref="feedback_comments")
 
     def __init__(self, feedback_id, author_id, content, is_admin=False):
         self.feedback_id = feedback_id
@@ -727,19 +769,22 @@ class FeedbackComment(db.Model):
 
 class FeedbackVote(db.Model):
     """User votes on feedback items."""
+
     __tablename__ = "feedback_vote"
 
     id = db.Column(db.Integer, primary_key=True)
-    feedback_id = db.Column(db.Integer, db.ForeignKey('feedback.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False)
+    feedback_id = db.Column(db.Integer, db.ForeignKey("feedback.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.ht_id"), nullable=False)
     vote_type = db.Column(db.String(10), nullable=False)  # up/down
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     # Relationships
-    user = db.relationship('User', backref='feedback_votes')
+    user = db.relationship("User", backref="feedback_votes")
 
     # Constraint: one vote per user per feedback item
-    __table_args__ = (db.UniqueConstraint('feedback_id', 'user_id', name='unique_user_vote'),)
+    __table_args__ = (
+        db.UniqueConstraint("feedback_id", "user_id", name="unique_user_vote"),
+    )
 
     def __init__(self, feedback_id, user_id, vote_type):
         self.feedback_id = feedback_id
@@ -776,9 +821,7 @@ class Team(db.Model):
 
     # Timestamps
     created = db.Column(db.DateTime, default=datetime.utcnow)
-    updated = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     user = db.relationship("User", backref="teams")
@@ -854,6 +897,7 @@ class Team(db.Model):
         self.updated = datetime.utcnow()
         db.session.commit()
 
+
 # --------------------------------------------------------------------------------
 
 
@@ -864,17 +908,27 @@ class ErrorLog(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    error_type = db.Column(db.String(50), nullable=False)  # '500', '404', 'Exception'
+    # '500', '404', 'Exception'
+    error_type = db.Column(db.String(50), nullable=False)
     message = db.Column(db.Text)
     stack_trace = db.Column(db.Text)
     user_id = db.Column(db.Integer, nullable=True)  # From session if available
     request_path = db.Column(db.String(500))
     request_method = db.Column(db.String(10))
     user_agent = db.Column(db.String(500))
-    environment = db.Column(db.String(50), default='production')
+    environment = db.Column(db.String(50), default="production")
 
-    def __init__(self, error_type, message=None, stack_trace=None, user_id=None,
-                 request_path=None, request_method=None, user_agent=None, environment='production'):
+    def __init__(
+        self,
+        error_type,
+        message=None,
+        stack_trace=None,
+        user_id=None,
+        request_path=None,
+        request_method=None,
+        user_agent=None,
+        environment="production",
+    ):
         self.error_type = error_type
         self.message = message
         self.stack_trace = stack_trace
@@ -885,32 +939,56 @@ class ErrorLog(db.Model):
         self.environment = environment
 
     def __repr__(self):
-        return f"<ErrorLog {self.error_type}: {self.message[:50]}... at {self.timestamp}>"
+        return (
+            f"<ErrorLog {self.error_type}: {self.message[:50]}... at {self.timestamp}>"
+        )
+
 
 # --------------------------------------------------------------------------------
 
 
 class TutorialAnalytics(db.Model):
     """Track tutorial usage analytics for debugging and optimization."""
+
     __tablename__ = "tutorial_analytics"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=True)  # Nullable for anonymous users
-    session_id = db.Column(db.String(255), nullable=False)  # Browser session identifier
-    event_type = db.Column(db.String(50), nullable=False)  # 'start', 'complete', 'skip', 'exit', 'help_click', 'reset'
-    tour_id = db.Column(db.String(50), nullable=False)  # 'welcome', 'player-management', 'data-update'
-    step_number = db.Column(db.Integer, nullable=True)  # Which step (for skips/exits)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.ht_id"), nullable=True
+    )  # Nullable for anonymous users
+    # Browser session identifier
+    session_id = db.Column(db.String(255), nullable=False)
+    event_type = db.Column(
+        db.String(50), nullable=False
+    )  # 'start', 'complete', 'skip', 'exit', 'help_click', 'reset'
+    tour_id = db.Column(
+        db.String(50), nullable=False
+    )  # 'welcome', 'player-management', 'data-update'
+    # Which step (for skips/exits)
+    step_number = db.Column(db.Integer, nullable=True)
     step_duration_seconds = db.Column(db.Float, nullable=True)  # Time spent on step
     total_duration_seconds = db.Column(db.Float, nullable=True)  # Total time in tour
-    page_path = db.Column(db.String(255), nullable=False)  # URL path where event occurred
+    page_path = db.Column(
+        db.String(255), nullable=False
+    )  # URL path where event occurred
     user_agent = db.Column(db.Text, nullable=True)  # Browser info
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationship to User
-    user = db.relationship('User', backref='tutorial_events', lazy=True)
+    user = db.relationship("User", backref="tutorial_events", lazy=True)
 
-    def __init__(self, session_id, event_type, tour_id, page_path, user_id=None,
-                 step_number=None, step_duration_seconds=None, total_duration_seconds=None, user_agent=None):
+    def __init__(
+        self,
+        session_id,
+        event_type,
+        tour_id,
+        page_path,
+        user_id=None,
+        step_number=None,
+        step_duration_seconds=None,
+        total_duration_seconds=None,
+        user_agent=None,
+    ):
         self.user_id = user_id
         self.session_id = session_id
         self.event_type = event_type
@@ -924,22 +1002,32 @@ class TutorialAnalytics(db.Model):
     def __repr__(self):
         return f"<TutorialAnalytics {self.event_type} {self.tour_id} by user {self.user_id} at {self.timestamp}>"
 
+
 # --------------------------------------------------------------------------------
 
 
 class AdminPreferences(db.Model):
     """Store admin-specific preferences for debug dashboard customization"""
+
     __tablename__ = "admin_preferences"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.ht_id'), nullable=False, unique=True)
-    chart_layout = db.Column(db.JSON, nullable=True)  # Chart order, positions, display modes
-    filter_settings = db.Column(db.JSON, nullable=True)  # Hide admin users, other filters
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.ht_id"), nullable=False, unique=True
+    )
+    chart_layout = db.Column(
+        db.JSON, nullable=True
+    )  # Chart order, positions, display modes
+    filter_settings = db.Column(
+        db.JSON, nullable=True
+    )  # Hide admin users, other filters
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
 
     # Relationship to User model
-    user = db.relationship('User', backref='admin_preferences')
+    user = db.relationship("User", backref="admin_preferences")
 
     def __init__(self, user_id, chart_layout=None, filter_settings=None):
         self.user_id = user_id
@@ -956,7 +1044,7 @@ class AdminPreferences(db.Model):
                 "userActivityChart",
                 "featureUsageChart",
                 "registrationChart",
-                "usageFrequencyChart"
+                "usageFrequencyChart",
             ],
             "chart_modes": {
                 "tutorialCompletionChart": "normal",
@@ -965,9 +1053,9 @@ class AdminPreferences(db.Model):
                 "userActivityChart": "normal",
                 "featureUsageChart": "normal",
                 "registrationChart": "normal",
-                "usageFrequencyChart": "normal"
+                "usageFrequencyChart": "normal",
             },
-            "grid_columns": 2
+            "grid_columns": 2,
         }
 
     def _default_filter_settings(self):
@@ -975,11 +1063,7 @@ class AdminPreferences(db.Model):
         return {
             "hide_admin_users": True,
             "activity_table_rows": 20,
-            "date_range": {
-                "default_months": 6,
-                "start_date": None,
-                "end_date": None
-            }
+            "date_range": {"default_months": 6, "start_date": None, "end_date": None},
         }
 
     def update_chart_layout(self, layout_data):
@@ -998,5 +1082,6 @@ class AdminPreferences(db.Model):
 
     def __repr__(self):
         return f"<AdminPreferences for user {self.user_id}>"
+
 
 # --------------------------------------------------------------------------------

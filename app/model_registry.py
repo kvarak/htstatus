@@ -52,8 +52,9 @@ class ModelRegistry:
         except ImportError as e:
             # If import fails, try to get models from sys.modules
             import sys
-            if 'models' in sys.modules:
-                models = sys.modules['models']
+
+            if "models" in sys.modules:
+                models = sys.modules["models"]
                 # Register all model classes from already imported models
                 cls.register("User", models.User)
                 cls.register("Players", models.Players)

@@ -6,10 +6,11 @@ import os
 
 import pytest
 
-# Import models to ensure they are registered with SQLAlchemy for all tests
-import models  # noqa: F401
 from app.factory import create_app, db
 from config import TestConfig
+
+# Import models to ensure they are registered with SQLAlchemy for all tests
+import models  # noqa: F401
 
 
 def pytest_sessionstart(session):  # noqa: ARG001
@@ -95,12 +96,12 @@ def client(app):
 def authenticated_session(client):
     """Create a test client with authenticated session for testing protected routes."""
     with client.session_transaction() as session:
-        session['access_key'] = 'test_access_key'
-        session['access_secret'] = 'test_access_secret'
-        session['current_user_id'] = 12345
-        session['current_user'] = 'testuser'
-        session['all_teams'] = [12345, 67890]
-        session['all_team_names'] = ['Test Team 1', 'Test Team 2']
+        session["access_key"] = "test_access_key"
+        session["access_secret"] = "test_access_secret"
+        session["current_user_id"] = 12345
+        session["current_user"] = "testuser"
+        session["all_teams"] = [12345, 67890]
+        session["all_team_names"] = ["Test Team 1", "Test Team 2"]
     return client
 
 
@@ -108,8 +109,8 @@ def authenticated_session(client):
 def route_testing_client(app):
     """Create a client specifically configured for route testing."""
     # Enable testing mode for better error reporting
-    app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
+    app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False  # Disable CSRF for testing
 
     with app.test_client() as client:
         yield client
@@ -118,21 +119,21 @@ def route_testing_client(app):
 @pytest.fixture(scope="function")
 def authenticated_route_client(app):
     """Create an authenticated client for protected route testing."""
-    app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
+    app.config["TESTING"] = True
+    app.config["WTF_CSRF_ENABLED"] = False
 
     with app.test_client() as client:
         with client.session_transaction() as session:
-            session['access_key'] = 'test_access_key'
-            session['access_secret'] = 'test_access_secret'
-            session['current_user_id'] = 12345
-            session['current_user'] = 'testuser'
-            session['all_teams'] = [12345]
-            session['all_team_names'] = ['Test Team']
+            session["access_key"] = "test_access_key"
+            session["access_secret"] = "test_access_secret"
+            session["current_user_id"] = 12345
+            session["current_user"] = "testuser"
+            session["all_teams"] = [12345]
+            session["all_team_names"] = ["Test Team"]
         yield client
 
 
-def create_test_user(db_session, user_id=12345, username='testuser'):
+def create_test_user(db_session, user_id=12345, username="testuser"):
     """Utility function to create test user in database."""
     from models import User
 
@@ -140,52 +141,51 @@ def create_test_user(db_session, user_id=12345, username='testuser'):
         ht_id=user_id,
         ht_user=username,
         username=username,
-        password='test_password',
-        access_key='test_access_key',
-        access_secret='test_access_secret'
+        password="test_password",
+        access_key="test_access_key",
+        access_secret="test_access_secret",
     )
 
-    user.role = 'user'  # Set role after creation
+    user.role = "user"  # Set role after creation
 
     db_session.add(user)
     db_session.commit()
     return user
 
 
-def create_test_team(db_session, team_id=12345, team_name='Test Team', user_id=12345):
+def create_test_team(db_session, team_id=12345, team_name="Test Team", user_id=12345):
     """Utility function to create test team in database."""
     from models import Team
 
-    team = Team(
-        ht_id=team_id,
-        name=team_name,
-        user_id=user_id
-    )
+    team = Team(ht_id=team_id, name=team_name, user_id=user_id)
 
     db_session.add(team)
     db_session.commit()
     return team
 
 
-def assert_route_requires_auth(client, route_path, method='GET'):
+def assert_route_requires_auth(client, route_path, method="GET"):
     """Utility function to assert that a route requires authentication."""
-    if method.upper() == 'GET':
+    if method.upper() == "GET":
         response = client.get(route_path)
-    elif method.upper() == 'POST':
+    elif method.upper() == "POST":
         response = client.post(route_path)
     else:
         raise ValueError(f"Unsupported method: {method}")
 
     # Should redirect to login or return 401/403
-    assert response.status_code in [302, 401, 403], \
-        f"Route {route_path} should require authentication but returned {response.status_code}"
+    assert response.status_code in [
+        302,
+        401,
+        403,
+    ], f"Route {route_path} should require authentication but returned {response.status_code}"
 
 
-def assert_route_accessible(client, route_path, method='GET', expected_status=200):
+def assert_route_accessible(client, route_path, method="GET", expected_status=200):
     """Utility function to assert that a route is accessible."""
-    if method.upper() == 'GET':
+    if method.upper() == "GET":
         response = client.get(route_path)
-    elif method.upper() == 'POST':
+    elif method.upper() == "POST":
         response = client.post(route_path)
     else:
         raise ValueError(f"Unsupported method: {method}")
@@ -194,8 +194,9 @@ def assert_route_accessible(client, route_path, method='GET', expected_status=20
     if isinstance(expected_status, int):
         expected_status = [expected_status]
 
-    assert response.status_code in expected_status, \
-        f"Route {route_path} returned {response.status_code}, expected one of {expected_status}"
+    assert (
+        response.status_code in expected_status
+    ), f"Route {route_path} returned {response.status_code}, expected one of {expected_status}"
 
 
 @pytest.fixture(scope="function")
@@ -363,4 +364,3 @@ def create_mock_chpp_utilities(user_id=12345, team_ids=None, team_names=None):
         "user_context": user_context,
         "fetch_teams": mock_fetch_teams,
     }
-

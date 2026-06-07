@@ -2,8 +2,9 @@
 """
 Trigger default groups creation for an existing user
 """
-import sys
+
 from pathlib import Path
+import sys
 
 from app.factory import create_app
 from app.utils import create_default_groups
@@ -28,6 +29,7 @@ def trigger_groups_for_user(user_id):
             return False
 
     return True
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

@@ -17,8 +17,8 @@ class TestPlayerDiffFunctions:
     """Test player comparison and change tracking functions."""
 
     @pytest.mark.skip(reason="Mock assertion issues with length mismatch")
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_diff_basic(self, mock_dprint, mock_db):
         """Test basic player_diff functionality."""
         # Mock player records
@@ -48,7 +48,7 @@ class TestPlayerDiffFunctions:
         mock_query = mock_db.session.query.return_value
         mock_query.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
             old_player,  # First call returns old player
-            current_player  # Second call returns current player
+            current_player,  # Second call returns current player
         ]
 
         result = player_diff(12345, 7, "Test Team")
@@ -66,22 +66,22 @@ class TestPlayerDiffFunctions:
         scorer_change = result[2]
         assert scorer_change == ["Test Team", "John", "Doe", "Scorer", 10, 11]
 
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_diff_no_old_record(self, mock_dprint, mock_db):
         """Test player_diff when no old record found."""
         # Mock no old record found
         mock_query = mock_db.session.query.return_value
         mock_query.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
             None,  # No old record
-            MagicMock()  # Current record exists
+            MagicMock(),  # Current record exists
         ]
 
         result = player_diff(12345, 7)
         assert result == []
 
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_diff_exception_handling(self, mock_dprint, mock_db):
         """Test player_diff handles exceptions gracefully."""
         # Mock database error
@@ -95,8 +95,8 @@ class TestPlayerDiffFunctions:
         assert "Error in player_diff" in str(mock_dprint.call_args)
 
     @pytest.mark.skip(reason="Mock assertion issues with empty list expectation")
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_diff_no_changes(self, mock_dprint, mock_db):
         """Test player_diff when no skill changes found."""
         # Mock identical records
@@ -114,15 +114,15 @@ class TestPlayerDiffFunctions:
         mock_query = mock_db.session.query.return_value
         mock_query.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
             same_player,  # Old record
-            same_player   # Current record (same)
+            same_player,  # Current record (same)
         ]
 
         result = player_diff(12345, 7)
         assert result == []
 
     @pytest.mark.skip(reason="Mock assertion issues with None skills handling")
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_diff_none_skills(self, mock_dprint, mock_db):
         """Test player_diff with None skill values."""
         old_player = MagicMock()
@@ -150,7 +150,7 @@ class TestPlayerDiffFunctions:
         mock_query = mock_db.session.query.return_value
         mock_query.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
             old_player,
-            current_player
+            current_player,
         ]
 
         result = player_diff(12345, 7)
@@ -161,8 +161,8 @@ class TestPlayerDiffFunctions:
         assert result[0][5] == 5  # Now 5
 
     @pytest.mark.skip(reason="Mock assertion issues with length mismatch")
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_daily_changes_basic(self, mock_dprint, mock_db):
         """Test player_daily_changes basic functionality."""
         # Mock target day record
@@ -179,7 +179,9 @@ class TestPlayerDiffFunctions:
 
         # Setup mock for the two separate queries
         mock_query = mock_db.session.query.return_value
-        mock_filtered = mock_query.filter_by.return_value.filter.return_value.order_by.return_value
+        mock_filtered = (
+            mock_query.filter_by.return_value.filter.return_value.order_by.return_value
+        )
         mock_filtered.first.side_effect = [target_player, prev_player]
 
         result = player_daily_changes(54321, 3, "Daily Team")
@@ -191,21 +193,21 @@ class TestPlayerDiffFunctions:
         assert result[1][4] == 5  # Old value
         assert result[1][5] == 6  # New value
 
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_daily_changes_no_records(self, mock_dprint, mock_db):
         """Test player_daily_changes when records not found."""
         mock_query = mock_db.session.query.return_value
         mock_query.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
             None,  # No target record
-            MagicMock()  # Previous record exists but doesn't matter
+            MagicMock(),  # Previous record exists but doesn't matter
         ]
 
         result = player_daily_changes(54321, 3)
         assert result == []
 
-    @patch('app.utils.db')
-    @patch('app.utils.dprint')
+    @patch("app.utils.db")
+    @patch("app.utils.dprint")
     def test_player_daily_changes_exception(self, mock_dprint, mock_db):
         """Test player_daily_changes exception handling."""
         mock_db.session.query.side_effect = Exception("Database connection lost")
@@ -222,8 +224,8 @@ def test_module_imports():
     from app import utils
 
     # Verify player diff functions exist
-    assert hasattr(utils, 'player_diff')
-    assert hasattr(utils, 'player_daily_changes')
+    assert hasattr(utils, "player_diff")
+    assert hasattr(utils, "player_daily_changes")
 
     # Verify functions are callable
     assert callable(utils.player_diff)

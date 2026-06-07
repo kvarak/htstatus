@@ -47,22 +47,24 @@ if __name__ == "__main__":
     load_dotenv()
 
     # Get database URL from environment
-    database_url = os.environ.get('DATABASE_URL')
+    database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         print("❌ ERROR: DATABASE_URL environment variable not set")
         print("Please ensure .env file contains DATABASE_URL")
         exit(1)
 
     print("Applying database migrations...")
-    print(f"Database: {database_url.split('@')[1] if '@' in database_url else 'configured'}")
+    print(
+        f"Database: {database_url.split('@')[1] if '@' in database_url else 'configured'}"
+    )
 
     try:
         # Configure Alembic
-        alembic_cfg = Config('migrations/alembic.ini')
-        alembic_cfg.set_main_option('sqlalchemy.url', database_url)
+        alembic_cfg = Config("migrations/alembic.ini")
+        alembic_cfg.set_main_option("sqlalchemy.url", database_url)
 
         # Run migrations to latest revision
-        command.upgrade(alembic_cfg, 'head')
+        command.upgrade(alembic_cfg, "head")
 
         print("✅ Database migrations completed successfully!")
 

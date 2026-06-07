@@ -1,7 +1,7 @@
 """Tests for app/chpp/client.py"""
 
-import xml.etree.ElementTree as ET
 from unittest.mock import patch
+import xml.etree.ElementTree as ET
 
 from app.chpp.client import CHPP
 
@@ -9,6 +9,7 @@ from app.chpp.client import CHPP
 def test_module_imports():
     """Test that CHPP client module imports without errors."""
     import app.chpp.client
+
     assert app.chpp.client is not None
 
 
@@ -18,7 +19,7 @@ class TestCHPPClient:
     def test_matches_endpoint(self):
         """Test matches endpoint call."""
         # Create mock XML response
-        xml_response = '''<?xml version="1.0" encoding="UTF-8"?>
+        xml_response = """<?xml version="1.0" encoding="UTF-8"?>
         <HattrickData>
             <Team>
                 <TeamID>1001</TeamID>
@@ -41,20 +42,22 @@ class TestCHPPClient:
                     </Match>
                 </MatchList>
             </Team>
-        </HattrickData>'''
+        </HattrickData>"""
 
         # Create CHPP client
         client = CHPP("test_key", "test_secret", "access_key", "access_secret")
 
         # Mock the request method
-        with patch.object(client, 'request') as mock_request:
+        with patch.object(client, "request") as mock_request:
             mock_request.return_value = ET.fromstring(xml_response)
 
             # Test matches method
             matches = client.matches(id_=1001, is_youth=False)
 
             # Verify request was made with correct parameters
-            mock_request.assert_called_once_with("matches", "2.6", teamID=1001, isYouth=False)
+            mock_request.assert_called_once_with(
+                "matches", "2.6", teamID=1001, isYouth=False
+            )
 
             # Verify returned data
             assert len(matches) == 1
@@ -70,14 +73,18 @@ class TestCHPPClient:
         client = CHPP("test_key", "test_secret", "access_key", "access_secret")
 
         # Mock the request method
-        with patch.object(client, 'request') as mock_request:
-            mock_request.return_value = ET.fromstring('<HattrickData><Team><MatchList></MatchList></Team></HattrickData>')
+        with patch.object(client, "request") as mock_request:
+            mock_request.return_value = ET.fromstring(
+                "<HattrickData><Team><MatchList></MatchList></Team></HattrickData>"
+            )
 
             # Test matches_archive method
             matches = client.matches_archive(id_=1001, is_youth=False)
 
             # Verify request was made with correct parameters
-            mock_request.assert_called_once_with("matchesarchive", "1.5", teamID=1001, isYouthTeam=False)
+            mock_request.assert_called_once_with(
+                "matchesarchive", "1.5", teamID=1001, isYouthTeam=False
+            )
 
             # Verify returned data structure
             assert isinstance(matches, list)

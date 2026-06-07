@@ -6,8 +6,8 @@ Focuses on utility functions, version detection, debugging, and admin functional
 that have missing coverage based on the coverage report.
 """
 
-import subprocess
 from datetime import datetime
+import subprocess
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -44,6 +44,7 @@ class TestUtilsAdvanced:
 
         # Import to check globals were set
         import app.utils
+
         assert app.utils.db is mock_db
         assert app.utils.debug_level == 2
 
@@ -52,7 +53,7 @@ class TestUtilsAdvanced:
         # Reset debug level to None
         initialize_utils(None, None, None)
 
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             dprint(5, "Test message")
 
             # Should print regardless of level when debug_level is None
@@ -64,7 +65,7 @@ class TestUtilsAdvanced:
         """Test dprint when message level is within debug level."""
         initialize_utils(None, None, 3)
 
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             dprint(2, "Low level message")
 
             # Should print when level <= debug_level
@@ -74,7 +75,7 @@ class TestUtilsAdvanced:
         """Test dprint when message level exceeds debug level."""
         initialize_utils(None, None, 1)
 
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             dprint(5, "High level message")
 
             # Should not print when level > debug_level
@@ -84,7 +85,7 @@ class TestUtilsAdvanced:
         """Test debug_print with enhanced format and filename extraction."""
         initialize_utils(None, None, 2)
 
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             debug_print("/test/route", "test_function", "arg1", "arg2")
 
             mock_print.assert_called_once()
@@ -97,7 +98,7 @@ class TestUtilsAdvanced:
         """Test debug_print doesn't print when debug level is too low."""
         initialize_utils(None, None, 1)
 
-        with patch('builtins.print') as mock_print:
+        with patch("builtins.print") as mock_print:
             debug_print("/route", "function", "message")
 
             # debug_print requires debug_level >= 2
@@ -155,56 +156,57 @@ class TestUtilsAdvanced:
         result = diff(set1, set2)
         assert set(result) == {1, 3}
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_simple_tag(self, mock_subprocess):
         """Test get_version_info with simple tag (no commits ahead)."""
-        mock_subprocess.return_value = b'3.12.0\n'
+        mock_subprocess.return_value = b"3.12.0\n"
 
         result = get_version_info()
 
-        assert result['version'] == '3.12.0'
-        assert result['fullversion'] == '3.12.0'
-        assert result['versionstr'] == '3.12.0'
+        assert result["version"] == "3.12.0"
+        assert result["fullversion"] == "3.12.0"
+        assert result["versionstr"] == "3.12.0"
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_with_git_tags(self, mock_subprocess):
         """Test get_version_info with commits ahead of tag."""
-        mock_subprocess.return_value = b'3.12-5-g1a2b3c4\n'
+        mock_subprocess.return_value = b"3.12-5-g1a2b3c4\n"
 
         result = get_version_info()
 
-        assert result['version'] == '3.12'
-        assert result['fullversion'] == '3.12.5-g1a2b3c4'  # First hyphen becomes dot
-        assert result['versionstr'] == '3.12.5-g1a2b3c4'
+        assert result["version"] == "3.12"
+        # First hyphen becomes dot
+        assert result["fullversion"] == "3.12.5-g1a2b3c4"
+        assert result["versionstr"] == "3.12.5-g1a2b3c4"
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_fallback(self, mock_subprocess):
         """Test get_version_info fallback when git command fails."""
-        mock_subprocess.side_effect = subprocess.CalledProcessError(1, 'git')
+        mock_subprocess.side_effect = subprocess.CalledProcessError(1, "git")
 
         result = get_version_info()
 
-        assert result['version'] == '2.0.0'
-        assert result['fullversion'] == '2.0.0-dev'
-        assert result['versionstr'] == '2.0.0-dev'
+        assert result["version"] == "2.0.0"
+        assert result["fullversion"] == "2.0.0-dev"
+        assert result["versionstr"] == "2.0.0-dev"
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_no_features(self, mock_subprocess):
         """Test get_version_info when git is not available."""
         mock_subprocess.side_effect = FileNotFoundError("git command not found")
 
         result = get_version_info()
 
-        assert result['version'] == '2.0.0'
-        assert result['fullversion'] == '2.0.0-dev'
-        assert result['versionstr'] == '2.0.0-dev'
+        assert result["version"] == "2.0.0"
+        assert result["fullversion"] == "2.0.0-dev"
+        assert result["versionstr"] == "2.0.0-dev"
 
     def test_get_admin_feedback_counts_no_user(self):
         """Test get_admin_feedback_counts when no user_id provided."""
         result = get_admin_feedback_counts()
         assert result is None
 
-    @patch('app.utils.User')
+    @patch("app.utils.User")
     @pytest.mark.skip(reason="app.utils does not have User attribute error")
     def test_get_admin_feedback_counts_non_admin(self, mock_user_model):
         """Test get_admin_feedback_counts for non-admin user."""
@@ -217,11 +219,13 @@ class TestUtilsAdvanced:
         result = get_admin_feedback_counts(12345)
         assert result is None
 
-    @patch('app.utils.User')
-    @patch('app.utils.Feedback')
-    @patch('app.utils.FeedbackComment')
+    @patch("app.utils.User")
+    @patch("app.utils.Feedback")
+    @patch("app.utils.FeedbackComment")
     @pytest.mark.skip(reason="app.utils does not have FeedbackComment attribute error")
-    def test_get_admin_feedback_counts_with_user(self, mock_comment_model, mock_feedback_model, mock_user_model):
+    def test_get_admin_feedback_counts_with_user(
+        self, mock_comment_model, mock_feedback_model, mock_user_model
+    ):
         """Test get_admin_feedback_counts for admin user."""
         # Mock admin user
         mock_admin = MagicMock()
@@ -244,17 +248,19 @@ class TestUtilsAdvanced:
         # Mock latest comment (from non-admin)
         mock_latest_comment = MagicMock()
         mock_latest_comment.author_id = 99999  # Non-admin ID
-        mock_comment_model.query.filter_by.return_value.order_by.return_value.first.return_value = mock_latest_comment
+        mock_comment_model.query.filter_by.return_value.order_by.return_value.first.return_value = (
+            mock_latest_comment
+        )
 
         result = get_admin_feedback_counts(182085)
 
         assert result is not None
-        assert 'no_replies' in result
-        assert 'needs_followup' in result
-        assert result['no_replies'] == 3
-        assert result['needs_followup'] == 1
+        assert "no_replies" in result
+        assert "needs_followup" in result
+        assert result["no_replies"] == 3
+        assert result["needs_followup"] == 1
 
-    @patch('app.utils.User')
+    @patch("app.utils.User")
     @pytest.mark.skip(reason="app.utils does not have User attribute error")
     def test_get_admin_feedback_counts_database_error(self, mock_user_model):
         """Test get_admin_feedback_counts handles database errors gracefully."""
@@ -265,17 +271,16 @@ class TestUtilsAdvanced:
         mock_user_model.query.filter_by.return_value.first.return_value = mock_admin
 
         # Make admin query fail
-        mock_user_model.query.filter.side_effect = Exception("Database connection error")
+        mock_user_model.query.filter.side_effect = Exception(
+            "Database connection error"
+        )
 
         result = get_admin_feedback_counts(182085)
 
         # Should return default values on error
-        assert result == {
-            "no_replies": 0,
-            "needs_followup": 0
-        }
+        assert result == {"no_replies": 0, "needs_followup": 0}
 
-    @patch('flask.render_template')
+    @patch("flask.render_template")
     @pytest.mark.skip(reason="Template not found: test.html")
     def test_create_page_basic(self, mock_render_template):
         """Test create_page basic functionality."""
@@ -287,13 +292,13 @@ class TestUtilsAdvanced:
         args, kwargs = mock_render_template.call_args
 
         assert args[0] == "test.html"
-        assert 'title' in kwargs
-        assert kwargs['title'] == "Test Title"
-        assert 'extra_var' in kwargs
-        assert kwargs['extra_var'] == "test_value"
+        assert "title" in kwargs
+        assert kwargs["title"] == "Test Title"
+        assert "extra_var" in kwargs
+        assert kwargs["extra_var"] == "test_value"
 
-    @patch('flask.render_template')
-    @patch('flask.session')
+    @patch("flask.render_template")
+    @patch("flask.session")
     @pytest.mark.skip(reason="SQLAlchemy ProgrammingError with coroutine type")
     def test_create_page_with_session(self, mock_session, mock_render_template):
         """Test create_page with session data."""
@@ -305,15 +310,17 @@ class TestUtilsAdvanced:
         # Verify render_template was called
         mock_render_template.assert_called_once()
 
-    @patch('flask.render_template')
-    @patch('app.utils.get_version_info')
+    @patch("flask.render_template")
+    @patch("app.utils.get_version_info")
     @pytest.mark.skip(reason="Template not found: test.html")
-    def test_create_page_with_version_info(self, mock_version_info, mock_render_template):
+    def test_create_page_with_version_info(
+        self, mock_version_info, mock_render_template
+    ):
         """Test create_page includes version information."""
         mock_version_info.return_value = {
-            'version': '3.12',
-            'fullversion': '3.12.5-g1a2b3c4',
-            'versionstr': '3.12.5-g1a2b3c4'
+            "version": "3.12",
+            "fullversion": "3.12.5-g1a2b3c4",
+            "versionstr": "3.12.5-g1a2b3c4",
         }
         mock_render_template.return_value = "rendered_html"
 
@@ -321,8 +328,8 @@ class TestUtilsAdvanced:
 
         # Check that version info is passed to template
         args, kwargs = mock_render_template.call_args
-        assert 'version' in kwargs
-        assert kwargs['version'] == '3.12'
+        assert "version" in kwargs
+        assert kwargs["version"] == "3.12"
 
 
 def test_module_imports():
@@ -330,14 +337,14 @@ def test_module_imports():
     import app.utils
 
     # Verify required functions exist
-    assert hasattr(app.utils, 'initialize_utils')
-    assert hasattr(app.utils, 'dprint')
-    assert hasattr(app.utils, 'debug_print')
-    assert hasattr(app.utils, 'diff_month')
-    assert hasattr(app.utils, 'diff')
-    assert hasattr(app.utils, 'get_version_info')
-    assert hasattr(app.utils, 'get_admin_feedback_counts')
-    assert hasattr(app.utils, 'create_page')
+    assert hasattr(app.utils, "initialize_utils")
+    assert hasattr(app.utils, "dprint")
+    assert hasattr(app.utils, "debug_print")
+    assert hasattr(app.utils, "diff_month")
+    assert hasattr(app.utils, "diff")
+    assert hasattr(app.utils, "get_version_info")
+    assert hasattr(app.utils, "get_admin_feedback_counts")
+    assert hasattr(app.utils, "create_page")
 
     # Verify functions are callable
     assert callable(app.utils.initialize_utils)

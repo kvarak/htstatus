@@ -29,12 +29,12 @@ def setup_feedback_blueprint(app_instance, db_instance):
     db = db_instance
 
     # Add nl2br filter for formatting feedback text
-    @app_instance.template_filter('nl2br')
+    @app_instance.template_filter("nl2br")
     def nl2br_filter(text):
         """Convert newlines to HTML line breaks."""
         if not text:
-            return ''
-        return text.replace('\n', '<br>\n')
+            return ""
+        return text.replace("\n", "<br>\n")
 
 
 @feedback_bp.route("/", methods=["GET", "POST"])
@@ -76,7 +76,9 @@ def list_feedback():
             return redirect(url_for("feedback.list_feedback"))
 
         if not description or len(description) > 5000:
-            flash("Description is required and must be 5000 characters or less", "error")
+            flash(
+                "Description is required and must be 5000 characters or less", "error"
+            )
             return redirect(url_for("feedback.list_feedback"))
 
         # Create feedback
@@ -84,7 +86,7 @@ def list_feedback():
             title=title,
             feedback_type=feedback_type,
             description=description,
-            author_id=user.ht_id
+            author_id=user.ht_id,
         )
         db.session.add(feedback)
         db.session.commit()
@@ -93,10 +95,18 @@ def list_feedback():
         return redirect(url_for("feedback.list_feedback"))
 
     # Get active feedback (non-archived) ordered by vote score and creation date
-    active_feedback = Feedback.query.filter(~Feedback.archived).order_by(desc(Feedback.vote_score), desc(Feedback.created_at)).all()
+    active_feedback = (
+        Feedback.query.filter(~Feedback.archived)
+        .order_by(desc(Feedback.vote_score), desc(Feedback.created_at))
+        .all()
+    )
 
     # Get archived feedback ordered by creation date (newest first)
-    archived_feedback = Feedback.query.filter(Feedback.archived).order_by(desc(Feedback.created_at)).all()
+    archived_feedback = (
+        Feedback.query.filter(Feedback.archived)
+        .order_by(desc(Feedback.created_at))
+        .all()
+    )
     # Get user's votes for quick lookup
     user_votes = {}
     votes = FeedbackVote.query.filter_by(user_id=user.ht_id).all()
@@ -106,7 +116,7 @@ def list_feedback():
     user_context = {
         "user": user,
         "teams": session.get("all_teams", []),
-        "team_names": session.get("all_team_names", [])
+        "team_names": session.get("all_team_names", []),
     }
 
     return create_page(
@@ -115,7 +125,7 @@ def list_feedback():
         active_feedback=active_feedback,
         archived_feedback=archived_feedback,
         user_votes=user_votes,
-        user_context=user_context
+        user_context=user_context,
     )
 
 
@@ -139,7 +149,7 @@ def new_feedback():
     user_context = {
         "user": user,
         "teams": session.get("all_teams", []),
-        "team_names": session.get("all_team_names", [])
+        "team_names": session.get("all_team_names", []),
     }
 
     if request.method == "POST":
@@ -148,7 +158,10 @@ def new_feedback():
         description = request.form.get("description", "").strip()
         feedback_type = request.form.get("feedback_type", "").strip()
 
-        dprint(1, f"Form data - title: '{title}', description: '{description}', feedback_type: '{feedback_type}'")
+        dprint(
+            1,
+            f"Form data - title: '{title}', description: '{description}', feedback_type: '{feedback_type}'",
+        )
 
         # Validation
         if not title or len(title) < 5:
@@ -156,7 +169,7 @@ def new_feedback():
             return create_page(
                 template="feedback/new.html",
                 title="Submit Feedback",
-                user_context=user_context
+                user_context=user_context,
             )
 
         if not description or len(description) < 10:
@@ -164,7 +177,7 @@ def new_feedback():
             return create_page(
                 template="feedback/new.html",
                 title="Submit Feedback",
-                user_context=user_context
+                user_context=user_context,
             )
 
         if feedback_type not in ["bug", "feature", "idea"]:
@@ -172,7 +185,7 @@ def new_feedback():
             return create_page(
                 template="feedback/new.html",
                 title="Submit Feedback",
-                user_context=user_context
+                user_context=user_context,
             )
 
         # Create feedback
@@ -181,7 +194,7 @@ def new_feedback():
             title=title,
             description=description,
             feedback_type=feedback_type,
-            author_id=user.ht_id
+            author_id=user.ht_id,
         )
 
         try:
@@ -197,9 +210,7 @@ def new_feedback():
             flash("Error submitting feedback. Please try again.", "error")
 
     return create_page(
-        template="feedback/new.html",
-        title="Submit Feedback",
-        user_context=user_context
+        template="feedback/new.html", title="Submit Feedback", user_context=user_context
     )
 
 
@@ -225,13 +236,17 @@ def detail(id):
     user_vote = vote.vote_type if vote else None
 
     # Get comments ordered by creation date
-    comments = FeedbackComment.query.filter_by(feedback_id=id).order_by(FeedbackComment.created_at).all()
+    comments = (
+        FeedbackComment.query.filter_by(feedback_id=id)
+        .order_by(FeedbackComment.created_at)
+        .all()
+    )
 
     # Create minimal user context from session data (no CHPP calls)
     user_context = {
         "user": user,
         "teams": session.get("all_teams", []),
-        "team_names": session.get("all_team_names", [])
+        "team_names": session.get("all_team_names", []),
     }
 
     return create_page(
@@ -240,7 +255,7 @@ def detail(id):
         feedback=feedback,
         comments=comments,
         user_vote=user_vote,
-        user_context=user_context
+        user_context=user_context,
     )
 
 
@@ -264,8 +279,7 @@ def vote(id):
     try:
         # Check if user already voted
         existing_vote = FeedbackVote.query.filter_by(
-            feedback_id=id,
-            user_id=user_id
+            feedback_id=id, user_id=user_id
         ).first()
 
         if existing_vote:
@@ -280,9 +294,7 @@ def vote(id):
         else:
             # Create new vote
             new_vote = FeedbackVote(
-                feedback_id=id,
-                user_id=user_id,
-                vote_type=vote_type
+                feedback_id=id, user_id=user_id, vote_type=vote_type
             )
             db.session.add(new_vote)
             new_vote_type = vote_type
@@ -292,11 +304,13 @@ def vote(id):
         # Update vote score cache
         feedback.update_vote_score()
 
-        return jsonify({
-            "success": True,
-            "vote_score": feedback.vote_score,
-            "user_vote": new_vote_type
-        })
+        return jsonify(
+            {
+                "success": True,
+                "vote_score": feedback.vote_score,
+                "user_vote": new_vote_type,
+            }
+        )
 
     except Exception as e:
         db.session.rollback()
@@ -332,10 +346,7 @@ def add_comment(id):
     is_admin = user.is_admin()
 
     comment = FeedbackComment(
-        feedback_id=id,
-        author_id=user_id,
-        content=content,
-        is_admin=is_admin
+        feedback_id=id, author_id=user_id, content=content, is_admin=is_admin
     )
 
     try:

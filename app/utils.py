@@ -1,7 +1,7 @@
 """Shared utility functions for HT Status application."""
 
-import inspect
 from datetime import datetime
+import inspect
 
 from flask import current_app, render_template, session
 
@@ -79,7 +79,9 @@ def get_version_info():
 
     try:
         # Get git describe output - this will show the current version
-        versionstr_raw = subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
+        versionstr_raw = (
+            subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
+        )
 
         # Parse the git describe output
         if "-" in versionstr_raw:
@@ -145,14 +147,14 @@ def get_admin_feedback_counts(user_id=None):
 
         # Count feedback with no admin replies (simple approach for hobby scale)
         no_replies_query = Feedback.query.filter(
-            Feedback.status.in_(['open', 'planned', 'in-progress']),
+            Feedback.status.in_(["open", "planned", "in-progress"]),
             ~Feedback.archived,
             ~exists().where(
                 and_(
                     FeedbackComment.feedback_id == Feedback.id,
-                    FeedbackComment.author_id.in_(admin_user_ids)
+                    FeedbackComment.author_id.in_(admin_user_ids),
                 )
-            )
+            ),
         )
         no_replies = no_replies_query.count()
 
@@ -160,36 +162,32 @@ def get_admin_feedback_counts(user_id=None):
         # For hobby scale: check if latest comment is from non-admin after admin reply exists
         needs_followup = 0
         feedback_with_admin_replies = Feedback.query.filter(
-            Feedback.status.in_(['open', 'planned', 'in-progress']),
+            Feedback.status.in_(["open", "planned", "in-progress"]),
             ~Feedback.archived,
             exists().where(
                 and_(
                     FeedbackComment.feedback_id == Feedback.id,
-                    FeedbackComment.author_id.in_(admin_user_ids)
+                    FeedbackComment.author_id.in_(admin_user_ids),
                 )
-            )
+            ),
         ).all()
 
         for feedback in feedback_with_admin_replies:
             # Get latest comment for this feedback
-            latest_comment = FeedbackComment.query.filter_by(
-                feedback_id=feedback.id
-            ).order_by(FeedbackComment.created_at.desc()).first()
+            latest_comment = (
+                FeedbackComment.query.filter_by(feedback_id=feedback.id)
+                .order_by(FeedbackComment.created_at.desc())
+                .first()
+            )
 
             # If latest comment is from non-admin, needs follow-up
             if latest_comment and latest_comment.author_id not in admin_user_ids:
                 needs_followup += 1
 
-        return {
-            "no_replies": no_replies,
-            "needs_followup": needs_followup
-        }
+        return {"no_replies": no_replies, "needs_followup": needs_followup}
     except Exception:
         # Graceful degradation if feedback tables don't exist or other DB errors
-        return {
-            "no_replies": 0,
-            "needs_followup": 0
-        }
+        return {"no_replies": 0, "needs_followup": 0}
 
 
 # =============================================================================
@@ -433,7 +431,7 @@ def player_daily_changes(playerid, days_ago, team_name="Unknown Team"):
     try:
         from datetime import datetime, timedelta
 
-        from sqlalchemy import Date, cast, desc
+        from sqlalchemy import cast, Date, desc
 
         from models import Players
 
@@ -523,7 +521,7 @@ def get_player_changes(player_id, start_days_ago, end_days_ago):
     try:
         from datetime import datetime, timedelta
 
-        from sqlalchemy import Date, cast, desc
+        from sqlalchemy import cast, Date, desc
 
         from models import Players
 
@@ -587,7 +585,9 @@ def get_player_changes(player_id, start_days_ago, end_days_ago):
 
             if old_val != new_val:
                 attr_name = _format_attribute_name(attr)
-                changes.append([player_display_data, attr_name, old_val, new_val, change_type])
+                changes.append(
+                    [player_display_data, attr_name, old_val, new_val, change_type]
+                )
 
         return changes
 
@@ -607,7 +607,7 @@ def _get_player_display_name(player_id, player_record):
         str: "Player Name" or "Player Name (Group Name)" if group exists
     """
     display_data = _get_player_display_data(player_id, player_record)
-    return display_data['name']
+    return display_data["name"]
 
 
 def _get_player_display_data(player_id, player_record):
@@ -626,14 +626,16 @@ def _get_player_display_data(player_id, player_record):
             'bg_color': str        # Group background color or None
         }
     """
-    base_name = f"{player_record.first_name or ''} {player_record.last_name or ''}".strip()
+    base_name = (
+        f"{player_record.first_name or ''} {player_record.last_name or ''}".strip()
+    )
 
     result = {
-        'name': base_name,
-        'group_name': None,
-        'group_order': None,
-        'text_color': None,
-        'bg_color': None
+        "name": base_name,
+        "group_name": None,
+        "group_order": None,
+        "text_color": None,
+        "bg_color": None,
     }
 
     try:
@@ -646,6 +648,7 @@ def _get_player_display_data(player_id, player_record):
         # Import models using registry pattern with fallback
         try:
             from app.model_registry import get_group_model, get_player_setting_model
+
             PlayerSetting = get_player_setting_model()
             Group = get_group_model()
         except (ImportError, ValueError):
@@ -659,13 +662,15 @@ def _get_player_display_data(player_id, player_record):
         )
 
         if player_setting and player_setting.group_id:
-            group = db.session.query(Group).filter_by(id=player_setting.group_id).first()
+            group = (
+                db.session.query(Group).filter_by(id=player_setting.group_id).first()
+            )
             if group and group.name:
-                result['name'] = f"{base_name} ({group.name})"
-                result['group_name'] = group.name
-                result['group_order'] = group.order
-                result['text_color'] = group.textcolor
-                result['bg_color'] = group.bgcolor
+                result["name"] = f"{base_name} ({group.name})"
+                result["group_name"] = group.name
+                result["group_order"] = group.order
+                result["text_color"] = group.textcolor
+                result["bg_color"] = group.bgcolor
 
     except Exception as e:
         dprint(2, f"Group lookup failed for player {player_id}: {e}")
@@ -700,7 +705,8 @@ def calculateManmark(player):
             defender = player.get("defender", 0) or 0
 
         # Convert experience to a 0-20 scale for calculations
-        exp_rating = min(experience / 5.0, 20.0)  # Scale experience appropriately
+        # Scale experience appropriately
+        exp_rating = min(experience / 5.0, 20.0)
 
         # Calculate man-mark as combination of defender skill and experience
         manmark = (
@@ -723,46 +729,56 @@ def calculateContribution(position, player):
     try:
         # Map position codes to position IDs if needed
         position_code_to_id = {
-            "GC": 100,    # Goalkeeper contribution
-            "CD": 103,    # Central Defender Normal - using middle central defender
-            "CDO": 103,   # Central Defender Offensive - using middle central defender with offensive weighting
+            "GC": 100,  # Goalkeeper contribution
+            "CD": 103,  # Central Defender Normal - using middle central defender
+            "CDO": 103,  # Central Defender Offensive - using middle central defender with offensive weighting
             "CDTW": 102,  # Side Central Defender Towards Wing - using right central defender
-            "WBD": 101,   # Wing Back Defensive - using right back
-            "WBN": 101,   # Wingback Normal - using right back
-            "WBO": 101,   # Wing Back Offensive - using right back with offensive weighting
+            "WBD": 101,  # Wing Back Defensive - using right back
+            "WBN": 101,  # Wingback Normal - using right back
+            "WBO": 101,  # Wing Back Offensive - using right back with offensive weighting
             "WBTM": 101,  # Wingback Towards Middle - using right back
-            "WO": 106,    # Winger Offensive - using right winger
-            "WTM": 106,   # Winger Towards Middle - using right winger
-            "WN": 106,    # Winger Normal - using right winger
-            "WD": 106,    # Winger Defensive - using right winger with defensive weighting
-            "IMN": 108,   # Inner Midfielder Normal - using central inner midfield
-            "IMD": 108,   # Inner Midfielder Defensive - using central inner midfield
-            "IMO": 108,   # Inner Midfielder Offensive - using central inner midfield
+            "WO": 106,  # Winger Offensive - using right winger
+            "WTM": 106,  # Winger Towards Middle - using right winger
+            "WN": 106,  # Winger Normal - using right winger
+            "WD": 106,  # Winger Defensive - using right winger with defensive weighting
+            "IMN": 108,  # Inner Midfielder Normal - using central inner midfield
+            "IMD": 108,  # Inner Midfielder Defensive - using central inner midfield
+            "IMO": 108,  # Inner Midfielder Offensive - using central inner midfield
             "IMTW": 107,  # Inner Midfielder Towards Wing - using right inner midfield
-            "FW": 112,    # Forward Normal - using middle forward
-            "FTW": 111,   # Forward Towards Wing - using right forward
-            "DF": 112,    # Defensive Forward - using middle forward
+            "FW": 112,  # Forward Normal - using middle forward
+            "FTW": 111,  # Forward Towards Wing - using right forward
+            "DF": 112,  # Defensive Forward - using middle forward
         }
 
         # Convert position code to ID if it's a string
         if isinstance(position, str):
-            position = position_code_to_id.get(position, 108)  # Default to central midfield if not found
+            position = position_code_to_id.get(
+                position, 108
+            )  # Default to central midfield if not found
 
         # Position skill mappings based on Hattrick position requirements and tactical variations
         position_skills = {
             100: {"keeper": 1.0},  # Goalkeeper
-            101: {"defender": 0.7, "passing": 0.3},  # Right Back / Wing Back base
+            # Right Back / Wing Back base
+            101: {"defender": 0.7, "passing": 0.3},
             102: {"defender": 0.8, "passing": 0.2},  # Right Centre Back
-            103: {"defender": 0.8, "passing": 0.2},  # Centre Back / Central Defender base
+            103: {
+                "defender": 0.8,
+                "passing": 0.2,
+            },  # Centre Back / Central Defender base
             104: {"defender": 0.8, "passing": 0.2},  # Left Centre Back
             105: {"defender": 0.7, "passing": 0.3},  # Left Back
             106: {"winger": 0.7, "passing": 0.3},  # Right Winger / Winger base
             107: {"playmaker": 0.6, "passing": 0.4},  # Right Inner Midfield
-            108: {"playmaker": 0.8, "passing": 0.2},  # Central Inner Midfield / Inner Midfielder base
+            108: {
+                "playmaker": 0.8,
+                "passing": 0.2,
+            },  # Central Inner Midfield / Inner Midfielder base
             109: {"playmaker": 0.6, "passing": 0.4},  # Left Inner Midfield
             110: {"winger": 0.7, "passing": 0.3},  # Left Winger
             111: {"scorer": 0.6, "passing": 0.4},  # Right Forward
-            112: {"scorer": 0.8, "passing": 0.2},  # Central Forward / Forward base
+            # Central Forward / Forward base
+            112: {"scorer": 0.8, "passing": 0.2},
             113: {"scorer": 0.6, "passing": 0.4},  # Left Forward
         }
 
@@ -907,9 +923,7 @@ def calculate_team_statistics(players):
     total_league_goals = sum(
         get_player_attr(player, "league_goals") for player in players
     )
-    total_cup_goals = sum(
-        get_player_attr(player, "cup_goals") for player in players
-    )
+    total_cup_goals = sum(get_player_attr(player, "cup_goals") for player in players)
     total_friendlies_goals = sum(
         get_player_attr(player, "friendlies_goals") for player in players
     )
@@ -958,6 +972,7 @@ def get_top_scorers(players, limit=5, sort_by_ratio=False):
         limit: Maximum number of players to return
         sort_by_ratio: If True, sort by goals/match ratio instead of total goals
     """
+
     # Use the same helper function as calculate_team_statistics
     def get_player_attr(player, attr):
         # For SQLAlchemy objects, always use getattr
@@ -1004,7 +1019,10 @@ def get_top_scorers(players, limit=5, sort_by_ratio=False):
 
     if sort_by_ratio:
         # Sort by goals/match ratio (for players with at least 1 match)
-        all_players.sort(key=lambda p: (get_player_matches(p) > 0, get_goals_per_match(p)), reverse=True)
+        all_players.sort(
+            key=lambda p: (get_player_matches(p) > 0, get_goals_per_match(p)),
+            reverse=True,
+        )
     else:
         # Sort by total goals
         all_players.sort(key=get_player_goals, reverse=True)
@@ -1146,6 +1164,7 @@ def downloadRecentMatches(teamid, chpp=None):
         # Use provided CHPP client or create one
         if chpp is None:
             from app.chpp import CHPP
+
             consumer_key = current_app.config.get("CONSUMER_KEY")
             consumer_secret = current_app.config.get("CONSUMER_SECRETS")
 
@@ -1156,12 +1175,14 @@ def downloadRecentMatches(teamid, chpp=None):
                     "recent_count": 0,
                     "upcoming_count": 0,
                     "count": 0,
-                    "message": "CHPP configuration missing"
+                    "message": "CHPP configuration missing",
                 }
 
             chpp = CHPP(
-                consumer_key, consumer_secret,
-                session["access_key"], session["access_secret"]
+                consumer_key,
+                consumer_secret,
+                session["access_key"],
+                session["access_secret"],
             )
 
         dprint(2, f"Fetching recent/upcoming matches for team {teamid}")
@@ -1179,15 +1200,18 @@ def downloadRecentMatches(teamid, chpp=None):
         for match in matches:
             try:
                 # Parse match datetime - handle both string and datetime objects
-                if hasattr(match.datetime, 'year'):
+                if hasattr(match.datetime, "year"):
                     # Already a datetime object
                     match_datetime = match.datetime
                 elif match.datetime:
                     # String datetime - try multiple formats
                     try:
-                        match_datetime = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
+                        match_datetime = datetime.strptime(
+                            match.datetime, "%Y-%m-%d %H:%M:%S"
+                        )
                     except ValueError:
                         from dateutil import parser
+
                         match_datetime = parser.parse(match.datetime)
                 else:
                     # No datetime available - skip this match
@@ -1201,13 +1225,16 @@ def downloadRecentMatches(teamid, chpp=None):
                     upcoming_count += 1
 
                 # Save match to database (use enhanced processing)
-                added, updated, enhanced = _process_matches_enhanced([match], chpp, fetch_enhanced=True)
+                added, updated, enhanced = _process_matches_enhanced(
+                    [match], chpp, fetch_enhanced=True
+                )
                 total_added += added
                 total_enhanced += enhanced
 
             except Exception as e:
                 dprint(2, f"Warning: Could not process match {match.ht_id}: {str(e)}")
                 import traceback
+
                 dprint(3, f"Match processing error details: {traceback.format_exc()}")
                 continue
 
@@ -1222,7 +1249,7 @@ def downloadRecentMatches(teamid, chpp=None):
             "upcoming_count": upcoming_count,
             "count": total_added,
             "enhanced_count": total_enhanced,
-            "message": message
+            "message": message,
         }
 
     except Exception as e:
@@ -1234,7 +1261,7 @@ def downloadRecentMatches(teamid, chpp=None):
             "recent_count": 0,
             "upcoming_count": 0,
             "count": 0,
-            "message": error_msg
+            "message": error_msg,
         }
 
 
@@ -1258,12 +1285,15 @@ def downloadMatches(teamid, chpp=None):
         # Use provided CHPP client or create one
         if chpp is None:
             from app.chpp import CHPP
+
             consumer_key = current_app.config.get("CONSUMER_KEY")
             consumer_secret = current_app.config.get("CONSUMER_SECRETS")
 
             chpp = CHPP(
-                consumer_key, consumer_secret,
-                session["access_key"], session["access_secret"]
+                consumer_key,
+                consumer_secret,
+                session["access_key"],
+                session["access_secret"],
             )
 
         dprint(1, f"Downloading recent match archive for team {teamid}")
@@ -1276,15 +1306,17 @@ def downloadMatches(teamid, chpp=None):
             # Filter out matches older than 1 year to avoid historical contamination
             if matches_data:
                 from datetime import timedelta
+
                 cutoff_date = datetime.now() - timedelta(days=365)
                 recent_matches = []
 
                 for match in matches_data:
                     try:
-                        if hasattr(match.datetime, 'year'):
+                        if hasattr(match.datetime, "year"):
                             match_date = match.datetime
                         elif match.datetime:
                             from dateutil import parser
+
                             match_date = parser.parse(str(match.datetime))
                         else:
                             continue
@@ -1297,14 +1329,18 @@ def downloadMatches(teamid, chpp=None):
                         continue
 
                 matches_data = recent_matches
-                dprint(2, f"Filtered to {len(matches_data)} recent matches (last 1 year)")
+                dprint(
+                    2, f"Filtered to {len(matches_data)} recent matches (last 1 year)"
+                )
 
         except Exception as e:
             dprint(1, f"Warning: Could not fetch matches: {str(e)}")
             matches_data = []
 
         # Process matches
-        added, updated, enhanced = _process_matches_enhanced(matches_data, chpp, fetch_enhanced=True)
+        added, updated, enhanced = _process_matches_enhanced(
+            matches_data, chpp, fetch_enhanced=True
+        )
 
         message = f"Archive download complete: {added} new, {updated} updated"
         if enhanced > 0:
@@ -1316,18 +1352,18 @@ def downloadMatches(teamid, chpp=None):
             "count": added,
             "updated": updated,
             "enhanced_count": enhanced,
-            "message": message
+            "message": message,
         }
 
     except Exception as e:
         dprint(1, f"Error downloading match archive for team {teamid}: {str(e)}")
-        if 'db' in locals():
+        if "db" in locals():
             db.session.rollback()
         return {
             "success": False,
             "error": str(e),
             "count": 0,
-            "message": f"Archive download failed: {str(e)}"
+            "message": f"Archive download failed: {str(e)}",
         }
 
 
@@ -1348,14 +1384,18 @@ def _process_matches(matches):
     for match in matches:
         try:
             # Parse match datetime
-            if hasattr(match.datetime, 'year'):
+            if hasattr(match.datetime, "year"):
                 thedate = datetime(
-                    match.datetime.year, match.datetime.month, match.datetime.day,
-                    match.datetime.hour, match.datetime.minute,
+                    match.datetime.year,
+                    match.datetime.month,
+                    match.datetime.day,
+                    match.datetime.hour,
+                    match.datetime.minute,
                 )
             elif match.datetime:
                 try:
                     from dateutil import parser
+
                     thedate = parser.parse(match.datetime)
                 except Exception:
                     thedate = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
@@ -1363,7 +1403,10 @@ def _process_matches(matches):
                 dprint(2, f"No datetime for match {match.ht_id}, skipping")
                 continue
 
-            dprint(3, f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}")
+            dprint(
+                3,
+                f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}",
+            )
 
             # Check if match already exists
             dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
@@ -1422,6 +1465,7 @@ def fetch_enhanced_match_data(match_id, chpp=None):
 
     if chpp is None:
         from app.chpp import CHPP
+
         consumer_key = current_app.config.get("CONSUMER_KEY")
         consumer_secret = current_app.config.get("CONSUMER_SECRETS")
 
@@ -1429,8 +1473,10 @@ def fetch_enhanced_match_data(match_id, chpp=None):
             return {}
 
         chpp = CHPP(
-            consumer_key, consumer_secret,
-            session["access_key"], session["access_secret"]
+            consumer_key,
+            consumer_secret,
+            session["access_key"],
+            session["access_secret"],
         )
 
     enhanced_data = {}
@@ -1443,106 +1489,134 @@ def fetch_enhanced_match_data(match_id, chpp=None):
         # Calculate average possession for debug output
         home_poss_avg = None
         away_poss_avg = None
-        if (details.possession_first_half_home is not None and
-            details.possession_second_half_home is not None):
-            home_poss_avg = (details.possession_first_half_home + details.possession_second_half_home) / 2
-        if (details.possession_first_half_away is not None and
-            details.possession_second_half_away is not None):
-            away_poss_avg = (details.possession_first_half_away + details.possession_second_half_away) / 2
+        if (
+            details.possession_first_half_home is not None
+            and details.possession_second_half_home is not None
+        ):
+            home_poss_avg = (
+                details.possession_first_half_home + details.possession_second_half_home
+            ) / 2
+        if (
+            details.possession_first_half_away is not None
+            and details.possession_second_half_away is not None
+        ):
+            away_poss_avg = (
+                details.possession_first_half_away + details.possession_second_half_away
+            ) / 2
 
         # Calculate total chances for debug output
-        home_total = sum(filter(None, [
-            details.home_team_chances_left,
-            details.home_team_chances_center,
-            details.home_team_chances_right,
-            details.home_team_chances_special,
-            details.home_team_chances_other
-        ]))
-        away_total = sum(filter(None, [
-            details.away_team_chances_left,
-            details.away_team_chances_center,
-            details.away_team_chances_right,
-            details.away_team_chances_special,
-            details.away_team_chances_other
-        ]))
+        home_total = sum(
+            filter(
+                None,
+                [
+                    details.home_team_chances_left,
+                    details.home_team_chances_center,
+                    details.home_team_chances_right,
+                    details.home_team_chances_special,
+                    details.home_team_chances_other,
+                ],
+            )
+        )
+        away_total = sum(
+            filter(
+                None,
+                [
+                    details.away_team_chances_left,
+                    details.away_team_chances_center,
+                    details.away_team_chances_right,
+                    details.away_team_chances_special,
+                    details.away_team_chances_other,
+                ],
+            )
+        )
 
         # Debug: Check what we actually got from CHPP
-        dprint(3, f"  CHPP returned - possession: {home_poss_avg}/{away_poss_avg}, "
-               f"chances: {home_total}/{away_total}, "
-               f"attendance: {details.attendance}")
+        dprint(
+            3,
+            f"  CHPP returned - possession: {home_poss_avg}/{away_poss_avg}, "
+            f"chances: {home_total}/{away_total}, "
+            f"attendance: {details.attendance}",
+        )
 
-        enhanced_data.update({
-            "possession_first_half_home": details.possession_first_half_home,
-            "possession_first_half_away": details.possession_first_half_away,
-            "possession_second_half_home": details.possession_second_half_home,
-            "possession_second_half_away": details.possession_second_half_away,
-            "home_team_chances_left": details.home_team_chances_left,
-            "home_team_chances_center": details.home_team_chances_center,
-            "home_team_chances_right": details.home_team_chances_right,
-            "home_team_chances_special": details.home_team_chances_special,
-            "home_team_chances_other": details.home_team_chances_other,
-            "away_team_chances_left": details.away_team_chances_left,
-            "away_team_chances_center": details.away_team_chances_center,
-            "away_team_chances_right": details.away_team_chances_right,
-            "away_team_chances_special": details.away_team_chances_special,
-            "away_team_chances_other": details.away_team_chances_other,
-            "home_team_rating": details.home_team_rating,
-            "away_team_rating": details.away_team_rating,
-            "home_team_rating_right_def": details.home_team_rating_right_def,
-            "home_team_rating_mid_def": details.home_team_rating_mid_def,
-            "home_team_rating_left_def": details.home_team_rating_left_def,
-            "away_team_rating_right_def": details.away_team_rating_right_def,
-            "away_team_rating_mid_def": details.away_team_rating_mid_def,
-            "away_team_rating_left_def": details.away_team_rating_left_def,
-            "home_team_rating_right_att": details.home_team_rating_right_att,
-            "home_team_rating_mid_att": details.home_team_rating_mid_att,
-            "home_team_rating_left_att": details.home_team_rating_left_att,
-            "away_team_rating_right_att": details.away_team_rating_right_att,
-            "away_team_rating_mid_att": details.away_team_rating_mid_att,
-            "away_team_rating_left_att": details.away_team_rating_left_att,
-            "home_team_rating_set_pieces_def": details.home_team_rating_set_pieces_def,
-            "home_team_rating_set_pieces_att": details.home_team_rating_set_pieces_att,
-            "away_team_rating_set_pieces_def": details.away_team_rating_set_pieces_def,
-            "away_team_rating_set_pieces_att": details.away_team_rating_set_pieces_att,
-            "attendance": details.attendance,
-            "arena_capacity_terraces": details.arena_capacity_terraces,
-            "arena_capacity_basic": details.arena_capacity_basic,
-            "arena_capacity_roof": details.arena_capacity_roof,
-            "arena_capacity_vip": details.arena_capacity_vip,
-            "weather_id": details.weather_id,
-            "added_minutes": details.added_minutes,
-            "referee_id": details.referee_id,
-            "referee_name": details.referee_name,
-            "referee_country_id": details.referee_country_id,
-            "referee_country": details.referee_country,
-            "referee_team_id": details.referee_team_id,
-            "referee_team_name": details.referee_team_name,
-            "home_team_dress_uri": details.home_team_dress_uri,
-            "away_team_dress_uri": details.away_team_dress_uri,
-            "home_team_attitude": details.home_team_attitude,
-            "away_team_attitude": details.away_team_attitude,
-            "home_team_tactic_type": details.home_team_tactic_type,
-            "home_team_tactic_skill": details.home_team_tactic_skill,
-            "away_team_tactic_type": details.away_team_tactic_type,
-            "away_team_tactic_skill": details.away_team_tactic_skill,
-        })
+        enhanced_data.update(
+            {
+                "possession_first_half_home": details.possession_first_half_home,
+                "possession_first_half_away": details.possession_first_half_away,
+                "possession_second_half_home": details.possession_second_half_home,
+                "possession_second_half_away": details.possession_second_half_away,
+                "home_team_chances_left": details.home_team_chances_left,
+                "home_team_chances_center": details.home_team_chances_center,
+                "home_team_chances_right": details.home_team_chances_right,
+                "home_team_chances_special": details.home_team_chances_special,
+                "home_team_chances_other": details.home_team_chances_other,
+                "away_team_chances_left": details.away_team_chances_left,
+                "away_team_chances_center": details.away_team_chances_center,
+                "away_team_chances_right": details.away_team_chances_right,
+                "away_team_chances_special": details.away_team_chances_special,
+                "away_team_chances_other": details.away_team_chances_other,
+                "home_team_rating": details.home_team_rating,
+                "away_team_rating": details.away_team_rating,
+                "home_team_rating_right_def": details.home_team_rating_right_def,
+                "home_team_rating_mid_def": details.home_team_rating_mid_def,
+                "home_team_rating_left_def": details.home_team_rating_left_def,
+                "away_team_rating_right_def": details.away_team_rating_right_def,
+                "away_team_rating_mid_def": details.away_team_rating_mid_def,
+                "away_team_rating_left_def": details.away_team_rating_left_def,
+                "home_team_rating_right_att": details.home_team_rating_right_att,
+                "home_team_rating_mid_att": details.home_team_rating_mid_att,
+                "home_team_rating_left_att": details.home_team_rating_left_att,
+                "away_team_rating_right_att": details.away_team_rating_right_att,
+                "away_team_rating_mid_att": details.away_team_rating_mid_att,
+                "away_team_rating_left_att": details.away_team_rating_left_att,
+                "home_team_rating_set_pieces_def": details.home_team_rating_set_pieces_def,
+                "home_team_rating_set_pieces_att": details.home_team_rating_set_pieces_att,
+                "away_team_rating_set_pieces_def": details.away_team_rating_set_pieces_def,
+                "away_team_rating_set_pieces_att": details.away_team_rating_set_pieces_att,
+                "attendance": details.attendance,
+                "arena_capacity_terraces": details.arena_capacity_terraces,
+                "arena_capacity_basic": details.arena_capacity_basic,
+                "arena_capacity_roof": details.arena_capacity_roof,
+                "arena_capacity_vip": details.arena_capacity_vip,
+                "weather_id": details.weather_id,
+                "added_minutes": details.added_minutes,
+                "referee_id": details.referee_id,
+                "referee_name": details.referee_name,
+                "referee_country_id": details.referee_country_id,
+                "referee_country": details.referee_country,
+                "referee_team_id": details.referee_team_id,
+                "referee_team_name": details.referee_team_name,
+                "home_team_dress_uri": details.home_team_dress_uri,
+                "away_team_dress_uri": details.away_team_dress_uri,
+                "home_team_attitude": details.home_team_attitude,
+                "away_team_attitude": details.away_team_attitude,
+                "home_team_tactic_type": details.home_team_tactic_type,
+                "home_team_tactic_skill": details.home_team_tactic_skill,
+                "away_team_tactic_type": details.away_team_tactic_type,
+                "away_team_tactic_skill": details.away_team_tactic_skill,
+            }
+        )
 
         # Fetch match lineup for formation and tactical data
         dprint(3, f"Fetching match lineup for match {match_id}")
         lineup = chpp.matchlineup(id_=match_id)
 
-        enhanced_data.update({
-            "home_team_formation": lineup.home_team_formation,
-            "away_team_formation": lineup.away_team_formation,
-            "home_team_tactic": lineup.home_team_tactic,
-            "away_team_tactic": lineup.away_team_tactic,
-        })
+        enhanced_data.update(
+            {
+                "home_team_formation": lineup.home_team_formation,
+                "away_team_formation": lineup.away_team_formation,
+                "home_team_tactic": lineup.home_team_tactic,
+                "away_team_tactic": lineup.away_team_tactic,
+            }
+        )
 
         # Filter out None values - only save fields that have actual data
         enhanced_data = {k: v for k, v in enhanced_data.items() if v is not None}
 
         if enhanced_data:
-            dprint(2, f"Successfully fetched enhanced data for match {match_id}: {len(enhanced_data)} fields")
+            dprint(
+                2,
+                f"Successfully fetched enhanced data for match {match_id}: {len(enhanced_data)} fields",
+            )
         else:
             dprint(2, f"No enhanced data available for match {match_id}")
 
@@ -1570,7 +1644,9 @@ def update_match_with_enhanced_data(match_id, enhanced_data):
         dbmatch = db.session.query(Match).filter_by(ht_id=match_id).first()
 
         if not dbmatch:
-            dprint(2, f"Match {match_id} not found in database for enhanced data update")
+            dprint(
+                2, f"Match {match_id} not found in database for enhanced data update"
+            )
             return False
 
         # Update with enhanced data
@@ -1610,14 +1686,18 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
     for match in matches:
         try:
             # Parse match datetime
-            if hasattr(match.datetime, 'year'):
+            if hasattr(match.datetime, "year"):
                 thedate = datetime(
-                    match.datetime.year, match.datetime.month, match.datetime.day,
-                    match.datetime.hour, match.datetime.minute,
+                    match.datetime.year,
+                    match.datetime.month,
+                    match.datetime.day,
+                    match.datetime.hour,
+                    match.datetime.minute,
                 )
             elif match.datetime:
                 try:
                     from dateutil import parser
+
                     thedate = parser.parse(match.datetime)
                 except Exception:
                     thedate = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
@@ -1625,13 +1705,16 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
                 dprint(2, f"No datetime for match {match.ht_id}, skipping")
                 continue
 
-            dprint(3, f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}")
+            dprint(
+                3,
+                f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}",
+            )
 
             # Check if match already exists
             dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
 
             # Determine if match is finished (has goals scored)
-            is_finished = (match.home_goals is not None and match.away_goals is not None)
+            is_finished = match.home_goals is not None and match.away_goals is not None
 
             if dbmatch:
                 # Update existing match
@@ -1735,7 +1818,10 @@ def create_default_groups(user_id):
     # Check if user already has groups
     existing_groups = Group.query.filter_by(user_id=user_id).count()
     if existing_groups > 0:
-        dprint(2, f"User {user_id} already has {existing_groups} groups, skipping default creation")
+        dprint(
+            2,
+            f"User {user_id} already has {existing_groups} groups, skipping default creation",
+        )
         return []
 
     # Default groups with football theme colors and spacing for customization
@@ -1744,38 +1830,38 @@ def create_default_groups(user_id):
             "name": "Goalkeepers",
             "order": 10,
             "textcolor": "#FFFFFF",
-            "bgcolor": "#001f3f"  # Navy blue
+            "bgcolor": "#001f3f",  # Navy blue
         },
         {
             "name": "Defenders",
             "order": 20,
             "textcolor": "#FFFFFF",
-            "bgcolor": "#0074D9"  # Blue
+            "bgcolor": "#0074D9",  # Blue
         },
         {
             "name": "Wing Defenders",
             "order": 30,
             "textcolor": "#FFFFFF",
-            "bgcolor": "#2ECC40"  # Green
+            "bgcolor": "#2ECC40",  # Green
         },
         {
             "name": "Midfielders",
             "order": 40,
             "textcolor": "#000000",
-            "bgcolor": "#FFFFFF"  # White
+            "bgcolor": "#FFFFFF",  # White
         },
         {
             "name": "Wingers",
             "order": 50,
             "textcolor": "#FFFFFF",
-            "bgcolor": "#B10DC9"  # Purple
+            "bgcolor": "#B10DC9",  # Purple
         },
         {
             "name": "Forwards",
             "order": 60,
             "textcolor": "#FFFFFF",
-            "bgcolor": "#FF4136"  # Red
-        }
+            "bgcolor": "#FF4136",  # Red
+        },
     ]
 
     created_groups = []
@@ -1787,7 +1873,7 @@ def create_default_groups(user_id):
                 name=group_data["name"],
                 order=group_data["order"],
                 textcolor=group_data["textcolor"],
-                bgcolor=group_data["bgcolor"]
+                bgcolor=group_data["bgcolor"],
             )
             db.session.add(group)
             created_groups.append(group)
@@ -1823,7 +1909,7 @@ FORMATION_TEMPLATES = {
             108: {"row": 3, "col": 3, "name": "Central Midfield"},  # CM
             109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},  # LIM
             110: {"row": 3, "col": 1, "name": "Left Midfielder"},  # LM
-        }
+        },
     },
     "5-4-1": {
         "name": "5-4-1 (Defensive Counter)",
@@ -1840,7 +1926,7 @@ FORMATION_TEMPLATES = {
             109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
             110: {"row": 3, "col": 1, "name": "Left Midfielder"},
             112: {"row": 4, "col": 3, "name": "Centre Forward"},
-        }
+        },
     },
     "5-3-2": {
         "name": "5-3-2 (Wing Backs)",
@@ -1857,7 +1943,7 @@ FORMATION_TEMPLATES = {
             109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
+        },
     },
     "5-2-3": {
         "name": "5-2-3 (Attack)",
@@ -1874,7 +1960,7 @@ FORMATION_TEMPLATES = {
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             112: {"row": 4, "col": 3, "name": "Centre Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
+        },
     },
     "4-5-1": {
         "name": "4-5-1 (Control)",
@@ -1891,7 +1977,7 @@ FORMATION_TEMPLATES = {
             109: {"row": 3, "col": 2, "name": "Left Inner Midfield"},
             110: {"row": 3, "col": 1, "name": "Left Midfielder"},
             112: {"row": 4, "col": 3, "name": "Centre Forward"},
-        }
+        },
     },
     "4-4-2": {
         "name": "4-4-2 (Classic)",
@@ -1908,7 +1994,7 @@ FORMATION_TEMPLATES = {
             110: {"row": 3, "col": 1, "name": "Left Midfielder"},
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
+        },
     },
     "4-3-3": {
         "name": "4-3-3 (Attacking)",
@@ -1925,7 +2011,7 @@ FORMATION_TEMPLATES = {
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             112: {"row": 4, "col": 3, "name": "Centre Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
+        },
     },
     "3-5-2": {
         "name": "3-5-2 (Midfield)",
@@ -1942,7 +2028,7 @@ FORMATION_TEMPLATES = {
             110: {"row": 3, "col": 1, "name": "Left Midfielder"},
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
+        },
     },
     "3-4-3": {
         "name": "3-4-3 (All-out Attack)",
@@ -1959,7 +2045,7 @@ FORMATION_TEMPLATES = {
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             112: {"row": 4, "col": 3, "name": "Centre Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
+        },
     },
     "2-5-3": {
         "name": "2-5-3 (Ultra Attack)",
@@ -1976,8 +2062,8 @@ FORMATION_TEMPLATES = {
             111: {"row": 4, "col": 4, "name": "Right Forward"},
             112: {"row": 4, "col": 3, "name": "Centre Forward"},
             113: {"row": 4, "col": 2, "name": "Left Forward"},
-        }
-    }
+        },
+    },
 }
 
 
@@ -2005,21 +2091,21 @@ def calculate_formation_effectiveness(formation_key, player_assignments):
             position_scores[position_id] = {
                 "contribution": contribution,
                 "position_name": formation["positions"][position_id]["name"],
-                "player_name": f"{getattr(player, 'first_name', '')} {getattr(player, 'last_name', '')}"
+                "player_name": f"{getattr(player, 'first_name', '')} {getattr(player, 'last_name', '')}",
             }
             total_score += contribution
         else:
             position_scores[position_id] = {
                 "contribution": 0,
                 "position_name": formation["positions"][position_id]["name"],
-                "player_name": "No player assigned"
+                "player_name": "No player assigned",
             }
 
     return {
         "total_score": round(total_score, 2),
         "average_score": round(total_score / len(formation["positions"]), 2),
         "position_scores": position_scores,
-        "formation_name": formation["name"]
+        "formation_name": formation["name"],
     }
 
 
@@ -2058,7 +2144,7 @@ def get_team_timeline(team_id):
         from models import Players
 
         # Get db from current Flask app context if not set globally
-        current_db = db if db is not None else current_app.extensions['sqlalchemy'].db
+        current_db = db if db is not None else current_app.extensions["sqlalchemy"].db
 
         # Get all players for this team from current roster
         latest_players = (
@@ -2102,10 +2188,10 @@ def get_team_timeline(team_id):
                 player_data = change[0]  # First element is player display data
                 if isinstance(player_data, dict):
                     # Sort by group order (None values last), then by player name
-                    group_order = player_data.get('group_order')
+                    group_order = player_data.get("group_order")
                     if group_order is None:
                         group_order = 9999  # Put players without groups at the end
-                    player_name = player_data.get('name', '')
+                    player_name = player_data.get("name", "")
                     return (group_order, player_name)
                 else:
                     # Legacy string format - use as is
@@ -2118,4 +2204,3 @@ def get_team_timeline(team_id):
     except Exception as e:
         dprint(1, f"Error in get_team_timeline: {e}")
         return {}
-

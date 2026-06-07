@@ -32,7 +32,9 @@ def training():
 
     # Track user activity
     User = get_user_model()
-    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    current_user = (
+        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    )
     if current_user:
         current_user.training()
         db.session.commit()
@@ -108,8 +110,8 @@ def training():
 
     for i in allplayers:
         # Date filler
-        (firstdate, previousskill) = allplayers[i][0]
-        (lastdate, x) = allplayers[i][len(allplayers[i]) - 1]
+        firstdate, previousskill = allplayers[i][0]
+        lastdate, x = allplayers[i][len(allplayers[i]) - 1]
 
         friday = (
             firstdate
@@ -134,7 +136,7 @@ def training():
         # Just take every 7th
         weekly = newy[0::7]
         # add the last day if it's not the last day already
-        (lastweekday, x) = weekly[len(weekly) - 1]
+        lastweekday, x = weekly[len(weekly) - 1]
         if lastdate != lastweekday:
             weekly.append(allplayers[i][len(allplayers[i]) - 1])
 
@@ -184,10 +186,7 @@ def training():
             .order_by(text("data_date DESC"))
             .first()
         )
-        player_info[player_id] = {
-            'first': first_record,
-            'latest': latest_record
-        }
+        player_info[player_id] = {"first": first_record, "latest": latest_record}
 
     return create_page(
         template="training.html",

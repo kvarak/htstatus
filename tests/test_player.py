@@ -361,7 +361,8 @@ class TestPlayerDataDisplay:
         authenticated_client = setup_authenticated_session(client, user)
 
         # Set custom columns
-        user.player_columns = '["Name", "Age", "TSI"]'  # Custom column configuration
+        # Custom column configuration
+        user.player_columns = '["Name", "Age", "TSI"]'
         db_session.commit()
 
         response = authenticated_client.get("/player?id=12345")

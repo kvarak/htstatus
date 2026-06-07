@@ -1,7 +1,7 @@
 """Tests for app/utils.py - Utility functions."""
 
-import subprocess
 from datetime import datetime
+import subprocess
 from unittest.mock import Mock, patch
 
 import pytest
@@ -30,6 +30,7 @@ from app.utils import (
 def test_module_imports():
     """Test that utils module imports without errors."""
     import app.utils
+
     assert app.utils is not None
 
 
@@ -45,6 +46,7 @@ class TestInitializeUtils:
         initialize_utils(mock_app, mock_db, debug_level_value)
 
         import app.utils
+
         assert app.utils.db == mock_db
         assert app.utils.debug_level == debug_level_value
 
@@ -52,8 +54,8 @@ class TestInitializeUtils:
 class TestDebugPrint:
     """Test debug printing functions."""
 
-    @patch('app.utils.debug_level', 2)
-    @patch('builtins.print')
+    @patch("app.utils.debug_level", 2)
+    @patch("builtins.print")
     def test_dprint_prints_when_level_allowed(self, mock_print):
         """Test dprint prints when debug level allows."""
         dprint(1, "test", "message")
@@ -65,24 +67,24 @@ class TestDebugPrint:
         assert "test" in str(args)
         assert "message" in str(args)
 
-    @patch('app.utils.debug_level', 0)
-    @patch('builtins.print')
+    @patch("app.utils.debug_level", 0)
+    @patch("builtins.print")
     def test_dprint_doesnt_print_when_level_too_high(self, mock_print):
         """Test dprint doesn't print when debug level too low."""
         dprint(1, "test", "message")
 
         mock_print.assert_not_called()
 
-    @patch('app.utils.debug_level', None)
-    @patch('builtins.print')
+    @patch("app.utils.debug_level", None)
+    @patch("builtins.print")
     def test_dprint_prints_when_debug_level_none(self, mock_print):
         """Test dprint prints when debug_level is None."""
         dprint(1, "test", "message")
 
         mock_print.assert_called_once()
 
-    @patch('app.utils.debug_level', 2)
-    @patch('builtins.print')
+    @patch("app.utils.debug_level", 2)
+    @patch("builtins.print")
     def test_debug_print_enhanced_format(self, mock_print):
         """Test debug_print with enhanced route formatting."""
         debug_print("test_route", "test_function", "arg1", "arg2")
@@ -93,8 +95,8 @@ class TestDebugPrint:
         assert "arg1" in args
         assert "arg2" in args
 
-    @patch('app.utils.debug_level', 1)
-    @patch('builtins.print')
+    @patch("app.utils.debug_level", 1)
+    @patch("builtins.print")
     def test_debug_print_doesnt_print_low_level(self, mock_print):
         """Test debug_print doesn't print when debug level too low."""
         debug_print("test_route", "test_function", "arg1")
@@ -160,7 +162,7 @@ class TestDateUtilities:
 class TestVersionInfo:
     """Test version detection utilities."""
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_with_git_tags(self, mock_subprocess):
         """Test get_version_info with git tag output."""
         # Mock git describe output - commits ahead of tag
@@ -172,7 +174,7 @@ class TestVersionInfo:
         assert result["fullversion"] == "3.12.1.gedd7f4a"
         assert result["versionstr"] == "3.12.1.gedd7f4a"
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_no_features(self, mock_subprocess):
         """Test get_version_info with exact tag match (no commits ahead)."""
         mock_subprocess.return_value = b"3.12"
@@ -183,7 +185,9 @@ class TestVersionInfo:
         assert result["fullversion"] == "3.12"
         assert result["versionstr"] == "3.12"
 
-    @patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(1, 'git'))
+    @patch(
+        "subprocess.check_output", side_effect=subprocess.CalledProcessError(1, "git")
+    )
     def test_get_version_info_fallback(self, mock_subprocess):
         """Test get_version_info fallback when git fails."""
         result = get_version_info()
@@ -192,7 +196,7 @@ class TestVersionInfo:
         assert result["fullversion"] == "2.0.0-dev"
         assert result["versionstr"] == "2.0.0-dev"
 
-    @patch('subprocess.check_output')
+    @patch("subprocess.check_output")
     def test_get_version_info_simple_tag(self, mock_subprocess):
         """Test get_version_info with simple tag (no build info)."""
         mock_subprocess.return_value = b"v1.0"
@@ -214,12 +218,14 @@ class TestCreatePage:
 
         self.app = create_app(TestConfig, include_routes=False)
 
-    @patch('app.utils.render_template')
-    @patch('app.utils.get_version_info')
+    @patch("app.utils.render_template")
+    @patch("app.utils.get_version_info")
     def test_create_page_basic(self, mock_version_info, mock_render):
         """Test create_page with basic parameters."""
         mock_version_info.return_value = {
-            "version": "2.0", "fullversion": "2.0.0-dev", "versionstr": "2.0.0-dev"
+            "version": "2.0",
+            "fullversion": "2.0.0-dev",
+            "versionstr": "2.0.0-dev",
         }
         mock_render.return_value = "rendered_template"
 
@@ -232,16 +238,21 @@ class TestCreatePage:
             # Check template variables
             call_kwargs = mock_render.call_args[1]
             assert call_kwargs["title"] == "Test Title"
-            assert call_kwargs["apptitle"] == "HattrickPlanner"  # Matches config.py
+            # Matches config.py
+            assert call_kwargs["apptitle"] == "HattrickPlanner"
             assert call_kwargs["version"] == "2.0"
 
-    @patch('app.utils.render_template')
-    @patch('app.utils.get_version_info')
-    @patch('models.User')
-    def test_create_page_with_session(self, mock_user_model, mock_version_info, mock_render):
+    @patch("app.utils.render_template")
+    @patch("app.utils.get_version_info")
+    @patch("models.User")
+    def test_create_page_with_session(
+        self, mock_user_model, mock_version_info, mock_render
+    ):
         """Test create_page with user session data."""
         mock_version_info.return_value = {
-            "version": "2.0", "fullversion": "2.0.0-dev", "versionstr": "2.0.0-dev"
+            "version": "2.0",
+            "fullversion": "2.0.0-dev",
+            "versionstr": "2.0.0-dev",
         }
         mock_render.return_value = "rendered_template"
 
@@ -250,6 +261,7 @@ class TestCreatePage:
 
         with self.app.test_request_context():
             from flask import session
+
             session["current_user"] = "testuser"
             session["current_user_id"] = 12345
             session["all_teams"] = [54321]
@@ -262,13 +274,17 @@ class TestCreatePage:
             assert call_kwargs["current_user_id"] == 12345
             assert call_kwargs["all_teams"] == [54321]
 
-    @patch('app.utils.render_template')
-    @patch('app.utils.get_version_info')
-    @patch('models.User')
-    def test_create_page_with_admin_user(self, mock_user, mock_version_info, mock_render):
+    @patch("app.utils.render_template")
+    @patch("app.utils.get_version_info")
+    @patch("models.User")
+    def test_create_page_with_admin_user(
+        self, mock_user, mock_version_info, mock_render
+    ):
         """Test create_page with admin user role."""
         mock_version_info.return_value = {
-            "version": "2.0", "fullversion": "2.0.0-dev", "versionstr": "2.0.0-dev"
+            "version": "2.0",
+            "fullversion": "2.0.0-dev",
+            "versionstr": "2.0.0-dev",
         }
         mock_render.return_value = "rendered_template"
 
@@ -284,6 +300,7 @@ class TestCreatePage:
 
             with self.app.test_request_context():
                 from flask import session
+
                 session["current_user"] = "admin"
                 session["current_user_id"] = 12345
 
@@ -292,12 +309,14 @@ class TestCreatePage:
                 call_kwargs = mock_render.call_args[1]
                 assert call_kwargs["role"] == "Admin"
 
-    @patch('app.utils.render_template')
-    @patch('app.utils.get_version_info')
+    @patch("app.utils.render_template")
+    @patch("app.utils.get_version_info")
     def test_create_page_with_custom_kwargs(self, mock_version_info, mock_render):
         """Test create_page with additional custom template variables."""
         mock_version_info.return_value = {
-            "version": "2.0", "fullversion": "2.0.0-dev", "versionstr": "2.0.0-dev"
+            "version": "2.0",
+            "fullversion": "2.0.0-dev",
+            "versionstr": "2.0.0-dev",
         }
         mock_render.return_value = "rendered_template"
 
@@ -450,9 +469,17 @@ class TestGetPlayerChanges:
 
         # Set defaults for all expected attributes
         defaults = {
-            "keeper": 0, "defender": 0, "playmaker": 0, "winger": 0,
-            "passing": 0, "scorer": 0, "set_pieces": 0, "experience": 0,
-            "age_years": 25, "cards": 0, "injury_level": -1
+            "keeper": 0,
+            "defender": 0,
+            "playmaker": 0,
+            "winger": 0,
+            "passing": 0,
+            "scorer": 0,
+            "set_pieces": 0,
+            "experience": 0,
+            "age_years": 25,
+            "cards": 0,
+            "injury_level": -1,
         }
         defaults.update(kwargs)
 
@@ -461,25 +488,30 @@ class TestGetPlayerChanges:
 
         return record
 
-    @patch('app.utils.db')
-    @patch('app.utils._get_player_display_data')
+    @patch("app.utils.db")
+    @patch("app.utils._get_player_display_data")
     def test_get_player_changes_basic_functionality(self, mock_display_data, mock_db):
         """Test basic get_player_changes functionality."""
         from app.utils import get_player_changes
 
-        old_record = self._create_mock_player_record("Test", "Player", datetime(2024, 1, 8), keeper=5)
-        new_record = self._create_mock_player_record("Test", "Player", datetime(2024, 1, 15), keeper=6)
+        old_record = self._create_mock_player_record(
+            "Test", "Player", datetime(2024, 1, 8), keeper=5
+        )
+        new_record = self._create_mock_player_record(
+            "Test", "Player", datetime(2024, 1, 15), keeper=6
+        )
 
         # Mock the display data
         mock_display_data.return_value = {
-            'name': "Test Player",
-            'group_name': None,
-            'text_color': None,
-            'bg_color': None
+            "name": "Test Player",
+            "group_name": None,
+            "text_color": None,
+            "bg_color": None,
         }
 
         mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
-            old_record, new_record
+            old_record,
+            new_record,
         ]
 
         result = get_player_changes(123456, 7, 0)
@@ -493,20 +525,22 @@ class TestGetPlayerChanges:
 
         # Check player data structure
         player_data = change[0]
-        assert player_data['name'] == "Test Player"
+        assert player_data["name"] == "Test Player"
         mock_display_data.assert_called_once_with(123456, new_record)
 
-    @patch('app.utils.db')
+    @patch("app.utils.db")
     def test_get_player_changes_no_records(self, mock_db):
         """Test get_player_changes with no records found."""
         from app.utils import get_player_changes
 
-        mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.return_value = None
+        mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.return_value = (
+            None
+        )
 
         result = get_player_changes(123456, 7, 0)
         assert result == []
 
-    @patch('app.utils.db')
+    @patch("app.utils.db")
     def test_get_player_changes_exception_handling(self, mock_db):
         """Test get_player_changes exception handling."""
         from app.utils import get_player_changes
@@ -533,12 +567,12 @@ class TestGetPlayerDisplayName:
 
         player_record = self._create_mock_player_record("John", "Doe")
 
-        with patch('app.utils.session', {}):
+        with patch("app.utils.session", {}):
             result = _get_player_display_name(123456, player_record)
             assert result == "John Doe"
 
-    @patch('app.utils.db')
-    @patch('app.utils.session', {"current_user_id": 12345})
+    @patch("app.utils.db")
+    @patch("app.utils.session", {"current_user_id": 12345})
     def test_get_player_display_name_with_group(self, mock_db):
         """Test player display name with group using direct patching."""
         from app.utils import _get_player_display_name
@@ -556,11 +590,12 @@ class TestGetPlayerDisplayName:
 
         # Simple mock setup - return PlayerSetting, then Group
         mock_db.session.query.return_value.filter_by.return_value.first.side_effect = [
-            mock_player_setting, mock_group
+            mock_player_setting,
+            mock_group,
         ]
 
         # Mock successful model imports
-        with patch('models.PlayerSetting'), patch('models.Group'):
+        with patch("models.PlayerSetting"), patch("models.Group"):
             result = _get_player_display_name(123456, player_record)
             assert result == "Jane Smith (Defenders)"
 
@@ -581,19 +616,19 @@ class TestGetPlayerDisplayData:
 
         player_record = self._create_mock_player_record("John", "Doe")
 
-        with patch('app.utils.session', {}):
+        with patch("app.utils.session", {}):
             result = _get_player_display_data(123456, player_record)
             expected = {
-                'name': 'John Doe',
-                'group_name': None,
-                'group_order': None,
-                'text_color': None,
-                'bg_color': None
+                "name": "John Doe",
+                "group_name": None,
+                "group_order": None,
+                "text_color": None,
+                "bg_color": None,
             }
             assert result == expected
 
-    @patch('app.utils.db')
-    @patch('app.utils.session', {"current_user_id": 12345})
+    @patch("app.utils.db")
+    @patch("app.utils.session", {"current_user_id": 12345})
     def test_get_player_display_data_with_group(self, mock_db):
         """Test player display data with group and colors."""
         from app.utils import _get_player_display_data
@@ -612,23 +647,24 @@ class TestGetPlayerDisplayData:
 
         # Simple mock setup - return PlayerSetting, then Group
         mock_db.session.query.return_value.filter_by.return_value.first.side_effect = [
-            mock_player_setting, mock_group
+            mock_player_setting,
+            mock_group,
         ]
 
         # Mock successful model imports
-        with patch('models.PlayerSetting'), patch('models.Group'):
+        with patch("models.PlayerSetting"), patch("models.Group"):
             result = _get_player_display_data(123456, player_record)
             expected = {
-                'name': 'Jane Smith (Defenders)',
-                'group_name': 'Defenders',
-                'group_order': 2,
-                'text_color': '#ffffff',
-                'bg_color': '#ff0000'
+                "name": "Jane Smith (Defenders)",
+                "group_name": "Defenders",
+                "group_order": 2,
+                "text_color": "#ffffff",
+                "bg_color": "#ff0000",
             }
             assert result == expected
 
-    @patch('app.utils.db')
-    @patch('app.utils.session', {"current_user_id": 12345})
+    @patch("app.utils.db")
+    @patch("app.utils.session", {"current_user_id": 12345})
     def test_get_player_display_data_no_group(self, mock_db):
         """Test player display data when no group is found."""
         from app.utils import _get_player_display_data
@@ -636,16 +672,18 @@ class TestGetPlayerDisplayData:
         player_record = self._create_mock_player_record("Bob", "Jones")
 
         # Mock no PlayerSetting found
-        mock_db.session.query.return_value.filter_by.return_value.first.return_value = None
+        mock_db.session.query.return_value.filter_by.return_value.first.return_value = (
+            None
+        )
 
-        with patch('models.PlayerSetting'), patch('models.Group'):
+        with patch("models.PlayerSetting"), patch("models.Group"):
             result = _get_player_display_data(123456, player_record)
             expected = {
-                'name': 'Bob Jones',
-                'group_name': None,
-                'group_order': None,
-                'text_color': None,
-                'bg_color': None
+                "name": "Bob Jones",
+                "group_name": None,
+                "group_order": None,
+                "text_color": None,
+                "bg_color": None,
             }
             assert result == expected
 
@@ -682,8 +720,9 @@ class TestCreateDefaultGroups:
 
         # Test function signature by checking that it accepts user_id parameter
         import inspect
+
         sig = inspect.signature(create_default_groups)
-        assert 'user_id' in sig.parameters
+        assert "user_id" in sig.parameters
 
         # Verify function docstring
         assert create_default_groups.__doc__ is not None
@@ -693,7 +732,7 @@ class TestCreateDefaultGroups:
 class TestAdminFeedbackCounts:
     """Test admin feedback count functionality."""
 
-    @patch('models.User')
+    @patch("models.User")
     def test_get_admin_feedback_counts_non_admin_returns_none(self, mock_user_model):
         """Test get_admin_feedback_counts returns None for non-admin users."""
 
@@ -707,14 +746,19 @@ class TestAdminFeedbackCounts:
 
         assert result is None
 
-    @patch('models.FeedbackComment')
-    @patch('models.Feedback')
-    @patch('models.User')
-    @patch('sqlalchemy.exists')
-    @patch('sqlalchemy.and_')
-    def test_get_admin_feedback_counts_admin_user_returns_counts(self, mock_and, mock_exists,
-                                                               mock_user_model, mock_feedback_model,
-                                                               mock_comment_model):
+    @patch("models.FeedbackComment")
+    @patch("models.Feedback")
+    @patch("models.User")
+    @patch("sqlalchemy.exists")
+    @patch("sqlalchemy.and_")
+    def test_get_admin_feedback_counts_admin_user_returns_counts(
+        self,
+        mock_and,
+        mock_exists,
+        mock_user_model,
+        mock_feedback_model,
+        mock_comment_model,
+    ):
         """Test get_admin_feedback_counts returns counts for admin users."""
 
         # Mock admin user
@@ -739,12 +783,14 @@ class TestAdminFeedbackCounts:
         mock_user_model.query.filter_by.return_value.first.return_value = mock_admin
         mock_user_model.query.filter.return_value.all.return_value = mock_admin_users
         mock_feedback_model.query.filter.return_value = mock_no_replies_query
-        mock_feedback_model.query.filter.return_value.all.return_value = mock_feedback_with_replies
+        mock_feedback_model.query.filter.return_value.all.return_value = (
+            mock_feedback_with_replies
+        )
 
         # Mock comment queries for follow-up check
         mock_comment_model.query.filter_by.return_value.order_by.return_value.first.side_effect = [
             mock_latest_comment1,  # First feedback needs follow-up
-            mock_latest_comment2   # Second feedback doesn't need follow-up
+            mock_latest_comment2,  # Second feedback doesn't need follow-up
         ]
 
         result = get_admin_feedback_counts(182085)
@@ -753,11 +799,12 @@ class TestAdminFeedbackCounts:
         assert result["no_replies"] == 3
         assert result["needs_followup"] == 1
 
-    @patch('models.FeedbackComment')
-    @patch('models.Feedback')
-    @patch('models.User')
-    def test_get_admin_feedback_counts_hardcoded_admin_id(self, mock_user_model,
-                                                        mock_feedback_model, mock_comment_model):
+    @patch("models.FeedbackComment")
+    @patch("models.Feedback")
+    @patch("models.User")
+    def test_get_admin_feedback_counts_hardcoded_admin_id(
+        self, mock_user_model, mock_feedback_model, mock_comment_model
+    ):
         """Test get_admin_feedback_counts works for hardcoded admin ID 182085."""
 
         # Mock user with hardcoded admin ID but no admin role
@@ -791,8 +838,9 @@ class TestAdminFeedbackCounts:
 
         # Test function signature
         import inspect
+
         sig = inspect.signature(get_admin_feedback_counts)
-        assert 'user_id' in sig.parameters
+        assert "user_id" in sig.parameters
 
         # Verify docstring
         assert get_admin_feedback_counts.__doc__ is not None
@@ -820,8 +868,9 @@ class TestTeamTimeline:
 
         # Test function signature
         import inspect
+
         sig = inspect.signature(get_team_timeline)
-        assert 'team_id' in sig.parameters
+        assert "team_id" in sig.parameters
 
         # Verify docstring
         assert get_team_timeline.__doc__ is not None
@@ -1023,6 +1072,7 @@ class TestTeamStatistics:
     def test_calculate_team_statistics_empty(self):
         """Test calculate_team_statistics with empty players."""
         from app.utils import calculate_team_statistics
+
         result = calculate_team_statistics([])
         assert isinstance(result, dict)
 
@@ -1049,6 +1099,7 @@ class TestTeamStatistics:
     def test_get_top_scorers_empty(self):
         """Test get_top_scorers with empty players."""
         from app.utils import get_top_scorers
+
         result = get_top_scorers([])
         assert isinstance(result, list)
         assert len(result) == 0
@@ -1076,6 +1127,7 @@ class TestTeamStatistics:
     def test_get_top_performers_empty(self):
         """Test get_top_performers with empty players."""
         from app.utils import get_top_performers
+
         result = get_top_performers([])
         assert isinstance(result, list)
         assert len(result) == 0
@@ -1116,4 +1168,5 @@ class TestDefaultGroups:
     def test_create_default_groups_function_exists(self):
         """Test that create_default_groups function exists."""
         from app.utils import create_default_groups
+
         assert callable(create_default_groups)

@@ -13,6 +13,7 @@ def test_api_blueprint_setup():
     setup_api_blueprint(mock_db)
 
     from app.api import players
+
     assert players.db == mock_db
 
 
@@ -21,8 +22,8 @@ def test_api_routes_basic():
     from app.api.players import api_bp
 
     # Basic blueprint coverage test
-    assert api_bp.name == 'api'
-    assert api_bp.url_prefix == '/api'
+    assert api_bp.name == "api"
+    assert api_bp.url_prefix == "/api"
 
 
 def test_bulk_assign_basic_coverage():

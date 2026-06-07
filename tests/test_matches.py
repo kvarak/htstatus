@@ -11,6 +11,7 @@ from app.utils import downloadMatches
 def test_module_imports():
     """Test that matches blueprint module imports without errors."""
     import app.blueprints.matches
+
     assert app.blueprints.matches is not None
 
 
@@ -61,12 +62,16 @@ class TestDownloadRecentMatches:
         mock_client.matches_archive.return_value = sample_matches
         return mock_client
 
-    @patch('app.utils.db')
-    @patch('app.utils.session', {'access_key': 'test_key', 'access_secret': 'test_secret'})
+    @patch("app.utils.db")
+    @patch(
+        "app.utils.session", {"access_key": "test_key", "access_secret": "test_secret"}
+    )
     def test_download_recent_matches_success(self, mock_db, mock_chpp_client):
         """Test successful recent matches download."""
         # Mock database session
-        mock_db.session.query.return_value.filter_by.return_value.first.return_value = None
+        mock_db.session.query.return_value.filter_by.return_value.first.return_value = (
+            None
+        )
         mock_db.session.add = Mock()
         mock_db.session.commit = Mock()
 
@@ -87,8 +92,10 @@ class TestDownloadRecentMatches:
         assert mock_db.session.add.call_count >= 0
         assert mock_db.session.commit.call_count >= 0
 
-    @patch('app.utils.db')
-    @patch('app.utils.session', {'access_key': 'test_key', 'access_secret': 'test_secret'})
+    @patch("app.utils.db")
+    @patch(
+        "app.utils.session", {"access_key": "test_key", "access_secret": "test_secret"}
+    )
     def test_download_recent_matches_error_handling(self, mock_db):
         """Test error handling in recent matches download."""
         # Mock CHPP client that raises an exception
@@ -105,7 +112,7 @@ class TestDownloadRecentMatches:
         assert result["count"] == 0  # No matches processed due to errors
         assert result["updated"] == 0  # No matches updated due to errors
 
-    @patch('app.utils.db')
+    @patch("app.utils.db")
     def test_download_recent_matches_without_chpp_client(self, mock_db):
         """Test downloadMatches when session access fails."""
         # Test the function without proper session - should handle error gracefully
@@ -115,6 +122,7 @@ class TestDownloadRecentMatches:
         assert result is not None, "Result should not be None"
         assert result["success"] is False
         assert "error" in result or "message" in result
+
 
 # TODO: Add comprehensive tests for matches blueprint
 # TODO: Test matches display and filtering

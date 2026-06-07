@@ -20,14 +20,7 @@ debug_level = None
 
 def initialize_routes(app, _db_instance):
     """Initialize routes module with app and db instances."""
-    global \
-        consumer_key, \
-        consumer_secret, \
-        versionstr, \
-        fullversion, \
-        version, \
-        timenow, \
-        debug_level
+    global consumer_key, consumer_secret, versionstr, fullversion, version, timenow, debug_level
 
     # Get db from current app context
     from app.factory import db as factory_db
@@ -42,6 +35,7 @@ def initialize_routes(app, _db_instance):
     # Handle version detection using shared utility
     print("DEBUG: initialize_routes - Detecting version")
     from app.utils import get_version_info
+
     version_info = get_version_info()
 
     # Extract version variables for module-level access

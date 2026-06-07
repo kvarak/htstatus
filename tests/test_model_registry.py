@@ -1,16 +1,15 @@
 """Tests for app/model_registry.py - Model registry for circular import resolution."""
 
-
 import pytest
 
 from app.model_registry import (
-    ModelRegistry,
     get_group_model,
     get_match_model,
     get_match_play_model,
     get_player_setting_model,
     get_players_model,
     get_user_model,
+    ModelRegistry,
 )
 
 
@@ -30,6 +29,7 @@ class TestModelRegistry:
 
     def test_register_model(self):
         """Test registering a model class."""
+
         class TestModel:
             pass
 
@@ -80,15 +80,16 @@ class TestModelRegistry:
         assert "MatchPlay" in ModelRegistry._models
 
         # Check models are actually classes
-        assert hasattr(ModelRegistry._models["User"], '__name__')
-        assert hasattr(ModelRegistry._models["Players"], '__name__')
-        assert hasattr(ModelRegistry._models["Group"], '__name__')
-        assert hasattr(ModelRegistry._models["PlayerSetting"], '__name__')
-        assert hasattr(ModelRegistry._models["Match"], '__name__')
-        assert hasattr(ModelRegistry._models["MatchPlay"], '__name__')
+        assert hasattr(ModelRegistry._models["User"], "__name__")
+        assert hasattr(ModelRegistry._models["Players"], "__name__")
+        assert hasattr(ModelRegistry._models["Group"], "__name__")
+        assert hasattr(ModelRegistry._models["PlayerSetting"], "__name__")
+        assert hasattr(ModelRegistry._models["Match"], "__name__")
+        assert hasattr(ModelRegistry._models["MatchPlay"], "__name__")
 
     def test_lazy_initialization_only_runs_once(self):
         """Test lazy initialization only runs once."""
+
         class TestModel:
             pass
 
@@ -99,6 +100,7 @@ class TestModelRegistry:
         # Register another model
         class AnotherModel:
             pass
+
         ModelRegistry.register("AnotherModel", AnotherModel)
 
         # Should not re-initialize
@@ -115,12 +117,12 @@ class TestConvenienceFunctions:
         ModelRegistry._initialized = False
 
         # Register mock model classes
-        self.mock_user = type('User', (), {})
-        self.mock_players = type('Players', (), {})
-        self.mock_group = type('Group', (), {})
-        self.mock_player_setting = type('PlayerSetting', (), {})
-        self.mock_match = type('Match', (), {})
-        self.mock_match_play = type('MatchPlay', (), {})
+        self.mock_user = type("User", (), {})
+        self.mock_players = type("Players", (), {})
+        self.mock_group = type("Group", (), {})
+        self.mock_player_setting = type("PlayerSetting", (), {})
+        self.mock_match = type("Match", (), {})
+        self.mock_match_play = type("MatchPlay", (), {})
 
         ModelRegistry.register("User", self.mock_user)
         ModelRegistry.register("Players", self.mock_players)
@@ -173,6 +175,7 @@ class TestIntegration:
         # Register a model
         class TestModel:
             pass
+
         ModelRegistry.register("TestModel", TestModel)
 
         # Verify state

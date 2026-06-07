@@ -13,6 +13,7 @@ def test_compare_blueprint_setup():
     setup_compare_blueprint(mock_db)
 
     from app.blueprints import compare
+
     assert compare.db == mock_db
 
 
@@ -21,8 +22,8 @@ def test_compare_routes_basic():
     from app.blueprints.compare import compare_bp
 
     # Basic blueprint coverage test
-    assert compare_bp.name == 'compare'
-    assert compare_bp.url_prefix == '/player'
+    assert compare_bp.name == "compare"
+    assert compare_bp.url_prefix == "/player"
 
 
 def test_compare_players_basic_coverage():

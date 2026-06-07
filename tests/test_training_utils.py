@@ -105,7 +105,8 @@ class TestUtilsTargetedCoverage:
         mock_player_later.set_pieces = 5
         mock_player_later.data_date = datetime(2024, 1, 20)
 
-        players = [mock_player_later, mock_player_early]  # Intentionally out of order
+        # Intentionally out of order
+        players = [mock_player_later, mock_player_early]
 
         allplayerids, allplayers, playernames = get_training(players)
 

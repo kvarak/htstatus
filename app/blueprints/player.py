@@ -11,10 +11,10 @@ from app.auth_utils import (
     require_authentication,
 )
 from app.error_handlers import (
-    TeamAccessError,
-    ValidationError,
     handle_error,
+    TeamAccessError,
     validate_team_id,
+    ValidationError,
 )
 from app.utils import create_page, dprint, get_training
 
@@ -64,6 +64,7 @@ def player():
     except (ImportError, ValueError):
         # Fallback to direct imports if registry fails
         import models
+
         PlayerSetting = models.PlayerSetting
         Group = models.Group
         Players = models.Players
@@ -71,7 +72,9 @@ def player():
         MatchPlay = models.MatchPlay
 
     # Track user activity
-    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    current_user = (
+        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    )
     if current_user:
         current_user.player()
         db.session.commit()
@@ -98,6 +101,7 @@ def player():
 
     # Get 4-week timeline for this team
     from app.utils import get_team_timeline
+
     timeline_changes = get_team_timeline(teamid)
 
     if updategroup and playerid and groupid:
@@ -119,13 +123,17 @@ def player():
             if connection:
                 (
                     db.session.query(PlayerSetting)
-                    .filter_by(player_id=int(playerid), user_id=session["current_user_id"])
+                    .filter_by(
+                        player_id=int(playerid), user_id=session["current_user_id"]
+                    )
                     .update({"group_id": groupid})
                 )
                 db.session.commit()
             else:
                 newconnection = PlayerSetting(
-                    player_id=int(playerid), user_id=session["current_user_id"], group_id=groupid
+                    player_id=int(playerid),
+                    user_id=session["current_user_id"],
+                    group_id=groupid,
                 )
                 db.session.add(newconnection)
                 db.session.commit()
@@ -141,10 +149,14 @@ def player():
     if not group_data:
         try:
             from app.utils import create_default_groups
+
             created_groups = create_default_groups(session["current_user_id"])
             if created_groups:
                 group_data = created_groups
-                dprint(1, f"Created {len(created_groups)} default groups for user {session['current_user_id']}")
+                dprint(
+                    1,
+                    f"Created {len(created_groups)} default groups for user {session['current_user_id']}",
+                )
         except Exception as e:
             dprint(1, f"Failed to create default groups: {e}")
 
@@ -163,7 +175,7 @@ def player():
         .all()
     )
 
-    (allplayerids, allplayers, playernames) = get_training(players_data)
+    allplayerids, allplayers, playernames = get_training(players_data)
 
     newlst = {}
     for thislist in players_data:
@@ -182,9 +194,15 @@ def player():
 
     if players_data_oldest:
         first_rec = players_data_oldest[0]
-        dprint(1, f"DEBUG: First record - player {first_rec.ht_id}, date {first_rec.data_date}, owner {first_rec.owner}")
+        dprint(
+            1,
+            f"DEBUG: First record - player {first_rec.ht_id}, date {first_rec.data_date}, owner {first_rec.owner}",
+        )
         last_rec = players_data_oldest[-1]
-        dprint(1, f"DEBUG: Last record - player {last_rec.ht_id}, date {last_rec.data_date}")
+        dprint(
+            1,
+            f"DEBUG: Last record - player {last_rec.ht_id}, date {last_rec.data_date}",
+        )
 
     players_oldest_dict = {}
     for thislist in players_data_oldest:
@@ -201,12 +219,14 @@ def player():
         dprint(1, f"  oldest keeper: {sample_oldest.get('keeper')}")
 
         # Find the same player in players_now
-        sample_now = next((p for p in players_now if p['ht_id'] == sample_ht_id), None)
+        sample_now = next((p for p in players_now if p["ht_id"] == sample_ht_id), None)
         if sample_now:
             dprint(1, f"  current date: {sample_now.get('data_date')}")
             dprint(1, f"  current keeper: {sample_now.get('keeper')}")
-            dprint(1, f"  difference: {sample_now.get('keeper') - sample_oldest.get('keeper')}")
-
+            dprint(
+                1,
+                f"  difference: {sample_now.get('keeper') - sample_oldest.get('keeper')}",
+            )
 
     # Add stars to the list of players
     for p in players_now:

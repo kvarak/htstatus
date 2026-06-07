@@ -10,15 +10,15 @@ helping to complete the country mapping for proper flag and color display.
 """
 
 import argparse
-import sys
 from collections import Counter
-
-# Setup path for app imports
-sys.path.append('.')
+import sys
 
 from app.factory import create_app
 from app.hattrick_countries import COUNTRIES
 from app.model_registry import get_players_model
+
+# Setup path for app imports
+sys.path.append(".")
 
 
 def check_unknown_countries(team_id=None):
@@ -40,7 +40,11 @@ def check_unknown_countries(team_id=None):
         print()
 
         # Collect all country IDs
-        country_ids = [player.native_country_id for player in players if player.native_country_id is not None]
+        country_ids = [
+            player.native_country_id
+            for player in players
+            if player.native_country_id is not None
+        ]
         country_counter = Counter(country_ids)
 
         # Find unknown countries
@@ -74,8 +78,15 @@ def check_unknown_countries(team_id=None):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Check for unknown countries in player data")
-    parser.add_argument("team_id", type=int, nargs="?", help="Team ID to check (optional, checks all teams if omitted)")
+    parser = argparse.ArgumentParser(
+        description="Check for unknown countries in player data"
+    )
+    parser.add_argument(
+        "team_id",
+        type=int,
+        nargs="?",
+        help="Team ID to check (optional, checks all teams if omitted)",
+    )
 
     args = parser.parse_args()
     check_unknown_countries(args.team_id)

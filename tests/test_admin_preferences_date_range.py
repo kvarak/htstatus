@@ -1,4 +1,5 @@
 """Tests for AdminPreferences model date range functionality."""
+
 import unittest
 
 from models import AdminPreferences
@@ -35,9 +36,9 @@ class TestAdminPreferencesDateRange(unittest.TestCase):
                 "date_range": {
                     "default_months": 3,
                     "start_date": "2026-01-01",
-                    "end_date": "2026-02-01"
+                    "end_date": "2026-02-01",
                 }
-            }
+            },
         )
 
         # Verify filter settings contain date range
@@ -48,5 +49,5 @@ class TestAdminPreferencesDateRange(unittest.TestCase):
         assert date_range["end_date"] == "2026-02-01"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

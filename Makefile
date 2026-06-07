@@ -56,7 +56,7 @@ help: ## Show this help message
 # Development Environment Commands
 setup: check-uv ## Initialize development environment (UV sync, Docker setup)
 	@echo "🚀 Setting up HT Status development environment..."
-	@$(UV) sync --dev
+	@$(UV) sync --extra dev
 	@$(DOCKER_COMPOSE) pull
 	@echo "✅ Development environment ready!"
 	@echo "   Next: 'make dev' to start development server"
@@ -69,7 +69,7 @@ check-venv: check-uv ## Verify virtual environment is healthy
 			echo "This usually happens after Python was upgraded via Homebrew."; \
 			echo ""; \
 			echo "🔧 Fix it by recreating the virtual environment:"; \
-			echo "  rm -rf .venv && uv sync --dev"; \
+			echo "  rm -rf .venv && uv sync --extra dev"; \
 			echo ""; \
 			exit 1; \
 		fi \
@@ -132,11 +132,11 @@ config-help: ## Show configuration setup help
 # Python Development Commands
 install: check-uv ## Install dependencies using UV
 	@echo "📦 Installing dependencies..."
-	@$(UV) sync
+	@$(UV) sync --extra dev
 
 update: check-uv ## Update dependencies and sync environment
 	@echo "🔄 Updating dependencies..."
-	@$(UV) sync --upgrade
+	@$(UV) sync --upgrade --extra dev
 	@$(UV) lock --upgrade
 	@$(MAKE) requirements-txt
 
@@ -150,27 +150,14 @@ shell: check-uv ## Open Python shell in UV environment
 	@$(PYTHON) -c "import IPython; IPython.start_ipython()" 2>&1 | tee /tmp/ipython-start.log || $(PYTHON)
 
 # Code Quality Commands
-lint: check-uv ## Run ruff linting
-	@echo "🔍 Running ruff linting..."
-	@mkdir -p out/tests && rm -f out/tests/$@.json
-	@$(UV) run ruff check . 2>&1 | tee /tmp/ruff-output.txt; \
-	if [ $${PIPESTATUS[0]} -eq 0 ]; then \
-		echo "All checks passed!"; \
-		scripts/qi-json.sh out/tests/lint.json "Code Quality" "make lint" PASSED 0 0 "0 errors" "excellent code quality"; \
-	else \
-		error_count=$$(grep -c "error" /tmp/ruff-output.txt || echo "0"); \
-		app_errors=$$(grep -E '^(app/|models\.py|config\.py)' /tmp/ruff-output.txt | wc -l | tr -d ' '); \
-		if [ "$$app_errors" = "0" ] 2>/dev/null; then \
-			scripts/qi-json.sh out/tests/lint.json "Code Quality" "make lint" ISSUES $$error_count 0 "$$error_count errors" "dev scripts only"; \
-		else \
-			scripts/qi-json.sh out/tests/lint.json "Code Quality" "make lint" ISSUES 0 $$error_count "$$error_count errors" "$$app_errors in production code"; \
-		fi; \
-		exit 1; \
-	fi
+lint: check-uv ## Run flake8 linting (matches CI)
+	@echo "🔍 Running flake8 linting..."
+	@$(UV) run flake8 --config=configs/.flake8 .
 
-lint-fix: check-uv ## Auto-fix linting issues using ruff
+lint-fix: check-uv ## Auto-fix linting issues
 	@echo "🔧 Auto-fixing linting issues..."
-	@$(UV) run ruff check . --fix
+	@$(UV) run isort .
+	@$(UV) run black .
 	@echo "✅ Linting auto-fix completed"
 
 lint-templates: check-uv ## Check Jinja2 template syntax and formatting

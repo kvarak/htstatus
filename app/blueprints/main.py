@@ -1,9 +1,9 @@
 """Main and admin routes blueprint for HT Status application."""
 
+from datetime import date
 import json
 import os
 import re
-from datetime import date
 
 from dateutil.relativedelta import relativedelta
 from flask import (
@@ -49,25 +49,29 @@ def get_releases_data():
     """Load recent user releases from JSON for display on main page."""
     try:
         # Use releases-full.json which contains all features per release
-        releases_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'releases-full.json')
-        with open(releases_path, encoding='utf-8') as f:
+        releases_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "static", "releases-full.json"
+        )
+        with open(releases_path, encoding="utf-8") as f:
             releases_data = json.load(f)
 
         releases = []
-        entries = releases_data.get('entries', [])
+        entries = releases_data.get("entries", [])
 
         # Get recent releases (already sorted newest first in JSON)
         for entry in entries:
-            version = entry.get('version', '')
-            period = entry.get('period', '')  # This is the formatted date
-            features = entry.get('features', [])  # Full list of features
+            version = entry.get("version", "")
+            period = entry.get("period", "")  # This is the formatted date
+            features = entry.get("features", [])  # Full list of features
 
             # Format for main page display
-            releases.append({
-                'version': version,
-                'date': period,
-                'features': features  # All features from RELEASES.md
-            })
+            releases.append(
+                {
+                    "version": version,
+                    "date": period,
+                    "features": features,  # All features from RELEASES.md
+                }
+            )
 
         return releases  # Show all user releases on main page
     except Exception as e:
@@ -317,43 +321,45 @@ def changes():
         all_entries = []
 
         # Read commits JSON
-        commits_path = os.path.join(current_app.static_folder, 'changelog.json')
+        commits_path = os.path.join(current_app.static_folder, "changelog.json")
         try:
-            with open(commits_path, encoding='utf-8') as f:
+            with open(commits_path, encoding="utf-8") as f:
                 commits_data = json.load(f)
-                all_entries.extend(commits_data.get('entries', []))
+                all_entries.extend(commits_data.get("entries", []))
         except Exception as e:
             dprint(1, f"Error reading commits JSON: {e}")
 
         # Read user releases JSON
-        releases_path = os.path.join(current_app.static_folder, 'releases.json')
+        releases_path = os.path.join(current_app.static_folder, "releases.json")
         try:
-            with open(releases_path, encoding='utf-8') as f:
+            with open(releases_path, encoding="utf-8") as f:
                 releases_data = json.load(f)
-                all_entries.extend(releases_data.get('entries', []))
+                all_entries.extend(releases_data.get("entries", []))
         except Exception as e:
             dprint(1, f"Error reading releases JSON: {e}")
 
         # Read internal releases JSON
-        internal_path = os.path.join(current_app.static_folder, 'releases-internal.json')
+        internal_path = os.path.join(
+            current_app.static_folder, "releases-internal.json"
+        )
         try:
-            with open(internal_path, encoding='utf-8') as f:
+            with open(internal_path, encoding="utf-8") as f:
                 internal_data = json.load(f)
-                all_entries.extend(internal_data.get('entries', []))
+                all_entries.extend(internal_data.get("entries", []))
         except Exception as e:
             dprint(1, f"Error reading internal releases JSON: {e}")
 
         # Sort all entries by date (newest first) with commit priority
         # When timestamps are equal, commits should appear before releases
         def sort_key(entry):
-            entry_type = entry.get('type', 'unknown')
-            date_val = entry.get('date') or ''
+            entry_type = entry.get("type", "unknown")
+            date_val = entry.get("date") or ""
 
             # Convert date to make it sortable, then invert priority logic
             # We want commits to appear BEFORE releases when dates are equal
             # So commits get priority 0 (lower) and releases get priority 1 (higher)
             # With reverse=True, commits (0) will come before releases (1)
-            type_priority = {'commit': 0, 'user_release': 1, 'internal_release': 1}
+            type_priority = {"commit": 0, "user_release": 1, "internal_release": 1}
             priority = type_priority.get(entry_type, 1)
 
             return (date_val, priority)
@@ -366,25 +372,28 @@ def changes():
         release_counter = 0
 
         for _i, entry in enumerate(all_entries):
-            entry_type = entry.get('type', 'unknown')
-            full_date = entry.get('date', '')
-            date = full_date.split(' ')[0]  # Get just the date part for display
+            entry_type = entry.get("type", "unknown")
+            full_date = entry.get("date", "")
+            # Get just the date part for display
+            date = full_date.split(" ")[0]
 
-            if entry_type == 'commit':
-                version = entry.get('version', 'unknown')
-                message = entry.get('message', '')
+            if entry_type == "commit":
+                version = entry.get("version", "unknown")
+                message = entry.get("message", "")
                 # Add data attributes to group commits with their release
-                commit_class = f'commit-group-{current_release_id}' if current_release_id else ''
+                commit_class = (
+                    f"commit-group-{current_release_id}" if current_release_id else ""
+                )
                 line = f'<div class="mb-1 py-1 px-2 border-left border-success bg-light {commit_class}" style="border-left-width: 3px !important; font-size: 0.9rem;"><small class="text-muted mr-2">{date}</small><code class="text-info small mr-2">{version}</code><span class="text-dark">{message}</span></div>'
-            elif entry_type == 'user_release':
-                version = entry.get('version', '')
-                message = entry.get('message', '')
+            elif entry_type == "user_release":
+                version = entry.get("version", "")
+                message = entry.get("message", "")
                 line = f'<div class="bg-success text-white p-2 mb-2 rounded shadow-sm"><strong><i class="fas fa-rocket"></i> {date} 🎉 {version} USER RELEASE</strong><br><small>{message}</small></div>'
                 # Reset current release for grouping
                 current_release_id = None
-            elif entry_type == 'internal_release':
-                version = entry.get('version', '')
-                message = entry.get('message', '')
+            elif entry_type == "internal_release":
+                version = entry.get("version", "")
+                message = entry.get("message", "")
                 release_counter += 1
                 current_release_id = release_counter
                 # Make technical releases clickable with prominent expand symbol
@@ -400,7 +409,9 @@ def changes():
 
     except Exception as e:
         dprint(1, f"Error reading changelog JSON files: {e}")
-        changelogfull = ["Error loading changelog - run 'make changelog' to generate JSON files"]
+        changelogfull = [
+            "Error loading changelog - run 'make changelog' to generate JSON files"
+        ]
 
     return create_page(
         template="changes.html",
@@ -451,18 +462,22 @@ def debug_chpp_teams():
         teams_data = []
         for team_id in user_data._teams_ht_id:
             team = chpp.team(ht_id=team_id)
-            teams_data.append({
-                "id": team_id,
-                "name": team.name,
-                "short_name": team.short_team_name,
-                "league": team.league_name,
-            })
+            teams_data.append(
+                {
+                    "id": team_id,
+                    "name": team.name,
+                    "short_name": team.short_team_name,
+                    "league": team.league_name,
+                }
+            )
 
-        return jsonify({
-            "teams_from_chpp": teams_data,
-            "session_teams": session.get("all_teams", []),
-            "session_team_names": session.get("all_team_names", [])
-        })
+        return jsonify(
+            {
+                "teams_from_chpp": teams_data,
+                "session_teams": session.get("all_teams", []),
+                "session_team_names": session.get("all_team_names", []),
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -488,7 +503,7 @@ def debug_chpp_raw(team_id):
         # Make the request and capture the response object
         root = chpp.request("teamdetails", "3.7", teamID=team_id)
 
-        xml_str = ET.tostring(root, encoding='unicode')
+        xml_str = ET.tostring(root, encoding="unicode")
 
         # Extract ALL teams from the XML (not just the first one!)
         all_teams_data = []
@@ -497,19 +512,35 @@ def debug_chpp_raw(team_id):
             team_name_elem = team_elem.find("TeamName")
             is_primary_elem = team_elem.find("IsPrimaryClub")
 
-            all_teams_data.append({
-                "team_id": team_id_elem.text if team_id_elem is not None else "NOT FOUND",
-                "team_name": team_name_elem.text if team_name_elem is not None else "NOT FOUND",
-                "is_primary": is_primary_elem.text if is_primary_elem is not None else "NOT FOUND"
-            })
+            all_teams_data.append(
+                {
+                    "team_id": (
+                        team_id_elem.text if team_id_elem is not None else "NOT FOUND"
+                    ),
+                    "team_name": (
+                        team_name_elem.text
+                        if team_name_elem is not None
+                        else "NOT FOUND"
+                    ),
+                    "is_primary": (
+                        is_primary_elem.text
+                        if is_primary_elem is not None
+                        else "NOT FOUND"
+                    ),
+                }
+            )
 
-        return jsonify({
-            "requested_team_id": team_id,
-            "all_teams_in_response": all_teams_data,
-            "team_count": len(all_teams_data),
-            "note": "The teamdetails API returns ALL teams for a user, not just the requested one!",
-            "raw_xml_preview": xml_str[:2000] + "..." if len(xml_str) > 2000 else xml_str
-        })
+        return jsonify(
+            {
+                "requested_team_id": team_id,
+                "all_teams_in_response": all_teams_data,
+                "team_count": len(all_teams_data),
+                "note": "The teamdetails API returns ALL teams for a user, not just the requested one!",
+                "raw_xml_preview": (
+                    xml_str[:2000] + "..." if len(xml_str) > 2000 else xml_str
+                ),
+            }
+        )
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -601,7 +632,10 @@ def admin():
 
     # Get recent errors for display
     from models import ErrorLog
-    recent_errors = db.session.query(ErrorLog).order_by(ErrorLog.timestamp.desc()).limit(10).all()
+
+    recent_errors = (
+        db.session.query(ErrorLog).order_by(ErrorLog.timestamp.desc()).limit(10).all()
+    )
 
     errors = []
     for error in recent_errors:
@@ -609,10 +643,14 @@ def admin():
             "id": error.id,
             "timestamp": error.timestamp,
             "error_type": error.error_type,
-            "message": error.message[:100] + "..." if error.message and len(error.message) > 100 else error.message or "No message",
+            "message": (
+                error.message[:100] + "..."
+                if error.message and len(error.message) > 100
+                else error.message or "No message"
+            ),
             "user_id": error.user_id,
             "request_path": error.request_path,
-            "environment": error.environment
+            "environment": error.environment,
         }
         errors.append(error_data)
 
@@ -641,10 +679,13 @@ def tutorial_analytics():
         user_id = get_current_user_id()
 
         # Extract session ID (fallback to a simple hash if not provided)
-        session_id = data.get('session_id', str(hash(request.remote_addr + str(session.get('_csrf_token', '')))))
+        session_id = data.get(
+            "session_id",
+            str(hash(request.remote_addr + str(session.get("_csrf_token", "")))),
+        )
 
         # Validate required fields
-        required_fields = ['event_type', 'tour_id', 'page_path']
+        required_fields = ["event_type", "tour_id", "page_path"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -653,13 +694,13 @@ def tutorial_analytics():
         analytics = TutorialAnalytics(
             user_id=user_id,
             session_id=session_id,
-            event_type=data['event_type'],
-            tour_id=data['tour_id'],
-            page_path=data['page_path'],
-            step_number=data.get('step_number'),
-            step_duration_seconds=data.get('step_duration_seconds'),
-            total_duration_seconds=data.get('total_duration_seconds'),
-            user_agent=request.headers.get('User-Agent')
+            event_type=data["event_type"],
+            tour_id=data["tour_id"],
+            page_path=data["page_path"],
+            step_number=data.get("step_number"),
+            step_duration_seconds=data.get("step_duration_seconds"),
+            total_duration_seconds=data.get("total_duration_seconds"),
+            user_agent=request.headers.get("User-Agent"),
         )
 
         # Save to database
@@ -671,36 +712,45 @@ def tutorial_analytics():
             if user:
                 # Map tour_id to field prefix
                 tour_field_map = {
-                    'welcome': 'welcome',
-                    'player-management': 'player',
-                    'data-update': 'update'
+                    "welcome": "welcome",
+                    "player-management": "player",
+                    "data-update": "update",
                 }
 
                 # Map event_type to field suffix
                 event_field_map = {
-                    'complete': 'complete',
-                    'skip': 'skip',
-                    'help_click': 'help'
+                    "complete": "complete",
+                    "skip": "skip",
+                    "help_click": "help",
                 }
 
-                tour_prefix = tour_field_map.get(data['tour_id'])
-                event_suffix = event_field_map.get(data['event_type'])
+                tour_prefix = tour_field_map.get(data["tour_id"])
+                event_suffix = event_field_map.get(data["event_type"])
 
                 # Handle reset events (global, affects all tours)
-                if data['event_type'] == 'reset':
+                if data["event_type"] == "reset":
                     current_value = user.c_tutorial_reset or 0
                     user.c_tutorial_reset = current_value + 1
-                    dprint(2, f"Incremented c_tutorial_reset to {current_value + 1} for user {user_id}")
+                    dprint(
+                        2,
+                        f"Incremented c_tutorial_reset to {current_value + 1} for user {user_id}",
+                    )
                 elif tour_prefix and event_suffix:
                     field_name = f"c_{tour_prefix}_{event_suffix}"
                     if hasattr(user, field_name):
                         current_value = getattr(user, field_name) or 0
                         setattr(user, field_name, current_value + 1)
-                        dprint(2, f"Incremented {field_name} to {current_value + 1} for user {user_id}")
+                        dprint(
+                            2,
+                            f"Incremented {field_name} to {current_value + 1} for user {user_id}",
+                        )
 
         db.session.commit()
 
-        dprint(2, f"Tutorial analytics recorded: {data['event_type']} for {data['tour_id']} by user {user_id}")
+        dprint(
+            2,
+            f"Tutorial analytics recorded: {data['event_type']} for {data['tour_id']} by user {user_id}",
+        )
 
         return jsonify({"status": "success"}), 200
 
@@ -725,7 +775,9 @@ def admin_preferences():
 
         if request.method == "GET":
             # Load preferences
-            prefs = db.session.query(AdminPreferences).filter_by(user_id=user_id).first()
+            prefs = (
+                db.session.query(AdminPreferences).filter_by(user_id=user_id).first()
+            )
 
             if not prefs:
                 # Create default preferences
@@ -733,10 +785,15 @@ def admin_preferences():
                 db.session.add(prefs)
                 db.session.commit()
 
-            return jsonify({
-                "chart_layout": prefs.chart_layout,
-                "filter_settings": prefs.filter_settings
-            }), 200
+            return (
+                jsonify(
+                    {
+                        "chart_layout": prefs.chart_layout,
+                        "filter_settings": prefs.filter_settings,
+                    }
+                ),
+                200,
+            )
 
         elif request.method == "POST":
             # Save preferences
@@ -744,7 +801,9 @@ def admin_preferences():
             if not data:
                 return jsonify({"error": "No data provided"}), 400
 
-            prefs = db.session.query(AdminPreferences).filter_by(user_id=user_id).first()
+            prefs = (
+                db.session.query(AdminPreferences).filter_by(user_id=user_id).first()
+            )
 
             if not prefs:
                 prefs = AdminPreferences(user_id=user_id)

@@ -32,7 +32,7 @@ class TestFormattingUtilities(unittest.TestCase):
         assert utils._format_attribute_name("Experience") == "Experience"
         assert utils._format_attribute_name("Form") == "Form"
 
-    @patch('app.utils.dprint')
+    @patch("app.utils.dprint")
     def test_calculate_manmark_basic(self, mock_dprint):
         """Test basic manmark calculation."""
         # Mock player with object attributes
@@ -46,13 +46,10 @@ class TestFormattingUtilities(unittest.TestCase):
         expected = round((8 + 2.0 * 0.3) * 0.95, 2)
         assert result == expected
 
-    @patch('app.utils.dprint')
+    @patch("app.utils.dprint")
     def test_calculate_manmark_dictionary_input(self, mock_dprint):
         """Test manmark calculation with dictionary input."""
-        player = {
-            "experience": 15,
-            "defender": 12
-        }
+        player = {"experience": 15, "defender": 12}
 
         result = utils.calculateManmark(player)
 
@@ -60,7 +57,7 @@ class TestFormattingUtilities(unittest.TestCase):
         expected = round((12 + 3.0 * 0.3) * 0.95, 2)
         assert result == expected
 
-    @patch('app.utils.dprint')
+    @patch("app.utils.dprint")
     def test_calculate_manmark_none_values(self, mock_dprint):
         """Test manmark calculation with None values."""
         player = Mock()
@@ -72,7 +69,7 @@ class TestFormattingUtilities(unittest.TestCase):
         # Expected: (0 + 0 * 0.3) * 0.95 = 0.0
         assert result == 0.0
 
-    @patch('app.utils.dprint')
+    @patch("app.utils.dprint")
     def test_calculate_manmark_high_experience(self, mock_dprint):
         """Test manmark calculation with high experience (should cap at 20)."""
         player = Mock()
@@ -85,7 +82,7 @@ class TestFormattingUtilities(unittest.TestCase):
         expected = round((10 + 20 * 0.3) * 0.95, 2)
         assert result == expected
 
-    @patch('app.utils.dprint')
+    @patch("app.utils.dprint")
     def test_calculate_manmark_missing_attributes(self, mock_dprint):
         """Test manmark calculation with missing attributes."""
         player = {}  # Empty dictionary
@@ -119,5 +116,5 @@ class TestFormattingUtilities(unittest.TestCase):
         assert result == 0.0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

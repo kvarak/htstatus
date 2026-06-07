@@ -85,7 +85,8 @@ def create_test_players(db_session, user, count=3):
             "leadership": 1,
             "data_date": date.today(),  # Required field for Players model
         }
-        player_ht_ids.append(player_data["ht_id"])  # Store ID before creating object
+        # Store ID before creating object
+        player_ht_ids.append(player_data["ht_id"])
         player = Players(player_data)
         db_session.add(player)
 

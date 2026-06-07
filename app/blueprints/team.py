@@ -1,8 +1,8 @@
 """Team management routes blueprint for HT Status application."""
 
+from datetime import datetime as dt
 import time
 import traceback
-from datetime import datetime as dt
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
@@ -41,7 +41,9 @@ def team():
     """Display team information."""
     # Track user activity
     User = get_user_model()
-    current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    current_user = (
+        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    )
     if current_user:
         current_user.team()
         db.session.commit()
@@ -103,12 +105,15 @@ def update():
                         updated_team_names.append(f"Team {team_id}")
 
                 # Update session with new team list
-                session['all_teams'] = current_teams
-                session['all_team_names'] = updated_team_names
+                session["all_teams"] = current_teams
+                session["all_team_names"] = updated_team_names
                 session.modified = True
                 all_teams = current_teams
                 all_team_names = updated_team_names
-                dprint(1, f"✅ Session updated with {len(current_teams)} teams: {updated_team_names}")
+                dprint(
+                    1,
+                    f"✅ Session updated with {len(current_teams)} teams: {updated_team_names}",
+                )
             else:
                 dprint(1, "✓ Team list unchanged")
 
@@ -141,8 +146,8 @@ def update():
     all_team_names = session["all_team_names"]
 
     # Handle archive download request (CHPP policy compliant)
-    archive_request = request.args.get('archive')
-    archive_team_id = request.args.get('id')
+    archive_request = request.args.get("archive")
+    archive_team_id = request.args.get("id")
 
     if archive_request and archive_team_id:
         try:
@@ -151,9 +156,12 @@ def update():
         except (ValueError, TypeError):
             dprint(1, f"Archive team ID conversion failed for: '{archive_team_id}'")
             flash("Invalid team ID format for archive download", "error")
-            return redirect(url_for('matches.matches', id=request.args.get('id', '')))
+            return redirect(url_for("matches.matches", id=request.args.get("id", "")))
 
-        dprint(1, f"Archive request: archive={archive_request}, id={archive_team_id} (type: {type(archive_team_id)})")
+        dprint(
+            1,
+            f"Archive request: archive={archive_request}, id={archive_team_id} (type: {type(archive_team_id)})",
+        )
 
         if archive_team_id in all_teams:
             try:
@@ -161,10 +169,15 @@ def update():
                 # Track archive usage
                 dprint(1, "Importing downloadMatches...")
                 from app.utils import downloadMatches
+
                 dprint(1, "Getting user model...")
                 User = get_user_model()
                 dprint(1, "Querying current user...")
-                current_user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+                current_user = (
+                    db.session.query(User)
+                    .filter_by(ht_id=session["current_user_id"])
+                    .first()
+                )
                 if current_user:
                     dprint(1, "Updating user matches_archive counter...")
                     current_user.matches_archive()
@@ -182,7 +195,10 @@ def update():
                     dprint(1, f"Archive download successful: {result['message']}")
                     flash(result["message"], "success")
                 else:
-                    dprint(1, f"Archive download failed: {result.get('message', 'Archive download failed')}")
+                    dprint(
+                        1,
+                        f"Archive download failed: {result.get('message', 'Archive download failed')}",
+                    )
                     flash(result.get("message", "Archive download failed"), "error")
 
             except Exception as e:
@@ -193,7 +209,7 @@ def update():
             flash("Invalid team ID for archive download", "error")
 
         # Redirect back to matches page after archive download
-        return redirect(url_for('matches.matches', id=archive_team_id))
+        return redirect(url_for("matches.matches", id=archive_team_id))
 
     updated = {}
     timeline_changes = {}  # Collect timeline changes for all teams
@@ -212,11 +228,13 @@ def update():
 
             # Update session with correct team name
             team_index = all_teams.index(teamid)
-            session['all_team_names'][team_index] = the_team.name
+            session["all_team_names"][team_index] = the_team.name
             session.modified = True
 
             # REFACTOR-064: Store team competition data in database for CHPP policy compliance
-            dprint(1, f"Fetching and storing competition data for team: {the_team.name}")
+            dprint(
+                1, f"Fetching and storing competition data for team: {the_team.name}"
+            )
             try:
                 # Import Team model here to avoid circular imports
                 from models import Team
@@ -225,9 +243,7 @@ def update():
                 team_record = Team.get_by_ht_id(teamid)
                 if not team_record:
                     team_record = Team(
-                        ht_id=teamid,
-                        team_name=the_team.name,
-                        user_id=current_user_id
+                        ht_id=teamid, team_name=the_team.name, user_id=current_user_id
                     )
                     db.session.add(team_record)
                     dprint(1, f"Created new team record for {the_team.name}")
@@ -239,18 +255,28 @@ def update():
                     "power_rating": getattr(the_team, "power_rating", None),
                     "cup_still_in_cup": getattr(the_team, "still_in_cup", False),
                     "cup_cup_name": getattr(the_team, "cup_name", None),
-                    "cup_cup_round": getattr(the_team, "cup_level", None),  # Using cup_level as round info
-                    "cup_cup_round_index": getattr(the_team, "cup_match_rounds_left", 0),
+                    "cup_cup_round": getattr(
+                        the_team, "cup_level", None
+                    ),  # Using cup_level as round info
+                    "cup_cup_round_index": getattr(
+                        the_team, "cup_match_rounds_left", 0
+                    ),
                     "dress_uri": getattr(the_team, "dress_uri", None),
                     "logo_url": getattr(the_team, "logo_url", None),
                 }
 
                 # Update team competition data
                 team_record.update_competition_data(**competition_data)
-                dprint(1, f"Updated competition data for {the_team.name}: league={competition_data['league_name']}, power={competition_data['power_rating']}")
+                dprint(
+                    1,
+                    f"Updated competition data for {the_team.name}: league={competition_data['league_name']}, power={competition_data['power_rating']}",
+                )
 
             except Exception as comp_error:
-                dprint(1, f"Warning: Failed to store competition data for team {teamid}: {str(comp_error)}")
+                dprint(
+                    1,
+                    f"Warning: Failed to store competition data for team {teamid}: {str(comp_error)}",
+                )
                 # Continue with update process even if competition data storage fails
 
         except Exception as e:
@@ -334,7 +360,7 @@ def update():
             thisplayer["statement"] = p.statement
             # language/language_id use country_id instead
             thisplayer["language"] = None
-            thisplayer["language_id"] = getattr(p, 'country_id', None)
+            thisplayer["language_id"] = getattr(p, "country_id", None)
             thisplayer["agreeability"] = p.agreeability
             thisplayer["aggressiveness"] = p.aggressiveness
             thisplayer["honesty"] = p.honesty
@@ -343,9 +369,8 @@ def update():
             thisplayer["aggressiveness"] = p.aggressiveness
             thisplayer["specialty"] = p.specialty
             # native_country_id/native_league_id/native_league_name use country_id fallback
-            country_id_value = getattr(p, 'country_id', None)
+            country_id_value = getattr(p, "country_id", None)
             thisplayer["native_country_id"] = country_id_value
-
 
             thisplayer["native_league_id"] = None
             thisplayer["native_league_name"] = None
@@ -357,12 +382,21 @@ def update():
             thisplayer["career_hattricks"] = the_player.career_hattricks
             thisplayer["league_goals"] = the_player.league_goals
             thisplayer["cup_goals"] = the_player.cup_goals
-            thisplayer["friendly_goals"] = the_player.friendlies_goals  # Custom CHPP field name
-            thisplayer["current_team_matches"] = the_player.matches_current_team  # Custom CHPP field name
-            thisplayer["current_team_goals"] = the_player.goals_current_team  # Custom CHPP field name
+            thisplayer["friendly_goals"] = (
+                the_player.friendlies_goals
+            )  # Custom CHPP field name
+            thisplayer["current_team_matches"] = (
+                the_player.matches_current_team
+            )  # Custom CHPP field name
+            thisplayer["current_team_goals"] = (
+                the_player.goals_current_team
+            )  # Custom CHPP field name
             thisplayer["national_team_id"] = the_player.national_team_id
-            thisplayer["national_team_name"] = None  # Not available in Custom CHPP
-            thisplayer["is_transfer_listed"] = the_player.transfer_listed  # Custom CHPP field name
+            # Not available in Custom CHPP
+            thisplayer["national_team_name"] = None
+            thisplayer["is_transfer_listed"] = (
+                the_player.transfer_listed
+            )  # Custom CHPP field name
             thisplayer["team_id"] = None  # Not available in Custom CHPP
             thisplayer["mother_club_bonus"] = the_player.mother_club_bonus
             thisplayer["leadership"] = the_player.leadership
@@ -389,14 +423,24 @@ def update():
                 return 0
 
             # Extract skills from CHPPPlayer attributes
-            thisplayer["stamina"] = safe_skill_int(p.stamina, old_player_query, "stamina")
+            thisplayer["stamina"] = safe_skill_int(
+                p.stamina, old_player_query, "stamina"
+            )
             thisplayer["keeper"] = safe_skill_int(p.keeper, old_player_query, "keeper")
-            thisplayer["defender"] = safe_skill_int(p.defender, old_player_query, "defender")
-            thisplayer["playmaker"] = safe_skill_int(p.playmaker, old_player_query, "playmaker")
+            thisplayer["defender"] = safe_skill_int(
+                p.defender, old_player_query, "defender"
+            )
+            thisplayer["playmaker"] = safe_skill_int(
+                p.playmaker, old_player_query, "playmaker"
+            )
             thisplayer["winger"] = safe_skill_int(p.winger, old_player_query, "winger")
-            thisplayer["passing"] = safe_skill_int(p.passing, old_player_query, "passing")
+            thisplayer["passing"] = safe_skill_int(
+                p.passing, old_player_query, "passing"
+            )
             thisplayer["scorer"] = safe_skill_int(p.scorer, old_player_query, "scorer")
-            thisplayer["set_pieces"] = safe_skill_int(p.set_pieces, old_player_query, "set_pieces")
+            thisplayer["set_pieces"] = safe_skill_int(
+                p.set_pieces, old_player_query, "set_pieces"
+            )
 
             thisplayer["data_date"] = time.strftime("%Y-%m-%d")
 
@@ -448,6 +492,7 @@ def update():
 
         # Get 4-week timeline using shared utility
         from app.utils import get_team_timeline
+
         try:
             dprint(1, f"Getting timeline for team {teamid}")
             timeline_changes[teamid] = get_team_timeline(teamid)
@@ -462,6 +507,7 @@ def update():
         # Get the most recent player roster from database to compare
         # We need to find the latest data_date and get only those players
         from sqlalchemy import func
+
         try:
             dprint(1, f"Querying database for existing players for team {teamid}")
             latest_date_subquery = (
@@ -513,7 +559,10 @@ def update():
 
         except Exception as e:
             error_details = traceback.format_exc()
-            dprint(1, f"ERROR: Player difference calculation failed for team {teamid}: {str(e)}")
+            dprint(
+                1,
+                f"ERROR: Player difference calculation failed for team {teamid}: {str(e)}",
+            )
             dprint(1, f"Player difference error traceback: {error_details}")
             raise
 
@@ -528,6 +577,7 @@ def update():
     # Download recent matches for each team as part of the update process
     dprint(1, "Importing downloadRecentMatches...")
     from app.utils import downloadRecentMatches
+
     dprint(1, "Import successful, initializing match download variables...")
 
     matches_results = {}
@@ -545,11 +595,20 @@ def update():
             if result["success"]:
                 total_recent_matches += result["recent_count"]
                 total_upcoming_matches += result["upcoming_count"]
-                dprint(1, f"Team {teamid}: {result['count']} new matches added, {result['recent_count']} recent, {result['upcoming_count']} upcoming")
+                dprint(
+                    1,
+                    f"Team {teamid}: {result['count']} new matches added, {result['recent_count']} recent, {result['upcoming_count']} upcoming",
+                )
             else:
-                dprint(1, f"Failed to download matches for team {teamid}: {result.get('error', 'Unknown error')}")
+                dprint(
+                    1,
+                    f"Failed to download matches for team {teamid}: {result.get('error', 'Unknown error')}",
+                )
 
-        dprint(1, f"Matches download complete: {total_recent_matches} recent, {total_upcoming_matches} upcoming")
+        dprint(
+            1,
+            f"Matches download complete: {total_recent_matches} recent, {total_upcoming_matches} upcoming",
+        )
 
     except Exception as e:
         error_details = traceback.format_exc()
@@ -577,7 +636,10 @@ def update():
         raise
 
     try:
-        dprint(1, f"Creating update_timeline.html page with timeline_changes keys: {list(timeline_changes.keys())}")
+        dprint(
+            1,
+            f"Creating update_timeline.html page with timeline_changes keys: {list(timeline_changes.keys())}",
+        )
         return create_page(
             template="update_timeline.html",
             title="Update Complete - Timeline View",

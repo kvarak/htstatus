@@ -25,13 +25,13 @@ class TestGetCurrentUserId:
 
     def test_returns_user_id_when_present(self):
         """Test returns user ID when present in session."""
-        with patch('app.auth_utils.session', {"current_user_id": 12345}):
+        with patch("app.auth_utils.session", {"current_user_id": 12345}):
             result = get_current_user_id()
             assert result == 12345
 
     def test_returns_none_when_not_present(self):
         """Test returns None when user ID not in session."""
-        with patch('app.auth_utils.session', {}):
+        with patch("app.auth_utils.session", {}):
             result = get_current_user_id()
             assert result is None
 
@@ -41,13 +41,13 @@ class TestIsAuthenticated:
 
     def test_returns_true_when_user_present(self):
         """Test returns True when current_user in session."""
-        with patch('app.auth_utils.session', {"current_user": "some_user"}):
+        with patch("app.auth_utils.session", {"current_user": "some_user"}):
             result = is_authenticated()
             assert result is True
 
     def test_returns_false_when_user_not_present(self):
         """Test returns False when current_user not in session."""
-        with patch('app.auth_utils.session', {}):
+        with patch("app.auth_utils.session", {}):
             result = is_authenticated()
             assert result is False
 
@@ -59,16 +59,16 @@ class TestGetUserTeams:
         """Test returns teams and team names from session."""
         session_data = {
             "all_teams": [12345, 67890],
-            "all_team_names": ["Team A", "Team B"]
+            "all_team_names": ["Team A", "Team B"],
         }
-        with patch('app.auth_utils.session', session_data):
+        with patch("app.auth_utils.session", session_data):
             team_ids, team_names = get_user_teams()
             assert team_ids == [12345, 67890]
             assert team_names == ["Team A", "Team B"]
 
     def test_returns_empty_lists_when_not_present(self):
         """Test returns empty lists when teams not in session."""
-        with patch('app.auth_utils.session', {}):
+        with patch("app.auth_utils.session", {}):
             team_ids, team_names = get_user_teams()
             assert team_ids == []
             assert team_names == []
@@ -101,9 +101,9 @@ class TestGetTeamInfo:
         """Test function uses session data when user_teams not provided."""
         session_data = {
             "all_teams": [12345, 67890],
-            "all_team_names": ["Team A", "Team B"]
+            "all_team_names": ["Team A", "Team B"],
         }
-        with patch('app.auth_utils.session', session_data):
+        with patch("app.auth_utils.session", session_data):
             is_valid, team_name, error = get_team_info(12345)
 
             assert is_valid is True
@@ -124,12 +124,13 @@ class TestGetTeamInfo:
 class TestRequireAuthenticationDecorator:
     """Test require_authentication decorator."""
 
-    @patch('app.auth_utils.render_template')
+    @patch("app.auth_utils.render_template")
     def test_redirects_when_not_authenticated(self, mock_render):
         """Test decorator redirects to login when not authenticated."""
         mock_render.return_value = "forward_template"
 
-        with patch('app.auth_utils.session', {}):
+        with patch("app.auth_utils.session", {}):
+
             @require_authentication
             def test_route():
                 return "protected_content"
@@ -141,7 +142,8 @@ class TestRequireAuthenticationDecorator:
 
     def test_allows_access_when_authenticated(self):
         """Test decorator allows access when authenticated."""
-        with patch('app.auth_utils.session', {"current_user": "testuser"}):
+        with patch("app.auth_utils.session", {"current_user": "testuser"}):
+
             @require_authentication
             def test_route():
                 return "protected_content"
@@ -152,7 +154,8 @@ class TestRequireAuthenticationDecorator:
 
     def test_preserves_function_metadata(self):
         """Test decorator preserves original function metadata."""
-        with patch('app.auth_utils.session', {"current_user": "testuser"}):
+        with patch("app.auth_utils.session", {"current_user": "testuser"}):
+
             @require_authentication
             def test_route():
                 """Test route docstring."""
@@ -163,7 +166,8 @@ class TestRequireAuthenticationDecorator:
 
     def test_passes_arguments_and_kwargs(self):
         """Test decorator passes through arguments and keyword arguments."""
-        with patch('app.auth_utils.session', {"current_user": "testuser"}):
+        with patch("app.auth_utils.session", {"current_user": "testuser"}):
+
             @require_authentication
             def test_route(arg1, arg2, kwarg1=None):
                 return f"{arg1}-{arg2}-{kwarg1}"

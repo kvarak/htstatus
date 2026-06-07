@@ -2,8 +2,8 @@
 """Test script to check current groups for user 182085"""
 
 import importlib.util
-import sys
 from pathlib import Path
+import sys
 
 import psycopg2
 
@@ -22,36 +22,35 @@ config_obj = config_module.Config()
 url = config_obj.SQLALCHEMY_DATABASE_URI
 
 # Parse URL
-url = url.replace('postgresql://', '')
-credentials, host_part = url.split('@', 1)
-user, password = credentials.split(':', 1)
-host_port, database = host_part.rsplit('/', 1)
-host, port = host_port.rsplit(':', 1)
+url = url.replace("postgresql://", "")
+credentials, host_part = url.split("@", 1)
+user, password = credentials.split(":", 1)
+host_port, database = host_part.rsplit("/", 1)
+host, port = host_port.rsplit(":", 1)
 
 # Connect and query
 conn = psycopg2.connect(
-    host=host,
-    port=int(port),
-    database=database,
-    user=user,
-    password=password
+    host=host, port=int(port), database=database, user=user, password=password
 )
 
 cur = conn.cursor()
 
 # Check groups for user 182085
-cur.execute('SELECT COUNT(*) FROM playergroup WHERE user_id = %s', (182085,))
+cur.execute("SELECT COUNT(*) FROM playergroup WHERE user_id = %s", (182085,))
 count = cur.fetchone()[0]
-print(f'Groups for user 182085: {count}')
+print(f"Groups for user 182085: {count}")
 
 if count > 0:
-    cur.execute('SELECT name, "order", bgcolor, textcolor FROM playergroup WHERE user_id = %s ORDER BY "order"', (182085,))
+    cur.execute(
+        'SELECT name, "order", bgcolor, textcolor FROM playergroup WHERE user_id = %s ORDER BY "order"',
+        (182085,),
+    )
     groups = cur.fetchall()
-    print('Groups:')
+    print("Groups:")
     for name, order, bgcolor, textcolor in groups:
-        print(f'  - {name} (order {order}, bg: {bgcolor}, text: {textcolor})')
+        print(f"  - {name} (order {order}, bg: {bgcolor}, text: {textcolor})")
 else:
-    print('No groups found!')
+    print("No groups found!")
 
 # Test the create_default_groups function
 print("\nTesting create_default_groups function:")
@@ -76,6 +75,7 @@ try:
 except Exception as e:
     print(f"❌ Error: {e}")
     import traceback
+
     traceback.print_exc()
 
 conn.close()

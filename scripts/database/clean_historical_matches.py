@@ -18,18 +18,17 @@ This script:
 Safety: Non-destructive operation with backup and rollback support.
 """
 
+from datetime import datetime
 import json
 import os
-import sys
-from datetime import datetime
 from pathlib import Path
+import sys
+
+from app.factory import create_app
+from models import db, Match
 
 # Add app directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-
-from app.factory import create_app
-from models import Match, db
 
 
 def create_backup():
@@ -42,38 +41,38 @@ def create_backup():
         matches = Match.query.order_by(Match.datetime).all()
 
         backup_data = {
-            'backup_timestamp': datetime.now().isoformat(),
-            'total_matches': len(matches),
-            'script_version': '1.0',
-            'matches': []
+            "backup_timestamp": datetime.now().isoformat(),
+            "total_matches": len(matches),
+            "script_version": "1.0",
+            "matches": [],
         }
 
         for match in matches:
             match_data = {
-                'ht_id': match.ht_id,
-                'home_team_id': match.home_team_id,
-                'home_team_name': match.home_team_name,
-                'away_team_id': match.away_team_id,
-                'away_team_name': match.away_team_name,
-                'datetime': match.datetime.isoformat() if match.datetime else None,
-                'matchtype': match.matchtype,
-                'context_id': match.context_id,
-                'rule_id': match.rule_id,
-                'cup_level': match.cup_level,
-                'cup_level_index': match.cup_level_index,
-                'home_goals': match.home_goals,
-                'away_goals': match.away_goals
+                "ht_id": match.ht_id,
+                "home_team_id": match.home_team_id,
+                "home_team_name": match.home_team_name,
+                "away_team_id": match.away_team_id,
+                "away_team_name": match.away_team_name,
+                "datetime": match.datetime.isoformat() if match.datetime else None,
+                "matchtype": match.matchtype,
+                "context_id": match.context_id,
+                "rule_id": match.rule_id,
+                "cup_level": match.cup_level,
+                "cup_level_index": match.cup_level_index,
+                "home_goals": match.home_goals,
+                "away_goals": match.away_goals,
             }
-            backup_data['matches'].append(match_data)
+            backup_data["matches"].append(match_data)
 
     # Save backup file with timestamp
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_file = f"scripts/database/backups/matches_backup_{timestamp}.json"
 
     # Ensure backup directory exists
     os.makedirs(os.path.dirname(backup_file), exist_ok=True)
 
-    with open(backup_file, 'w') as f:
+    with open(backup_file, "w") as f:
         json.dump(backup_data, f, indent=2)
 
     print(f"✅ Backup created: {backup_file}")
@@ -81,13 +80,14 @@ def create_backup():
 
     return backup_file
 
+
 def analyze_cleanup_impact():
     """Analyze what will be deleted and what will be kept."""
     print("\n=== ANALYZING CLEANUP IMPACT ===")
 
     app = create_app()
     with app.app_context():
-        cutoff_date = '2024-01-01'
+        cutoff_date = "2024-01-01"
 
         # Count matches to delete
         old_matches = Match.query.filter(Match.datetime < cutoff_date).all()
@@ -100,7 +100,7 @@ def analyze_cleanup_impact():
         # Show year breakdown of what gets deleted
         years_to_delete = {}
         for match in old_matches:
-            year = match.datetime.year if match.datetime else 'Unknown'
+            year = match.datetime.year if match.datetime else "Unknown"
             years_to_delete[year] = years_to_delete.get(year, 0) + 1
 
         print("\nDeletion breakdown by year:")
@@ -110,7 +110,9 @@ def analyze_cleanup_impact():
         # Show sample of what gets deleted
         print("\nSample matches to be deleted (showing first 5):")
         for match in old_matches[:5]:
-            date_str = match.datetime.strftime('%Y-%m-%d') if match.datetime else 'No date'
+            date_str = (
+                match.datetime.strftime("%Y-%m-%d") if match.datetime else "No date"
+            )
             print(f"  {date_str}: {match.home_team_name} vs {match.away_team_name}")
 
         if len(old_matches) > 5:
@@ -118,13 +120,14 @@ def analyze_cleanup_impact():
 
         return len(old_matches), len(recent_matches)
 
+
 def perform_cleanup():
     """Perform the actual cleanup operation."""
     print("\n=== PERFORMING CLEANUP ===")
 
     app = create_app()
     with app.app_context():
-        cutoff_date = '2024-01-01'
+        cutoff_date = "2024-01-01"
 
         # Delete old matches
         old_matches = Match.query.filter(Match.datetime < cutoff_date)
@@ -153,6 +156,7 @@ def perform_cleanup():
         else:
             print("✅ Cleanup completed successfully!")
             return True
+
 
 def create_rollback_script(backup_file):
     """Create a rollback script for emergency recovery."""
@@ -229,11 +233,12 @@ if __name__ == "__main__":
 """
 
     rollback_file = "scripts/database/rollback_match_cleanup.py"
-    with open(rollback_file, 'w') as f:
+    with open(rollback_file, "w") as f:
         f.write(rollback_script)
 
     print(f"✅ Rollback script created: {rollback_file}")
     return rollback_file
+
 
 def main():
     """Main cleanup process."""
@@ -260,7 +265,7 @@ def main():
         print("  💾 CREATE full backup for rollback capability")
 
         response = input("\nProceed with cleanup? (yes/no): ").lower().strip()
-        if response not in ['yes', 'y']:
+        if response not in ["yes", "y"]:
             print("❌ Operation cancelled by user.")
             return
 
@@ -288,6 +293,7 @@ def main():
         print("   Operation may be partially completed")
         print("   Use rollback script if needed")
         raise
+
 
 if __name__ == "__main__":
     main()

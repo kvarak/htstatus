@@ -9,12 +9,14 @@ from models import Group, Match, MatchPlay, Players, PlayerSetting, User
 def test_root_models_imports():
     """Test that root models module imports without errors."""
     import models
+
     assert models is not None
 
 
 def test_chpp_models_imports():
     """Test that CHPP models module imports without errors."""
     import app.chpp.models
+
     assert app.chpp.models is not None
 
 
@@ -23,14 +25,14 @@ class TestUserModel:
 
     def test_user_creation(self):
         """Test User model initialization with all required fields."""
-        with patch('time.strftime', return_value="2024-01-01 12:00:00"):
+        with patch("time.strftime", return_value="2024-01-01 12:00:00"):
             user = User(
                 ht_id=12345,
                 ht_user="test_ht_user",
                 username="testuser",
                 password="testpass",
                 access_key="access_key",
-                access_secret="access_secret"
+                access_secret="access_secret",
             )
 
             assert user.ht_id == 12345
@@ -141,7 +143,7 @@ class TestGroupModel:
             name="Goalkeepers",
             order=1,
             textcolor="#000000",
-            bgcolor="#FFD700"
+            bgcolor="#FFD700",
         )
 
         assert group.user_id == 12345
@@ -161,11 +163,7 @@ class TestPlayerSettingModel:
 
     def test_player_setting_creation(self):
         """Test PlayerSetting model initialization."""
-        setting = PlayerSetting(
-            player_id=123456,
-            user_id=12345,
-            group_id=1
-        )
+        setting = PlayerSetting(player_id=123456, user_id=12345, group_id=1)
 
         assert setting.player_id == 123456
         assert setting.user_id == 12345
@@ -195,7 +193,7 @@ class TestMatchModel:
             "cup_level": 0,
             "cup_level_index": 0,
             "home_goals": 2,
-            "away_goals": 1
+            "away_goals": 1,
         }
 
         match = Match(match_data)
@@ -218,9 +216,13 @@ class TestMatchModel:
             "away_team_id": 54321,
             "away_team_name": "Sample United",
             "datetime": datetime(2024, 3, 15, 15, 0),
-            "matchtype": 1, "context_id": 0, "rule_id": 0,
-            "cup_level": 0, "cup_level_index": 0,
-            "home_goals": 3, "away_goals": 0
+            "matchtype": 1,
+            "context_id": 0,
+            "rule_id": 0,
+            "cup_level": 0,
+            "cup_level_index": 0,
+            "home_goals": 3,
+            "away_goals": 0,
         }
 
         match = Match(match_data)
@@ -235,9 +237,13 @@ class TestMatchModel:
             "away_team_id": 2222,
             "away_team_name": "Away FC",
             "datetime": datetime(2024, 5, 1, 20, 0),
-            "matchtype": 1, "context_id": 0, "rule_id": 0,
-            "cup_level": 0, "cup_level_index": 0,
-            "home_goals": 2, "away_goals": 1,
+            "matchtype": 1,
+            "context_id": 0,
+            "rule_id": 0,
+            "cup_level": 0,
+            "cup_level_index": 0,
+            "home_goals": 2,
+            "away_goals": 1,
             # Possession by halves
             "possession_first_half_home": 55,
             "possession_first_half_away": 45,
@@ -302,9 +308,13 @@ class TestMatchModel:
             "away_team_id": 2222,
             "away_team_name": "Away FC",
             "datetime": datetime(2024, 5, 1, 20, 0),
-            "matchtype": 1, "context_id": 0, "rule_id": 0,
-            "cup_level": 0, "cup_level_index": 0,
-            "home_goals": 1, "away_goals": 1,
+            "matchtype": 1,
+            "context_id": 0,
+            "rule_id": 0,
+            "cup_level": 0,
+            "cup_level_index": 0,
+            "home_goals": 1,
+            "away_goals": 1,
         }
 
         match = Match(match_data)
@@ -332,7 +342,7 @@ class TestMatchPlayModel:
             "role_id": 100,
             "rating_stars": 7.5,
             "rating_stars_eom": 7.0,
-            "behaviour": 1
+            "behaviour": 1,
         }
 
         matchplay = MatchPlay(matchplay_data)
@@ -349,12 +359,16 @@ class TestMatchPlayModel:
     def test_matchplay_repr(self):
         """Test MatchPlay string representation."""
         matchplay_data = {
-            "match_id": 987655, "player_id": 123457,
+            "match_id": 987655,
+            "player_id": 123457,
             "datetime": datetime(2024, 3, 15, 15, 0),
-            "first_name": "Jane", "nick_name": "Janie",
-            "last_name": "Smith", "role_id": 101,
-            "rating_stars": 8.0, "rating_stars_eom": 7.5,
-            "behaviour": 1
+            "first_name": "Jane",
+            "nick_name": "Janie",
+            "last_name": "Smith",
+            "role_id": 101,
+            "rating_stars": 8.0,
+            "rating_stars_eom": 7.5,
+            "behaviour": 1,
         }
 
         matchplay = MatchPlay(matchplay_data)
@@ -369,25 +383,58 @@ class TestPlayersModel:
         """Test Players model initialization with basic required fields."""
         player_data = {
             "ht_id": 123456,
-            "first_name": "Test", "nick_name": "Test", "last_name": "Player",
-            "number": 1, "category_id": 0, "owner_notes": "",
-            "age_years": 25, "age_days": 100, "age": "25.100",
+            "first_name": "Test",
+            "nick_name": "Test",
+            "last_name": "Player",
+            "number": 1,
+            "category_id": 0,
+            "owner_notes": "",
+            "age_years": 25,
+            "age_days": 100,
+            "age": "25.100",
             "next_birthday": datetime(2024, 6, 1),
             "arrival_date": datetime(2024, 1, 1),
-            "form": 7, "cards": 0, "injury_level": 0, "statement": "",
-            "language": "English", "language_id": 2,
-            "agreeability": 3, "aggressiveness": 3, "honesty": 3,
-            "experience": 5, "loyalty": 10, "specialty": 0,
-            "native_country_id": 1, "native_league_id": 1,
-            "native_league_name": "Test League", "tsi": 1000, "salary": 5000,
-            "caps": 0, "caps_u20": 0, "career_goals": 10, "career_hattricks": 1,
-            "league_goals": 5, "cup_goals": 2, "friendly_goals": 3,
-            "current_team_matches": 20, "current_team_goals": 8,
-            "national_team_id": 0, "national_team_name": "",
-            "is_transfer_listed": False, "team_id": 12345,
-            "stamina": 6, "keeper": 3, "defender": 7, "playmaker": 8,
-            "winger": 5, "passing": 6, "scorer": 9, "set_pieces": 4,
-            "owner": 12345, "mother_club_bonus": False, "leadership": 5
+            "form": 7,
+            "cards": 0,
+            "injury_level": 0,
+            "statement": "",
+            "language": "English",
+            "language_id": 2,
+            "agreeability": 3,
+            "aggressiveness": 3,
+            "honesty": 3,
+            "experience": 5,
+            "loyalty": 10,
+            "specialty": 0,
+            "native_country_id": 1,
+            "native_league_id": 1,
+            "native_league_name": "Test League",
+            "tsi": 1000,
+            "salary": 5000,
+            "caps": 0,
+            "caps_u20": 0,
+            "career_goals": 10,
+            "career_hattricks": 1,
+            "league_goals": 5,
+            "cup_goals": 2,
+            "friendly_goals": 3,
+            "current_team_matches": 20,
+            "current_team_goals": 8,
+            "national_team_id": 0,
+            "national_team_name": "",
+            "is_transfer_listed": False,
+            "team_id": 12345,
+            "stamina": 6,
+            "keeper": 3,
+            "defender": 7,
+            "playmaker": 8,
+            "winger": 5,
+            "passing": 6,
+            "scorer": 9,
+            "set_pieces": 4,
+            "owner": 12345,
+            "mother_club_bonus": False,
+            "leadership": 5,
         }
 
         player = Players(player_data)
@@ -402,27 +449,59 @@ class TestPlayersModel:
     def test_players_boolean_conversion(self):
         """Test Players model boolean field conversion."""
         player_data = {
-            "ht_id": 123457, "first_name": "Bool", "nick_name": "Test",
-            "last_name": "Player", "number": 2, "category_id": 0,
-            "owner_notes": "", "age_years": 26, "age_days": 30, "age": "26.30",
+            "ht_id": 123457,
+            "first_name": "Bool",
+            "nick_name": "Test",
+            "last_name": "Player",
+            "number": 2,
+            "category_id": 0,
+            "owner_notes": "",
+            "age_years": 26,
+            "age_days": 30,
+            "age": "26.30",
             "next_birthday": datetime(2024, 9, 1),
             "arrival_date": datetime(2023, 6, 15),
-            "form": 7, "cards": 1, "injury_level": 1, "statement": "",
-            "language": "German", "language_id": 4,
-            "agreeability": 7, "aggressiveness": 6, "honesty": 8,
-            "experience": 6, "loyalty": 7, "specialty": 1,
-            "native_country_id": 10, "native_league_id": 3,
-            "native_league_name": "Germany", "tsi": 3000, "salary": 18000,
-            "caps": 5, "caps_u20": 8, "career_goals": 20, "career_hattricks": 1,
-            "league_goals": 15, "cup_goals": 3, "friendly_goals": 2,
-            "current_team_matches": 40, "current_team_goals": 15,
-            "national_team_id": 3010, "national_team_name": "Germany",
+            "form": 7,
+            "cards": 1,
+            "injury_level": 1,
+            "statement": "",
+            "language": "German",
+            "language_id": 4,
+            "agreeability": 7,
+            "aggressiveness": 6,
+            "honesty": 8,
+            "experience": 6,
+            "loyalty": 7,
+            "specialty": 1,
+            "native_country_id": 10,
+            "native_league_id": 3,
+            "native_league_name": "Germany",
+            "tsi": 3000,
+            "salary": 18000,
+            "caps": 5,
+            "caps_u20": 8,
+            "career_goals": 20,
+            "career_hattricks": 1,
+            "league_goals": 15,
+            "cup_goals": 3,
+            "friendly_goals": 2,
+            "current_team_matches": 40,
+            "current_team_goals": 15,
+            "national_team_id": 3010,
+            "national_team_name": "Germany",
             "is_transfer_listed": 1,  # Truthy value
-            "team_id": 54321, "stamina": 8, "keeper": 5, "defender": 8,
-            "playmaker": 7, "winger": 6, "passing": 7, "scorer": 8,
-            "set_pieces": 6, "owner": 12345,
+            "team_id": 54321,
+            "stamina": 8,
+            "keeper": 5,
+            "defender": 8,
+            "playmaker": 7,
+            "winger": 6,
+            "passing": 7,
+            "scorer": 8,
+            "set_pieces": 6,
+            "owner": 12345,
             "mother_club_bonus": 1,  # Truthy value
-            "leadership": 6
+            "leadership": 6,
         }
 
         player = Players(player_data)
@@ -435,25 +514,59 @@ class TestPlayersModel:
     def test_players_repr(self):
         """Test Players string representation."""
         player_data = {
-            "ht_id": 999999, "first_name": "Repr", "nick_name": "Test",
-            "last_name": "Player", "number": 99, "category_id": 0,
-            "owner_notes": "", "age_years": 20, "age_days": 0, "age": "20.0",
+            "ht_id": 999999,
+            "first_name": "Repr",
+            "nick_name": "Test",
+            "last_name": "Player",
+            "number": 99,
+            "category_id": 0,
+            "owner_notes": "",
+            "age_years": 20,
+            "age_days": 0,
+            "age": "20.0",
             "next_birthday": datetime(2024, 6, 1),
             "arrival_date": datetime(2024, 1, 1),
-            "form": 6, "cards": 0, "injury_level": 0, "statement": "",
-            "language": "English", "language_id": 2,
-            "agreeability": 5, "aggressiveness": 5, "honesty": 5,
-            "experience": 3, "loyalty": 6, "specialty": 0,
-            "native_country_id": 1, "native_league_id": 1,
-            "native_league_name": "Test League", "tsi": 1000, "salary": 5000,
-            "caps": 0, "caps_u20": 0, "career_goals": 0, "career_hattricks": 0,
-            "league_goals": 0, "cup_goals": 0, "friendly_goals": 0,
-            "current_team_matches": 0, "current_team_goals": 0,
-            "national_team_id": 0, "national_team_name": "",
-            "is_transfer_listed": False, "team_id": 12345,
-            "stamina": 5, "keeper": 5, "defender": 5, "playmaker": 5,
-            "winger": 5, "passing": 5, "scorer": 5, "set_pieces": 5,
-            "owner": 12345, "mother_club_bonus": False, "leadership": 5
+            "form": 6,
+            "cards": 0,
+            "injury_level": 0,
+            "statement": "",
+            "language": "English",
+            "language_id": 2,
+            "agreeability": 5,
+            "aggressiveness": 5,
+            "honesty": 5,
+            "experience": 3,
+            "loyalty": 6,
+            "specialty": 0,
+            "native_country_id": 1,
+            "native_league_id": 1,
+            "native_league_name": "Test League",
+            "tsi": 1000,
+            "salary": 5000,
+            "caps": 0,
+            "caps_u20": 0,
+            "career_goals": 0,
+            "career_hattricks": 0,
+            "league_goals": 0,
+            "cup_goals": 0,
+            "friendly_goals": 0,
+            "current_team_matches": 0,
+            "current_team_goals": 0,
+            "national_team_id": 0,
+            "national_team_name": "",
+            "is_transfer_listed": False,
+            "team_id": 12345,
+            "stamina": 5,
+            "keeper": 5,
+            "defender": 5,
+            "playmaker": 5,
+            "winger": 5,
+            "passing": 5,
+            "scorer": 5,
+            "set_pieces": 5,
+            "owner": 12345,
+            "mother_club_bonus": False,
+            "leadership": 5,
         }
 
         player = Players(player_data)

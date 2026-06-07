@@ -6,12 +6,12 @@ import pytest
 
 from app.error_handlers import (
     AuthenticationError,
+    handle_error,
     HTStatusError,
     TeamAccessError,
-    ValidationError,
-    handle_error,
     validate_player_id,
     validate_team_id,
+    ValidationError,
 )
 
 
@@ -45,7 +45,7 @@ class TestHTStatusError:
             message="Custom error",
             error_code="TEST_001",
             template="error.html",
-            title="Custom Error"
+            title="Custom Error",
         )
 
         assert str(error) == "Custom error"
@@ -128,7 +128,7 @@ class TestTeamAccessError:
 class TestHandleError:
     """Test handle_error function."""
 
-    @patch('app.error_handlers.create_page')
+    @patch("app.error_handlers.create_page")
     def test_handle_error_with_htstatus_error(self, mock_create_page):
         """Test handle_error with HTStatusError instance."""
         mock_create_page.return_value = "error_page"
@@ -142,10 +142,10 @@ class TestHandleError:
             title="Error",
             error="Invalid data",
             error_code="VALIDATION_TEST",
-            extra_context="test_value"
+            extra_context="test_value",
         )
 
-    @patch('app.error_handlers.create_page')
+    @patch("app.error_handlers.create_page")
     def test_handle_error_with_string(self, mock_create_page):
         """Test handle_error with string error."""
         mock_create_page.return_value = "error_page"
@@ -154,12 +154,10 @@ class TestHandleError:
 
         assert result == "error_page"
         mock_create_page.assert_called_once_with(
-            template="error.html",
-            title="Error",
-            error="Simple error message"
+            template="error.html", title="Error", error="Simple error message"
         )
 
-    @patch('app.error_handlers.create_page')
+    @patch("app.error_handlers.create_page")
     def test_handle_error_with_exception(self, mock_create_page):
         """Test handle_error with generic exception."""
         mock_create_page.return_value = "error_page"
@@ -169,12 +167,10 @@ class TestHandleError:
 
         assert result == "error_page"
         mock_create_page.assert_called_once_with(
-            template="error.html",
-            title="Error",
-            error="Value error message"
+            template="error.html", title="Error", error="Value error message"
         )
 
-    @patch('app.error_handlers.create_page')
+    @patch("app.error_handlers.create_page")
     def test_handle_error_with_none(self, mock_create_page):
         """Test handle_error with None error."""
         mock_create_page.return_value = "error_page"
@@ -183,9 +179,7 @@ class TestHandleError:
 
         assert result == "error_page"
         mock_create_page.assert_called_once_with(
-            template="error.html",
-            title="Error",
-            error="An unexpected error occurred"
+            template="error.html", title="Error", error="An unexpected error occurred"
         )
 
 

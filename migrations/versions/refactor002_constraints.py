@@ -57,63 +57,66 @@ def upgrade():
     null_found = False
     for table_name, column_name, description in constraints_to_add:
         try:
-            result = connection.execute(sa.text(f"SELECT COUNT(*) FROM {table_name} WHERE {column_name} IS NULL"))
+            result = connection.execute(
+                sa.text(f"SELECT COUNT(*) FROM {table_name} WHERE {column_name} IS NULL"))
             null_count = result.scalar()
             if null_count > 0:
-                print(f"WARNING: Found {null_count} NULL values in {table_name}.{column_name}")
+                print(
+                    f"WARNING: Found {null_count} NULL values in {table_name}.{column_name}")
                 null_found = True
         except Exception as e:
             print(f"Could not check {table_name}.{column_name}: {e}")
 
     if null_found:
-        raise Exception("Migration aborted: NULL values found in fields that need NOT NULL constraints. Please clean data first.")
+        raise Exception(
+            "Migration aborted: NULL values found in fields that need NOT NULL constraints. Please clean data first.")
 
     # Apply NOT NULL constraints
     try:
         # Users table
         with op.batch_alter_table('users', schema=None) as batch_op:
             batch_op.alter_column('ht_user',
-                existing_type=sa.String(length=50),
-                nullable=False)
+                                  existing_type=sa.String(length=50),
+                                  nullable=False)
             batch_op.alter_column('username',
-                existing_type=sa.String(length=100),
-                nullable=False)
+                                  existing_type=sa.String(length=100),
+                                  nullable=False)
 
         # Match table
         with op.batch_alter_table('match', schema=None) as batch_op:
             batch_op.alter_column('home_team_name',
-                existing_type=sa.String(length=100),
-                nullable=False)
+                                  existing_type=sa.String(length=100),
+                                  nullable=False)
             batch_op.alter_column('away_team_name',
-                existing_type=sa.String(length=100),
-                nullable=False)
+                                  existing_type=sa.String(length=100),
+                                  nullable=False)
 
         # MatchPlay table
         with op.batch_alter_table('matchplay', schema=None) as batch_op:
             batch_op.alter_column('first_name',
-                existing_type=sa.String(length=50),
-                nullable=False)
+                                  existing_type=sa.String(length=50),
+                                  nullable=False)
             batch_op.alter_column('last_name',
-                existing_type=sa.String(length=50),
-                nullable=False)
+                                  existing_type=sa.String(length=50),
+                                  nullable=False)
 
         # PlayerSetting table
         with op.batch_alter_table('playersetting', schema=None) as batch_op:
             batch_op.alter_column('user_id',
-                existing_type=sa.Integer(),
-                nullable=False)
+                                  existing_type=sa.Integer(),
+                                  nullable=False)
             batch_op.alter_column('player_id',
-                existing_type=sa.Integer(),
-                nullable=False)
+                                  existing_type=sa.Integer(),
+                                  nullable=False)
 
         # PlayerGroup table
         with op.batch_alter_table('playergroup', schema=None) as batch_op:
             batch_op.alter_column('user_id',
-                existing_type=sa.Integer(),
-                nullable=False)
+                                  existing_type=sa.Integer(),
+                                  nullable=False)
             batch_op.alter_column('name',
-                existing_type=sa.String(length=100),
-                nullable=False)
+                                  existing_type=sa.String(length=100),
+                                  nullable=False)
 
     except Exception as e:
         raise Exception(f"Migration failed during constraint addition: {e}")
@@ -126,47 +129,47 @@ def downgrade():
         # Reverse Users table changes
         with op.batch_alter_table('users', schema=None) as batch_op:
             batch_op.alter_column('ht_user',
-                existing_type=sa.String(length=50),
-                nullable=True)
+                                  existing_type=sa.String(length=50),
+                                  nullable=True)
             batch_op.alter_column('username',
-                existing_type=sa.String(length=100),
-                nullable=True)
+                                  existing_type=sa.String(length=100),
+                                  nullable=True)
 
         # Reverse Match table changes
         with op.batch_alter_table('match', schema=None) as batch_op:
             batch_op.alter_column('home_team_name',
-                existing_type=sa.String(length=100),
-                nullable=True)
+                                  existing_type=sa.String(length=100),
+                                  nullable=True)
             batch_op.alter_column('away_team_name',
-                existing_type=sa.String(length=100),
-                nullable=True)
+                                  existing_type=sa.String(length=100),
+                                  nullable=True)
 
         # Reverse MatchPlay table changes
         with op.batch_alter_table('matchplay', schema=None) as batch_op:
             batch_op.alter_column('first_name',
-                existing_type=sa.String(length=50),
-                nullable=True)
+                                  existing_type=sa.String(length=50),
+                                  nullable=True)
             batch_op.alter_column('last_name',
-                existing_type=sa.String(length=50),
-                nullable=True)
+                                  existing_type=sa.String(length=50),
+                                  nullable=True)
 
         # Reverse PlayerSetting table changes
         with op.batch_alter_table('playersetting', schema=None) as batch_op:
             batch_op.alter_column('user_id',
-                existing_type=sa.Integer(),
-                nullable=True)
+                                  existing_type=sa.Integer(),
+                                  nullable=True)
             batch_op.alter_column('player_id',
-                existing_type=sa.Integer(),
-                nullable=True)
+                                  existing_type=sa.Integer(),
+                                  nullable=True)
 
         # Reverse PlayerGroup table changes
         with op.batch_alter_table('playergroup', schema=None) as batch_op:
             batch_op.alter_column('user_id',
-                existing_type=sa.Integer(),
-                nullable=True)
+                                  existing_type=sa.Integer(),
+                                  nullable=True)
             batch_op.alter_column('name',
-                existing_type=sa.String(length=100),
-                nullable=True)
+                                  existing_type=sa.String(length=100),
+                                  nullable=True)
 
     except Exception as e:
         raise Exception(f"Downgrade failed: {e}")

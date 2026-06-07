@@ -34,7 +34,8 @@ class TestConfigClass:
             config_instance = config.Config()
             # The default key should be a development-safe value, not production secrets
             assert config_instance.SECRET_KEY
-            assert len(config_instance.SECRET_KEY) > 10  # Ensure it's not empty
+            # Ensure it's not empty
+            assert len(config_instance.SECRET_KEY) > 10
 
     def test_custom_secret_key_from_env(self):
         """Test that SECRET_KEY can be set via environment variable."""

@@ -13,39 +13,50 @@ import tempfile
 def test_detect_version_changes():
     """Test version detection script"""
     result = subprocess.run(
-        ["./scripts/release/detect_version_changes.sh"],
-        capture_output=True,
-        text=True
+        ["./scripts/release/detect_version_changes.sh"], capture_output=True, text=True
     )
 
     # Script can return 1 if no changes are found, which is valid
-    assert result.returncode in [0, 1], f"Version detection failed unexpectedly: {result.stderr}"
+    assert result.returncode in [
+        0,
+        1,
+    ], f"Version detection failed unexpectedly: {result.stderr}"
     assert "Current version:" in result.stderr
     # If no changes found, should contain expected message
     if result.returncode == 1:
-        assert "No feature commits found since" in result.stderr or "No feature or significant commits found" in result.stderr
+        assert (
+            "No feature commits found since" in result.stderr
+            or "No feature or significant commits found" in result.stderr
+        )
     else:
-        assert "Feature commits found" in result.stderr or "Significant commits found" in result.stderr
+        assert (
+            "Feature commits found" in result.stderr
+            or "Significant commits found" in result.stderr
+        )
+
 
 def test_generate_release_content():
     """Test release content generation"""
     result = subprocess.run(
         ["./scripts/release/generate_release_content.sh", "v3.1"],
         capture_output=True,
-        text=True
+        text=True,
     )
 
     assert result.returncode == 0, f"Content generation failed: {result.stderr}"
     assert "## v3.1 - " in result.stdout
     # Check for valid month format (e.g., "January 2026", "February 2026", etc.)
-    assert re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December) 202\d', result.stdout), \
-        f"Expected month and year format not found in output: {result.stdout}"
+    assert re.search(
+        r"(January|February|March|April|May|June|July|August|September|October|November|December) 202\d",
+        result.stdout,
+    ), f"Expected month and year format not found in output: {result.stdout}"
     assert "-" in result.stdout  # Should have bullet points
+
 
 def test_update_releases():
     """Test RELEASES.md update process"""
     # Create a temporary RELEASES.md file
-    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.md') as temp_file:
+    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".md") as temp_file:
         temp_file.write("""# Releases
 
 **Purpose**: User-focused summaries
@@ -68,7 +79,7 @@ def test_update_releases():
         result = subprocess.run(
             ["./scripts/release/update_releases.sh", "v3.2"],
             capture_output=True,
-            text=True
+            text=True,
         )
 
         assert result.returncode == 0, f"Update script failed: {result.stderr}"
@@ -83,6 +94,7 @@ def test_update_releases():
     finally:
         # Restore original file
         shutil.move(backup_path, original_path)
+
 
 if __name__ == "__main__":
     test_detect_version_changes()

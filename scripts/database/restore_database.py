@@ -17,16 +17,16 @@ Created: February 6, 2026 (INFRA-033 Database Protection)
 """
 
 import os
+from pathlib import Path
 import subprocess
 import sys
-from pathlib import Path
 
 import click
+from db_utils import load_database_config
 from dotenv import load_dotenv
 
 # Add the current directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
-from db_utils import load_database_config
 
 
 def confirm_restore(backup_file: str, target_db: str) -> bool:
@@ -36,8 +36,12 @@ def confirm_restore(backup_file: str, target_db: str) -> bool:
     print(f"   Target database: {target_db}")
     print()
 
-    response = input("Are you sure you want to continue? Type 'yes' to confirm: ").strip().lower()
-    return response == 'yes'
+    response = (
+        input("Are you sure you want to continue? Type 'yes' to confirm: ")
+        .strip()
+        .lower()
+    )
+    return response == "yes"
 
 
 def restore_database_backup(backup_file: str, target_db: str = None) -> bool:
@@ -64,7 +68,7 @@ def restore_database_backup(backup_file: str, target_db: str = None) -> bool:
 
     # Load environment variables
     load_dotenv()
-    database_url = os.environ.get('DATABASE_URL')
+    database_url = os.environ.get("DATABASE_URL")
     if not database_url:
         print("❌ ERROR: DATABASE_URL environment variable not set")
         return False
@@ -74,36 +78,44 @@ def restore_database_backup(backup_file: str, target_db: str = None) -> bool:
 
         # Use target database if specified, otherwise use configured database
         if target_db:
-            db_config['database'] = target_db
+            db_config["database"] = target_db
 
-        print(f"Target: {db_config['user']}@{db_config['host']}:{db_config['port']}/{db_config['database']}")
+        print(
+            f"Target: {db_config['user']}@{db_config['host']}:{db_config['port']}/{db_config['database']}"
+        )
 
     except ValueError as e:
         print(f"❌ ERROR: {e}")
         return False
 
     # Confirm restoration
-    if not confirm_restore(str(backup_path), db_config['database']):
+    if not confirm_restore(str(backup_path), db_config["database"]):
         print("❌ Restoration cancelled by user")
         return False
 
     # Prepare psql command
     cmd = [
-        'psql',
-        '--host', db_config['host'],
-        '--port', db_config['port'],
-        '--username', db_config['user'],
-        '--no-password',  # Use PGPASSWORD environment variable
-        '--dbname', 'postgres',  # Connect to postgres database to create target DB
-        '--file', str(backup_path),
-        '--quiet',
-        '--variable', 'ON_ERROR_STOP=1'  # Stop on first error
+        "psql",
+        "--host",
+        db_config["host"],
+        "--port",
+        db_config["port"],
+        "--username",
+        db_config["user"],
+        "--no-password",  # Use PGPASSWORD environment variable
+        "--dbname",
+        "postgres",  # Connect to postgres database to create target DB
+        "--file",
+        str(backup_path),
+        "--quiet",
+        "--variable",
+        "ON_ERROR_STOP=1",  # Stop on first error
     ]
 
     # Set environment for psql
     env = os.environ.copy()
-    if db_config['password']:
-        env['PGPASSWORD'] = db_config['password']
+    if db_config["password"]:
+        env["PGPASSWORD"] = db_config["password"]
 
     print(f"Restoring to database: {db_config['database']}")
     print(f"Command: {' '.join(cmd[:6])} ... [details hidden]")
@@ -111,11 +123,7 @@ def restore_database_backup(backup_file: str, target_db: str = None) -> bool:
     try:
         # Run psql restore
         result = subprocess.run(
-            cmd,
-            env=env,
-            capture_output=True,
-            text=True,
-            check=True
+            cmd, env=env, capture_output=True, text=True, check=True
         )
 
         print("✅ Database restored successfully!")
@@ -142,8 +150,10 @@ def restore_database_backup(backup_file: str, target_db: str = None) -> bool:
 
 
 @click.command()
-@click.argument('backup_file', type=click.Path(exists=True))
-@click.option('--target-db', help='Target database name (defaults to configured database)')
+@click.argument("backup_file", type=click.Path(exists=True))
+@click.option(
+    "--target-db", help="Target database name (defaults to configured database)"
+)
 def main(backup_file, target_db):
     """Restore database from backup file.
 
@@ -158,5 +168,5 @@ def main(backup_file, target_db):
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

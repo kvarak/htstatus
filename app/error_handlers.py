@@ -136,14 +136,15 @@ def log_error_to_database(error_type, error, request_info=None):
     try:
         import traceback
 
-        from flask import current_app, session
+        from flask import current_app
         from flask import request as flask_request
+        from flask import session
 
         from app import db
         from models import ErrorLog
 
         # Only log errors in production environment
-        if current_app.config.get('FLASK_ENV') != 'production':
+        if current_app.config.get("FLASK_ENV") != "production":
             return
 
         # Gather error context
@@ -151,13 +152,15 @@ def log_error_to_database(error_type, error, request_info=None):
         stack_trace = None
 
         # Get stack trace for exceptions
-        if hasattr(error, '__traceback__'):
-            stack_trace = ''.join(traceback.format_exception(type(error), error, error.__traceback__))
-        elif error_type == '500':
+        if hasattr(error, "__traceback__"):
+            stack_trace = "".join(
+                traceback.format_exception(type(error), error, error.__traceback__)
+            )
+        elif error_type == "500":
             stack_trace = traceback.format_exc()
 
         # Get user context from session
-        user_id = session.get('current_user_id') if session else None
+        user_id = session.get("current_user_id") if session else None
 
         # Get request context
         request_path = None
@@ -165,13 +168,15 @@ def log_error_to_database(error_type, error, request_info=None):
         user_agent = None
 
         if request_info:
-            request_path = request_info.get('path')
-            request_method = request_info.get('method')
-            user_agent = request_info.get('user_agent')
+            request_path = request_info.get("path")
+            request_method = request_info.get("method")
+            user_agent = request_info.get("user_agent")
         elif flask_request:
             request_path = flask_request.path
             request_method = flask_request.method
-            user_agent = flask_request.user_agent.string if flask_request.user_agent else None
+            user_agent = (
+                flask_request.user_agent.string if flask_request.user_agent else None
+            )
 
         # Create error log entry
         error_log = ErrorLog(
@@ -181,7 +186,7 @@ def log_error_to_database(error_type, error, request_info=None):
             user_id=user_id,
             request_path=request_path,
             request_method=request_method,
-            user_agent=user_agent
+            user_agent=user_agent,
         )
 
         # Save to database
@@ -200,24 +205,25 @@ def register_error_handlers(app):
     Args:
         app: Flask application instance
     """
+
     @app.errorhandler(500)
     def handle_internal_error(error):
         """Handle 500 Internal Server Error."""
-        log_error_to_database('500', error)
+        log_error_to_database("500", error)
         return handle_error("Internal server error occurred"), 500
 
     @app.errorhandler(404)
     def handle_not_found(error):
         """Handle 404 Not Found Error."""
-        log_error_to_database('404', error)
+        log_error_to_database("404", error)
         return handle_error("Page not found"), 404
 
     @app.errorhandler(Exception)
     def handle_generic_exception(error):
         """Handle any unhandled exception."""
         # Don't double-log HTTP errors that have specific handlers
-        if hasattr(error, 'code') and error.code in [404, 500]:
+        if hasattr(error, "code") and error.code in [404, 500]:
             raise error
 
-        log_error_to_database('Exception', error)
+        log_error_to_database("Exception", error)
         return handle_error("An unexpected error occurred"), 500

@@ -14,14 +14,14 @@ class TestFeedbackModels:
     def test_feedback_create(self):
         """Test creating a feedback item."""
         # Create test user
-        with patch('time.strftime', return_value="2024-01-01 12:00:00"):
+        with patch("time.strftime", return_value="2024-01-01 12:00:00"):
             user = User(
                 ht_id=12345,
                 ht_user="testuser",
                 username="TestUser",
                 password="password",
                 access_key="test_key",
-                access_secret="test_secret"
+                access_secret="test_secret",
             )
 
             # Create feedback (without database)
@@ -29,7 +29,7 @@ class TestFeedbackModels:
                 title="Test Feedback",
                 description="Test description",
                 feedback_type="bug",
-                author_id=user.ht_id
+                author_id=user.ht_id,
             )
 
             # Verify model attributes
@@ -47,32 +47,32 @@ class TestFeedbackModels:
             title="Test Vote Feedback",
             description="Test vote description",
             feedback_type="feature",
-            author_id=12345
+            author_id=12345,
         )
 
         # Test initial state
         assert feedback.vote_score == 0
 
         # Test vote score method exists (without database)
-        assert hasattr(feedback, 'update_vote_score')
+        assert hasattr(feedback, "update_vote_score")
 
     def test_feedback_relationships(self):
         """Test feedback model relationships."""
-        with patch('time.strftime', return_value="2024-01-01 12:00:00"):
+        with patch("time.strftime", return_value="2024-01-01 12:00:00"):
             user = User(
                 ht_id=12345,
                 ht_user="testuser",
                 username="TestUser",
                 password="password",
                 access_key="test_key",
-                access_secret="test_secret"
+                access_secret="test_secret",
             )
 
             feedback = Feedback(
                 title="Relationship Test",
                 description="Test relationships",
                 feedback_type="bug",
-                author_id=user.ht_id
+                author_id=user.ht_id,
             )
 
             # Test basic model structure
@@ -82,9 +82,7 @@ class TestFeedbackModels:
     def test_feedback_comment_create(self):
         """Test creating a feedback comment."""
         feedback_comment = FeedbackComment(
-            feedback_id=1,
-            author_id=12345,
-            content="This is a test comment"
+            feedback_id=1, author_id=12345, content="This is a test comment"
         )
 
         assert feedback_comment.feedback_id == 1
@@ -93,11 +91,7 @@ class TestFeedbackModels:
 
     def test_feedback_vote_unique_constraint(self):
         """Test feedback vote model creation."""
-        feedback_vote = FeedbackVote(
-            feedback_id=1,
-            user_id=12345,
-            vote_type="upvote"
-        )
+        feedback_vote = FeedbackVote(feedback_id=1, user_id=12345, vote_type="upvote")
 
         assert feedback_vote.feedback_id == 1
         assert feedback_vote.user_id == 12345
@@ -105,7 +99,7 @@ class TestFeedbackModels:
 
     def test_feedback_admin_role(self):
         """Test feedback admin role detection."""
-        with patch('time.strftime', return_value="2024-01-01 12:00:00"):
+        with patch("time.strftime", return_value="2024-01-01 12:00:00"):
             # Test regular user
             user = User(
                 ht_id=12345,
@@ -113,7 +107,7 @@ class TestFeedbackModels:
                 username="TestUser",
                 password="password",
                 access_key="test_key",
-                access_secret="test_secret"
+                access_secret="test_secret",
             )
 
             assert not user.is_admin()
@@ -125,7 +119,7 @@ class TestFeedbackModels:
                 username="admin",
                 password="password",
                 access_key="admin_key",
-                access_secret="admin_secret"
+                access_secret="admin_secret",
             )
 
             assert admin_user.is_admin()
@@ -137,7 +131,7 @@ class TestFeedbackModels:
                 username="roleadmin",
                 password="password",
                 access_key="role_key",
-                access_secret="role_secret"
+                access_secret="role_secret",
             )
             role_admin.role = "admin"
 

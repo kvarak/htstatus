@@ -40,6 +40,7 @@ class TestRoutesBlueprintObject:
     def test_routes_bp_is_blueprint(self):
         """Test routes_bp is a Flask Blueprint."""
         from flask import Blueprint
+
         assert isinstance(routes_bp, Blueprint)
 
     def test_routes_bp_name(self):
@@ -50,8 +51,8 @@ class TestRoutesBlueprintObject:
 class TestInitializeRoutes:
     """Test initialize_routes function."""
 
-    @patch('app.utils.get_version_info')
-    @patch('app.routes_bp.time')
+    @patch("app.utils.get_version_info")
+    @patch("app.routes_bp.time")
     def test_initialize_routes_sets_globals(self, mock_time, mock_get_version):
         """Test initialize_routes sets all global variables."""
         # Mock app with config
@@ -60,14 +61,14 @@ class TestInitializeRoutes:
         mock_app.config.get.side_effect = lambda key, default=None: {
             "CONSUMER_KEY": "test_key",
             "CONSUMER_SECRETS": "test_secret",
-            "DEBUG_LEVEL": 2
+            "DEBUG_LEVEL": 2,
         }.get(key, default)
 
         # Mock version info
         mock_get_version.return_value = {
             "versionstr": "2.0.0",
             "fullversion": "2.0.0-dev",
-            "version": "2.0"
+            "version": "2.0",
         }
 
         # Mock time
@@ -95,15 +96,21 @@ class TestInitializeRoutes:
         mock_app.config.get.side_effect = lambda key, default=None: {
             "CONSUMER_KEY": "dev_key",
             "CONSUMER_SECRETS": "dev_secret",
-            "DEBUG_LEVEL": 1
+            "DEBUG_LEVEL": 1,
         }.get(key, default)
 
         mock_db = Mock()
 
-        with patch('app.utils.get_version_info') as mock_version, \
-             patch('app.routes_bp.time') as mock_time:
+        with (
+            patch("app.utils.get_version_info") as mock_version,
+            patch("app.routes_bp.time") as mock_time,
+        ):
 
-            mock_version.return_value = {"versionstr": "dev", "fullversion": "dev", "version": "dev"}
+            mock_version.return_value = {
+                "versionstr": "dev",
+                "fullversion": "dev",
+                "version": "dev",
+            }
             mock_time.strftime.return_value = "test_time"
 
             # Should not raise any errors
@@ -113,63 +120,63 @@ class TestInitializeRoutes:
 class TestRouteReferences:
     """Test route function references."""
 
-    @patch('app.blueprints.main.index')
+    @patch("app.blueprints.main.index")
     def test_index_reference(self, mock_main_index):
         """Test index route reference."""
         mock_main_index.return_value = "test_response"
         index()
         mock_main_index.assert_called_once()
 
-    @patch('app.blueprints.player.player')
+    @patch("app.blueprints.player.player")
     def test_player_reference(self, mock_player_func):
         """Test player route reference."""
         mock_player_func.return_value = "test_response"
         player()
         mock_player_func.assert_called_once()
 
-    @patch('app.blueprints.team.team')
+    @patch("app.blueprints.team.team")
     def test_team_reference(self, mock_team_func):
         """Test team route reference."""
         mock_team_func.return_value = "test_response"
         team()
         mock_team_func.assert_called_once()
 
-    @patch('app.blueprints.main.settings')
+    @patch("app.blueprints.main.settings")
     def test_settings_reference(self, mock_settings_func):
         """Test settings route reference."""
         mock_settings_func.return_value = "test_response"
         settings()
         mock_settings_func.assert_called_once()
 
-    @patch('app.blueprints.auth.logout')
+    @patch("app.blueprints.auth.logout")
     def test_logout_reference(self, mock_logout_func):
         """Test logout route reference."""
         mock_logout_func.return_value = "test_response"
         logout()
         mock_logout_func.assert_called_once()
 
-    @patch('app.blueprints.matches.matches')
+    @patch("app.blueprints.matches.matches")
     def test_matches_reference(self, mock_matches_func):
         """Test matches route reference."""
         mock_matches_func.return_value = "test_response"
         matches()
         mock_matches_func.assert_called_once()
 
-    @patch('app.blueprints.training.training')
+    @patch("app.blueprints.training.training")
     def test_training_reference(self, mock_training_func):
         """Test training route reference."""
         mock_training_func.return_value = "test_response"
         training()
         mock_training_func.assert_called_once()
 
-    @patch('app.blueprints.team.update')
+    @patch("app.blueprints.team.update")
     def test_update_reference(self, mock_update_func):
         """Test update route reference."""
         mock_update_func.return_value = "test_response"
         update()
         mock_update_func.assert_called_once()
 
-    @patch('app.blueprints.main.admin')
+    @patch("app.blueprints.main.admin")
     def test_debug_reference(self, mock_admin_func):
         """Test debug route reference."""
         mock_admin_func.return_value = "test_response"
@@ -182,7 +189,7 @@ class TestGetMainBp:
 
     def test_get_main_bp_returns_blueprint(self):
         """Test get_main_bp returns a blueprint."""
-        with patch('app.blueprints.main.main_bp') as mock_main_bp:
+        with patch("app.blueprints.main.main_bp") as mock_main_bp:
             result = get_main_bp()
             assert result is mock_main_bp
 
@@ -194,7 +201,7 @@ class TestDynamicAttributeAccess:
         """Test __getattr__ returns main_bp for backward compatibility."""
         import app.routes_bp as routes_module
 
-        with patch('app.blueprints.main.main_bp') as mock_main_bp:
+        with patch("app.blueprints.main.main_bp") as mock_main_bp:
             result = routes_module.main_bp
             assert result is mock_main_bp
 
@@ -217,8 +224,8 @@ class TestModuleConstants:
         """Test that expected module constants are defined."""
         import app.routes_bp as routes_module
 
-        assert hasattr(routes_module, 'default_group_order')
-        assert hasattr(routes_module, 'logfile')
+        assert hasattr(routes_module, "default_group_order")
+        assert hasattr(routes_module, "logfile")
         assert routes_module.default_group_order == 99
         assert routes_module.logfile == "htplanner.log"
 
