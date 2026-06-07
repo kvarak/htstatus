@@ -472,6 +472,7 @@ def debug_chpp_teams():
 def debug_chpp_raw(team_id):
     """Debug endpoint to show raw CHPP XML for a team."""
     import xml.etree.ElementTree as ET
+
     from app.chpp_utilities import get_chpp_client
 
     User = get_user_model()
