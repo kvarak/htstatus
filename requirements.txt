@@ -78,7 +78,7 @@ urllib3==2.7.0
     #   requests
 visitor==0.1.3
     # via flask-bootstrap
-werkzeug==3.1.8
+werkzeug==3.1.9
     # via
     #   htstatus (pyproject.toml)
     #   flask
