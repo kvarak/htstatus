@@ -735,7 +735,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
   <script>
       window.goatcounter = {
           path: function (path) {
-              return location.hostname + path;
+              return location.hostname + path.split('?')[0];
           }
       };
   </script>
