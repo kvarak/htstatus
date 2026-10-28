@@ -40,6 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Stats, formation, training, compare and player pages load the current roster with shared database-side queries (`app/roster.py`) instead of per-page history scans and per-player queries
 - `make lint` uses ruff + black (flake8/isort were not installed); CI also runs file-format, CHPP-policy and the full test suite against PostgreSQL
 
+- Page-visit tracking uses one `@track_activity` decorator; the logged-in user is loaded once per request (`get_current_user`) instead of up to four times
+- Admin debug charts: date-range logic moved to `app/static/js/debug-date-filter.js` with Node unit tests; inline error messages instead of pop-up alerts
+- Admin debug charts accessibility: labelled date range fieldset, screen-reader chart descriptions, labelled shrink/expand buttons, keyboard chart reordering (Arrow Up/Down) with announcements
+
 ### Removed
 - Unused code: `/api/players/filter`, admin `/debug/chpp_teams` and `/debug/chpp_raw` (violated CHPP policy), `logout.html`, unused helpers in `utils.py`, `auth_utils.py`, `error_handlers.py`, `chpp_utilities.py`, `hattrick_countries.py`, XML debug printing in the player parser
 - One-off debugging scripts and committed match backup data files
@@ -49,6 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Players sold some time ago remained listed in the team; the update now releases every departed player
 - Changelog page escapes commit messages (they were rendered as raw HTML)
 - Test isolation: tests no longer drop shared tables or leave the model registry mocked
+- `User.is_admin()` ignored role-based admins (compared against lowercase "admin")
+- Debug chart date range end date is now inclusive (users active later on the end day were excluded)
 
 ## [2.0.0] - 2026-01-01
 

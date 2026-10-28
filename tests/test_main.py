@@ -190,16 +190,10 @@ class TestAdminRequiredResponse:
         user = None
         if role:
             user = MagicMock()
-            user.getRole.return_value = role
-        fake_db = MagicMock()
-        fake_db.session.query.return_value.filter_by.return_value.first.return_value = (
-            user
-        )
-
+            user.is_admin.return_value = role == "Admin"
         with (
             app.test_request_context(),
-            patch.object(main_module, "db", fake_db),
-            patch.object(main_module, "get_current_user_id", return_value=1),
+            patch.object(main_module, "get_current_user", return_value=user),
         ):
             result = main_module.admin_required_response()
 
@@ -207,3 +201,46 @@ class TestAdminRequiredResponse:
             assert result is None
         else:
             assert result[1] == expected_status
+
+
+class TestDebugPageAccessibility:
+    """Debug charts page renders accessible controls and valid inline JS."""
+
+    def test_admin_debug_page(self, authenticated_client, db_session):
+        import re
+        import shutil
+        import subprocess  # nosec B404 - static local syntax check only
+        import tempfile
+
+        from models import User
+
+        admin = User(12345, "admin", "admin", "x", "k", "s")
+        admin.setRole("Admin")
+        db_session.add(admin)
+        db_session.commit()
+
+        with authenticated_client.session_transaction() as sess:
+            sess["current_user"] = "admin"
+        response = authenticated_client.get("/debug")
+        html = response.get_data(as_text=True)
+
+        assert response.status_code == 200
+        assert 'id="dateRangeError"' in html and 'role="alert"' in html
+        assert '<legend class="sr-only">Chart date range</legend>' in html
+        assert (
+            'role="img"' in html
+            and 'aria-describedby="userActivityChartDescription"' in html
+        )
+        assert 'aria-label="Shrink User Activity chart"' in html
+        assert 'tabindex="0"' in html
+        assert html.index("debug-date-filter.js") < html.index("debug-charts.js")
+
+        if shutil.which("node"):
+            scripts = re.findall(r"<script>(.*?)</script>", html, re.S)
+            inline = max(scripts, key=len)
+            with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f:
+                f.write(inline)
+            check = subprocess.run(  # nosec B603 B607
+                ["node", "--check", f.name], capture_output=True, text=True
+            )
+            assert check.returncode == 0, check.stderr

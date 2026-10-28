@@ -106,11 +106,12 @@ chpp = get_chpp_client(session)
 user_context = get_current_user_context(chpp)  # Fetches all player data!
 
 # ✅ CORRECT - Use session and database only
-if "current_user_id" not in session:
-    return redirect(url_for("auth.login"))
-user_id = session["current_user_id"]
-user = User.query.filter_by(ht_id=user_id).first()
-user_context = {
+@bp.route("/stats")
+@require_authentication
+@track_activity("stats")  # counts the visit on User (c_stats, last_usage)
+def stats():
+    user = get_current_user()  # app.auth_utils; one DB query per request (cached)
+    user_context = {
     "user": user,
     "teams": session.get("all_teams", []),
     "team_names": session.get("all_team_names", [])

@@ -7,7 +7,7 @@
 ## Status Summary
 - **Quality**: 8/9 quality gates passing (HIGH deployment confidence)
 - **Coverage**: 47.56% test coverage (BELOW 50% target by 2.44%) - NEEDS RESTORATION after UI-021 code reduction
-- **Testing**: 507 tests passing, 0 skipped, 57.7% coverage (October 28, 2026) - full suite now runs in CI with PostgreSQL
+- **Testing**: 519 tests passing (incl. Node JS unit tests via pytest), 59% coverage (October 28, 2026) - full suite runs in CI with PostgreSQL
 - **Security**: 0 CVE vulnerabilities, 13 dependency warnings (non-critical), 0 code issues
 - **Environment**: Production data restored (26,004 players) - fresh production backup January 29, 2026
 - **Architecture**: Blueprint migration complete, Flask-only frontend, comprehensive activity tracking
@@ -28,7 +28,7 @@
 - **Critical Need**: Test coverage restoration from 47.56% to 50% threshold after successful simplification efforts
 - **Quality Gate Status**: MODERATE deployment confidence (6/9 passing), test coverage gap is primary blocker
 - **Next Priority**: TEST-011 comprehensive test coverage for simplified debug chart functionality to restore quality gates
-- **Backlog Status**: 85 improvement/bug/refactor tasks in backlog.md; feature ideas now tracked separately in features.md (October 28, 2026)
+- **Backlog Status**: 81 tasks, P2 cleared (REFACTOR-036/037, TEST-117, UI-023 done October 28, 2026); feature ideas tracked in features.md
 
 ## Recent Completions (February 1-6, 2026)
 

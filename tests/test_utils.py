@@ -276,7 +276,7 @@ class TestCreatePage:
 
     @patch("app.utils.render_template")
     @patch("app.utils.get_version_info")
-    @patch("models.User")
+    @patch("app.auth_utils.get_current_user")
     def test_create_page_with_admin_user(
         self, mock_user, mock_version_info, mock_render
     ):
@@ -289,9 +289,9 @@ class TestCreatePage:
         mock_render.return_value = "rendered_template"
 
         # Mock admin user
-        admin_user = Mock()
-        admin_user.role = "Admin"
-        mock_user.query.filter_by.return_value.first.return_value = admin_user
+        admin_user = Mock(ht_id=12345)
+        admin_user.is_admin.return_value = True
+        mock_user.return_value = admin_user
 
         with self.app.test_client() as client:
             with client.session_transaction() as sess:
@@ -689,7 +689,7 @@ class TestAdminFeedbackCounts:
 
         # Mock user query to return non-admin user
         mock_user = Mock()
-        mock_user.role = "User"
+        mock_user.is_admin.return_value = False
         mock_user.ht_id = 12345
         mock_user_model.query.filter_by.return_value.first.return_value = mock_user
 

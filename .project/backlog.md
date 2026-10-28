@@ -7,7 +7,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 85 tasks** (P1=0, P2=4, P3=81); features tracked separately in [features.md](features.md)
+**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 81 tasks** (P1=0, P2=0, P3=81); features tracked separately in [features.md](features.md)
 
 ---
 
@@ -17,10 +17,7 @@
 
 ## P2: Important Improvements 🎯
 
-- **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](tasks/REFACTOR-036.md)
-- **[REFACTOR-037]** Optimize User Context Queries → [Details](tasks/REFACTOR-037.md)
-- **[TEST-117]** Add Client-Side Date Filtering Tests - Create comprehensive tests for debug chart date range filtering logic and user interaction patterns (45 min)
-- **[UI-023]** Enhance Debug Chart Accessibility - Add screen reader support, keyboard navigation, and ARIA labels to debug charts and date range controls (30 min)
+*No active P2 issues*
 
 ## P3: Maintenance 🔧
 

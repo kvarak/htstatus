@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from flask import Blueprint, request, session
 
-from app.auth_utils import require_authentication
+from app.auth_utils import require_authentication, track_activity
 from app.utils import create_page
 
 # Create Blueprint for training routes
@@ -24,20 +24,11 @@ def setup_training_blueprint(db_instance, trace_cols):
 
 @training_bp.route("/training")
 @require_authentication
+@track_activity("training")
 def training():
     """Display player training progression and skill development."""
-    from app.model_registry import get_user_model
     from app.roster import latest_player_records, oldest_player_records
     from models import Players  # Import here to avoid circular dependencies
-
-    # Track user activity
-    User = get_user_model()
-    current_user = (
-        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-    )
-    if current_user:
-        current_user.training()
-        db.session.commit()
 
     teamid = request.values.get("id")
 

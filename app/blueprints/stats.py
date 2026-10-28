@@ -4,7 +4,7 @@ import traceback
 
 from flask import Blueprint, request, session
 
-from app.auth_utils import require_authentication
+from app.auth_utils import require_authentication, track_activity
 from app.utils import create_page, dprint
 
 # Create Blueprint for stats routes
@@ -22,18 +22,9 @@ def setup_stats_blueprint(db_instance):
 
 @stats_bp.route("/stats")
 @require_authentication
+@track_activity("stats")
 def stats():
     """Display team statistics."""
-    from app.model_registry import get_user_model
-
-    # Track user activity (stats page)
-    User = get_user_model()
-    current_user = (
-        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-    )
-    if current_user:
-        current_user.stats()
-        db.session.commit()
 
     teamid = request.values.get("id")
 

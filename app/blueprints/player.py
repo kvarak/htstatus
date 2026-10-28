@@ -5,9 +5,11 @@ import math
 from flask import Blueprint, request, session
 
 from app.auth_utils import (
+    get_current_user,
     get_team_info,
     get_user_teams,
     require_authentication,
+    track_activity,
 )
 from app.error_handlers import (
     handle_error,
@@ -71,6 +73,7 @@ def add_star_ratings(match_play_model, players):
 
 @player_bp.route("/player", methods=["GET", "POST"])
 @require_authentication
+@track_activity("player")
 def player():
     """Display player list with skill tracking and grouping."""
     # Get model classes from registry
@@ -81,13 +84,11 @@ def player():
             get_match_play_model,
             get_player_setting_model,
             get_players_model,
-            get_user_model,
         )
 
         PlayerSetting = get_player_setting_model()
         Group = get_group_model()
         Players = get_players_model()
-        User = get_user_model()
         MatchPlay = get_match_play_model()
     except (ImportError, ValueError):
         # Fallback to direct imports if registry fails
@@ -96,16 +97,7 @@ def player():
         PlayerSetting = models.PlayerSetting
         Group = models.Group
         Players = models.Players
-        User = models.User
         MatchPlay = models.MatchPlay
-
-    # Track user activity
-    current_user = (
-        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-    )
-    if current_user:
-        current_user.player()
-        db.session.commit()
 
     updategroup = request.form.get("updategroup")
     playerid = request.form.get("playerid")
@@ -216,7 +208,7 @@ def player():
     add_star_ratings(MatchPlay, players_now)
 
     # Get the columns
-    user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
+    user = get_current_user()
     columns = user.getColumns() if user else []
     if len(columns) == 0:
         columns = defaultcolumns

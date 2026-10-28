@@ -3,6 +3,8 @@
 from datetime import datetime
 from unittest.mock import patch
 
+import pytest
+
 from models import Group, Match, MatchPlay, Players, PlayerSetting, User
 
 
@@ -56,6 +58,39 @@ class TestUserModel:
         # Test setting role
         user.setRole("admin")
         assert user.getRole() == "admin"
+
+    @pytest.mark.parametrize(
+        ("ht_id", "role", "expected"),
+        [
+            (1, "Admin", True),
+            (1, "admin", True),
+            (1, "User", False),
+            (1, None, False),
+            (182085, "", True),
+        ],
+    )
+    def test_is_admin(self, ht_id, role, expected):
+        user = User(ht_id, "test", "user", "pass", "key", "secret")
+        user.role = role
+        assert user.is_admin() is expected
+
+    def test_visit_counters_and_timestamps(self):
+        user = User(1, "test", "user", "pass", "key", "secret")
+        with patch("time.strftime", return_value="2026-10-28 19:00:00"):
+            user.stats()
+            user.stats()
+            user.updatedata()
+            user.matches_archive()
+            user.login()
+
+        assert user.c_stats == 2
+        assert user.c_update == 1
+        assert user.c_matches_archive == 1
+        assert user.c_login == 2
+        assert user.last_update == "2026-10-28 19:00:00"
+        assert user.last_matches_archive == "2026-10-28 19:00:00"
+        assert user.last_login == "2026-10-28 19:00:00"
+        assert user.last_usage == "2026-10-28 19:00:00"
 
     def test_user_activity_tracking(self):
         """Test User activity tracking methods."""

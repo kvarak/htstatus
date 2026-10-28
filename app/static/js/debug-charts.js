@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const mode = chart.querySelector('.chart-card').dataset.mode || 'normal';
         setChartMode(chart, mode);
         setupDragAndDrop(chart);
+        setupKeyboardReorder(chart);
     });
 });
 
@@ -75,23 +76,42 @@ function updateButtons(chartContainer, mode) {
     const shrinkBtn = chartContainer.querySelector('.chart-shrink');
     const expandBtn = chartContainer.querySelector('.chart-expand');
 
-    // Reset both buttons
-    [shrinkBtn, expandBtn].forEach(btn => {
-        if (btn) {
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-            btn.classList.remove('disabled');
-        }
-    });
+    // A real disabled state also blocks keyboard activation and is announced
+    if (shrinkBtn) shrinkBtn.disabled = mode === 'minimized';
+    if (expandBtn) expandBtn.disabled = mode === 'full';
+}
 
-    // Disable appropriate button for each state
-    if (mode === 'minimized' && shrinkBtn) {
-        shrinkBtn.style.opacity = '0.5';
-        shrinkBtn.style.pointerEvents = 'none';
-    } else if (mode === 'full' && expandBtn) {
-        expandBtn.style.opacity = '0.5';
-        expandBtn.style.pointerEvents = 'none';
-    }
+// Keyboard alternative to drag and drop: Arrow Up/Down on the focused handle
+function setupKeyboardReorder(chartContainer) {
+    const handle = chartContainer.querySelector('.chart-drag-handle');
+    if (!handle) return;
+
+    handle.addEventListener('keydown', (e) => {
+        if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+        e.preventDefault();
+
+        const sibling = e.key === 'ArrowUp'
+            ? chartContainer.previousElementSibling
+            : chartContainer.nextElementSibling;
+        if (!sibling || !sibling.dataset.chartId) return;
+
+        if (e.key === 'ArrowUp') {
+            sibling.parentNode.insertBefore(chartContainer, sibling);
+        } else {
+            sibling.parentNode.insertBefore(sibling, chartContainer);
+        }
+        handle.focus();
+        announceChartPosition(chartContainer);
+        savePreferences();
+    });
+}
+
+function announceChartPosition(chartContainer) {
+    const status = document.getElementById('chartOrderStatus');
+    if (!status) return;
+    const charts = Array.from(chartContainer.parentNode.querySelectorAll('[data-chart-id]'));
+    const title = chartContainer.querySelector('.chart-drag-handle').textContent.trim();
+    status.textContent = `${title} moved to position ${charts.indexOf(chartContainer) + 1} of ${charts.length}`;
 }
 
 // Simple drag and drop - minimal implementation

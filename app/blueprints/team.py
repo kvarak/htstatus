@@ -6,7 +6,13 @@ import traceback
 
 from flask import Blueprint, flash, redirect, render_template, request, session, url_for
 
-from app.auth_utils import get_current_user_id, get_user_teams, require_authentication
+from app.auth_utils import (
+    get_current_user,
+    get_current_user_id,
+    get_user_teams,
+    require_authentication,
+    track_activity,
+)
 from app.chpp_utilities import fetch_user_teams, get_chpp_client
 from app.model_registry import get_user_model
 from app.utils import create_page, diff, dprint
@@ -78,17 +84,9 @@ def reconcile_roster(players_model, teamid, players_indb, players_fromht, player
 
 @team_bp.route("/team")
 @require_authentication
+@track_activity("team")
 def team():
     """Display team information."""
-    # Track user activity
-    User = get_user_model()
-    current_user = (
-        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-    )
-    if current_user:
-        current_user.team()
-        db.session.commit()
-
     chpp = get_chpp_client(session)
 
     team_ids, team_names = fetch_user_teams(chpp)
@@ -628,8 +626,7 @@ def update():
     # Update user's last_update timestamp using model method
     try:
         dprint(1, f"Updating user timestamp for user {current_user_id}")
-        User = get_user_model()
-        user = db.session.query(User).filter_by(ht_id=current_user_id).first()
+        user = get_current_user()
         if user:
             user.updatedata()  # This method sets last_update and increments c_update
             db.session.commit()

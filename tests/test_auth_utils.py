@@ -157,3 +157,85 @@ class TestRequireAuthenticationDecorator:
             result = test_route("a", "b", kwarg1="c")
 
             assert result == "a-b-c"
+
+
+class TestCurrentUserAndActivity:
+    """get_current_user caches per request; track_activity counts page visits."""
+
+    @staticmethod
+    def _user(db_session, ht_id=777001):
+        from models import User
+
+        user = User(
+            ht_id=ht_id,
+            ht_user="tracker",
+            username="tracker",
+            password="x",
+            access_key="k",
+            access_secret="s",
+        )
+        db_session.add(user)
+        db_session.flush()
+        return user
+
+    def test_get_current_user_queries_once_per_request(self, app, db_session):
+        from sqlalchemy import event
+
+        from app.auth_utils import get_current_user
+
+        self._user(db_session)
+        statements = []
+
+        def count(*_args, **_kwargs):
+            statements.append(1)
+
+        engine = db_session.get_bind().engine
+        event.listen(engine, "before_cursor_execute", count)
+        try:
+            with app.test_request_context():
+                from flask import session
+
+                session["current_user_id"] = 777001
+                first = get_current_user()
+                second = get_current_user()
+        finally:
+            event.remove(engine, "before_cursor_execute", count)
+
+        assert first is second
+        assert first.ht_user == "tracker"
+        assert len(statements) == 1
+
+    def test_get_current_user_without_session(self, app):
+        from app.auth_utils import get_current_user
+
+        with app.test_request_context():
+            assert get_current_user() is None
+
+    def test_track_activity_counts_visit(self, app, db_session):
+        from app.auth_utils import track_activity
+
+        user = self._user(db_session)
+
+        @track_activity("training")
+        def view():
+            return "ok"
+
+        with app.test_request_context():
+            from flask import session
+
+            session["current_user_id"] = 777001
+            assert view() == "ok"
+            assert view() == "ok"
+
+        assert user.c_training == 2
+        assert user.last_usage
+
+    def test_track_activity_ignores_anonymous(self, app):
+        from app.auth_utils import track_activity
+
+        @track_activity("training")
+        def view():
+            return "ok"
+
+        with app.test_request_context():
+            assert view() == "ok"

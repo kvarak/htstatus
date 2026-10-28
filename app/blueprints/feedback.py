@@ -12,6 +12,7 @@ from flask import (
 from sqlalchemy import desc
 from werkzeug.exceptions import abort
 
+from app.auth_utils import get_current_user
 from app.utils import create_page, dprint
 
 # Create Blueprint for feedback routes
@@ -41,24 +42,17 @@ def setup_feedback_blueprint(app_instance, db_instance):
 def list_feedback():
     """Display list of all feedback items with voting and handle new submissions."""
 
-    from models import Feedback, FeedbackVote, User
+    from models import Feedback, FeedbackVote
 
     # Check authentication - session only, no CHPP calls
     if "access_key" not in session or "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    # Track feedback page access
-    current_user_id = session["current_user_id"]
-    current_user = db.session.query(User).filter_by(ht_id=current_user_id).first()
-    if current_user:
-        current_user.feedback()
-        db.session.commit()
-
-    # Get user from database (no CHPP API call)
-    user_id = session["current_user_id"]
-    user = User.query.filter_by(ht_id=user_id).first()
+    user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
+    user.feedback()
+    db.session.commit()
 
     # Handle form submission
     if request.method == "POST":
@@ -133,15 +127,13 @@ def list_feedback():
 def new_feedback():
     """Create new feedback item."""
     dprint(1, f"new_feedback called with method: {request.method}")
-    from models import Feedback, User
+    from models import Feedback
 
     # Check authentication - session only, no CHPP calls
     if "access_key" not in session or "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    # Get user from database (no CHPP API call)
-    user_id = session["current_user_id"]
-    user = User.query.filter_by(ht_id=user_id).first()
+    user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
 
@@ -217,15 +209,13 @@ def new_feedback():
 @feedback_bp.route("/<int:id>")
 def detail(id):
     """Display feedback details with comments."""
-    from models import Feedback, FeedbackComment, FeedbackVote, User
+    from models import Feedback, FeedbackComment, FeedbackVote
 
     # Check authentication - session only, no CHPP calls
     if "access_key" not in session or "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    # Get user from database (no CHPP API call)
-    user_id = session["current_user_id"]
-    user = User.query.filter_by(ht_id=user_id).first()
+    user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
 
@@ -321,7 +311,7 @@ def vote(id):
 @feedback_bp.route("/<int:id>/comment", methods=["POST"])
 def add_comment(id):
     """Add comment to feedback item."""
-    from models import Feedback, FeedbackComment, User
+    from models import Feedback, FeedbackComment
 
     # Check authentication - just verify session
     if "access_key" not in session or "current_user_id" not in session:
@@ -330,7 +320,7 @@ def add_comment(id):
     user_id = session["current_user_id"]
 
     # Get user from database to check admin status
-    user = User.query.filter_by(ht_id=user_id).first()
+    user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
 
@@ -364,14 +354,13 @@ def add_comment(id):
 @feedback_bp.route("/<int:id>/status", methods=["POST"])
 def update_status(id):
     """Update feedback status (admin only)."""
-    from models import Feedback, User
+    from models import Feedback
 
     # Check authentication - verify admin without CHPP calls
     if "access_key" not in session or "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    user_id = session["current_user_id"]
-    user = User.query.filter_by(ht_id=user_id).first()
+    user = get_current_user()
 
     if not user or not user.is_admin():
         abort(403)
@@ -399,14 +388,13 @@ def update_status(id):
 @feedback_bp.route("/<int:id>/archive", methods=["POST"])
 def toggle_archive(id):
     """Toggle feedback archive status (admin only)."""
-    from models import Feedback, User
+    from models import Feedback
 
     # Check authentication - verify admin without CHPP calls
     if "access_key" not in session or "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
-    user_id = session["current_user_id"]
-    user = User.query.filter_by(ht_id=user_id).first()
+    user = get_current_user()
 
     if not user or not user.is_admin():
         abort(403)

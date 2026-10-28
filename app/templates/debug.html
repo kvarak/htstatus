@@ -217,7 +217,7 @@
             <div class="card-body py-2">
               <div class="d-flex justify-content-between align-items-center">
                 <h6 class="mb-0">
-                  <i class="fas fa-chart-bar mr-2"></i>Chart Controls
+                  <i class="fas fa-chart-bar mr-2" aria-hidden="true"></i>Chart Controls
                 </h6>
                 <div class="d-flex align-items-center">
                   <div class="form-check mr-4">
@@ -227,43 +227,53 @@
                   <button type="button"
                           class="btn btn-sm btn-outline-secondary"
                           id="resetCharts">
-                    <i class="fas fa-undo mr-1"></i>Reset Charts
+                    <i class="fas fa-undo mr-1" aria-hidden="true"></i>Reset Charts
                   </button>
                 </div>
               </div>
               <!-- Date Range Filters -->
-              <div class="mt-3 chart-filters">
+              <fieldset class="mt-3 chart-filters" aria-describedby="dateRangeHint">
+                <legend class="sr-only">Chart date range</legend>
+                <p id="dateRangeHint" class="sr-only">
+                  Charts include users registered or active between the start and end date (inclusive).
+                </p>
                 <div class="row">
                   <div class="col-md-4">
                     <label for="dateRangeStart" class="form-label text-small">Start Date</label>
                     <input type="date"
                            class="form-control form-control-sm"
                            id="dateRangeStart"
-                           name="dateRangeStart">
+                           name="dateRangeStart"
+                           aria-describedby="dateRangeError">
                   </div>
                   <div class="col-md-4">
                     <label for="dateRangeEnd" class="form-label text-small">End Date</label>
                     <input type="date"
                            class="form-control form-control-sm"
                            id="dateRangeEnd"
-                           name="dateRangeEnd">
+                           name="dateRangeEnd"
+                           aria-describedby="dateRangeError">
                   </div>
                   <div class="col-md-4 d-flex align-items-end">
-                    <div class="btn-group" role="group">
+                    <div class="btn-group" role="group" aria-label="Date range actions">
                       <button type="button"
                               class="btn btn-primary-custom btn-sm"
                               onclick="updateChartsDateRange()">
-                        <i class="fas fa-sync mr-1"></i>Update Charts
+                        <i class="fas fa-sync mr-1" aria-hidden="true"></i>Update Charts
                       </button>
                       <button type="button"
                               class="btn btn-outline-secondary btn-sm"
-                              onclick="resetDateRangeToDefault()">
-                        <i class="fas fa-calendar mr-1"></i>6 Months
+                              onclick="resetDateRangeToDefault()"
+                              aria-label="Reset date range to the last 6 months">
+                        <i class="fas fa-calendar mr-1" aria-hidden="true"></i>6 Months
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+                <div id="dateRangeError"
+                     class="text-danger small mt-2 d-none"
+                     role="alert"></div>
+              </fieldset>
             </div>
           </div>
         </div>
@@ -384,6 +394,7 @@
             }
           ] %}
           <!-- Chart Rendering -->
+          <div id="chartOrderStatus" class="sr-only" aria-live="polite"></div>
           <div class="row" id="chartsContainer">
             {% for chart in charts %}
               <div class="col-lg-6 col-md-12 mb-3 chart-normal"
@@ -391,25 +402,37 @@
                 <div class="card chart-card" data-mode="normal">
                   <div class="card-header py-2">
                     <div class="d-flex justify-content-between align-items-center">
-                      <h6 class="card-title mb-0 chart-drag-handle" style="cursor: move;">
-                        <i class="{{ chart.icon }}"></i> {{ chart.title }}
-                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt"></i></small>
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move {{ chart.title }} chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="{{ chart.icon }}" aria-hidden="true"></i> {{ chart.title }}
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
                       </h6>
                       <div class="chart-controls">
-                        <button class="btn btn-sm btn-outline-secondary chart-shrink"
-                                title="Shrink Chart">
-                          <i class="fas fa-minus"></i>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink {{ chart.title }} chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-secondary chart-expand" title="Expand">
-                          <i class="fas fa-expand-arrows-alt"></i>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand {{ chart.title }} chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
                         </button>
                       </div>
                     </div>
-                    <small class="text-muted d-block">{{ chart.description }}</small>
+                    <small class="text-muted d-block" id="{{ chart.id }}Description">{{ chart.description }}</small>
                   </div>
                   <div class="card-body chart-content">
                     <canvas id="{{ chart.id }}"
-                            style="max-height: {{ chart.height | default("200px") }}"></canvas>
+                            role="img"
+                            aria-label="{{ chart.title }} chart"
+                            aria-describedby="{{ chart.id }}Description"
+                            style="max-height: {{ chart.height | default("200px") }}">{{ chart.title }}: {{ chart.description }}</canvas>
                   </div>
                 </div>
               </div>
@@ -421,6 +444,7 @@
   {% endblock %}
   {% block scripts %}
     {{ super() }}
+    <script src="{{ url_for('static', filename='js/debug-date-filter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/debug-charts.js') }}"></script>
     <script>
 // User data from backend
@@ -436,63 +460,45 @@ let currentDateRange = {
     defaultMonths: 6
 };
 
-// Helper function to parse dates safely
-function parseDate(dateStr) {
-    if (!dateStr || dateStr === 'N/A' || dateStr === '-') return null;
-    return new Date(dateStr);
-}
-
-// Helper function to format date for input
-function formatDateForInput(date) {
-    return date.toISOString().split('T')[0];
-}
+const { parseDate, formatDateForInput, defaultDateRange, validateDateRange, filterUsers } = window.DebugDateFilter;
 
 // Initialize default date range (6 months ago to now)
 function initializeDateRange() {
-    const now = new Date();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 6);
+    const range = defaultDateRange(new Date(), currentDateRange.defaultMonths);
+    currentDateRange.start = range.start;
+    currentDateRange.end = range.end;
 
-    currentDateRange.end = now;
-    currentDateRange.start = sixMonthsAgo;
-
-    // Set form inputs
-    document.getElementById('dateRangeStart').value = formatDateForInput(sixMonthsAgo);
-    document.getElementById('dateRangeEnd').value = formatDateForInput(now);
+    document.getElementById('dateRangeStart').value = formatDateForInput(range.start);
+    document.getElementById('dateRangeEnd').value = formatDateForInput(range.end);
+    showDateRangeError('');
 }
 
-// Filter users by date range
-function filterUsersByDateRange(users, startDate, endDate) {
-    if (!startDate || !endDate) return users;
-
-    return users.filter(user => {
-        const userDate = parseDate(user.created || user.last_usage);
-        if (!userDate) return false;
-
-        return userDate >= startDate && userDate <= endDate;
+// Show (or clear) the inline, screen-reader-announced date range error
+function showDateRangeError(message) {
+    const errorEl = document.getElementById('dateRangeError');
+    const invalid = Boolean(message);
+    errorEl.textContent = message;
+    errorEl.classList.toggle('d-none', !invalid);
+    ['dateRangeStart', 'dateRangeEnd'].forEach(id => {
+        document.getElementById(id).setAttribute('aria-invalid', String(invalid));
     });
 }
 
 // Update charts with date range
 function updateChartsDateRange() {
-    const startDateStr = document.getElementById('dateRangeStart').value;
-    const endDateStr = document.getElementById('dateRangeEnd').value;
-
-    if (!startDateStr || !endDateStr) {
-        alert('Please select both start and end dates');
+    const range = validateDateRange(
+        document.getElementById('dateRangeStart').value,
+        document.getElementById('dateRangeEnd').value
+    );
+    if (range.error) {
+        showDateRangeError(range.error);
+        document.getElementById('dateRangeStart').focus();
         return;
     }
+    showDateRangeError('');
 
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(endDateStr);
-
-    if (startDate >= endDate) {
-        alert('Start date must be before end date');
-        return;
-    }
-
-    currentDateRange.start = startDate;
-    currentDateRange.end = endDate;
+    currentDateRange.start = range.start;
+    currentDateRange.end = range.end;
 
     // Update all charts with new date range
     updateAllCharts();
@@ -560,20 +566,11 @@ async function loadDateRangePreference() {
 
 // Filter function
 function getFilteredUsers() {
-    let filteredUsers = usersData;
-
-    // Apply admin filter
-    const filterAdmins = document.getElementById('filterAdmins').checked;
-    if (filterAdmins) {
-        filteredUsers = filteredUsers.filter(user => user.role !== 'Admin');
-    }
-
-    // Apply date range filter if set
-    if (currentDateRange.start && currentDateRange.end) {
-        filteredUsers = filterUsersByDateRange(filteredUsers, currentDateRange.start, currentDateRange.end);
-    }
-
-    return filteredUsers;
+    return filterUsers(usersData, {
+        hideAdmins: document.getElementById('filterAdmins').checked,
+        start: currentDateRange.start,
+        end: currentDateRange.end,
+    });
 }
 
 // Function to update all charts

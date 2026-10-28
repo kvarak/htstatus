@@ -18,7 +18,12 @@ from flask import (
 )
 from markupsafe import escape
 
-from app.auth_utils import get_current_user_id, require_authentication
+from app.auth_utils import (
+    get_current_user,
+    get_current_user_id,
+    require_authentication,
+    track_activity,
+)
 from app.model_registry import (
     get_group_model,
     get_player_setting_model,
@@ -47,9 +52,8 @@ def setup_main_blueprint(db_instance, cols, all_cols, group_order=99):
 
 def admin_required_response():
     """Return a 403 JSON response unless the current user is an admin, else None."""
-    User = get_user_model()
-    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-    if not user or user.getRole() != "Admin":
+    user = get_current_user()
+    if not user or not user.is_admin():
         return jsonify({"error": "Admin access required"}), 403
     return None
 
@@ -119,8 +123,7 @@ def index():
 
     dprint(2, updated)
 
-    current_user_id = get_current_user_id()
-    thisuserdata = db.session.query(User).filter_by(ht_id=current_user_id).first()
+    thisuserdata = get_current_user()
 
     if not thisuserdata:
         # User not found in database, clear session and redirect to login
@@ -158,19 +161,12 @@ def index():
 
 @main_bp.route("/settings", methods=["GET", "POST"])
 @require_authentication
+@track_activity("settings")
 def settings():
     """Handle user settings for player groups and display columns."""
     # Get model classes from registry
-    User = get_user_model()
     Group = get_group_model()
     PlayerSetting = get_player_setting_model()
-
-    # Track settings page access
-    current_user_id = get_current_user_id()
-    user = db.session.query(User).filter_by(ht_id=current_user_id).first()
-    if user:
-        user.settings()
-        db.session.commit()
 
     error = ""
 
@@ -187,7 +183,7 @@ def settings():
     if not bgcolor:
         bgcolor = "#FFFFFF"
 
-    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
+    user = get_current_user()
     columns = user.getColumns() if user else []
     if len(columns) == 0:
         columns = defaultcolumns
@@ -313,16 +309,9 @@ def settings():
 
 
 @main_bp.route("/changes")
+@track_activity("changes")
 def changes():
     """Public changes and changelog page."""
-    # Track changes page access for authenticated users
-    if "current_user_id" in session:
-        User = get_user_model()
-        current_user_id = get_current_user_id()
-        user = db.session.query(User).filter_by(ht_id=current_user_id).first()
-        if user:
-            user.changes()
-            db.session.commit()
     changelogfull = []
     try:
         all_entries = []
@@ -456,9 +445,8 @@ def admin():
     form_error = ""
 
     try:
-        user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-        role = user.getRole() if user else "User"
-        if role != "Admin":
+        user = get_current_user()
+        if not user or not user.is_admin():
             return render_template("_forward.html", url="/")
     except Exception:
         return render_template("_forward.html", url="/")

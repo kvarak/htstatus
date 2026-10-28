@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import Blueprint, request, session
 
-from app.auth_utils import require_authentication
+from app.auth_utils import require_authentication, track_activity
 from app.constants import HT_MATCH_ROLE
 from app.hattrick_countries import get_country_display
 from app.model_registry import get_match_model, get_match_play_model
@@ -59,24 +59,15 @@ def has_enhanced_data_filter(match):
 
 @matches_bp.route("/matches", methods=["GET", "POST"])
 @require_authentication
+@track_activity("matches")
 def matches():
     """Display team matches and match details."""
     try:
         # Get model classes from registry
-        from app.model_registry import get_user_model
         from app.utils import dprint
 
         Match = get_match_model()
         MatchPlay = get_match_play_model()
-
-        # Track user activity
-        User = get_user_model()
-        current_user = (
-            db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-        )
-        if current_user:
-            current_user.matches()
-            db.session.commit()
 
         teamid = request.values.get("id")
         matchid = request.values.get("m")
@@ -272,20 +263,11 @@ def matches():
 
 @matches_bp.route("/formations")
 @require_authentication
+@track_activity("formation")
 def formations():
     """Display formation tester and tactical analyzer."""
-    from app.model_registry import get_user_model
     from app.roster import latest_player_records
     from models import Players
-
-    # Track user activity (formation page)
-    User = get_user_model()
-    current_user = (
-        db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()
-    )
-    if current_user:
-        current_user.formation()
-        db.session.commit()
 
     teamid = request.values.get("id")
     teamid = int(teamid) if teamid else request.form.get("id")

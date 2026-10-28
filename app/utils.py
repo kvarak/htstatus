@@ -127,21 +127,17 @@ def get_admin_feedback_counts(user_id=None):
     # Import here to avoid circular imports
     from sqlalchemy import and_, exists
 
-    from models import Feedback, FeedbackComment, User
+    from models import Feedback, FeedbackComment, SUPERADMIN_HT_ID, User
 
-    # Check admin status
-    user = None
-    if user_id:
-        user = User.query.filter_by(ht_id=user_id).first()
-
-    if not user or not (user.role == "Admin" or user.ht_id == 182085):
+    user = User.query.filter_by(ht_id=user_id).first() if user_id else None
+    if not user or not user.is_admin():
         return None
 
     # Handle case where feedback tables don't exist (graceful degradation)
     try:
         # Get all admin user IDs for query optimization
         admin_users = User.query.filter(
-            (User.role == "Admin") | (User.ht_id == 182085)
+            (User.role == "Admin") | (User.ht_id == SUPERADMIN_HT_ID)
         ).all()
         admin_user_ids = [admin.ht_id for admin in admin_users]
 
@@ -267,11 +263,10 @@ def create_page(template, title, **kwargs):
             }
         )
 
-        # Check if user has admin role
-        from models import User
+        from app.auth_utils import get_current_user
 
-        user = User.query.filter_by(ht_id=session.get("current_user_id")).first()
-        if user and (user.role == "Admin" or user.ht_id == 182085):
+        user = get_current_user()
+        if user and user.is_admin():
             template_vars["role"] = "Admin"
 
             # Add admin feedback counts for navigation indicators

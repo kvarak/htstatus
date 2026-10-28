@@ -4,6 +4,9 @@ import time
 
 from app import db
 
+# Project owner; always treated as admin regardless of stored role
+SUPERADMIN_HT_ID = 182085
+
 
 def utc_now():
     """Naive UTC timestamp (same values as the deprecated datetime.utcnow())."""
@@ -433,8 +436,8 @@ class User(db.Model):
         self.role = newrole
 
     def is_admin(self):
-        """Check if user is admin (hardcoded user 182085 + role check)."""
-        return self.ht_id == 182085 or self.role == "admin"
+        """Admin if the project owner or the stored role is admin (any case)."""
+        return self.ht_id == SUPERADMIN_HT_ID or (self.role or "").lower() == "admin"
 
     def claimUser(self, username, password, access_key, access_secret):
         self.username = username
@@ -445,56 +448,49 @@ class User(db.Model):
         self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    def login(self):
-        self.c_login = (self.c_login or 0) + 1
-        self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
+    def _count_visit(self, counter):
+        """Increment a page-visit counter and update last_usage."""
+        setattr(self, counter, (getattr(self, counter) or 0) + 1)
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    def login(self):
+        self._count_visit("c_login")
+        self.last_login = self.last_usage
 
     def player(self):
-        self.c_player = (self.c_player or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_player")
 
     def matches(self):
-        self.c_matches = (self.c_matches or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_matches")
 
     def matches_archive(self):
-        self.c_matches_archive = (self.c_matches_archive or 0) + 1
-        self.last_matches_archive = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_matches_archive")
+        self.last_matches_archive = self.last_usage
 
     def team(self):
-        self.c_team = (self.c_team or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_team")
 
     def training(self):
-        self.c_training = (self.c_training or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_training")
 
     def updatedata(self):
-        self.c_update = (self.c_update or 0) + 1
-        self.last_update = time.strftime("%Y-%m-%d %H:%M:%S")
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_update")
+        self.last_update = self.last_usage
 
     def settings(self):
-        self.c_settings = (self.c_settings or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_settings")
 
     def changes(self):
-        self.c_changes = (self.c_changes or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_changes")
 
     def feedback(self):
-        self.c_feedback = (self.c_feedback or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_feedback")
 
     def formation(self):
-        self.c_formation = (self.c_formation or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_formation")
 
     def stats(self):
-        self.c_stats = (self.c_stats or 0) + 1
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+        self._count_visit("c_stats")
 
     def updateColumns(self, cols):
         pcols = pickle.dumps(cols)
