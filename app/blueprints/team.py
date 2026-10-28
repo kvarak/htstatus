@@ -35,6 +35,47 @@ def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
     fullversion = fv
 
 
+def get_owned_player_ids(players_model, teamid):
+    """Return the set of player ids that currently have any record owned by teamid."""
+    rows = (
+        db.session.query(players_model.ht_id).filter_by(owner=teamid).distinct().all()
+    )
+    return {row.ht_id for row in rows}
+
+
+def reconcile_roster(players_model, teamid, players_indb, players_fromht, playernames):
+    """Compare stored roster with Hattrick roster and release departed players.
+
+    Every record of a departed player is moved from owner=teamid to owner=0
+    (keeping old_owner=teamid), so they disappear from the team's player lists.
+
+    Returns:
+        tuple: (new player ids, departed player ids)
+    """
+    players_new = diff(list(players_fromht), list(players_indb))
+    players_left = diff(list(players_indb), list(players_fromht))
+    dprint(1, f"Found {len(players_new)} new and {len(players_left)} departed players")
+
+    for ht_id in players_left:
+        if ht_id not in playernames:
+            last_record = (
+                db.session.query(players_model)
+                .filter_by(ht_id=ht_id, owner=teamid)
+                .order_by(players_model.data_date.desc())
+                .first()
+            )
+            if last_record:
+                playernames[ht_id] = f"{last_record.first_name} {last_record.last_name}"
+        (
+            db.session.query(players_model)
+            .filter_by(ht_id=ht_id, owner=teamid)
+            .update({"old_owner": teamid, "owner": 0})
+        )
+    db.session.commit()
+
+    return players_new, players_left
+
+
 @team_bp.route("/team")
 @require_authentication
 def team():
@@ -321,6 +362,10 @@ def update():
                 all_team_names=session["all_team_names"],
             )
 
+        # Snapshot roster before today's data is inserted, so the diff below
+        # compares Hattrick's roster against what we owned prior to this update
+        players_indb = get_owned_player_ids(Players, teamid)
+
         players_fromht = []
         for p in the_team.players():
             thisplayer = {}
@@ -504,56 +549,19 @@ def update():
         updated[teamid].append("/player?id=" + str(teamid))
         updated[teamid].append("players")
 
-        # Get the most recent player roster from database to compare
-        # We need to find the latest data_date and get only those players
-        from sqlalchemy import func
-
         try:
-            dprint(1, f"Querying database for existing players for team {teamid}")
-            latest_date_subquery = (
-                db.session.query(func.max(Players.data_date))
-                .filter_by(owner=teamid)
-                .scalar_subquery()
+            players_new, players_left = reconcile_roster(
+                Players, teamid, players_indb, players_fromht, playernames
             )
-
-            players_data = (
-                db.session.query(Players)
-                .filter_by(owner=teamid)
-                .filter(Players.data_date == latest_date_subquery)
-                .all()
-            )
-
-            dprint(1, f"Found {len(players_data)} existing players in database")
-
-            players_indb = []
-            for p in players_data:
-                players_indb.append(p.ht_id)
-                playernames[p.ht_id] = p.first_name + " " + p.last_name
-            players_indb = list(set(players_indb))
-
-            # Which players are new
-            players_new = diff(players_fromht, players_indb)
-            dprint(1, f"Found {len(players_new)} new players")
 
             for p in players_new:
-                # Get player name from playernames dict, with fallback for new players
-                player_name = playernames.get(p, "Unknown Player")
-                new_players.append([updated[teamid][0], player_name])
-
-            # Which players are no longer in the team
-            players_left = diff(players_indb, players_fromht)
-            dprint(1, f"Found {len(players_left)} players who left")
-
-            for p in players_left:
-                # Get player name from playernames dict, with fallback
-                player_name = playernames.get(p, "Unknown Player")
-                left_players.append([updated[teamid][0], player_name])
-                (
-                    db.session.query(Players)
-                    .filter_by(ht_id=p, owner=teamid)
-                    .update({"old_owner": teamid, "owner": 0})
+                new_players.append(
+                    [updated[teamid][0], playernames.get(p, "Unknown Player")]
                 )
-                db.session.commit()
+            for p in players_left:
+                left_players.append(
+                    [updated[teamid][0], playernames.get(p, "Unknown Player")]
+                )
 
             dprint(1, f"Player difference calculation completed for team {teamid}")
 

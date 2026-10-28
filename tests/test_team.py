@@ -180,3 +180,113 @@ class TestTeamDataProcessing:
             else:
                 # Actual team page content
                 assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
+
+
+def _player_record(ht_id, owner, first_name="Test", last_name="Player"):
+    from models import Players
+
+    fields = {
+        "ht_id": ht_id,
+        "first_name": first_name,
+        "nick_name": "",
+        "last_name": last_name,
+        "owner": owner,
+        "age": 25,
+        "is_transfer_listed": False,
+        "mother_club_bonus": False,
+    }
+    for key in [
+        "number",
+        "category_id",
+        "owner_notes",
+        "age_years",
+        "age_days",
+        "next_birthday",
+        "arrival_date",
+        "form",
+        "cards",
+        "injury_level",
+        "statement",
+        "language",
+        "language_id",
+        "agreeability",
+        "aggressiveness",
+        "honesty",
+        "experience",
+        "loyalty",
+        "specialty",
+        "native_country_id",
+        "native_league_id",
+        "native_league_name",
+        "tsi",
+        "salary",
+        "caps",
+        "caps_u20",
+        "career_goals",
+        "career_hattricks",
+        "league_goals",
+        "cup_goals",
+        "friendly_goals",
+        "current_team_matches",
+        "current_team_goals",
+        "national_team_id",
+        "national_team_name",
+        "team_id",
+    ]:
+        fields[key] = None
+    for key in [
+        "stamina",
+        "keeper",
+        "defender",
+        "playmaker",
+        "winger",
+        "passing",
+        "scorer",
+        "set_pieces",
+        "leadership",
+    ]:
+        fields[key] = 1
+    return Players(fields)
+
+
+class TestRosterReconciliation:
+    """Sold players must be released from the team (regression)."""
+
+    def test_departed_players_released_including_stale_ones(self, db_session):
+        import app.blueprints.team as team_module
+        from models import Players
+
+        teamid = 999001
+        stale = _player_record(1, teamid, "Michal", "Bittner")
+        stale.data_date = "2026-01-01"
+        recent_left = _player_record(2, teamid, "Yngve", "Granbo")
+        recent_left.data_date = "2026-09-01"
+        staying = _player_record(3, teamid)
+        staying.data_date = "2026-09-01"
+        db_session.add_all([stale, recent_left, staying])
+        db_session.flush()
+
+        with patch.object(team_module, "db", MagicMock(session=db_session)):
+            players_indb = team_module.get_owned_player_ids(Players, teamid)
+            assert players_indb == {1, 2, 3}
+
+            # Today's roster from Hattrick: player 3 stays, player 4 is new
+            db_session.add(_player_record(3, teamid))
+            db_session.add(_player_record(4, teamid))
+            db_session.flush()
+
+            names = {}
+            new, left = team_module.reconcile_roster(
+                Players, teamid, players_indb, [3, 4], names
+            )
+
+        assert new == [4]
+        assert sorted(left) == [1, 2]
+        assert names[1] == "Michal Bittner"
+        assert names[2] == "Yngve Granbo"
+        owned = {
+            p.ht_id for p in db_session.query(Players).filter_by(owner=teamid).all()
+        }
+        assert owned == {3, 4}
+        released = db_session.query(Players).filter_by(ht_id=1).one()
+        assert (released.owner, released.old_owner) == (0, teamid)
