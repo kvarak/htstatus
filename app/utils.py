@@ -118,10 +118,11 @@ def get_version_info():
 # =============================================================================
 
 
-def get_admin_feedback_counts(user_id=None):
+def get_admin_feedback_counts(user=None):
     """Get feedback counts for admin indicators (hobby project scale).
 
-    Returns dict with no_replies and needs_followup counts, or None if not admin.
+    Takes the (already loaded) User; returns dict with no_replies and
+    needs_followup counts, or None if not admin.
     Uses simple queries appropriate for <50 feedback items.
     """
     # Import here to avoid circular imports
@@ -129,7 +130,6 @@ def get_admin_feedback_counts(user_id=None):
 
     from models import Feedback, FeedbackComment, SUPERADMIN_HT_ID, User
 
-    user = User.query.filter_by(ht_id=user_id).first() if user_id else None
     if not user or not user.is_admin():
         return None
 
@@ -270,7 +270,7 @@ def create_page(template, title, **kwargs):
             template_vars["role"] = "Admin"
 
             # Add admin feedback counts for navigation indicators
-            feedback_counts = get_admin_feedback_counts(user.ht_id)
+            feedback_counts = get_admin_feedback_counts(user)
             if feedback_counts:
                 template_vars["admin_feedback_counts"] = feedback_counts
 

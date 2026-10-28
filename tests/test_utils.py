@@ -244,7 +244,7 @@ class TestCreatePage:
 
     @patch("app.utils.render_template")
     @patch("app.utils.get_version_info")
-    @patch("models.User")
+    @patch("app.auth_utils.get_current_user", return_value=None)
     def test_create_page_with_session(
         self, mock_user_model, mock_version_info, mock_render
     ):
@@ -255,9 +255,6 @@ class TestCreatePage:
             "versionstr": "2.0.0-dev",
         }
         mock_render.return_value = "rendered_template"
-
-        # Mock User query to return None (no admin role)
-        mock_user_model.query.filter_by.return_value.first.return_value = None
 
         with self.app.test_request_context():
             from flask import session
@@ -277,8 +274,9 @@ class TestCreatePage:
     @patch("app.utils.render_template")
     @patch("app.utils.get_version_info")
     @patch("app.auth_utils.get_current_user")
+    @patch("app.utils.get_admin_feedback_counts", return_value=None)
     def test_create_page_with_admin_user(
-        self, mock_user, mock_version_info, mock_render
+        self, _mock_counts, mock_user, mock_version_info, mock_render
     ):
         """Test create_page with admin user role."""
         mock_version_info.return_value = {
@@ -691,9 +689,7 @@ class TestAdminFeedbackCounts:
         mock_user = Mock()
         mock_user.is_admin.return_value = False
         mock_user.ht_id = 12345
-        mock_user_model.query.filter_by.return_value.first.return_value = mock_user
-
-        result = get_admin_feedback_counts(12345)
+        result = get_admin_feedback_counts(mock_user)
 
         assert result is None
 
@@ -714,7 +710,7 @@ class TestAdminFeedbackCounts:
 
         # Mock admin user
         mock_admin = Mock()
-        mock_admin.role = "Admin"
+        mock_admin.is_admin.return_value = True
         mock_admin.ht_id = 182085
 
         # Mock admin users query
@@ -731,7 +727,6 @@ class TestAdminFeedbackCounts:
         mock_latest_comment2 = Mock(author_id=182085)  # Admin
 
         # Setup mocks
-        mock_user_model.query.filter_by.return_value.first.return_value = mock_admin
         mock_user_model.query.filter.return_value.all.return_value = mock_admin_users
         mock_feedback_model.query.filter.return_value = mock_no_replies_query
         mock_feedback_model.query.filter.return_value.all.return_value = (
@@ -744,7 +739,7 @@ class TestAdminFeedbackCounts:
             mock_latest_comment2,  # Second feedback doesn't need follow-up
         ]
 
-        result = get_admin_feedback_counts(182085)
+        result = get_admin_feedback_counts(mock_admin)
 
         assert result is not None
         assert result["no_replies"] == 3
@@ -760,24 +755,23 @@ class TestAdminFeedbackCounts:
 
         # Mock user with hardcoded admin ID but no admin role
         mock_user = Mock()
-        mock_user.role = "User"  # Not admin role
-        mock_user.ht_id = 182085  # But hardcoded admin ID
+        mock_user.is_admin.return_value = True  # owner is admin regardless of role
+        mock_user.ht_id = 182085
 
         # Mock empty results for simplicity
         mock_no_replies_query = Mock()
         mock_no_replies_query.count.return_value = 0
 
-        mock_user_model.query.filter_by.return_value.first.return_value = mock_user
         mock_user_model.query.filter.return_value.all.return_value = [mock_user]
         mock_feedback_model.query.filter.return_value = mock_no_replies_query
         mock_feedback_model.query.filter.return_value.all.return_value = []
 
-        result = get_admin_feedback_counts(182085)
+        result = get_admin_feedback_counts(mock_user)
         assert "no_replies" in result
         assert "needs_followup" in result
 
     def test_get_admin_feedback_counts_no_user_id(self):
-        """Test get_admin_feedback_counts with no user_id returns None."""
+        """Test get_admin_feedback_counts with no user returns None."""
 
         result = get_admin_feedback_counts(None)
         assert result is None
@@ -791,7 +785,7 @@ class TestAdminFeedbackCounts:
         import inspect
 
         sig = inspect.signature(get_admin_feedback_counts)
-        assert "user_id" in sig.parameters
+        assert "user" in sig.parameters
 
         # Verify docstring
         assert get_admin_feedback_counts.__doc__ is not None
