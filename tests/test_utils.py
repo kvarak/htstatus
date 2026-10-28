@@ -866,48 +866,71 @@ class TestUtilityFunctions:
         result = calculateManmark(player)
         assert result > 0
 
-    def test_calculateContribution_numeric_positions(self):
-        """Test calculateContribution with numeric position IDs."""
-        player = Mock()
-        # Set all required skills and attributes
-        player.keeper = 5.0
-        player.defending = 8.0
-        player.playmaker = 7.0
-        player.winger = 6.0
-        player.passing = 7.0
-        player.scorer = 9.0
-        player.set_pieces = 5.0
-        player.age = 25  # Add age field
-        player.experience = 50  # Add experience field
+    def test_calculateContribution_positions(self):
+        """Weights per position code; neutral form/experience/loyalty -> no bonus."""
+        player = {
+            "keeper": 10,
+            "defender": 10,
+            "playmaker": 8,
+            "winger": 6,
+            "passing": 5,
+            "scorer": 4,
+            "form": 5,
+            "experience": 0,
+            "loyalty": 0,
+        }
 
-        # Test goalkeeper position (100)
-        result = calculateContribution(100, player)
-        assert isinstance(result, (int, float))
-        assert result >= 0  # May be 0 for some positions
+        assert calculateContribution("GC", player) == 10.0
+        assert calculateContribution("CD", player) == 9.0  # 0.8*10 + 0.2*5
+        assert calculateContribution("IMN", player) == 7.4  # 0.8*8 + 0.2*5
+        assert calculateContribution("FW", player) == 4.2  # 0.8*4 + 0.2*5
 
-        # Test field position (101 = right back)
-        result = calculateContribution(101, player)
-        assert isinstance(result, (int, float))
-        assert result >= 0
-        """Test calculateContribution with string position names."""
-        player = Mock()
-        # Set skills for testing
-        player.keeper = 5.0
-        player.defending = 8.0
-        player.playmaker = 7.0
-        player.winger = 6.0
-        player.passing = 7.0
-        player.scorer = 9.0
-        player.set_pieces = 5.0
+    def test_calculateContribution_tactical_variants_differ(self):
+        """Variants used to silently fall back to the base position (bug)."""
+        player = {"defender": 10, "playmaker": 8, "scorer": 4, "passing": 5}
 
-        # Test string position
-        result = calculateContribution("Central Defender", player)
-        assert isinstance(result, (int, float))
-        assert result >= 0
+        imn = calculateContribution("IMN", player)
+        imd = calculateContribution("IMD", player)
+        imo = calculateContribution("IMO", player)
 
-        # Test unknown position (should default to 0)
-        result = calculateContribution("unknown_position", player)
-        assert result == 0
+        assert len({imn, imd, imo}) == 3
+        assert imd == 8.0  # 0.3*10 + 0.5*8 + 0.2*5
+
+    def test_calculateContribution_role_ids_map_to_codes(self):
+        player = {"keeper": 7, "defender": 9, "passing": 6, "playmaker": 5}
+
+        assert calculateContribution(100, player) == calculateContribution("GC", player)
+        assert calculateContribution(103, player) == calculateContribution("CD", player)
+        assert calculateContribution(101, player) == calculateContribution(
+            "WBN", player
+        )
+        assert calculateContribution(108, player) == calculateContribution(
+            "IMN", player
+        )
+
+    def test_calculateContribution_dict_and_object_agree(self):
+        from types import SimpleNamespace
+
+        fields = {
+            "playmaker": 12,
+            "passing": 7,
+            "form": 7,
+            "experience": 4,
+            "loyalty": 20,
+        }
+
+        assert calculateContribution("IMN", fields) == calculateContribution(
+            "IMN", SimpleNamespace(**fields)
+        )
+        # form 7 (+10%), experience 4 (+4%), loyalty 20 (+10%)
+        assert calculateContribution("IMN", fields) == round(11.0 * 1.1 * 1.04 * 1.1, 2)
+
+    def test_calculateContribution_unknown_position_uses_passing(self):
+        assert calculateContribution("XYZ", {"passing": 6}) == 6.0
+        assert calculateContribution(999, {"passing": 6}) == 6.0
+
+    def test_calculateContribution_missing_skills_count_as_zero(self):
+        assert calculateContribution("CD", {"defender": None}) == 0.0
 
 
 class TestTrainingFunctions:

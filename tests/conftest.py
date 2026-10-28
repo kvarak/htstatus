@@ -111,6 +111,19 @@ def authenticated_client(app_with_routes):
     return client
 
 
+@pytest.fixture(autouse=True)
+def restore_model_registry():
+    """Undo registry changes made by a test (clears, or caching patched models)."""
+    from app.model_registry import ModelRegistry
+
+    saved_models = dict(ModelRegistry._models)
+    saved_initialized = ModelRegistry._initialized
+    yield
+    ModelRegistry._models.clear()
+    ModelRegistry._models.update(saved_models)
+    ModelRegistry._initialized = saved_initialized
+
+
 @pytest.fixture(scope="function", autouse=True)
 def cleanup_connections(app):
     """Automatically clean up connections after each test to prevent ResourceWarnings."""

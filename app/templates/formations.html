@@ -106,6 +106,25 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('formation-status').textContent = formationString;
     }
 
+    const TEAM_SIZE = 11;
+
+    // Same thresholds for the analysis bars and the pitch colours
+    function effectivenessLevel(score) {
+        if (score >= 12) return 'high';
+        if (score >= 8) return 'mid';
+        return 'low';
+    }
+
+    function colourPitchByEffectiveness(positionScores) {
+        document.querySelectorAll('.position-slot[data-position-id]').forEach(slot => {
+            slot.classList.remove('effect-high', 'effect-mid', 'effect-low');
+            const data = positionScores[slot.dataset.positionId];
+            if (data) {
+                slot.classList.add(`effect-${effectivenessLevel(data.score)}`);
+            }
+        });
+    }
+
     // Calculate live formation analysis
     function calculateLiveAnalysis() {
         const assignedCount = Object.keys(playerAssignments).length;
@@ -116,6 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateFormationDisplay();
 
         if (assignedCount === 0) {
+            colourPitchByEffectiveness({});
             document.getElementById('overall-rating').textContent = '0.0';
             document.getElementById('position-analysis').innerHTML = '<p class="text-muted-custom small text-center">Assign players to see analysis</p>';
             return;
@@ -137,13 +157,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        const averageScore = assignedCount > 0 ? totalScore / assignedCount : 0;
+        // Empty positions count as 0, so a half-filled team doesn't look great
+        const averageScore = totalScore / TEAM_SIZE;
 
         // Update overall rating
         document.getElementById('overall-rating').textContent = averageScore.toFixed(1);
 
         // Update position analysis
         updatePositionAnalysis(positionScores);
+        colourPitchByEffectiveness(positionScores);
     }
 
     // Calculate player contribution to position (simplified version)
@@ -206,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = positionScores[positionId];
             const score = data.score;
             const percentage = Math.min(100, (score / 20) * 100);
-            const colorClass = score >= 12 ? 'bg-success' : score >= 8 ? 'bg-warning' : 'bg-danger';
+            const colorClass = { high: 'bg-success', mid: 'bg-warning', low: 'bg-danger' }[effectivenessLevel(score)];
             const positionAbbr = getPositionAbbreviation(parseInt(positionId));
 
             html += `
@@ -350,41 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     }
 
-    function assignPlayerToPosition(playerId, positionId, playerElement) {
-        // Remove player from previous position if assigned
-        Object.keys(playerAssignments).forEach(pos => {
-            if (playerAssignments[pos] === playerId) {
-                delete playerAssignments[pos];
-                const oldZone = document.querySelector(`[data-position-id="${pos}"]`);
-                if (oldZone) {
-                    oldZone.classList.remove('occupied');
-                    oldZone.innerHTML = `<span class="text-white-50">${oldZone.dataset.positionName}</span>`;
-                }
-            }
-        });
-
-        // Assign player to new position
-        playerAssignments[positionId] = playerId;
-
-        const dropZone = document.querySelector(`[data-position-id="${positionId}"]`);
-        if (dropZone) {
-            dropZone.classList.add('occupied');
-            const playerNumber = playerElement.dataset.playerNumber || '#';
-            dropZone.innerHTML = `
-                <div class="assigned-player">
-                    <button type="button" class="remove-btn" onclick="removePlayerFromPosition('${positionId}')">&times;</button>
-                    <strong>${playerNumber}</strong>
-                </div>
-            `;
-        }
-
-        // Hide assigned player from available list
-        playerElement.style.display = 'none';
-
-        // Trigger live analysis update
-        calculateLiveAnalysis();
-    }
-
     // Enhanced assignment function for new drag and drop system
     function assignPlayerToPositionEnhanced(dragData, positionId) {
         const { playerId, playerNumber, playerName, fromPosition } = dragData;
@@ -502,6 +489,11 @@ document.addEventListener('DOMContentLoaded', function() {
         playerElement.dataset.playerName = playerName;
         playerElement.dataset.fromPosition = positionId;
         playerElement.title = playerName;
+        // Same hover tooltip as in the "Available players" list
+        const sourcePlayer = document.querySelector(`.available-player[data-player-id="${playerId}"]`);
+        if (sourcePlayer?.dataset.playerData) {
+            playerElement.dataset.playerData = sourcePlayer.dataset.playerData;
+        }
 
         // Add drag listeners
         playerElement.addEventListener('dragstart', handleDragStart);

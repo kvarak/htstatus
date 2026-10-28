@@ -13,10 +13,7 @@
 
 ## P2: Worth doing 🎯
 
-- **[UI-013]** Show progress while "Update" runs - The update takes a while with no feedback; a spinner/"working..." state is enough → [Details](tasks/UI-013.md)
-- **[UI-019]** Formation page fixes - Overall rating ignores empty positions (bug); tooltips and colour-coding are nice extras → [Details](tasks/UI-019.md)
-- **[REFACTOR-058]** Tidy up `calculateContribution` - It accepts two position formats; settle on one and add a few tests for the common positions (was TEST-036)
-- **[REFACTOR-119]** Render the changelog in the template - `main.changes()` builds HTML in Python; pass entries to `changes.html` instead
+*Nothing right now*
 
 ## P3: When you're in that code anyway 🔧
 

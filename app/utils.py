@@ -705,134 +705,91 @@ def calculateManmark(player):
         return 0.0
 
 
+# Skill weights per position code (the codes used as player-table columns).
+# Tactical variants shift weight between skills; unknown codes fall back to passing.
+POSITION_SKILL_WEIGHTS = {
+    "GC": {"keeper": 1.0},
+    "CD": {"defender": 0.8, "passing": 0.2},
+    "CDO": {"defender": 0.6, "passing": 0.3, "playmaker": 0.1},
+    "CDTW": {"defender": 0.8, "passing": 0.2},
+    "WBD": {"defender": 0.8, "passing": 0.2},
+    "WBN": {"defender": 0.7, "passing": 0.3},
+    "WBO": {"defender": 0.5, "passing": 0.3, "winger": 0.2},
+    "WBTM": {"defender": 0.6, "passing": 0.4},
+    "WO": {"winger": 0.8, "passing": 0.2},
+    "WTM": {"winger": 0.5, "playmaker": 0.3, "passing": 0.2},
+    "WN": {"winger": 0.7, "passing": 0.3},
+    "WD": {"winger": 0.6, "defender": 0.2, "passing": 0.2},
+    "IMN": {"playmaker": 0.8, "passing": 0.2},
+    "IMD": {"defender": 0.3, "playmaker": 0.5, "passing": 0.2},
+    "IMO": {"playmaker": 0.6, "scorer": 0.2, "passing": 0.2},
+    "IMTW": {"playmaker": 0.5, "winger": 0.3, "passing": 0.2},
+    "FW": {"scorer": 0.8, "passing": 0.2},
+    "FTW": {"scorer": 0.6, "winger": 0.2, "passing": 0.2},
+    "DF": {"scorer": 0.6, "defender": 0.2, "passing": 0.2},
+}
+UNKNOWN_POSITION_WEIGHTS = {"passing": 1.0}
+
+# Hattrick match role IDs (formation tester) -> position code
+ROLE_ID_TO_POSITION = {
+    100: "GC",
+    101: "WBN",
+    102: "CD",
+    103: "CD",
+    104: "CD",
+    105: "WBN",
+    106: "WN",
+    107: "IMN",
+    108: "IMN",
+    109: "IMN",
+    110: "WN",
+    111: "FW",
+    112: "FW",
+    113: "FW",
+}
+
+
+def _player_value(player, field, default=0):
+    """Read a field from a player model object or a player dict (None -> default)."""
+    value = (
+        player.get(field) if isinstance(player, dict) else getattr(player, field, None)
+    )
+    return default if value is None else value
+
+
 def calculateContribution(position, player):
-    """Calculate player contribution to team based on position and skills."""
+    """Calculate a player's contribution for a position.
+
+    ``position`` is a position code (e.g. "IMN", see POSITION_SKILL_WEIGHTS) or a
+    Hattrick match role ID (100-113), which is mapped to its code.
+    ``player`` may be a Players object or a dict of its fields.
+    """
     try:
-        # Map position codes to position IDs if needed
-        position_code_to_id = {
-            "GC": 100,  # Goalkeeper contribution
-            "CD": 103,  # Central Defender Normal - using middle central defender
-            "CDO": 103,  # Central Defender Offensive - using middle central defender with offensive weighting
-            "CDTW": 102,  # Side Central Defender Towards Wing - using right central defender
-            "WBD": 101,  # Wing Back Defensive - using right back
-            "WBN": 101,  # Wingback Normal - using right back
-            "WBO": 101,  # Wing Back Offensive - using right back with offensive weighting
-            "WBTM": 101,  # Wingback Towards Middle - using right back
-            "WO": 106,  # Winger Offensive - using right winger
-            "WTM": 106,  # Winger Towards Middle - using right winger
-            "WN": 106,  # Winger Normal - using right winger
-            "WD": 106,  # Winger Defensive - using right winger with defensive weighting
-            "IMN": 108,  # Inner Midfielder Normal - using central inner midfield
-            "IMD": 108,  # Inner Midfielder Defensive - using central inner midfield
-            "IMO": 108,  # Inner Midfielder Offensive - using central inner midfield
-            "IMTW": 107,  # Inner Midfielder Towards Wing - using right inner midfield
-            "FW": 112,  # Forward Normal - using middle forward
-            "FTW": 111,  # Forward Towards Wing - using right forward
-            "DF": 112,  # Defensive Forward - using middle forward
-        }
+        code = ROLE_ID_TO_POSITION.get(position, position)
+        weights = POSITION_SKILL_WEIGHTS.get(code, UNKNOWN_POSITION_WEIGHTS)
 
-        # Convert position code to ID if it's a string
-        if isinstance(position, str):
-            position = position_code_to_id.get(
-                position, 108
-            )  # Default to central midfield if not found
+        contribution = sum(
+            (_player_value(player, skill) or 0) * weight
+            for skill, weight in weights.items()
+        )
 
-        # Position skill mappings based on Hattrick position requirements and tactical variations
-        position_skills = {
-            100: {"keeper": 1.0},  # Goalkeeper
-            # Right Back / Wing Back base
-            101: {"defender": 0.7, "passing": 0.3},
-            102: {"defender": 0.8, "passing": 0.2},  # Right Centre Back
-            103: {
-                "defender": 0.8,
-                "passing": 0.2,
-            },  # Centre Back / Central Defender base
-            104: {"defender": 0.8, "passing": 0.2},  # Left Centre Back
-            105: {"defender": 0.7, "passing": 0.3},  # Left Back
-            106: {"winger": 0.7, "passing": 0.3},  # Right Winger / Winger base
-            107: {"playmaker": 0.6, "passing": 0.4},  # Right Inner Midfield
-            108: {
-                "playmaker": 0.8,
-                "passing": 0.2,
-            },  # Central Inner Midfield / Inner Midfielder base
-            109: {"playmaker": 0.6, "passing": 0.4},  # Left Inner Midfield
-            110: {"winger": 0.7, "passing": 0.3},  # Left Winger
-            111: {"scorer": 0.6, "passing": 0.4},  # Right Forward
-            # Central Forward / Forward base
-            112: {"scorer": 0.8, "passing": 0.2},
-            113: {"scorer": 0.6, "passing": 0.4},  # Left Forward
-        }
-
-        # Handle tactical variations with custom skill weightings
-        if isinstance(position, str):
-            if position == "CDO":  # Central Defender Offensive
-                skills_weights = {"defender": 0.6, "passing": 0.3, "playmaker": 0.1}
-            elif position == "WBD":  # Wing Back Defensive
-                skills_weights = {"defender": 0.8, "passing": 0.2}
-            elif position == "WBO":  # Wing Back Offensive
-                skills_weights = {"defender": 0.5, "passing": 0.3, "winger": 0.2}
-            elif position == "WBTM":  # Wingback Towards Middle
-                skills_weights = {"defender": 0.6, "passing": 0.4}
-            elif position == "WO":  # Winger Offensive
-                skills_weights = {"winger": 0.8, "passing": 0.2}
-            elif position == "WTM":  # Winger Towards Middle
-                skills_weights = {"winger": 0.5, "playmaker": 0.3, "passing": 0.2}
-            elif position == "WD":  # Winger Defensive
-                skills_weights = {"winger": 0.6, "defender": 0.2, "passing": 0.2}
-            elif position == "IMD":  # Inner Midfielder Defensive
-                skills_weights = {"defender": 0.3, "playmaker": 0.5, "passing": 0.2}
-            elif position == "IMO":  # Inner Midfielder Offensive
-                skills_weights = {"playmaker": 0.6, "scorer": 0.2, "passing": 0.2}
-            elif position == "IMTW":  # Inner Midfielder Towards Wing
-                skills_weights = {"playmaker": 0.5, "winger": 0.3, "passing": 0.2}
-            elif position == "FTW":  # Forward Towards Wing
-                skills_weights = {"scorer": 0.6, "winger": 0.2, "passing": 0.2}
-            elif position == "DF":  # Defensive Forward
-                skills_weights = {"scorer": 0.6, "defender": 0.2, "passing": 0.2}
-            else:
-                # Use standard position mapping
-                skills_weights = position_skills.get(position, {"passing": 1.0})
-        else:
-            # Numeric position ID
-            skills_weights = position_skills.get(position, {"passing": 1.0})
-
-        contribution = 0.0
-        for skill, weight in skills_weights.items():
-            # Handle both object attributes and dictionary keys
-            if hasattr(player, skill):
-                skill_value = getattr(player, skill, 0) or 0
-            else:
-                skill_value = player.get(skill, 0) or 0
-            contribution += skill_value * weight
-
-        # Apply experience and form multipliers
-        # Handle both object attributes and dictionary keys
-        if hasattr(player, "experience"):
-            experience = player.experience or 0
-            form = player.form or 5
-            loyalty = player.loyalty or 0
-        else:
-            experience = player.get("experience", 0) or 0
-            form = player.get("form", 5) or 5
-            loyalty = player.get("loyalty", 0) or 0
+        experience = _player_value(player, "experience") or 0
+        form = _player_value(player, "form", 5) or 5
+        loyalty = _player_value(player, "loyalty") or 0
 
         experience_mult = 1.0 + (min(experience, 20) / 100.0)  # Up to 20% bonus
         form_mult = 1.0 + (form - 5) / 20.0  # -25% to +25% based on form
         loyalty_mult = 1.0 + (min(loyalty, 20) / 200.0)  # Up to 10% bonus
 
-        final_contribution = contribution * experience_mult * form_mult * loyalty_mult
-
-        return round(max(0, final_contribution), 2)
+        return round(
+            max(0, contribution * experience_mult * form_mult * loyalty_mult), 2
+        )
 
     except Exception as e:
-        # Handle both object attributes and dictionary keys for error logging
-        if hasattr(player, "ht_id"):
-            player_id = player.ht_id
-        else:
-            player_id = player.get("ht_id", "unknown")
         dprint(
             1,
-            f"Error calculating contribution for player {player_id} at position {position}: {e}",
+            f"Error calculating contribution for player "
+            f"{_player_value(player, 'ht_id', 'unknown')} at position {position}: {e}",
         )
         return 0.0
 

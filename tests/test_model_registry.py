@@ -13,17 +13,6 @@ from app.model_registry import (
 )
 
 
-@pytest.fixture(autouse=True)
-def restore_model_registry():
-    """These tests clear/mock the global registry; restore it for other tests."""
-    saved_models = dict(ModelRegistry._models)
-    saved_initialized = ModelRegistry._initialized
-    yield
-    ModelRegistry._models.clear()
-    ModelRegistry._models.update(saved_models)
-    ModelRegistry._initialized = saved_initialized
-
-
 def test_module_imports():
     """Test that all model registry functions can be imported correctly."""
     assert ModelRegistry is not None

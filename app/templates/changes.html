@@ -35,7 +35,38 @@
             </div>
             <hr>
             <div class="text-sm13">
-              {% for c in changelogfull %}{{ c|safe }}{% endfor %}
+              {% for e in changelog_entries %}
+                {% if e.type == "commit" %}
+                  <div class="mb-1 py-1 px-2 border-left border-success bg-light {% if e.group %}commit-group-{{ e.group }}{% endif %}"
+                       style="border-left-width: 3px !important;
+                              font-size: 0.9rem">
+                    <small class="text-muted mr-2">{{ e.date }}</small><code class="text-info small mr-2">{{ e.version or "unknown" }}</code><span class="text-dark">{{ e.message }}</span>
+                  </div>
+                {% elif e.type == "user_release" %}
+                  <div class="bg-success text-white p-2 mb-2 rounded shadow-sm">
+                    <strong><i class="fas fa-rocket"></i> {{ e.date }} 🎉 {{ e.version }} USER RELEASE</strong>
+                    <br>
+                    <small>{{ e.message }}</small>
+                  </div>
+                {% elif e.type == "internal_release" %}
+                  <div class="bg-info text-white p-2 mb-2 rounded shadow-sm"
+                       style="cursor: pointer"
+                       onclick="toggleCommits({{ e.group }})"
+                       title="Click to expand/collapse commit details">
+                    <strong><span id="chevron-{{ e.group }}"
+      style="display: inline-block;
+             transition: transform 0.2s">▼</span> <i class="fas fa-cog"></i> {{ e.date }} 🔧 {{ e.version }} TECHNICAL RELEASE</strong>
+                    <br>
+                    <small>{{ e.message }}</small>
+                  </div>
+                {% else %}
+                  <div class="mb-2 p-2 border border-warning bg-warning-light">
+                    <span class="text-muted">{{ e.date }}</span> <span class="text-warning font-weight-bold">[UNKNOWN]</span> {{ e.raw }}
+                  </div>
+                {% endif %}
+              {% else %}
+                <p class="text-muted">No changelog available - run 'make changelog' to generate the JSON files.</p>
+              {% endfor %}
             </div>
           </div>
         </div>

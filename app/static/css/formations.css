@@ -45,6 +45,22 @@
     border-style: solid;
 }
 
+/* Live effectiveness of the assigned player (set by formations.html JS) */
+.position-slot.occupied.effect-high {
+    background: rgba(40, 167, 69, 0.9) !important;
+    border-color: rgba(30, 126, 52, 1) !important;
+}
+
+.position-slot.occupied.effect-mid {
+    background: rgba(255, 193, 7, 0.9) !important;
+    border-color: rgba(224, 168, 0, 1) !important;
+}
+
+.position-slot.occupied.effect-low {
+    background: rgba(220, 53, 69, 0.85) !important;
+    border-color: rgba(189, 33, 48, 1) !important;
+}
+
 .position-slot.drag-over {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);

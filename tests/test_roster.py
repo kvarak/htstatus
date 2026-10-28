@@ -90,3 +90,25 @@ class TestRosterPages:
         assert response.status_code == 200
         total = re.search(rb'card-title mb-1">(\d+)</h6>', response.data)
         assert total and total.group(1) == b"2"
+
+    def test_formations_page_script_is_valid_js(self, roster_client):
+        import re
+        import shutil
+        import subprocess  # nosec B404 - static local syntax check only
+        import tempfile
+
+        html = roster_client.get(f"/formations?id={self.USER_TEAM}").get_data(
+            as_text=True
+        )
+        assert "const TEAM_SIZE = 11;" in html
+        assert "colourPitchByEffectiveness" in html
+
+        if not shutil.which("node"):
+            pytest.skip("Node.js not installed")
+        for script in re.findall(r"<script>(.*?)</script>", html, re.S):
+            with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False) as f:
+                f.write(script)
+            check = subprocess.run(  # nosec B603 B607
+                ["node", "--check", f.name], capture_output=True, text=True
+            )
+            assert check.returncode == 0, check.stderr

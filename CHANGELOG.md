@@ -42,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Page-visit tracking uses one `@track_activity` decorator; the logged-in user is loaded once per request (`get_current_user`) instead of up to four times
 - Admin debug charts: date-range logic moved to `app/static/js/debug-date-filter.js` with Node unit tests; inline error messages instead of pop-up alerts
+- Formation tester: players on the pitch show the same hover tooltip as the player list, and positions are coloured green/yellow/red by effectiveness
+- Changelog page markup lives in `changes.html` (Jinja escaping) instead of HTML built in Python
 - Admin debug charts accessibility: labelled date range fieldset, screen-reader chart descriptions, labelled shrink/expand buttons, keyboard chart reordering (Arrow Up/Down) with announcements
 
 ### Removed
@@ -58,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A failed team competition-data save no longer breaks the rest of the update (rollback); today's player snapshot is replaced in one commit
 - Sessions pointing to a user that no longer exists are logged out instead of browsing with a missing user
 - Error log: identical errors within an hour are stored once, rows older than 90 days are deleted, and logging works after a failed DB transaction
+- Position contributions: tactical variants (e.g. IMD/IMO, WBO, WO, DF) used their own skill weights in name only and silently fell back to the base position; they now differ as intended. Formation tester side midfielders/forwards use the IMN/FW weights
+- Formation tester: the overall rating counts empty positions as 0 (it averaged only the assigned players)
 
 ## [2.0.0] - 2026-01-01
 

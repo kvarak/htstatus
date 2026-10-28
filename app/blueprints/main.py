@@ -16,7 +16,6 @@ from flask import (
     session,
     url_for,
 )
-from markupsafe import escape
 
 from app.auth_utils import (
     get_current_user,
@@ -308,111 +307,67 @@ def settings():
     )
 
 
+CHANGELOG_FILES = ("changelog.json", "releases.json", "releases-internal.json")
+# Same timestamp: a release is listed above its commits (list is newest first)
+CHANGELOG_TYPE_PRIORITY = {"commit": 0, "user_release": 1, "internal_release": 1}
+
+
+def load_changelog_entries(static_folder):
+    """Merge the changelog JSON files into display entries, newest first.
+
+    Each entry gets ``date`` (YYYY-MM-DD) and ``group``: commits listed under a
+    technical (internal) release share that release's group number so the page
+    can collapse them.
+    """
+    entries = []
+    for filename in CHANGELOG_FILES:
+        try:
+            with open(os.path.join(static_folder, filename), encoding="utf-8") as f:
+                entries.extend(json.load(f).get("entries", []))
+        except Exception as e:
+            dprint(1, f"Error reading {filename}: {e}")
+
+    entries.sort(
+        key=lambda e: (
+            e.get("date") or "",
+            CHANGELOG_TYPE_PRIORITY.get(e.get("type"), 1),
+        ),
+        reverse=True,
+    )
+
+    display = []
+    group = None
+    release_counter = 0
+    for entry in entries:
+        entry_type = entry.get("type", "unknown")
+        if entry_type == "internal_release":
+            release_counter += 1
+            group = release_counter
+        elif entry_type != "commit":
+            group = None
+        display.append(
+            {
+                "type": entry_type,
+                "date": (entry.get("date") or "").split(" ")[0],
+                "version": entry.get("version", ""),
+                "message": entry.get("message", ""),
+                "group": group,
+                "raw": entry,
+            }
+        )
+    return display
+
+
 @main_bp.route("/changes")
 @track_activity("changes")
 def changes():
     """Public changes and changelog page."""
-    changelogfull = []
-    try:
-        all_entries = []
-
-        # Read commits JSON
-        commits_path = os.path.join(current_app.static_folder, "changelog.json")
-        try:
-            with open(commits_path, encoding="utf-8") as f:
-                commits_data = json.load(f)
-                all_entries.extend(commits_data.get("entries", []))
-        except Exception as e:
-            dprint(1, f"Error reading commits JSON: {e}")
-
-        # Read user releases JSON
-        releases_path = os.path.join(current_app.static_folder, "releases.json")
-        try:
-            with open(releases_path, encoding="utf-8") as f:
-                releases_data = json.load(f)
-                all_entries.extend(releases_data.get("entries", []))
-        except Exception as e:
-            dprint(1, f"Error reading releases JSON: {e}")
-
-        # Read internal releases JSON
-        internal_path = os.path.join(
-            current_app.static_folder, "releases-internal.json"
-        )
-        try:
-            with open(internal_path, encoding="utf-8") as f:
-                internal_data = json.load(f)
-                all_entries.extend(internal_data.get("entries", []))
-        except Exception as e:
-            dprint(1, f"Error reading internal releases JSON: {e}")
-
-        # Sort all entries by date (newest first) with commit priority
-        # When timestamps are equal, commits should appear before releases
-        def sort_key(entry):
-            entry_type = entry.get("type", "unknown")
-            date_val = entry.get("date") or ""
-
-            # Convert date to make it sortable, then invert priority logic
-            # We want commits to appear BEFORE releases when dates are equal
-            # So commits get priority 0 (lower) and releases get priority 1 (higher)
-            # With reverse=True, commits (0) will come before releases (1)
-            type_priority = {"commit": 0, "user_release": 1, "internal_release": 1}
-            priority = type_priority.get(entry_type, 1)
-
-            return (date_val, priority)
-
-        # Sort by date descending, then commits before releases for same dates
-        all_entries.sort(key=sort_key, reverse=True)
-
-        # Format entries for display and group commits with releases
-        current_release_id = None
-        release_counter = 0
-
-        for _i, entry in enumerate(all_entries):
-            entry_type = entry.get("type", "unknown")
-            full_date = entry.get("date", "")
-            # Get just the date part for display (escaped: rendered with |safe)
-            date = escape(full_date.split(" ")[0])
-
-            if entry_type == "commit":
-                version = escape(entry.get("version", "unknown"))
-                message = escape(entry.get("message", ""))
-                # Add data attributes to group commits with their release
-                commit_class = (
-                    f"commit-group-{current_release_id}" if current_release_id else ""
-                )
-                line = f'<div class="mb-1 py-1 px-2 border-left border-success bg-light {commit_class}" style="border-left-width: 3px !important; font-size: 0.9rem;"><small class="text-muted mr-2">{date}</small><code class="text-info small mr-2">{version}</code><span class="text-dark">{message}</span></div>'
-            elif entry_type == "user_release":
-                version = escape(entry.get("version", ""))
-                message = escape(entry.get("message", ""))
-                line = f'<div class="bg-success text-white p-2 mb-2 rounded shadow-sm"><strong><i class="fas fa-rocket"></i> {date} 🎉 {version} USER RELEASE</strong><br><small>{message}</small></div>'
-                # Reset current release for grouping
-                current_release_id = None
-            elif entry_type == "internal_release":
-                version = escape(entry.get("version", ""))
-                message = escape(entry.get("message", ""))
-                release_counter += 1
-                current_release_id = release_counter
-                # Make technical releases clickable with prominent expand symbol
-                line = f'<div class="bg-info text-white p-2 mb-2 rounded shadow-sm" style="cursor: pointer;" onclick="toggleCommits({current_release_id})" title="Click to expand/collapse commit details"><strong><span id="chevron-{current_release_id}" style="display: inline-block; transition: transform 0.2s;">▼</span> <i class="fas fa-cog"></i> {date} 🔧 {version} TECHNICAL RELEASE</strong><br><small>{message}</small></div>'
-            else:
-                line = f'<div class="mb-2 p-2 border border-warning bg-warning-light"><span class="text-muted">{date}</span> <span class="text-warning font-weight-bold">[UNKNOWN]</span> {escape(str(entry))}</div>'
-                # Reset current release for grouping
-                current_release_id = None
-
-            changelogfull.append(line)
-
-        dprint(2, f"Loaded {len(changelogfull)} combined changelog entries")
-
-    except Exception as e:
-        dprint(1, f"Error reading changelog JSON files: {e}")
-        changelogfull = [
-            "Error loading changelog - run 'make changelog' to generate JSON files"
-        ]
-
+    entries = load_changelog_entries(current_app.static_folder)
+    dprint(2, f"Loaded {len(entries)} combined changelog entries")
     return create_page(
         template="changes.html",
         title="Changes & Development History",
-        changelogfull=changelogfull,
+        changelog_entries=entries,
     )
 
 

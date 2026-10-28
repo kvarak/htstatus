@@ -244,3 +244,52 @@ class TestDebugPageAccessibility:
                 ["node", "--check", f.name], capture_output=True, text=True
             )
             assert check.returncode == 0, check.stderr
+
+
+def test_load_changelog_entries_groups_commits_under_technical_releases(tmp_path):
+    import json
+
+    from app.blueprints.main import load_changelog_entries
+
+    (tmp_path / "changelog.json").write_text(
+        json.dumps(
+            {
+                "entries": [
+                    {"type": "commit", "date": "2026-10-03 10:00", "message": "c3"},
+                    {"type": "commit", "date": "2026-10-02 10:00", "message": "c2"},
+                    {"type": "commit", "date": "2026-10-01 10:00", "message": "c1"},
+                ]
+            }
+        )
+    )
+    (tmp_path / "releases-internal.json").write_text(
+        json.dumps(
+            {
+                "entries": [
+                    {"type": "internal_release", "date": "2026-10-03 10:00"},
+                    {"type": "internal_release", "date": "2026-10-01 12:00"},
+                ]
+            }
+        )
+    )
+    (tmp_path / "releases.json").write_text(
+        json.dumps({"entries": [{"type": "user_release", "date": "2026-10-02 12:00"}]})
+    )
+
+    entries = load_changelog_entries(str(tmp_path))
+
+    assert [(e["type"], e.get("message"), e["group"]) for e in entries] == [
+        ("internal_release", "", 1),
+        ("commit", "c3", 1),
+        ("user_release", "", None),
+        ("commit", "c2", None),
+        ("internal_release", "", 2),
+        ("commit", "c1", 2),
+    ]
+    assert entries[0]["date"] == "2026-10-03"
+
+
+def test_load_changelog_entries_missing_files(tmp_path):
+    from app.blueprints.main import load_changelog_entries
+
+    assert load_changelog_entries(str(tmp_path)) == []
