@@ -13,6 +13,16 @@ from config import TestConfig
 import models  # noqa: F401
 
 
+def pytest_collection_modifyitems(config, items):  # noqa: ARG001
+    """Skip tests marked ``local_only`` on CI (GitHub Actions sets CI=true)."""
+    if not os.environ.get("CI"):
+        return
+    skip_on_ci = pytest.mark.skip(reason="local_only: needs developer environment")
+    for item in items:
+        if "local_only" in item.keywords:
+            item.add_marker(skip_on_ci)
+
+
 def pytest_sessionstart(session):  # noqa: ARG001
     """Called after the Session object has been created."""
     # Ensure clean start for resource tracking

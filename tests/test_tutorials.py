@@ -6,6 +6,9 @@ Tests for the interactive tutorial and onboarding functionality.
 
 import pytest
 
+# Builds its own DB connection from local POSTGRES_* settings
+pytestmark = pytest.mark.local_only
+
 
 @pytest.fixture
 def tutorial_client(db_session):

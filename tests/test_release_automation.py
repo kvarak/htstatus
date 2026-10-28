@@ -9,7 +9,10 @@ import shutil
 import subprocess
 import tempfile
 
+import pytest
 
+
+@pytest.mark.local_only  # needs git tags (CI checkout is shallow)
 def test_detect_version_changes():
     """Test version detection script"""
     result = subprocess.run(

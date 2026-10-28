@@ -114,6 +114,7 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
     "chpp: marks tests that require CHPP API access",
+    "local_only: needs the developer environment (.env, git tags, local DB); skipped when CI is set",
 ]
 
 [tool.coverage.run]

@@ -9,6 +9,8 @@ import importlib
 import os
 from unittest.mock import patch
 
+import pytest
+
 import config
 
 
@@ -269,6 +271,7 @@ class TestTestConfig:
         config_instance = config.TestConfig()
         assert config_instance.CONSUMER_SECRETS == "test-consumer-secrets"
 
+    @pytest.mark.local_only  # expects values from the developer .env
     def test_test_config_callback_url(self):
         """Test that TestConfig inherits CALLBACK_URL from parent Config."""
         config_instance = config.TestConfig()
@@ -290,6 +293,7 @@ class TestTestConfig:
             config_instance = config.TestConfig()
             assert test_url == config_instance.SQLALCHEMY_DATABASE_URI
 
+    @pytest.mark.local_only  # expects values from the developer .env
     def test_test_database_url_construction_defaults(self):
         """Test test database URI construction with defaults."""
         # Clear both TEST_DATABASE_URL and DATABASE_URL to ensure individual components are used

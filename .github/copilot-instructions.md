@@ -39,5 +39,6 @@ Before non-trivial work, read the relevant docs below instead of guessing.
 
 - Use `uv` and `make`: `make test-single FILE=tests/...`, `make test-python`, `make lint`, `make check-chpp`, `make test-all` (full quality gate)
 - The `Players` table holds one row per player per `data_date`. `owner` is the team ID; players who leave get `owner=0` and `old_owner=<team>`
+- Tests that need the developer environment (`.env`, git tags, local DB settings) are marked `@pytest.mark.local_only` and skipped on CI (`CI` env var)
 - Update the matching `.project/` docs (backlog/features/progress/tasks) and `CHANGELOG.md` when behavior changes
 - When a task is done, delete it from backlog.md/features.md and delete its `.project/tasks/` file. Never create history/archive files: Git history is the archive
