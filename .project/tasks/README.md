@@ -1,57 +1,9 @@
-# Project Tasks Directory
+# Task Details
 
-This directory contains detailed specifications for individual development tasks. Each task has its own file following the naming convention `<TASK-ID>.md`.
+Optional longer notes for a backlog or feature item, named `<TASK-ID>.md` (e.g. `UI-013.md`).
 
-## Structure
+Most items don't need a file; a one-line entry in [backlog.md](../backlog.md) or [features.md](../features.md) is enough. Write one only when there's context worth keeping.
 
-```
-.project/tasks/
-├── BUG-001.md     # Bug fix tasks
-├── FEAT-001.md    # Feature development tasks
-├── REFACTOR-001.md # Code refactoring tasks
-├── UI-001.md      # User interface tasks
-├── DOC-001.md     # Documentation tasks
-├── INFRA-001.md   # Infrastructure tasks
-├── TEST-001.md    # Testing tasks
-└── EPIC-001.md    # Epic groupings (P3 maintenance only)
-```
+**Format (keep it short):** what's wrong or wanted, what "good enough" looks like, any gotchas. No status fields, estimates or acceptance-criteria checklists required.
 
-## Task File Format
-
-Each task file contains:
-
-- **Status**: Current task status (🎯 Ready, 🚀 Active, etc.)
-- **Effort**: Time estimate
-- **Priority**: Priority level (P1-P3)
-- **Impact**: Expected impact description
-- **Dependencies**: Prerequisites or blockers
-- **Strategic Value**: Business/technical value
-
-### Sections:
-- **Problem Statement**: Clear description of what needs to be solved
-- **Implementation**: Detailed steps and phases
-- **Acceptance Criteria**: Success conditions
-- **Expected Outcomes**: Benefits and results
-
-## Lifecycle
-
-1. **Creation**: New tasks get individual files via `add-to-backlog` prompt
-2. **Reference**: `backlog.md` (improvements/bugs/refactors) or `features.md` (new features) contains summary with links to task files
-3. **Execution**: Agents read task files for detailed requirements
-4. **Completion**: Task files are **deleted** when work is complete (git preserves history)
-
-## File Management Rules
-
-- **Create**: When adding new tasks to backlog
-- **Read**: When planning or executing tasks
-- **Delete**: When tasks are completed (use `update` prompt)
-- **Never Edit**: Task requirements should be stable; create new tasks for changes
-
-## Integration
-
-- `backlog.md`: Summary view with priority and links to task files
-- `features.md`: Feature roadmap with links to task files
-- `prompts.json`: Updated to handle task file creation and deletion
-- `htplanner-ai-agent.md`: Documents task file workflow for AI agents
-
-This structure keeps the backlog clean and focused while providing detailed specifications when needed.
+**Lifecycle:** when the item is done or dropped, delete the file. Git history is the archive.

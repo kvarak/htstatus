@@ -28,7 +28,7 @@
 - **Critical Need**: Test coverage restoration from 47.56% to 50% threshold after successful simplification efforts
 - **Quality Gate Status**: MODERATE deployment confidence (6/9 passing), test coverage gap is primary blocker
 - **Next Priority**: TEST-011 comprehensive test coverage for simplified debug chart functionality to restore quality gates
-- **Backlog Status**: 81 tasks, P2 cleared (REFACTOR-036/037, TEST-117, UI-023 done October 28, 2026); feature ideas tracked in features.md
+- **Backlog Status**: Rewritten for hobby scale (October 28, 2026): 81 → 15 items about real problems; no epics, audits or coverage-chasing. Feature ideas in features.md
 
 ## Recent Completions (February 1-6, 2026)
 
