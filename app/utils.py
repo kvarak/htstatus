@@ -596,20 +596,6 @@ def get_player_changes(player_id, start_days_ago, end_days_ago):
         return []
 
 
-def _get_player_display_name(player_id, player_record):
-    """Get player display name with optional group name (legacy function).
-
-    Args:
-        player_id: Hattrick player ID
-        player_record: Player database record
-
-    Returns:
-        str: "Player Name" or "Player Name (Group Name)" if group exists
-    """
-    display_data = _get_player_display_data(player_id, player_record)
-    return display_data["name"]
-
-
 def _get_player_display_data(player_id, player_record):
     """Get player display data including name and group colors.
 

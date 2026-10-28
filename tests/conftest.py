@@ -75,6 +75,32 @@ def app():
         gc.collect()
 
 
+@pytest.fixture(scope="function")
+def app_with_routes(app):  # noqa: ARG001 - ensures tables exist via session app
+    """Fresh app with all routes registered, sharing the session test database.
+
+    Never drops tables: they belong to the session-scoped ``app`` fixture.
+    """
+    routed_app = create_app(TestConfig, include_routes=True)
+    with routed_app.app_context():
+        yield routed_app
+        with contextlib.suppress(Exception):
+            db.session.remove()
+
+
+@pytest.fixture(scope="function")
+def authenticated_client(app_with_routes):
+    """Routed test client with a logged-in session for team 12345."""
+    client = app_with_routes.test_client()
+    with client.session_transaction() as session:
+        session["access_key"] = "test_access_key"
+        session["access_secret"] = "test_access_secret"
+        session["current_user_id"] = 12345
+        session["all_teams"] = [12345]
+        session["all_team_names"] = ["Test Team"]
+    return client
+
+
 @pytest.fixture(scope="function", autouse=True)
 def cleanup_connections(app):
     """Automatically clean up connections after each test to prevent ResourceWarnings."""

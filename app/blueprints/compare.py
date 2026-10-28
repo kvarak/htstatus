@@ -62,30 +62,25 @@ def compare_players():
         except (ImportError, ValueError):
             from models import Players
 
-        # Get player data
+        from app.roster import oldest_player_records
+
         players_data = []
         players_oldest_dict = {}
 
-        # Get oldest player data for skill changes
-        oldest_data = (
-            db.session.query(Players)
-            .filter_by(owner=team_id)
-            .order_by(Players.data_date.asc())
-            .all()
+        # Oldest data per player, for skill changes
+        skills = (
+            "keeper",
+            "defender",
+            "playmaker",
+            "winger",
+            "passing",
+            "scorer",
+            "set_pieces",
         )
-
-        # Build dictionary of oldest data for each player
-        for oldest_player in oldest_data:
-            if oldest_player.ht_id not in players_oldest_dict:
-                players_oldest_dict[oldest_player.ht_id] = {
-                    "keeper": getattr(oldest_player, "keeper", 0),
-                    "defender": getattr(oldest_player, "defender", 0),
-                    "playmaker": getattr(oldest_player, "playmaker", 0),
-                    "winger": getattr(oldest_player, "winger", 0),
-                    "passing": getattr(oldest_player, "passing", 0),
-                    "scorer": getattr(oldest_player, "scorer", 0),
-                    "set_pieces": getattr(oldest_player, "set_pieces", 0),
-                }
+        for ht_id, oldest_player in oldest_player_records(Players, team_id).items():
+            players_oldest_dict[ht_id] = {
+                skill: getattr(oldest_player, skill, 0) for skill in skills
+            }
 
         for player_id in player_ids:
             try:

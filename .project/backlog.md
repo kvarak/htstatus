@@ -1,12 +1,13 @@
 # HattrickPlanner Backlog
 
 **Task Organization**: Use **numbered Epic structure** (EPIC-XXX) for maintenance tasks - related tasks grouped under Epic goals (🎯) with smaller actionable increments (15-90 min). All P3 tasks must be under an Epic. This allows working toward bigger objectives while maintaining progress visibility and partial completion capability.
-**Rule**: Work top to bottom, update status when starting (🚀 ACTIVE) or completing (✅ COMPLETE)
+**Scope**: Improvements, bug fixes, refactoring, tests and infrastructure only. New user-facing features go in [features.md](features.md).
+**Rule**: Work top to bottom, mark 🚀 ACTIVE when starting; when done, DELETE the task (and its `tasks/` file). No history/archive files: Git history is the archive.
 **Task IDs**: Use `./scripts/get-next-task-id.sh <TYPE>` to get next sequential ID (e.g., `./scripts/get-next-task-id.sh FEAT` → `FEAT-032`, `./scripts/get-next-task-id.sh EPIC` → `EPIC-011`)
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 103 tasks** (P1=0, P2=11, P3=92)
+**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 85 tasks** (P1=0, P2=4, P3=81); features tracked separately in [features.md](features.md)
 
 ---
 
@@ -14,19 +15,12 @@
 
 *No active P1 issues*
 
-## P2: Features 🎯
+## P2: Important Improvements 🎯
 
-- **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
-- **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
-- **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
-- **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](.project/tasks/FEAT-027.md)
-- **[FEAT-034]** Search Engine Optimization (SEO) Implementation - Add comprehensive SEO features including meta tags, robots.txt, sitemap.xml, structured data, and social sharing optimization to improve search engine discoverability for Hattrick enthusiasts → [Details](.project/tasks/FEAT-034.md)
-- **[UI-014]** Add Dark Mode Support - Implement theme switching between dark mode and light mode with user preference persistence → [Details](.project/tasks/UI-014.md)
-- **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](.project/tasks/REFACTOR-036.md)
-- **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
+- **[REFACTOR-036]** Consolidate Activity Tracking Pattern → [Details](tasks/REFACTOR-036.md)
+- **[REFACTOR-037]** Optimize User Context Queries → [Details](tasks/REFACTOR-037.md)
 - **[TEST-117]** Add Client-Side Date Filtering Tests - Create comprehensive tests for debug chart date range filtering logic and user interaction patterns (45 min)
 - **[UI-023]** Enhance Debug Chart Accessibility - Add screen reader support, keyboard navigation, and ARIA labels to debug charts and date range controls (30 min)
-- **[BUG-078]** Resolve CHPP Policy Violation in Admin Debug Routes - `make check-chpp` fails: `/debug/chpp_teams` and `/debug/chpp_raw` in `app/blueprints/main.py` call CHPP outside login/callback/update. Decide: remove them (preferred, hobby scope) or explicitly allow-list admin diagnostics in `scripts/check-chpp-usage.sh` (15 min)
 
 ## P3: Maintenance 🔧
 
@@ -40,39 +34,33 @@
 ### **EPIC-002: Hobby Project Simplification** 🎯
 *Goal: Consolidate documentation, assets, and configuration for hobby project maintainability*
 
-- **[REFACTOR-049]** Comprehensive Hobby Project Simplification - Consolidate documentation, assets, and configuration (Consolidates REFACTOR-045, 046, 047, 048, DOC-024) → [Details](.project/tasks/REFACTOR-049.md)
-- **[DOC-032]** Consolidate and Reduce Documentation Overhead - Reduce project docs from 66 to <40 files, preserve CHPP reference docs, merge setup instructions → [Details](.project/tasks/DOC-032.md)
-- **[REFACTOR-109]** Remove Test Stub Waste and TODO Overhead - Remove test files with only TODO comments, eliminate false coverage signals → [Details](.project/tasks/REFACTOR-109.md)
-- **[INFRA-088]** Simplify Configuration Complexity for Hobby Scale - Consolidate Docker configs, simplify environment variables, streamline Makefile targets → [Details](.project/tasks/INFRA-088.md)
-- **[REFACTOR-110]** Evaluate and Simplify Blueprint Architecture for Hobby Scale - Right-size blueprint patterns, error handling, and model access for hobby project complexity → [Details](.project/tasks/REFACTOR-110.md)
-- **[REFACTOR-030]** Implement Rate Limiting for CHPP Requests → [Details](.project/tasks/REFACTOR-030.md)
-- **[REFACTOR-031]** Clean Up Unused View Functions → [Details](.project/tasks/REFACTOR-031.md)
-- **[REFACTOR-032]** Optimize Database Query Performance → [Details](.project/tasks/REFACTOR-032.md)
+- **[REFACTOR-049]** Comprehensive Hobby Project Simplification - Consolidate documentation, assets, and configuration (Consolidates REFACTOR-045, 046, 047, 048, DOC-024) → [Details](tasks/REFACTOR-049.md)
+- **[DOC-032]** Consolidate and Reduce Documentation Overhead - Reduce project docs from 66 to <40 files, preserve CHPP reference docs, merge setup instructions → [Details](tasks/DOC-032.md)
+- **[INFRA-088]** Simplify Configuration Complexity for Hobby Scale - Consolidate Docker configs, simplify environment variables, streamline Makefile targets → [Details](tasks/INFRA-088.md)
+- **[REFACTOR-110]** Evaluate and Simplify Blueprint Architecture for Hobby Scale - Right-size blueprint patterns, error handling, and model access for hobby project complexity → [Details](tasks/REFACTOR-110.md)
+- **[REFACTOR-030]** Implement Rate Limiting for CHPP Requests → [Details](tasks/REFACTOR-030.md)
+- **[REFACTOR-032]** Optimize Database Query Performance → [Details](tasks/REFACTOR-032.md)
 
 ### **EPIC-003: User Interface Enhancement** 🎯
 *Goal: Essential UI improvements focused on hobby project user experience*
 
-- **[UI-013]** Implement Loading States for CHPP Operations → [Details](.project/tasks/UI-013.md)
-- **[UI-019]** Formation Page Visual and Interaction Enhancements - Add hover tooltips to assigned players, fix overall rating calculation to include empty positions, and color-code position effectiveness → [Details](.project/tasks/UI-019.md)
+- **[UI-013]** Implement Loading States for CHPP Operations → [Details](tasks/UI-013.md)
+- **[UI-019]** Formation Page Visual and Interaction Enhancements - Add hover tooltips to assigned players, fix overall rating calculation to include empty positions, and color-code position effectiveness → [Details](tasks/UI-019.md)
 
 ### **EPIC-004: Test Infrastructure & Security** 🎯
 *Goal: Essential testing foundation and security for hobby project*
 
 - **[REFACTOR-086]** Implement Progressive Enhancement Fallback for Chart Management - Add graceful fallback for disabled JavaScript, server-side state management option for chart functionality (15 min)
 - **[TEST-011]** Add Comprehensive Test Coverage for Simplified Debug Chart Functionality - Create test suite for admin preferences API, event delegation patterns, drag-and-drop state persistence (45 min)
-- **[REFACTOR-113]** Replace Skipped Test Infrastructure with Simple Integration Tests - Remove all @pytest.mark.skip decorators and replace with straightforward tests that don't require complex mocking, focusing on 2.2% coverage gap closure using real database fixtures (30 min)
-- **[REFACTOR-099]** Consolidate Authentication Test Fixtures - Move all authentication fixtures to conftest.py, eliminate per-file duplication (20 min)
 - **[TEST-037]** Add Blueprint Route Testing - Enhance conftest.py for blueprint testing, add route tests for feedback routes (60 min)
 - **[REFACTOR-114]** Test Pattern Standardization - Analyze existing working tests (test_db_utils, test_training_utils) and establish consistent patterns for new test creation, eliminate environment-specific failures (45 min)
-- **[TEST-116]** Strategic Coverage Gap Analysis - Identify specific functions/branches representing the 2.2% gap between 48.2% and 50% threshold, prioritize by implementation complexity (15 min)
 - **[REFACTOR-100]** Test Strategy Realignment - Establish quality thresholds over quantity metrics, fix infrastructure before expanding coverage (30 min)
 - **[REFACTOR-108]** Implement Consistent API Validation Patterns - Add comprehensive input validation, rate limiting, and consistent error responses across all new API endpoints to prevent bypass vulnerabilities (90 min)
 
 ### **EPIC-005: Database Optimization** 🎯
 *Goal: Optimize database architecture and queries for hobby project scale*
 
-- **[REFACTOR-115]** Centralize "Current Roster" Query - The "latest record per player for team" pattern is duplicated ~9 times (stats.py, matches.py, compare.py, player.py, training.py, api/players.py, utils.py ×3), each loading full player history and deduplicating in Python. Add one helper (e.g. `get_current_roster(teamid)` using a DB-side latest-per-`ht_id` query) and use it everywhere; it is also the single place that respects `owner=0` for sold players (60 min)
-- **[REFACTOR-116]** Remove N+1 Queries in Player/Timeline Views - `player()` runs two full `MatchPlay` history queries per player (max/last stars), `get_team_timeline()` calls `get_player_changes()` per player × week, `training()` runs first/latest queries per player. Replace with grouped/aggregate queries (60 min)
+- **[REFACTOR-116]** Remove N+1 Queries in Timeline View - `get_team_timeline()` calls `get_player_changes()` per player × week (2 queries each). Fetch the 4-week history once and group in memory. (Player page stars and training first/latest already batched 2026-10-28) (45 min)
 - **[REFACTOR-106]** Simplify Match Model Schema with Analytics Table - Refactor Match model into lean core table (teams, datetime, score, type) with separate MatchAnalytics table for optional enhanced data (90 min)
 - **[INFRA-087]** Add Match Analytics Database Indexes - Create indexes on Match.attendance, Match.weather_id, Match.home_team_formation (30 min)
 - **[REFACTOR-073]** Simplify Team Competition Data Storage - Replace 9-parameter update method with JSON field or upsert pattern (45 min)
@@ -116,20 +104,16 @@
 - **[DOC-022]** Architecture Decision Records - Document rationale for blueprint separation, calculation approaches, and frontend business logic decisions (30 min)
 - **[TEST-115]** Database Utilities Test Coverage - Create comprehensive test suite for db_utils.py module to restore coverage threshold and validate consolidation benefits (60 min)
 
-### **EPIC-008: Core Hattrick Features** 🎯
-*Goal: Essential player analysis and team management features*
+### **EPIC-008: Core Hattrick Code Quality** 🎯
+*Goal: Keep core player analysis code correct and simple (new features live in [features.md](features.md))*
 
 - **[REFACTOR-058]** Simplify calculateContribution Function - Normalize position inputs to single format, remove dual-mode complexity (45 min)
 - **[REFACTOR-059]** Extract Frontend Formation API - Replace JavaScript calculations with API endpoints to eliminate duplication (60 min)
 - **[REFACTOR-060]** Externalize Position Configuration - Move formation templates and skill weightings from hardcoded dictionaries to JSON/YAML (30 min)
 - **[TEST-036]** Add calculateContribution Test Coverage - Cover position code mapping and tactical variations (45 min)
-- **[FEAT-019]** Player Skill Changes Timeline - 4-week timeline with better browser compatibility and simplified approach
 - **[REFACTOR-081]** Investigate Server-Side Session Config - Research Flask session settings vs 195-line PWA JavaScript solution (30 min)
 - **[REFACTOR-067]** Extract Navigation Component Logic - Move admin indicator logic from templates to view layer (30 min)
 - **[REFACTOR-068]** Simplify Admin Feedback Test Mocking - Replace complex mocks with simple fake data (20 min)
-- **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics
-- **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences
-- **[FEAT-011]** Training Camp Planner
 
 ### **EPIC-009: Application Architecture** 🎯
 *Goal: Simplify import patterns and essential authentication*
@@ -147,7 +131,6 @@
 ### **EPIC-010: Essential Testing & Quality** 🎯
 *Goal: Focus testing on business logic and modernize quality processes*
 
-- **[INFRA-089]** Run Test Suite in CI - `.github/workflows/main.yml` only runs `make lint`; add a pytest job with a PostgreSQL service container so regressions (e.g. stale test fixtures) are caught on push (45 min)
 - **[TEST-070]** Team Model Comprehensive Coverage - Add tests for Team model creation, competition data updates, error handling (60 min)
 - **[TEST-034]** Business Logic Route Coverage - Prioritize blueprint routes (auth, main, team, matches, training) over utilities (60 min)
 - **[TEST-012]** Tutorial Analytics Test Coverage - Create coverage for tracking logic, calculations, event mapping (60 min)

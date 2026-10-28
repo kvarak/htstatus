@@ -88,11 +88,3 @@ class TestCHPPClient:
 
             # Verify returned data structure
             assert isinstance(matches, list)
-
-
-# TODO: Add comprehensive tests for CHPP client
-# TODO: Test CHPP API authentication
-# TODO: Test API request methods and responses
-# TODO: Test error handling for API failures
-# TODO: Test rate limiting and retry logic
-# TODO: Test data parsing and transformation

@@ -112,31 +112,6 @@ def fetch_user_teams(chpp: CHPP) -> tuple[list[int], list[str]]:
     return team_ids, team_names
 
 
-def fetch_team_data(chpp: CHPP, team_id: int) -> dict:
-    """Fetch comprehensive team data including players.
-
-    Args:
-        chpp: Initialized CHPP client with user authentication
-        team_id: Hattrick team ID
-
-    Returns:
-        dict: Team data containing team object and players list
-
-    Example:
-        >>> chpp = get_chpp_client(session)
-        >>> data = fetch_team_data(chpp, 1234567)
-        >>> print(f"Team: {data['team'].name}")
-        >>> print(f"Players: {len(data['players'])}")
-    """
-    team = chpp.team(ht_id=team_id)
-    players = team.players()
-
-    return {
-        "team": team,
-        "players": players,
-    }
-
-
 def get_current_user_context(chpp: CHPP) -> dict:
     """Fetch current user context including user details and owned teams.
 

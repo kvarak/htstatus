@@ -40,6 +40,35 @@ def setup_player_blueprint(
     default_group_order = group_order
 
 
+def add_star_ratings(match_play_model, players):
+    """Set max_stars/last_stars (and their match ids) on each player dict.
+
+    Uses one query for all players instead of two per player.
+    """
+    for p in players:
+        p["max_stars"] = "-"
+        p["last_stars"] = "-"
+    by_id = {p["ht_id"]: p for p in players}
+    if not by_id:
+        return
+
+    rated_plays = (
+        db.session.query(match_play_model)
+        .filter(match_play_model.player_id.in_(list(by_id)))
+        .filter(match_play_model.rating_stars.isnot(None))
+        .order_by(match_play_model.datetime.desc())
+        .all()
+    )
+    for play in rated_plays:
+        p = by_id[play.player_id]
+        if p["max_stars"] == "-" or play.rating_stars > p["max_stars"]:
+            p["max_stars"] = play.rating_stars
+            p["max_stars_match_id"] = play.match_id
+        if p["last_stars"] == "-" and play.rating_stars != 0:
+            p["last_stars"] = play.rating_stars
+            p["last_stars_match_id"] = play.match_id
+
+
 @player_bp.route("/player", methods=["GET", "POST"])
 @require_authentication
 def player():
@@ -175,83 +204,16 @@ def player():
 
     allplayerids, allplayers, playernames = get_training(players_data)
 
-    newlst = {}
-    for thislist in players_data:
-        newlst[thislist.ht_id] = dict(iter(thislist))
-    players_now = []
-    for _k, val in newlst.items():
-        players_now.append(val)
-
-    # Of each of the players you ever have owned, get the first download
-    players_data_oldest = (
-        db.session.query(Players)
-        .filter_by(owner=teamid)
-        .order_by(Players.data_date.asc())
-        .all()
-    )
-
-    if players_data_oldest:
-        first_rec = players_data_oldest[0]
-        dprint(
-            1,
-            f"DEBUG: First record - player {first_rec.ht_id}, date {first_rec.data_date}, owner {first_rec.owner}",
-        )
-        last_rec = players_data_oldest[-1]
-        dprint(
-            1,
-            f"DEBUG: Last record - player {last_rec.ht_id}, date {last_rec.data_date}",
-        )
-
+    # players_data is oldest-first: keep the first and the last record per player
     players_oldest_dict = {}
-    for thislist in players_data_oldest:
-        # Only keep the first (oldest) record for each player
-        if thislist.ht_id not in players_oldest_dict:
-            players_oldest_dict[thislist.ht_id] = dict(iter(thislist))
+    latest_by_player = {}
+    for record in players_data:
+        record_dict = dict(iter(record))
+        players_oldest_dict.setdefault(record.ht_id, record_dict)
+        latest_by_player[record.ht_id] = record_dict
+    players_now = list(latest_by_player.values())
 
-    # Debug: Check a sample player
-    if players_oldest_dict:
-        sample_ht_id = list(players_oldest_dict.keys())[0]
-        sample_oldest = players_oldest_dict[sample_ht_id]
-        dprint(1, f"DEBUG player.py: Sample player {sample_ht_id}")
-        dprint(1, f"  oldest date: {sample_oldest.get('data_date')}")
-        dprint(1, f"  oldest keeper: {sample_oldest.get('keeper')}")
-
-        # Find the same player in players_now
-        sample_now = next((p for p in players_now if p["ht_id"] == sample_ht_id), None)
-        if sample_now:
-            dprint(1, f"  current date: {sample_now.get('data_date')}")
-            dprint(1, f"  current keeper: {sample_now.get('keeper')}")
-            dprint(
-                1,
-                f"  difference: {sample_now.get('keeper') - sample_oldest.get('keeper')}",
-            )
-
-    # Add stars to the list of players
-    for p in players_now:
-        dbmatch = (
-            db.session.query(MatchPlay)
-            .filter_by(player_id=p["ht_id"])
-            .order_by(MatchPlay.rating_stars.desc())
-            .all()
-        )
-        p["max_stars"] = "-"
-        for m in dbmatch:
-            if m.rating_stars is not None:
-                p["max_stars"] = m.rating_stars
-                p["max_stars_match_id"] = m.match_id
-                break
-        dbmatch = (
-            db.session.query(MatchPlay)
-            .filter_by(player_id=p["ht_id"])
-            .order_by(MatchPlay.datetime.desc())
-            .all()
-        )
-        p["last_stars"] = "-"
-        for m in dbmatch:
-            if m.rating_stars is not None and m.rating_stars != 0:
-                p["last_stars"] = m.rating_stars
-                p["last_stars_match_id"] = m.match_id
-                break
+    add_star_ratings(MatchPlay, players_now)
 
     # Get the columns
     user = db.session.query(User).filter_by(ht_id=session["current_user_id"]).first()

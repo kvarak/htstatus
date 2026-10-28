@@ -6,7 +6,7 @@
 > **Standards**: Follow [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) for editing guidelines
 
 ## Quick Navigation
-🔗 **Project Context**: [Goals](goals.md) • [Backlog](backlog.md)
+🔗 **Project Context**: [Goals](goals.md) • [Backlog](backlog.md) • [Features](features.md)
 🛠️ **Setup Instructions**: [README.md](../README.md) for user setup • [DEPLOYMENT.md](../DEPLOYMENT.md) for production
 
 *This file preserves all 2.0 architecture documentation, adapted to the new format. Update as the project evolves.*
@@ -64,12 +64,13 @@ HT Status is a **hobby project** for Hattrick team management built with Flask a
   - `training.py` - Player training progression
 - **Authentication Utilities**: `/app/auth_utils.py` - Unified authentication patterns with @require_authentication decorator (**NEW** ✅ REFACTOR-008)
 - **Error Handling**: `/app/error_handlers.py` - Standardized error handling with HattrickPlannerError exception hierarchy (**NEW** ✅ REFACTOR-008)
-- **Test Utilities**: `/app/test_factories.py` - Simplified fixture creation for testing infrastructure (**NEW** ✅ REFACTOR-008)
+- **Test Utilities**: `/tests/factories.py` - Simplified fixture creation for testing infrastructure
 - **Constants Module**: `/app/constants.py` - Hattrick data definitions (match types, roles, behaviors, column specs)
 - **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, team statistics)
+- **Roster Queries**: `/app/roster.py` - Latest/oldest record per player for a team (DB-side); sold players (`owner=0`) are excluded
 - **Legacy Compatibility**: `/app/routes_bp.py` - Maintained for backward compatibility during migration
 - **Database**: `/models.py` - SQLAlchemy models
-- **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig/ProductionConfig classes
+- **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig classes (template: `config.py.example`)
 - **Route Architecture**: Pure blueprint-based architecture - legacy routes.py monolith eliminated (2,335 lines removed)
 
 #### Authentication & API Integration
@@ -169,7 +170,7 @@ As a hobby project with valuable user data, **database integrity is the highest 
 ### Root Directory
 ```
 htstatus-2.0/
-├── .project/           # Project management (backlog, plan, goals, architecture, progress)
+├── .project/           # Project management (backlog, features, goals, architecture, progress)
 ├── app/               # Flask backend application
 │   ├── __init__.py
 │   ├── factory.py     # Application factory pattern with blueprint registration

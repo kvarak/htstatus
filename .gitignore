@@ -65,3 +65,6 @@ docker-compose.override.yml
 # pyCHPP reference code
 pychpp/
 production_db_dump.sql
+
+# Local database backups (data, not code)
+scripts/database/backups/

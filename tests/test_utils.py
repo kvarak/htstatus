@@ -551,55 +551,6 @@ class TestGetPlayerChanges:
         assert result == []
 
 
-class TestGetPlayerDisplayName:
-    """Test _get_player_display_name helper function."""
-
-    def _create_mock_player_record(self, first_name, last_name):
-        """Helper to create simple mock player records."""
-        record = Mock()
-        record.first_name = first_name
-        record.last_name = last_name
-        return record
-
-    def test_get_player_display_name_basic(self):
-        """Test basic player display name without group."""
-        from app.utils import _get_player_display_name
-
-        player_record = self._create_mock_player_record("John", "Doe")
-
-        with patch("app.utils.session", {}):
-            result = _get_player_display_name(123456, player_record)
-            assert result == "John Doe"
-
-    @patch("app.utils.db")
-    @patch("app.utils.session", {"current_user_id": 12345})
-    def test_get_player_display_name_with_group(self, mock_db):
-        """Test player display name with group using direct patching."""
-        from app.utils import _get_player_display_name
-
-        player_record = self._create_mock_player_record("Jane", "Smith")
-
-        # Mock PlayerSetting and Group instances with proper attribute setup
-        mock_player_setting = Mock()
-        mock_player_setting.group_id = 5
-
-        mock_group = Mock()
-        mock_group.name = "Defenders"  # Set as direct attribute, not a Mock
-        mock_group.textcolor = "#ffffff"
-        mock_group.bgcolor = "#ff0000"
-
-        # Simple mock setup - return PlayerSetting, then Group
-        mock_db.session.query.return_value.filter_by.return_value.first.side_effect = [
-            mock_player_setting,
-            mock_group,
-        ]
-
-        # Mock successful model imports
-        with patch("models.PlayerSetting"), patch("models.Group"):
-            result = _get_player_display_name(123456, player_record)
-            assert result == "Jane Smith (Defenders)"
-
-
 class TestGetPlayerDisplayData:
     """Test _get_player_display_data helper function."""
 
@@ -1014,20 +965,6 @@ class TestPlayerDiff:
 
 class TestPlayerUtilityFunctions:
     """Test player utility functions."""
-
-    def test_get_player_display_name_basic(self):
-        """Test _get_player_display_name function."""
-        from app.utils import _get_player_display_name
-
-        # Mock player record
-        player_record = Mock()
-        player_record.playername = "John Doe"
-        player_record.first_name = "John"
-        player_record.last_name = "Doe"
-
-        result = _get_player_display_name(12345, player_record)
-        # Function should return a string representation
-        assert isinstance(result, str)
 
     def test_get_player_display_data_basic(self):
         """Test _get_player_display_data function."""

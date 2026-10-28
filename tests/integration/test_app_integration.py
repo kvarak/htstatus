@@ -37,15 +37,10 @@ def test_app_configuration_integration(app):
 
 @pytest.mark.integration
 def test_uv_environment_integration():
-    """Test that tests run in UV-managed environment."""
-    # We should be in some kind of managed environment
-    # UV creates .venv directory, so check for that
+    """Test that tests run inside a virtual environment (as uv provides)."""
     import sys
 
-    executable_path = sys.executable
-
-    # Should be running in some virtual environment
-    assert ".venv" in executable_path or "virtual" in executable_path.lower()
+    assert sys.prefix != sys.base_prefix
 
 
 @pytest.mark.integration

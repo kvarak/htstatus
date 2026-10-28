@@ -6,7 +6,6 @@ from app.auth_utils import (
     get_current_user_id,
     get_team_info,
     get_user_teams,
-    is_authenticated,
     require_authentication,
 )
 
@@ -15,7 +14,6 @@ def test_module_imports():
     """Test that all auth utility functions can be imported correctly."""
     assert callable(get_current_user_id)
     assert callable(get_user_teams)
-    assert callable(is_authenticated)
     assert callable(get_team_info)
     assert callable(require_authentication)
 
@@ -34,22 +32,6 @@ class TestGetCurrentUserId:
         with patch("app.auth_utils.session", {}):
             result = get_current_user_id()
             assert result is None
-
-
-class TestIsAuthenticated:
-    """Test is_authenticated function."""
-
-    def test_returns_true_when_user_present(self):
-        """Test returns True when current_user in session."""
-        with patch("app.auth_utils.session", {"current_user": "some_user"}):
-            result = is_authenticated()
-            assert result is True
-
-    def test_returns_false_when_user_not_present(self):
-        """Test returns False when current_user not in session."""
-        with patch("app.auth_utils.session", {}):
-            result = is_authenticated()
-            assert result is False
 
 
 class TestGetUserTeams:

@@ -122,11 +122,3 @@ class TestDownloadRecentMatches:
         assert result is not None, "Result should not be None"
         assert result["success"] is False
         assert "error" in result or "message" in result
-
-
-# TODO: Add comprehensive tests for matches blueprint
-# TODO: Test matches display and filtering
-# TODO: Test match data processing and calculations
-# TODO: Test team access validation
-# TODO: Test CHPP integration for match data
-# TODO: Test error handling and edge cases

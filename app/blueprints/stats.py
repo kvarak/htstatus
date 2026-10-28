@@ -46,23 +46,10 @@ def stats():
     all_team_names = session["all_team_names"]
     teamname = all_team_names[all_teams.index(teamid)]
 
-    # Get all current players for the team
+    from app.roster import latest_player_records
     from models import Players
 
-    current_players = (
-        db.session.query(Players)
-        .filter_by(owner=teamid)
-        .order_by(Players.data_date.desc())
-        .all()
-    )
-
-    # Filter to get the most recent data for each player
-    latest_players = {}
-    for player in current_players:
-        if player.ht_id not in latest_players:
-            latest_players[player.ht_id] = player
-
-    current_players_list = list(latest_players.values())
+    current_players_list = latest_player_records(Players, teamid)
 
     # Calculate team statistics
     from app.utils import (
@@ -229,8 +216,6 @@ def stats():
         dprint(1, f"Error fetching competition data from database: {e}")
         dprint(3, traceback.format_exc())
         competition_info = {}
-
-    print("=== COMPETITION FETCH COMPLETE ===\n")
 
     return create_page(
         template="stats.html",

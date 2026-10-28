@@ -8,10 +8,10 @@ Before non-trivial work, read the relevant docs below instead of guessing.
 
 - [goals.md](../.project/goals.md): project objectives and success metrics
 - [architecture.md](../.project/architecture.md): system structure, components, data flow
-- [backlog.md](../.project/backlog.md): prioritized tasks (P1–Px); add newly found issues here
+- [backlog.md](../.project/backlog.md): improvements, bug fixes, refactoring, tests, infra (P1–P3); add newly found issues here
+- [features.md](../.project/features.md): planned new user-facing features (FEAT-/UI- items); never mix into the backlog
 - [progress.md](../.project/progress.md): current status; update it when a task is completed
 - [tasks/](../.project/tasks/): detailed specs per task ID (e.g. `FEAT-xxx.md`, `REFACTOR-xxx.md`)
-- [history/](../.project/history/): finished or archived work notes
 - [prompts.json](../.project/prompts.json): UI/framework guidelines for AI assistants
 
 ## Repo root docs
@@ -39,4 +39,5 @@ Before non-trivial work, read the relevant docs below instead of guessing.
 
 - Use `uv` and `make`: `make test-single FILE=tests/...`, `make test-python`, `make lint`, `make check-chpp`, `make test-all` (full quality gate)
 - The `Players` table holds one row per player per `data_date`. `owner` is the team ID; players who leave get `owner=0` and `old_owner=<team>`
-- Update the matching `.project/` docs (backlog/progress/tasks) and `CHANGELOG.md` when behavior changes
+- Update the matching `.project/` docs (backlog/features/progress/tasks) and `CHANGELOG.md` when behavior changes
+- When a task is done, delete it from backlog.md/features.md and delete its `.project/tasks/` file. Never create history/archive files: Git history is the archive

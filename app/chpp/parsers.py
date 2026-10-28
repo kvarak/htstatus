@@ -510,38 +510,6 @@ def parse_player(root: ET.Element) -> CHPPPlayer:
     goals_current_team = safe_find_int(player_elem, "GoalsCurrentTeam")
     assists_current_team = safe_find_int(player_elem, "AssistsCurrentTeam")
     career_assists = safe_find_int(player_elem, "CareerAssists")
-    # DEBUG: Print actual XML goal field values for investigation
-    player_id_debug = safe_find_int(player_elem, "PlayerID")
-    if player_id_debug in [461202762, 476003339, 474535474]:  # Key test players
-        print(
-            f"[XML DEBUG] Player {player_id_debug}: GoalsCurrentTeam='{player_elem.find('GoalsCurrentTeam')}', MatchesCurrentTeam='{player_elem.find('MatchesCurrentTeam')}'"
-        )
-        if player_elem.find("GoalsCurrentTeam") is not None:
-            print(
-                f"[XML DEBUG] GoalsCurrentTeam element text: '{player_elem.find('GoalsCurrentTeam').text}'"
-            )
-        if player_elem.find("MatchesCurrentTeam") is not None:
-            print(
-                f"[XML DEBUG] MatchesCurrentTeam element text: '{player_elem.find('MatchesCurrentTeam').text}'"
-            )
-
-        # Show ALL available goal-related XML elements for debugging
-        print(f"[XML DEBUG] Available goal fields for player {player_id_debug}:")
-        for child in player_elem:
-            if (
-                "goal" in child.tag.lower()
-                or "match" in child.tag.lower()
-                or "assist" in child.tag.lower()
-            ):
-                print(f"  - {child.tag}: '{child.text}'")
-
-        # Check if goals are in a different container
-        for container in ["PlayerStats", "Statistics", "Goals", "TeamStats"]:
-            container_elem = player_elem.find(container)
-            if container_elem is not None:
-                print(f"[XML DEBUG] Found container {container}, checking for goals...")
-                for child in container_elem:
-                    print(f"  - {container}/{child.tag}: '{child.text}'")
 
     national_team_id_text = safe_find_text(player_elem, "NationalTeamID")
     national_team_id = int(national_team_id_text) if national_team_id_text else None

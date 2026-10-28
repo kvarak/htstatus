@@ -79,6 +79,8 @@ dev: check-uv check-venv services changelog ## Start development server (equival
 	@echo "🌐 Starting HT Status development server..."
 	@$(PYTHON) run.py
 
+serve: dev ## Alias for starting the development server
+
 stop: ## Stop dev server and Docker Compose services
 	@echo "🛑 Stopping HT Status development services..."
 	@$(DOCKER_COMPOSE) stop 2>&1 | tee -a /tmp/docker-stop.log || docker compose stop 2>&1 | tee -a /tmp/docker-stop.log || true
@@ -304,7 +306,7 @@ test-single: check-uv services ## 🧪 Run a single test file (usage: make test-
 	@$(UV) run pytest $(FILE) $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0 --json-report --json-report-file=out/tests/test-single.json
 	@echo "✅ Single test file completed: $(FILE)"
 
-EXCEPTIONS = __init__.py test_factories.py constants.py error_handlers.py
+EXCEPTIONS = __init__.py constants.py error_handlers.py
 
 test-python: check-uv services ## 🧪 Run all Python tests with coverage
 	@echo "🧪 Running all Python tests with coverage..."

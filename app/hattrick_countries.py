@@ -439,23 +439,6 @@ def get_country_color(country_id):
     return country_data.get("color", "#6B7280") if country_data else "#6B7280"
 
 
-def get_country_data(country_id):
-    """
-    Get complete country display information.
-
-    Args:
-        country_id (int): Hattrick country ID
-
-    Returns:
-        dict: Dictionary with name, flag, and color
-    """
-    return {
-        "name": get_country_name(country_id),
-        "flag": get_country_flag(country_id),
-        "color": get_country_color(country_id),
-    }
-
-
 def get_country_info(country_id):
     """
     Get complete country information from Hattrick country ID.

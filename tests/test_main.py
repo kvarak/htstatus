@@ -10,25 +10,6 @@ def test_module_imports():
     assert app.blueprints.main is not None
 
 
-@pytest.fixture
-def authenticated_client():
-    """Create test client with authenticated session for main route testing."""
-    # Create app with routes for testing
-    from app.factory import create_app
-    from config import TestConfig
-
-    test_app = create_app(TestConfig, include_routes=True)
-    client = test_app.test_client()
-
-    with client.session_transaction() as session:
-        session["access_key"] = "test_access_key"
-        session["access_secret"] = "test_access_secret"
-        session["current_user_id"] = 12345
-        session["all_teams"] = [12345]
-        session["all_team_names"] = ["Test Team"]
-    return client
-
-
 class TestMainRoutes:
     """Test main blueprint route functionality."""
 

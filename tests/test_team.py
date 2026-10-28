@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-import pytest
+from tests.factories import make_player_record
 
 
 def test_module_imports():
@@ -10,25 +10,6 @@ def test_module_imports():
     import app.blueprints.team
 
     assert app.blueprints.team is not None
-
-
-@pytest.fixture
-def authenticated_client():
-    """Create test client with authenticated session for team route testing."""
-    # Create app with routes for testing
-    from app.factory import create_app
-    from config import TestConfig
-
-    test_app = create_app(TestConfig, include_routes=True)
-    client = test_app.test_client()
-
-    with client.session_transaction() as session:
-        session["access_key"] = "test_access_key"
-        session["access_secret"] = "test_access_secret"
-        session["current_user_id"] = 12345
-        session["all_teams"] = [12345]
-        session["all_team_names"] = ["Test Team"]
-    return client
 
 
 class TestTeamRoutes:
@@ -182,73 +163,6 @@ class TestTeamDataProcessing:
                 assert b"<!DOCTYPE html>" in response.data or b"<html" in response.data
 
 
-def _player_record(ht_id, owner, first_name="Test", last_name="Player"):
-    from models import Players
-
-    fields = {
-        "ht_id": ht_id,
-        "first_name": first_name,
-        "nick_name": "",
-        "last_name": last_name,
-        "owner": owner,
-        "age": 25,
-        "is_transfer_listed": False,
-        "mother_club_bonus": False,
-    }
-    for key in [
-        "number",
-        "category_id",
-        "owner_notes",
-        "age_years",
-        "age_days",
-        "next_birthday",
-        "arrival_date",
-        "form",
-        "cards",
-        "injury_level",
-        "statement",
-        "language",
-        "language_id",
-        "agreeability",
-        "aggressiveness",
-        "honesty",
-        "experience",
-        "loyalty",
-        "specialty",
-        "native_country_id",
-        "native_league_id",
-        "native_league_name",
-        "tsi",
-        "salary",
-        "caps",
-        "caps_u20",
-        "career_goals",
-        "career_hattricks",
-        "league_goals",
-        "cup_goals",
-        "friendly_goals",
-        "current_team_matches",
-        "current_team_goals",
-        "national_team_id",
-        "national_team_name",
-        "team_id",
-    ]:
-        fields[key] = None
-    for key in [
-        "stamina",
-        "keeper",
-        "defender",
-        "playmaker",
-        "winger",
-        "passing",
-        "scorer",
-        "set_pieces",
-        "leadership",
-    ]:
-        fields[key] = 1
-    return Players(fields)
-
-
 class TestRosterReconciliation:
     """Sold players must be released from the team (regression)."""
 
@@ -257,11 +171,11 @@ class TestRosterReconciliation:
         from models import Players
 
         teamid = 999001
-        stale = _player_record(1, teamid, "Michal", "Bittner")
+        stale = make_player_record(1, teamid, "Michal", "Bittner")
         stale.data_date = "2026-01-01"
-        recent_left = _player_record(2, teamid, "Yngve", "Granbo")
+        recent_left = make_player_record(2, teamid, "Yngve", "Granbo")
         recent_left.data_date = "2026-09-01"
-        staying = _player_record(3, teamid)
+        staying = make_player_record(3, teamid)
         staying.data_date = "2026-09-01"
         db_session.add_all([stale, recent_left, staying])
         db_session.flush()
@@ -271,8 +185,8 @@ class TestRosterReconciliation:
             assert players_indb == {1, 2, 3}
 
             # Today's roster from Hattrick: player 3 stays, player 4 is new
-            db_session.add(_player_record(3, teamid))
-            db_session.add(_player_record(4, teamid))
+            db_session.add(make_player_record(3, teamid))
+            db_session.add(make_player_record(4, teamid))
             db_session.flush()
 
             names = {}

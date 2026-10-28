@@ -20,7 +20,7 @@ if ! [[ "$TASK_TYPE" =~ ^[A-Z]+$ ]]; then
     exit 1
 fi
 
-# Search git history for task IDs in both backlog.md and .project/tasks/
+# Search git history for task IDs in backlog.md, features.md and .project/tasks/
 # Look for patterns like FEAT-123, DOC-456, EPIC-007, etc.
 PATTERN="${TASK_TYPE}-[0-9]+"
 
@@ -28,15 +28,15 @@ PATTERN="${TASK_TYPE}-[0-9]+"
 TASK_IDS=$(git log --all --grep="$PATTERN" --oneline 2>/dev/null | grep -oE "$PATTERN" || true)
 
 # Also search file contents in git history
-FILE_TASK_IDS=$(git log --all -p .project/backlog.md .project/tasks/ 2>/dev/null | grep -oE "$PATTERN" || true)
+FILE_TASK_IDS=$(git log --all -p .project/backlog.md .project/features.md .project/tasks/ 2>/dev/null | grep -oE "$PATTERN" || true)
 
 # Search current files (uncommitted changes)
 if [ "$TASK_TYPE" = "EPIC" ]; then
     # EPICs are section headers, not task lines
-    CURRENT_BACKLOG=$(grep -oE "EPIC-[0-9]+" .project/backlog.md 2>/dev/null || true)
+    CURRENT_BACKLOG=$(grep -ohE "EPIC-[0-9]+" .project/backlog.md .project/features.md 2>/dev/null || true)
 else
     # Regular tasks are in task lines starting with -
-    CURRENT_BACKLOG=$(grep -E "^\s*-.*$PATTERN" .project/backlog.md 2>/dev/null | grep -oE "$PATTERN" || true)
+    CURRENT_BACKLOG=$(grep -hE "^\s*-.*$PATTERN" .project/backlog.md .project/features.md 2>/dev/null | grep -oE "$PATTERN" || true)
 fi
 CURRENT_TASKS=$(find .project/tasks/ -name "*.md" -exec grep -oE "$PATTERN" {} \; 2>/dev/null || true)
 

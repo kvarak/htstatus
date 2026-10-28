@@ -5,11 +5,9 @@ from unittest.mock import patch
 import pytest
 
 from app.error_handlers import (
-    AuthenticationError,
     handle_error,
     HTStatusError,
     TeamAccessError,
-    validate_player_id,
     validate_team_id,
     ValidationError,
 )
@@ -18,12 +16,10 @@ from app.error_handlers import (
 def test_module_imports():
     """Test that all error handler classes and functions can be imported correctly."""
     assert HTStatusError is not None
-    assert AuthenticationError is not None
     assert ValidationError is not None
     assert TeamAccessError is not None
     assert callable(handle_error)
     assert callable(validate_team_id)
-    assert callable(validate_player_id)
 
 
 class TestHTStatusError:
@@ -53,30 +49,6 @@ class TestHTStatusError:
         assert error.error_code == "TEST_001"
         assert error.template == "error.html"
         assert error.title == "Custom Error"
-
-
-class TestAuthenticationError:
-    """Test AuthenticationError exception class."""
-
-    def test_authentication_error_default(self):
-        """Test AuthenticationError with default message."""
-        error = AuthenticationError()
-
-        assert str(error) == "Authentication required"
-        assert error.message == "Authentication required"
-        assert error.error_code == "AUTH_001"
-        assert error.template == "login.html"
-        assert error.title == "Authentication Required"
-
-    def test_authentication_error_custom_message(self):
-        """Test AuthenticationError with custom message."""
-        error = AuthenticationError("Please log in first")
-
-        assert str(error) == "Please log in first"
-        assert error.message == "Please log in first"
-        assert error.error_code == "AUTH_001"
-        assert error.template == "login.html"
-        assert error.title == "Authentication Required"
 
 
 class TestValidationError:
@@ -235,57 +207,3 @@ class TestValidateTeamId:
 
         assert "Team ID must be positive" in str(exc_info.value)
         assert exc_info.value.field_name == "team_id"
-
-
-class TestValidatePlayerId:
-    """Test validate_player_id function."""
-
-    def test_validate_player_id_valid(self):
-        """Test validate_player_id with valid player ID."""
-        result = validate_player_id("67890")
-        assert result == 67890
-
-    def test_validate_player_id_valid_large_number(self):
-        """Test validate_player_id with large valid player ID."""
-        result = validate_player_id("8888888")
-        assert result == 8888888
-
-    def test_validate_player_id_empty_string(self):
-        """Test validate_player_id with empty string."""
-        with pytest.raises(ValidationError) as exc_info:
-            validate_player_id("")
-
-        assert "Player ID is required" in str(exc_info.value)
-        assert exc_info.value.field_name == "player_id"
-
-    def test_validate_player_id_none(self):
-        """Test validate_player_id with None."""
-        with pytest.raises(ValidationError) as exc_info:
-            validate_player_id(None)
-
-        assert "Player ID is required" in str(exc_info.value)
-        assert exc_info.value.field_name == "player_id"
-
-    def test_validate_player_id_invalid_format(self):
-        """Test validate_player_id with invalid format."""
-        with pytest.raises(ValidationError) as exc_info:
-            validate_player_id("xyz789")
-
-        assert "Invalid player ID format" in str(exc_info.value)
-        assert exc_info.value.field_name == "player_id"
-
-    def test_validate_player_id_zero(self):
-        """Test validate_player_id with zero."""
-        with pytest.raises(ValidationError) as exc_info:
-            validate_player_id("0")
-
-        assert "Player ID must be positive" in str(exc_info.value)
-        assert exc_info.value.field_name == "player_id"
-
-    def test_validate_player_id_negative(self):
-        """Test validate_player_id with negative number."""
-        with pytest.raises(ValidationError) as exc_info:
-            validate_player_id("-456")
-
-        assert "Player ID must be positive" in str(exc_info.value)
-        assert exc_info.value.field_name == "player_id"

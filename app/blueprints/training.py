@@ -27,6 +27,7 @@ def setup_training_blueprint(db_instance, trace_cols):
 def training():
     """Display player training progression and skill development."""
     from app.model_registry import get_user_model
+    from app.roster import latest_player_records, oldest_player_records
     from models import Players  # Import here to avoid circular dependencies
 
     # Track user activity
@@ -170,21 +171,15 @@ def training():
             skill_changes[player_id].append((date_val, skills, changes))
 
     # Get first and latest player records for additional info
-    player_info = {}
-    for player_id in allplayerids:
-        first_record = (
-            db.session.query(Players)
-            .filter_by(ht_id=player_id, owner=teamid)
-            .order_by(Players.data_date)
-            .first()
-        )
-        latest_record = (
-            db.session.query(Players)
-            .filter_by(ht_id=player_id, owner=teamid)
-            .order_by(Players.data_date.desc())
-            .first()
-        )
-        player_info[player_id] = {"first": first_record, "latest": latest_record}
+    first_records = oldest_player_records(Players, teamid)
+    latest_records = {p.ht_id: p for p in latest_player_records(Players, teamid)}
+    player_info = {
+        player_id: {
+            "first": first_records.get(player_id),
+            "latest": latest_records.get(player_id),
+        }
+        for player_id in allplayerids
+    }
 
     return create_page(
         template="training.html",

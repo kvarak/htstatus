@@ -156,7 +156,6 @@ def login():
             )
 
             # Setup team data from Hattrick API using OAuth tokens
-            print("Setting up team data")
             dprint(1, "Setting up team data for logged-in user")
             try:
                 # Create temporary session with user's OAuth tokens for CHPP client
@@ -274,9 +273,7 @@ def login():
         session["password"] = generate_password_hash(password)
         return start_oauth_flow()
 
-    print(
-        "ERROR: Reached end of login function without returning - this should not happen!"
-    )
+    dprint(1, "ERROR: Reached end of login function without returning")
 
 
 def start_oauth_flow():

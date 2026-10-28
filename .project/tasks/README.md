@@ -36,7 +36,7 @@ Each task file contains:
 ## Lifecycle
 
 1. **Creation**: New tasks get individual files via `add-to-backlog` prompt
-2. **Reference**: `backlog.md` contains summary with links to task files
+2. **Reference**: `backlog.md` (improvements/bugs/refactors) or `features.md` (new features) contains summary with links to task files
 3. **Execution**: Agents read task files for detailed requirements
 4. **Completion**: Task files are **deleted** when work is complete (git preserves history)
 
@@ -50,6 +50,7 @@ Each task file contains:
 ## Integration
 
 - `backlog.md`: Summary view with priority and links to task files
+- `features.md`: Feature roadmap with links to task files
 - `prompts.json`: Updated to handle task file creation and deletion
 - `htplanner-ai-agent.md`: Documents task file workflow for AI agents
 

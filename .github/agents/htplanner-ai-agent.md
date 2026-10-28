@@ -22,7 +22,8 @@ description: HattrickPlanner Development Agent - Specialized for Hattrick team m
 **CRITICAL**: ALWAYS read ALL files in `.project/` directory before making any code or documentation changes. This ensures awareness of project requirements, standards, and current planning context.
 
 **Required Reading Order**:
-1. `.project/backlog.md` - Current priorities and active tasks
+1. `.project/backlog.md` - Current priorities: improvements, bug fixes, refactoring, tests, infra
+   - `.project/features.md` - Planned new user-facing features (kept separate from the backlog)
 2. `.project/progress.md` - Current status and blockers
 3. `.project/architecture.md` - System structure and components
 4. `.project/goals.md` - Strategic objectives and vision
@@ -195,15 +196,13 @@ players = team.players()  # Live data from Hattrick
 **Development Metadata** (`.project/`):
 - **architecture.md**: Update with structural changes
 - **plan.md**: Mark completed items and update status
-- **backlog.md**: Update with new tasks and milestones
+- **backlog.md**: Update with new improvement/bug/refactor/test/infra tasks
+- **features.md**: Update with new feature ideas (FEAT-/UI- features)
 - **progress.md**: Update accomplishments and next steps
 - **goals.md**: Strategic vision and objectives - keep up to date
 - **prompts.json**: AI agent prompt definitions
 
-**Historical Documentation** (`.project/history/`):
-- Implementation guides, bug reviews, retrospectives
-- Completed task archives from backlog.md
-- Never delete - audit trail for project decisions
+**No History Files**: Git is the only archive. Never create history/archive/"done" files (e.g. `.project/history/`, `backlog-done.md`) for completed tasks; delete finished items and let `git log` keep the record.
 
 **User Documentation** (root level):
 - **README.md**: User-focused setup and usage guide
@@ -218,7 +217,7 @@ players = team.players()  # Live data from Hattrick
 
 #### Update Triggers
 - **architecture.md**: System structure, data flow, or tech stack changes
-- **backlog.md**: Task status changes (starting, completing, discovering)
+- **backlog.md** / **features.md**: Task status changes (starting, completing, discovering)
 - **progress.md**: Milestones, accomplishments, status changes
 - **plan.md**: Strategic direction or goal changes
 - **README.md**: Setup process or user-facing feature changes
@@ -367,16 +366,16 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 4. **Update task status appropriately**
    - Mark tasks 🚀 ACTIVE when starting
    - Mark tasks ✅ COMPLETED when finished
-   - **CRITICAL**: Move completed tasks to `.project/history/backlog-done.md` and DELETE from backlog
-   - **NEW**: DELETE completed task files from `.project/tasks/` (git preserves history)
+   - **CRITICAL**: DELETE completed tasks from backlog.md/features.md (git preserves history; no archive files)
+   - DELETE completed task files from `.project/tasks/`
    - Add new discovered tasks to backlog
 
 5. **Maintain clean backlog at all times**
    - Never leave ✅ COMPLETED tasks in backlog.md after finishing work
    - Use search pattern `✅.*COMPLETE` to find all completed tasks during update prompts
    - Backlog should only contain active (🚀), ready (🎯), or future (🔮) tasks
-   - Historical tasks belong in `.project/history/backlog-done.md` with completion dates
-   - **NEW**: Completed task files must be deleted from `.project/tasks/`
+   - Completed tasks are deleted, never archived to files (git history is the record)
+   - Completed task files must be deleted from `.project/tasks/`
 
 #### Coding Standards
 
@@ -421,21 +420,21 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 ### When Completing Work
 1. Run quality gates (`make test-all`, `make lint`)
 2. Update relevant documentation files
-3. **IMMEDIATELY move completed tasks to `.project/history/backlog-done.md` and DELETE from backlog**
-4. Add new discovered tasks to backlog with proper categorization
+3. **IMMEDIATELY DELETE completed tasks from backlog.md/features.md and their `.project/tasks/` files** (no history files)
+4. Add new discovered tasks to backlog (or features.md for new features) with proper categorization
 5. Update progress.md with accomplishments
 
 ### When Executing Update Prompt
 1. **MANDATORY**: Search backlog.md for pattern `✅.*COMPLETE` to find ALL completed tasks
-2. **For EACH completed task found**: Move complete task description to history/backlog-done.md with completion date
-3. **DELETE the completed task from backlog.md** - backlog must be clean of ✅ COMPLETE tasks
+2. **DELETE each completed task from backlog.md** (and its task file) - backlog must be clean of ✅ COMPLETE tasks
+3. Do NOT copy completed tasks anywhere; git history is the archive
 4. Update priority counts and status summaries
 5. Identify and unblock dependencies
 
 ### Backlog Hygiene Rules (CRITICAL)
 - **Never leave completed tasks in backlog.md** - this is a primary failure mode
 - Backlog should only contain: 🚀 ACTIVE, 🎯 Ready to Execute, or 🔮 Future tasks
-- All ✅ COMPLETED tasks belong in `.project/history/backlog-done.md` with completion dates
+- ✅ COMPLETED tasks are deleted, not archived; never create history files (git keeps the record)
 - Use systematic search approach: grep for `✅.*COMPLETE` pattern during updates
 - Clean backlog = clear priorities, no historical clutter interfering with current planning
 

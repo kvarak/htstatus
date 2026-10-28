@@ -14,18 +14,6 @@ class HTStatusError(Exception):
         super().__init__(self.message)
 
 
-class AuthenticationError(HTStatusError):
-    """Exception for authentication-related errors."""
-
-    def __init__(self, message="Authentication required"):
-        super().__init__(
-            message,
-            error_code="AUTH_001",
-            template="login.html",
-            title="Authentication Required",
-        )
-
-
 class ValidationError(HTStatusError):
     """Exception for data validation errors."""
 
@@ -97,32 +85,6 @@ def validate_team_id(team_id_str):
         return team_id
     except (ValueError, TypeError) as err:
         raise ValidationError("Invalid team ID format", field_name="team_id") from err
-
-
-def validate_player_id(player_id_str):
-    """Validate and convert player ID with standardized error handling.
-
-    Args:
-        player_id_str: Player ID as string from request
-
-    Returns:
-        int: Validated player ID
-
-    Raises:
-        ValidationError: If player ID is invalid
-    """
-    if not player_id_str:
-        raise ValidationError("Player ID is required", field_name="player_id")
-
-    try:
-        player_id = int(player_id_str)
-        if player_id <= 0:
-            raise ValidationError("Player ID must be positive", field_name="player_id")
-        return player_id
-    except (ValueError, TypeError) as err:
-        raise ValidationError(
-            "Invalid player ID format", field_name="player_id"
-        ) from err
 
 
 def log_error_to_database(error_type, error, request_info=None):

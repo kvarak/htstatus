@@ -88,7 +88,7 @@ HattrickPlanner uses a modern Flask blueprint architecture with clean separation
 - Testable blueprints with isolated dependencies
 - Easy to extend with new blueprints
 
-> **Historical Note**: Previously used monolithic `routes.py` (2,335 lines, removed January 2026). See [.project/history/backlog-done.md](.project/history/backlog-done.md) for migration details.
+> **Historical Note**: Previously used monolithic `routes.py` (2,335 lines, removed January 2026). See Git history for migration details.
 
 ## File Structure
 - `/app/factory.py`: Application factory with blueprint registration

@@ -1,8 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import pickle
 import time
 
 from app import db
+
+
+def utc_now():
+    """Naive UTC timestamp (same values as the deprecated datetime.utcnow())."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
 
 # --------------------------------------------------------------------------------
 
@@ -820,8 +826,8 @@ class Team(db.Model):
     logo_url = db.Column(db.String(500))
 
     # Timestamps
-    created = db.Column(db.DateTime, default=datetime.utcnow)
-    updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, default=utc_now)
+    updated = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
 
     # Relationships
     user = db.relationship("User", backref="teams")
@@ -894,7 +900,7 @@ class Team(db.Model):
         if logo_url is not None:
             self.logo_url = logo_url
 
-        self.updated = datetime.utcnow()
+        self.updated = utc_now()
         db.session.commit()
 
 
@@ -907,7 +913,7 @@ class ErrorLog(db.Model):
     __tablename__ = "error_log"
 
     id = db.Column(db.Integer, primary_key=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = db.Column(db.DateTime, default=utc_now, nullable=False)
     # '500', '404', 'Exception'
     error_type = db.Column(db.String(50), nullable=False)
     message = db.Column(db.Text)
@@ -972,7 +978,7 @@ class TutorialAnalytics(db.Model):
         db.String(255), nullable=False
     )  # URL path where event occurred
     user_agent = db.Column(db.Text, nullable=True)  # Browser info
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = db.Column(db.DateTime, default=utc_now, nullable=False)
 
     # Relationship to User
     user = db.relationship("User", backref="tutorial_events", lazy=True)
@@ -1021,10 +1027,8 @@ class AdminPreferences(db.Model):
     filter_settings = db.Column(
         db.JSON, nullable=True
     )  # Hide admin users, other filters
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    created_at = db.Column(db.DateTime, default=utc_now)
+    updated_at = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
 
     # Relationship to User model
     user = db.relationship("User", backref="admin_preferences")
@@ -1070,14 +1074,14 @@ class AdminPreferences(db.Model):
         """Update chart layout preferences"""
         if layout_data:
             self.chart_layout = layout_data
-            self.updated_at = datetime.utcnow()
+            self.updated_at = utc_now()
             db.session.commit()
 
     def update_filter_settings(self, filter_data):
         """Update filter preferences"""
         if filter_data:
             self.filter_settings = filter_data
-            self.updated_at = datetime.utcnow()
+            self.updated_at = utc_now()
             db.session.commit()
 
     def __repr__(self):

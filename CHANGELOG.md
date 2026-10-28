@@ -36,6 +36,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - App version meta tag added for tutorial feature detection
 - Project documentation updated with completion status and metrics
 - Backlog dependencies updated to reflect infrastructure readiness
+- Feature ideas moved from `.project/backlog.md` to new `.project/features.md`; backlog now holds improvements, bug fixes, refactoring, tests and infra only
+- Stats, formation, training, compare and player pages load the current roster with shared database-side queries (`app/roster.py`) instead of per-page history scans and per-player queries
+- `make lint` uses ruff + black (flake8/isort were not installed); CI also runs file-format, CHPP-policy and the full test suite against PostgreSQL
+
+### Removed
+- Unused code: `/api/players/filter`, admin `/debug/chpp_teams` and `/debug/chpp_raw` (violated CHPP policy), `logout.html`, unused helpers in `utils.py`, `auth_utils.py`, `error_handlers.py`, `chpp_utilities.py`, `hattrick_countries.py`, XML debug printing in the player parser
+- One-off debugging scripts and committed match backup data files
+- 21 permanently skipped, broken tests; TODO-only test stubs replaced with real tests
+
+### Fixed
+- Players sold some time ago remained listed in the team; the update now releases every departed player
+- Changelog page escapes commit messages (they were rendered as raw HTML)
+- Test isolation: tests no longer drop shared tables or leave the model registry mocked
 
 ## [2.0.0] - 2026-01-01
 

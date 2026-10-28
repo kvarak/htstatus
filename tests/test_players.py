@@ -34,25 +34,15 @@ def test_bulk_assign_basic_coverage():
     assert callable(bulk_assign_players)
 
 
-def test_filter_players_basic_coverage():
-    """Basic test for filter players route coverage."""
-    from app.api.players import filter_players
-
-    # Test that function exists and is callable
-    assert callable(filter_players)
-
-
 def test_api_blueprint_import_coverage():
     """Import more of the API module for coverage."""
     from app.api.players import (
         api_bp,
         bulk_assign_players,
-        filter_players,
         setup_api_blueprint,
     )
 
     # Test that all main components exist
     assert callable(bulk_assign_players)
-    assert callable(filter_players)
     assert callable(setup_api_blueprint)
     assert api_bp is not None

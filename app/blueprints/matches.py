@@ -275,6 +275,7 @@ def matches():
 def formations():
     """Display formation tester and tactical analyzer."""
     from app.model_registry import get_user_model
+    from app.roster import latest_player_records
     from models import Players
 
     # Track user activity (formation page)
@@ -297,20 +298,7 @@ def formations():
     teamname = all_team_names[all_teams.index(teamid)]
 
     # Get all current players for the team
-    current_players = (
-        db.session.query(Players)
-        .filter_by(owner=teamid)
-        .order_by(Players.data_date.desc(), Players.tsi.desc())
-        .all()
-    )
-
-    # Filter to get the most recent data for each player
-    latest_players = {}
-    for player in current_players:
-        if player.ht_id not in latest_players:
-            latest_players[player.ht_id] = player
-
-    current_players_list = list(latest_players.values())
+    current_players_list = latest_player_records(Players, teamid)
 
     # Sort players by number (players without numbers go to end)
     current_players_list.sort(key=lambda p: (p.number is None, p.number or 999))

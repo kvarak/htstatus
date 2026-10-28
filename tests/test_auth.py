@@ -1,39 +1,6 @@
 """Test authentication and session management."""
 
-import contextlib
-import os
-
 import pytest
-
-
-@pytest.fixture(scope="function")
-def app_with_routes():
-    """Create a fresh application with routes properly initialized for auth testing."""
-    from app.factory import create_app, db
-    from config import TestConfig
-
-    # Set testing environment
-    os.environ["FLASK_ENV"] = "testing"
-
-    # Create app with routes included from the beginning
-    app = create_app(TestConfig, include_routes=True)
-
-    with app.app_context():
-        # Create test database tables
-        db.create_all()
-        yield app
-
-        # Complete cleanup
-        with contextlib.suppress(Exception):
-            db.session.remove()
-        with contextlib.suppress(Exception):
-            db.drop_all()
-        with contextlib.suppress(Exception):
-            db.engine.dispose()
-
-        import gc
-
-        gc.collect()
 
 
 @pytest.fixture(scope="function")

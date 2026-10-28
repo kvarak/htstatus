@@ -3,52 +3,21 @@ Comprehensive tests for player management blueprint to achieve 80+ coverage.
 Tests player display, group management, skill tracking and data operations.
 """
 
-import contextlib
 from unittest.mock import patch
 
 import pytest
 
 from app.factory import db
-from app.test_factories import (
+from models import Group, Players, PlayerSetting, User
+from tests.factories import (
     create_test_group,
     create_test_players,
     create_test_user,
     setup_authenticated_session,
 )
-from models import Group, Players, PlayerSetting, User
 
 # Removed player_app fixture - using shared app fixture from conftest.py instead
 # This prevents database table drops that contaminate other tests
-
-
-@pytest.fixture(scope="function")
-def app_with_routes():
-    """Create a fresh application with routes properly initialized."""
-    import os
-
-    from app.factory import create_app, db
-    from config import TestConfig
-
-    # Set testing environment
-    os.environ["FLASK_ENV"] = "testing"
-
-    # Create app with routes included from the beginning
-    app = create_app(TestConfig, include_routes=True)
-
-    with app.app_context():
-        # Create test database tables
-        db.create_all()
-        yield app
-
-        # Tables are shared with the session-scoped conftest app; never drop them here
-        with contextlib.suppress(Exception):
-            db.session.remove()
-        with contextlib.suppress(Exception):
-            db.engine.dispose()
-
-        import gc
-
-        gc.collect()
 
 
 @pytest.fixture(scope="function")
@@ -460,3 +429,57 @@ class TestPlayerUtilityFunctions:
         for player in sample_players:
             # Player data should be accessible (verify no exceptions)
             assert player.ht_id is not None
+
+
+class TestAddStarRatings:
+    """Star ratings are computed with a single query for all players."""
+
+    @staticmethod
+    def _play(db_session, play_id, player_id, match_id, when, stars):
+        from datetime import datetime
+
+        from models import MatchPlay
+
+        play = MatchPlay(
+            {
+                "match_id": match_id,
+                "player_id": player_id,
+                "datetime": datetime.fromisoformat(when),
+                "first_name": "A",
+                "nick_name": "",
+                "last_name": "B",
+                "role_id": 100,
+                "rating_stars": stars,
+                "rating_stars_eom": None,
+                "behaviour": 0,
+            }
+        )
+        play.id = play_id
+        db_session.add(play)
+
+    def test_max_and_last_stars(self, db_session):
+        from app.blueprints.player import add_star_ratings
+        from models import MatchPlay
+
+        self._play(db_session, 9001, 501, 1, "2026-01-01", 3.5)
+        self._play(db_session, 9002, 501, 2, "2026-02-01", 5.0)
+        self._play(db_session, 9003, 501, 3, "2026-03-01", 0)  # not "last"
+        self._play(db_session, 9004, 501, 4, "2026-04-01", None)  # ignored
+        self._play(db_session, 9005, 502, 5, "2026-01-01", 2.0)
+        db_session.flush()
+
+        players = [{"ht_id": 501}, {"ht_id": 502}, {"ht_id": 503}]
+        add_star_ratings(MatchPlay, players)
+
+        p501, p502, p503 = players
+        assert (p501["max_stars"], p501["max_stars_match_id"]) == (5.0, 2)
+        assert (p501["last_stars"], p501["last_stars_match_id"]) == (5.0, 2)
+        assert (p502["max_stars"], p502["last_stars"]) == (2.0, 2.0)
+        assert (p503["max_stars"], p503["last_stars"]) == ("-", "-")
+
+    def test_no_players(self):
+        from app.blueprints.player import add_star_ratings
+
+        players = []
+        add_star_ratings(None, players)
+        assert players == []

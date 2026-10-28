@@ -44,11 +44,6 @@ def get_user_teams():
     return session.get("all_teams", []), session.get("all_team_names", [])
 
 
-def is_authenticated():
-    """Check if user is currently authenticated."""
-    return session.get("current_user") is not None
-
-
 def get_team_info(teamid, user_teams=None):
     """Get team name for given team ID with validation.
 

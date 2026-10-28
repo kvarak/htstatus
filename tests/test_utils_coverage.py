@@ -14,7 +14,6 @@ import pytest
 
 # Import the module under test
 from app.utils import (
-    create_page,
     debug_print,
     diff,
     diff_month,
@@ -205,131 +204,6 @@ class TestUtilsAdvanced:
         """Test get_admin_feedback_counts when no user_id provided."""
         result = get_admin_feedback_counts()
         assert result is None
-
-    @patch("app.utils.User")
-    @pytest.mark.skip(reason="app.utils does not have User attribute error")
-    def test_get_admin_feedback_counts_non_admin(self, mock_user_model):
-        """Test get_admin_feedback_counts for non-admin user."""
-        # Mock non-admin user
-        mock_user = MagicMock()
-        mock_user.role = "User"
-        mock_user.ht_id = 12345
-        mock_user_model.query.filter_by.return_value.first.return_value = mock_user
-
-        result = get_admin_feedback_counts(12345)
-        assert result is None
-
-    @patch("app.utils.User")
-    @patch("app.utils.Feedback")
-    @patch("app.utils.FeedbackComment")
-    @pytest.mark.skip(reason="app.utils does not have FeedbackComment attribute error")
-    def test_get_admin_feedback_counts_with_user(
-        self, mock_comment_model, mock_feedback_model, mock_user_model
-    ):
-        """Test get_admin_feedback_counts for admin user."""
-        # Mock admin user
-        mock_admin = MagicMock()
-        mock_admin.role = "Admin"
-        mock_admin.ht_id = 182085
-        mock_user_model.query.filter_by.return_value.first.return_value = mock_admin
-
-        # Mock admin users query
-        mock_user_model.query.filter.return_value.all.return_value = [mock_admin]
-
-        # Mock feedback queries
-        mock_feedback_query = MagicMock()
-        mock_feedback_query.count.return_value = 3
-        mock_feedback_model.query.filter.return_value = mock_feedback_query
-
-        # Mock feedback with admin replies
-        mock_feedback_with_replies = MagicMock()
-        mock_feedback_query.all.return_value = [mock_feedback_with_replies]
-
-        # Mock latest comment (from non-admin)
-        mock_latest_comment = MagicMock()
-        mock_latest_comment.author_id = 99999  # Non-admin ID
-        mock_comment_model.query.filter_by.return_value.order_by.return_value.first.return_value = (
-            mock_latest_comment
-        )
-
-        result = get_admin_feedback_counts(182085)
-
-        assert result is not None
-        assert "no_replies" in result
-        assert "needs_followup" in result
-        assert result["no_replies"] == 3
-        assert result["needs_followup"] == 1
-
-    @patch("app.utils.User")
-    @pytest.mark.skip(reason="app.utils does not have User attribute error")
-    def test_get_admin_feedback_counts_database_error(self, mock_user_model):
-        """Test get_admin_feedback_counts handles database errors gracefully."""
-        # Mock admin user
-        mock_admin = MagicMock()
-        mock_admin.role = "Admin"
-        mock_admin.ht_id = 182085
-        mock_user_model.query.filter_by.return_value.first.return_value = mock_admin
-
-        # Make admin query fail
-        mock_user_model.query.filter.side_effect = Exception(
-            "Database connection error"
-        )
-
-        result = get_admin_feedback_counts(182085)
-
-        # Should return default values on error
-        assert result == {"no_replies": 0, "needs_followup": 0}
-
-    @patch("flask.render_template")
-    @pytest.mark.skip(reason="Template not found: test.html")
-    def test_create_page_basic(self, mock_render_template):
-        """Test create_page basic functionality."""
-        mock_render_template.return_value = "rendered_html"
-
-        create_page("test.html", "Test Title", extra_var="test_value")
-
-        mock_render_template.assert_called_once()
-        args, kwargs = mock_render_template.call_args
-
-        assert args[0] == "test.html"
-        assert "title" in kwargs
-        assert kwargs["title"] == "Test Title"
-        assert "extra_var" in kwargs
-        assert kwargs["extra_var"] == "test_value"
-
-    @patch("flask.render_template")
-    @patch("flask.session")
-    @pytest.mark.skip(reason="SQLAlchemy ProgrammingError with coroutine type")
-    def test_create_page_with_session(self, mock_session, mock_render_template):
-        """Test create_page with session data."""
-        mock_session.get.return_value = None
-        mock_render_template.return_value = "rendered_html"
-
-        create_page("test.html", "Test Title")
-
-        # Verify render_template was called
-        mock_render_template.assert_called_once()
-
-    @patch("flask.render_template")
-    @patch("app.utils.get_version_info")
-    @pytest.mark.skip(reason="Template not found: test.html")
-    def test_create_page_with_version_info(
-        self, mock_version_info, mock_render_template
-    ):
-        """Test create_page includes version information."""
-        mock_version_info.return_value = {
-            "version": "3.12",
-            "fullversion": "3.12.5-g1a2b3c4",
-            "versionstr": "3.12.5-g1a2b3c4",
-        }
-        mock_render_template.return_value = "rendered_html"
-
-        create_page("test.html", "Test Title")
-
-        # Check that version info is passed to template
-        args, kwargs = mock_render_template.call_args
-        assert "version" in kwargs
-        assert kwargs["version"] == "3.12"
 
 
 def test_module_imports():

@@ -7,12 +7,12 @@
 ## Status Summary
 - **Quality**: 8/9 quality gates passing (HIGH deployment confidence)
 - **Coverage**: 47.56% test coverage (BELOW 50% target by 2.44%) - NEEDS RESTORATION after UI-021 code reduction
-- **Testing**: All 498 tests passing, 25 skipped (October 28, 2026) - fixed test DB drop contamination, db_utils import order and outdated teamdetails parser fixtures
+- **Testing**: 507 tests passing, 0 skipped, 57.7% coverage (October 28, 2026) - full suite now runs in CI with PostgreSQL
 - **Security**: 0 CVE vulnerabilities, 13 dependency warnings (non-critical), 0 code issues
 - **Environment**: Production data restored (26,004 players) - fresh production backup January 29, 2026
 - **Architecture**: Blueprint migration complete, Flask-only frontend, comprehensive activity tracking
 - **Design System**: Flask templates unified with consistent CSS and football theme
-- **CHPP Policy**: ⚠️ `make check-chpp` fails on admin debug routes in main.py (tracked as BUG-078)
+- **CHPP Policy**: ✅ COMPLIANT - `make check-chpp` passes and runs in CI (October 28, 2026)
 - **Linting**: `make lint` now uses ruff + black (flake8/isort were not installed and CI lint was broken) (October 28, 2026)
 - **CHPP Documentation**: ✅ COMPLETE - Comprehensive reference for 21/79 APIs with implementation examples (February 5, 2026)
 - **Production Monitoring**: ✅ COMPLETE - Error logging system with database storage, web interface, and command-line tools
@@ -28,7 +28,7 @@
 - **Critical Need**: Test coverage restoration from 47.56% to 50% threshold after successful simplification efforts
 - **Quality Gate Status**: MODERATE deployment confidence (6/9 passing), test coverage gap is primary blocker
 - **Next Priority**: TEST-011 comprehensive test coverage for simplified debug chart functionality to restore quality gates
-- **Backlog Status**: 103 tasks in three-tier structure; October 28, 2026 refactor review added BUG-078, REFACTOR-115–119, INFRA-089
+- **Backlog Status**: 85 improvement/bug/refactor tasks in backlog.md; feature ideas now tracked separately in features.md (October 28, 2026)
 
 ## Recent Completions (February 1-6, 2026)
 

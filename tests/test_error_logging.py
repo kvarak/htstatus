@@ -1,8 +1,8 @@
 """Test production error logging functionality."""
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-import pytest
+from models import utc_now
 
 
 def test_error_log_creation():
@@ -27,7 +27,7 @@ def test_error_log_creation():
     assert error.environment == "production"
 
 
-@patch("flask.current_app")
+@patch("flask.current_app", new_callable=MagicMock)
 def test_log_error_to_database_only_in_production(mock_current_app):
     """Test that errors are only logged in production environment."""
     from app.error_handlers import log_error_to_database
@@ -102,9 +102,6 @@ class TestErrorLogModel:
 class TestErrorLogDatabase:
     """Test error logging database operations."""
 
-    @pytest.mark.skip(
-        reason="Database table requires migration setup - focus on model and integration tests"
-    )
     def test_error_log_database_persistence(self, app, db_session):
         """Test that ErrorLog records are persisted to database."""
         from models import ErrorLog
@@ -131,9 +128,6 @@ class TestErrorLogDatabase:
             assert stored_error.message == "Database test error"
             assert stored_error.environment == "test"
 
-    @pytest.mark.skip(
-        reason="Database table requires migration setup - focus on model and integration tests"
-    )
     def test_error_log_query_operations(self, app, db_session):
         """Test ErrorLog query operations."""
         from models import ErrorLog
@@ -162,7 +156,7 @@ class TestErrorLogDatabase:
 class TestErrorHandlerIntegration:
     """Test error handler integration with logging system."""
 
-    @patch("flask.current_app")
+    @patch("flask.current_app", new_callable=MagicMock)
     def test_log_error_to_database_production_mode(self, mock_app):
         """Test error logging in production environment."""
         from app.error_handlers import log_error_to_database
@@ -177,7 +171,7 @@ class TestErrorHandlerIntegration:
         # Should attempt to log to database
         assert result is None  # Function doesn't return anything
 
-    @patch("flask.current_app")
+    @patch("flask.current_app", new_callable=MagicMock)
     def test_log_error_to_database_development_mode(self, mock_app):
         """Test error logging is skipped in development environment."""
         from app.error_handlers import log_error_to_database
@@ -206,12 +200,9 @@ class TestErrorHandlerIntegration:
 class TestErrorLogManagement:
     """Test error log management functionality."""
 
-    @pytest.mark.skip(
-        reason="Database table requires migration setup - focus on model and integration tests"
-    )
     def test_recent_errors_query(self, app, db_session):
         """Test querying recent errors."""
-        from datetime import datetime, timedelta
+        from datetime import timedelta
 
         from models import ErrorLog
 
@@ -225,11 +216,11 @@ class TestErrorLogManagement:
             db_session.commit()
 
             # Manually update old_error timestamp to be old
-            old_error.timestamp = datetime.utcnow() - timedelta(days=30)
+            old_error.timestamp = utc_now() - timedelta(days=30)
             db_session.commit()
 
             # Query recent errors (last 24 hours)
-            recent_cutoff = datetime.utcnow() - timedelta(hours=24)
+            recent_cutoff = utc_now() - timedelta(hours=24)
             recent_errors = ErrorLog.query.filter(
                 ErrorLog.timestamp >= recent_cutoff
             ).all()
@@ -238,9 +229,6 @@ class TestErrorLogManagement:
             recent_messages = [e.message for e in recent_errors]
             assert "Recent error" in recent_messages
 
-    @pytest.mark.skip(
-        reason="Database table requires migration setup - focus on model and integration tests"
-    )
     def test_error_type_statistics(self, app, db_session):
         """Test error type statistics collection."""
         from sqlalchemy import func

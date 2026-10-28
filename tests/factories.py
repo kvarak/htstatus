@@ -129,3 +129,75 @@ def setup_authenticated_session(client, user_or_id, user_ht_user=None):
         sess["all_team_names"] = ["Test Team"]
         sess["team_id"] = 12345
     return client
+
+
+def make_player_record(ht_id, owner, first_name="Test", last_name="Player"):
+    """Build an unsaved Players row with realistic default values."""
+    text_fields = [
+        "owner_notes",
+        "statement",
+        "language",
+        "native_league_name",
+        "national_team_name",
+    ]
+    nullable_fields = [
+        "number",
+        "next_birthday",
+        "arrival_date",
+        "national_team_id",
+        "team_id",
+    ]
+    numeric_fields = [
+        "category_id",
+        "age_days",
+        "cards",
+        "injury_level",
+        "language_id",
+        "agreeability",
+        "aggressiveness",
+        "honesty",
+        "specialty",
+        "native_country_id",
+        "native_league_id",
+        "caps",
+        "caps_u20",
+        "career_goals",
+        "career_hattricks",
+        "league_goals",
+        "cup_goals",
+        "friendly_goals",
+        "current_team_matches",
+        "current_team_goals",
+    ]
+    skill_fields = [
+        "stamina",
+        "keeper",
+        "defender",
+        "playmaker",
+        "winger",
+        "passing",
+        "scorer",
+        "set_pieces",
+        "leadership",
+        "form",
+        "experience",
+        "loyalty",
+    ]
+    fields = {
+        "ht_id": ht_id,
+        "first_name": first_name,
+        "nick_name": "",
+        "last_name": last_name,
+        "owner": owner,
+        "age": 25,
+        "age_years": 25,
+        "tsi": 1000,
+        "salary": 5000,
+        "is_transfer_listed": False,
+        "mother_club_bonus": False,
+        **dict.fromkeys(text_fields, ""),
+        **dict.fromkeys(nullable_fields),
+        **dict.fromkeys(numeric_fields, 0),
+        **dict.fromkeys(skill_fields, 5),
+    }
+    return Players(fields)

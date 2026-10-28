@@ -216,65 +216,6 @@ class TestAuthBlueprintAdvanced:
                 error="Password must be at least 8 characters long",
             )
 
-    @pytest.mark.skip(reason="Mock assertion issues with database calls")
-    @patch("models.User")
-    @patch("app.blueprints.auth.check_password_hash")
-    @patch("app.blueprints.auth.dprint")
-    def test_login_post_existing_user_validation(
-        self, mock_dprint, mock_check_password, mock_user_model, mock_app, mock_db
-    ):
-        """Test login POST request finds existing user and validates password."""
-        # Create mock existing user
-        mock_existing_user = MagicMock()
-        mock_existing_user.username = "testuser"
-        mock_existing_user.password_hash = "hashed_password"
-        mock_user_model.query.filter_by.return_value.first.return_value = (
-            mock_existing_user
-        )
-
-        mock_check_password.return_value = True
-
-        setup_auth_blueprint(mock_app, mock_db, "ck", "cs")
-
-        with mock_app.test_request_context(
-            "/",
-            method="POST",
-            data={
-                "username": "testuser",
-                "password": "testpass123",
-                "cookie_consent": "on",
-            },
-        ):
-            # Test that existing user is found and password is checked
-            mock_user_model.query.filter_by.assert_called_with(username="testuser")
-            mock_check_password.assert_called_with("hashed_password", "testpass123")
-
-    @pytest.mark.skip(reason="Mock assertion issues with password generation calls")
-    @patch("models.User")
-    @patch("app.blueprints.auth.generate_password_hash")
-    @patch("app.blueprints.auth.dprint")
-    def test_login_post_new_user_creation(
-        self, mock_dprint, mock_generate_hash, mock_user_model, mock_app, mock_db
-    ):
-        """Test login POST request creates new user when none exists."""
-        # No existing user found
-        mock_user_model.query.filter_by.return_value.first.return_value = None
-        mock_generate_hash.return_value = "hashed_new_password"
-
-        setup_auth_blueprint(mock_app, mock_db, "ck", "cs")
-
-        with mock_app.test_request_context(
-            "/",
-            method="POST",
-            data={
-                "username": "newuser",
-                "password": "newpass123",
-                "cookie_consent": "on",
-            },
-        ):
-            # Test that new user creation logic is triggered
-            mock_generate_hash.assert_called_with("newpass123")
-
     def test_auth_blueprint_registration(self, mock_app):
         """Test that auth blueprint can be registered with Flask app."""
         mock_app.register_blueprint(auth_bp)
@@ -282,24 +223,6 @@ class TestAuthBlueprintAdvanced:
         # Verify blueprint is registered
         assert "auth" in mock_app.blueprints
         assert mock_app.blueprints["auth"] == auth_bp
-
-    @pytest.mark.skip(
-        reason="Blueprints don't have url_map attribute until registered with app"
-    )
-    def test_auth_blueprint_route_methods(self):
-        """Test that auth blueprint routes have correct HTTP methods."""
-        # Get all route rules for the blueprint
-        rules = []
-        for rule in auth_bp.url_map.iter_rules():
-            rules.append((rule.rule, rule.methods, rule.endpoint))
-
-        # Find login route and verify methods
-        login_rules = [rule for rule in rules if rule[0] == "/login"]
-        assert len(login_rules) > 0
-
-        login_rule = login_rules[0]
-        assert "GET" in login_rule[1]
-        assert "POST" in login_rule[1]
 
     @patch("app.blueprints.auth.dprint")
     def test_login_debug_prints_coverage(self, mock_dprint, mock_app, mock_db):
@@ -323,51 +246,6 @@ class TestAuthBlueprintAdvanced:
             )
             assert any(
                 "Showing login form" in str(call) for call in mock_dprint.call_args_list
-            )
-
-    @pytest.mark.skip(
-        reason="Context manager protocol issues with mock_app and tuple unpacking"
-    )
-    @patch("app.blueprints.auth.dprint")
-    def test_login_post_debug_coverage(self, mock_dprint, mock_app, mock_db):
-        """Test debug print coverage for POST request validation."""
-        setup_auth_blueprint(mock_app, mock_db, "ck", "cs")
-
-        from app.blueprints.auth import login
-
-        with (
-            mock_app.test_request_context(
-                "/",
-                method="POST",
-                data={
-                    "username": "testuser",
-                    "password": "testpass123",
-                    "cookie_consent": "on",
-                },
-            ),
-            patch("flask.session", {}),
-            patch("app.blueprints.auth.create_page", return_value="form"),
-            patch("models.User.query.filter_by"),
-        ) as mock_query:
-            mock_query.return_value.first.return_value = None
-
-            login()
-
-            # Verify POST debug prints
-            assert any(
-                "Processing POST login request" in str(call)
-                for call in mock_dprint.call_args_list
-            )
-            assert any(
-                "Login attempt for username" in str(call)
-                for call in mock_dprint.call_args_list
-            )
-            assert any(
-                "Password provided" in str(call) for call in mock_dprint.call_args_list
-            )
-            assert any(
-                "Cookie consent provided" in str(call)
-                for call in mock_dprint.call_args_list
             )
 
 
