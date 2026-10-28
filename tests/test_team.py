@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from tests.factories import make_player_record
 
 
@@ -204,3 +206,72 @@ class TestRosterReconciliation:
         assert owned == {3, 4}
         released = db_session.query(Players).filter_by(ht_id=1).one()
         assert (released.owner, released.old_owner) == (0, teamid)
+
+
+class TestSaveTeamCompetitionData:
+    """Team competition data is stored atomically (BUG-074)."""
+
+    TEAM_ID = 999101
+
+    @pytest.fixture
+    def team_db(self, db_session):
+        from app import db
+        import app.blueprints.team as team_module
+        from models import User
+
+        db_session.add(User(777101, "owner", "owner", "x", "k", "s"))
+        db_session.commit()
+        with patch.object(team_module, "db", db):
+            yield team_module, db_session
+
+    @staticmethod
+    def _chpp_team(**overrides):
+        from types import SimpleNamespace
+
+        values = {
+            "name": "Dalby Stenbrotters FC",
+            "league_name": "Sweden",
+            "league_level": 5,
+            "power_rating": 1234,
+            "still_in_cup": True,
+            "cup_name": "Cup",
+            "cup_level": "3",
+            "cup_match_rounds_left": 2,
+            "dress_uri": None,
+            "logo_url": None,
+        }
+        values.update(overrides)
+        return SimpleNamespace(**values)
+
+    def test_creates_and_updates_team(self, team_db):
+        from models import Team
+
+        team_module, _ = team_db
+
+        assert team_module.save_team_competition_data(
+            self.TEAM_ID, self._chpp_team(), 777101
+        )
+        assert team_module.save_team_competition_data(
+            self.TEAM_ID, self._chpp_team(power_rating=1500), 777101
+        )
+
+        team = Team.get_by_ht_id(self.TEAM_ID)
+        assert (team.team_name, team.league_level, team.power_rating) == (
+            "Dalby Stenbrotters FC",
+            5,
+            1500,
+        )
+
+    def test_failure_rolls_back_and_session_stays_usable(self, team_db):
+        from models import Team, User
+
+        team_module, db_session = team_db
+
+        ok = team_module.save_team_competition_data(
+            self.TEAM_ID, self._chpp_team(league_level="not a number"), 777101
+        )
+
+        assert ok is False
+        assert Team.get_by_ht_id(self.TEAM_ID) is None
+        # Without the rollback this query would raise PendingRollbackError
+        assert db_session.query(User).filter_by(ht_id=777101).count() == 1

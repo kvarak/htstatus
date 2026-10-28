@@ -12,6 +12,9 @@ def require_authentication(f):
         if session.get('current_user') is None:
             return render_template('_forward.html', url='/login')
 
+    Also logs the user out when the session points to a user that no longer
+    exists in the database.
+
     Usage:
         @blueprint.route('/protected')
         @require_authentication
@@ -22,6 +25,10 @@ def require_authentication(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("current_user") is None:
+            return render_template("_forward.html", url="/login")
+        if get_current_user() is None:
+            # Session outlived its User row (e.g. DB reset); logging in recreates it
+            session.clear()
             return render_template("_forward.html", url="/login")
         return f(*args, **kwargs)
 

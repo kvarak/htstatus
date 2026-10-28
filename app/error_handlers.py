@@ -1,5 +1,7 @@
 """Standardized error handling utilities for HTStatus application."""
 
+from datetime import timedelta
+
 from app.utils import create_page
 
 
@@ -87,8 +89,16 @@ def validate_team_id(team_id_str):
         raise ValidationError("Invalid team ID format", field_name="team_id") from err
 
 
+# Keep the error log small on the Pi: drop old rows, skip repeats
+ERROR_LOG_RETENTION = timedelta(days=90)
+ERROR_LOG_DEDUP_WINDOW = timedelta(hours=1)
+
+
 def log_error_to_database(error_type, error, request_info=None):
     """Log error to database for production monitoring.
+
+    Rows older than ERROR_LOG_RETENTION are pruned, and an identical error
+    (type, message, path) seen within ERROR_LOG_DEDUP_WINDOW is not stored again.
 
     Args:
         error_type: Type of error ('500', '404', 'Exception')
@@ -102,7 +112,7 @@ def log_error_to_database(error_type, error, request_info=None):
         from flask import request as flask_request
 
         from app import db
-        from models import ErrorLog
+        from models import ErrorLog, utc_now
 
         # Only log errors in production environment
         if current_app.config.get("FLASK_ENV") != "production":
@@ -139,19 +149,36 @@ def log_error_to_database(error_type, error, request_info=None):
                 flask_request.user_agent.string if flask_request.user_agent else None
             )
 
-        # Create error log entry
-        error_log = ErrorLog(
-            error_type=error_type,
-            message=error_message,
-            stack_trace=stack_trace,
-            user_id=user_id,
-            request_path=request_path,
-            request_method=request_method,
-            user_agent=user_agent,
-        )
+        # The failing request may have left the session mid-transaction
+        db.session.rollback()
 
-        # Save to database
-        db.session.add(error_log)
+        now = utc_now()
+        db.session.query(ErrorLog).filter(
+            ErrorLog.timestamp < now - ERROR_LOG_RETENTION
+        ).delete(synchronize_session=False)
+
+        already_logged = (
+            db.session.query(ErrorLog.id)
+            .filter(
+                ErrorLog.error_type == error_type,
+                ErrorLog.message == error_message,
+                ErrorLog.request_path == request_path,
+                ErrorLog.timestamp >= now - ERROR_LOG_DEDUP_WINDOW,
+            )
+            .first()
+        )
+        if not already_logged:
+            db.session.add(
+                ErrorLog(
+                    error_type=error_type,
+                    message=error_message,
+                    stack_trace=stack_trace,
+                    user_id=user_id,
+                    request_path=request_path,
+                    request_method=request_method,
+                    user_agent=user_agent,
+                )
+            )
         db.session.commit()
 
     except Exception as log_error:

@@ -55,6 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Test isolation: tests no longer drop shared tables or leave the model registry mocked
 - `User.is_admin()` ignored role-based admins (compared against lowercase "admin")
 - Debug chart date range end date is now inclusive (users active later on the end day were excluded)
+- A failed team competition-data save no longer breaks the rest of the update (rollback); today's player snapshot is replaced in one commit
+- Sessions pointing to a user that no longer exists are logged out instead of browsing with a missing user
+- Error log: identical errors within an hour are stored once, rows older than 90 days are deleted, and logging works after a failed DB transaction
 
 ## [2.0.0] - 2026-01-01
 

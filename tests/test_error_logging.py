@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from models import utc_now
 
 
@@ -263,3 +265,67 @@ class TestErrorLogManagement:
             assert stats_dict.get("404", 0) >= 2
             assert stats_dict.get("500", 0) >= 1
             assert stats_dict.get("403", 0) >= 1
+
+
+class TestErrorLogRetentionAndDedup:
+    """INFRA-086: the error log stays small (prune old rows, skip repeats)."""
+
+    @pytest.fixture
+    def production_app(self, app, db_session):
+        from models import ErrorLog
+
+        # Start empty (rows from other tests may exist); rolled back afterwards
+        db_session.query(ErrorLog).delete()
+        db_session.commit()
+        old_env = app.config.get("FLASK_ENV")
+        app.config["FLASK_ENV"] = "production"
+        yield app
+        app.config["FLASK_ENV"] = old_env
+
+    @staticmethod
+    def _messages():
+        from models import ErrorLog
+
+        return sorted(e.message for e in ErrorLog.query.all())
+
+    def test_repeated_error_is_stored_once(self, production_app):
+        from app.error_handlers import log_error_to_database
+
+        for _ in range(3):
+            with production_app.test_request_context("/stats"):
+                log_error_to_database("500", Exception("boom"))
+        with production_app.test_request_context("/training"):
+            log_error_to_database("500", Exception("boom"))
+
+        assert self._messages() == ["boom", "boom"]
+
+    def test_old_rows_are_pruned(self, production_app, db_session):
+        from datetime import timedelta
+
+        from app.error_handlers import ERROR_LOG_RETENTION, log_error_to_database
+        from models import ErrorLog, utc_now
+
+        old = ErrorLog(error_type="500", message="ancient")
+        old.timestamp = utc_now() - ERROR_LOG_RETENTION - timedelta(days=1)
+        recent = ErrorLog(error_type="500", message="recent")
+        recent.timestamp = utc_now() - timedelta(days=1)
+        db_session.add_all([old, recent])
+        db_session.commit()
+
+        with production_app.test_request_context("/"):
+            log_error_to_database("404", Exception("new"))
+
+        assert self._messages() == ["new", "recent"]
+
+    def test_logs_after_failed_transaction(self, production_app, db_session):
+        from sqlalchemy import text
+
+        from app.error_handlers import log_error_to_database
+
+        with pytest.raises(Exception):  # noqa: B017 - any DB error will do
+            db_session.execute(text("SELECT * FROM table_that_does_not_exist"))
+
+        with production_app.test_request_context("/"):
+            log_error_to_database("500", Exception("after failure"))
+
+        assert self._messages() == ["after failure"]

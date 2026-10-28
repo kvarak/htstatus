@@ -38,7 +38,9 @@ def sample_user(app, db_session):  # noqa: ARG001
         access_secret="test_access_secret",
     )
     db_session.add(user)
-    db_session.flush()
+    db_session.commit()  # survives request teardown (unlike a flush)
+    db_session.refresh(user)
+    db_session.expunge(user)  # keep loaded values usable after requests
     return user
 
 
@@ -112,7 +114,10 @@ def sample_players(app, sample_user, db_session):  # noqa: ARG001
         db_session.add(player)
         players.append(player)
 
-    db_session.flush()
+    db_session.commit()
+    for player in players:
+        db_session.refresh(player)
+        db_session.expunge(player)
     return players
 
 

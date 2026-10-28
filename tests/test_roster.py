@@ -42,7 +42,10 @@ class TestRosterPages:
 
     @pytest.fixture
     def roster_client(self, app_with_routes, db_session):
+        from models import User
         from tests.factories import setup_authenticated_session
+
+        db_session.add(User(self.USER_TEAM, "owner", "owner", "x", "k", "s"))
 
         for ht_id, first, last, date in [
             (601, "Alfa", "Zettergren", "2026-01-01"),

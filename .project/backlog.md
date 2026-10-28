@@ -9,9 +9,7 @@
 
 ## P1: Broken or risky 🔥
 
-- **[BUG-074]** Team data update isn't atomic - If storing team competition data fails halfway, roll back instead of leaving half-written rows
-- **[FEAT-018]** Logged-in session without a User row - Some sessions point to users that don't exist in the DB (REFACTOR-050). Either create the row or send them to login; pick whatever is simplest
-- **[INFRA-086]** Keep the error log from growing forever - The Pi has limited disk. Delete old ErrorLog rows (e.g. older than 90 days) and skip storing the same error over and over (was FEAT-024)
+*Nothing right now*
 
 ## P2: Worth doing 🎯
 
@@ -28,7 +26,7 @@
 - **[REFACTOR-103]** Drop Flask-Bootstrap - Templates mostly use Bootstrap 4 already; remove the dependency when template work happens (was REFACTOR-091) → [Details](tasks/REFACTOR-103.md)
 - **[REFACTOR-116]** Timeline is query-heavy - `get_team_timeline()` runs 2 queries per player per week. Only worth fixing if the page feels slow
 - **[REFACTOR-102]** Less copy-paste in Chart.js code - The debug page builds ~18 charts by hand; a small helper would shrink it. Only if you're editing charts anyway
-- **[REFACTOR-073]** Simplify team competition data storage - The 9-parameter update method could be a simple upsert; do it together with BUG-074
+- **[REFACTOR-073]** Simplify team competition data storage - The 9-parameter update method could be a simple upsert (now wrapped by `save_team_competition_data` in team.py)
 - **[INFRA-088]** Trim tooling and docs - Makefile targets, quality-intelligence scripts and 60+ doc files are more than a hobby project needs. Delete what nobody uses when it gets in the way (was REFACTOR-049, DOC-032, REFACTOR-101, REFACTOR-028 changelog, REFACTOR-052..056) → [Details](tasks/INFRA-088.md)
 
 ---

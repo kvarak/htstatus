@@ -122,7 +122,8 @@ class TestRequireAuthenticationDecorator:
             assert result == "forward_template"
             mock_render.assert_called_once_with("_forward.html", url="/login")
 
-    def test_allows_access_when_authenticated(self):
+    @patch("app.auth_utils.get_current_user", return_value=object())
+    def test_allows_access_when_authenticated(self, _mock_user):
         """Test decorator allows access when authenticated."""
         with patch("app.auth_utils.session", {"current_user": "testuser"}):
 
@@ -133,6 +134,22 @@ class TestRequireAuthenticationDecorator:
             result = test_route()
 
             assert result == "protected_content"
+
+    @patch("app.auth_utils.get_current_user", return_value=None)
+    @patch("app.auth_utils.render_template", return_value="forward_template")
+    def test_logs_out_session_without_user_row(self, mock_render, _mock_user):
+        """A session pointing to a deleted/missing User is cleared (FEAT-018)."""
+        fake_session = {"current_user": "ghost", "current_user_id": 404}
+        with patch("app.auth_utils.session", fake_session):
+
+            @require_authentication
+            def test_route():
+                return "protected_content"
+
+            assert test_route() == "forward_template"
+
+        assert fake_session == {}
+        mock_render.assert_called_once_with("_forward.html", url="/login")
 
     def test_preserves_function_metadata(self):
         """Test decorator preserves original function metadata."""
@@ -146,7 +163,8 @@ class TestRequireAuthenticationDecorator:
             assert test_route.__name__ == "test_route"
             assert test_route.__doc__ == "Test route docstring."
 
-    def test_passes_arguments_and_kwargs(self):
+    @patch("app.auth_utils.get_current_user", return_value=object())
+    def test_passes_arguments_and_kwargs(self, _mock_user):
         """Test decorator passes through arguments and keyword arguments."""
         with patch("app.auth_utils.session", {"current_user": "testuser"}):
 
