@@ -3,7 +3,6 @@
 from datetime import datetime
 
 from flask import Blueprint, request, session
-from sqlalchemy import text
 
 from app.auth_utils import require_authentication
 from app.constants import HT_MATCH_ROLE
@@ -152,7 +151,7 @@ def matches():
             dbmatches = (
                 db.session.query(Match)
                 .filter((Match.away_team_id == teamid) | (Match.home_team_id == teamid))
-                .order_by(text("datetime desc"))
+                .order_by(Match.datetime.desc())
                 .all()
             )
             dprint(2, f"Found {len(dbmatches)} matches for team {teamid}")

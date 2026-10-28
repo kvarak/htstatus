@@ -136,9 +136,8 @@ def log_error_to_database(error_type, error, request_info=None):
     try:
         import traceback
 
-        from flask import current_app
+        from flask import current_app, session
         from flask import request as flask_request
-        from flask import session
 
         from app import db
         from models import ErrorLog

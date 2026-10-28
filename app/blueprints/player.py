@@ -3,7 +3,6 @@
 import math
 
 from flask import Blueprint, request, session
-from sqlalchemy import text
 
 from app.auth_utils import (
     get_team_info,
@@ -170,8 +169,7 @@ def player():
     players_data = (
         db.session.query(Players)
         .filter_by(owner=teamid)
-        .order_by(text("data_date"))
-        .order_by(text("number"))
+        .order_by(Players.data_date, Players.number)
         .all()
     )
 
@@ -233,7 +231,7 @@ def player():
         dbmatch = (
             db.session.query(MatchPlay)
             .filter_by(player_id=p["ht_id"])
-            .order_by(text("rating_stars desc"))
+            .order_by(MatchPlay.rating_stars.desc())
             .all()
         )
         p["max_stars"] = "-"
@@ -245,7 +243,7 @@ def player():
         dbmatch = (
             db.session.query(MatchPlay)
             .filter_by(player_id=p["ht_id"])
-            .order_by(text("datetime desc"))
+            .order_by(MatchPlay.datetime.desc())
             .all()
         )
         p["last_stars"] = "-"

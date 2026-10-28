@@ -33,7 +33,6 @@ def initialize_routes(app, _db_instance):
     consumer_secret = app.config.get("CONSUMER_SECRETS", "dev_secret")
 
     # Handle version detection using shared utility
-    print("DEBUG: initialize_routes - Detecting version")
     from app.utils import get_version_info
 
     version_info = get_version_info()

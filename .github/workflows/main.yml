@@ -23,5 +23,5 @@ jobs:
         run: pip install uv
       - name: Install dependencies
         run: make install
-      - name: Run flake8 linting
+      - name: Run ruff linting
         run: make lint

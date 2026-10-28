@@ -3,7 +3,7 @@
 from datetime import datetime
 import inspect
 
-from flask import current_app, render_template, session
+from flask import render_template, session
 
 # Global variables - will be initialized by initialize_utils()
 db = None
@@ -1367,89 +1367,6 @@ def downloadMatches(teamid, chpp=None):
         }
 
 
-def _process_matches(matches):
-    """Process a list of matches and add/update them in the database.
-
-    Args:
-        matches: List of CHPPMatch objects
-
-    Returns:
-        tuple: (added_count, updated_count)
-    """
-    from models import Match
-
-    added = 0
-    updated = 0
-
-    for match in matches:
-        try:
-            # Parse match datetime
-            if hasattr(match.datetime, "year"):
-                thedate = datetime(
-                    match.datetime.year,
-                    match.datetime.month,
-                    match.datetime.day,
-                    match.datetime.hour,
-                    match.datetime.minute,
-                )
-            elif match.datetime:
-                try:
-                    from dateutil import parser
-
-                    thedate = parser.parse(match.datetime)
-                except Exception:
-                    thedate = datetime.strptime(match.datetime, "%Y-%m-%d %H:%M:%S")
-            else:
-                dprint(2, f"No datetime for match {match.ht_id}, skipping")
-                continue
-
-            dprint(
-                3,
-                f"Processing match {match.ht_id}: {match.home_team_name} vs {match.away_team_name}",
-            )
-
-            # Check if match already exists
-            dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
-
-            if dbmatch:
-                # Update existing match
-                dbmatch.home_goals = match.home_goals
-                dbmatch.away_goals = match.away_goals
-                dbmatch.home_team_name = match.home_team_name
-                dbmatch.away_team_name = match.away_team_name
-                updated += 1
-            else:
-                # Create new match record
-                thismatch = {
-                    "ht_id": match.ht_id,
-                    "home_team_id": match.home_team_id,
-                    "home_team_name": match.home_team_name,
-                    "away_team_id": match.away_team_id,
-                    "away_team_name": match.away_team_name,
-                    "datetime": thedate,
-                    "matchtype": match.matchtype,
-                    "context_id": match.context_id,
-                    "rule_id": match.rule_id,
-                    "cup_level": match.cup_level,
-                    "cup_level_index": match.cup_level_index,
-                    "home_goals": match.home_goals,
-                    "away_goals": match.away_goals,
-                }
-
-                newmatch = Match(thismatch)
-                db.session.add(newmatch)
-                added += 1
-
-            db.session.commit()
-
-        except Exception as e:
-            dprint(2, f"Error processing match {match.ht_id}: {str(e)}")
-            db.session.rollback()
-            continue
-
-    return added, updated
-
-
 def fetch_enhanced_match_data(match_id, chpp=None):
     """Fetch enhanced match data (statistics, lineup, events) for a finished match.
 
@@ -1628,42 +1545,6 @@ def fetch_enhanced_match_data(match_id, chpp=None):
     return enhanced_data
 
 
-def update_match_with_enhanced_data(match_id, enhanced_data):
-    """Update existing match record with enhanced analytics data.
-
-    Args:
-        match_id: Hattrick match ID
-        enhanced_data: Dictionary of enhanced match data
-
-    Returns:
-        bool: True if successfully updated, False otherwise
-    """
-    from models import Match
-
-    try:
-        dbmatch = db.session.query(Match).filter_by(ht_id=match_id).first()
-
-        if not dbmatch:
-            dprint(
-                2, f"Match {match_id} not found in database for enhanced data update"
-            )
-            return False
-
-        # Update with enhanced data
-        for field, value in enhanced_data.items():
-            if hasattr(dbmatch, field) and value is not None:
-                setattr(dbmatch, field, value)
-
-        db.session.commit()
-        dprint(3, f"Updated match {match_id} with enhanced data")
-        return True
-
-    except Exception as e:
-        dprint(2, f"Error updating match {match_id} with enhanced data: {str(e)}")
-        db.session.rollback()
-        return False
-
-
 def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
     """Process matches and optionally fetch enhanced analytics data.
 
@@ -1771,21 +1652,6 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
             continue
 
     return added, updated, enhanced
-
-
-def count_clicks(page):
-    """Count page clicks for analytics."""
-    try:
-        # Simple click counting - could be enhanced with proper analytics
-        if hasattr(current_app, "click_counter"):
-            current_app.click_counter[page] = current_app.click_counter.get(page, 0) + 1
-        else:
-            current_app.click_counter = {page: 1}
-
-        return current_app.click_counter.get(page, 0)
-    except Exception as e:
-        dprint(1, f"Error counting clicks for page {page}: {e}")
-        return 0
 
 
 # =============================================================================

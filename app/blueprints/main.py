@@ -16,7 +16,7 @@ from flask import (
     session,
     url_for,
 )
-from sqlalchemy import text
+from markupsafe import escape
 
 from app.auth_utils import get_current_user_id, require_authentication
 from app.model_registry import (
@@ -43,6 +43,15 @@ def setup_main_blueprint(db_instance, cols, all_cols, group_order=99):
     defaultcolumns = cols
     allcolumns = all_cols
     default_group_order = group_order
+
+
+def admin_required_response():
+    """Return a 403 JSON response unless the current user is an admin, else None."""
+    User = get_user_model()
+    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
+    if not user or user.getRole() != "Admin":
+        return jsonify({"error": "Admin access required"}), 403
+    return None
 
 
 def get_releases_data():
@@ -316,8 +325,6 @@ def changes():
             db.session.commit()
     changelogfull = []
     try:
-        import json
-
         all_entries = []
 
         # Read commits JSON
@@ -374,32 +381,32 @@ def changes():
         for _i, entry in enumerate(all_entries):
             entry_type = entry.get("type", "unknown")
             full_date = entry.get("date", "")
-            # Get just the date part for display
-            date = full_date.split(" ")[0]
+            # Get just the date part for display (escaped: rendered with |safe)
+            date = escape(full_date.split(" ")[0])
 
             if entry_type == "commit":
-                version = entry.get("version", "unknown")
-                message = entry.get("message", "")
+                version = escape(entry.get("version", "unknown"))
+                message = escape(entry.get("message", ""))
                 # Add data attributes to group commits with their release
                 commit_class = (
                     f"commit-group-{current_release_id}" if current_release_id else ""
                 )
                 line = f'<div class="mb-1 py-1 px-2 border-left border-success bg-light {commit_class}" style="border-left-width: 3px !important; font-size: 0.9rem;"><small class="text-muted mr-2">{date}</small><code class="text-info small mr-2">{version}</code><span class="text-dark">{message}</span></div>'
             elif entry_type == "user_release":
-                version = entry.get("version", "")
-                message = entry.get("message", "")
+                version = escape(entry.get("version", ""))
+                message = escape(entry.get("message", ""))
                 line = f'<div class="bg-success text-white p-2 mb-2 rounded shadow-sm"><strong><i class="fas fa-rocket"></i> {date} 🎉 {version} USER RELEASE</strong><br><small>{message}</small></div>'
                 # Reset current release for grouping
                 current_release_id = None
             elif entry_type == "internal_release":
-                version = entry.get("version", "")
-                message = entry.get("message", "")
+                version = escape(entry.get("version", ""))
+                message = escape(entry.get("message", ""))
                 release_counter += 1
                 current_release_id = release_counter
                 # Make technical releases clickable with prominent expand symbol
                 line = f'<div class="bg-info text-white p-2 mb-2 rounded shadow-sm" style="cursor: pointer;" onclick="toggleCommits({current_release_id})" title="Click to expand/collapse commit details"><strong><span id="chevron-{current_release_id}" style="display: inline-block; transition: transform 0.2s;">▼</span> <i class="fas fa-cog"></i> {date} 🔧 {version} TECHNICAL RELEASE</strong><br><small>{message}</small></div>'
             else:
-                line = f'<div class="mb-2 p-2 border border-warning bg-warning-light"><span class="text-muted">{date}</span> <span class="text-warning font-weight-bold">[UNKNOWN]</span> {entry}</div>'
+                line = f'<div class="mb-2 p-2 border border-warning bg-warning-light"><span class="text-muted">{date}</span> <span class="text-warning font-weight-bold">[UNKNOWN]</span> {escape(str(entry))}</div>'
                 # Reset current release for grouping
                 current_release_id = None
 
@@ -424,12 +431,9 @@ def changes():
 @require_authentication
 def debug_session():
     """Debug endpoint to show session data."""
-    User = get_user_model()
-    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-
-    # Only allow admin users
-    if not user or user.getRole() != "Admin":
-        return jsonify({"error": "Admin access required"}), 403
+    forbidden = admin_required_response()
+    if forbidden:
+        return forbidden
 
     # Return session data for debugging
     session_data = {
@@ -448,12 +452,9 @@ def debug_chpp_teams():
     """Debug endpoint to fetch team names directly from CHPP."""
     from app.chpp_utilities import get_chpp_client
 
-    User = get_user_model()
-    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-
-    # Only allow admin users
-    if not user or user.getRole() != "Admin":
-        return jsonify({"error": "Admin access required"}), 403
+    forbidden = admin_required_response()
+    if forbidden:
+        return forbidden
 
     try:
         chpp = get_chpp_client(session)
@@ -490,12 +491,9 @@ def debug_chpp_raw(team_id):
 
     from app.chpp_utilities import get_chpp_client
 
-    User = get_user_model()
-    user = db.session.query(User).filter_by(ht_id=get_current_user_id()).first()
-
-    # Only allow admin users
-    if not user or user.getRole() != "Admin":
-        return jsonify({"error": "Admin access required"}), 403
+    forbidden = admin_required_response()
+    if forbidden:
+        return forbidden
 
     try:
         chpp = get_chpp_client(session)
@@ -582,7 +580,7 @@ def admin():
         except Exception:
             form_error = "couldn't change user"
 
-    allusers = db.session.query(User).order_by(text("last_usage desc")).all()
+    allusers = db.session.query(User).order_by(User.last_usage.desc()).all()
     users = []
     for user in allusers:
         if (user.last_update - user.created).days < 1:
@@ -767,11 +765,9 @@ def admin_preferences():
 
     try:
         user_id = get_current_user_id()
-        User = get_user_model()
-        user = db.session.query(User).filter_by(ht_id=user_id).first()
-
-        if not user or user.getRole() != "Admin":
-            return jsonify({"error": "Admin access required"}), 403
+        forbidden = admin_required_response()
+        if forbidden:
+            return forbidden
 
         if request.method == "GET":
             # Load preferences

@@ -150,13 +150,14 @@ shell: check-uv ## Open Python shell in UV environment
 	@$(PYTHON) -c "import IPython; IPython.start_ipython()" 2>&1 | tee /tmp/ipython-start.log || $(PYTHON)
 
 # Code Quality Commands
-lint: check-uv ## Run flake8 linting (matches CI)
-	@echo "🔍 Running flake8 linting..."
-	@$(UV) run flake8 --config=configs/.flake8 .
+lint: check-uv ## Run ruff linting and black format check (matches CI)
+	@echo "🔍 Running ruff linting..."
+	@$(UV) run ruff check .
+	@$(UV) run black --check --quiet .
 
 lint-fix: check-uv ## Auto-fix linting issues
 	@echo "🔧 Auto-fixing linting issues..."
-	@$(UV) run isort .
+	@$(UV) run ruff check --fix .
 	@$(UV) run black .
 	@echo "✅ Linting auto-fix completed"
 

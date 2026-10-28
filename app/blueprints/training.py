@@ -3,7 +3,6 @@
 from datetime import date, timedelta
 
 from flask import Blueprint, request, session
-from sqlalchemy import text
 
 from app.auth_utils import require_authentication
 from app.utils import create_page
@@ -56,8 +55,7 @@ def training():
     players_data = (
         db.session.query(Players)
         .filter_by(owner=teamid)
-        .order_by(text("data_date"))
-        .order_by(text("ht_id"))
+        .order_by(Players.data_date, Players.ht_id)
         .all()
     )
 
@@ -177,13 +175,13 @@ def training():
         first_record = (
             db.session.query(Players)
             .filter_by(ht_id=player_id, owner=teamid)
-            .order_by(text("data_date"))
+            .order_by(Players.data_date)
             .first()
         )
         latest_record = (
             db.session.query(Players)
             .filter_by(ht_id=player_id, owner=teamid)
-            .order_by(text("data_date DESC"))
+            .order_by(Players.data_date.desc())
             .first()
         )
         player_info[player_id] = {"first": first_record, "latest": latest_record}

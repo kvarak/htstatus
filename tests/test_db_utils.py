@@ -7,15 +7,14 @@ database URL parsing functionality used throughout database scripts.
 """
 
 import os
-
-# Import the module under test
 import sys
 from unittest.mock import patch
 
-from db_utils import load_database_config, parse_database_url
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "database"))
+
+from db_utils import load_database_config, parse_database_url  # noqa: E402
 
 
 class TestParseDatabaseUrl:

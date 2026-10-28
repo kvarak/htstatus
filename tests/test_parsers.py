@@ -246,6 +246,7 @@ class TestParseTeam:
         """Test parsing basic team information."""
         xml = """
         <root>
+            <Teams>
             <Team>
                 <TeamID>12345</TeamID>
                 <TeamName>Test Team</TeamName>
@@ -253,15 +254,16 @@ class TestParseTeam:
                 <RegionId>123</RegionId>
                 <FoundedDate>2020-01-01</FoundedDate>
                 <LogoURL>http://example.com/logo.png</LogoURL>
+                <League>
+                    <LeagueName>Test League</LeagueName>
+                    <LeagueLevel>3</LeagueLevel>
+                </League>
+                <Arena>
+                    <ArenaName>Test Arena</ArenaName>
+                    <ArenaId>456</ArenaId>
+                </Arena>
             </Team>
-            <League>
-                <LeagueName>Test League</LeagueName>
-                <LeagueLevel>3</LeagueLevel>
-            </League>
-            <Arena>
-                <ArenaName>Test Arena</ArenaName>
-                <ArenaId>456</ArenaId>
-            </Arena>
+            </Teams>
         </root>
         """
         root = ET.fromstring(xml)
@@ -283,11 +285,13 @@ class TestParseTeam:
         """Test parsing fan club and supporters information."""
         xml = """
         <root>
+            <Teams>
             <Team>
                 <TeamID>12345</TeamID>
                 <TeamName>Test Team</TeamName>
                 <ShortTeamName>TT</ShortTeamName>
             </Team>
+            </Teams>
             <FanClub>
                 <FanClubSize>1500</FanClubSize>
             </FanClub>
@@ -308,11 +312,13 @@ class TestParseTeam:
         """Test parsing team with missing optional fields."""
         xml = """
         <root>
+            <Teams>
             <Team>
                 <TeamID>12345</TeamID>
                 <TeamName>Test Team</TeamName>
                 <ShortTeamName>TT</ShortTeamName>
             </Team>
+            </Teams>
         </root>
         """
         root = ET.fromstring(xml)

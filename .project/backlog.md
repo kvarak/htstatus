@@ -6,7 +6,7 @@
 **Task Counts**: Use `uv run python scripts/count_tasks_by_priority.py --line` to get current task distribution for updates
 **📚 CHPP Reference**: For CHPP API development, see [docs/chpp/](../docs/chpp/) for comprehensive API documentation
 
-**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 96 tasks** (P1=0, P2=10, P3=86)
+**Recent Organization** (February 13, 2026): Implemented numbered EPIC structure requiring all P3 maintenance tasks to be under an Epic. Three-tier priority structure (P1/P2/P3) with aggressive consolidation. 10 focused epics addressing hobby project simplicity goals. Quality gates: 6/9 passing (MODERATE deployment confidence). Test coverage at 47.91% after FEAT-033 date range implementation. **Active: 103 tasks** (P1=0, P2=11, P3=92)
 
 ---
 
@@ -18,7 +18,6 @@
 
 - **[FEAT-008]** Next Game Analyser → [Details](.project/tasks/FEAT-008.md)
 - **[FEAT-030]** Series League Table with Next Round Insights - Display complete league standings with tactical insights for upcoming matches → [Details](.project/tasks/FEAT-030.md)
-- **[FEAT-033]** ✅ COMPLETE Debug Charts Date Range Selection - Add date range controls to debug page charts with 6-month default for focused admin analysis
 - **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](.project/tasks/FEAT-025.md)
 - **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](.project/tasks/FEAT-027.md)
 - **[FEAT-034]** Search Engine Optimization (SEO) Implementation - Add comprehensive SEO features including meta tags, robots.txt, sitemap.xml, structured data, and social sharing optimization to improve search engine discoverability for Hattrick enthusiasts → [Details](.project/tasks/FEAT-034.md)
@@ -27,6 +26,7 @@
 - **[REFACTOR-037]** Optimize User Context Queries → [Details](.project/tasks/REFACTOR-037.md)
 - **[TEST-117]** Add Client-Side Date Filtering Tests - Create comprehensive tests for debug chart date range filtering logic and user interaction patterns (45 min)
 - **[UI-023]** Enhance Debug Chart Accessibility - Add screen reader support, keyboard navigation, and ARIA labels to debug charts and date range controls (30 min)
+- **[BUG-078]** Resolve CHPP Policy Violation in Admin Debug Routes - `make check-chpp` fails: `/debug/chpp_teams` and `/debug/chpp_raw` in `app/blueprints/main.py` call CHPP outside login/callback/update. Decide: remove them (preferred, hobby scope) or explicitly allow-list admin diagnostics in `scripts/check-chpp-usage.sh` (15 min)
 
 ## P3: Maintenance 🔧
 
@@ -71,6 +71,8 @@
 ### **EPIC-005: Database Optimization** 🎯
 *Goal: Optimize database architecture and queries for hobby project scale*
 
+- **[REFACTOR-115]** Centralize "Current Roster" Query - The "latest record per player for team" pattern is duplicated ~9 times (stats.py, matches.py, compare.py, player.py, training.py, api/players.py, utils.py ×3), each loading full player history and deduplicating in Python. Add one helper (e.g. `get_current_roster(teamid)` using a DB-side latest-per-`ht_id` query) and use it everywhere; it is also the single place that respects `owner=0` for sold players (60 min)
+- **[REFACTOR-116]** Remove N+1 Queries in Player/Timeline Views - `player()` runs two full `MatchPlay` history queries per player (max/last stars), `get_team_timeline()` calls `get_player_changes()` per player × week, `training()` runs first/latest queries per player. Replace with grouped/aggregate queries (60 min)
 - **[REFACTOR-106]** Simplify Match Model Schema with Analytics Table - Refactor Match model into lean core table (teams, datetime, score, type) with separate MatchAnalytics table for optional enhanced data (90 min)
 - **[INFRA-087]** Add Match Analytics Database Indexes - Create indexes on Match.attendance, Match.weather_id, Match.home_team_formation (30 min)
 - **[REFACTOR-073]** Simplify Team Competition Data Storage - Replace 9-parameter update method with JSON field or upsert pattern (45 min)
@@ -83,6 +85,7 @@
 ### **EPIC-006: Frontend Simplification** 🎯
 *Goal: Consolidate templates, CSS/JS architecture for hobby project maintainability*
 
+- **[REFACTOR-119]** Render Changelog in Template - `main.changes()` builds HTML with f-strings and the template renders it with `|safe` (values now escaped as a stopgap). Pass structured entries to `changes.html` and let Jinja handle markup/escaping (30 min)
 - **[REFACTOR-103]** Complete Bootstrap 4.x Migration - Remove Flask-Bootstrap dependency, standardize templates to Bootstrap 4.x syntax (120 min)
 - **[REFACTOR-092]** Template Architecture Audit - Systematic review of all templates for inheritance optimization and consistent patterns (45 min)
 - **[REFACTOR-104]** Extract Player Field Display Logic - Replace repeated conditional logic with reusable Jinja2 macros (15 min)
@@ -131,6 +134,8 @@
 ### **EPIC-009: Application Architecture** 🎯
 *Goal: Simplify import patterns and essential authentication*
 
+- **[REFACTOR-117]** Split Team Update God Function - `team.update()` is ~570 lines mixing CHPP fetch, player field mapping, persistence, roster reconciliation, timeline and match download. Extract focused functions (e.g. `build_player_record`, `save_player_snapshot`, existing `reconcile_roster`) without changing behavior (90 min)
+- **[REFACTOR-118]** Split Authentication Flows - `auth.login()` (~240 lines) and `handle_oauth_callback()` (~310 lines) mix local login, legacy hash migration, OAuth token exchange, user persistence and session setup. Extract per-step helpers with tests (90 min)
 - **[REFACTOR-028]** Evaluate Model Registry Necessity - Assess if model registry is justified for hobby project vs simpler imports (30 min)
 - **[REFACTOR-029]** Consolidate Model Import Patterns - Choose single approach (registry OR direct imports) to eliminate dual paths (45 min)
 - **[REFACTOR-050]** Authentication Flow Analysis - Investigate why authenticated sessions reference non-existent users (30 min)
@@ -142,6 +147,7 @@
 ### **EPIC-010: Essential Testing & Quality** 🎯
 *Goal: Focus testing on business logic and modernize quality processes*
 
+- **[INFRA-089]** Run Test Suite in CI - `.github/workflows/main.yml` only runs `make lint`; add a pytest job with a PostgreSQL service container so regressions (e.g. stale test fixtures) are caught on push (45 min)
 - **[TEST-070]** Team Model Comprehensive Coverage - Add tests for Team model creation, competition data updates, error handling (60 min)
 - **[TEST-034]** Business Logic Route Coverage - Prioritize blueprint routes (auth, main, team, matches, training) over utilities (60 min)
 - **[TEST-012]** Tutorial Analytics Test Coverage - Create coverage for tracking logic, calculations, event mapping (60 min)

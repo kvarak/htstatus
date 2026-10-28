@@ -40,11 +40,9 @@ def app_with_routes():
         db.create_all()
         yield app
 
-        # Complete cleanup
+        # Tables are shared with the session-scoped conftest app; never drop them here
         with contextlib.suppress(Exception):
             db.session.remove()
-        with contextlib.suppress(Exception):
-            db.drop_all()
         with contextlib.suppress(Exception):
             db.engine.dispose()
 

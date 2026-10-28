@@ -159,3 +159,70 @@ class TestMainBlueprintSetup:
         assert isinstance(main_bp, Blueprint)
         assert main_bp.name == "main"
         assert callable(setup_main_blueprint)
+
+
+class TestChangelogEscaping:
+    """Changelog entries are rendered with |safe, so values must be escaped."""
+
+    def test_commit_message_html_is_escaped(self, tmp_path):
+        import json
+
+        from app.factory import create_app
+        from config import TestConfig
+
+        (tmp_path / "changelog.json").write_text(
+            json.dumps(
+                {
+                    "entries": [
+                        {
+                            "type": "commit",
+                            "date": "2026-10-28 12:00",
+                            "version": "v1<b>",
+                            "message": "Fix <script>alert(1)</script> bug",
+                        }
+                    ]
+                }
+            )
+        )
+        test_app = create_app(TestConfig, include_routes=True)
+        test_app.static_folder = str(tmp_path)
+
+        response = test_app.test_client().get("/changes")
+
+        assert response.status_code == 200
+        assert b"<script>alert(1)</script>" not in response.data
+        assert b"Fix &lt;script&gt;alert(1)&lt;/script&gt; bug" in response.data
+        assert b"v1&lt;b&gt;" in response.data
+
+
+class TestAdminRequiredResponse:
+    """Shared admin gate used by debug and admin API routes."""
+
+    @pytest.mark.parametrize(
+        ("role", "expected_status"), [("Admin", None), ("User", 403), (None, 403)]
+    )
+    def test_admin_gate(self, app, role, expected_status):
+        from unittest.mock import MagicMock, patch
+
+        import app.blueprints.main as main_module
+
+        user = None
+        if role:
+            user = MagicMock()
+            user.getRole.return_value = role
+        fake_db = MagicMock()
+        fake_db.session.query.return_value.filter_by.return_value.first.return_value = (
+            user
+        )
+
+        with (
+            app.test_request_context(),
+            patch.object(main_module, "db", fake_db),
+            patch.object(main_module, "get_current_user_id", return_value=1),
+        ):
+            result = main_module.admin_required_response()
+
+        if expected_status is None:
+            assert result is None
+        else:
+            assert result[1] == expected_status
