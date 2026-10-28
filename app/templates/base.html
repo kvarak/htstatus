@@ -732,6 +732,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
   </script>
   <!-- GoatCounter Analytics -->
+  <script>
+      window.goatcounter = {
+          path: function (path) {
+              return location.hostname + path;
+          }
+      };
+  </script>
   <script data-goatcounter="https://stats.kvarak.net/count"
           async
           src="//stats.kvarak.net/count.js"></script>
