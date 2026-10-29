@@ -309,8 +309,10 @@ db-backup-auto: check-uv ## Run automated backup to kloker.local (for cron/deplo
 # Deployment Commands
 deploy-prepare: ## Prepare deployment environment (git, dependencies)
 	@echo "🚀 Preparing deployment environment..."
-	@echo "Installing system dependencies..."
-	@if command -v apt-get >/dev/null 2>&1; then \
+	@echo "Checking system dependencies..."
+	@if command -v jq >/dev/null 2>&1; then \
+		echo "✓ jq already installed"; \
+	elif command -v apt-get >/dev/null 2>&1; then \
 		sudo apt-get update -qq && sudo apt-get install -y jq; \
 	elif command -v yum >/dev/null 2>&1; then \
 		sudo yum install -y jq; \

@@ -71,6 +71,15 @@ if [ ${#MISSING_VARS[@]} -ne 0 ]; then
   exit 1
 fi
 
+# Fail fast instead of hanging when the server is unreachable (e.g. not on the home network)
+SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=10)
+if ! ssh "${SSH_OPTS[@]}" "$DEPLOY_SERVER" true 2>/tmp/htstatus-deploy-ssh.log; then
+  echo "❌ Cannot reach $DEPLOY_SERVER over SSH:"
+  sed 's/^/   /' /tmp/htstatus-deploy-ssh.log
+  echo "   Are you on the same network as the server, and is it powered on?"
+  exit 1
+fi
+
 echo "✓ Environment variables loaded successfully"
 echo "  Target server: $DEPLOY_SERVER"
 echo "  Repository: $DEPLOY_REPO_PATH"
@@ -147,8 +156,9 @@ SCRIPT
   fi
 }
 
-# Generate and execute deployment script
+# Generate and execute deployment script (always removed, it may contain a new SECRET_KEY)
 rm -f command.sh
+trap 'rm -f command.sh' EXIT
 
 if [ "$DRY_RUN" = true ]; then
   generate_dryrun_script
@@ -159,5 +169,5 @@ else
 fi
 
 chmod +x command.sh
-ssh $DEPLOY_SERVER 'bash -s' < command.sh
+ssh "${SSH_OPTS[@]}" "$DEPLOY_SERVER" 'bash -s' < command.sh
 rm command.sh
