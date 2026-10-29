@@ -302,7 +302,7 @@ if (currentPath.includes('/player') && !completed['player-management']) {
 **Migration Notes**:
 - All templates updated from Bootstrap 3.x/Flask-Bootstrap to Bootstrap 4.x (BUG-077)
 - Player details, matches, navigation, and settings templates standardized
-- Flask-Bootstrap dependency scheduled for removal (REFACTOR-103)
+- Flask-Bootstrap removed; templates extend a local `_skeleton.html` (REFACTOR-103)
 - Custom CSS classes maintain visual consistency during Bootstrap upgrades
 - **LESSON LEARNED**: Bootstrap version must match between CSS/JS files and data-* attributes
 

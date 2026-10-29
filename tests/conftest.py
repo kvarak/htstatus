@@ -112,16 +112,13 @@ def authenticated_client(app_with_routes):
 
 
 @pytest.fixture(autouse=True)
-def restore_model_registry():
-    """Undo registry changes made by a test (clears, or caching patched models)."""
-    from app.model_registry import ModelRegistry
+def restore_utils_globals():
+    """Some tests call initialize_utils() with mocks; restore the real values."""
+    import app.utils
 
-    saved_models = dict(ModelRegistry._models)
-    saved_initialized = ModelRegistry._initialized
+    saved = (app.utils.db, app.utils.debug_level)
     yield
-    ModelRegistry._models.clear()
-    ModelRegistry._models.update(saved_models)
-    ModelRegistry._initialized = saved_initialized
+    app.utils.db, app.utils.debug_level = saved
 
 
 @pytest.fixture(scope="function", autouse=True)

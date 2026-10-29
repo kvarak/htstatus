@@ -608,3 +608,22 @@ class TestPlayersModel:
         player_str = str(player)
         assert "Repr Player" in player_str
         assert "999999" in player_str
+
+
+class TestTeamCompetitionData:
+    def test_sets_known_fields_and_skips_none(self):
+        from models import Team
+
+        team = Team(ht_id=1, team_name="T", user_id=1)
+        team.league_name = "Old"
+        team.update_competition_data(league_name=None, power_rating=900)
+
+        assert team.league_name == "Old"
+        assert team.power_rating == 900
+        assert team.updated is not None
+
+    def test_rejects_unknown_fields(self):
+        from models import Team
+
+        with pytest.raises(ValueError, match="nonsense"):
+            Team(ht_id=1, team_name="T", user_id=1).update_competition_data(nonsense=1)

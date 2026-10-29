@@ -16,7 +16,6 @@ from app.utils import (
     diff_month,
     dprint,
     get_admin_feedback_counts,
-    get_player_changes,
     get_team_match_statistics,
     get_team_timeline,
     get_training,
@@ -455,188 +454,6 @@ class TestGetTraining:
         assert skills == [0, 8, 0, 4, 0, 9, 0]
 
 
-class TestGetPlayerChanges:
-    """Test get_player_changes function with simplified approach."""
-
-    def _create_mock_player_record(self, first_name, last_name, date, **kwargs):
-        """Helper to create mock player records with default attributes."""
-        record = Mock()
-        record.first_name = first_name
-        record.last_name = last_name
-        record.data_date = date
-
-        # Set defaults for all expected attributes
-        defaults = {
-            "keeper": 0,
-            "defender": 0,
-            "playmaker": 0,
-            "winger": 0,
-            "passing": 0,
-            "scorer": 0,
-            "set_pieces": 0,
-            "experience": 0,
-            "age_years": 25,
-            "cards": 0,
-            "injury_level": -1,
-        }
-        defaults.update(kwargs)
-
-        for attr, value in defaults.items():
-            setattr(record, attr, value)
-
-        return record
-
-    @patch("app.utils.db")
-    @patch("app.utils._get_player_display_data")
-    def test_get_player_changes_basic_functionality(self, mock_display_data, mock_db):
-        """Test basic get_player_changes functionality."""
-        from app.utils import get_player_changes
-
-        old_record = self._create_mock_player_record(
-            "Test", "Player", datetime(2024, 1, 8), keeper=5
-        )
-        new_record = self._create_mock_player_record(
-            "Test", "Player", datetime(2024, 1, 15), keeper=6
-        )
-
-        # Mock the display data
-        mock_display_data.return_value = {
-            "name": "Test Player",
-            "group_name": None,
-            "text_color": None,
-            "bg_color": None,
-        }
-
-        mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.side_effect = [
-            old_record,
-            new_record,
-        ]
-
-        result = get_player_changes(123456, 7, 0)
-
-        assert len(result) == 1
-        change = result[0]
-        assert change[1] == "Keeper"  # Attribute name
-        assert change[2] == 5  # Old value
-        assert change[3] == 6  # New value
-        assert change[4] == "skill"  # Change type
-
-        # Check player data structure
-        player_data = change[0]
-        assert player_data["name"] == "Test Player"
-        mock_display_data.assert_called_once_with(123456, new_record)
-
-    @patch("app.utils.db")
-    def test_get_player_changes_no_records(self, mock_db):
-        """Test get_player_changes with no records found."""
-        from app.utils import get_player_changes
-
-        mock_db.session.query.return_value.filter_by.return_value.filter.return_value.order_by.return_value.first.return_value = (
-            None
-        )
-
-        result = get_player_changes(123456, 7, 0)
-        assert result == []
-
-    @patch("app.utils.db")
-    def test_get_player_changes_exception_handling(self, mock_db):
-        """Test get_player_changes exception handling."""
-        from app.utils import get_player_changes
-
-        mock_db.session.query.side_effect = Exception("Database error")
-
-        result = get_player_changes(123456, 7, 0)
-        assert result == []
-
-
-class TestGetPlayerDisplayData:
-    """Test _get_player_display_data helper function."""
-
-    def _create_mock_player_record(self, first_name, last_name):
-        """Helper to create simple mock player records."""
-        record = Mock()
-        record.first_name = first_name
-        record.last_name = last_name
-        return record
-
-    def test_get_player_display_data_basic(self):
-        """Test basic player display data without group."""
-        from app.utils import _get_player_display_data
-
-        player_record = self._create_mock_player_record("John", "Doe")
-
-        with patch("app.utils.session", {}):
-            result = _get_player_display_data(123456, player_record)
-            expected = {
-                "name": "John Doe",
-                "group_name": None,
-                "group_order": None,
-                "text_color": None,
-                "bg_color": None,
-            }
-            assert result == expected
-
-    @patch("app.utils.db")
-    @patch("app.utils.session", {"current_user_id": 12345})
-    def test_get_player_display_data_with_group(self, mock_db):
-        """Test player display data with group and colors."""
-        from app.utils import _get_player_display_data
-
-        player_record = self._create_mock_player_record("Jane", "Smith")
-
-        # Mock PlayerSetting and Group instances with color info
-        mock_player_setting = Mock()
-        mock_player_setting.group_id = 5
-
-        mock_group = Mock()
-        mock_group.name = "Defenders"
-        mock_group.order = 2
-        mock_group.textcolor = "#ffffff"
-        mock_group.bgcolor = "#ff0000"
-
-        # Simple mock setup - return PlayerSetting, then Group
-        mock_db.session.query.return_value.filter_by.return_value.first.side_effect = [
-            mock_player_setting,
-            mock_group,
-        ]
-
-        # Mock successful model imports
-        with patch("models.PlayerSetting"), patch("models.Group"):
-            result = _get_player_display_data(123456, player_record)
-            expected = {
-                "name": "Jane Smith (Defenders)",
-                "group_name": "Defenders",
-                "group_order": 2,
-                "text_color": "#ffffff",
-                "bg_color": "#ff0000",
-            }
-            assert result == expected
-
-    @patch("app.utils.db")
-    @patch("app.utils.session", {"current_user_id": 12345})
-    def test_get_player_display_data_no_group(self, mock_db):
-        """Test player display data when no group is found."""
-        from app.utils import _get_player_display_data
-
-        player_record = self._create_mock_player_record("Bob", "Jones")
-
-        # Mock no PlayerSetting found
-        mock_db.session.query.return_value.filter_by.return_value.first.return_value = (
-            None
-        )
-
-        with patch("models.PlayerSetting"), patch("models.Group"):
-            result = _get_player_display_data(123456, player_record)
-            expected = {
-                "name": "Bob Jones",
-                "group_name": None,
-                "group_order": None,
-                "text_color": None,
-                "bg_color": None,
-            }
-            assert result == expected
-
-
 class TestFormatAttributeName:
     """Test _format_attribute_name helper function."""
 
@@ -821,6 +638,69 @@ class TestTeamTimeline:
         assert get_team_timeline.__doc__ is not None
         assert "4-week timeline" in get_team_timeline.__doc__
 
+    def test_timeline_changes_per_week(self, app, db_session):
+        """Changes come from the latest snapshot at each week boundary."""
+        from datetime import datetime, timedelta
+
+        from sqlalchemy import event
+
+        from models import Group, PlayerSetting, User
+        from tests.factories import make_player_record
+
+        team, user_id = 998801, 998802
+        now = datetime.now()
+
+        def snapshot(ht_id, days_ago, owner=team, **skills):
+            record = make_player_record(ht_id, owner, "Kim", f"P{ht_id}")
+            record.data_date = (now - timedelta(days=days_ago)).replace(microsecond=0)
+            for skill, value in skills.items():
+                setattr(record, skill, value)
+            db_session.add(record)
+
+        snapshot(701, 40, scorer=5)
+        snapshot(701, 10, scorer=6)
+        snapshot(701, 2, scorer=7, passing=6)
+        snapshot(702, 10, owner=0, scorer=1)  # sold player: not in the timeline
+        snapshot(702, 2, owner=0, scorer=2)
+        db_session.add(User(user_id, "u", "u", "x", "k", "s"))
+        db_session.flush()
+        group = Group(user_id, "Forwards", 3, "#fff", "#000")
+        db_session.add(group)
+        db_session.flush()
+        db_session.add(PlayerSetting(701, user_id, group.id))
+        db_session.flush()
+
+        statements = []
+
+        def count(*_args, **_kwargs):
+            statements.append(1)
+
+        engine = db_session.get_bind().engine
+        event.listen(engine, "before_cursor_execute", count)
+        try:
+            with app.test_request_context():
+                from flask import session
+
+                session["current_user_id"] = user_id
+                timeline = get_team_timeline(team)
+        finally:
+            event.remove(engine, "before_cursor_execute", count)
+
+        week1 = [
+            (c[0]["name"], c[1], c[2], c[3]) for c in timeline["week_1"]["changes"]
+        ]
+        week2 = [
+            (c[0]["name"], c[1], c[2], c[3]) for c in timeline["week_2"]["changes"]
+        ]
+        assert week1 == [
+            ("Kim P701 (Forwards)", "Passing", 5, 6),
+            ("Kim P701 (Forwards)", "Scorer", 6, 7),
+        ]
+        assert week2 == [("Kim P701 (Forwards)", "Scorer", 5, 6)]
+        assert timeline["week_3"]["changes"] == []
+        assert timeline["week_1"]["changes"][0][0]["group_order"] == 3
+        assert len(statements) <= 5  # independent of number of players/weeks
+
 
 class TestUtilityFunctions:
     """Test utility functions for coverage expansion."""
@@ -983,20 +863,6 @@ class TestPlayerDiff:
 class TestPlayerUtilityFunctions:
     """Test player utility functions."""
 
-    def test_get_player_display_data_basic(self):
-        """Test _get_player_display_data function."""
-        from app.utils import _get_player_display_data
-
-        # Mock player record with basic attributes
-        player_record = Mock()
-        player_record.playername = "Test Player"
-        player_record.age = 25
-
-        result = _get_player_display_data(12345, player_record)
-        assert isinstance(result, dict)
-        # Should contain the player data in some form
-        assert len(result) > 0
-
     def test_format_attribute_name_cases(self):
         """Test _format_attribute_name function."""
         from app.utils import _format_attribute_name
@@ -1009,15 +875,6 @@ class TestPlayerUtilityFunctions:
         result2 = _format_attribute_name("age")
         assert isinstance(result2, str)
         assert len(result2) > 0
-
-    def test_get_player_changes_basic(self):
-        """Test get_player_changes function."""
-        try:
-            result = get_player_changes(12345, 7, 0)
-            assert result is not None
-        except Exception:
-            # Expected in test environment without database
-            pass
 
 
 class TestTeamStatistics:

@@ -57,9 +57,9 @@ def get_current_user():
         return cached
 
     from app import db
-    from app.model_registry import get_user_model
+    from models import User
 
-    user = db.session.query(get_user_model()).filter_by(ht_id=user_id).first()
+    user = db.session.query(User).filter_by(ht_id=user_id).first()
     g.current_user_obj = user
     return user
 

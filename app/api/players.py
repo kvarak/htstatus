@@ -61,14 +61,7 @@ def bulk_assign_players():
         if not is_valid:
             return jsonify({"error": error_msg}), 403
 
-        # Import models using registry pattern for consistency
-        try:
-            from app.model_registry import get_group_model, get_player_setting_model
-
-            PlayerSetting = get_player_setting_model()
-            Group = get_group_model()
-        except (ImportError, ValueError):
-            from models import Group, PlayerSetting
+        from models import Group, PlayerSetting
 
         current_user_id = session.get("current_user_id")
         if not current_user_id:

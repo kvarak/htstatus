@@ -2,7 +2,7 @@
 """
 Additional targeted tests for player diff functions to boost coverage.
 
-Tests player_diff, player_daily_changes, and get_player_changes functions
+Tests player_diff and player_daily_changes functions
 that have significant uncovered lines according to coverage report.
 """
 

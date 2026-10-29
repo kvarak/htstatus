@@ -44,6 +44,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin debug charts: date-range logic moved to `app/static/js/debug-date-filter.js` with Node unit tests; inline error messages instead of pop-up alerts
 - Formation tester: players on the pitch show the same hover tooltip as the player list, and positions are coloured green/yellow/red by effectiveness
 - Changelog page markup lives in `changes.html` (Jinja escaping) instead of HTML built in Python
+- `/update` split into small helpers (team refresh, archive download, player record building, snapshot saving, match download); previous player records are loaded once per team instead of once per player
+- Login and OAuth callback split into small helpers; team fetching (incl. the "no youth team" CHPP workaround) lives in one place, `fetch_user_teams`
+- Skill-change timeline loads player history in a few queries instead of ~4 per player per week
+- Model registry removed; models are imported directly
+- Flask-Bootstrap removed (templates already used Bootstrap 4); `base.html` extends a small local `_skeleton.html`, and the error page now uses the normal app layout
+- Debug charts share one `renderChart` helper instead of 18 copies of the create/destroy code
 - Admin debug charts accessibility: labelled date range fieldset, screen-reader chart descriptions, labelled shrink/expand buttons, keyboard chart reordering (Arrow Up/Down) with announcements
 
 ### Removed
@@ -62,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error log: identical errors within an hour are stored once, rows older than 90 days are deleted, and logging works after a failed DB transaction
 - Position contributions: tactical variants (e.g. IMD/IMO, WBO, WO, DF) used their own skill weights in name only and silently fell back to the base position; they now differ as intended. Formation tester side midfielders/forwards use the IMN/FW weights
 - Formation tester: the overall rating counts empty positions as 0 (it averaged only the assigned players)
+- OAuth callback: the fallback for users without a youth team crashed (it parsed an already-parsed XML element); login no longer logs the password length
 
 ## [2.0.0] - 2026-01-01
 

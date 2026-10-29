@@ -275,3 +275,152 @@ class TestSaveTeamCompetitionData:
         assert Team.get_by_ht_id(self.TEAM_ID) is None
         # Without the rollback this query would raise PendingRollbackError
         assert db_session.query(User).filter_by(ht_id=777101).count() == 1
+
+
+def _fake_chpp_player(ht_id, first, last, **skills):
+    from types import SimpleNamespace
+
+    base = {
+        "id": ht_id,
+        "first_name": first,
+        "nick_name": "",
+        "last_name": last,
+        "number": ht_id % 100,
+        "category_id": 0,
+        "owner_notes": "",
+        "age": 25,
+        "age_days": 10,
+        "arrival_date": None,
+        "form": 6,
+        "cards": 0,
+        "injury_level": -1,
+        "statement": "",
+        "country_id": 1,
+        "agreeability": 3,
+        "aggressiveness": 3,
+        "honesty": 3,
+        "experience": 4,
+        "loyalty": 10,
+        "specialty": 0,
+    }
+    for skill in (
+        "stamina",
+        "keeper",
+        "defender",
+        "playmaker",
+        "winger",
+        "passing",
+        "scorer",
+        "set_pieces",
+    ):
+        base[skill] = skills.get(skill, 5)
+    return SimpleNamespace(**base)
+
+
+def _fake_chpp_details():
+    from types import SimpleNamespace
+
+    return SimpleNamespace(
+        tsi=1000,
+        salary=5000,
+        caps=0,
+        caps_u20=0,
+        career_goals=1,
+        career_hattricks=0,
+        league_goals=1,
+        cup_goals=0,
+        friendlies_goals=0,
+        matches_current_team=3,
+        goals_current_team=1,
+        national_team_id=None,
+        transfer_listed=False,
+        mother_club_bonus=False,
+        leadership=4,
+        transfer_details=None,
+    )
+
+
+class TestBuildPlayerRecord:
+    def test_keeps_previous_skill_when_chpp_returns_zero(self):
+        from types import SimpleNamespace
+
+        from app.blueprints.team import build_player_record
+
+        p = _fake_chpp_player(801, "Ann", "Keeper", keeper=0, scorer=6)
+        previous = SimpleNamespace(keeper=7)
+
+        record = build_player_record(p, _fake_chpp_details(), previous, 4242)
+
+        assert record["keeper"] == 7
+        assert record["scorer"] == 6
+        assert record["owner"] == 4242
+        assert record["friendly_goals"] == 0
+        assert record["current_team_matches"] == 3
+
+    def test_zero_skill_without_previous_stays_zero(self):
+        from app.blueprints.team import build_player_record
+
+        p = _fake_chpp_player(801, "Ann", "Keeper", keeper=0)
+        assert build_player_record(p, _fake_chpp_details(), None, 1)["keeper"] == 0
+
+
+class TestUpdateRoute:
+    """End-to-end /update with a fake CHPP client (REFACTOR-117 safety net)."""
+
+    TEAM = 999301
+
+    def test_update_saves_players_and_reconciles_roster(
+        self, app_with_routes, db_session
+    ):
+        from datetime import datetime, timedelta
+        from types import SimpleNamespace
+
+        from models import Players, User
+        from tests.factories import make_player_record, setup_authenticated_session
+
+        user = User(self.TEAM, "owner", "owner", "x", "k", "s")
+        db_session.add(user)
+        for ht_id, last in ((801, "Keeper"), (802, "Sold")):
+            row = make_player_record(ht_id, self.TEAM, "Old", last)
+            row.data_date = datetime.now() - timedelta(days=3)
+            row.keeper = 7
+            db_session.add(row)
+        db_session.commit()
+
+        team = SimpleNamespace(
+            name="Dalby Stenbrotters FC",
+            players=lambda: [
+                _fake_chpp_player(801, "Ann", "Keeper", keeper=0),
+                _fake_chpp_player(803, "New", "Signing"),
+            ],
+        )
+        chpp = SimpleNamespace(
+            user=lambda: SimpleNamespace(_teams_ht_id=[self.TEAM]),
+            team=lambda ht_id: team,
+            player=lambda id_: _fake_chpp_details(),
+        )
+        no_matches = {"success": True, "recent_count": 0, "upcoming_count": 0}
+
+        client = setup_authenticated_session(app_with_routes.test_client(), self.TEAM)
+        with (
+            patch("app.blueprints.team.get_chpp_client", return_value=chpp),
+            patch("app.utils.downloadRecentMatches", return_value=no_matches),
+        ):
+            response = client.get("/update")
+
+        html = response.get_data(as_text=True)
+        assert response.status_code == 200, html[:500]
+        assert "New Signing" in html and "Old Sold" in html
+
+        owned = {
+            p.ht_id for p in db_session.query(Players).filter_by(owner=self.TEAM).all()
+        }
+        assert owned == {801, 803}
+        today_keeper = (
+            db_session.query(Players)
+            .filter_by(ht_id=801, owner=self.TEAM)
+            .order_by(Players.data_date.desc())
+            .first()
+        )
+        assert today_keeper.keeper == 7  # CHPP hid it; kept the stored value
+        assert db_session.query(User).filter_by(ht_id=self.TEAM).one().c_update == 1

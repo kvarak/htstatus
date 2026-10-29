@@ -4,41 +4,28 @@ from datetime import datetime as dt
 import time
 import traceback
 
-from flask import Blueprint, flash, redirect, render_template, request, session, url_for
+from flask import Blueprint, flash, redirect, request, session, url_for
 
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
-    get_user_teams,
     require_authentication,
     track_activity,
 )
 from app.chpp_utilities import fetch_user_teams, get_chpp_client
-from app.model_registry import get_user_model
 from app.utils import create_page, diff, dprint
 
 # Create Blueprint for team routes
 team_bp = Blueprint("team", __name__)
 
-# These will be set by setup_team_blueprint()
-app = None
+# Set by setup_team_blueprint()
 db = None
-consumer_key = None
-consumer_secret = None
-version = None
-timenow = None
-fullversion = None
 
 
-def setup_team_blueprint(app_instance, db_instance, ck, cs, v, fv):
-    """Initialize team blueprint with app and db instances."""
-    global app, db, consumer_key, consumer_secret, version, fullversion
-    app = app_instance
+def setup_team_blueprint(db_instance):
+    """Initialize team blueprint with the db instance."""
+    global db
     db = db_instance
-    consumer_key = ck
-    consumer_secret = cs
-    version = v
-    fullversion = fv
 
 
 def get_owned_player_ids(players_model, teamid):
@@ -82,6 +69,20 @@ def reconcile_roster(players_model, teamid, players_indb, players_fromht, player
     return players_new, players_left
 
 
+# Team column -> (CHPP team attribute, default when missing)
+TEAM_COMPETITION_FIELDS = {
+    "league_name": ("league_name", None),
+    "league_level": ("league_level", None),
+    "power_rating": ("power_rating", None),
+    "cup_still_in_cup": ("still_in_cup", False),
+    "cup_cup_name": ("cup_name", None),
+    "cup_cup_round": ("cup_level", None),
+    "cup_cup_round_index": ("cup_match_rounds_left", 0),
+    "dress_uri": ("dress_uri", None),
+    "logo_url": ("logo_url", None),
+}
+
+
 def save_team_competition_data(teamid, the_team, user_id):
     """Create/update the Team row with CHPP competition data in one transaction.
 
@@ -97,16 +98,12 @@ def save_team_competition_data(teamid, the_team, user_id):
             db.session.add(team_record)
 
         team_record.update_competition_data(
-            league_name=getattr(the_team, "league_name", None),
-            league_level=getattr(the_team, "league_level", None),
-            power_rating=getattr(the_team, "power_rating", None),
-            cup_still_in_cup=getattr(the_team, "still_in_cup", False),
-            cup_cup_name=getattr(the_team, "cup_name", None),
-            cup_cup_round=getattr(the_team, "cup_level", None),
-            cup_cup_round_index=getattr(the_team, "cup_match_rounds_left", 0),
-            dress_uri=getattr(the_team, "dress_uri", None),
-            logo_url=getattr(the_team, "logo_url", None),
+            **{
+                column: getattr(the_team, attr, default)
+                for column, (attr, default) in TEAM_COMPETITION_FIELDS.items()
+            }
         )
+        db.session.commit()
         return True
     except Exception as e:
         db.session.rollback()
@@ -126,165 +123,228 @@ def team():
     return create_page(template="team.html", title="Team")
 
 
+def update_error_page(error, errorinfo=""):
+    """Render the update error page with the session's team list."""
+    return create_page(
+        template="update_error.html",
+        title="Update Failed",
+        error=error,
+        errorinfo=errorinfo,
+        all_teams=session.get("all_teams", []),
+        all_team_names=session.get("all_team_names", []),
+    )
+
+
+def refresh_user_teams(chpp):
+    """Sync the session's team list with Hattrick (teams bought/sold since login).
+
+    A known CHPP "YouthTeamId" error on user() is tolerated; the session list
+    is kept as is. Other errors propagate.
+    """
+    all_teams = session.get("all_teams", [])
+    try:
+        current_teams = chpp.user()._teams_ht_id
+    except Exception as e:
+        if "YouthTeamId" in str(e):
+            dprint(1, f"YouthTeamId error, keeping session team list: {e}")
+            return
+        raise
+
+    if set(current_teams) == set(all_teams):
+        return
+
+    team_names = []
+    for team_id in current_teams:
+        try:
+            team_names.append(chpp.team(ht_id=team_id).name)
+        except Exception as e:
+            dprint(1, f"Could not fetch name for team {team_id}: {e}")
+            team_names.append(f"Team {team_id}")
+    session["all_teams"] = current_teams
+    session["all_team_names"] = team_names
+    session.modified = True
+    dprint(1, f"Team list changed, session now has: {team_names}")
+
+
+def handle_archive_download(chpp, team_id_arg):
+    """Download a team's full match archive, then go back to its matches page."""
+    from app.utils import downloadMatches
+
+    try:
+        team_id = int(team_id_arg)
+    except (ValueError, TypeError):
+        flash("Invalid team ID format for archive download", "error")
+        return redirect(url_for("matches.matches", id=team_id_arg or ""))
+
+    if team_id not in session.get("all_teams", []):
+        flash("Invalid team ID for archive download", "error")
+        return redirect(url_for("matches.matches", id=team_id))
+
+    try:
+        user = get_current_user()
+        if user:
+            user.matches_archive()
+            db.session.commit()
+
+        result = downloadMatches(team_id, chpp)
+        if result["success"]:
+            flash(result["message"], "success")
+        else:
+            flash(result.get("message", "Archive download failed"), "error")
+    except Exception as e:
+        dprint(1, f"Archive download error: {e}")
+        flash(f"Archive download failed: {e}", "error")
+
+    return redirect(url_for("matches.matches", id=team_id))
+
+
+SKILL_FIELDS = (
+    "stamina",
+    "keeper",
+    "defender",
+    "playmaker",
+    "winger",
+    "passing",
+    "scorer",
+    "set_pieces",
+)
+
+
+def _skill_or_previous(new_value, previous, field):
+    """CHPP returns 0 for skills it doesn't expose; keep the last known value then."""
+    if isinstance(new_value, int) and new_value > 0:
+        return new_value
+    return (getattr(previous, field, 0) or 0) if previous else 0
+
+
+def build_player_record(p, details, previous, teamid):
+    """Build today's Players row (as a dict) from CHPP data.
+
+    Args:
+        p: player from the team's player list (basic fields and skills)
+        details: chpp.player() result (TSI, salary, goals, ...)
+        previous: the player's latest stored row for this team, or None
+        teamid: owning team ID
+    """
+    arrival = p.arrival_date
+    record = {
+        "ht_id": p.id,
+        "first_name": p.first_name,
+        "nick_name": p.nick_name,
+        "last_name": p.last_name,
+        "number": p.number,
+        "category_id": p.category_id,
+        "owner_notes": p.owner_notes,
+        "age_years": p.age,
+        "age_days": p.age_days,
+        "age": p.age,
+        "next_birthday": None,
+        "arrival_date": (
+            dt(arrival.year, arrival.month, arrival.day, arrival.hour, arrival.minute)
+            if arrival
+            else None
+        ),
+        "form": p.form,
+        "cards": p.cards,
+        "injury_level": p.injury_level,
+        "statement": p.statement,
+        "language": None,
+        "language_id": getattr(p, "country_id", None),
+        "agreeability": p.agreeability,
+        "aggressiveness": p.aggressiveness,
+        "honesty": p.honesty,
+        "experience": p.experience,
+        "loyalty": p.loyalty,
+        "specialty": p.specialty,
+        "native_country_id": getattr(p, "country_id", None),
+        "native_league_id": None,
+        "native_league_name": None,
+        "tsi": details.tsi,
+        "salary": details.salary,
+        "caps": details.caps,
+        "caps_u20": details.caps_u20,
+        "career_goals": details.career_goals,
+        "career_hattricks": details.career_hattricks,
+        "league_goals": details.league_goals,
+        "cup_goals": details.cup_goals,
+        "friendly_goals": details.friendlies_goals,
+        "current_team_matches": details.matches_current_team,
+        "current_team_goals": details.goals_current_team,
+        "national_team_id": details.national_team_id,
+        "national_team_name": None,
+        "is_transfer_listed": details.transfer_listed,
+        "team_id": None,
+        "mother_club_bonus": details.mother_club_bonus,
+        "leadership": details.leadership,
+        "data_date": time.strftime("%Y-%m-%d"),
+        "owner": teamid,
+    }
+    for field in SKILL_FIELDS:
+        record[field] = _skill_or_previous(getattr(p, field), previous, field)
+    return record
+
+
+def save_player_snapshot(record):
+    """Store today's snapshot, replacing an earlier one from today, in one commit."""
+    from models import Players
+
+    existing = (
+        db.session.query(Players)
+        .filter_by(ht_id=record["ht_id"], data_date=record["data_date"])
+        .first()
+    )
+    if existing:
+        db.session.delete(existing)
+        db.session.flush()
+    db.session.add(Players(record))
+    db.session.commit()
+
+
+def download_recent_matches(chpp, team_ids):
+    """Download recent/upcoming matches for each team; failures don't stop the update."""
+    from app.utils import downloadRecentMatches
+
+    results, recent, upcoming = {}, 0, 0
+    for teamid in team_ids:
+        try:
+            result = downloadRecentMatches(teamid, chpp)
+        except Exception as e:
+            dprint(1, f"Match download failed for team {teamid}: {e}")
+            continue
+        results[teamid] = result
+        if result["success"]:
+            recent += result["recent_count"]
+            upcoming += result["upcoming_count"]
+        else:
+            dprint(1, f"Match download failed for team {teamid}: {result.get('error')}")
+    return results, recent, upcoming
+
+
 @team_bp.route("/update")
 @require_authentication
 def update():
-    """Update player data from Hattrick API."""
-    from models import Players  # Import here to avoid circular dependencies
-
-    dprint(1, "=== DATA UPDATE PROCESS STARTED ===")
-
-    # Session state validation using standardized functions
-    current_user_id = get_current_user_id()
-    all_teams, all_team_names = get_user_teams()
-
-    dprint(1, f"Current user ID: {current_user_id}")
-    dprint(1, f"Access key available: {bool(session.get('access_key'))}")
-    dprint(1, f"Access secret available: {bool(session.get('access_secret'))}")
-    dprint(1, f"All teams: {all_teams}")
-    dprint(1, f"Team names: {all_team_names}")
+    """Update player data from Hattrick API (the only routine CHPP sync)."""
+    from app.roster import latest_player_records
+    from app.utils import get_team_timeline
+    from models import Players
 
     try:
-        # Initialize CHPP with enhanced error handling
-        dprint(1, "Initializing CHPP client...")
         chpp = get_chpp_client(session)
-        dprint(1, "CHPP client initialized successfully")
-
-        # Test basic API connectivity with YouthTeamId error handling
-        dprint(1, "Testing CHPP API connectivity...")
-        try:
-            test_user = chpp.user()
-            dprint(1, f"API connectivity test successful, user ID: {test_user.ht_id}")
-
-            # MULTI-TEAM-001: Refresh team list to detect new teams acquired since login
-            dprint(1, "Checking for new teams acquired since login...")
-            current_teams = test_user._teams_ht_id
-            dprint(1, f"Teams from CHPP: {current_teams}")
-            dprint(1, f"Teams in session: {all_teams}")
-
-            if set(current_teams) != set(all_teams):
-                dprint(1, "⚠️ Team list has changed! Updating session...")
-                # Fetch names for all current teams
-                updated_team_names = []
-                for team_id in current_teams:
-                    try:
-                        team = chpp.team(ht_id=team_id)
-                        updated_team_names.append(team.name)
-                        dprint(1, f"Found team: {team.name} (ID: {team_id})")
-                    except Exception as e:
-                        dprint(1, f"Could not fetch name for team {team_id}: {e}")
-                        updated_team_names.append(f"Team {team_id}")
-
-                # Update session with new team list
-                session["all_teams"] = current_teams
-                session["all_team_names"] = updated_team_names
-                session.modified = True
-                all_teams = current_teams
-                all_team_names = updated_team_names
-                dprint(
-                    1,
-                    f"✅ Session updated with {len(current_teams)} teams: {updated_team_names}",
-                )
-            else:
-                dprint(1, "✓ Team list unchanged")
-
-        except Exception as chpp_user_error:
-            if "YouthTeamId" in str(chpp_user_error):
-                dprint(
-                    1,
-                    f"YouthTeamId error encountered, continuing with limited functionality: {chpp_user_error}",
-                )
-                # We can still proceed with team data updates despite user() failing
-                test_user = None
-            else:
-                raise chpp_user_error
-
+        refresh_user_teams(chpp)
     except Exception as e:
-        error_details = traceback.format_exc()
-        dprint(1, f"CRITICAL ERROR: CHPP initialization failed: {str(e)}")
-        dprint(1, f"Full error traceback: {error_details}")
-
-        return create_page(
-            template="update_error.html",
-            title="Update Failed",
-            error=f"Cannot connect to Hattrick API: {str(e)}",
-            errorinfo="Please check your internet connection and try again. If the problem persists, Hattrick servers may be unavailable.",
-            all_teams=session.get("all_teams", []),
-            all_team_names=session.get("all_team_names", []),
+        dprint(1, f"CHPP initialization failed: {traceback.format_exc()}")
+        return update_error_page(
+            f"Cannot connect to Hattrick API: {e}",
+            "Please check your internet connection and try again. If the problem "
+            "persists, Hattrick servers may be unavailable.",
         )
+
+    if request.args.get("archive") and request.args.get("id"):
+        return handle_archive_download(chpp, request.args.get("id"))
 
     all_teams = session["all_teams"]
-    all_team_names = session["all_team_names"]
-
-    # Handle archive download request (CHPP policy compliant)
-    archive_request = request.args.get("archive")
-    archive_team_id = request.args.get("id")
-
-    if archive_request and archive_team_id:
-        try:
-            # Convert team ID with specific error handling
-            archive_team_id = int(archive_team_id)
-        except (ValueError, TypeError):
-            dprint(1, f"Archive team ID conversion failed for: '{archive_team_id}'")
-            flash("Invalid team ID format for archive download", "error")
-            return redirect(url_for("matches.matches", id=request.args.get("id", "")))
-
-        dprint(
-            1,
-            f"Archive request: archive={archive_request}, id={archive_team_id} (type: {type(archive_team_id)})",
-        )
-
-        if archive_team_id in all_teams:
-            try:
-                dprint(1, f"Team {archive_team_id} found in all_teams: {all_teams}")
-                # Track archive usage
-                dprint(1, "Importing downloadMatches...")
-                from app.utils import downloadMatches
-
-                dprint(1, "Getting user model...")
-                User = get_user_model()
-                dprint(1, "Querying current user...")
-                current_user = (
-                    db.session.query(User)
-                    .filter_by(ht_id=session["current_user_id"])
-                    .first()
-                )
-                if current_user:
-                    dprint(1, "Updating user matches_archive counter...")
-                    current_user.matches_archive()
-                    dprint(1, "Committing user update...")
-                    db.session.commit()
-                    dprint(1, "User update committed successfully")
-                else:
-                    dprint(1, "Warning: Current user not found in database")
-
-                dprint(1, f"Archive download requested for team {archive_team_id}")
-                result = downloadMatches(archive_team_id, chpp)
-                dprint(1, f"downloadMatches result: {result}")
-
-                if result["success"]:
-                    dprint(1, f"Archive download successful: {result['message']}")
-                    flash(result["message"], "success")
-                else:
-                    dprint(
-                        1,
-                        f"Archive download failed: {result.get('message', 'Archive download failed')}",
-                    )
-                    flash(result.get("message", "Archive download failed"), "error")
-
-            except Exception as e:
-                dprint(1, f"Archive download error: {str(e)}")
-                flash(f"Archive download failed: {str(e)}", "error")
-        else:
-            dprint(1, f"Team {archive_team_id} not found in all_teams: {all_teams}")
-            flash("Invalid team ID for archive download", "error")
-
-        # Redirect back to matches page after archive download
-        return redirect(url_for("matches.matches", id=archive_team_id))
-
     updated = {}
-    timeline_changes = {}  # Collect timeline changes for all teams
-
+    timeline_changes = {}
     new_players = []
     left_players = []
     playernames = {}
@@ -292,367 +352,78 @@ def update():
     for teamid in all_teams:
         try:
             the_team = chpp.team(ht_id=teamid)
-            dprint(1, f"Team data fetched successfully: {the_team.name}")
-
-            # Use the actual team name from CHPP API instead of session data
             updated[teamid] = [the_team.name]
-
-            # Update session with correct team name
-            team_index = all_teams.index(teamid)
-            session["all_team_names"][team_index] = the_team.name
+            session["all_team_names"][all_teams.index(teamid)] = the_team.name
             session.modified = True
-
-            # Competition data is stored so stats pages don't need CHPP calls
-            save_team_competition_data(teamid, the_team, current_user_id)
-
+            # Stored so stats pages don't need CHPP calls
+            save_team_competition_data(teamid, the_team, get_current_user_id())
         except Exception as e:
-            error_details = traceback.format_exc()
-            dprint(1, f"ERROR: Failed to fetch team data for team {teamid}: {str(e)}")
-            dprint(1, f"Team fetch error traceback: {error_details}")
-
-            return create_page(
-                template="update_error.html",
-                title="Update Failed",
-                error=f"Failed to fetch team data for team {teamid}: {str(e)}",
-                errorinfo=error_details,
-                all_teams=session["all_teams"],
-                all_team_names=session["all_team_names"],
+            return update_error_page(
+                f"Failed to fetch team data for team {teamid}: {e}",
+                traceback.format_exc(),
             )
 
         try:
-            dprint(1, f"Fetching players for team: {the_team.name}")
-            players_count = len(the_team.players())
-            dprint(1, f"Found {players_count} players in team")
-            dprint(2, the_team.players())
-
+            team_players = the_team.players()
         except Exception as e:
-            errorincode = traceback.format_exc()
-            dprint(1, f"ERROR: Failed to access players for team {teamid}: {str(e)}")
-            dprint(1, f"Players access error traceback: {errorincode}")
-
-            error = "Cannot access player data. Is your team playing a match right now?"
-            errorinfo = "If your team is not currently playing, please report this as a bug.\n\n"
-            errorinfo += f"Technical details: {str(e)}\n\n{errorincode}"
-
-            return render_template(
-                "update_error.html",
-                version=version,
-                timenow=timenow,
-                fullversion=fullversion,
-                title="Update",
-                current_user=session["current_user"],
-                error=error,
-                errorinfo=errorinfo,
-                all_teams=session["all_teams"],
-                all_team_names=session["all_team_names"],
+            return update_error_page(
+                "Cannot access player data. Is your team playing a match right now?",
+                "If your team is not currently playing, please report this as a bug."
+                f"\n\nTechnical details: {e}\n\n{traceback.format_exc()}",
             )
 
-        # Snapshot roster before today's data is inserted, so the diff below
-        # compares Hattrick's roster against what we owned prior to this update
+        # Snapshot the stored roster before today's rows are inserted
         players_indb = get_owned_player_ids(Players, teamid)
+        previous = {p.ht_id: p for p in latest_player_records(Players, teamid)}
 
         players_fromht = []
-        for p in the_team.players():
-            thisplayer = {}
-
-            the_player = chpp.player(id_=p.id)
-
-            if the_player.transfer_details:
-                dprint(2, "transfer details --- ", the_player.transfer_details.deadline)
-
-            thisplayer["ht_id"] = p.id
-            thisplayer["first_name"] = p.first_name
-            thisplayer["nick_name"] = p.nick_name
-            thisplayer["last_name"] = p.last_name
-            thisplayer["number"] = p.number
-            thisplayer["category_id"] = p.category_id
-            thisplayer["owner_notes"] = p.owner_notes
-            thisplayer["age_years"] = p.age
-            thisplayer["age_days"] = p.age_days
-            thisplayer["age"] = p.age
-            # next_birthday not available
-            thisplayer["next_birthday"] = None
-
-            if p.arrival_date:
-                thedate = dt(
-                    p.arrival_date.year,
-                    p.arrival_date.month,
-                    p.arrival_date.day,
-                    p.arrival_date.hour,
-                    p.arrival_date.minute,
-                )
-                thisplayer["arrival_date"] = thedate
-            else:
-                thisplayer["arrival_date"] = None
-            thisplayer["form"] = p.form
-            thisplayer["cards"] = p.cards
-            thisplayer["injury_level"] = p.injury_level
-            thisplayer["statement"] = p.statement
-            # language/language_id use country_id instead
-            thisplayer["language"] = None
-            thisplayer["language_id"] = getattr(p, "country_id", None)
-            thisplayer["agreeability"] = p.agreeability
-            thisplayer["aggressiveness"] = p.aggressiveness
-            thisplayer["honesty"] = p.honesty
-            thisplayer["experience"] = p.experience
-            thisplayer["loyalty"] = p.loyalty
-            thisplayer["aggressiveness"] = p.aggressiveness
-            thisplayer["specialty"] = p.specialty
-            # native_country_id/native_league_id/native_league_name use country_id fallback
-            country_id_value = getattr(p, "country_id", None)
-            thisplayer["native_country_id"] = country_id_value
-
-            thisplayer["native_league_id"] = None
-            thisplayer["native_league_name"] = None
-            thisplayer["tsi"] = the_player.tsi
-            thisplayer["salary"] = the_player.salary
-            thisplayer["caps"] = the_player.caps
-            thisplayer["caps_u20"] = the_player.caps_u20
-            thisplayer["career_goals"] = the_player.career_goals
-            thisplayer["career_hattricks"] = the_player.career_hattricks
-            thisplayer["league_goals"] = the_player.league_goals
-            thisplayer["cup_goals"] = the_player.cup_goals
-            thisplayer["friendly_goals"] = (
-                the_player.friendlies_goals
-            )  # Custom CHPP field name
-            thisplayer["current_team_matches"] = (
-                the_player.matches_current_team
-            )  # Custom CHPP field name
-            thisplayer["current_team_goals"] = (
-                the_player.goals_current_team
-            )  # Custom CHPP field name
-            thisplayer["national_team_id"] = the_player.national_team_id
-            # Not available in Custom CHPP
-            thisplayer["national_team_name"] = None
-            thisplayer["is_transfer_listed"] = (
-                the_player.transfer_listed
-            )  # Custom CHPP field name
-            thisplayer["team_id"] = None  # Not available in Custom CHPP
-            thisplayer["mother_club_bonus"] = the_player.mother_club_bonus
-            thisplayer["leadership"] = the_player.leadership
-
-            # Try to get skill values from CHPPPlayer attributes
-            # If they're 0 (not provided by API), fetch old values from database
-
-            old_player_query = (
-                db.session.query(Players)
-                .filter_by(ht_id=p.id, owner=teamid)
-                .order_by(Players.data_date.desc())
-                .first()
+        for p in team_players:
+            record = build_player_record(
+                p, chpp.player(id_=p.id), previous.get(p.id), teamid
             )
-
-            # Helper function to safely extract int from skill value
-            def safe_skill_int(new_val, old_player, field_name):
-                # If new value is non-zero, use it
-                if isinstance(new_val, int) and new_val > 0:
-                    return new_val
-                # Otherwise, try to get old value from database
-                if old_player and hasattr(old_player, field_name):
-                    old_val = getattr(old_player, field_name, 0)
-                    return old_val if old_val else 0
-                return 0
-
-            # Extract skills from CHPPPlayer attributes
-            thisplayer["stamina"] = safe_skill_int(
-                p.stamina, old_player_query, "stamina"
-            )
-            thisplayer["keeper"] = safe_skill_int(p.keeper, old_player_query, "keeper")
-            thisplayer["defender"] = safe_skill_int(
-                p.defender, old_player_query, "defender"
-            )
-            thisplayer["playmaker"] = safe_skill_int(
-                p.playmaker, old_player_query, "playmaker"
-            )
-            thisplayer["winger"] = safe_skill_int(p.winger, old_player_query, "winger")
-            thisplayer["passing"] = safe_skill_int(
-                p.passing, old_player_query, "passing"
-            )
-            thisplayer["scorer"] = safe_skill_int(p.scorer, old_player_query, "scorer")
-            thisplayer["set_pieces"] = safe_skill_int(
-                p.set_pieces, old_player_query, "set_pieces"
-            )
-
-            thisplayer["data_date"] = time.strftime("%Y-%m-%d")
-
-            # Owner is the team ID (players are owned by teams, not users)
-            thisplayer["owner"] = teamid
-
-            playernames[p.id] = p.first_name + " " + p.last_name
-
+            playernames[p.id] = f"{p.first_name} {p.last_name}"
             try:
-                dbplayer = (
-                    db.session.query(Players)
-                    .filter_by(
-                        ht_id=thisplayer["ht_id"], data_date=thisplayer["data_date"]
-                    )
-                    .first()
-                )
-
-                # Replace today's snapshot in one commit, so a failed insert
-                # doesn't lose the existing row
-                if dbplayer:
-                    db.session.delete(dbplayer)
-                    db.session.flush()
-                db.session.add(Players(thisplayer))
-                db.session.commit()
-                dprint(
-                    1,
-                    f"✅ Successfully added {thisplayer['first_name']} {thisplayer['last_name']} for {thisplayer['data_date']}",
-                )
-
+                save_player_snapshot(record)
             except Exception as e:
                 db.session.rollback()
-                error_details = traceback.format_exc()
-                dprint(
-                    1,
-                    f"ERROR: Database operation failed for player {thisplayer['first_name']} {thisplayer['last_name']}: {str(e)}",
+                name = playernames[p.id]
+                return update_error_page(
+                    f"Database error while saving player data: {e}",
+                    f"Failed to save {name} to database.\n\n{traceback.format_exc()}",
                 )
-                dprint(1, f"Database error traceback: {error_details}")
+            players_fromht.append(p.id)
 
-                return create_page(
-                    template="update_error.html",
-                    title="Update Failed",
-                    error=f"Database error while saving player data: {str(e)}",
-                    errorinfo=f"Failed to save {thisplayer['first_name']} {thisplayer['last_name']} to database.\n\n{error_details}",
-                    all_teams=session["all_teams"],
-                    all_team_names=session["all_team_names"],
-                )
+        timeline_changes[teamid] = get_team_timeline(teamid)
+        updated[teamid] += [f"/player?id={teamid}", "players"]
 
-            players_fromht.append(thisplayer["ht_id"])
-
-        # Get 4-week timeline using shared utility
-        from app.utils import get_team_timeline
-
-        try:
-            dprint(1, f"Getting timeline for team {teamid}")
-            timeline_changes[teamid] = get_team_timeline(teamid)
-            dprint(1, f"Timeline retrieved successfully for team {teamid}")
-        except Exception as e:
-            dprint(1, f"ERROR: Failed to get timeline for team {teamid}: {str(e)}")
-            timeline_changes[teamid] = {}
-
-        updated[teamid].append("/player?id=" + str(teamid))
-        updated[teamid].append("players")
-
-        try:
-            players_new, players_left = reconcile_roster(
-                Players, teamid, players_indb, players_fromht, playernames
-            )
-
-            for p in players_new:
-                new_players.append(
-                    [updated[teamid][0], playernames.get(p, "Unknown Player")]
-                )
-            for p in players_left:
-                left_players.append(
-                    [updated[teamid][0], playernames.get(p, "Unknown Player")]
-                )
-
-            dprint(1, f"Player difference calculation completed for team {teamid}")
-
-        except Exception as e:
-            error_details = traceback.format_exc()
-            dprint(
-                1,
-                f"ERROR: Player difference calculation failed for team {teamid}: {str(e)}",
-            )
-            dprint(1, f"Player difference error traceback: {error_details}")
-            raise
-
-    # End of team processing loop
-    dprint(1, "=== COMPLETED PROCESSING ALL TEAMS ===")
-    dprint(1, f"Processed {len(all_teams)} teams successfully")
-    dprint(1, f"Timeline changes collected for teams: {list(timeline_changes.keys())}")
-    dprint(1, f"Updated teams: {list(updated.keys())}")
-    dprint(1, f"New players found: {len(new_players)}")
-    dprint(1, f"Players who left: {len(left_players)}")
-
-    # Download recent matches for each team as part of the update process
-    dprint(1, "Importing downloadRecentMatches...")
-    from app.utils import downloadRecentMatches
-
-    dprint(1, "Import successful, initializing match download variables...")
-
-    matches_results = {}
-    total_recent_matches = 0
-    total_upcoming_matches = 0
-    dprint(1, "Match download variables initialized successfully")
-
-    try:
-        dprint(1, f"Starting match downloads for {len(all_teams)} teams")
-        for teamid in all_teams:
-            dprint(1, f"Downloading recent matches for team {teamid}")
-            result = downloadRecentMatches(teamid, chpp)
-            matches_results[teamid] = result
-
-            if result["success"]:
-                total_recent_matches += result["recent_count"]
-                total_upcoming_matches += result["upcoming_count"]
-                dprint(
-                    1,
-                    f"Team {teamid}: {result['count']} new matches added, {result['recent_count']} recent, {result['upcoming_count']} upcoming",
-                )
-            else:
-                dprint(
-                    1,
-                    f"Failed to download matches for team {teamid}: {result.get('error', 'Unknown error')}",
-                )
-
-        dprint(
-            1,
-            f"Matches download complete: {total_recent_matches} recent, {total_upcoming_matches} upcoming",
+        players_new, players_left = reconcile_roster(
+            Players, teamid, players_indb, players_fromht, playernames
         )
+        team_name = updated[teamid][0]
+        new_players += [
+            [team_name, playernames.get(p, "Unknown Player")] for p in players_new
+        ]
+        left_players += [
+            [team_name, playernames.get(p, "Unknown Player")] for p in players_left
+        ]
 
-    except Exception as e:
-        error_details = traceback.format_exc()
-        dprint(1, f"ERROR: Match download failed: {str(e)}")
-        dprint(1, f"Match download error traceback: {error_details}")
-        # Continue with update process even if match download fails
-        dprint(1, "Continuing with update process despite match download error")
+    matches_results, total_recent, total_upcoming = download_recent_matches(
+        chpp, all_teams
+    )
 
-    # Update user's last_update timestamp using model method
-    try:
-        dprint(1, f"Updating user timestamp for user {current_user_id}")
-        user = get_current_user()
-        if user:
-            user.updatedata()  # This method sets last_update and increments c_update
-            db.session.commit()
-            dprint(1, f"Updated user last_update timestamp: {user.last_update}")
-        else:
-            dprint(1, f"Warning: User {current_user_id} not found in database")
+    user = get_current_user()
+    if user:
+        user.updatedata()
+        db.session.commit()
 
-    except Exception as e:
-        error_details = traceback.format_exc()
-        dprint(1, f"ERROR: User timestamp update failed: {str(e)}")
-        dprint(1, f"User update error traceback: {error_details}")
-        raise
-
-    try:
-        dprint(
-            1,
-            f"Creating update_timeline.html page with timeline_changes keys: {list(timeline_changes.keys())}",
-        )
-        return create_page(
-            template="update_timeline.html",
-            title="Update Complete - Timeline View",
-            updated=updated,
-            timeline_changes=timeline_changes,
-            left_players=left_players,
-            new_players=new_players,
-            matches_results=matches_results,
-            total_recent_matches=total_recent_matches,
-            total_upcoming_matches=total_upcoming_matches,
-        )
-    except Exception as e:
-        error_details = traceback.format_exc()
-        dprint(1, f"ERROR: Failed to render update_timeline.html: {str(e)}")
-        dprint(1, f"Template error traceback: {error_details}")
-
-        return create_page(
-            template="update_error.html",
-            title="Update Failed",
-            error=f"Template rendering failed: {str(e)}",
-            errorinfo=error_details,
-            all_teams=session.get("all_teams", []),
-            all_team_names=session.get("all_team_names", []),
-        )
+    return create_page(
+        template="update_timeline.html",
+        title="Update Complete - Timeline View",
+        updated=updated,
+        timeline_changes=timeline_changes,
+        left_players=left_players,
+        new_players=new_players,
+        matches_results=matches_results,
+        total_recent_matches=total_recent,
+        total_upcoming_matches=total_upcoming,
+    )

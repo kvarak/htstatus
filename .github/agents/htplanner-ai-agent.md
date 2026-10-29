@@ -142,7 +142,7 @@ players = team.players()  # Live data from Hattrick
 
 ### Development Notes
 - Version tracking via git tags: `git describe --tags` in routes.py
-- Bootstrap 3.x styling in Flask templates with custom CSS
+- Bootstrap 4 (CDN) styling in Flask templates with custom CSS; `base.html` extends the local `_skeleton.html`
 - Chart.js used for player skill progression visualization
 - Multiple team support requires careful session state management
 
@@ -232,7 +232,7 @@ players = team.players()  # Live data from Hattrick
 - `/config.py`: Configuration management (not tracked in git)
 
 **Frontend Structure**:
-- `/app/templates/`: Jinja2 templates for legacy frontend (Flask-Bootstrap 3.x)
+- `/app/templates/`: Jinja2 templates (Bootstrap 4, all extend `base.html`)
 
 **Test Structure**:
 - `/tests/conftest.py`: Central test fixture configuration
@@ -299,7 +299,7 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 - **Deployment**: Docker containers with uWSGI
 
 #### Frontend
-- **Legacy**: Server-rendered Jinja2 templates with Flask-Bootstrap 3.x
+- **Templates**: Server-rendered Jinja2 templates with Bootstrap 4 (CDN)
 - **Visualization**: Chart.js for player skill progression
 - **PWA**: Service Worker with cache-first strategy
 

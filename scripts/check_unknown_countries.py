@@ -15,7 +15,6 @@ import sys
 
 from app.factory import create_app
 from app.hattrick_countries import COUNTRIES
-from app.model_registry import get_players_model
 
 # Setup path for app imports
 sys.path.append(".")
@@ -26,7 +25,7 @@ def check_unknown_countries(team_id=None):
     app = create_app()
 
     with app.app_context():
-        Players = get_players_model()
+        from models import Players
 
         # Get players for specific team or all players
         if team_id:

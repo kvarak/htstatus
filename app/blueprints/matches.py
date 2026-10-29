@@ -7,7 +7,6 @@ from flask import Blueprint, request, session
 from app.auth_utils import require_authentication, track_activity
 from app.constants import HT_MATCH_ROLE
 from app.hattrick_countries import get_country_display
-from app.model_registry import get_match_model, get_match_play_model
 from app.utils import (
     calculate_formation_effectiveness,
     create_page,
@@ -63,11 +62,8 @@ def has_enhanced_data_filter(match):
 def matches():
     """Display team matches and match details."""
     try:
-        # Get model classes from registry
         from app.utils import dprint
-
-        Match = get_match_model()
-        MatchPlay = get_match_play_model()
+        from models import Match, MatchPlay
 
         teamid = request.values.get("id")
         matchid = request.values.get("m")

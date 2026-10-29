@@ -54,15 +54,8 @@ def compare_players():
         if not is_valid:
             return redirect(url_for("player.player", error=error_msg))
 
-        # Import models
-        try:
-            from app.model_registry import get_players_model
-
-            Players = get_players_model()
-        except (ImportError, ValueError):
-            from models import Players
-
         from app.roster import oldest_player_records
+        from models import Group, Players, PlayerSetting
 
         players_data = []
         players_oldest_dict = {}
@@ -108,17 +101,6 @@ def compare_players():
 
                     # Get group information
                     group_name = "No Group"
-                    try:
-                        from app.model_registry import (
-                            get_group_model,
-                            get_player_setting_model,
-                        )
-
-                        PlayerSetting = get_player_setting_model()
-                        Group = get_group_model()
-                    except (ImportError, ValueError):
-                        from models import Group, PlayerSetting
-
                     # Check if player has a group assignment
                     from flask import session
 

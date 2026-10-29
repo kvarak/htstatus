@@ -864,40 +864,27 @@ class Team(db.Model):
         """Get team by Hattrick ID."""
         return Team.query.filter_by(ht_id=ht_id).first()
 
-    def update_competition_data(
-        self,
-        league_name=None,
-        league_level=None,
-        power_rating=None,
-        cup_still_in_cup=None,
-        cup_cup_name=None,
-        cup_cup_round=None,
-        cup_cup_round_index=None,
-        dress_uri=None,
-        logo_url=None,
-    ):
-        """Update competition data for the team."""
-        if league_name is not None:
-            self.league_name = league_name
-        if league_level is not None:
-            self.league_level = league_level
-        if power_rating is not None:
-            self.power_rating = power_rating
-        if cup_still_in_cup is not None:
-            self.cup_still_in_cup = cup_still_in_cup
-        if cup_cup_name is not None:
-            self.cup_cup_name = cup_cup_name
-        if cup_cup_round is not None:
-            self.cup_cup_round = cup_cup_round
-        if cup_cup_round_index is not None:
-            self.cup_cup_round_index = cup_cup_round_index
-        if dress_uri is not None:
-            self.dress_uri = dress_uri
-        if logo_url is not None:
-            self.logo_url = logo_url
+    COMPETITION_FIELDS = (
+        "league_name",
+        "league_level",
+        "power_rating",
+        "cup_still_in_cup",
+        "cup_cup_name",
+        "cup_cup_round",
+        "cup_cup_round_index",
+        "dress_uri",
+        "logo_url",
+    )
 
+    def update_competition_data(self, **fields):
+        """Set competition fields (None values are skipped). Caller commits."""
+        unknown = set(fields) - set(self.COMPETITION_FIELDS)
+        if unknown:
+            raise ValueError(f"Unknown competition fields: {sorted(unknown)}")
+        for name, value in fields.items():
+            if value is not None:
+                setattr(self, name, value)
         self.updated = utc_now()
-        db.session.commit()
 
 
 # --------------------------------------------------------------------------------

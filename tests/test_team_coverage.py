@@ -37,20 +37,14 @@ class TestTeamBlueprintAdvanced:
 
     def test_setup_team_blueprint_initialization(self, mock_app, mock_db):
         """Test the blueprint setup function sets global variables correctly."""
-        # Test setup_team_blueprint function
-        setup_team_blueprint(
-            mock_app, mock_db, "test_ck", "test_cs", "v1.0", "v1.0-full"
-        )
-
-        # Import the globals to verify they were set
         from app.blueprints import team
 
-        assert team.app is mock_app
-        assert team.db is mock_db
-        assert team.consumer_key == "test_ck"
-        assert team.consumer_secret == "test_cs"
-        assert team.version == "v1.0"
-        assert team.fullversion == "v1.0-full"
+        original_db = team.db
+        try:
+            setup_team_blueprint(mock_db)
+            assert team.db is mock_db
+        finally:
+            team.db = original_db
 
     def test_team_blueprint_registration(self, mock_app):
         """Test that team blueprint can be registered with Flask app."""

@@ -57,9 +57,7 @@ class TestCreateApp:
         app = create_app(config_object=MinimalConfig, include_routes=False)
 
         # Should not have blueprint routes when routes disabled
-        blueprint_names = list(app.blueprints.keys())
-        assert len(blueprint_names) == 1  # Bootstrap blueprint registered
-        assert "bootstrap" in blueprint_names  # Flask-Bootstrap blueprint
+        assert list(app.blueprints.keys()) == []
 
     def test_create_app_database_initialization(self):
         """Test create_app initializes database properly."""

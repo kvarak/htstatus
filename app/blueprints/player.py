@@ -76,28 +76,7 @@ def add_star_ratings(match_play_model, players):
 @track_activity("player")
 def player():
     """Display player list with skill tracking and grouping."""
-    # Get model classes from registry
-    # Import models - use direct import as fallback if registry fails
-    try:
-        from app.model_registry import (
-            get_group_model,
-            get_match_play_model,
-            get_player_setting_model,
-            get_players_model,
-        )
-
-        PlayerSetting = get_player_setting_model()
-        Group = get_group_model()
-        Players = get_players_model()
-        MatchPlay = get_match_play_model()
-    except (ImportError, ValueError):
-        # Fallback to direct imports if registry fails
-        import models
-
-        PlayerSetting = models.PlayerSetting
-        Group = models.Group
-        Players = models.Players
-        MatchPlay = models.MatchPlay
+    from models import Group, MatchPlay, Players, PlayerSetting
 
     updategroup = request.form.get("updategroup")
     playerid = request.form.get("playerid")

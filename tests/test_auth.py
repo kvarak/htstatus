@@ -279,3 +279,125 @@ class TestSessionValidationAPI:
         assert data["valid"] is True
         assert data["user_id"] == 12345
         assert data["user"] == "testuser"
+
+
+class TestAuthHelpers:
+    """REFACTOR-118: login and OAuth callback helpers."""
+
+    @staticmethod
+    def _user(db_session, ht_id=556001, username="tester", password="secret123"):
+        from werkzeug.security import generate_password_hash
+
+        from models import User
+
+        user = User(
+            ht_id, "TesterHT", username, generate_password_hash(password), "ak", "as"
+        )
+        db_session.add(user)
+        db_session.commit()
+        return user
+
+    def test_check_password(self):
+        from types import SimpleNamespace
+
+        from werkzeug.security import generate_password_hash
+
+        from app.blueprints.auth import _check_password
+
+        modern = SimpleNamespace(password=generate_password_hash("pw"), username="u")
+        assert _check_password(modern, "pw") == (True, False)
+        assert _check_password(modern, "nope") == (False, False)
+        legacy = SimpleNamespace(password="sha256$abc", username="u")
+        assert _check_password(legacy, "pw") == (False, True)
+
+    def _post_login(self, app_with_routes, **form):
+        client = app_with_routes.test_client()
+        data = {"username": "tester", "password": "secret123", "cookie_consent": "on"}
+        data.update(form)
+        return client, client.post("/login", data=data)
+
+    def test_login_with_stored_tokens_sets_teams(self, app_with_routes, db_session):
+        from unittest.mock import patch
+
+        self._user(db_session)
+        with (
+            patch(
+                "app.blueprints.auth.fetch_user_teams",
+                return_value=([7, 8], ["A", "B"]),
+            ),
+            patch("app.blueprints.auth.get_chpp_client"),
+        ):
+            client, response = self._post_login(app_with_routes)
+
+        assert response.status_code == 302
+        with client.session_transaction() as sess:
+            assert sess["current_user_id"] == 556001
+            assert sess["all_teams"] == [7, 8]
+            assert sess["team_id"] == 7
+
+    def test_login_wrong_password(self, app_with_routes, db_session):
+        self._user(db_session)
+        _, response = self._post_login(app_with_routes, password="wrongpass")
+        assert b"Invalid username or password" in response.data
+
+    def test_signup_requires_long_password(
+        self, app_with_routes, db_session
+    ):  # noqa: ARG002
+        _, response = self._post_login(
+            app_with_routes, username="newbie", password="short"
+        )
+        assert b"at least 8 characters" in response.data
+
+    def test_callback_falls_back_to_user_found_by_token(
+        self, app_with_routes, db_session
+    ):
+        from unittest.mock import MagicMock, patch
+
+        self._user(db_session)
+        chpp = MagicMock()
+        chpp.get_access_token.return_value = {"key": "ak", "secret": "as2"}
+        client = app_with_routes.test_client()
+        with client.session_transaction() as sess:
+            sess["request_token"] = "rt"
+            sess["req_secret"] = "rs"
+        with (
+            patch("app.blueprints.auth.get_chpp_client_no_auth", return_value=chpp),
+            patch("app.blueprints.auth.get_chpp_client", return_value=chpp),
+            patch(
+                "app.blueprints.auth.get_current_user_context",
+                side_effect=ValueError("YouthTeamId"),
+            ),
+            patch("app.blueprints.auth.fetch_user_teams", return_value=([9], ["Nine"])),
+            patch("app.utils.create_default_groups"),
+        ):
+            response = client.get("/login?oauth_verifier=v")
+
+        assert response.status_code == 302
+        with client.session_transaction() as sess:
+            assert sess["current_user_id"] == 556001
+            assert sess["all_team_names"] == ["Nine"]
+
+    def test_callback_without_identifiable_user_fails_safely(
+        self, app_with_routes, db_session  # noqa: ARG002
+    ):
+        from unittest.mock import MagicMock, patch
+
+        chpp = MagicMock()
+        chpp.get_access_token.return_value = {"key": "unknown", "secret": "x"}
+        client = app_with_routes.test_client()
+        with client.session_transaction() as sess:
+            sess["request_token"] = "rt"
+            sess["req_secret"] = "rs"
+        with (
+            patch("app.blueprints.auth.get_chpp_client_no_auth", return_value=chpp),
+            patch("app.blueprints.auth.get_chpp_client", return_value=chpp),
+            patch(
+                "app.blueprints.auth.get_current_user_context",
+                side_effect=ValueError("YouthTeamId"),
+            ),
+        ):
+            response = client.get("/login?oauth_verifier=v")
+
+        assert b"no longer valid" in response.data
+        with client.session_transaction() as sess:
+            assert "current_user_id" not in sess

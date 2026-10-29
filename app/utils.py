@@ -500,163 +500,89 @@ def player_daily_changes(playerid, days_ago, team_name="Unknown Team"):
         return []
 
 
-def get_player_changes(player_id, start_days_ago, end_days_ago):
-    """Universal function to get ANY player changes between two time periods.
-
-    Args:
-        player_id: Hattrick player ID
-        start_days_ago: Start of period (older date, higher number)
-        end_days_ago: End of period (newer date, lower number)
-        team_name: Team name for display
-
-    Returns:
-        List of changes: [player_name, attribute, old_value, new_value, change_type]
-        player_name includes group name if player belongs to a group: "Player Name (Group Name)"
-    """
-    try:
-        from datetime import datetime, timedelta
-
-        from sqlalchemy import cast, Date, desc
-
-        from models import Players
-
-        # Calculate dates
-        start_date = (datetime.now() - timedelta(days=start_days_ago)).date()
-        end_date = (datetime.now() - timedelta(days=end_days_ago)).date()
-
-        # Get records at start and end of period
-        old_record = (
-            db.session.query(Players)
-            .filter_by(ht_id=player_id)
-            .filter(cast(Players.data_date, Date) <= start_date)
-            .order_by(desc(Players.data_date))
-            .first()
-        )
-
-        new_record = (
-            db.session.query(Players)
-            .filter_by(ht_id=player_id)
-            .filter(cast(Players.data_date, Date) <= end_date)
-            .order_by(desc(Players.data_date))
-            .first()
-        )
-
-        if (
-            not old_record
-            or not new_record
-            or old_record.data_date == new_record.data_date
-        ):
-            return []
-
-        # Attributes to check for changes
-        check_attrs = {
-            # Skills
-            "keeper": "skill",
-            "defender": "skill",
-            "playmaker": "skill",
-            "winger": "skill",
-            "passing": "skill",
-            "scorer": "skill",
-            "set_pieces": "skill",
-            # Other important attributes
-            "experience": "other",
-            "age_years": "age",
-            # Cards and injuries - critical player status changes
-            "cards": "cards",
-            "injury_level": "injury",
-        }
-
-        # List not to check for, as reference:
-        # 'id', 'data_date', 'ht_id', 'first_name', 'last_name',
-        # 'owner', 'age_days', 'age', 'next_birthday', 'loyalty': 'other',
-        # 'stamina': 'other', 'form': 'other', 'tsi': 'money', 'salary': 'money',
-
-        changes = []
-        player_display_data = _get_player_display_data(player_id, new_record)
-
-        for attr, change_type in check_attrs.items():
-            old_val = getattr(old_record, attr, None) or 0
-            new_val = getattr(new_record, attr, None) or 0
-
-            if old_val != new_val:
-                attr_name = _format_attribute_name(attr)
-                changes.append(
-                    [player_display_data, attr_name, old_val, new_val, change_type]
-                )
-
-        return changes
-
-    except Exception as e:
-        dprint(1, f"Error in get_player_changes: {e}")
-        return []
+# Attributes shown in the skill-change timeline: attr -> change type
+TIMELINE_ATTRIBUTES = {
+    "keeper": "skill",
+    "defender": "skill",
+    "playmaker": "skill",
+    "winger": "skill",
+    "passing": "skill",
+    "scorer": "skill",
+    "set_pieces": "skill",
+    "experience": "other",
+    "age_years": "age",
+    "cards": "cards",
+    "injury_level": "injury",
+}
 
 
-def _get_player_display_data(player_id, player_record):
-    """Get player display data including name and group colors.
-
-    Args:
-        player_id: Hattrick player ID
-        player_record: Player database record
-
-    Returns:
-        dict: {
-            'name': str,           # "Player Name" or "Player Name (Group Name)"
-            'group_name': str,     # Group name or None
-            'group_order': int,    # Group order number or None
-            'text_color': str,     # Group text color or None
-            'bg_color': str        # Group background color or None
-        }
-    """
-    base_name = (
-        f"{player_record.first_name or ''} {player_record.last_name or ''}".strip()
-    )
-
-    result = {
-        "name": base_name,
-        "group_name": None,
-        "group_order": None,
-        "text_color": None,
-        "bg_color": None,
-    }
-
-    try:
-        # Use module-level session import to work with test mocking
-        current_user_id = session.get("current_user_id") if session else None
-
-        if not current_user_id:
-            return result
-
-        # Import models using registry pattern with fallback
-        try:
-            from app.model_registry import get_group_model, get_player_setting_model
-
-            PlayerSetting = get_player_setting_model()
-            Group = get_group_model()
-        except (ImportError, ValueError):
-            from models import Group, PlayerSetting
-
-        # Query for player's group
-        player_setting = (
-            db.session.query(PlayerSetting)
-            .filter_by(player_id=player_id, user_id=current_user_id)
-            .first()
-        )
-
-        if player_setting and player_setting.group_id:
-            group = (
-                db.session.query(Group).filter_by(id=player_setting.group_id).first()
+def _record_changes(old_record, new_record, display_data):
+    """List [display_data, attribute, old, new, change_type] for changed attributes."""
+    changes = []
+    for attr, change_type in TIMELINE_ATTRIBUTES.items():
+        old_val = getattr(old_record, attr, None) or 0
+        new_val = getattr(new_record, attr, None) or 0
+        if old_val != new_val:
+            changes.append(
+                [
+                    display_data,
+                    _format_attribute_name(attr),
+                    old_val,
+                    new_val,
+                    change_type,
+                ]
             )
-            if group and group.name:
-                result["name"] = f"{base_name} ({group.name})"
-                result["group_name"] = group.name
-                result["group_order"] = group.order
-                result["text_color"] = group.textcolor
-                result["bg_color"] = group.bgcolor
+    return changes
 
+
+def _player_group_info(player_ids):
+    """Return {ht_id: Group} for the current user's group assignments (2 queries)."""
+    from models import Group, PlayerSetting
+
+    current_user_id = session.get("current_user_id") if session else None
+    if not current_user_id or not player_ids:
+        return {}
+    try:
+        settings = (
+            db.session.query(PlayerSetting)
+            .filter(PlayerSetting.user_id == current_user_id)
+            .filter(PlayerSetting.player_id.in_(list(player_ids)))
+            .all()
+        )
+        group_ids = {s.group_id for s in settings if s.group_id}
+        groups = (
+            {g.id: g for g in db.session.query(Group).filter(Group.id.in_(group_ids))}
+            if group_ids
+            else {}
+        )
+        return {
+            s.player_id: groups[s.group_id]
+            for s in settings
+            if s.group_id in groups and groups[s.group_id].name
+        }
     except Exception as e:
-        dprint(2, f"Group lookup failed for player {player_id}: {e}")
+        dprint(2, f"Group lookup failed: {e}")
+        return {}
 
-    return result
+
+def _player_display_data(record, group):
+    """Display data for a timeline row: name (with group) and group colours."""
+    base_name = f"{record.first_name or ''} {record.last_name or ''}".strip()
+    if not group:
+        return {
+            "name": base_name,
+            "group_name": None,
+            "group_order": None,
+            "text_color": None,
+            "bg_color": None,
+        }
+    return {
+        "name": f"{base_name} ({group.name})",
+        "group_name": group.name,
+        "group_order": group.order,
+        "text_color": group.textcolor,
+        "bg_color": group.bgcolor,
+    }
 
 
 def _format_attribute_name(attr):
@@ -1921,89 +1847,99 @@ def get_formation_list():
     ]
 
 
-def get_team_timeline(team_id):
+def _player_history(player_ids, since):
+    """{ht_id: [records oldest first]} with all rows from ``since`` on plus the
+    last row before it (the baseline for the oldest week). Two queries."""
+    from sqlalchemy import cast, Date
+
+    from models import Players
+
+    window = (
+        db.session.query(Players)
+        .filter(Players.ht_id.in_(player_ids))
+        .filter(cast(Players.data_date, Date) >= since)
+        .all()
+    )
+    baseline = (
+        db.session.query(Players)
+        .filter(Players.ht_id.in_(player_ids))
+        .filter(cast(Players.data_date, Date) < since)
+        .distinct(Players.ht_id)
+        .order_by(Players.ht_id, Players.data_date.desc())
+        .all()
+    )
+    history = {}
+    for record in sorted(baseline + window, key=lambda r: r.data_date):
+        history.setdefault(record.ht_id, []).append(record)
+    return history
+
+
+def _record_on(records, day):
+    """Latest record (oldest-first list) whose data_date falls on or before ``day``."""
+    found = None
+    for record in records:
+        if record.data_date.date() > day:
+            break
+        found = record
+    return found
+
+
+def get_team_timeline(team_id, weeks=4):
     """Get 4-week timeline of skill changes for a specific team.
 
-    Extracted from team.py update route for reuse in player pages.
-
-    Args:
-        team_id: Hattrick team ID to filter players by
+    Loads the needed player history once (instead of querying per player and
+    week) and compares the latest snapshot at each week boundary.
 
     Returns:
-        dict: Timeline changes structured by week with format:
-        {
-            "week_1": {
-                "week_label": "Week 1",
-                "is_current": True,
-                "days_ago_start": 7,
-                "days_ago_end": 0,
-                "changes": [player_changes...]
-            },
-            ...
-        }
+        dict: {"week_1": {"week_label", "is_current", "days_ago_start",
+        "days_ago_end", "changes": [[display_data, attr, old, new, type], ...]}, ...}
     """
     try:
-        from flask import current_app
+        from datetime import timedelta
 
         from models import Players
 
-        # Get db from current Flask app context if not set globally
-        current_db = db if db is not None else current_app.extensions["sqlalchemy"].db
-
-        # Get all players for this team from current roster
-        latest_players = (
-            current_db.session.query(Players.ht_id)
+        player_ids = [
+            row.ht_id
+            for row in db.session.query(Players.ht_id)
             .filter_by(owner=team_id)
             .distinct()
-            .all()
-        )
-
-        players_fromht = [p.ht_id for p in latest_players]
-
-        if not players_fromht:
+        ]
+        if not player_ids:
             return {}
 
-        # Collect changes for 4-week timeline - simplified
-        timeline_changes = {}
+        today = datetime.now().date()
+        history = _player_history(player_ids, today - timedelta(days=weeks * 7))
+        groups = _player_group_info(player_ids)
 
-        for week_num in range(1, 5):  # Weeks 1-4
-            week_start_days = week_num * 7  # Start of week (older)
-            week_end_days = (week_num - 1) * 7  # End of week (newer)
+        def sort_key(change):
+            data = change[0]
+            order = data.get("group_order")
+            return (9999 if order is None else order, data.get("name", ""))
 
-            timeline_changes[f"week_{week_num}"] = {
+        timeline = {}
+        for week_num in range(1, weeks + 1):
+            start_days, end_days = week_num * 7, (week_num - 1) * 7
+            start_day = today - timedelta(days=start_days)
+            end_day = today - timedelta(days=end_days)
+
+            changes = []
+            for player_id, records in history.items():
+                old = _record_on(records, start_day)
+                new = _record_on(records, end_day)
+                if not old or not new or old.data_date == new.data_date:
+                    continue
+                display = _player_display_data(new, groups.get(player_id))
+                changes.extend(_record_changes(old, new, display))
+
+            timeline[f"week_{week_num}"] = {
                 "week_label": f"Week {week_num}",
                 "is_current": week_num == 1,
-                "days_ago_start": week_start_days,
-                "days_ago_end": week_end_days,
-                "changes": [],
+                "days_ago_start": start_days,
+                "days_ago_end": end_days,
+                "changes": sorted(changes, key=sort_key),
             }
-
-            # Get all changes for all players in this week period
-            for player_id in players_fromht:
-                player_changes = get_player_changes(
-                    player_id, week_start_days, week_end_days
-                )
-
-                for change in player_changes:
-                    timeline_changes[f"week_{week_num}"]["changes"].append(change)
-
-            # Sort changes by group order (None last), then by player name
-            def sort_changes_key(change):
-                player_data = change[0]  # First element is player display data
-                if isinstance(player_data, dict):
-                    # Sort by group order (None values last), then by player name
-                    group_order = player_data.get("group_order")
-                    if group_order is None:
-                        group_order = 9999  # Put players without groups at the end
-                    player_name = player_data.get("name", "")
-                    return (group_order, player_name)
-                else:
-                    # Legacy string format - use as is
-                    return (9999, str(player_data))
-
-            timeline_changes[f"week_{week_num}"]["changes"].sort(key=sort_changes_key)
-
-        return timeline_changes
+        return timeline
 
     except Exception as e:
         dprint(1, f"Error in get_team_timeline: {e}")

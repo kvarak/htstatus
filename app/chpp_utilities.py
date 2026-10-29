@@ -85,30 +85,33 @@ def get_chpp_client_no_auth(
     return CHPP(consumer_key, consumer_secret)
 
 
-def fetch_user_teams(chpp: CHPP) -> tuple[list[int], list[str]]:
-    """Fetch all teams owned by the current CHPP user.
+def fetch_user_teams(chpp: CHPP, user=None) -> tuple[list[int], list[str]]:
+    """Fetch the IDs and names of all teams owned by the current CHPP user.
+
+    Works around the known CHPP "YouthTeamId" parse error on ``user()`` (users
+    without a youth team) by reading team IDs from managercompendium directly.
+    A team whose name can't be fetched is called "Team <id>".
 
     Args:
         chpp: Initialized CHPP client with user authentication
-
-    Returns:
-        Tuple containing:
-            - List of team IDs (list[int])
-            - List of team names (list[str])
-
-    Example:
-        >>> chpp = get_chpp_client(session)
-        >>> team_ids, team_names = fetch_user_teams(chpp)
-        >>> print(f"User owns {len(team_ids)} teams")
+        user: Optional already-fetched ``chpp.user()`` result
     """
-    current_user = chpp.user()
-    team_ids = current_user._teams_ht_id
+    try:
+        team_ids = (user or chpp.user())._teams_ht_id
+    except Exception as e:
+        if "YouthTeamId" not in str(e):
+            raise
+        root = chpp.request(file="managercompendium", version="1.6")
+        team_ids = [
+            int(node.text) for node in root.findall(".//Team/TeamId") if node.text
+        ]
 
     team_names = []
     for team_id in team_ids:
-        team = chpp.team(ht_id=team_id)
-        team_names.append(team.name)
-
+        try:
+            team_names.append(chpp.team(ht_id=team_id).name)
+        except Exception:
+            team_names.append(f"Team {team_id}")
     return team_ids, team_names
 
 
@@ -128,7 +131,7 @@ def get_current_user_context(chpp: CHPP) -> dict:
         >>> print(f"Teams: {context['team_names']}")
     """
     user = chpp.user()
-    team_ids, team_names = fetch_user_teams(chpp)
+    team_ids, team_names = fetch_user_teams(chpp, user)
 
     return {
         "user": user,

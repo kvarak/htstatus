@@ -1,5 +1,8 @@
 """Authentication routes blueprint for HT Status application."""
 
+import traceback
+from types import SimpleNamespace
+
 from flask import (
     Blueprint,
     make_response,
@@ -11,6 +14,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.chpp_utilities import (
+    fetch_user_teams,
     get_chpp_client,
     get_chpp_client_no_auth,
     get_current_user_context,
@@ -36,244 +40,113 @@ def setup_auth_blueprint(app_instance, db_instance, ck, cs):
     consumer_secret = cs
 
 
+LOGIN_TITLE = "Login / Signup"
+TEAM_FETCH_ERROR = (
+    "Unable to fetch team data from Hattrick. Please try again or contact support."
+)
+
+
+def _login_page(error=None):
+    extra = {"error": error} if error else {}
+    return create_page(template="login.html", title=LOGIN_TITLE, **extra)
+
+
+def _clear_login_session():
+    for key in ("current_user", "current_user_id", "access_key", "access_secret"):
+        session.pop(key, None)
+
+
+def _set_session_teams(team_ids, team_names):
+    session["all_teams"] = team_ids
+    session["all_team_names"] = team_names
+    session["team_id"] = team_ids[0]
+
+
+def _check_password(user, password):
+    """Return (valid, needs_migration) for a stored password hash."""
+    if user.password.startswith(("MIGRATION_REQUIRED:", "sha256$")):
+        # Legacy SHA256 hash: can't be verified, user must log in via Hattrick
+        return False, True
+    try:
+        return check_password_hash(user.password, password), False
+    except ValueError as e:
+        dprint(1, f"Unsupported password hash for {user.username}: {e}")
+        return False, True
+
+
+def _login_with_stored_tokens(user):
+    """Log in a user whose Hattrick OAuth tokens are already stored."""
+    session["access_key"] = user.access_key
+    session["access_secret"] = user.access_secret
+    session["current_user"] = user.ht_user
+    session["current_user_id"] = user.ht_id
+    user.login()
+    db.session.commit()
+
+    try:
+        chpp = get_chpp_client(
+            {"access_key": user.access_key, "access_secret": user.access_secret}
+        )
+        team_ids, team_names = fetch_user_teams(chpp)
+        if not team_ids:
+            raise ValueError("No teams found for this Hattrick user")
+        _set_session_teams(team_ids, team_names)
+    except Exception:
+        dprint(1, f"Error fetching teams from Hattrick: {traceback.format_exc()}")
+        return _login_page(TEAM_FETCH_ERROR)
+    return redirect("/")
+
+
+def _start_signup_oauth(username, password):
+    """Remember the chosen credentials and send the user to Hattrick to authorize."""
+    session["username"] = username
+    session["password"] = generate_password_hash(password)
+    return start_oauth_flow()
+
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """Handle user login and Hattrick OAuth authentication."""
     from models import User
 
-    dprint(1, "=== LOGIN FUNCTION START ===")
-
-    # Return early if already logged in
     if session.get("current_user"):
-        dprint(1, "User already logged in, redirecting")
         return redirect("/")
 
-    # Handle OAuth callback
     oauth_verifier = request.args.get("oauth_verifier")
     if oauth_verifier:
-        dprint(1, "Handling OAuth callback")
         return handle_oauth_callback(oauth_verifier)
 
-    # Handle GET request - show login form
     if request.method == "GET":
-        dprint(1, "Showing login form")
-        return create_page(template="login.html", title="Login / Signup")
+        return _login_page()
 
-    # Handle POST request (form submission)
-    dprint(1, "Processing POST login request")
     username = request.form.get("username")
     password = request.form.get("password")
-    cookie_consent = request.form.get("cookie_consent")
-    dprint(1, f"Login attempt for username: {username}")
-    dprint(
-        1,
-        f"Password provided: {bool(password)}, length: {len(password) if password else 0}",
-    )
-    dprint(1, f"Cookie consent provided: {bool(cookie_consent)}")
-
-    # Validate form data
     if not username:
-        return create_page(
-            template="login.html", title="Login / Signup", error="Username is required"
-        )
-
+        return _login_page("Username is required")
     if not password:
-        return create_page(
-            template="login.html", title="Login / Signup", error="Password is required"
+        return _login_page("Password is required")
+    if not request.form.get("cookie_consent"):
+        return _login_page(
+            "You must consent to the use of essential session cookies to log in"
         )
 
-    if not cookie_consent:
-        return create_page(
-            template="login.html",
-            title="Login / Signup",
-            error="You must consent to the use of essential session cookies to log in",
-        )
-
-    # Check for existing user
-    existing_user = User.query.filter_by(username=username).first()
-    dprint(
-        1, f"Found existing user: {existing_user.username if existing_user else 'None'}"
-    )
-
-    # Handle password verification with migration support
-    password_valid = False
-    needs_migration = False
-
-    if existing_user:
-        dprint(
-            1,
-            f"Password format check - starts with MIGRATION_REQUIRED: {existing_user.password.startswith('MIGRATION_REQUIRED:')}",
-        )
-        dprint(
-            1,
-            f"Password format check - starts with sha256: {existing_user.password.startswith('sha256$')}",
-        )
-        dprint(
-            1,
-            f"Password format check - starts with scrypt: {existing_user.password.startswith('scrypt:')}",
-        )
-
-        if existing_user.password.startswith(
-            "MIGRATION_REQUIRED:"
-        ) or existing_user.password.startswith("sha256$"):
-            # User has an old SHA256 hash that needs migration
-            needs_migration = True
-            dprint(1, f"User {username} has legacy password hash requiring migration")
-            # For migration users, we can't verify the old password
-            # They need to either use OAuth or reset their password
-        else:
-            # Normal password verification for modern hashes (scrypt, pbkdf2)
-            dprint(1, "Attempting normal password verification for modern hash")
-            try:
-                password_valid = check_password_hash(existing_user.password, password)
-                dprint(1, f"Password verification result: {password_valid}")
-            except ValueError as e:
-                dprint(1, f"Password verification failed for {username}: {e}")
-                # This might be another unsupported hash format, treat as migration needed
-                needs_migration = True
-
-    if existing_user and password_valid:
-        # Existing user login with valid password
-        dprint(1, f"Password validation successful for user: {username}")
-        dprint(1, f"User has access_key: {bool(existing_user.access_key)}")
-        dprint(1, f"User has access_secret: {bool(existing_user.access_secret)}")
-        if existing_user.access_key and existing_user.access_secret:
-            # User has OAuth tokens - log them in directly
-            dprint(1, "User has valid OAuth tokens, logging in directly")
-            session["access_key"] = existing_user.access_key
-            session["access_secret"] = existing_user.access_secret
-            session["current_user"] = existing_user.ht_user
-            session["current_user_id"] = existing_user.ht_id
-            dprint(1, f"Set session current_user: {existing_user.ht_user}")
-            dprint(1, f"Set session current_user_id: {existing_user.ht_id}")
-
-            # Track login activity
-            existing_user.login()
-            db.session.commit()
-            dprint(
-                1,
-                f"Updated login counter and timestamp for user: {existing_user.ht_user}",
-            )
-
-            # Setup team data from Hattrick API using OAuth tokens
-            dprint(1, "Setting up team data for logged-in user")
-            try:
-                # Create temporary session with user's OAuth tokens for CHPP client
-                temp_session = {
-                    "access_key": existing_user.access_key,
-                    "access_secret": existing_user.access_secret,
-                }
-                dprint(1, "Initializing CHPP client with user credentials")
-                chpp = get_chpp_client(temp_session)
-                dprint(1, "Created CHPP instance")
-
-                # Try to get user and teams, handling YouthTeamId error gracefully
-                try:
-                    dprint(1, "Fetching user context from CHPP")
-                    user_context = get_current_user_context(chpp)
-                    dprint(1, f"Got user context: {user_context['ht_user']}")
-                    all_teams = user_context["team_ids"]
-                    dprint(1, f"Got teams from user: {all_teams}")
-                except Exception as user_error:
-                    dprint(1, f"Exception in chpp.user(): {user_error}")
-                    # YouthTeamId is optional but API treats it as required
-                    # Work around by accessing teams data directly
-                    if "YouthTeamId" in str(user_error):
-                        dprint(
-                            1,
-                            f"YouthTeamId parsing error (user has no youth team): {user_error}",
-                        )
-                        # Try to get teams by accessing the raw data directly
-                        try:
-                            # chpp.request() returns already-parsed ElementTree Element
-                            root = chpp.request(file="managercompendium", version="1.6")
-
-                            # Extract team IDs from XML
-                            team_nodes = root.findall(".//Team/TeamId")
-                            all_teams = [
-                                int(node.text) for node in team_nodes if node.text
-                            ]
-                            dprint(1, f"Extracted team IDs from XML: {all_teams}")
-                        except Exception as xml_error:
-                            dprint(1, f"Failed to extract teams from XML: {xml_error}")
-                            dprint(1, f"XML error type: {type(xml_error)}")
-                            import traceback
-
-                            dprint(1, f"XML error traceback: {traceback.format_exc()}")
-                            raise Exception(
-                                "Cannot get team IDs from CHPP - authentication failed"
-                            ) from None
-                    else:
-                        raise user_error
-
-                all_team_names = []
-                for team_id in all_teams:
-                    try:
-                        dprint(1, f"Fetching team name for team_id: {team_id}")
-                        team_name = chpp.team(ht_id=team_id).name
-                        dprint(1, f"Got team name: {team_name}")
-                        all_team_names.append(team_name)
-                    except Exception as e:
-                        dprint(1, f"Could not fetch team name for {team_id}: {e}")
-                        all_team_names.append(f"Team {team_id}")
-
-                session["all_teams"] = all_teams
-                session["all_team_names"] = all_team_names
-                session["team_id"] = all_teams[0]
-                dprint(
-                    1, f"Team setup complete: {all_teams} with names: {all_team_names}"
-                )
-            except Exception as e:
-                dprint(1, f"Error fetching teams from Hattrick: {e}")
-                dprint(1, f"Error type: {type(e)}")
-                import traceback
-
-                dprint(1, f"Full traceback: {traceback.format_exc()}")
-                return create_page(
-                    template="login.html",
-                    title="Login",
-                    error="Unable to fetch team data from Hattrick. Please try again or contact support.",
-                )
-
-            dprint(1, "Login successful, redirecting to /")
-            return redirect("/")
-        else:
-            # Need to get OAuth tokens for existing user
-            dprint(1, "User needs OAuth tokens, starting OAuth flow")
-            session["username"] = username
-            session["password"] = generate_password_hash(password)
-            return start_oauth_flow()
-
-    # Handle authentication failures and migration cases
-    if existing_user:
-        if needs_migration:
-            return create_page(
-                template="login.html",
-                title="Login / Signup",
-                error="Your password needs to be updated. Please use the 'Register via Hattrick' button to log in with your Hattrick account.",
-            )
-        else:
-            # Wrong password
-            return create_page(
-                template="login.html",
-                title="Login / Signup",
-                error="Invalid username or password",
-            )
-    else:
-        # New user signup - enforce password length requirement
+    user = User.query.filter_by(username=username).first()
+    if not user:
         if len(password) < 8:
-            return create_page(
-                template="login.html",
-                title="Login / Signup",
-                error="Password must be at least 8 characters long",
-            )
+            return _login_page("Password must be at least 8 characters long")
+        return _start_signup_oauth(username, password)
 
-        # Store new user credentials and start OAuth flow
-        session["username"] = username
-        session["password"] = generate_password_hash(password)
-        return start_oauth_flow()
-
-    dprint(1, "ERROR: Reached end of login function without returning")
+    valid, needs_migration = _check_password(user, password)
+    if valid:
+        if user.access_key and user.access_secret:
+            return _login_with_stored_tokens(user)
+        return _start_signup_oauth(username, password)
+    if needs_migration:
+        return _login_page(
+            "Your password needs to be updated. Please use the 'Register via "
+            "Hattrick' button to log in with your Hattrick account."
+        )
+    return _login_page("Invalid username or password")
 
 
 def start_oauth_flow():
@@ -306,314 +179,138 @@ def start_oauth_flow():
         )
 
 
-def handle_oauth_callback(oauth_verifier):
-    """Handle OAuth callback after authorization."""
+def _save_oauth_user(current_user, access_token):
+    """Create the User row, or update the existing one with fresh OAuth tokens."""
     from models import User
 
+    # Check if user exists in database
+    existing_user = User.query.filter_by(ht_id=current_user.ht_id).first()
+
+    if existing_user:
+        # Check if this is a migration user who needs password update
+        if existing_user.password.startswith("MIGRATION_REQUIRED:"):
+            # User had old SHA256 hash, upgrade to modern hash if they provided a new password
+            new_password = session.get("password", "")
+            if new_password:
+                # User provided a new password during this OAuth flow, upgrade their hash
+                dprint(
+                    1,
+                    f"Upgrading password hash for migration user: {existing_user.username}",
+                )
+                User.claimUser(
+                    existing_user,
+                    username=session.get("username", current_user.username),
+                    password=new_password,  # This will be a modern scrypt hash
+                    access_key=session["access_key"],
+                    access_secret=session["access_secret"],
+                )
+            else:
+                # No new password, just update OAuth tokens but keep migration marker
+                User.claimUser(
+                    existing_user,
+                    username=session.get("username", current_user.username),
+                    password=existing_user.password,  # Keep migration marker
+                    access_key=session["access_key"],
+                    access_secret=session["access_secret"],
+                )
+        else:
+            # Normal existing user update
+            User.claimUser(
+                existing_user,
+                username=session.get("username", current_user.username),
+                password=session.get("password", ""),
+                access_key=session["access_key"],
+                access_secret=session["access_secret"],
+            )
+    else:
+        # Create new user
+        new_user = User(
+            ht_id=current_user.ht_id,
+            ht_user=current_user.username,
+            username=session.get("username", current_user.username),
+            password=session.get("password", ""),
+            access_key=access_token["key"],
+            access_secret=access_token["secret"],
+        )
+        db.session.add(new_user)
+
+    db.session.commit()
+
+
+def _find_user_for_tokens():
+    """Find our User when CHPP user() fails: by form username, then by token."""
+    from models import User
+
+    user = None
+    if session.get("username"):
+        user = User.query.filter_by(username=session["username"]).first()
+    if not user:
+        user = User.query.filter_by(access_key=session["access_key"]).first()
+    return user
+
+
+def handle_oauth_callback(oauth_verifier):
+    """Handle OAuth callback after authorization."""
     try:
-        # Debug session state
-        dprint(1, f"OAuth callback - verifier: {oauth_verifier}")
-        dprint(1, f"Session request_token: {session.get('request_token', 'MISSING')}")
-        dprint(1, f"Session req_secret: {session.get('req_secret', 'MISSING')}")
-
-        # Get access tokens
         chpp = get_chpp_client_no_auth()
-        dprint(1, f"Using consumer key: {chpp.consumer_key[:10]}...")
-
         access_token = chpp.get_access_token(
             request_token=session["request_token"],
             request_token_secret=session["req_secret"],
             code=oauth_verifier,
         )
-
         session["access_key"] = access_token["key"]
         session["access_secret"] = access_token["secret"]
-
-        # Get user from Hattrick with error handling for CHPP library issues
         chpp = get_chpp_client(session)
 
-        current_user = None
+        teams = None
         try:
-            user_context = get_current_user_context(chpp)
-            session["current_user"] = user_context["ht_user"]
-            session["current_user_id"] = user_context["ht_id"]
-            # Create current_user object from successful CHPP response
-            current_user = user_context["user"]
-            dprint(
-                1,
-                f"Successfully got user from CHPP: {current_user.username} (ID: {current_user.ht_id})",
+            context = get_current_user_context(chpp)
+            hattrick_user = SimpleNamespace(
+                ht_id=context["ht_id"], username=context["ht_user"]
             )
-
-            # Note: Don't call .login() here - current_user is CHPPUser object, not database User
-            # Login activity tracking will be handled after database user is created/found
+            teams = (context["team_ids"], context["team_names"])
         except Exception as chpp_error:
-            dprint(1, f"CHPP user() error (likely YouthTeamId issue): {chpp_error}")
-            # This is a known CHPP library issue where YouthTeamId field is None
-            # We can still proceed with OAuth tokens but need to handle user data differently
-
-            # Try to find existing user by OAuth tokens since we can't get user ID from CHPP
-            existing_user = None
-            dprint(1, "Attempting to find existing user for fallback authentication")
-
-            # First try to find by username if available (from form login)
-            if session.get("username"):
-                existing_user = User.query.filter_by(
-                    username=session["username"]
-                ).first()
-                dprint(
-                    1,
-                    f"Found user by session username '{session.get('username')}': {existing_user.username if existing_user else 'None'}",
-                )
-
-            # If no username in session (direct OAuth), try to find by access tokens
+            dprint(1, f"CHPP user() failed (likely YouthTeamId): {chpp_error}")
+            # Only fall back to a user we can identify by form username or token;
+            # never guess, to avoid logging into someone else's account
+            existing_user = _find_user_for_tokens()
             if not existing_user:
-                existing_user = User.query.filter_by(
-                    access_key=session["access_key"]
-                ).first()
-                dprint(
-                    1,
-                    f"Found user by access_key '{session['access_key'][:10]}...': {existing_user.username if existing_user else 'None'}",
+                _clear_login_session()
+                return _login_page(
+                    "Your Hattrick authentication tokens are no longer valid. "
+                    "Please log in again."
                 )
-
-            # SECURITY FIX: Do NOT fall back to random legacy users!
-            # If no user found by valid means, fail gracefully instead of session cross-contamination
-            if not existing_user:
-                dprint(
-                    1,
-                    "SECURITY: No user found by valid OAuth tokens - failing safely instead of fallback",
-                )
-                session.pop("current_user", None)
-                session.pop("current_user_id", None)
-                session.pop("access_key", None)
-                session.pop("access_secret", None)
-                return create_page(
-                    template="login.html",
-                    title="Login / Signup",
-                    error="Your Hattrick authentication tokens are no longer valid. Please log in again.",
-                )
-
-            if existing_user:
-                # Use existing user's Hattrick data
-                session["current_user"] = existing_user.ht_user
-                session["current_user_id"] = existing_user.ht_id
-                dprint(
-                    1,
-                    f"Using existing user data: {existing_user.ht_user} ({existing_user.ht_id})",
-                )
-
-                # Track login activity
-                existing_user.login()
-                db.session.commit()
-                dprint(
-                    1,
-                    f"Updated login counter and timestamp for user: {existing_user.ht_user}",
-                )
-
-                # Create a minimal current_user object for the rest of the function
-                class MinimalUser:
-                    def __init__(self, ht_id, username, teams_ht_id=None):
-                        self.ht_id = ht_id
-                        self.username = username
-                        self._teams_ht_id = teams_ht_id or [
-                            ht_id
-                        ]  # Use ht_id as team if no teams available
-
-                # Get team IDs from existing user if available, otherwise use the ht_id
-                teams_ht_id = getattr(existing_user, "team_ids", None) or [
-                    existing_user.ht_id
-                ]
-                current_user = MinimalUser(
-                    existing_user.ht_id, existing_user.ht_user, teams_ht_id
-                )
-            else:
-                # Cannot proceed without user identification
-                # Clear session to prevent conflicting success/failure messages
-                session.pop("current_user", None)
-                session.pop("current_user_id", None)
-                return create_page(
-                    template="login.html",
-                    title="Login / Signup",
-                    error="There was an issue with Hattrick authentication. Please try logging in with your username and password instead.",
-                )
-
-        # Verify current_user is not None before proceeding
-        if current_user is None:
-            dprint(
-                1, "current_user is None after CHPP processing - authentication failed"
-            )
-            session.pop("current_user", None)
-            session.pop("current_user_id", None)
-            return create_page(
-                template="login.html",
-                title="Login / Signup",
-                error="Unable to authenticate with Hattrick. Please try again.",
+            hattrick_user = SimpleNamespace(
+                ht_id=existing_user.ht_id, username=existing_user.ht_user
             )
 
-        # Check if user exists in database
-        existing_user = User.query.filter_by(ht_id=current_user.ht_id).first()
+        session["current_user"] = hattrick_user.username
+        session["current_user_id"] = hattrick_user.ht_id
+        _save_oauth_user(hattrick_user, access_token)
 
-        if existing_user:
-            # Check if this is a migration user who needs password update
-            if existing_user.password.startswith("MIGRATION_REQUIRED:"):
-                # User had old SHA256 hash, upgrade to modern hash if they provided a new password
-                new_password = session.get("password", "")
-                if new_password:
-                    # User provided a new password during this OAuth flow, upgrade their hash
-                    dprint(
-                        1,
-                        f"Upgrading password hash for migration user: {existing_user.username}",
-                    )
-                    User.claimUser(
-                        existing_user,
-                        username=session.get("username", current_user.username),
-                        password=new_password,  # This will be a modern scrypt hash
-                        access_key=session["access_key"],
-                        access_secret=session["access_secret"],
-                    )
-                else:
-                    # No new password, just update OAuth tokens but keep migration marker
-                    User.claimUser(
-                        existing_user,
-                        username=session.get("username", current_user.username),
-                        password=existing_user.password,  # Keep migration marker
-                        access_key=session["access_key"],
-                        access_secret=session["access_secret"],
-                    )
-            else:
-                # Normal existing user update
-                User.claimUser(
-                    existing_user,
-                    username=session.get("username", current_user.username),
-                    password=session.get("password", ""),
-                    access_key=session["access_key"],
-                    access_secret=session["access_secret"],
-                )
-        else:
-            # Create new user
-            new_user = User(
-                ht_id=current_user.ht_id,
-                ht_user=current_user.username,
-                username=session.get("username", current_user.username),
-                password=session.get("password", ""),
-                access_key=access_token["key"],
-                access_secret=access_token["secret"],
-            )
-            db.session.add(new_user)
-
-        db.session.commit()
-
-        # Ensure user is properly persisted before creating groups
-        db.session.flush()
-
-        # Refresh the actual database User object, not the CHPPUser object
-        if not existing_user:
-            # For new users, we need to get the newly created user from the database
-            db_user = User.query.filter_by(ht_id=current_user.ht_id).first()
-            if db_user:
-                db.session.refresh(db_user)
-        else:
-            # For existing users, refresh the existing user object
-            db.session.refresh(existing_user)
-
-        # Create default player groups for new users
         try:
             from app.utils import create_default_groups
 
-            create_default_groups(current_user.ht_id)
-            dprint(1, f"Created default groups for new user {current_user.ht_id}")
+            create_default_groups(hattrick_user.ht_id)
         except Exception as group_error:
-            dprint(
-                1,
-                f"Failed to create default groups for user {current_user.ht_id}: {group_error}",
-            )
-            # Continue with login even if group creation fails
+            dprint(1, f"Failed to create default groups: {group_error}")
 
-        # Setup team data with error handling
         try:
-            all_teams = current_user._teams_ht_id
-            all_team_names = []
+            team_ids, team_names = teams or fetch_user_teams(chpp)
+            if not team_ids:
+                raise ValueError("No teams found for this Hattrick user")
+        except Exception:
+            dprint(1, f"Team setup error: {traceback.format_exc()}")
+            session.pop("current_user", None)
+            session.pop("current_user_id", None)
+            return _login_page(TEAM_FETCH_ERROR)
 
-            for id in all_teams:
-                try:
-                    team_name = chpp.team(ht_id=id).name
-                    all_team_names.append(team_name)
-                    dprint(1, f"Fetched team name: {team_name} for ID {id}")
-                except Exception as team_error:
-                    dprint(1, f"Could not get team name for {id}: {team_error}")
-                    all_team_names.append(f"Team {id}")  # Fallback team name
-
-            session["all_teams"] = all_teams
-            session["all_team_names"] = all_team_names
-            session["team_id"] = all_teams[0]
-            dprint(
-                1,
-                f"OAuth callback team setup complete: {all_teams} with names: {all_team_names}",
-            )
-        except Exception as team_setup_error:
-            # YouthTeamId is optional but API treats it as required
-            if "YouthTeamId" in str(team_setup_error):
-                dprint(
-                    1,
-                    f"YouthTeamId parsing error (user has no youth team): {team_setup_error}",
-                )
-                try:
-                    # Work around by accessing raw XML directly
-                    import xml.etree.ElementTree as ET
-
-                    user_xml = chpp.request(file="managercompendium", version="1.6")
-                    root = ET.fromstring(user_xml)
-
-                    # Extract team IDs from XML
-                    team_nodes = root.findall(".//Team/TeamId")
-                    all_teams = [int(node.text) for node in team_nodes if node.text]
-                    dprint(1, f"Extracted team IDs from raw XML: {all_teams}")
-
-                    # Get team names
-                    all_team_names = []
-                    for team_id in all_teams:
-                        try:
-                            team_name = chpp.team(ht_id=team_id).name
-                            all_team_names.append(team_name)
-                        except Exception:
-                            all_team_names.append(f"Team {team_id}")
-
-                    session["all_teams"] = all_teams
-                    session["all_team_names"] = all_team_names
-                    session["team_id"] = all_teams[0]
-                    dprint(
-                        1,
-                        f"Team setup complete via XML: {all_teams} with names: {all_team_names}",
-                    )
-                except Exception as xml_error:
-                    dprint(1, f"Failed to extract teams from XML: {xml_error}")
-                    # Clear session to prevent conflicting success/failure messages
-                    session.pop("current_user", None)
-                    session.pop("current_user_id", None)
-                    return create_page(
-                        template="login.html",
-                        title="Login",
-                        error="Unable to fetch team data from Hattrick. Please try again or contact support.",
-                    )
-            else:
-                dprint(1, f"Team setup error: {team_setup_error}")
-                # Clear session to prevent conflicting success/failure messages
-                session.pop("current_user", None)
-                session.pop("current_user_id", None)
-                return create_page(
-                    template="login.html",
-                    title="Login",
-                    error="Unable to fetch team data from Hattrick. Please try again or contact support.",
-                )
-
+        _set_session_teams(team_ids, team_names)
         return redirect("/")
 
     except Exception as e:
         dprint(1, f"OAuth callback error: {e}")
-        return create_page(
-            template="login.html",
-            title="Login / Signup",
-            error="OAuth authentication failed. Please try again.",
-        )
+        return _login_page("OAuth authentication failed. Please try again.")
 
 
 @auth_bp.route("/validate-session")

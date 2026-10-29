@@ -44,7 +44,7 @@ HT Status is a **hobby project** for Hattrick team management built with Flask a
 
 #### Flask Frontend
 - **Location**: `/app/templates/`
-- **Technology**: Jinja2 templates + Flask-Bootstrap 3.x + CSS
+- **Technology**: Jinja2 templates + Bootstrap 4 (CDN) + CSS; `base.html` extends `_skeleton.html`
 - **Purpose**: Server-rendered HTML pages for all application functionality
 - **Key Templates**: `player.html`, `matches.html`, `team.html`, `main.html`
 - **Features**: Responsive design, WCAG 2.1 accessibility, football-themed UI
@@ -194,7 +194,7 @@ htstatus-2.0/
 ```
 
 ### Key Architectural Notes
-- **Flask-Only Frontend**: Server-rendered Jinja2 templates with Flask-Bootstrap 3.x and custom CSS
+- **Flask-Only Frontend**: Server-rendered Jinja2 templates with Bootstrap 4 and custom CSS
 - **Blueprint Architecture**: Modern Flask blueprint pattern with 6 feature-based blueprints (REFACTOR-007 completed January 2026)
   - Factory pattern in `app/factory.py` handles initialization and registration
   - Each blueprint has `setup_*_blueprint()` function for dependency injection

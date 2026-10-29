@@ -224,30 +224,6 @@ class TestAuthBlueprintAdvanced:
         assert "auth" in mock_app.blueprints
         assert mock_app.blueprints["auth"] == auth_bp
 
-    @patch("app.blueprints.auth.dprint")
-    def test_login_debug_prints_coverage(self, mock_dprint, mock_app, mock_db):
-        """Test that debug print statements are called correctly."""
-        setup_auth_blueprint(mock_app, mock_db, "ck", "cs")
-
-        from app.blueprints.auth import login
-
-        # Test GET request debug print
-        with (
-            mock_app.test_request_context("/", method="GET"),
-            patch("flask.session", {}),
-            patch("app.blueprints.auth.create_page", return_value="form"),
-        ):
-            login()
-
-            # Verify debug prints are called
-            assert any(
-                "LOGIN FUNCTION START" in str(call)
-                for call in mock_dprint.call_args_list
-            )
-            assert any(
-                "Showing login form" in str(call) for call in mock_dprint.call_args_list
-            )
-
 
 def test_auth_module_imports():
     """Test that auth module imports work correctly."""

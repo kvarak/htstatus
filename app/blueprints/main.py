@@ -23,11 +23,6 @@ from app.auth_utils import (
     require_authentication,
     track_activity,
 )
-from app.model_registry import (
-    get_group_model,
-    get_player_setting_model,
-    get_user_model,
-)
 from app.utils import create_page, diff_month, dprint
 
 # Create Blueprint for main routes
@@ -94,7 +89,8 @@ def get_releases_data():
 @main_bp.route("/index")
 def index():
     """Display home page with user and team statistics."""
-    User = get_user_model()
+    from models import User
+
     allusers = db.session.query(User).all()
     time1m = date.today() - relativedelta(months=1)
     activeusers = db.session.query(User).filter(User.last_usage > time1m).all()
@@ -163,9 +159,7 @@ def index():
 @track_activity("settings")
 def settings():
     """Handle user settings for player groups and display columns."""
-    # Get model classes from registry
-    Group = get_group_model()
-    PlayerSetting = get_player_setting_model()
+    from models import Group, PlayerSetting
 
     error = ""
 
@@ -394,8 +388,7 @@ def debug_session():
 @require_authentication
 def admin():
     """Admin dashboard for user management."""
-    # Get model classes from registry
-    User = get_user_model()
+    from models import User
 
     form_error = ""
 
@@ -552,7 +545,7 @@ def tutorial_analytics():
 
         # Increment specific tour counter if user is logged in
         if user_id:
-            user = get_user_model().query.filter_by(ht_id=user_id).first()
+            user = get_current_user()
             if user:
                 # Map tour_id to field prefix
                 tour_field_map = {

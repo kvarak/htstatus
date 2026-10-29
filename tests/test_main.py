@@ -293,3 +293,21 @@ def test_load_changelog_entries_missing_files(tmp_path):
     from app.blueprints.main import load_changelog_entries
 
     assert load_changelog_entries(str(tmp_path)) == []
+
+
+def test_pages_render_without_flask_bootstrap(app_with_routes):
+    """REFACTOR-103: pages use our own skeleton and only Bootstrap 4."""
+    from app.error_handlers import handle_error
+
+    html = app_with_routes.test_client().get("/changes").get_data(as_text=True)
+
+    assert html.lstrip().startswith("<!DOCTYPE html>")
+    assert '<html lang="en">' in html
+    assert html.count("<title>") == 1
+    assert "bootstrap/4.5.0/css/bootstrap.min.css" in html
+    assert "bootstrap/3" not in html
+
+    with app_with_routes.test_request_context("/"):
+        error_html = handle_error("Something broke")
+    assert "Something broke" in error_html
+    assert "components.css" in error_html  # error page now uses the app layout

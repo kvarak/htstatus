@@ -450,8 +450,17 @@
 // User data from backend
 const usersData = JSON.parse('{{ users | tojson | safe }}');
 
-// Chart instances for updates - using HattrickCharts utility
+// Chart instances by key, so a redraw can destroy the previous chart
 let charts = {};
+
+// Create (or recreate) a chart; all charts share the responsive defaults
+function renderChart(key, canvasId, config) {
+    if (charts[key]) {
+        charts[key].destroy();
+    }
+    config.options = { responsive: true, maintainAspectRatio: false, ...config.options };
+    charts[key] = new Chart(document.getElementById(canvasId).getContext('2d'), config);
+}
 
 // Date range state
 let currentDateRange = {
@@ -624,12 +633,7 @@ function updateTutorialCompletionChart(filteredUsers) {
         tutorialData.update_skip += user.c_update_skip || 0;
     });
 
-    if (charts.tutorialCompletion) {
-        charts.tutorialCompletion.destroy();
-    }
-
-    const tutorialCompletionCtx = document.getElementById('tutorialCompletionChart').getContext('2d');
-    charts.tutorialCompletion = new Chart(tutorialCompletionCtx, {
+    renderChart('tutorialCompletion', 'tutorialCompletionChart', {
         type: 'bar',
         data: {
             labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
@@ -648,8 +652,6 @@ function updateTutorialCompletionChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -679,12 +681,7 @@ function updateTutorialHelpChart(filteredUsers) {
         helpData.update_help += user.c_update_help || 0;
     });
 
-    if (charts.tutorialHelp) {
-        charts.tutorialHelp.destroy();
-    }
-
-    const tutorialHelpCtx = document.getElementById('tutorialHelpChart').getContext('2d');
-    charts.tutorialHelp = new Chart(tutorialHelpCtx, {
+    renderChart('tutorialHelp', 'tutorialHelpChart', {
         type: 'doughnut',
         data: {
             labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
@@ -696,8 +693,6 @@ function updateTutorialHelpChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -730,12 +725,7 @@ function updateTutorialResetChart(filteredUsers) {
         }
     });
 
-    if (charts.tutorialReset) {
-        charts.tutorialReset.destroy();
-    }
-
-    const tutorialResetCtx = document.getElementById('tutorialResetChart').getContext('2d');
-    charts.tutorialReset = new Chart(tutorialResetCtx, {
+    renderChart('tutorialReset', 'tutorialResetChart', {
         type: 'pie',
         data: {
             labels: Object.keys(resetBuckets),
@@ -747,8 +737,6 @@ function updateTutorialResetChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -776,12 +764,7 @@ function updateUserActivityChart(filteredUsers) {
         }
     });
 
-    if (charts.userActivity) {
-        charts.userActivity.destroy();
-    }
-
-    const userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
-    charts.userActivity = new Chart(userActivityCtx, {
+    renderChart('userActivity', 'userActivityChart', {
         type: 'doughnut',
         data: {
             labels: ['Active (30d)', 'Inactive'],
@@ -793,8 +776,6 @@ function updateUserActivityChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -825,12 +806,7 @@ function updateFeatureUsageChart(filteredUsers) {
         featureData.stats += user.c_stats || 0;
     });
 
-    if (charts.featureUsage) {
-        charts.featureUsage.destroy();
-    }
-
-    const featureUsageCtx = document.getElementById('featureUsageChart').getContext('2d');
-    charts.featureUsage = new Chart(featureUsageCtx, {
+    renderChart('featureUsage', 'featureUsageChart', {
         type: 'bar',
         data: {
             labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
@@ -843,8 +819,6 @@ function updateFeatureUsageChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -874,12 +848,7 @@ function updateRegistrationTimelineChart(filteredUsers) {
     const sortedMonths = Object.keys(monthlyRegistrations).sort();
     const registrationCounts = sortedMonths.map(month => monthlyRegistrations[month]);
 
-    if (charts.registrationTimeline) {
-        charts.registrationTimeline.destroy();
-    }
-
-    const registrationCtx = document.getElementById('registrationChart').getContext('2d');
-    charts.registrationTimeline = new Chart(registrationCtx, {
+    renderChart('registrationTimeline', 'registrationChart', {
         type: 'line',
         data: {
             labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
@@ -893,7 +862,6 @@ function updateRegistrationTimelineChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
             maintainAspectRatio: true,
             aspectRatio: 2,
             scales: {
@@ -938,12 +906,7 @@ function updateUsageFrequencyChart(filteredUsers) {
         // Users with 0 activity are not included
     });
 
-    if (charts.usageFrequency) {
-        charts.usageFrequency.destroy();
-    }
-
-    const usageFrequencyCtx = document.getElementById('usageFrequencyChart').getContext('2d');
-    charts.usageFrequency = new Chart(usageFrequencyCtx, {
+    renderChart('usageFrequency', 'usageFrequencyChart', {
         type: 'pie',
         data: {
             labels: Object.keys(frequencyBuckets),
@@ -955,8 +918,6 @@ function updateUsageFrequencyChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -988,12 +949,7 @@ function updateTopUsersChart(filteredUsers) {
     const topUserNames = usersWithTotalActivity.map(user => user.name);
     const topUserActivity = usersWithTotalActivity.map(user => user.activity);
 
-    if (charts.topUsers) {
-        charts.topUsers.destroy();
-    }
-
-    const topUsersCtx = document.getElementById('topUsersChart').getContext('2d');
-    charts.topUsers = new Chart(topUsersCtx, {
+    renderChart('topUsers', 'topUsersChart', {
         type: 'bar',
         data: {
             labels: topUserNames,
@@ -1007,7 +963,6 @@ function updateTopUsersChart(filteredUsers) {
         },
         options: {
             indexAxis: 'y',
-            responsive: true,
             maintainAspectRatio: true,
             aspectRatio: 1.5,
             scales: {
@@ -1047,12 +1002,7 @@ function updateLoginTimelineChart(filteredUsers) {
         }
     });
 
-    if (charts.loginTimeline) {
-        charts.loginTimeline.destroy();
-    }
-
-    const loginTimelineCtx = document.getElementById('loginTimelineChart').getContext('2d');
-    charts.loginTimeline = new Chart(loginTimelineCtx, {
+    renderChart('loginTimeline', 'loginTimelineChart', {
         type: 'line',
         data: {
             labels: Object.keys(weekData),
@@ -1067,8 +1017,6 @@ function updateLoginTimelineChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -1111,12 +1059,7 @@ function updateAdoptionRateChart(filteredUsers) {
         Math.round((adoptionData[key] / totalUsers) * 100)
     );
 
-    if (charts.adoptionRate) {
-        charts.adoptionRate.destroy();
-    }
-
-    const adoptionRateCtx = document.getElementById('adoptionRateChart').getContext('2d');
-    charts.adoptionRate = new Chart(adoptionRateCtx, {
+    renderChart('adoptionRate', 'adoptionRateChart', {
         type: 'bar',
         data: {
             labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
@@ -1129,8 +1072,6 @@ function updateAdoptionRateChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -1182,12 +1123,7 @@ function updateRetentionChart(filteredUsers) {
         return data.total > 0 ? Math.round((data.active / data.total) * 100) : 0;
     });
 
-    if (charts.retention) {
-        charts.retention.destroy();
-    }
-
-    const retentionCtx = document.getElementById('retentionChart').getContext('2d');
-    charts.retention = new Chart(retentionCtx, {
+    renderChart('retention', 'retentionChart', {
         type: 'bar',
         data: {
             labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
@@ -1200,8 +1136,6 @@ function updateRetentionChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
@@ -1239,12 +1173,7 @@ function updateHourlyActivityChart(filteredUsers) {
         hours.push(i + ':00');
     }
 
-    if (charts.hourlyActivity) {
-        charts.hourlyActivity.destroy();
-    }
-
-    const hourlyActivityCtx = document.getElementById('hourlyActivityChart').getContext('2d');
-    charts.hourlyActivity = new Chart(hourlyActivityCtx, {
+    renderChart('hourlyActivity', 'hourlyActivityChart', {
         type: 'line',
         data: {
             labels: hours,
@@ -1259,8 +1188,6 @@ function updateHourlyActivityChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -1304,12 +1231,7 @@ function updateActivityFocusChart(filteredUsers) {
         }
     });
 
-    if (charts.activityFocus) {
-        charts.activityFocus.destroy();
-    }
-
-    const activityFocusCtx = document.getElementById('activityFocusChart').getContext('2d');
-    charts.activityFocus = new Chart(activityFocusCtx, {
+    renderChart('activityFocus', 'activityFocusChart', {
         type: 'doughnut',
         data: {
             labels: ['Team Focused', 'Player Focused', 'Balanced'],
@@ -1321,8 +1243,6 @@ function updateActivityFocusChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -1347,12 +1267,7 @@ function updatePlayerBreakdownChart(filteredUsers) {
         playerData.formation += user.c_formation || 0;
     });
 
-    if (charts.playerBreakdown) {
-        charts.playerBreakdown.destroy();
-    }
-
-    const playerBreakdownCtx = document.getElementById('playerBreakdownChart').getContext('2d');
-    charts.playerBreakdown = new Chart(playerBreakdownCtx, {
+    renderChart('playerBreakdown', 'playerBreakdownChart', {
         type: 'bar',
         data: {
             labels: ['Player Views', 'Training Analysis', 'Formation Planning'],
@@ -1365,8 +1280,6 @@ function updatePlayerBreakdownChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true
@@ -1403,12 +1316,7 @@ function updateTeamBreakdownChart(filteredUsers) {
         teamData = { team: 1, matches: 1, stats: 1 };
     }
 
-    if (charts.teamBreakdown) {
-        charts.teamBreakdown.destroy();
-    }
-
-    const teamBreakdownCtx = document.getElementById('teamBreakdownChart').getContext('2d');
-    charts.teamBreakdown = new Chart(teamBreakdownCtx, {
+    renderChart('teamBreakdown', 'teamBreakdownChart', {
         type: 'doughnut',
         data: {
             labels: ['Team Overview', 'Match Analysis', 'Statistics'],
@@ -1420,8 +1328,6 @@ function updateTeamBreakdownChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -1457,12 +1363,7 @@ function updateUpdateFrequencyChart(filteredUsers) {
         }
     });
 
-    if (charts.updateFrequency) {
-        charts.updateFrequency.destroy();
-    }
-
-    const updateFrequencyCtx = document.getElementById('updateFrequencyChart').getContext('2d');
-    charts.updateFrequency = new Chart(updateFrequencyCtx, {
+    renderChart('updateFrequency', 'updateFrequencyChart', {
         type: 'pie',
         data: {
             labels: Object.keys(updateBuckets),
@@ -1474,8 +1375,6 @@ function updateUpdateFrequencyChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: true,
@@ -1514,12 +1413,7 @@ function updateFeatureRadarChart(filteredUsers) {
         Math.round((featureData[key] / totalUsers) * 100)
     );
 
-    if (charts.featureRadar) {
-        charts.featureRadar.destroy();
-    }
-
-    const featureRadarCtx = document.getElementById('featureRadarChart').getContext('2d');
-    charts.featureRadar = new Chart(featureRadarCtx, {
+    renderChart('featureRadar', 'featureRadarChart', {
         type: 'radar',
         data: {
             labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
@@ -1533,8 +1427,6 @@ function updateFeatureRadarChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 r: {
                     beginAtZero: true,
@@ -1581,12 +1473,7 @@ function updateEngagementScoreChart(filteredUsers) {
         else engagementScoreBuckets['Very High (76-100)']++;
     });
 
-    if (charts.engagementScore) {
-        charts.engagementScore.destroy();
-    }
-
-    const engagementScoreCtx = document.getElementById('engagementScoreChart').getContext('2d');
-    charts.engagementScore = new Chart(engagementScoreCtx, {
+    renderChart('engagementScore', 'engagementScoreChart', {
         type: 'bar',
         data: {
             labels: Object.keys(engagementScoreBuckets),
@@ -1599,8 +1486,6 @@ function updateEngagementScoreChart(filteredUsers) {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true

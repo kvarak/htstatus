@@ -1,4 +1,4 @@
-{% extends 'bootstrap/base.html' %}
+{% extends '_skeleton.html' %}
 ##########################
 ## Styling
 ##########################
@@ -759,86 +759,87 @@ window.addEventListener('beforeinstallprompt', (e) => {
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       {% if current_user %}
-      <!-- Authenticated navigation -->
-      <ul class="navbar-nav" id="navbar-authenticated">
-        <li>
-          <img height="30" src="{{ url_for('static', filename='chpp.png') }}">
-          &nbsp;&nbsp;&nbsp;
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
-        </li>
-        {% if all_teams %}
-          {% for team_idx in range(all_teams|length) %}
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle"
-                 href="#"
-                 id="navbar-team-dropdown-{{ team_idx }}"
-                 role="button"
-                 data-toggle="dropdown"
-                 aria-haspopup="true"
-                 aria-expanded="false">{{ all_team_names[team_idx] }}</a>
-              <div class="dropdown-menu" aria-labelledby="navbar-team-dropdown-{{ team_idx }}">
-                <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team_idx] }}">Team</a> -->
-                <a id="navbar-players-link-{{ team_idx }}"
-                   class="dropdown-item"
-                   href="/player?id={{ all_teams[team_idx] }}"
-                   onclick="loading();">Players</a>
-                <a id="navbar-formations-link-{{ team_idx }}"
-                   class="dropdown-item"
-                   href="/formations?id={{ all_teams[team_idx] }}"
-                   onclick="loading();">Formations</a>
-                <a id="navbar-matches-link-{{ team_idx }}"
-                   class="dropdown-item"
-                   href="/matches?id={{ all_teams[team_idx] }}"
-                   onclick="loading();">Matches</a>
-                <a id="navbar-training-link-{{ team_idx }}"
-                   class="dropdown-item"
-                   href="/training?id={{ all_teams[team_idx] }}"
-                   onclick="loading();">Training</a>
-                <a id="navbar-stats-link-{{ team_idx }}"
-                   class="dropdown-item"
-                   href="/stats?id={{ all_teams[team_idx] }}"
-                   onclick="loading();">Statistics</a>
-              </div>
-            </li>
-          {% endfor %}
-        {% endif %}
-        <li class="nav-item">
-          <a id="navbar-update-link"
-             class="nav-link"
-             href="/update"
-             onclick="loading();">Update data</a>
-        </li>
-        <li class="nav-item">
-          <a id="navbar-settings-link"
-             class="nav-link"
-             href="/settings"
-             onclick="loading();">Settings</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
-        </li>
-        {% if role == "Admin" %}
-          <li class="nav-item">
-            <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
+        <!-- Authenticated navigation -->
+        <ul class="navbar-nav" id="navbar-authenticated">
+          <li>
+            <img height="30" src="{{ url_for('static', filename='chpp.png') }}">
+            &nbsp;&nbsp;&nbsp;
           </li>
-        {% endif %}
-        <li class="nav-item">
-          {% if admin_feedback_counts and (admin_feedback_counts.no_replies > 0 or admin_feedback_counts.needs_followup > 0) %}
-            <a class="nav-link" href="/feedback" onclick="loading();">Feedback ({{ admin_feedback_counts.no_replies }} unanswered / {{ admin_feedback_counts.needs_followup }} new replies)</a>
-          {% else %}
-            <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
+          <li class="nav-item active">
+            <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
+          </li>
+          {% if all_teams %}
+            {% for team_idx in range(all_teams|length) %}
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="navbar-team-dropdown-{{ team_idx }}"
+                   role="button"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">{{ all_team_names[team_idx] }}</a>
+                <div class="dropdown-menu"
+                     aria-labelledby="navbar-team-dropdown-{{ team_idx }}">
+                  <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team_idx] }}">Team</a> -->
+                  <a id="navbar-players-link-{{ team_idx }}"
+                     class="dropdown-item"
+                     href="/player?id={{ all_teams[team_idx] }}"
+                     onclick="loading();">Players</a>
+                  <a id="navbar-formations-link-{{ team_idx }}"
+                     class="dropdown-item"
+                     href="/formations?id={{ all_teams[team_idx] }}"
+                     onclick="loading();">Formations</a>
+                  <a id="navbar-matches-link-{{ team_idx }}"
+                     class="dropdown-item"
+                     href="/matches?id={{ all_teams[team_idx] }}"
+                     onclick="loading();">Matches</a>
+                  <a id="navbar-training-link-{{ team_idx }}"
+                     class="dropdown-item"
+                     href="/training?id={{ all_teams[team_idx] }}"
+                     onclick="loading();">Training</a>
+                  <a id="navbar-stats-link-{{ team_idx }}"
+                     class="dropdown-item"
+                     href="/stats?id={{ all_teams[team_idx] }}"
+                     onclick="loading();">Statistics</a>
+                </div>
+              </li>
+            {% endfor %}
           {% endif %}
-        </li>
-      </ul>
+          <li class="nav-item">
+            <a id="navbar-update-link"
+               class="nav-link"
+               href="/update"
+               onclick="loading();">Update data</a>
+          </li>
+          <li class="nav-item">
+            <a id="navbar-settings-link"
+               class="nav-link"
+               href="/settings"
+               onclick="loading();">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
+          </li>
+          {% if role == "Admin" %}
+            <li class="nav-item">
+              <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
+            </li>
+          {% endif %}
+          <li class="nav-item">
+            {% if admin_feedback_counts and (admin_feedback_counts.no_replies > 0 or admin_feedback_counts.needs_followup > 0) %}
+              <a class="nav-link" href="/feedback" onclick="loading();">Feedback ({{ admin_feedback_counts.no_replies }} unanswered / {{ admin_feedback_counts.needs_followup }} new replies)</a>
+            {% else %}
+              <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
+            {% endif %}
+          </li>
+        </ul>
       {% else %}
-      <!-- Unauthenticated navigation -->
-      <ul class="navbar-nav" id="navbar-unauthenticated">
-        <li class="nav-item">
-          <a class="nav-link" href="/login">Login</a>
-        </li>
-      </ul>
+        <!-- Unauthenticated navigation -->
+        <ul class="navbar-nav" id="navbar-unauthenticated">
+          <li class="nav-item">
+            <a class="nav-link" href="/login">Login</a>
+          </li>
+        </ul>
       {% endif %}
     </div>
   </nav>
@@ -876,4 +877,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     <img src="{{ url_for('static', filename='soccer_ball.png') }}" width="100">
   </div>
 {% endblock %}
-{% block content %}<!-- Page content will be inserted here -->{% endblock %}
+{% block content %}
+  <!-- Page content will be inserted here -->
+{% endblock %}

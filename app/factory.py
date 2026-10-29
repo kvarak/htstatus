@@ -5,7 +5,6 @@ import pkgutil
 
 from dotenv import load_dotenv
 from flask import Flask
-from flask_bootstrap import Bootstrap
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
@@ -24,7 +23,6 @@ load_dotenv()
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
-bootstrap = Bootstrap()
 
 
 def create_app(config_object=None, include_routes=True):
@@ -51,7 +49,6 @@ def create_app(config_object=None, include_routes=True):
     # Initialize extensions with app
     db.init_app(app)
     migrate.init_app(app, db)
-    bootstrap.init_app(app)
 
     # Import models after db is initialized to avoid circular imports
 
@@ -133,13 +130,6 @@ def setup_routes(app_instance, db_instance):
         TRACE_COLUMNS,
     )
 
-    # Get version info using shared utility
-    from app.utils import get_version_info
-
-    version_info = get_version_info()
-    version = version_info["version"]
-    fullversion = version_info["fullversion"]
-
     # Setup blueprint dependencies
     setup_auth_blueprint(
         app_instance,
@@ -156,14 +146,7 @@ def setup_routes(app_instance, db_instance):
         db_instance, DEFAULT_COLUMNS, CALC_COLUMNS, TRACE_COLUMNS, DEFAULT_GROUP_ORDER
     )
 
-    setup_team_blueprint(
-        app_instance,
-        db_instance,
-        app_instance.config.get("CONSUMER_KEY", "dev_key"),
-        app_instance.config.get("CONSUMER_SECRETS", "dev_secret"),
-        version,
-        fullversion,
-    )
+    setup_team_blueprint(db_instance)
 
     setup_matches_blueprint(
         db_instance, HT_MATCH_TYPE, HT_MATCH_ROLE, HT_MATCH_BEHAVIOUR
