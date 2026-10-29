@@ -119,12 +119,12 @@ This limits organic growth and discoverability within the Hattrick community.
 - **Hobby Project Scale**: Keep SEO implementation simple and maintainable
 - **Privacy Considerations**: Only expose public team information in structured data
 - **Cache Strategy**: Consider caching sitemap and social images for performance
-- **Future Localization**: Design meta tag system to support multiple languages (FEAT-027)
+- **Future Localization**: Design meta tag system to support multiple languages (FEAT-027 done for Hattrick terms only)
 
 ## Dependencies
 
 - None (standalone implementation)
-- **Nice to have**: completion after FEAT-027 (Localization) for multi-language SEO
+- **Nice to have**: FEAT-027 (Hattrick terms) is done; full UI translation is not planned for multi-language SEO
 
 ## Estimated Effort
 

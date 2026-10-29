@@ -10,7 +10,7 @@ This directory contains comprehensive documentation for Hattrick Community Premi
 
 ## Documentation Status
 
-### ✅ Documented APIs (21/79 total)
+### ✅ Documented APIs (22/79 total)
 These APIs have comprehensive documentation with implementation examples, authentication patterns, and strategic usage guidelines:
 
 - **[avatars](api-reference-avatars.md)** - Avatars for all players of user's team
@@ -35,8 +35,9 @@ These APIs have comprehensive documentation with implementation examples, authen
 - **[teamdetails](api-reference-teamdetails.md)** - Team information
 - **[training](api-reference-training.md)** - Training information
 - **[translations](api-reference-translations.md)** - Translations for the denominations in the game
+- **[worldlanguages](api-reference-worldlanguages.md)** - Available languages
 
-### 🔮 Available But Not Yet Documented (58/79 remaining)
+### 🔮 Available But Not Yet Documented (57/79 remaining)
 These APIs are available on request for future features:
 
 #### Core Team Management
@@ -72,7 +73,6 @@ These APIs are available on request for future features:
 - **nationalplayers** - National team players
 - **worldcup** - World cup groups and matches
 - **worlddetails** - General Information about all countries in HT World
-- **worldlanguages** - Available languages
 
 #### Youth System
 - **youthavatars** - Avatars for all players of user's youthteam

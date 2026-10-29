@@ -10,6 +10,7 @@ from flask import (
     Blueprint,
     current_app,
     jsonify,
+    make_response,
     redirect,
     render_template,
     request,
@@ -17,6 +18,7 @@ from flask import (
     url_for,
 )
 
+from app import translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
@@ -290,15 +292,41 @@ def settings():
 
     group_data = before_default + after_default
 
-    return create_page(
-        template="settings.html",
-        title="Settings",
-        columns=columns,
-        hiddencolumns=hiddencolumns,
-        showdefaultcolumns=showdefaultcolumns,
-        group_data=group_data,
-        error=error,
+    language_choice = request.form.get("language")
+    if language_choice is None:
+        language_choice = request.cookies.get(translations.LANGUAGE_COOKIE, "")
+
+    response = make_response(
+        create_page(
+            template="settings.html",
+            title="Settings",
+            columns=columns,
+            hiddencolumns=hiddencolumns,
+            showdefaultcolumns=showdefaultcolumns,
+            group_data=group_data,
+            error=error,
+            languages=translations.available_languages(),
+            language_choice=language_choice,
+            language_saved="language" in request.form,
+        )
     )
+    return _save_language_choice(response, request.form.get("language"))
+
+
+def _save_language_choice(response, choice):
+    """Store the Settings language override in a long-lived cookie ("" = automatic)."""
+    if choice is None:
+        return response
+    if choice.isdigit():
+        response.set_cookie(
+            translations.LANGUAGE_COOKIE,
+            choice,
+            max_age=translations.LANGUAGE_COOKIE_MAX_AGE,
+            samesite="Lax",
+        )
+    else:
+        response.delete_cookie(translations.LANGUAGE_COOKIE)
+    return response
 
 
 CHANGELOG_FILES = ("changelog.json", "releases.json", "releases-internal.json")

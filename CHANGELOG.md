@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Hattrick terms in your language** (FEAT-027) - skill names, skill levels, specialties and personality traits now use the words Hattrick uses in the language you play in; pick another language in Settings
 - **Dark mode** (UI-014) - 🌙/☀️ toggle in the navbar, same look and behaviour as the other kvarak projects: follows the system setting until you pick a mode, remembers the choice, no light flash on load; charts switch colours too
 - **Debug Charts Date Range Selection** - Enhanced admin debugging with time-based filtering (FEAT-033)
   - Date range controls in debug page Chart Controls section with 6-month default

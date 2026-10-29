@@ -395,7 +395,7 @@ class TestUpdateRoute:
             ],
         )
         chpp = SimpleNamespace(
-            user=lambda: SimpleNamespace(_teams_ht_id=[self.TEAM]),
+            user=lambda: SimpleNamespace(_teams_ht_id=[self.TEAM], language_id=None),
             team=lambda ht_id: team,
             player=lambda id_: _fake_chpp_details(),
         )

@@ -67,6 +67,10 @@ def create_app(config_object=None, include_routes=True):
             return f"{years} y {days} d"
         return str(age_string)
 
+    from app.translations import init_app as init_translations
+
+    init_translations(app)
+
     # Set up routes only if requested (allows testing without complex routes)
     if include_routes:
         setup_routes(app, db)

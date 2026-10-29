@@ -68,3 +68,6 @@ production_db_dump.sql
 
 # Local database backups (data, not code)
 scripts/database/backups/
+
+# Runtime cache (Hattrick translations)
+instance/

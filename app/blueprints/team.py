@@ -6,6 +6,7 @@ import traceback
 
 from flask import Blueprint, flash, redirect, request, session, url_for
 
+from app import translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
@@ -136,19 +137,22 @@ def update_error_page(error, errorinfo=""):
 
 
 def refresh_user_teams(chpp):
-    """Sync the session's team list with Hattrick (teams bought/sold since login).
+    """Sync the session's team list and Hattrick translations with Hattrick.
 
     A known CHPP "YouthTeamId" error on user() is tolerated; the session list
     is kept as is. Other errors propagate.
     """
     all_teams = session.get("all_teams", [])
     try:
-        current_teams = chpp.user()._teams_ht_id
+        ht_user = chpp.user()
     except Exception as e:
         if "YouthTeamId" in str(e):
             dprint(1, f"YouthTeamId error, keeping session team list: {e}")
             return
         raise
+
+    translations.refresh(chpp, ht_user.language_id)
+    current_teams = ht_user._teams_ht_id
 
     if set(current_teams) == set(all_teams):
         return

@@ -30,7 +30,13 @@ from app.chpp.models import (
     CHPPTeam,
     CHPPUser,
 )
-from app.chpp.parsers import parse_players, parse_team, parse_user
+from app.chpp.parsers import (
+    parse_players,
+    parse_team,
+    parse_translations,
+    parse_user,
+    parse_worldlanguages,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -315,6 +321,15 @@ class CHPP:
         """
         root = self.request("managercompendium", "1.5")
         return parse_user(root)
+
+    def translations(self, language_id: int) -> dict:
+        """Get Hattrick's own names for skills, levels, specialties etc."""
+        root = self.request("translations", "1.2", languageId=language_id)
+        return parse_translations(root)
+
+    def worldlanguages(self) -> list[tuple[int, str]]:
+        """Get all Hattrick languages as ``(language_id, name)`` pairs."""
+        return parse_worldlanguages(self.request("worldlanguages", "1.2"))
 
     def team(self, ht_id: int) -> CHPPTeam:
         """Get team details including players.

@@ -110,8 +110,45 @@ def parse_user(root: ET.Element) -> CHPPUser:
         username=username,
         _teams_ht_id=teams,
         youth_team_id=youth_team_id,
+        language_id=safe_find_int(root, ".//Manager/Language/LanguageId", None),
         _SOURCE_FILE="managercompendium",
     )
+
+
+def parse_translations(root: ET.Element) -> dict:
+    """Parse translations XML into ``{"texts": {section: {key: text}}, ...}``.
+
+    Items are keyed by their ``Type`` or ``Value`` attribute; section labels
+    (e.g. "Specialty") go into ``labels``.
+    """
+    language = root.find("Language")
+    texts: dict[str, dict[str, str]] = {}
+    labels: dict[str, str] = {}
+    for section in root.findall("Texts/*"):
+        items = {
+            item.get("Type") or item.get("Value"): item.text.strip()
+            for item in section
+            if item.text and (item.get("Type") or item.get("Value")) is not None
+        }
+        if items:
+            texts[section.tag] = items
+        if section.get("Label"):
+            labels[section.tag] = section.get("Label").strip()
+    return {
+        "language_id": int(language.get("Id")) if language is not None else None,
+        "language_name": language.text if language is not None else None,
+        "texts": texts,
+        "labels": labels,
+    }
+
+
+def parse_worldlanguages(root: ET.Element) -> list[tuple[int, str]]:
+    """Parse worldlanguages XML into ``(language_id, name)`` pairs sorted by name."""
+    languages = [
+        (safe_find_int(node, "LanguageID"), safe_find_text(node, "LanguageName", ""))
+        for node in root.findall(".//LanguageList/Language")
+    ]
+    return sorted((lang for lang in languages if lang[0]), key=lambda x: x[1].lower())
 
 
 def parse_team(root: ET.Element, requested_team_id: int | None = None) -> CHPPTeam:

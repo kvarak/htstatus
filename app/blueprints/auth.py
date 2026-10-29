@@ -13,6 +13,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
+from app import translations
 from app.chpp_utilities import (
     fetch_user_teams,
     get_chpp_client,
@@ -87,13 +88,15 @@ def _login_with_stored_tokens(user):
         chpp = get_chpp_client(
             {"access_key": user.access_key, "access_secret": user.access_secret}
         )
-        team_ids, team_names = fetch_user_teams(chpp)
+        ht_user = chpp.user()
+        team_ids, team_names = fetch_user_teams(chpp, ht_user)
         if not team_ids:
             raise ValueError("No teams found for this Hattrick user")
         _set_session_teams(team_ids, team_names)
     except Exception:
         dprint(1, f"Error fetching teams from Hattrick: {traceback.format_exc()}")
         return _login_page(TEAM_FETCH_ERROR)
+    translations.refresh(chpp, ht_user.language_id)
     return redirect("/")
 
 
@@ -263,11 +266,13 @@ def handle_oauth_callback(oauth_verifier):
         chpp = get_chpp_client(session)
 
         teams = None
+        language_id = None
         try:
             context = get_current_user_context(chpp)
             hattrick_user = SimpleNamespace(
                 ht_id=context["ht_id"], username=context["ht_user"]
             )
+            language_id = context["user"].language_id
             teams = (context["team_ids"], context["team_names"])
         except Exception as chpp_error:
             dprint(1, f"CHPP user() failed (likely YouthTeamId): {chpp_error}")
@@ -306,6 +311,7 @@ def handle_oauth_callback(oauth_verifier):
             return _login_page(TEAM_FETCH_ERROR)
 
         _set_session_teams(team_ids, team_names)
+        translations.refresh(chpp, language_id)
         return redirect("/")
 
     except Exception as e:

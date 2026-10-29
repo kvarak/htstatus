@@ -560,60 +560,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function initializePlayerTooltips() {
         let tooltip = null;
 
-        // Function to get specialty name from number
-        function getSpecialtyName(specialtyNum) {
-            const specialties = {
-                0: "None",
-                1: "Technical",
-                2: "Quick",
-                3: "Powerful",
-                4: "Unpredictable",
-                5: "Head specialist",
-                6: "Resilient",
-                7: "Support",
-                8: "Regainer"
-            };
-            return specialties[specialtyNum] || "Unknown";
-        }
+        const SPECIALTY_NAMES = {{ specialty_names() | tojson }};
+        const SKILL_LABELS = {{ skill_labels() | tojson }};
 
-        // Function to calculate best position based on skills
-        function getBestPosition(data) {
-            const positions = {
-                'Goalkeeper': data.keeper,
-                'Defender': (data.defender * 0.8) + (data.passing * 0.2),
-                'Wing Back': (data.defender * 0.6) + (data.passing * 0.4),
-                'Midfielder': (data.playmaker * 0.6) + (data.passing * 0.4),
-                'Winger': (data.winger * 0.7) + (data.passing * 0.3),
-                'Forward': (data.scorer * 0.8) + (data.passing * 0.2)
-            };
-
-            let bestPos = 'Midfielder';
-            let maxScore = 0;
-
-            Object.entries(positions).forEach(([position, score]) => {
-                if (score > maxScore) {
-                    maxScore = score;
-                    bestPos = position;
-                }
-            });
-
-            return bestPos;
-        }
-
-        // Helper function to get specialty name
         function getSpecialtyName(specialty) {
-            const specialties = {
-                0: 'None',
-                1: 'Technical',
-                2: 'Quick',
-                3: 'Powerful',
-                4: 'Unpredictable',
-                5: 'Head specialist',
-                6: 'Resilient',
-                7: 'Support',
-                8: 'Regainer'
-            };
-            return specialties[specialty] || 'Unknown';
+            return SPECIALTY_NAMES[specialty] || SPECIALTY_NAMES[0];
         }
 
         // Helper function to calculate best position
@@ -677,16 +628,16 @@ document.addEventListener('DOMContentLoaded', function() {
             tooltip.innerHTML = `
                 <div class="tooltip-name">${playerName}</div>
                 <div class="tooltip-stats">
-                    <div class="stat-item"><span class="stat-label">Keeper:</span> <span class="stat-value">${data.keeper || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">Defender:</span> <span class="stat-value">${data.defender || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">Playmaker:</span> <span class="stat-value">${data.playmaker || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">Winger:</span> <span class="stat-value">${data.winger || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">Passing:</span> <span class="stat-value">${data.passing || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">Scorer:</span> <span class="stat-value">${data.scorer || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.keeper}:</span> <span class="stat-value">${data.keeper || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.defender}:</span> <span class="stat-value">${data.defender || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.playmaker}:</span> <span class="stat-value">${data.playmaker || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.winger}:</span> <span class="stat-value">${data.winger || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.passing}:</span> <span class="stat-value">${data.passing || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.scorer}:</span> <span class="stat-value">${data.scorer || 0}</span></div>
                 </div>
                 <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #555;">
                     <div class="stat-item"><span class="stat-label">Best Pos:</span> <span class="stat-value">${calculateBestPosition(data)}</span></div>
-                    <div class="stat-item"><span class="stat-label">Specialty:</span> <span class="stat-value">${getSpecialtyName(data.specialty)}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.specialty}:</span> <span class="stat-value">${getSpecialtyName(data.specialty)}</span></div>
                 </div>
             `;
 

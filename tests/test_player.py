@@ -340,6 +340,32 @@ class TestPlayerDataDisplay:
         response = authenticated_client.get("/player?id=12345")
         assert response.status_code == 200
 
+    def test_player_page_uses_hattrick_terms(
+        self,
+        app_with_routes,
+        authenticated_client,
+        sample_players,
+        tmp_path,
+        monkeypatch,
+    ):  # noqa: ARG002
+        """FEAT-027: column titles and levels use the cached Hattrick language."""
+        from app import translations
+        from tests.test_translations import FRENCH
+
+        monkeypatch.setattr(app_with_routes, "instance_path", str(tmp_path))
+        translations._cache.clear()
+        with app_with_routes.test_request_context("/"):
+            translations._write(5, FRENCH)
+        with authenticated_client.session_transaction() as sess:
+            sess["ht_language_id"] = 5
+
+        html = authenticated_client.get("/player?id=12345").get_data(as_text=True)
+        translations._cache.clear()
+
+        assert "Gardien" in html  # Keeper column + modal row
+        assert "Coup franc" in html  # Set pieces
+        assert "Tempérament de chef" in html  # Leadership in the modal
+
     def test_player_skill_calculations(self, authenticated_client, sample_players):
         """Test player skill calculation displays."""
         response = authenticated_client.get("/player?id=12345")

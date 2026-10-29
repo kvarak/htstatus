@@ -195,7 +195,7 @@
                           </th>
                         {% else %}
                           <th scope="col" class="text-small vertical">
-                            <div class="vertical">{{ title }}</div>
+                            <div class="vertical">{{ column_label(title, val) }}</div>
                           </th>
                           {% if val in tracecolumns %}
                             <th scope="col" class="text-small"></th>
@@ -221,7 +221,7 @@
                             </td>
                             {% for (title, val) in columns %}
                               {% if val in tracecolumns %}
-                                <td class="text-small" align="right">{{ p[val] }}</td>
+                                <td class="text-small" align="right" title="{{ skill_level(p[val]) }}">{{ p[val] }}</td>
                                 <td class="text-small">
                                   {% if players_oldest[p['ht_id']][val] < p[val] %}(+{{ p[val] - players_oldest[p['ht_id']][val] }}){% endif %}
                                   {% if players_oldest[p['ht_id']][val] > p[val] %}({{ p[val] - players_oldest[p['ht_id']][val] }}){% endif %}
@@ -242,6 +242,8 @@
                                     {% set pngnr = p['specialty'] | string() %}
                                     {% set pngname = 'ico-sp-' + pngnr + '.png' %}
                                     <img src="{{ url_for('static', filename=pngname) }}"
+                                         alt="{{ specialty_name(p['specialty']) }}"
+                                         title="{{ specialty_name(p['specialty']) }}"
                                          height="13"
                                          style="background-color:rgba(255, 255, 255, 0.5)">
                                     {% endif %}
@@ -347,7 +349,10 @@
                     {% if p['specialty'] and p['specialty'] > 0 %}
                       {% set pngnr = p['specialty'] | string() %}
                       {% set pngname = 'ico-sp-' + pngnr + '.png' %}
-                      <img src="{{ url_for('static', filename=pngname) }}" height="25">
+                      <img src="{{ url_for('static', filename=pngname) }}"
+                           alt="{{ specialty_name(p['specialty']) }}"
+                           title="{{ specialty_name(p['specialty']) }}"
+                           height="25">
                       {% endif %}
                       {% if p['is_transfer_listed'] %}
                       <img src="{{ url_for('static', filename='ico-forsale.png') }}" height="25">
@@ -454,12 +459,12 @@
                           {% endif %}
                         </p>
                         <p class="card-text text-sm11">
-                          Leadership: {{ p['leadership'] }},
-                          Agreeability: {{ p['agreeability'] }},
-                          Aggressiveness: {{ p['aggressiveness'] }},
-                          Honesty: {{ p['honesty'] }},
-                          Experience: {{ p['experience'] }},
-                          Loyalty: {{ p['loyalty'] }}
+                          {{ column_label('Leadership', 'leadership') }}: {{ ht_level(p['leadership']) }},
+                          {{ column_label('Agreeability', 'agreeability') }}: {{ ht_level(p['agreeability'], "PlayerAgreeability") }},
+                          {{ column_label('Aggressiveness', 'aggressiveness') }}: {{ ht_level(p['aggressiveness'], "PlayerAgressiveness") }},
+                          {{ column_label('Honesty', 'honesty') }}: {{ ht_level(p['honesty'], "PlayerHonesty") }},
+                          {{ column_label('Experience', 'experience') }}: {{ ht_level(p['experience']) }},
+                          Loyalty: {{ ht_level(p['loyalty']) }}
                         </br>
                         TSI: {{ p['tsi'] }},
                         Salary: {{ p['salary'] }}
@@ -467,132 +472,23 @@
                     </div>
                   </div>
                   <table class="table-custom" style="max-width: 450px;">
-                    <tr>
-                      <td class="text-small">Keeper</td>
-                      <td class="text-small">{{ p['keeper'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['keeper'] * 5 }}%"
-                               aria-valuenow="{{ p['keeper'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Defender</td>
-                      <td class="text-small">{{ p['defender'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['defender'] * 5 }}%"
-                               aria-valuenow="{{ p['defender'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Playmaker</td>
-                      <td class="text-small">{{ p['playmaker'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['playmaker'] * 5 }}%"
-                               aria-valuenow="{{ p['playmaker'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Winger</td>
-                      <td class="text-small">{{ p['winger'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['winger'] * 5 }}%"
-                               aria-valuenow="{{ p['winger'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Passing</td>
-                      <td class="text-small">{{ p['passing'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['passing'] * 5 }}%"
-                               aria-valuenow="{{ p['passing'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Scorer</td>
-                      <td class="text-small">{{ p['scorer'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['scorer'] * 5 }}%"
-                               aria-valuenow="{{ p['scorer'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Set pieces</td>
-                      <td class="text-small">{{ p['set_pieces'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['set_pieces'] * 5 }}%"
-                               aria-valuenow="{{ p['set_pieces'] * 5 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Form</td>
-                      <td class="text-small">{{ p['form'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['form'] / 8 * 100 }}%"
-                               aria-valuenow="{{ p['form'] / 8 * 100 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="text-small">Stamina</td>
-                      <td class="text-small">{{ p['stamina'] }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ p['stamina'] / 9 * 100 }}%"
-                               aria-valuenow="{{ p['stamina'] / 9 * 100 }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
+                    {% for (skill, english, max_level) in [("keeper", "Keeper", 20), ("defender", "Defender", 20), ("playmaker", "Playmaker", 20), ("winger", "Winger", 20), ("passing", "Passing", 20), ("scorer", "Scorer", 20), ("set_pieces", "Set pieces", 20), ("form", "Form", 8), ("stamina", "Stamina", 9)] %}
+                      {% set pct = (p[skill] or 0) / max_level * 100 %}
+                      <tr>
+                        <td class="text-small">{{ column_label(english, skill) }}</td>
+                        <td class="text-small" title="{{ skill_level(p[skill]) }}">{{ p[skill] }}</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: {{ pct }}%"
+                                 aria-valuenow="{{ pct }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    {% endfor %}
                   </table>
                   <div class="player-chart"
                        style="margin: 1rem 0;

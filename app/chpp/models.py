@@ -58,6 +58,7 @@ class CHPPUser:
         username: Hattrick login name
         _teams_ht_id: List of team IDs owned by user
         youth_team_id: Youth team ID (optional, fixes pychpp bug)
+        language_id: Hattrick language the user plays in (optional)
         _SOURCE_FILE: CHPP file name (for compatibility)
     """
 
@@ -65,6 +66,7 @@ class CHPPUser:
     username: str
     _teams_ht_id: list[int]
     youth_team_id: int | None = None
+    language_id: int | None = None
     _SOURCE_FILE: str = "managercompendium"
 
     def __getitem__(self, key: str) -> Any:
