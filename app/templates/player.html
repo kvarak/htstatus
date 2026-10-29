@@ -215,8 +215,7 @@
                               data-player-group-id="{{ group.id }}"
                               data-player-group-name="{{ group.name or '' }}"
                               data-player-position="{{ p.get('best_position', '') or '' }}"
-                              style="color: {{ group.textcolor }};
-                                     background: {{ group.bgcolor }}">
+                              {% if group.id %}style="color: {{ group.textcolor }}; background: {{ group.bgcolor }}"{% endif %}>
                             <td class="text-small">
                               <input type="checkbox" class="player-checkbox" value="{{ p['ht_id'] }}">
                             </td>
@@ -253,7 +252,7 @@
                                        data-toggle="modal"
                                        href="#player-modal-{{ p['ht_id'] }}"
                                        role="button"
-                                       style="color: {{ group.textcolor }}">
+                                       style="color: {{ group.textcolor if group.id else 'inherit' }}">
                                       {{ p['first_name'] }} {{ p['last_name'] }}
                                     </a>
                                   </td>
@@ -300,14 +299,12 @@
                                 {% elif val == "last_stars" %}
                                   <td class="text-small" align="center">
                                     <a href="/matches?id={{ teamid }}&m={{ p['last_stars_match_id'] }}"
-                                       style="color: {{ group.textcolor }};
-                                              background: {{ group.bgcolor }}">{{ p['last_stars'] }}</a>
+                                       {% if group.id %}style="color: {{ group.textcolor }}; background: {{ group.bgcolor }}"{% else %}style="color: inherit"{% endif %}>{{ p['last_stars'] }}</a>
                                   </td>
                                 {% elif val == "max_stars" %}
                                   <td class="text-small" align="center">
                                     <a href="/matches?id={{ teamid }}&m={{ p['max_stars_match_id'] }}"
-                                       style="color: {{ group.textcolor }};
-                                              background: {{ group.bgcolor }}">{{ p['max_stars'] }}</a>
+                                       {% if group.id %}style="color: {{ group.textcolor }}; background: {{ group.bgcolor }}"{% else %}style="color: inherit"{% endif %}>{{ p['max_stars'] }}</a>
                                   </td>
                                 {% else %}
                                   {% if p[val] == "None" %}

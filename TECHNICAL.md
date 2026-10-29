@@ -166,6 +166,7 @@ HattrickPlanner uses a **logical component CSS architecture** organized by featu
 **Core Components** (`/app/static/css/`):
 - `components.css` - Main entry point with @import statements (11 lines)
 - `ui-components.css` - Reusable interface elements (sections, containers, comments) (85+ lines)
+- `dark-mode.css` - Dark theme, loaded separately after the page styles; every rule is scoped to `html.dark-mode` (toggle: `js/dark-mode.js`, pre-paint snippet in `_skeleton.html`)
 - `utilities.css` - Helper classes for spacing, colors, display utilities (50+ lines)
 - `layout.css` - Grid systems, positioning, empty states (25+ lines)
 - `charts.css` - Chart.js styling and data visualization (30+ lines)

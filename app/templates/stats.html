@@ -200,29 +200,29 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         },
         scales: {
-          yAxes: [{
+          y: {
+            beginAtZero: true,
+            suggestedMax: {{ max_count_all }},
             ticks: {
-              beginAtZero: true,
-              suggestedMax: {{ max_count_all }},
               stepSize: 1,
               precision: 0,
               callback: function(value) {
                 return Number.isInteger(value) ? value : '';
               }
             }
-          }],
-          xAxes: [{
+          },
+          x: {
             type: 'category',
-            scaleLabel: {
+            title: {
               display: true,
-              labelString: 'Age (years)'
+              text: 'Age (years)'
             },
             ticks: {
               autoSkip: false,
               maxRotation: 0,
               minRotation: 0
             }
-          }]
+          }
         }
       }
     });
@@ -266,29 +266,29 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         },
         scales: {
-          yAxes: [{
+          y: {
+            beginAtZero: true,
+            suggestedMax: {{ max_count_all }},
             ticks: {
-              beginAtZero: true,
-              suggestedMax: {{ max_count_all }},
               stepSize: 1,
               precision: 0,
               callback: function(value) {
                 return Number.isInteger(value) ? value : '';
               }
             }
-          }],
-          xAxes: [{
+          },
+          x: {
             type: 'category',
-            scaleLabel: {
+            title: {
               display: true,
-              labelString: 'Age (years)'
+              text: 'Age (years)'
             },
             ticks: {
               autoSkip: false,
               maxRotation: 0,
               minRotation: 0
             }
-          }]
+          }
         }
       }
     });

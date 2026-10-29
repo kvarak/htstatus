@@ -311,3 +311,17 @@ def test_pages_render_without_flask_bootstrap(app_with_routes):
         error_html = handle_error("Something broke")
     assert "Something broke" in error_html
     assert "components.css" in error_html  # error page now uses the app layout
+
+
+def test_pages_include_dark_mode(app_with_routes):
+    """UI-014: pre-paint snippet before CSS, toggle button, stylesheet and script."""
+    html = app_with_routes.test_client().get("/changes").get_data(as_text=True)
+
+    head = html[: html.index("</head>")]
+    assert 'localStorage.getItem("htstatus-dark-mode")' in head
+    assert head.index("htstatus-dark-mode") < head.index("stylesheet")
+    assert 'id="dark-mode-toggle"' in html
+    assert 'aria-label="Toggle dark mode"' in html
+    assert 'id="dark-mode-icon">&#127769;</span>' in html
+    assert "css/dark-mode.css" in html
+    assert "js/dark-mode.js" in html

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Dark mode** (UI-014) - 🌙/☀️ toggle in the navbar, same look and behaviour as the other kvarak projects: follows the system setting until you pick a mode, remembers the choice, no light flash on load; charts switch colours too
 - **Debug Charts Date Range Selection** - Enhanced admin debugging with time-based filtering (FEAT-033)
   - Date range controls in debug page Chart Controls section with 6-month default
   - HTML5 date inputs with validation for start/end date relationships
@@ -66,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changelog page escapes commit messages (they were rendered as raw HTML)
 - Test isolation: tests no longer drop shared tables or leave the model registry mocked
 - `User.is_admin()` ignored role-based admins (compared against lowercase "admin")
+- Stats age-distribution charts used Chart.js v2 axis options (ignored by v4, console errors); the axis title and integer ticks now apply
 - Debug chart date range end date is now inclusive (users active later on the end day were excluded)
 - A failed team competition-data save no longer breaks the rest of the update (rollback); today's player snapshot is replaced in one commit
 - Sessions pointing to a user that no longer exists are logged out instead of browsing with a missing user

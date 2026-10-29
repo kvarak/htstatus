@@ -547,7 +547,15 @@
     font-size: 14px;
   }
 
+  /* Dark mode: darken the background photo (other dark rules live in dark-mode.css) */
+  html.dark-mode body {
+    background-image: linear-gradient(rgba(10, 14, 10, 0.88), rgba(10, 14, 10, 0.88)),
+      url("{{url_for('static', filename='background.jpg')}}");
+  }
+
   </style>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/dark-mode.css') }}">
 {% endblock %}
 ##########################
 ## Java script
@@ -584,6 +592,7 @@ $('.toast').toast('show')
   <script src="{{url_for('static', filename='js/session-persistence.js')}}"></script>
   <!-- Chart.js Utilities -->
   <script src="{{url_for('static', filename='js/chart-utils.js')}}"></script>
+  <script src="{{url_for('static', filename='js/dark-mode.js')}}"></script>
   <!-- Intro.js Tutorial Library -->
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
@@ -842,6 +851,12 @@ window.addEventListener('beforeinstallprompt', (e) => {
         </ul>
       {% endif %}
     </div>
+    <button type="button"
+            id="dark-mode-toggle"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode">
+      <span id="dark-mode-icon">&#127769;</span>
+    </button>
   </nav>
   <!-- PWA Install Button and Session Persistence -->
   <button id="install-pwa"

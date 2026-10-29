@@ -46,16 +46,10 @@ class HattrickCharts {
                         }
                     }
                 },
+                // Grid/tick colours come from Chart.defaults (set by dark-mode.js)
                 scales: type !== 'doughnut' && type !== 'pie' ? {
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        }
-                    },
+                    x: {},
                     y: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.1)'
-                        },
                         beginAtZero: true
                     }
                 } : undefined

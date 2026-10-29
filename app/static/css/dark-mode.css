@@ -1,0 +1,323 @@
+/* Dark mode - enabled by dark-mode.js / the <head> snippet adding .dark-mode to <html>.
+   Light mode is untouched: every rule here is scoped to html.dark-mode. */
+
+/* ---- Design tokens (override the :root values in base.html) ---- */
+html.dark-mode {
+  color-scheme: dark;
+
+  --primary: 120 45% 40%;
+  --primary-foreground: 0 0% 98%;
+  --primary-glow: 120 55% 50%;
+  --secondary: 120 15% 22%;
+  --secondary-foreground: 120 10% 90%;
+  --success: 120 55% 40%;
+  --success-foreground: 0 0% 98%;
+  --warning: 45 90% 55%;
+  --warning-foreground: 45 20% 12%;
+  --destructive: 0 70% 55%;
+  --destructive-foreground: 0 0% 98%;
+  --muted: 120 8% 18%;
+  --muted-foreground: 120 6% 68%;
+  --accent: 120 50% 45%;
+  --accent-foreground: 0 0% 98%;
+  --background: 120 8% 8%;
+  --foreground: 120 10% 90%;
+  --card: 120 6% 12%;
+  --card-foreground: 120 10% 90%;
+  --border: 120 6% 24%;
+  --input: 120 6% 24%;
+  --ring: 120 45% 45%;
+
+  --color-primary: hsl(120, 45%, 40%);
+  --color-primary-hover: hsl(120, 45%, 46%);
+  --color-primary-light: hsl(120, 45%, 50%);
+  --color-success: hsl(120, 55%, 40%);
+  --color-success-hover: hsl(120, 55%, 46%);
+  --color-background: hsl(120, 8%, 8%);
+  --color-foreground: hsl(120, 10%, 90%);
+  --color-muted: hsl(120, 8%, 18%);
+  --color-muted-foreground: hsl(120, 6%, 68%);
+  --color-border: hsl(120, 6%, 24%);
+  --color-input: hsl(120, 6%, 20%);
+  --gradient-subtle: linear-gradient(180deg, hsl(120, 8%, 10%), hsl(120, 8%, 14%));
+
+  /* Shared dark palette for the overrides below */
+  --dm-page: #121412;
+  --dm-surface: #1c201c;
+  --dm-surface-muted: #262b26;
+  --dm-border: #3a413a;
+  --dm-text: #e4e8e4;
+  --dm-text-muted: #a3aca4;
+  --dm-link: #7cc47f;
+}
+
+html.dark-mode body {
+  color: var(--dm-text);
+  background-color: var(--dm-page);
+}
+
+html.dark-mode a:not(.btn):not(.nav-link):not(.dropdown-item) {
+  color: var(--dm-link);
+}
+
+/* ---- Bootstrap 4 components ---- */
+html.dark-mode .navbar-light.bg-light,
+html.dark-mode .bg-light,
+html.dark-mode .bg-white,
+html.dark-mode .bg-off {
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text);
+}
+
+html.dark-mode .navbar-light .navbar-nav .nav-link,
+html.dark-mode .navbar-light .navbar-brand {
+  color: var(--dm-text);
+}
+
+html.dark-mode .navbar-light .navbar-nav .nav-link:hover,
+html.dark-mode .navbar-light .navbar-nav .active > .nav-link {
+  color: #fff;
+}
+
+html.dark-mode .navbar-light .navbar-toggler {
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .navbar-light .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+html.dark-mode .card,
+html.dark-mode .modal-content,
+html.dark-mode .dropdown-menu,
+html.dark-mode .list-group-item,
+html.dark-mode .popover,
+html.dark-mode .toast {
+  background-color: var(--dm-surface);
+  color: var(--dm-text);
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .card-header,
+html.dark-mode .card-footer,
+html.dark-mode .modal-header,
+html.dark-mode .modal-footer,
+html.dark-mode .breadcrumb,
+html.dark-mode .jumbotron,
+html.dark-mode .input-group-text,
+html.dark-mode .toast-header {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text);
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .breadcrumb-item.active,
+html.dark-mode .breadcrumb-item + .breadcrumb-item::before,
+html.dark-mode .text-muted,
+html.dark-mode .text-secondary,
+html.dark-mode .form-text,
+html.dark-mode .blockquote-footer {
+  color: var(--dm-text-muted) !important;
+}
+
+html.dark-mode .text-dark,
+html.dark-mode .text-body {
+  color: var(--dm-text) !important;
+}
+
+html.dark-mode .dropdown-item {
+  color: var(--dm-text);
+}
+
+html.dark-mode .dropdown-item:hover,
+html.dark-mode .dropdown-item:focus,
+html.dark-mode .list-group-item-action:hover {
+  background-color: var(--dm-surface-muted);
+  color: #fff;
+}
+
+html.dark-mode .dropdown-divider,
+html.dark-mode hr {
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .form-control,
+html.dark-mode .custom-select {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text);
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .form-control:focus,
+html.dark-mode .custom-select:focus {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text);
+}
+
+html.dark-mode .form-control::placeholder {
+  color: var(--dm-text-muted);
+}
+
+html.dark-mode .form-control:disabled,
+html.dark-mode .form-control[readonly] {
+  background-color: var(--dm-surface);
+}
+
+html.dark-mode .table {
+  color: var(--dm-text);
+}
+
+html.dark-mode .table th,
+html.dark-mode .table td,
+html.dark-mode .table thead th,
+html.dark-mode .border,
+html.dark-mode .border-top,
+html.dark-mode .border-bottom,
+html.dark-mode .border-left,
+html.dark-mode .border-right {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark-mode .table .thead-light th,
+html.dark-mode .table-light,
+html.dark-mode .table-light > th,
+html.dark-mode .table-light > td {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text);
+}
+
+html.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+html.dark-mode .table-hover tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: var(--dm-text);
+}
+
+html.dark-mode .page-link {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border);
+  color: var(--dm-link);
+}
+
+html.dark-mode .page-item.disabled .page-link {
+  background-color: var(--dm-surface);
+  color: var(--dm-text-muted);
+}
+
+html.dark-mode .close {
+  color: var(--dm-text);
+  text-shadow: none;
+}
+
+html.dark-mode .badge-light,
+html.dark-mode .btn-light {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text);
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .btn-outline-secondary {
+  color: var(--dm-text-muted);
+  border-color: var(--dm-border);
+}
+
+html.dark-mode .btn-outline-secondary:hover {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text);
+}
+
+html.dark-mode .progress {
+  background-color: var(--dm-surface-muted);
+}
+
+html.dark-mode code {
+  color: #f08dc3;
+}
+
+/* ---- App components with hard-coded light colours ---- */
+html.dark-mode .td-fixed {
+  background-color: var(--dm-surface) !important;
+}
+
+html.dark-mode .table-custom thead th {
+  background-color: var(--dm-surface-muted);
+  color: #8fd18f;
+}
+
+html.dark-mode table.sortable thead {
+  background-color: var(--dm-surface-muted);
+  color: var(--dm-text-muted);
+}
+
+html.dark-mode .section-title,
+html.dark-mode .section-subtitle,
+html.dark-mode .changes-container,
+html.dark-mode .page-title-box,
+html.dark-mode .status-message,
+html.dark-mode .updated-teams-box,
+html.dark-mode .positioned-player {
+  background: rgba(28, 32, 28, 0.95);
+  color: var(--dm-text);
+}
+
+html.dark-mode .timeline-container,
+html.dark-mode .week-container,
+html.dark-mode .available-player {
+  background: var(--dm-surface);
+  color: var(--dm-text);
+}
+
+html.dark-mode .week-header,
+html.dark-mode .player-entry,
+html.dark-mode .no-changes,
+html.dark-mode .filter-controls,
+html.dark-mode .group-pill,
+html.dark-mode .available-player:hover {
+  background: var(--dm-surface-muted);
+  color: var(--dm-text);
+}
+
+html.dark-mode .timeline-title,
+html.dark-mode .player-name {
+  color: var(--dm-text);
+}
+
+html.dark-mode .other-change {
+  color: var(--dm-text-muted);
+}
+
+html.dark-mode .table-responsive::-webkit-scrollbar-track {
+  background: var(--dm-surface);
+}
+
+html.dark-mode .introjs-tooltip {
+  background-color: var(--dm-surface);
+  color: var(--dm-text);
+}
+
+/* ---- Toggle button (same look as the other kvarak projects) ---- */
+#dark-mode-toggle {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  margin-left: 0.5rem;
+  padding: 0 0.4rem;
+  cursor: pointer;
+}
+
+#dark-mode-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.dark-mode #dark-mode-toggle {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+html.dark-mode #dark-mode-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}

@@ -812,9 +812,7 @@ document.addEventListener('DOMContentLoaded', function() {
                              data-player-number="{{ player.number or '#' }}"
                              data-player-name="{{ player.first_name }} {{ player.last_name }}"
                              data-player-data='{"ht_id": {{ player.ht_id }}, "keeper": {{ player.keeper or 0 }}, "defender": {{ player.defender or 0 }}, "playmaker": {{ player.playmaker or 0 }}, "winger": {{ player.winger or 0 }}, "passing": {{ player.passing or 0 }}, "scorer": {{ player.scorer or 0 }}, "set_pieces": {{ player.set_pieces or 0 }}, "form": {{ player.form or 7 }}, "experience": {{ player.experience or 0 }}, "loyalty": {{ player.loyalty or 0 }}, "specialty": {{ player.specialty or 0 }}}'
-                             style="background: white;
-                                    color: #333;
-                                    padding: 4px 8px;
+                             style="padding: 4px 8px;
                                     border-radius: 4px;
                                     cursor: grab;
                                     font-size: 0.8rem;

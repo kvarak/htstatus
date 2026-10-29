@@ -11,7 +11,6 @@
 - **[FEAT-025]** Transfer Current Bid Display (Connected to GitHub Issue #27 - Show current bid amounts for players on transfer market) → [Details](tasks/FEAT-025.md)
 - **[FEAT-027]** Hattrick Language Localization (Connected to GitHub Issue #13 - Translate interface to match user's Hattrick language setting) → [Details](tasks/FEAT-027.md)
 - **[FEAT-034]** Search Engine Optimization (SEO) Implementation - Add comprehensive SEO features including meta tags, robots.txt, sitemap.xml, structured data, and social sharing optimization to improve search engine discoverability for Hattrick enthusiasts → [Details](tasks/FEAT-034.md)
-- **[UI-014]** Add Dark Mode Support - Implement theme switching between dark mode and light mode with user preference persistence → [Details](tasks/UI-014.md)
 
 ## Later 🔮
 

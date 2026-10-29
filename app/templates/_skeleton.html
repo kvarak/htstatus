@@ -6,6 +6,14 @@
       <head>
         {%- block head %}
           <title>{% block title %}{{ title|default }}{% endblock title %}</title>
+          <script>
+            // Applies the saved dark mode choice before the page paints, so light mode does not flash.
+            (function () {
+              var stored = localStorage.getItem("htstatus-dark-mode");
+              var dark = stored !== null ? stored === "true" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+              if (dark) document.documentElement.classList.add("dark-mode");
+            })();
+          </script>
           {%- block metas %}
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
           {%- endblock metas %}
