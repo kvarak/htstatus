@@ -93,15 +93,15 @@ function resetTutorialProgress() {
       <div class="col-sm">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Hattrick language</h5>
+            <h5 class="card-title">Hattrick terms</h5>
             <p class="text-sm13 card-text">
               Skill names, skill levels and specialties are shown with the words Hattrick uses.
               By default we use the language you play Hattrick in.
             </p>
-            {% if languages %}
-              <form method="POST" action="/settings" class="form-inline">
+            <form method="POST" action="/settings" class="form-inline">
+              {% if languages %}
                 <label class="mr-2" for="language-select">Language</label>
-                <select class="custom-select custom-select-sm mr-2"
+                <select class="custom-select custom-select-sm mr-3"
                         id="language-select"
                         name="language">
                   <option value="" {{ "selected" if not language_choice }}>Use my Hattrick language
@@ -113,15 +113,27 @@ function resetTutorialProgress() {
                     </option>
                   {% endfor %}
                 </select>
-                <button type="submit" class="btn btn-outline-secondary btn-sm">Save</button>
-              </form>
-              {% if language_saved %}
-                <p class="text-sm13 card-text mt-2">
-                  Saved. If the words stay the same, click <a href="/update">Update</a> to fetch them from Hattrick.
-                </p>
               {% endif %}
-            {% else %}
-              <p class="text-sm13 card-text">
+              <label class="mr-2" for="level-format-select">Show levels as</label>
+              <select class="custom-select custom-select-sm mr-2"
+                      id="level-format-select"
+                      name="level_format">
+                <option value="both" {{ "selected" if level_format == "both" }}>Words (Numbers): solid (7)
+                </option>
+                <option value="numbers" {{ "selected" if level_format == "numbers" }}>Numbers: 7
+                </option>
+                <option value="words" {{ "selected" if level_format == "words" }}>Words: solid
+                </option>
+              </select>
+              <button type="submit" class="btn btn-outline-secondary btn-sm">Save</button>
+            </form>
+            {% if display_saved %}
+              <p class="text-sm13 card-text mt-2">
+                Saved. If the words stay the same, click <a href="/update">Update</a> to fetch them from Hattrick.
+              </p>
+            {% endif %}
+            {% if not languages %}
+              <p class="text-sm13 card-text mt-2">
                 The language list is loaded from Hattrick on your next <a href="/update">Update</a>.
               </p>
             {% endif %}

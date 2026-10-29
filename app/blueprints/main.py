@@ -292,9 +292,12 @@ def settings():
 
     group_data = before_default + after_default
 
-    language_choice = request.form.get("language")
+    form_language = request.form.get("language")
+    form_level_format = request.form.get("level_format")
+    language_choice = form_language
     if language_choice is None:
         language_choice = request.cookies.get(translations.LANGUAGE_COOKIE, "")
+    level_format = form_level_format or translations.level_format()
 
     response = make_response(
         create_page(
@@ -307,26 +310,38 @@ def settings():
             error=error,
             languages=translations.available_languages(),
             language_choice=language_choice,
-            language_saved="language" in request.form,
+            level_format=level_format,
+            display_saved=form_language is not None or form_level_format is not None,
         )
     )
-    return _save_language_choice(response, request.form.get("language"))
-
-
-def _save_language_choice(response, choice):
-    """Store the Settings language override in a long-lived cookie ("" = automatic)."""
-    if choice is None:
-        return response
-    if choice.isdigit():
-        response.set_cookie(
+    if form_language is not None:
+        _save_preference(
+            response,
             translations.LANGUAGE_COOKIE,
-            choice,
-            max_age=translations.LANGUAGE_COOKIE_MAX_AGE,
+            form_language.isdigit(),
+            form_language,
+        )
+    if form_level_format in translations.LEVEL_FORMATS:
+        _save_preference(
+            response,
+            translations.LEVEL_FORMAT_COOKIE,
+            form_level_format != translations.DEFAULT_LEVEL_FORMAT,
+            form_level_format,
+        )
+    return response
+
+
+def _save_preference(response, cookie, keep, value):
+    """Store a Settings display choice in a long-lived cookie, or clear it (default)."""
+    if keep:
+        response.set_cookie(
+            cookie,
+            value,
+            max_age=translations.PREFERENCE_COOKIE_MAX_AGE,
             samesite="Lax",
         )
     else:
-        response.delete_cookie(translations.LANGUAGE_COOKIE)
-    return response
+        response.delete_cookie(cookie)
 
 
 CHANGELOG_FILES = ("changelog.json", "releases.json", "releases-internal.json")

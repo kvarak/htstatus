@@ -67,7 +67,8 @@ See [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md#
 - **Hattrick terms in the user's language** (`app/translations.py`): skill names, skill levels, specialties and personality traits use Hattrick's own translations
   - Language: Settings override (cookie `htstatus-language`) → the user's Hattrick language (managercompendium, `session["ht_language_id"]`) → English
   - Fetched only at login and Update, cached as JSON in `instance/translations/`, refreshed after 30 days; failures are logged and ignored
-  - Templates use `column_label(title, key)`, `ht_term(section, key)`, `ht_level(value)`, `specialty_name(n)`; anything missing falls back to the English text
+  - Templates use `column_label(title, key)`, `ht_term(section, key)`, `specialty_name(n)`; anything missing falls back to the English text
+  - Levels: `level_text(value, section)` shows a number, Hattrick's word or `word (n)` per the Settings choice (cookie `htstatus-level-format`: both (default) / numbers / words); `level_hint` gives the other form for tooltips. Sortable cells keep `sorttable_customkey` with the number
 - **PWA Implementation**: Service Worker with cache-first strategy for static assets, network-first for dynamic content, offline functionality for core routes
 - **Mobile Optimization**: Responsive CSS, touch-friendly navigation, installable PWA with app manifest
 - **Security**:

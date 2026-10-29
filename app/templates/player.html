@@ -181,8 +181,10 @@
                 </div>
               </div>
               <p class="card-text">
+                {# Rotated headers only fit narrow number cells #}
+                {% set rotated = level_format() == "numbers" %}
                 <table id="player-table"
-                       class="table-custom table-rotated table-scroll sortable">
+                       class="table-custom {{ 'table-rotated' if rotated }} table-scroll sortable">
                   <thead>
                     <tr>
                       <th scope="col" class="text-small">
@@ -190,14 +192,16 @@
                       </th>
                       {% for (title, val) in columns %}
                         {% if val in calccolumns %}
-                          <th scope="col" class="text-small vertical">
-                            <div class="vertical">{{ val }}</div>
+                          <th scope="col" class="text-small {{ 'vertical' if rotated }}">
+                            <div class="{{ 'vertical' if rotated }}">{{ val }}</div>
                           </th>
                         {% else %}
-                          <th scope="col" class="text-small vertical">
-                            <div class="vertical">{{ column_label(title, val) }}</div>
+                          {% set level_col = val in tracecolumns %}
+                          <th scope="col"
+                              class="text-small {{ 'vertical' if rotated }} {{ 'text-center' if level_col }}">
+                            <div class="{{ 'vertical' if rotated }} {{ 'mx-auto' if rotated and level_col }}">{{ column_label(title, val) }}</div>
                           </th>
-                          {% if val in tracecolumns %}
+                          {% if level_col %}
                             <th scope="col" class="text-small"></th>
                           {% endif %}
                         {% endif %}
@@ -221,7 +225,9 @@
                             </td>
                             {% for (title, val) in columns %}
                               {% if val in tracecolumns %}
-                                <td class="text-small" align="right" title="{{ skill_level(p[val]) }}">{{ p[val] }}</td>
+                                <td class="text-small text-center"
+                                    title="{{ level_hint(p[val]) }}"
+                                    sorttable_customkey="{{ p[val] }}">{{ level_text(p[val]) }}</td>
                                 <td class="text-small">
                                   {% if players_oldest[p['ht_id']][val] < p[val] %}(+{{ p[val] - players_oldest[p['ht_id']][val] }}){% endif %}
                                   {% if players_oldest[p['ht_id']][val] > p[val] %}({{ p[val] - players_oldest[p['ht_id']][val] }}){% endif %}
@@ -459,12 +465,12 @@
                           {% endif %}
                         </p>
                         <p class="card-text text-sm11">
-                          {{ column_label('Leadership', 'leadership') }}: {{ ht_level(p['leadership']) }},
-                          {{ column_label('Agreeability', 'agreeability') }}: {{ ht_level(p['agreeability'], "PlayerAgreeability") }},
-                          {{ column_label('Aggressiveness', 'aggressiveness') }}: {{ ht_level(p['aggressiveness'], "PlayerAgressiveness") }},
-                          {{ column_label('Honesty', 'honesty') }}: {{ ht_level(p['honesty'], "PlayerHonesty") }},
-                          {{ column_label('Experience', 'experience') }}: {{ ht_level(p['experience']) }},
-                          Loyalty: {{ ht_level(p['loyalty']) }}
+                          {{ column_label('Leadership', 'leadership') }}: <span title="{{ level_hint(p['leadership']) }}">{{ level_text(p['leadership']) }}</span>,
+                          {{ column_label('Agreeability', 'agreeability') }}: <span title="{{ level_hint(p['agreeability'], 'PlayerAgreeability') }}">{{ level_text(p['agreeability'], 'PlayerAgreeability') }}</span>,
+                          {{ column_label('Aggressiveness', 'aggressiveness') }}: <span title="{{ level_hint(p['aggressiveness'], 'PlayerAgressiveness') }}">{{ level_text(p['aggressiveness'], 'PlayerAgressiveness') }}</span>,
+                          {{ column_label('Honesty', 'honesty') }}: <span title="{{ level_hint(p['honesty'], 'PlayerHonesty') }}">{{ level_text(p['honesty'], 'PlayerHonesty') }}</span>,
+                          {{ column_label('Experience', 'experience') }}: <span title="{{ level_hint(p['experience']) }}">{{ level_text(p['experience']) }}</span>,
+                          Loyalty: <span title="{{ level_hint(p['loyalty']) }}">{{ level_text(p['loyalty']) }}</span>
                         </br>
                         TSI: {{ p['tsi'] }},
                         Salary: {{ p['salary'] }}
@@ -476,7 +482,7 @@
                       {% set pct = (p[skill] or 0) / max_level * 100 %}
                       <tr>
                         <td class="text-small">{{ column_label(english, skill) }}</td>
-                        <td class="text-small" title="{{ skill_level(p[skill]) }}">{{ p[skill] }}</td>
+                        <td class="text-small text-center" title="{{ level_hint(p[skill]) }}">{{ level_text(p[skill]) }}</td>
                         <td class="text-small" style="width: 80%">
                           <div class="progress" style="height: 13px;">
                             <div class="progress-bar"

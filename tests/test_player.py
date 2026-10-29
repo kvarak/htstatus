@@ -3,6 +3,7 @@ Comprehensive tests for player management blueprint to achieve 80+ coverage.
 Tests player display, group management, skill tracking and data operations.
 """
 
+import re
 from unittest.mock import patch
 
 import pytest
@@ -340,6 +341,26 @@ class TestPlayerDataDisplay:
         response = authenticated_client.get("/player?id=12345")
         assert response.status_code == 200
 
+    @staticmethod
+    def _french_player_page(app, client, tmp_path, monkeypatch, level_format=None):
+        """Render /player with French Hattrick terms cached (FEAT-027)."""
+        from app import translations
+        from tests.test_translations import FRENCH
+
+        monkeypatch.setattr(app, "instance_path", str(tmp_path))
+        translations._cache.clear()
+        with app.test_request_context("/"):
+            translations._write(5, FRENCH)
+        with client.session_transaction() as sess:
+            sess["ht_language_id"] = 5
+        if level_format:
+            client.set_cookie(translations.LEVEL_FORMAT_COOKIE, level_format)
+        try:
+            html = client.get("/player?id=12345").get_data(as_text=True)
+            return html[html.index('<table id="player-table"') :]
+        finally:
+            translations._cache.clear()
+
     def test_player_page_uses_hattrick_terms(
         self,
         app_with_routes,
@@ -348,23 +369,57 @@ class TestPlayerDataDisplay:
         tmp_path,
         monkeypatch,
     ):  # noqa: ARG002
-        """FEAT-027: column titles and levels use the cached Hattrick language."""
-        from app import translations
-        from tests.test_translations import FRENCH
-
-        monkeypatch.setattr(app_with_routes, "instance_path", str(tmp_path))
-        translations._cache.clear()
-        with app_with_routes.test_request_context("/"):
-            translations._write(5, FRENCH)
-        with authenticated_client.session_transaction() as sess:
-            sess["ht_language_id"] = 5
-
-        html = authenticated_client.get("/player?id=12345").get_data(as_text=True)
-        translations._cache.clear()
-
+        """Default: Hattrick names, levels as "word (n)", horizontal headers."""
+        html = self._french_player_page(
+            app_with_routes, authenticated_client, tmp_path, monkeypatch
+        )
         assert "Gardien" in html  # Keeper column + modal row
         assert "Coup franc" in html  # Set pieces
         assert "Tempérament de chef" in html  # Leadership in the modal
+        assert re.search(r'sorttable_customkey="7">honorable \(7\)<', html)
+        # Words are too wide for 90-degree headers
+        assert 'class="vertical"' not in html
+        assert "table-rotated" not in html
+
+    def test_player_page_numbers_keep_rotated_headers(
+        self,
+        app_with_routes,
+        authenticated_client,
+        sample_players,
+        tmp_path,
+        monkeypatch,
+    ):  # noqa: ARG002
+        html = self._french_player_page(
+            app_with_routes, authenticated_client, tmp_path, monkeypatch, "numbers"
+        )
+        assert re.search(
+            r'class="text-small text-center"\s+title="honorable"\s+'
+            r'sorttable_customkey="7">7<',
+            html,
+        )
+        assert re.search(
+            r'vertical\s+text-center">\s*<div class="vertical mx-auto">', html
+        )
+        assert re.search(r'<div class="vertical\s*">', html)
+        assert "table-rotated" in html
+
+    def test_player_page_shows_level_words(
+        self,
+        app_with_routes,
+        authenticated_client,
+        sample_players,
+        tmp_path,
+        monkeypatch,
+    ):  # noqa: ARG002
+        """Levels as words keep sorting by number via sorttable_customkey."""
+        html = self._french_player_page(
+            app_with_routes, authenticated_client, tmp_path, monkeypatch, "words"
+        )
+        assert re.search(r'title="7"\s+sorttable_customkey="7">honorable<', html)
+        assert re.search(
+            r'class="text-small\s+text-center">\s*<div class="\s*">\s*Gardien', html
+        )
+        assert "table-rotated" not in html
 
     def test_player_skill_calculations(self, authenticated_client, sample_players):
         """Test player skill calculation displays."""

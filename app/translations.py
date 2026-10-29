@@ -16,7 +16,10 @@ from app.utils import dprint
 
 DEFAULT_LANGUAGE_ID = 2  # English (UK)
 LANGUAGE_COOKIE = "htstatus-language"
-LANGUAGE_COOKIE_MAX_AGE = 5 * 365 * 24 * 3600
+LEVEL_FORMAT_COOKIE = "htstatus-level-format"
+LEVEL_FORMATS = ("numbers", "words", "both")
+DEFAULT_LEVEL_FORMAT = "both"
+PREFERENCE_COOKIE_MAX_AGE = 5 * 365 * 24 * 3600
 MAX_AGE_SECONDS = 30 * 24 * 3600
 LANGUAGES_FILE = "languages"
 
@@ -157,15 +160,30 @@ def specialty_names():
     return {key: specialty_name(key) for key in ENGLISH_SPECIALTIES}
 
 
-def skill_level(value):
-    """Hattrick's word for a skill level (e.g. 7 = "solid"), or "" if unknown."""
-    return ht_term("SkillLevels", value)
+def level_format():
+    """How levels are shown, chosen in Settings: "both" (default), "numbers" or "words"."""
+    choice = request.cookies.get(LEVEL_FORMAT_COOKIE) if has_request_context() else None
+    return choice if choice in LEVEL_FORMATS else DEFAULT_LEVEL_FORMAT
 
 
-def ht_level(value, section="SkillLevels"):
-    """Level as "word (n)", e.g. "solid (7)", or just "n" when untranslated."""
-    word = ht_term(section, value)
-    return f"{word} ({value})" if word else str(value)
+def level_text(value, section="SkillLevels"):
+    """A level as the user wants it: "7", "solid" or "solid (7)".
+
+    Falls back to the number when the word isn't known (e.g. not cached yet).
+    """
+    fmt = level_format()
+    word = ht_term(section, value) if fmt != "numbers" else ""
+    if not word:
+        return str(value)
+    return f"{word} ({value})" if fmt == "both" else word
+
+
+def level_hint(value, section="SkillLevels"):
+    """The form not shown, for tooltips ("" when both are already shown)."""
+    fmt = level_format()
+    if fmt == "words":
+        return str(value)
+    return ht_term(section, value) if fmt == "numbers" else ""
 
 
 def init_app(app):
@@ -177,8 +195,9 @@ def init_app(app):
             "ht_term": ht_term,
             "ht_label": ht_label,
             "column_label": column_label,
-            "skill_level": skill_level,
-            "ht_level": ht_level,
+            "level_format": level_format,
+            "level_text": level_text,
+            "level_hint": level_hint,
             "skill_labels": skill_labels,
             "specialty_name": specialty_name,
             "specialty_names": specialty_names,
