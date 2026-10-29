@@ -47,7 +47,7 @@ description: HattrickPlanner Development Agent - Specialized for Hattrick team m
 - **Fix Nearby Issues**: Address lint errors, format violations, and obvious bugs while working in an area
 - **Opportunistic Cleanup**: Remove unused imports, dead code, redundant logic encountered during tasks
 - **Quality Improvements**: Enhance test coverage, add missing documentation, improve code clarity
-- **Test Coverage Mandate**: When touching any code file, ALWAYS increase test coverage for that file - add missing tests, improve existing tests, or expand test scenarios
+- **Tests**: Add a test when fixing a bug or changing behaviour. No coverage chasing beyond the 50% CI threshold
 - **Standards Enforcement**: Apply consistent formatting, naming conventions, and architectural patterns
 - **Proactive Maintenance**: Update outdated comments, fix broken links, consolidate duplicated code
 - **No Broken Windows**: Never leave technical debt worse than you found it, even for "quick fixes"
@@ -128,9 +128,9 @@ def stats():
 
 #### Architecture Patterns
 ```python
-# Standard CHPP pattern throughout app
-chpp = CHPP(consumer_key, consumer_secret, session['access_key'], session['access_secret'])
-current_user = chpp.user()
+# CHPP is only used in login/OAuth callback and /update
+chpp = get_chpp_client(session)  # app/chpp_utilities.py
+team_ids, team_names = fetch_user_teams(chpp)
 team = chpp.team(ht_id=teamid)
 players = team.players()  # Live data from Hattrick
 ```
@@ -141,7 +141,7 @@ players = team.players()  # Live data from Hattrick
 - **Database Consistency**: All Hattrick IDs (players, matches, teams) use external `ht_id` fields
 
 ### Development Notes
-- Version tracking via git tags: `git describe --tags` in routes.py
+- Version tracking via git tags: `get_version_info()` in app/utils.py
 - Bootstrap 4 (CDN) styling in Flask templates with custom CSS; `base.html` extends the local `_skeleton.html`
 - Chart.js used for player skill progression visualization
 - Multiple team support requires careful session state management
@@ -194,7 +194,6 @@ players = team.players()  # Live data from Hattrick
 
 **Development Metadata** (`.project/`):
 - **architecture.md**: Update with structural changes
-- **plan.md**: Mark completed items and update status
 - **backlog.md**: Update with new improvement/bug/refactor/test/infra tasks
 - **features.md**: Update with new feature ideas (FEAT-/UI- features)
 - **progress.md**: Update accomplishments and next steps
@@ -212,13 +211,12 @@ players = team.players()  # Live data from Hattrick
 **Specialized Documentation**:
 - **docs/**: Detailed technical guides and workflows
 - **scripts/README.md**: Development scripts and utilities
-- **configs/README.md**: Configuration management
 
 #### Update Triggers
 - **architecture.md**: System structure, data flow, or tech stack changes
 - **backlog.md** / **features.md**: Task status changes (starting, completing, discovering)
 - **progress.md**: Milestones, accomplishments, status changes
-- **plan.md**: Strategic direction or goal changes
+- **goals.md**: Strategic direction or goal changes
 - **README.md**: Setup process or user-facing feature changes
 - **TECHNICAL.md**: Implementation patterns or technical detail changes
 - **CHANGELOG.md**: All user-visible changes, features, bug fixes
@@ -259,44 +257,20 @@ make test-all
 make lint
 
 # Development workflow
-uv run python scripts/manage.py db migrate  # Generate migration
-uv run python scripts/manage.py db upgrade  # Apply migration
-uv run python scripts/database/apply_migrations.py  # Safe migrations
+make db-backup                       # Always back up first
+make db-migrate MESSAGE="describe"   # Generate migration
+make db-upgrade                      # Apply migration locally
+make db-apply                        # Production-safe apply script
 ```
-
-### 7. Current Project State Awareness
-
-#### Priority Status (as of February 2, 2026)
-- **P0 Critical Bugs**: ✅ COMPLETE - All authentication and functionality bugs resolved
-- **P1 Testing & App Reliability**: ✅ COMPLETE - Custom CHPP client fully operational
-- **P1 Architecture Cleanup**: ✅ COMPLETE - CSS logical architecture implemented
-- **P2 Remove Obsolete & Minimize**: 🎯 CURRENT FOCUS - Systematic waste elimination and simplification
-- **P3 Stability & Maintainability**: Ready - UI standardization, type sync, core features
-
-#### Ready to Execute Tasks (Current as of February 2, 2026)
-1. **REFACTOR-085** - Simplify JavaScript Architecture (30 min) - P1 PRIORITY
-2. **TEST-010** - Address Test Coverage Gap (165 min) - P2 PRIORITY
-3. **REFACTOR-021** - Remove Legacy CHPP References (30 min) - P2 PRIORITY
-4. **UI-012** - Fix Version Display Format (15 min) - P2 PRIORITY
-5. **REFACTOR-022** - Fix Legacy Branding References (30 min) - P2 PRIORITY
-
-#### Current Blockers
-- 16 test coverage file gaps (TEST-010 addresses this)
-- 13 dependency warnings (non-critical)
-
-#### Recent Completions (February 2, 2026)
-- **REFACTOR-084**: CSS Logical Architecture ✅ COMPLETE - Transformed monolithic CSS into logical component architecture organized by feature and reusability (ui-components, utilities, layout, charts, animations, timeline, formations)
-- **BUG-075**: Integration Test Fixes ✅ COMPLETE - All Flask-Bootstrap template inheritance resolved
-- **INFRA-085**: Production Error Logging System ✅ COMPLETE - Database error storage with web/CLI interfaces
 
 ### 8. Technology Stack & Configuration
 
 #### Backend
 - **Framework**: Flask 2.x with Blueprint architecture
 - **Database**: PostgreSQL with SQLAlchemy ORM
-- **Authentication**: Hattrick OAuth via pychpp library
+- **Authentication**: Hattrick OAuth via the custom CHPP client in `app/chpp/`
 - **Testing**: pytest with transaction isolation
-- **Deployment**: Docker containers with uWSGI
+- **Deployment**: systemd service on a Raspberry Pi via `make deploy` (see DEPLOYMENT.md)
 
 #### Frontend
 - **Templates**: Server-rendered Jinja2 templates with Bootstrap 4 (CDN)
@@ -307,7 +281,7 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 - `./scripts/run.sh` - Flask dev server (port 5000)
 - `make test-all` - Run full test suite with coverage
 - `make lint` - Run linter
-- `uv run python scripts/manage.py db migrate/upgrade` - Database migrations
+- `make db-migrate` / `make db-upgrade` - Database migrations
 
 #### Configuration Requirements
 - **config.py**: CHPP credentials (CONSUMER_KEY, CONSUMER_SECRETS, CALLBACK_URL), PostgreSQL connection string
@@ -381,25 +355,7 @@ uv run python scripts/database/apply_migrations.py  # Safe migrations
 **Python Development**:
 - **Debugging**: Use `dprint(level, msg)` instead of print() (levels 0-3 controlled by DEBUG_LEVEL config)
 - **Routes**: Use `create_page(template='...', title='...', ...)` pattern consistently
-- **CHPP**: Initialize with `CHPP(consumer_key, consumer_secret, session['access_key'], session['access_secret'])`
-
-### 9. Quality Gates (23/26 passing)
-
-#### Security & Dependencies
-- ✅ Zero CVE vulnerabilities
-- ✅ Zero Bandit security issues
-- ⚠️ 13 dependency warnings (non-critical)
-
-#### Testing & Coverage
-- ✅ 193/193 tests passing (100% success rate)
-- ✅ Quality Intelligence Platform operational
-- ✅ Authentication blueprint: 17/17 tests passing
-
-#### Code Quality
-- ✅ Zero linting errors
-- ✅ Modern Python type annotations
-- ✅ Blueprint architecture complete
-- ⚠️ 85 type sync drift issues (P3 task)
+- **CHPP**: `get_chpp_client(session)` from `app/chpp_utilities.py`, only in login/OAuth/update
 
 ## Agent Behavioral Guidelines
 

@@ -109,7 +109,9 @@
         </nav>
       </div>
     </div>
-    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
     <div class="row">
       <div class="col-12">
         <div class="card-deck">
@@ -159,7 +161,9 @@
                     <select id="bulk-group-select" class="form-control form-control-sm">
                       <option value="">Assign to Group...</option>
                       {% for group in group_data %}
-                        {% if group.name %}<option value="{{ group.id }}">{{ group.name }}</option>{% endif %}
+                        {% if group.name %}
+                          <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endif %}
                       {% endfor %}
                       <option value="-1">Remove from Group</option>
                     </select>
@@ -193,7 +197,9 @@
                           <th scope="col" class="text-small vertical">
                             <div class="vertical">{{ title }}</div>
                           </th>
-                          {% if val in tracecolumns %}<th scope="col" class="text-small"></th>{% endif %}
+                          {% if val in tracecolumns %}
+                            <th scope="col" class="text-small"></th>
+                          {% endif %}
                         {% endif %}
                       {% endfor %}
                     </tr>

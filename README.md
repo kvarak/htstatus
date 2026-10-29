@@ -16,8 +16,8 @@ brew install uv  # macOS
 
 # Setup project
 git clone <repo-url> && cd htstatus-2.0
-cp environments/.env.development.example .env
-# Edit .env with your CHPP credentials
+cp .env.example .env            # then add your CHPP credentials
+cp config.py.example config.py
 
 # Start development
 make setup  # Install dependencies + start services
@@ -29,7 +29,7 @@ make dev    # Run Flask development server
 ```bash
 make help          # Show all commands
 make dev           # Start development server
-make test-all      # Run comprehensive tests
+make test-all      # Run all quality gates (tests, lint, CHPP policy, ...)
 make db-migrate    # Create database migration
 make db-upgrade    # Apply migrations
 make clean         # Clean temporary files
@@ -41,20 +41,16 @@ make clean         # Clean temporary files
 ```bash
 CONSUMER_KEY=your-chpp-key                # Get at https://chpp.hattrick.org/
 CONSUMER_SECRETS=your-chpp-secret
-CALLBACK_URL=http://localhost:5000/auth
+CALLBACK_URL=http://localhost:5000/login
 DATABASE_URL=postgresql://user:pass@host:port/db  # Auto-configured for dev
 ```
 
-**Quick Config**:
-```bash
-cp config.py.template config.py  # Full config with documentation
-# or use environment variables only
-```
+`config.py` (copied from `config.py.example`) reads everything from these variables.
 
 ## Architecture
 
-- **Backend**: Flask 2.x + SQLAlchemy + PostgreSQL
-- **Frontend**: Server-rendered Jinja2 templates + Chart.js
+- **Backend**: Flask + SQLAlchemy + PostgreSQL
+- **Frontend**: Server-rendered Jinja2 templates + Bootstrap 4 + Chart.js
 - **Authentication**: Hattrick OAuth via CHPP API
 
 ## Development

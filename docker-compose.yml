@@ -21,24 +21,6 @@ services:
     networks:
       - htplanner_network
 
-  # Redis for caching (Task 4.1 preparation)
-  redis:
-    image: redis:7-alpine
-    container_name: htplanner_redis
-    restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-development}
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - htplanner_network
-
   # pgAdmin for database administration (development only)
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -62,8 +44,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
-  redis_data:
     driver: local
   pgadmin_data:
     driver: local

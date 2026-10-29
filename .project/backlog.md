@@ -17,7 +17,7 @@
 
 ## P3: When you're in that code anyway 🔧
 
-- **[INFRA-088]** Trim tooling and docs - Makefile targets, quality-intelligence scripts and 60+ doc files are more than a hobby project needs. Delete what nobody uses when it gets in the way (was REFACTOR-049, DOC-032, REFACTOR-101, REFACTOR-028 changelog, REFACTOR-052..056) → [Details](tasks/INFRA-088.md)
+*Nothing right now*
 
 ---
 

@@ -1,6 +1,6 @@
 # Task Details
 
-Optional longer notes for a backlog or feature item, named `<TASK-ID>.md` (e.g. `INFRA-088.md`).
+Optional longer notes for a backlog or feature item, named `<TASK-ID>.md` (e.g. `BUG-123.md`).
 
 Most items don't need a file; a one-line entry in [backlog.md](../backlog.md) or [features.md](../features.md) is enough. Write one only when there's context worth keeping.
 

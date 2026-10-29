@@ -49,9 +49,6 @@ class Config(object):
     except ValueError:
         DEBUG_LEVEL = 3  # Default to full debug on invalid input
 
-    # Redis Configuration (for Task 4.1 - Caching Layer)
-    REDIS_URL = os.environ.get(
-        'REDIS_URL', 'redis://:development@localhost:6379/0')
 
 
 class TestConfig(Config):

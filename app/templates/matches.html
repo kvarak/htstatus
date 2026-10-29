@@ -33,7 +33,9 @@
         </nav>
       </div>
     </div>
-    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -155,7 +157,9 @@
                   </div>
                 {% endif %}
               {% endfor %}
-              {% if not history_matches %}<p class="text-muted small">No matches recorded</p>{% endif %}
+              {% if not history_matches %}
+                <p class="text-muted small">No matches recorded</p>
+              {% endif %}
             </div>
           </div>
         </div>

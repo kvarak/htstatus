@@ -183,7 +183,6 @@ htstatus-2.0/
 ├── migrations/        # Database migrations (30 Alembic versions)
 ├── tests/            # Test suite (218 tests, 100% passing)
 ├── environments/      # Environment configuration templates
-├── configs/          # Tool and Docker configurations
 ├── scripts/          # Utility scripts
 ├── docker/           # Docker-related files
 ├── models.py         # SQLAlchemy database models (406 lines)
@@ -208,7 +207,7 @@ htstatus-2.0/
 ## Related Documentation
 
 📋 **Project Management**:
-- [Development Plan](plan.md) - Requirements, standards, and development guidelines
+- [Goals](goals.md) - Objectives and principles
 - [Current Progress](progress.md) - Implementation status and recent accomplishments
 - [Strategic Goals](goals.md) - Vision and objectives driving architectural decisions
 

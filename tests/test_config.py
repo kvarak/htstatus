@@ -135,21 +135,6 @@ class TestConfigClass:
             assert isinstance(config_instance.DEBUG_LEVEL, int)
             assert config_instance.DEBUG_LEVEL == 2
 
-    def test_default_redis_url(self):
-        """Test default REDIS_URL when not provided via environment."""
-        with patch.dict(os.environ, {}, clear=True):
-            reload_config_module()
-            config_instance = config.Config()
-            assert config_instance.REDIS_URL == "redis://:development@localhost:6379/0"
-
-    def test_custom_redis_url_from_env(self):
-        """Test that REDIS_URL can be set via environment variable."""
-        test_url = "redis://localhost:6380/1"
-        with patch.dict(os.environ, {"REDIS_URL": test_url}, clear=True):
-            reload_config_module()
-            config_instance = config.Config()
-            assert test_url == config_instance.REDIS_URL
-
 
 class TestDatabaseConfiguration:
     """Test database URI construction logic."""
@@ -389,9 +374,6 @@ class TestConfigurationValidation:
 
         # Application Settings
         assert hasattr(config_instance, "DEBUG_LEVEL")
-
-        # Redis Configuration
-        assert hasattr(config_instance, "REDIS_URL")
 
     def test_test_config_all_required_attributes_exist(self):
         """Test that TestConfig has all expected attributes."""

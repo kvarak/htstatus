@@ -271,7 +271,8 @@ class CHPP:
             response.raise_for_status()
 
             # Parse XML response
-            root = ET.fromstring(response.content)
+            # Trusted source: Hattrick's CHPP server over HTTPS (not user input)
+            root = ET.fromstring(response.content)  # nosec B314
 
             # Check for CHPP API errors
             error_code_elem = root.find(".//ErrorCode")

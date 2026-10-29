@@ -6,10 +6,6 @@
 set -euo pipefail
 
 VIOLATIONS=0
-OUTPUT_FILE="out/tests/check-chpp.json"
-
-# Create output directory
-mkdir -p out/tests
 
 # CHPP usage patterns to detect
 declare -a PATTERNS=(
@@ -66,10 +62,6 @@ if [ $VIOLATIONS -eq 0 ]; then
     echo "✅ CHPP API usage policy: PASSED"
     echo "   All CHPP calls are in approved routes (login, OAuth, update)"
 
-    # Success JSON
-    scripts/qi-json.sh "$OUTPUT_FILE" "CHPP Policy" "make check-chpp" "PASSED" 0 0 \
-        "policy compliant" "CHPP API only used in login/OAuth/update routes"
-
     exit 0
 else
     echo "❌ CHPP API usage policy: FAILED"
@@ -82,10 +74,6 @@ else
     echo ""
     echo "Fix: Remove CHPP calls from unauthorized routes"
     echo "See: .github/agents/htplanner-ai-agent.md#chpp-api-usage-critical"
-
-    # Failure JSON
-    scripts/qi-json.sh "$OUTPUT_FILE" "CHPP Policy" "make check-chpp" "FAILED" 0 "$VIOLATIONS" \
-        "policy violations found" "CHPP API used in unauthorized routes"
 
     exit 1
 fi

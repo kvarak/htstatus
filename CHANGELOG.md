@@ -50,9 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Model registry removed; models are imported directly
 - Flask-Bootstrap removed (templates already used Bootstrap 4); `base.html` extends a small local `_skeleton.html`, and the error page now uses the normal app layout
 - Debug charts share one `renderChart` helper instead of 18 copies of the create/destroy code
+- Tooling trimmed for hobby scale: `make test-all` runs the gates (tests, file format, lint, template lint, bandit, CHPP policy) and prints a pass/fail summary; the quality-intelligence JSON reporting, coverage-report script and test-file-per-module gate are gone
+- Docs trimmed: DEPLOYMENT.md describes the real Pi/systemd deployment; TECHNICAL.md debugging guide replaced by a short troubleshooting list; progress.md shows current status only
 - Admin debug charts accessibility: labelled date range fieldset, screen-reader chart descriptions, labelled shrink/expand buttons, keyboard chart reordering (Arrow Up/Down) with announcements
 
 ### Removed
+- Redis (never used by the app), the `configs/` docker-compose overrides (one `docker-compose.yml` remains, pgAdmin via `make pgadmin`), broken `services-staging` target
+- Unused dev dependencies (safety, pre-commit, pytest-json-report) and one-off scripts (old user cleanup, historical match cleanup, unknown-country check, match data query)
 - Unused code: `/api/players/filter`, admin `/debug/chpp_teams` and `/debug/chpp_raw` (violated CHPP policy), `logout.html`, unused helpers in `utils.py`, `auth_utils.py`, `error_handlers.py`, `chpp_utilities.py`, `hattrick_countries.py`, XML debug printing in the player parser
 - One-off debugging scripts and committed match backup data files
 - 21 permanently skipped, broken tests; TODO-only test stubs replaced with real tests

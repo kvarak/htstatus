@@ -7,8 +7,7 @@
 # B603: subprocess call without shell=True - No shell needed for static commands
 #
 # Security rationale: Git version detection is a development/operations utility
-# with no user input injection vectors. See inline documentation in app/routes.py
-# and app/routes_bp.py for detailed security context.
+# with no user input injection vectors (see get_version_info in app/utils.py).
 
 skips: ['B404', 'B607', 'B603']
 exclude_dirs: ['/tests']

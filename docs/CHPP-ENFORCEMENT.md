@@ -50,7 +50,7 @@ make test-all
 
 1. **Makefile Quality Gate** (Primary)
    ```makefile
-   GATES = fileformat lint security-bandit security-deps test-coverage-files check-chpp
+   GATES = test-python fileformat lint lint-templates security-bandit check-chpp
    ```
 
 2. **Manual Check**
@@ -137,7 +137,7 @@ def stats():
 
 ## Documentation
 
-**Full Policy**: [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md#chpp-api-usage-critical)
+**Full Policy**: [.github/agents/htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md#chpp-api-usage-critical)
 
 **Implementation Examples**:
 - ✅ `app/blueprints/feedback.py` - Correct pattern (session + database)
