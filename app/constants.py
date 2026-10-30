@@ -115,6 +115,7 @@ ALL_COLUMNS = [
     ("Max stars", "max_stars"),
     ("Last stars", "last_stars"),
     ("Status", "status"),
+    ("Current bid", "current_bid"),
     ("First seen", "firstseen"),
     ("Player notes", "owner_notes"),
     ("Leadership", "leadership"),
@@ -168,6 +169,7 @@ DEFAULT_COLUMNS = [
     ("Max stars", "max_stars"),
     ("Last stars", "last_stars"),
     ("Status", "status"),
+    ("Current bid", "current_bid"),
     ("First seen", "firstseen"),
     ("Best position", "bestposition"),
 ]

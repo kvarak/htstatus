@@ -96,6 +96,7 @@
   </script>
 {% endblock %}
 {% block content %}
+  {% from "_transfer_macros.html" import bid_amount, bid_badge, bid_details with context %}
   <div class="container">
     <div class="row">
       <div class="col-sm">
@@ -198,7 +199,7 @@
                         {% else %}
                           {% set level_col = val in tracecolumns %}
                           <th scope="col"
-                              class="text-small {{ 'vertical' if rotated }} {{ 'text-center' if level_col }}">
+                              class="text-small {{ 'vertical' if rotated }} {{ 'text-center' if level_col or val == 'current_bid' }}">
                             <div class="{{ 'vertical' if rotated }} {{ 'mx-auto' if rotated and level_col }}">{{ column_label(title, val) }}</div>
                           </th>
                           {% if level_col %}
@@ -263,6 +264,13 @@
                                        style="color: {{ group.textcolor if group.id else 'inherit' }}">
                                       {{ p['first_name'] }} {{ p['last_name'] }}
                                     </a>
+                                  </td>
+                                {% elif val == "current_bid" %}
+                                  {% set t = p.get('transfer') %}
+                                  <td class="text-small text-center"
+                                      sorttable_customkey="{{ t.highest_bid if t else -1 }}"
+                                      title="{{ bid_details(t) | trim if t }}">
+                                    {% if t %}{{ bid_amount(t) }} {{ bid_badge(t) }}{% endif %}
                                   </td>
                                 {% elif val == "status" %}
                                   <td class="text-small" align="center">
@@ -474,6 +482,11 @@
                         </br>
                         TSI: {{ p['tsi'] }},
                         Salary: {{ p['salary'] }}
+                        {% if p.get('transfer') %}
+                          <br>
+                          Current bid: {{ bid_amount(p['transfer']) }} {{ bid_badge(p['transfer']) }}
+                          <span class="text-muted">({{ bid_details(p['transfer']) | trim }})</span>
+                        {% endif %}
                       </p>
                     </div>
                   </div>

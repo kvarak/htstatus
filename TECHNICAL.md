@@ -69,6 +69,8 @@ See [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md#
   - Fetched only at login and Update, cached as JSON in `instance/translations/`, refreshed after 30 days; failures are logged and ignored
   - Templates use `column_label(title, key)`, `ht_term(section, key)`, `specialty_name(n)`; anything missing falls back to the English text
   - Levels: `level_text(value, section)` shows a number, Hattrick's word or `word (n)` per the Settings choice (cookie `htstatus-level-format`: both (default) / numbers / words); `level_hint` gives the other form for tooltips. Sortable cells keep `sorttable_customkey` with the number
+- **Transfer bids** (`app/transfers.py`, FEAT-025): Update keeps the `TransferDetails` from the `playerdetails` call it already makes, and stores them per team as JSON in `instance/transfers/<team_id>.json` (no DB change). The player page shows them only for players whose latest snapshot is transfer listed. Status: active / ending soon (< 24 h) / deadline passed; a sold player simply leaves the roster at the next Update
+- **Instance cache** (`app/instance_cache.py`): shared atomic JSON read/write for data fetched from CHPP at login/Update (translations, transfer bids). Tests get a temp instance folder per app from `conftest.py`
 - **PWA Implementation**: Service Worker with cache-first strategy for static assets, network-first for dynamic content, offline functionality for core routes
 - **Mobile Optimization**: Responsive CSS, touch-friendly navigation, installable PWA with app manifest
 - **Security**:

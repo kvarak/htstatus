@@ -55,12 +55,13 @@ def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001
 
 
 @pytest.fixture(scope="session")
-def app():
+def app(tmp_path_factory):
     """Create application for the tests."""
     # Set testing environment
     os.environ["FLASK_ENV"] = "testing"
 
     app = create_app(TestConfig, include_routes=False)
+    app.instance_path = str(tmp_path_factory.mktemp("instance"))
 
     # Create application context
     with app.app_context():
@@ -86,12 +87,18 @@ def app():
 
 
 @pytest.fixture(scope="function")
-def app_with_routes(app):  # noqa: ARG001 - ensures tables exist via session app
+def app_with_routes(app, tmp_path):  # noqa: ARG001 - ensures tables exist
     """Fresh app with all routes registered, sharing the session test database.
 
     Never drops tables: they belong to the session-scoped ``app`` fixture.
+    Gets its own empty instance folder, so cached CHPP data never leaks between
+    tests or into the repo.
     """
+    from app import instance_cache
+
     routed_app = create_app(TestConfig, include_routes=True)
+    routed_app.instance_path = str(tmp_path)
+    instance_cache.clear()
     with routed_app.app_context():
         yield routed_app
         with contextlib.suppress(Exception):

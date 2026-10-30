@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from app import translations
+from app import instance_cache, translations
 from app.chpp.parsers import parse_translations, parse_user, parse_worldlanguages
 
 # Trimmed from a real CHPP translations response (languageId=5, Français)
@@ -50,12 +50,9 @@ LANGUAGES = parse_worldlanguages(ET.fromstring(WORLDLANGUAGES_XML))
 
 
 @pytest.fixture
-def tr_app(app_with_routes, tmp_path, monkeypatch):
-    """Routed app whose translation cache lives in a temp folder."""
-    monkeypatch.setattr(app_with_routes, "instance_path", str(tmp_path))
-    translations._cache.clear()
-    yield app_with_routes
-    translations._cache.clear()
+def tr_app(app_with_routes):
+    """Routed app; conftest gives it an empty temp instance folder."""
+    return app_with_routes
 
 
 def _fake_chpp():
@@ -123,7 +120,7 @@ class TestTranslations:
             assert chpp.translations.call_count == 1
 
             old = time.time() - translations.MAX_AGE_SECONDS - 60
-            os.utime(translations._path(5), (old, old))
+            os.utime(instance_cache.path(translations.FOLDER, 5), (old, old))
             translations.refresh(chpp, 5)
             assert chpp.translations.call_count == 2
 

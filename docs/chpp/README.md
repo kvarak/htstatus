@@ -10,9 +10,11 @@ This directory contains comprehensive documentation for Hattrick Community Premi
 
 ## Documentation Status
 
-### ✅ Documented APIs (22/79 total)
+### ✅ Documented APIs (27/79 total)
 These APIs have comprehensive documentation with implementation examples, authentication patterns, and strategic usage guidelines:
 
+- **[achievements](api-reference-achievements.md)** - The achievements of a specific user
+- **[arenadetails](api-reference-arenadetails.md)** - Information about specific arenas, supporter statistics and the largest arenas
 - **[avatars](api-reference-avatars.md)** - Avatars for all players of user's team
 - **[club](api-reference-club.md)** - Information about specialists and youth
 - **[currentbids](api-reference-currentbids.md)** - Shows the current transfer activity for a team
@@ -34,15 +36,16 @@ These APIs have comprehensive documentation with implementation examples, authen
 - **[stafflist](api-reference-stafflist.md)** - A list of all staff members
 - **[teamdetails](api-reference-teamdetails.md)** - Team information
 - **[training](api-reference-training.md)** - Training information
+- **[transfersplayer](api-reference-transfersplayer.md)** - Get all transfers of a player
+- **[transfersearch](api-reference-transfersearch.md)** - Search the transfer market (manual user request only)
+- **[transfersteam](api-reference-transfersteam.md)** - Get the transfer history of a team
 - **[translations](api-reference-translations.md)** - Translations for the denominations in the game
 - **[worldlanguages](api-reference-worldlanguages.md)** - Available languages
 
-### 🔮 Available But Not Yet Documented (57/79 remaining)
+### 🔮 Available But Not Yet Documented (52/79 remaining)
 These APIs are available on request for future features:
 
 #### Core Team Management
-- **achievements** - The achievements of a specific user
-- **arenadetails** - Information about specific arenas, supporter statistics and the largest arenas
 - **bookmarks** - User bookmarks
 - **challenges** - Challenges system
 - **hofplayers** - Hall of Fame Players
@@ -62,9 +65,6 @@ These APIs are available on request for future features:
 - **tournamentlist** - Information about tournaments that the user is currently playing in
 
 #### Transfer Market
-- **transfersearch** - Search the transfer market (manual user request only)
-- **transfersteam** - Get the transfer history of a team
-- **transfersplayer** - Get all transfers of a player
 
 #### National Teams & International
 - **nationalteams** - National teams

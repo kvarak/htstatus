@@ -300,6 +300,13 @@ class TestPlayerGroupManagement:
         assert setting.group_id == group2_id
 
 
+def _mark_transfer_listed(db_session, ht_id):
+    db_session.query(Players).filter_by(ht_id=ht_id).update(
+        {"is_transfer_listed": True}
+    )
+    db_session.commit()
+
+
 class TestPlayerDataDisplay:
     """Test player data display and calculations."""
 
@@ -342,37 +349,28 @@ class TestPlayerDataDisplay:
         assert response.status_code == 200
 
     @staticmethod
-    def _french_player_page(app, client, tmp_path, monkeypatch, level_format=None):
+    def _french_player_page(app, client, level_format=None):
         """Render /player with French Hattrick terms cached (FEAT-027)."""
         from app import translations
         from tests.test_translations import FRENCH
 
-        monkeypatch.setattr(app, "instance_path", str(tmp_path))
-        translations._cache.clear()
         with app.test_request_context("/"):
             translations._write(5, FRENCH)
         with client.session_transaction() as sess:
             sess["ht_language_id"] = 5
         if level_format:
             client.set_cookie(translations.LEVEL_FORMAT_COOKIE, level_format)
-        try:
-            html = client.get("/player?id=12345").get_data(as_text=True)
-            return html[html.index('<table id="player-table"') :]
-        finally:
-            translations._cache.clear()
+        html = client.get("/player?id=12345").get_data(as_text=True)
+        return html[html.index('<table id="player-table"') :]
 
     def test_player_page_uses_hattrick_terms(
         self,
         app_with_routes,
         authenticated_client,
         sample_players,
-        tmp_path,
-        monkeypatch,
     ):  # noqa: ARG002
         """Default: Hattrick names, levels as "word (n)", horizontal headers."""
-        html = self._french_player_page(
-            app_with_routes, authenticated_client, tmp_path, monkeypatch
-        )
+        html = self._french_player_page(app_with_routes, authenticated_client)
         assert "Gardien" in html  # Keeper column + modal row
         assert "Coup franc" in html  # Set pieces
         assert "Tempérament de chef" in html  # Leadership in the modal
@@ -386,11 +384,9 @@ class TestPlayerDataDisplay:
         app_with_routes,
         authenticated_client,
         sample_players,
-        tmp_path,
-        monkeypatch,
     ):  # noqa: ARG002
         html = self._french_player_page(
-            app_with_routes, authenticated_client, tmp_path, monkeypatch, "numbers"
+            app_with_routes, authenticated_client, "numbers"
         )
         assert re.search(
             r'class="text-small text-center"\s+title="honorable"\s+'
@@ -408,18 +404,65 @@ class TestPlayerDataDisplay:
         app_with_routes,
         authenticated_client,
         sample_players,
-        tmp_path,
-        monkeypatch,
     ):  # noqa: ARG002
         """Levels as words keep sorting by number via sorttable_customkey."""
-        html = self._french_player_page(
-            app_with_routes, authenticated_client, tmp_path, monkeypatch, "words"
-        )
+        html = self._french_player_page(app_with_routes, authenticated_client, "words")
         assert re.search(r'title="7"\s+sorttable_customkey="7">honorable<', html)
         assert re.search(
             r'class="text-small\s+text-center">\s*<div class="\s*">\s*Gardien', html
         )
         assert "table-rotated" not in html
+
+    def test_player_page_shows_current_bid(
+        self, app_with_routes, authenticated_client, sample_players, db_session
+    ):
+        """FEAT-025: bid column and modal line for transfer-listed players only."""
+        from app import transfers
+
+        listed, unlisted = sample_players[0], sample_players[1]
+        _mark_transfer_listed(db_session, listed.ht_id)
+        bid = {
+            "asking_price": 900000,
+            "highest_bid": 1250000,
+            "deadline": "2099-01-01 12:00:00",
+            "bidder": "Buyers FC",
+        }
+        with app_with_routes.app_context():
+            # The unlisted player's stale snapshot must not be shown
+            transfers.save_team_transfers(
+                12345, {listed.ht_id: bid, unlisted.ht_id: bid}
+            )
+
+        html = authenticated_client.get("/player?id=12345").get_data(as_text=True)
+
+        assert "Current bid" in html  # default column header
+        assert re.search(r'sorttable_customkey="1250000"', html)
+        assert html.count("1\u00a0250\u00a0000 SEK") == 2  # table cell + modal
+        assert "highest bidder Buyers FC" in html
+
+    def test_player_page_bid_without_bids(
+        self, app_with_routes, authenticated_client, sample_players, db_session
+    ):
+        from app import transfers
+
+        _mark_transfer_listed(db_session, sample_players[0].ht_id)
+        with app_with_routes.app_context():
+            transfers.save_team_transfers(
+                12345,
+                {
+                    sample_players[0].ht_id: {
+                        "asking_price": 900000,
+                        "highest_bid": 0,
+                        "deadline": "2000-01-01 12:00:00",
+                        "bidder": None,
+                    }
+                },
+            )
+
+        html = authenticated_client.get("/player?id=12345").get_data(as_text=True)
+        assert "No bids" in html
+        assert "deadline passed" in html
+        assert "highest bidder" not in html
 
     def test_player_skill_calculations(self, authenticated_client, sample_players):
         """Test player skill calculation displays."""

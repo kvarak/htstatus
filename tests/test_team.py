@@ -340,6 +340,20 @@ def _fake_chpp_details():
     )
 
 
+def _listed_details():
+    from app.chpp.models import BidderTeam, TransferDetails
+
+    details = _fake_chpp_details()
+    details.transfer_listed = True
+    details.transfer_details = TransferDetails(
+        asking_price=500000,
+        deadline="2026-11-01 20:15:00",
+        highest_bid=620000,
+        bidder_team=BidderTeam(team_id=55, team_name="Bidders FC"),
+    )
+    return details
+
+
 class TestBuildPlayerRecord:
     def test_keeps_previous_skill_when_chpp_returns_zero(self):
         from types import SimpleNamespace
@@ -397,7 +411,9 @@ class TestUpdateRoute:
         chpp = SimpleNamespace(
             user=lambda: SimpleNamespace(_teams_ht_id=[self.TEAM], language_id=None),
             team=lambda ht_id: team,
-            player=lambda id_: _fake_chpp_details(),
+            player=lambda id_: (
+                _listed_details() if id_ == 803 else _fake_chpp_details()
+            ),
         )
         no_matches = {"success": True, "recent_count": 0, "upcoming_count": 0}
 
@@ -424,3 +440,16 @@ class TestUpdateRoute:
         )
         assert today_keeper.keeper == 7  # CHPP hid it; kept the stored value
         assert db_session.query(User).filter_by(ht_id=self.TEAM).one().c_update == 1
+        # FEAT-025: bids from the same playerdetails call are kept until next Update
+        from app.transfers import team_transfers
+
+        with app_with_routes.app_context():
+            saved = team_transfers(self.TEAM)
+        assert saved == {
+            803: {
+                "asking_price": 500000,
+                "highest_bid": 620000,
+                "deadline": "2026-11-01 20:15:00",
+                "bidder": "Bidders FC",
+            }
+        }

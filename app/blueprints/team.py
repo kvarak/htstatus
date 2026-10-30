@@ -6,7 +6,7 @@ import traceback
 
 from flask import Blueprint, flash, redirect, request, session, url_for
 
-from app import translations
+from app import transfers, translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
@@ -288,6 +288,14 @@ def build_player_record(p, details, previous, teamid):
     return record
 
 
+def save_transfer_snapshot(teamid, team_bids):
+    """Store current bids; a failure only costs the bid column, never the Update."""
+    try:
+        transfers.save_team_transfers(teamid, team_bids)
+    except OSError as e:
+        dprint(1, f"Could not save transfer bids for team {teamid}: {e}")
+
+
 def save_player_snapshot(record):
     """Store today's snapshot, replacing an earlier one from today, in one commit."""
     from models import Players
@@ -381,10 +389,13 @@ def update():
         previous = {p.ht_id: p for p in latest_player_records(Players, teamid)}
 
         players_fromht = []
+        team_bids = {}
         for p in team_players:
-            record = build_player_record(
-                p, chpp.player(id_=p.id), previous.get(p.id), teamid
-            )
+            details = chpp.player(id_=p.id)
+            record = build_player_record(p, details, previous.get(p.id), teamid)
+            bid = transfers.from_details(details)
+            if bid:
+                team_bids[p.id] = bid
             playernames[p.id] = f"{p.first_name} {p.last_name}"
             try:
                 save_player_snapshot(record)
@@ -397,6 +408,7 @@ def update():
                 )
             players_fromht.append(p.id)
 
+        save_transfer_snapshot(teamid, team_bids)
         timeline_changes[teamid] = get_team_timeline(teamid)
         updated[teamid] += [f"/player?id={teamid}", "players"]
 

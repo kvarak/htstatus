@@ -4,6 +4,7 @@ import math
 
 from flask import Blueprint, request, session
 
+from app import transfers
 from app.auth_utils import (
     get_current_user,
     get_team_info,
@@ -40,6 +41,15 @@ def setup_player_blueprint(
     calccolumns = calc_cols
     tracecolumns = trace_cols
     default_group_order = group_order
+
+
+def add_transfer_bids(teamid, players):
+    """Attach the bid snapshot from the last Update to transfer-listed players."""
+    bids = transfers.team_transfers(teamid)
+    for p in players:
+        bid = bids.get(p["ht_id"]) if p.get("is_transfer_listed") else None
+        if bid:
+            p["transfer"] = {**bid, "status": transfers.status(bid)}
 
 
 def add_star_ratings(match_play_model, players):
@@ -183,6 +193,7 @@ def player():
         players_oldest_dict.setdefault(record.ht_id, record_dict)
         latest_by_player[record.ht_id] = record_dict
     players_now = list(latest_by_player.values())
+    add_transfer_bids(teamid, players_now)
 
     add_star_ratings(MatchPlay, players_now)
 
@@ -263,4 +274,5 @@ def player():
         allplayers=allplayers,
         timeline_changes=timeline_changes,
         last_update=user.last_update if user else None,
+        format_money=transfers.format_money,
     )

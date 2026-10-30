@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Current bid on transfer-listed players** (FEAT-025, #27) - new "Current bid" column (on by default; add it in Settings if you have saved your own columns) and a line in the player popup: highest bid, asking price, deadline and highest bidder, with "ends soon" / "deadline passed" badges. Bids are updated with Update, at no extra Hattrick calls
 - **Levels as numbers or words** - choose in Settings whether skill and personality levels show as both Hattrick's word and the number (solid (7), the default), just numbers (7) or just words (solid); with one form, the other is shown on hover, the player table still sorts by number, and its headers are only rotated 90° in numbers mode
 - **Hattrick terms in your language** (FEAT-027) - skill names, skill levels, specialties and personality traits now use the words Hattrick uses in the language you play in; pick another language in Settings
 - **Dark mode** (UI-014) - 🌙/☀️ toggle in the navbar, same look and behaviour as the other kvarak projects: follows the system setting until you pick a mode, remembers the choice, no light flash on load; charts switch colours too

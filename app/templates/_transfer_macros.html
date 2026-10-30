@@ -1,0 +1,18 @@
+{# FEAT-025: transfer bids from the last Update #}
+{% macro bid_amount(t) %}
+  {% if t.highest_bid %}
+    {{ format_money(t.highest_bid) }}
+  {% else %}
+    <span class="text-muted">No bids</span>
+  {% endif %}
+{% endmacro %}
+{% macro bid_badge(t) %}
+  {% if t.status == "ending_soon" %}
+    <span class="badge badge-warning">ends soon</span>
+  {% elif t.status == "deadline_passed" %}
+    <span class="badge badge-secondary">deadline passed</span>
+  {% endif %}
+{% endmacro %}
+{% macro bid_details(t) %}
+  Asking {{ format_money(t.asking_price) }}, deadline {{ t.deadline }}{{ ", highest bidder " ~ t.bidder if t.bidder }}
+{% endmacro %}

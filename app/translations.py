@@ -5,12 +5,9 @@ policy). They are cached as JSON in the instance folder and refreshed monthly.
 Anything missing falls back to the English text used in the templates.
 """
 
-import json
-import os
-import time
+from flask import has_request_context, request, session
 
-from flask import current_app, has_request_context, request, session
-
+from app import instance_cache
 from app.constants import ALL_COLUMNS
 from app.utils import dprint
 
@@ -53,41 +50,19 @@ ENGLISH_SPECIALTIES = {
     8: "Support",
 }
 
-_cache: dict[str, tuple[float, object]] = {}
-
-
-def _path(name):
-    return os.path.join(current_app.instance_path, "translations", f"{name}.json")
+FOLDER = "translations"
 
 
 def _read(name):
-    """Read a cached JSON file, reloading it only when it changed on disk."""
-    path = _path(name)
-    try:
-        mtime = os.path.getmtime(path)
-        if path not in _cache or _cache[path][0] != mtime:
-            with open(path, encoding="utf-8") as f:
-                _cache[path] = (mtime, json.load(f))
-        return _cache[path][1]
-    except (OSError, ValueError):
-        return None
+    return instance_cache.read_json(FOLDER, name)
 
 
 def _write(name, data):
-    text = json.dumps(data, ensure_ascii=False)
-    path = _path(name)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    tmp = f"{path}.tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        f.write(text)
-    os.replace(tmp, path)
+    instance_cache.write_json(FOLDER, name, data)
 
 
 def _is_fresh(name):
-    try:
-        return time.time() - os.path.getmtime(_path(name)) < MAX_AGE_SECONDS
-    except OSError:
-        return False
+    return instance_cache.is_fresh(FOLDER, name, MAX_AGE_SECONDS)
 
 
 def language_id():
