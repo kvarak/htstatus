@@ -3,12 +3,12 @@
 
 /* Empty State Displays */
 .empty-state {
-    color: hsl(120, 15%, 50%);
+    color: hsl(var(--muted-foreground));
     font-style: italic;
     font-size: 0.9rem;
     padding: 0.75rem;
-    background: hsl(120, 8%, 97%);
-    border: 1px solid hsl(120, 20%, 85%);
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
     text-align: center;
 }

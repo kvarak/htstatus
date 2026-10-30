@@ -1,38 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-  <!-- Work in Progress Sticker -->
-  <div class="wip-sticker">
-    <span>🚧 Work in Progress</span>
-  </div>
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb d-flex justify-content-between align-items-center">
-            <div class="d-flex">
-              <li class="breadcrumb-item">
-                <a href="#">{{ teamname }}</a>
-              </li>
-              <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-            </div>
-            {% if not(error) %}
-              <form method="POST" action="/matches" class="mb-0">
-                <input type="hidden" id="id" name="id" value="{{ teamid }}">
-                <button type="submit"
-                        name="updatebutton"
-                        value="archive"
-                        class="btn btn-sm btn-primary-custom"
-                        aria-label="Download Archive"
-                        data-toggle="tooltip"
-                        data-placement="top"
-                        title="2 seasons back"
-                        onclick="loading();">Download Archive</button>
-              </form>
-            {% endif %}
-          </ol>
-        </nav>
+  {% from "_page.html" import page_header %}
+  {# One rating: "home - away" plus a thin bar of each side's share (us = accent) #}
+  {% macro rating_box(label, home, away, home_is_us, col) %}
+    <div class="{{ col }}">
+      <div class="rating-box">
+        <div class="rating-label">{{ label }}</div>
+        <div>{{ home|round(1) if home is not none else 'N/A' }} - {{ away|round(1) if away is not none else 'N/A' }}</div>
+        {% if home is not none and away is not none and home + away > 0 %}
+          <div class="rating-split">
+            <span class="{{ 'us' if home_is_us else 'them' }}"
+                  style="width: {{ (home / (home + away) * 100)|round(1) }}%"></span>
+            <span class="{{ 'them' if home_is_us else 'us' }}"></span>
+          </div>
+        {% endif %}
       </div>
     </div>
+  {% endmacro %}
+  <!-- Work in Progress Sticker -->
+  <div class="container">
+    {% call page_header([(teamname, '/'), (title, None)]) %}
+      <span class="wip-sticker">Work in progress</span>
+      {% if not(error) %}
+        <form method="POST" action="/matches">
+          <input type="hidden" id="id" name="id" value="{{ teamid }}">
+          <button type="submit"
+                  name="updatebutton"
+                  value="archive"
+                  class="btn btn-sm btn-primary"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  title="2 seasons back"
+                  onclick="loading();">Download Archive</button>
+        </form>
+      {% endif %}
+    {% endcall %}
     {% if error %}
       <div class="alert alert-danger" role="alert">{{ error }}</div>
     {% endif %}
@@ -56,13 +58,8 @@
           <div class="card-body p-2">
             <div class="list-group list-group-flush">
               {% for m in upcoming_matches %}
-                <div class="list-group-item list-group-item-action p-2 small border-0 mb-1 rounded"
-                     style="cursor: pointer;
-                            border-left: 4px solid {% if m.matchtype == 1 %} #007bff;
-                            {% elif m.matchtype == 3 %} #28a745;
-                            {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %} #ffc107;
-                            {% else %} #6c757d;
-                            {% endif %}"
+                <div class="list-group-item list-group-item-action p-2 small mb-1 rounded match-item match-type-{{ 'league' if m.matchtype == 1 else 'cup' if m.matchtype == 3 else 'other' }}"
+                     style="cursor: pointer"
                      data-match="{{ m.ht_id }}">
                   <div class="d-flex justify-content-between align-items-center mb-1">
                     <small class="text-muted">{{ m.datetime.strftime("%m-%d %H:%M") }}</small>
@@ -114,13 +111,8 @@
             <div class="list-group list-group-flush">
               {% for m in history_matches %}
                 {% if m.home_goals is not none %}
-                  <div class="list-group-item list-group-item-action p-2 small border-0 mb-1 rounded"
-                       style="cursor: pointer;
-                              border-left: 4px solid {% if m.matchtype == 1 %} #007bff;
-                              {% elif m.matchtype == 3 %} #28a745;
-                              {% elif m.matchtype == 4 or m.matchtype == 5 or m.matchtype == 8 or m.matchtype == 9 %} #ffc107;
-                              {% else %} #6c757d;
-                              {% endif %}"
+                  <div class="list-group-item list-group-item-action p-2 small mb-1 rounded match-item match-type-{{ 'league' if m.matchtype == 1 else 'cup' if m.matchtype == 3 else 'other' }}"
+                       style="cursor: pointer"
                        data-match="{{ m.ht_id }}"
                        data-match-item
                        data-matchtype="{{ m.matchtype }}">
@@ -300,8 +292,7 @@
                         <div class="card-body p-2">
                           <div class="row g-2 mb-2 small text-center">
                             <div class="col-6">
-                              <div class="p-2 border rounded"
-                                   style="background: {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.1){% else %}rgba(220, 53, 69, 0.1){% endif %}">
+                              <div class="team-box {{ 'us' if teamname == m.home_team_name else 'them' }}">
                                 <div class="text-muted" style="font-size: 0.75rem;">{{ m.home_team_name }}</div>
                                 <div>
                                   <strong style="font-size: 1.5rem;">{{ m.home_goals }}</strong> <span class="text-muted">goals</span>
@@ -312,8 +303,7 @@
                               </div>
                             </div>
                             <div class="col-6">
-                              <div class="p-2 border rounded"
-                                   style="background: {% if teamname == m.away_team_name %}rgba(0, 123, 255, 0.1){% else %}rgba(220, 53, 69, 0.1){% endif %}">
+                              <div class="team-box {{ 'us' if teamname == m.away_team_name else 'them' }}">
                                 <div class="text-muted" style="font-size: 0.75rem;">{{ m.away_team_name }}</div>
                                 <div>
                                   <strong style="font-size: 1.5rem;">{{ m.away_goals }}</strong> <span class="text-muted">goals</span>
@@ -371,134 +361,21 @@
                           </div>
                         </div>
                         <div class="card-body p-2">
-                          <!-- Defense Ratings -->
-                          <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                              <strong class="small">Defense</strong>
-                            </div>
-                            <div class="row g-2 text-center small">
-                              <div class="col-4">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_right_def is not none and m.away_team_rating_right_def is not none and (m.home_team_rating_right_def + m.away_team_rating_right_def) > 0 %}{% set home_pct = (m.home_team_rating_right_def / (m.home_team_rating_right_def + m.away_team_rating_right_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Right</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_right_def|round(1) if m.home_team_rating_right_def is not none else 'N/A' }} - {{ m.away_team_rating_right_def|round(1) if m.away_team_rating_right_def is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-4">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_mid_def is not none and m.away_team_rating_mid_def is not none and (m.home_team_rating_mid_def + m.away_team_rating_mid_def) > 0 %}{% set home_pct = (m.home_team_rating_mid_def / (m.home_team_rating_mid_def + m.away_team_rating_mid_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Center</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_mid_def|round(1) if m.home_team_rating_mid_def is not none else 'N/A' }} - {{ m.away_team_rating_mid_def|round(1) if m.away_team_rating_mid_def is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-4">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_left_def is not none and m.away_team_rating_left_def is not none and (m.home_team_rating_left_def + m.away_team_rating_left_def) > 0 %}{% set home_pct = (m.home_team_rating_left_def / (m.home_team_rating_left_def + m.away_team_rating_left_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Left</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_left_def|round(1) if m.home_team_rating_left_def is not none else 'N/A' }} - {{ m.away_team_rating_left_def|round(1) if m.away_team_rating_left_def is not none else 'N/A' }}
-                                  </div>
-                                </div>
+                          {% set home_is_us = teamname == m.home_team_name %}
+                          {% for (section, boxes) in [
+                            ("Defense", [("Right", m.home_team_rating_right_def, m.away_team_rating_right_def), ("Center", m.home_team_rating_mid_def, m.away_team_rating_mid_def), ("Left", m.home_team_rating_left_def, m.away_team_rating_left_def)]),
+                            ("Attack", [("Right", m.home_team_rating_right_att, m.away_team_rating_right_att), ("Center", m.home_team_rating_mid_att, m.away_team_rating_mid_att), ("Left", m.home_team_rating_left_att, m.away_team_rating_left_att)]),
+                            ("Set Pieces", [("Defense", m.home_team_rating_set_pieces_def, m.away_team_rating_set_pieces_def), ("Attack", m.home_team_rating_set_pieces_att, m.away_team_rating_set_pieces_att)]),
+                            ] %}
+                            <div class="mb-3">
+                              <strong class="small d-block mb-2">{{ section }}</strong>
+                              <div class="row g-2 text-center small">
+                                {% for (label, home, away) in boxes %}
+                                  {{ rating_box(label, home, away, home_is_us, "col-6" if boxes|length == 2 else "col-4") }}
+                                {% endfor %}
                               </div>
                             </div>
-                          </div>
-                          <!-- Attack Ratings -->
-                          <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                              <strong class="small">Attack</strong>
-                            </div>
-                            <div class="row g-2 text-center small">
-                              <div class="col-4">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_right_att is not none and m.away_team_rating_right_att is not none and (m.home_team_rating_right_att + m.away_team_rating_right_att) > 0 %}{% set home_pct = (m.home_team_rating_right_att / (m.home_team_rating_right_att + m.away_team_rating_right_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Right</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_right_att|round(1) if m.home_team_rating_right_att is not none else 'N/A' }} - {{ m.away_team_rating_right_att|round(1) if m.away_team_rating_right_att is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-4">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_mid_att is not none and m.away_team_rating_mid_att is not none and (m.home_team_rating_mid_att + m.away_team_rating_mid_att) > 0 %}{% set home_pct = (m.home_team_rating_mid_att / (m.home_team_rating_mid_att + m.away_team_rating_mid_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Center</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_mid_att|round(1) if m.home_team_rating_mid_att is not none else 'N/A' }} - {{ m.away_team_rating_mid_att|round(1) if m.away_team_rating_mid_att is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-4">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_left_att is not none and m.away_team_rating_left_att is not none and (m.home_team_rating_left_att + m.away_team_rating_left_att) > 0 %}{% set home_pct = (m.home_team_rating_left_att / (m.home_team_rating_left_att + m.away_team_rating_left_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Left</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_left_att|round(1) if m.home_team_rating_left_att is not none else 'N/A' }} - {{ m.away_team_rating_left_att|round(1) if m.away_team_rating_left_att is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <!-- Set Pieces -->
-                          <div>
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                              <strong class="small">Set Pieces</strong>
-                            </div>
-                            <div class="row g-2 text-center small">
-                              <div class="col-6">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_set_pieces_def is not none and m.away_team_rating_set_pieces_def is not none and (m.home_team_rating_set_pieces_def + m.away_team_rating_set_pieces_def) > 0 %}{% set home_pct = (m.home_team_rating_set_pieces_def / (m.home_team_rating_set_pieces_def + m.away_team_rating_set_pieces_def) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Defense</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_set_pieces_def|round(1) if m.home_team_rating_set_pieces_def is not none else 'N/A' }} - {{ m.away_team_rating_set_pieces_def|round(1) if m.away_team_rating_set_pieces_def is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                              <div class="col-6">
-                                <div class="p-2 border rounded"
-                                     style="{% if m.home_team_rating_set_pieces_att is not none and m.away_team_rating_set_pieces_att is not none and (m.home_team_rating_set_pieces_att + m.away_team_rating_set_pieces_att) > 0 %}{% set home_pct = (m.home_team_rating_set_pieces_att / (m.home_team_rating_set_pieces_att + m.away_team_rating_set_pieces_att) * 100)|round(1) %}background: linear-gradient(to right, {% if teamname == m.home_team_name %}rgba(0, 123, 255, 0.7) 0%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(220, 53, 69, 0.7) 100%{% else %}rgba(220, 53, 69, 0.7) 0%, rgba(220, 53, 69, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) {{ home_pct }}%, rgba(0, 123, 255, 0.7) 100%{% endif %});
-                                            color: white;
-                                            {% endif %}">
-                                  <div class="text-muted"
-                                       style="font-size: 0.75rem;
-                                              color: rgba(255, 255, 255, 0.9) !important">Attack</div>
-                                  <div style="position: relative; z-index: 1;">
-                                    {{ m.home_team_rating_set_pieces_att|round(1) if m.home_team_rating_set_pieces_att is not none else 'N/A' }} - {{ m.away_team_rating_set_pieces_att|round(1) if m.away_team_rating_set_pieces_att is not none else 'N/A' }}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                          {% endfor %}
                         </div>
                       </div>
                     {% endif %}
@@ -785,6 +662,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
   </script>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

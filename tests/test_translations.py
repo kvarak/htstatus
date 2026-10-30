@@ -34,6 +34,10 @@ TRANSLATIONS_XML = """<HattrickData>
     <PlayerHonesty Label="Honnêteté">
       <Level Value="2">honnête</Level>
     </PlayerHonesty>
+    <MatchPositions Label="Position">
+      <Item Type="Keeper">Gardien de but</Item>
+      <Item Type="Forward">Attaquant</Item>
+    </MatchPositions>
   </Texts>
 </HattrickData>"""
 

@@ -17,7 +17,7 @@
 
 ## P3: When you're in that code anyway 🔧
 
-*Nothing right now*
+- **[REFACTOR-120]** Feedback blueprint checks `access_key`/`current_user_id` by hand in 5 routes; use `@require_authentication` (and `get_current_user()`) like the other blueprints
 
 ---
 

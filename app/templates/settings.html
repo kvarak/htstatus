@@ -56,16 +56,9 @@ function resetTutorialProgress() {
   </script>
 {% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([(title, None) ]) }}
     <!-- Tutorial Reset Section -->
     <div class="row mb-3">
       <div class="col-sm">
@@ -346,6 +339,4 @@ function resetTutorialProgress() {
       </div>
     </div>
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

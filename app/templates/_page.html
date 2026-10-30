@@ -1,0 +1,21 @@
+{# Page header used by every page: breadcrumb trail plus optional actions.
+   crumbs: [(label, url), ...]; the last one is the current page (url ignored).
+   Actions: {% call page_header(crumbs) %}<buttons>{% endcall %} #}
+{% macro page_header(crumbs) %}
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        {% for (label, url) in crumbs %}
+          {% if loop.last %}
+            <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
+          {% else %}
+            <li class="breadcrumb-item">
+              <a href="{{ url }}">{{ label }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </nav>
+    {% if caller is defined %}<div class="page-actions">{{ caller() }}</div>{% endif %}
+  </div>
+{% endmacro %}

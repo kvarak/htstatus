@@ -1,0 +1,404 @@
+/* One look for every page: neutral surfaces, gray borders, green accent (actions,
+   our team) balanced by a slate blue second accent (links, selection, info).
+   Loaded after Bootstrap and the base styles; dark-mode.css overrides the
+   variables used here, so these rules work in both modes.
+   Red/amber only for errors and warnings. */
+
+/* ---- Page ---- */
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Background photo, recolored to the theme: its luminosity with the two accents' hues (green -> slate),
+   faded so content stays calm. Dark mode only changes the variables/opacity. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(135deg, hsl(var(--primary)) 20%, hsl(var(--accent2)) 80%),
+    url("../background.jpg") center / cover no-repeat;
+  background-blend-mode: color;
+  opacity: var(--background-photo-opacity, 0.22);
+  pointer-events: none;
+}
+
+a {
+  color: hsl(var(--accent2));
+}
+
+a:hover {
+  color: hsl(var(--accent2) / 0.8);
+}
+
+.container {
+  padding-top: var(--spacing-4);
+  padding-bottom: var(--spacing-8);
+}
+
+/* ---- Navbar ---- */
+.navbar.bg-light {
+  background-color: hsl(var(--card)) !important;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+/* ---- Page header (templates/_page.html) ---- */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-2);
+  padding-bottom: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.breadcrumb-item.active {
+  color: hsl(var(--foreground));
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.page-actions form {
+  margin: 0;
+}
+
+/* ---- Cards: flat, bordered, no colored headers ---- */
+.card,
+.card-custom {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+.card-header,
+.card-custom-header {
+  background-color: transparent;
+  border-bottom: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.card-header h1,
+.card-header h2,
+.card-header h3,
+.card-header h4,
+.card-header h5,
+.card-header h6,
+.card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0;
+}
+
+.card-body > .card-title {
+  margin-bottom: var(--spacing-3);
+}
+
+.card-footer {
+  background-color: transparent;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.card + .card,
+.card-deck + .card-deck {
+  margin-top: var(--spacing-4);
+}
+
+/* ---- Bootstrap colors -> the one accent ---- */
+.btn-primary,
+.btn-success {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-primary:focus,
+.btn-success:focus,
+.btn-primary:not(:disabled):not(.disabled).active,
+.btn-success:not(:disabled):not(.disabled).active {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: hsl(var(--primary-foreground));
+}
+
+.btn-outline-primary,
+.btn-outline-success {
+  color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-primary:not(:disabled):not(.disabled).active,
+.btn-outline-success:not(:disabled):not(.disabled).active {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.btn-outline-secondary {
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--input));
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:not(:disabled):not(.disabled).active {
+  background-color: hsl(var(--muted));
+  border-color: hsl(var(--input));
+  color: hsl(var(--foreground));
+}
+
+.btn:focus,
+.form-control:focus,
+.custom-select:focus {
+  box-shadow: 0 0 0 0.2rem hsl(var(--primary) / 0.2);
+}
+
+.form-control:focus,
+.custom-select:focus {
+  border-color: hsl(var(--primary));
+}
+
+.badge-primary,
+.badge-success {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.badge-secondary,
+.badge-light,
+.badge-dark {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.bg-primary,
+.bg-success {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground));
+}
+
+.bg-light {
+  background-color: hsl(var(--muted)) !important;
+}
+
+.text-primary,
+.text-success {
+  color: hsl(var(--primary)) !important;
+}
+
+.border-primary,
+.border-success {
+  border-color: hsl(var(--primary)) !important;
+}
+
+.alert-info,
+.alert-primary,
+.alert-success,
+.alert-secondary,
+.alert-light {
+  background-color: hsl(var(--muted));
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.list-group-item {
+  background-color: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.list-group-item.active,
+.list-group-item-action.active,
+.nav-pills .nav-link.active {
+  background-color: hsl(var(--accent2));
+  border-color: hsl(var(--accent2));
+  color: hsl(var(--accent2-foreground));
+}
+
+.list-group-item-action:hover {
+  background-color: hsl(var(--muted));
+}
+
+.nav-tabs .nav-link.active {
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border)) hsl(var(--border)) hsl(var(--card));
+}
+
+.nav-link {
+  color: hsl(var(--accent2));
+}
+
+.progress-bar {
+  background-color: hsl(var(--primary));
+}
+
+/* ---- Tables: light header, thin rules ---- */
+.table-custom,
+.table {
+  background-color: hsl(var(--card));
+  box-shadow: none;
+  color: hsl(var(--foreground));
+}
+
+.table-custom thead,
+.table thead th,
+table.sortable thead {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+.table-custom thead th {
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.table td,
+.table th {
+  border-color: hsl(var(--border));
+}
+
+/* ---- Small "work in progress" label ---- */
+.wip-sticker {
+  display: inline-block;
+  align-self: center;
+  padding: 0.125rem 0.5rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- Footer ---- */
+.site-footer {
+  border-top: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+}
+
+/* ---- Us vs them (matches): our team = accent, opponent = gray ---- */
+.match-item {
+  border: 1px solid hsl(var(--border));
+  border-left: 3px solid hsl(var(--border));
+}
+
+.match-item.match-type-league {
+  border-left-color: hsl(var(--primary));
+}
+
+.match-item.match-type-cup {
+  border-left-color: hsl(var(--accent2));
+}
+
+.team-box,
+.rating-box {
+  padding: var(--spacing-2);
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-md);
+}
+
+.team-box.us {
+  border-color: hsl(var(--primary));
+}
+
+.rating-label {
+  font-size: var(--font-size-xs);
+  color: hsl(var(--muted-foreground));
+}
+
+.rating-split {
+  display: flex;
+  height: 4px;
+  margin-top: var(--spacing-1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rating-split span:last-child {
+  flex: 1;
+}
+
+.rating-split .us {
+  background-color: hsl(var(--primary));
+}
+
+.rating-split .them {
+  background-color: hsl(var(--muted-foreground) / 0.35);
+}
+
+/* ---- Small shared bits ---- */
+.table-icon {
+  background-color: hsl(var(--card) / 0.5);
+  border-radius: 2px;
+}
+
+.change-up {
+  color: hsl(var(--primary));
+  font-weight: var(--font-weight-bold);
+}
+
+.change-down {
+  color: hsl(var(--destructive));
+  font-weight: var(--font-weight-bold);
+}
+
+/* ---- Second accent: slate blue (links, selection, info) ---- */
+.btn-info {
+  background-color: hsl(var(--accent2));
+  border-color: hsl(var(--accent2));
+  color: hsl(var(--accent2-foreground));
+}
+
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:not(:disabled):not(.disabled).active {
+  background-color: hsl(var(--accent2) / 0.85);
+  border-color: hsl(var(--accent2) / 0.85);
+  color: hsl(var(--accent2-foreground));
+}
+
+.btn-outline-info {
+  color: hsl(var(--accent2));
+  border-color: hsl(var(--accent2));
+}
+
+.btn-outline-info:hover,
+.btn-outline-info:not(:disabled):not(.disabled).active {
+  background-color: hsl(var(--accent2));
+  color: hsl(var(--accent2-foreground));
+}
+
+.badge-info,
+.bg-info {
+  background-color: hsl(var(--accent2)) !important;
+  color: hsl(var(--accent2-foreground));
+}
+
+.text-info {
+  color: hsl(var(--accent2)) !important;
+}
+
+.border-info {
+  border-color: hsl(var(--accent2)) !important;
+}

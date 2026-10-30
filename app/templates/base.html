@@ -23,71 +23,73 @@
      ======================================== */
 
   :root {
-    /* Color System - Football Theme */
+    /* Color System - minimal: neutral grays + one green accent.
+       Warning/destructive are for warnings and errors only. */
     /* Using HSL without hsl() wrapper for consistent color management */
 
-    --primary: 120 45% 25%;                    /* Football green */
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 120 60% 45%;
+    --primary: 125 35% 30%;                    /* The one accent: football green */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 125 35% 30%;
 
-    --secondary: 120 25% 88%;                  /* Light pitch green */
-    --secondary-foreground: 120 20% 12%;
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 15%;
 
-    --success: 120 70% 35%;                    /* Goal green */
-    --success-foreground: 0 0% 98%;
+    --success: 125 35% 30%;                    /* Same as the accent */
+    --success-foreground: 0 0% 100%;
 
-    --warning: 45 90% 55%;                     /* Yellow card */
-    --warning-foreground: 45 20% 15%;
+    --warning: 40 90% 50%;
+    --warning-foreground: 40 30% 12%;
 
-    --destructive: 0 84% 60%;                  /* Red card */
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --muted: 120 15% 92%;
-    --muted-foreground: 120 10% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
 
-    --accent: 120 60% 45%;                     /* Bright football green */
-    --accent-foreground: 0 0% 98%;
+    --accent: 125 35% 30%;
+    --accent-foreground: 0 0% 100%;
 
-    --background: 120 8% 97%;
-    --foreground: 120 20% 12%;
+    --accent2: 215 28% 42%;                    /* Second accent: slate blue, balances the green */
+    --accent2-foreground: 0 0% 100%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 120 20% 12%;
+    --card-foreground: 0 0% 13%;
 
-    --border: 120 20% 85%;
-    --input: 120 20% 85%;
-    --ring: 120 45% 25%;
+    --border: 0 0% 88%;
+    --input: 0 0% 82%;
+    --ring: 125 35% 30%;
 
     /* Legacy color aliases for existing Flask templates */
-    /* These maintain backward compatibility during migration */
-    --color-primary: hsl(120, 45%, 25%);
-    --color-primary-hover: hsl(120, 45%, 20%);
-    --color-primary-light: hsl(120, 45%, 35%);
-    --color-success: hsl(120, 70%, 35%);
-    --color-success-hover: hsl(120, 70%, 30%);
-    --color-warning: hsl(45, 90%, 55%);
-    --color-warning-hover: hsl(45, 90%, 45%);
-    --color-destructive: hsl(0, 84%, 60%);
-    --color-destructive-hover: hsl(0, 84%, 50%);
-    --color-background: hsl(120, 8%, 97%);
-    --color-foreground: hsl(0, 0%, 15%);
-    --color-muted: hsl(120, 8%, 90%);
-    --color-muted-foreground: hsl(0, 0%, 45%);
-    --color-border: hsl(120, 8%, 85%);
-    --color-input: hsl(120, 8%, 88%);
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(125, 35%, 24%);
+    --color-primary-light: hsl(125, 30%, 40%);
+    --color-success: hsl(var(--success));
+    --color-success-hover: hsl(125, 35%, 24%);
+    --color-warning: hsl(var(--warning));
+    --color-warning-hover: hsl(40, 90%, 42%);
+    --color-destructive: hsl(var(--destructive));
+    --color-destructive-hover: hsl(0, 65%, 42%);
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
 
-    /* Gradients - Football pitch inspired */
-    --gradient-pitch: linear-gradient(135deg, hsl(120, 45%, 25%), hsl(120, 60%, 45%));
-    --gradient-hero: linear-gradient(135deg, hsl(120, 60%, 45%), hsl(120, 45%, 25%));
-    --gradient-subtle: linear-gradient(180deg, hsl(120, 8%, 97%), hsl(120, 15%, 92%));
+    /* No gradients or glows: flat surfaces */
+    --gradient-pitch: hsl(var(--primary));
+    --gradient-hero: hsl(var(--primary));
+    --gradient-subtle: hsl(var(--muted));
 
-    /* Shadows - Enhanced football theme */
-    --shadow-football: 0 4px 12px hsla(120, 45%, 25%, 0.15);
-    --shadow-glow: 0 0 20px hsla(120, 60%, 45%, 0.3);
-    --shadow-elegant: 0 8px 25px -8px hsla(120, 45%, 25%, 0.2);
+    --shadow-football: none;
+    --shadow-glow: none;
+    --shadow-elegant: none;
 
     /* Border Radius */
-    --radius: 0.75rem;      /* 12px - default */
+    --radius: 0.5rem;       /* 8px - default */
 
     /* Typography Scale */
     --font-size-xs: 0.75rem;    /* 12px */
@@ -128,7 +130,6 @@
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-    --shadow-football: 0 4px 14px 0 rgba(34, 139, 34, 0.25);
   }
 
   /* ========================================
@@ -327,17 +328,9 @@
     height: 100%;
   }
   body {
-    /* <!-- Background vector created by Harryarts - www.freepik.com --> */
-    background-image: url("{{url_for('static', filename='background.jpg')}}");
-
-    /* Full height */
     height: 100%;
-
-    /* Center and scale the image nicely */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
 
   .bg-off {
@@ -547,13 +540,9 @@
     font-size: 14px;
   }
 
-  /* Dark mode: darken the background photo (other dark rules live in dark-mode.css) */
-  html.dark-mode body {
-    background-image: linear-gradient(rgba(10, 14, 10, 0.88), rgba(10, 14, 10, 0.88)),
-      url("{{url_for('static', filename='background.jpg')}}");
-  }
-
   </style>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/theme.css') }}">
   <link rel="stylesheet"
         href="{{ url_for('static', filename='css/dark-mode.css') }}">
 {% endblock %}

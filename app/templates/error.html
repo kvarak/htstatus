@@ -1,13 +1,14 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }} - HTStatus{% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <h1>{{ title }}</h1>
+        {{ page_header([(title, None) ]) }}
         {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
         <p>
-          <a href="#" onclick="history.back()" class="btn btn-primary">Go Back</a>
+          <a href="#" onclick="history.back()" class="btn btn-outline-secondary">Go back</a>
         </p>
       </div>
     </div>

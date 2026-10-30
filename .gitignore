@@ -71,3 +71,7 @@ scripts/database/backups/
 
 # Runtime cache (Hattrick translations)
 instance/
+
+# Local UI preview renders (never commit)
+app/static/zz-preview-*.html
+tests/test_zz_preview.py

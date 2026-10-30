@@ -1,18 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <div class="jumbotron">
-          <div class="container">
-            <h1 class="display-4">{{ title }}</h1>
-          </div>
-          {% if current_user %}
-            <div class="alert alert-success" role="alert">Successfully logged in as {{ current_user }}.</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
+    {{ page_header([(title, None) ]) }}
+    {% if current_user %}
+      <div class="alert alert-success" role="alert">Successfully logged in as {{ current_user }}.</div>
+    {% endif %}
     {% if error %}<div class="alert alert-danger" role="alert">{{ error|safe }}</div>{% endif %}
     {% if not(current_user) %}
       <div class="row">
@@ -41,16 +34,11 @@
             <div class="card">
               <div class="card-body">
                 {% if accesslink %}
-                  {% if accesslink %}
-                    <p class="lead">You need to give {{ apptitle }} permission to access your HT data.</p>
-                    <hr class="my-4">
-                    <p>
-                      Click <a href="{{ accesslink }}">here be sent to Hattrick</a>.
-                    </p>
-                  {% else %}
-                    <p class="lead">Success! Access have been granted.</p>
-                    <hr class="my-4">
-                  {% endif %}
+                  <p class="lead">You need to give {{ apptitle }} permission to access your HT data.</p>
+                  <hr class="my-4">
+                  <p>
+                    Click <a href="{{ accesslink }}">here be sent to Hattrick</a>.
+                  </p>
                   {% if team %}<p>{{ team }}</p>{% endif %}
                 {% else %}
                   <form method="POST" action="/login">
@@ -110,6 +98,4 @@
       </div>
     {% endif %}
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

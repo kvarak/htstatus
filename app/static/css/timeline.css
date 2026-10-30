@@ -6,32 +6,18 @@
     padding: 0.5rem 0;
 }
 
-.page-title-box {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid hsl(120, 20%, 85%);
-    border-radius: 0.25rem;
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.page-title-box .breadcrumb-item {
-    color: hsl(120, 45%, 25%);
-    font-weight: 600;
-    font-size: 1rem;
-}
-
 /* Status Messages */
 .status-message {
     padding: 0.5rem;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid hsl(120, 20%, 85%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
 }
 
 .status-success {
-    color: hsl(120, 70%, 35%);
+    color: hsl(var(--primary));
 }
 
 .status-error {
@@ -49,7 +35,7 @@
 /* Timeline Layout - 4 Column Grid */
 .timeline-container {
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
     padding: 0.75rem;
     margin-bottom: 0.5rem;
@@ -58,7 +44,7 @@
 .timeline-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #333;
+    color: hsl(var(--foreground));
     margin-bottom: 0.75rem;
     text-align: center;
 }
@@ -73,26 +59,26 @@
 /* Week Containers */
 .week-container {
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
     overflow: hidden;
     height: fit-content;
 }
 
 .week-container.current-week {
-    border-color: #28a745;
+    border-color: hsl(var(--primary));
     border-width: 2px;
 }
 
 .week-header {
-    background: #f8f9fa;
-    border-bottom: 1px solid #ddd;
+    background: hsl(var(--muted));
+    border-bottom: 1px solid hsl(var(--border));
     padding: 0.5rem;
     text-align: center;
 }
 
 .week-container.current-week .week-header {
-    background: #28a745;
+    background: hsl(var(--primary));
     color: white;
 }
 
@@ -104,7 +90,7 @@
 
 .week-subtitle {
     font-size: 0.7rem;
-    color: #666;
+    color: hsl(var(--muted-foreground));
 }
 
 .week-container.current-week .week-subtitle {
@@ -134,13 +120,13 @@
 
 .day-group {
     padding-left: 0.5rem;
-    border-left: 2px solid #28a745;
+    border-left: 2px solid hsl(var(--primary));
     margin-bottom: 0.5rem;
 }
 
 .day-header {
     font-size: 0.75rem;
-    color: #28a745;
+    color: hsl(var(--primary));
     font-weight: 600;
     margin-bottom: 0.3rem;
     padding: 0.2rem 0;
@@ -148,14 +134,14 @@
 
 .player-entry {
     padding: 0.4rem;
-    background: #f8f9fa;
+    background: hsl(var(--muted));
     border-radius: 0.2rem;
     margin-bottom: 0.35rem;
 }
 
 .player-name {
     font-weight: 600;
-    color: #333;
+    color: hsl(var(--foreground));
     font-size: 0.8rem;
     margin-bottom: 0.2rem;
 }
@@ -167,27 +153,27 @@
 }
 
 .skill-up {
-    color: #28a745;
+    color: hsl(var(--primary));
     font-weight: 500;
 }
 
 .skill-down {
-    color: #dc3545;
+    color: hsl(var(--destructive));
     font-weight: 500;
 }
 
 .money-change {
-    color: #007bff;
+    color: hsl(var(--primary));
     font-weight: 500;
 }
 
 .age-change {
-    color: #6f42c1;
+    color: hsl(var(--muted-foreground));
     font-weight: 500;
 }
 
 .other-change {
-    color: #6c757d;
+    color: hsl(var(--muted-foreground));
     font-weight: 500;
 }
 
@@ -197,26 +183,26 @@
 }
 
 .no-changes {
-    color: #666;
+    color: hsl(var(--muted-foreground));
     font-style: italic;
     font-size: 0.8rem;
     padding: 0.75rem;
     text-align: center;
-    background: #f8f9fa;
+    background: hsl(var(--muted));
 }
 
 /* Updated Teams */
 .updated-teams-box {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid hsl(120, 20%, 85%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.4rem;
     padding: 0.75rem;
     margin-bottom: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
 }
 
 .team-link {
-    color: hsl(120, 45%, 25%);
+    color: hsl(var(--primary));
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
@@ -226,13 +212,13 @@
 }
 
 .team-link:hover {
-    background: hsl(120, 45%, 95%);
+    background: hsl(var(--muted));
     text-decoration: none;
-    color: hsl(120, 55%, 20%);
+    color: hsl(var(--foreground));
 }
 
 .divider {
     border: none;
-    border-top: 2px solid hsl(120, 20%, 85%);
+    border-top: 2px solid hsl(var(--border));
     margin: 1rem 0;
 }

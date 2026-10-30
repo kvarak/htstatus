@@ -60,7 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var ageChart = new Chart(ctx1, {
       type: 'doughnut',
       data: {
-        labels: ['Goalkeepers', 'Defenders', 'Wing Defenders', 'Midfielders', 'Wingers', 'Forwards'],
+        labels: [
+          {{ ht_term('MatchPositions', 'Keeper', 'Goalkeepers') | tojson }},
+          {{ ht_term('MatchPositions', 'CentralDefender', 'Defenders') | tojson }},
+          {{ ht_term('MatchPositions', 'WingBack', 'Wing Defenders') | tojson }},
+          {{ ht_term('MatchPositions', 'InnerMidfield', 'Midfielders') | tojson }},
+          {{ ht_term('MatchPositions', 'Winger', 'Wingers') | tojson }},
+          {{ ht_term('MatchPositions', 'Forward', 'Forwards') | tojson }}
+        ],
         datasets: [{
           data: [
             positionCounts['Goalkeepers'],
@@ -70,14 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
             positionCounts['Wingers'],
             positionCounts['Forwards']
           ],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.8)',   // Goalkeepers - Red
-            'rgba(54, 162, 235, 0.8)',   // Defenders - Blue
-            'rgba(255, 206, 86, 0.8)',   // Wing Defenders - Yellow
-            'rgba(75, 192, 192, 0.8)',   // Midfielders - Teal
-            'rgba(153, 102, 255, 0.8)',  // Wingers - Purple
-            'rgba(255, 159, 64, 0.8)'    // Forwards - Orange
-          ],
+          backgroundColor: [0, 1, 2, 3, 4, 5].map(i => chartColor(i)),
           borderWidth: 2
         }]
       },
@@ -142,9 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endif %}
           ],
           backgroundColor: [
-            'rgba(75, 192, 192, 0.8)',   // Youth - Teal
-            'rgba(54, 162, 235, 0.8)',   // Prime - Blue
-            'rgba(255, 159, 64, 0.8)'    // Veterans - Orange
+            chartColor(0), chartColor(1), chartColor(2)
           ],
           borderWidth: 2
         }]
@@ -182,8 +180,8 @@ document.addEventListener('DOMContentLoaded', function() {
             {{ count }}{% if not loop.last %},{% endif %}
             {% endfor %}
           ],
-          backgroundColor: 'rgba(54, 162, 235, 0.8)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: chartColor(0, 0.8),
+          borderColor: chartColor(0),
           borderWidth: 2,
           barThickness: 20
         }]
@@ -248,8 +246,8 @@ document.addEventListener('DOMContentLoaded', function() {
             {{ count }}{% if not loop.last %},{% endif %}
             {% endfor %}
           ],
-          backgroundColor: 'rgba(75, 192, 192, 0.8)',
-          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: chartColor(0, 0.8),
+          borderColor: chartColor(0),
           borderWidth: 2,
           barThickness: 20
         }]
@@ -312,8 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endfor %}
           ],
           backgroundColor: [
-            {% for country, count, color in country_distribution_all %}
-            '{{ color }}'{% if not loop.last %},{% endif %}
+            {# Flag colors on purpose: the one place where many colors carry meaning #}{% for country, count, color in country_distribution_all %}{{ color | tojson }}{% if not loop.last %},{% endif %}
             {% endfor %}
           ]
         }]
@@ -379,8 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endfor %}
           ],
           backgroundColor: [
-            {% for country, count, color in country_distribution_top11 %}
-            '{{ color }}'{% if not loop.last %},{% endif %}
+            {# Flag colors on purpose: the one place where many colors carry meaning #}{% for country, count, color in country_distribution_top11 %}{{ color | tojson }}{% if not loop.last %},{% endif %}
             {% endfor %}
           ]
         }]
@@ -434,19 +430,9 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 {% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="/">{{ teamname }}</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([(teamname, '/') , (title, None)]) }}
     {% if error %}
       <div class="alert alert-danger" role="alert">{{ error }}</div>
     {% endif %}
@@ -886,6 +872,4 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     </div>
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

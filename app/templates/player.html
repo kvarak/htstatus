@@ -21,6 +21,7 @@
   <script>
   // Data
 
+  {% set skill_names = skill_labels() %}
   {% for ht_id in allplayerids %}
 
   {% set thisplayer = allplayers[ht_id] %}
@@ -36,13 +37,9 @@
     datasets: [
       {% for i in range(7) %}
       {
-      label: "{{ skills[i] }}",
-      backgroundColor: "rgba({{ 255 - i * 40 }}, {{ 155 - i * i }}, {{ i * 30 }}, 0.2)",
-      borderColor: "rgba({{ 255 - i * 40 }}, {{ 155 - i * i }}, {{ i * 30 }})",
-      pointColor: "rgba(220,220,220,1)",
-      pointStrokeColor: "#fff",
-      pointHighlightFill: "#fff",
-      pointHighlightStroke: "rgba(220,220,220,1)",
+      label: {{ skill_names[skills[i]] | tojson }},
+      backgroundColor: chartColor({{ i }}, 0.15),
+      borderColor: chartColor({{ i }}),
       data: [
         {% for (dat, skills) in thisplayer %}
         {{ skills[i] }},
@@ -96,20 +93,10 @@
   </script>
 {% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   {% from "_transfer_macros.html" import bid_amount, bid_badge, bid_details with context %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="#">{{ title }}</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Players</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([(title, '/') , ('Players', None)]) }}
     {% if error %}
       <div class="alert alert-danger" role="alert">{{ error }}</div>
     {% endif %}
@@ -147,7 +134,7 @@
                     </div>
                     <small class="text-muted mt-2">
                       <i class="fas fa-info-circle"></i>
-                      To create or edit player groups, visit the <a href="{{ url_for('main.settings') }}" class="text-primary">Settings page</a>
+                      To create or edit player groups, visit the <a href="{{ url_for('main.settings') }}">Settings page</a>
                     </small>
                   </div>
                 </div>
@@ -252,7 +239,7 @@
                                          alt="{{ specialty_name(p['specialty']) }}"
                                          title="{{ specialty_name(p['specialty']) }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {% endif %}
                                   </td>
                                 {% elif val == "name" %}
@@ -277,34 +264,34 @@
                                     {% if p.mother_club_bonus %}
                                     <img src="{{ url_for('static', filename='ico-homegrown.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {% endif %}
                                     {% if p['is_transfer_listed'] %}
                                     <img src="{{ url_for('static', filename='ico-forsale.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {% endif %}
                                     {% if p['cards'] == 1 %}
                                     <img src="{{ url_for('static', filename='ico-yellow-1.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {% elif p['cards'] == 2 %}
                                     <img src="{{ url_for('static', filename='ico-yellow-2.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {% elif p['cards'] == 3 %}
                                     <img src="{{ url_for('static', filename='ico-red.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {% endif %}
                                     {% if p['injury_level'] == 0 %}
                                     <img src="{{ url_for('static', filename='ico-damage.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                   {% elif p['injury_level'] and p['injury_level'] > 0 %}
                                     <img src="{{ url_for('static', filename='ico-injury.png') }}"
                                          height="13"
-                                         style="background-color:rgba(255, 255, 255, 0.5)">
+                                         class="table-icon">
                                     {{ p['injury_level'] }}
                                     {% endif %}
                                   </td>
@@ -527,6 +514,4 @@
     {% endfor %}
   {% endfor %}
 </div>
-<!-- Footer -->
-{% include 'footer.html' %}
 {% endblock %}

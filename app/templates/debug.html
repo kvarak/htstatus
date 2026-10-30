@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <style>
     .vertical-text {
       writing-mode: vertical-rl;
@@ -12,15 +13,7 @@
     }
   </style>
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([(title, None) ]) }}
     {% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
     <!-- Production Errors Table -->
     <div class="row mb-4">
@@ -640,14 +633,14 @@ function updateTutorialCompletionChart(filteredUsers) {
             datasets: [{
                 label: 'Completed',
                 data: [tutorialData.welcome_complete, tutorialData.player_complete, tutorialData.update_complete],
-                backgroundColor: '#28a745',
-                borderColor: '#1e7e34',
+                backgroundColor: chartColor(0),
+                borderColor: chartColor(0),
                 borderWidth: 1
             }, {
                 label: 'Skipped',
                 data: [tutorialData.welcome_skip, tutorialData.player_skip, tutorialData.update_skip],
-                backgroundColor: '#ffc107',
-                borderColor: '#e0a800',
+                backgroundColor: chartColor(5),
+                borderColor: chartColor(5),
                 borderWidth: 1
             }]
         },
@@ -687,8 +680,8 @@ function updateTutorialHelpChart(filteredUsers) {
             labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
             datasets: [{
                 data: [helpData.welcome_help, helpData.player_help, helpData.update_help],
-                backgroundColor: ['#007bff', '#17a2b8', '#6f42c1'],
-                borderColor: ['#0056b3', '#138496', '#59359a'],
+                backgroundColor: [chartColor(1), chartColor(2), chartColor(4)],
+                borderColor: [chartColor(1), chartColor(2), chartColor(4)],
                 borderWidth: 1
             }]
         },
@@ -731,8 +724,8 @@ function updateTutorialResetChart(filteredUsers) {
             labels: Object.keys(resetBuckets),
             datasets: [{
                 data: Object.values(resetBuckets),
-                backgroundColor: ['#28a745', '#ffc107', '#fd7e14', '#dc3545'],
-                borderColor: ['#1e7e34', '#e0a800', '#e8650e', '#c82333'],
+                backgroundColor: [chartColor(0), chartColor(5), chartColor(6), CHART_DANGER],
+                borderColor: [chartColor(0), chartColor(5), chartColor(6), CHART_DANGER],
                 borderWidth: 1
             }]
         },
@@ -770,8 +763,8 @@ function updateUserActivityChart(filteredUsers) {
             labels: ['Active (30d)', 'Inactive'],
             datasets: [{
                 data: [activeUsers, inactiveUsers],
-                backgroundColor: ['#28a745', '#dc3545'],
-                borderColor: ['#1e7e34', '#c82333'],
+                backgroundColor: [chartColor(0), CHART_DANGER],
+                borderColor: [chartColor(0), CHART_DANGER],
                 borderWidth: 1
             }]
         },
@@ -813,8 +806,8 @@ function updateFeatureUsageChart(filteredUsers) {
             datasets: [{
                 label: 'Total Usage',
                 data: [featureData.team, featureData.training, featureData.matches, featureData.player, featureData.update, featureData.settings, featureData.changes, featureData.feedback, featureData.formation, featureData.stats],
-                backgroundColor: '#007bff',
-                borderColor: '#0056b3',
+                backgroundColor: chartColor(1),
+                borderColor: chartColor(1),
                 borderWidth: 1
             }]
         },
@@ -855,8 +848,8 @@ function updateRegistrationTimelineChart(filteredUsers) {
             datasets: [{
                 label: 'New Users',
                 data: registrationCounts,
-                borderColor: '#28a745',
-                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                borderColor: chartColor(0),
+                backgroundColor: chartColor(0, 0.2),
                 borderWidth: 2,
                 fill: true
             }]
@@ -912,8 +905,8 @@ function updateUsageFrequencyChart(filteredUsers) {
             labels: Object.keys(frequencyBuckets),
             datasets: [{
                 data: Object.values(frequencyBuckets),
-                backgroundColor: ['#ffc107', '#17a2b8', '#28a745', '#dc3545'],
-                borderColor: ['#e0a800', '#138496', '#1e7e34', '#c82333'],
+                backgroundColor: [chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
+                borderColor: [chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
                 borderWidth: 1
             }]
         },
@@ -956,8 +949,8 @@ function updateTopUsersChart(filteredUsers) {
             datasets: [{
                 label: 'Total Activity',
                 data: topUserActivity,
-                backgroundColor: '#6c757d',
-                borderColor: '#5a6268',
+                backgroundColor: chartColor(3),
+                borderColor: chartColor(3),
                 borderWidth: 1
             }]
         },
@@ -1009,8 +1002,8 @@ function updateLoginTimelineChart(filteredUsers) {
             datasets: [{
                 label: 'Weekly Logins',
                 data: Object.values(weekData),
-                borderColor: '#17a2b8',
-                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                borderColor: chartColor(2),
+                backgroundColor: chartColor(2, 0.1),
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4
@@ -1066,8 +1059,8 @@ function updateAdoptionRateChart(filteredUsers) {
             datasets: [{
                 label: 'Adoption Rate (%)',
                 data: adoptionPercentages,
-                backgroundColor: '#28a745',
-                borderColor: '#1e7e34',
+                backgroundColor: chartColor(0),
+                borderColor: chartColor(0),
                 borderWidth: 1
             }]
         },
@@ -1130,8 +1123,8 @@ function updateRetentionChart(filteredUsers) {
             datasets: [{
                 label: 'Retention Rate (%)',
                 data: retentionRates,
-                backgroundColor: '#fd7e14',
-                borderColor: '#e8690b',
+                backgroundColor: chartColor(6),
+                borderColor: chartColor(6),
                 borderWidth: 1
             }]
         },
@@ -1180,8 +1173,8 @@ function updateHourlyActivityChart(filteredUsers) {
             datasets: [{
                 label: 'Activity Count',
                 data: hourlyData,
-                borderColor: '#6f42c1',
-                backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                borderColor: chartColor(4),
+                backgroundColor: chartColor(4, 0.1),
                 borderWidth: 2,
                 fill: true,
                 tension: 0.4
@@ -1237,8 +1230,8 @@ function updateActivityFocusChart(filteredUsers) {
             labels: ['Team Focused', 'Player Focused', 'Balanced'],
             datasets: [{
                 data: [teamFocused, playerFocused, balanced],
-                backgroundColor: ['#007bff', '#28a745', '#ffc107'],
-                borderColor: ['#0056b3', '#1e7e34', '#e0a800'],
+                backgroundColor: [chartColor(1), chartColor(0), chartColor(5)],
+                borderColor: [chartColor(1), chartColor(0), chartColor(5)],
                 borderWidth: 1
             }]
         },
@@ -1274,8 +1267,8 @@ function updatePlayerBreakdownChart(filteredUsers) {
             datasets: [{
                 label: 'Usage Count',
                 data: [playerData.player, playerData.training, playerData.formation],
-                backgroundColor: ['#28a745', '#17a2b8', '#6610f2'],
-                borderColor: ['#1e7e34', '#138496', '#520dc2'],
+                backgroundColor: [chartColor(0), chartColor(2), chartColor(6)],
+                borderColor: [chartColor(0), chartColor(2), chartColor(6)],
                 borderWidth: 1
             }]
         },
@@ -1322,8 +1315,8 @@ function updateTeamBreakdownChart(filteredUsers) {
             labels: ['Team Overview', 'Match Analysis', 'Statistics'],
             datasets: [{
                 data: [teamData.team, teamData.matches, teamData.stats],
-                backgroundColor: ['#007bff', '#fd7e14', '#20c997'],
-                borderColor: ['#0056b3', '#e8690b', '#1aa179'],
+                backgroundColor: [chartColor(1), chartColor(6), chartColor(2)],
+                borderColor: [chartColor(1), chartColor(6), chartColor(2)],
                 borderWidth: 1
             }]
         },
@@ -1369,8 +1362,8 @@ function updateUpdateFrequencyChart(filteredUsers) {
             labels: Object.keys(updateBuckets),
             datasets: [{
                 data: Object.values(updateBuckets),
-                backgroundColor: ['#6c757d', '#ffc107', '#17a2b8', '#28a745', '#dc3545'],
-                borderColor: ['#5a6268', '#e0a800', '#138496', '#1e7e34', '#c82333'],
+                backgroundColor: [chartColor(3), chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
+                borderColor: [chartColor(3), chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
                 borderWidth: 1
             }]
         },
@@ -1420,10 +1413,10 @@ function updateFeatureRadarChart(filteredUsers) {
             datasets: [{
                 label: 'Adoption Rate (%)',
                 data: adoptionPercentages,
-                borderColor: '#6f42c1',
-                backgroundColor: 'rgba(111, 66, 193, 0.2)',
+                borderColor: chartColor(4),
+                backgroundColor: chartColor(4, 0.2),
                 borderWidth: 2,
-                pointBackgroundColor: '#6f42c1'
+                pointBackgroundColor: chartColor(4)
             }]
         },
         options: {
@@ -1480,8 +1473,8 @@ function updateEngagementScoreChart(filteredUsers) {
             datasets: [{
                 label: 'Number of Users',
                 data: Object.values(engagementScoreBuckets),
-                backgroundColor: ['#dc3545', '#ffc107', '#28a745', '#6f42c1'],
-                borderColor: ['#c82333', '#e0a800', '#1e7e34', '#5a32a3'],
+                backgroundColor: [CHART_DANGER, chartColor(5), chartColor(0), chartColor(4)],
+                borderColor: [CHART_DANGER, chartColor(5), chartColor(0), chartColor(4)],
                 borderWidth: 1
             }]
         },

@@ -1,5 +1,6 @@
 """Tests for app/blueprints/matches.py"""
 
+import re
 from unittest.mock import Mock, patch
 
 import pytest
@@ -122,3 +123,59 @@ class TestDownloadRecentMatches:
         assert result is not None, "Result should not be None"
         assert result["success"] is False
         assert "error" in result or "message" in result
+
+
+def _played_match(team_id, ht_id=990001):
+    from datetime import datetime
+
+    from models import Match
+
+    match = Match(
+        {
+            "ht_id": ht_id,
+            "home_team_id": team_id,
+            "home_team_name": "Test Team",
+            "away_team_id": 1,
+            "away_team_name": "Rivals FC",
+            "datetime": datetime(2026, 10, 1, 20, 0),
+            "matchtype": 1,
+            "context_id": 0,
+            "rule_id": 0,
+            "cup_level": 0,
+            "cup_level_index": 0,
+            "home_goals": 2,
+            "away_goals": 1,
+            "home_team_chances_left": 2,
+            "home_team_chances_center": 2,
+            "home_team_chances_right": 1,
+            "away_team_chances_left": 1,
+            "away_team_chances_center": 1,
+            "away_team_chances_right": 1,
+        }
+    )
+    for zone in ("right_def", "mid_def", "left_def", "right_att", "mid_att"):
+        setattr(match, f"home_team_rating_{zone}", 8.0)
+        setattr(match, f"away_team_rating_{zone}", 2.0)
+    for zone in ("left_att", "set_pieces_def", "set_pieces_att"):
+        setattr(match, f"home_team_rating_{zone}", 5.0)
+        setattr(match, f"away_team_rating_{zone}", 5.0)
+    return match
+
+
+def test_matches_page_shows_ratings_as_us_vs_them(app_with_routes, db_session):
+    """Ratings: 'home - away' plus a split bar where our share is the accent."""
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    db_session.add(_played_match(12345))
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert "match-item match-type-league" in html
+    assert "team-box us" in html and "team-box them" in html
+    assert html.count('class="rating-box"') == 8
+    assert re.search(r'class="us"\s+style="width: 80.0%"', html)
+    assert "8.0 - 2.0" in html

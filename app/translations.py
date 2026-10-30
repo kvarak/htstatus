@@ -153,6 +153,11 @@ def level_text(value, section="SkillLevels"):
     return f"{word} ({value})" if fmt == "both" else word
 
 
+def level_texts(max_level=20):
+    """``{level: level_text(level)}`` for JavaScript that formats levels itself."""
+    return {level: level_text(level) for level in range(max_level + 1)}
+
+
 def level_hint(value, section="SkillLevels"):
     """The form not shown, for tooltips ("" when both are already shown)."""
     fmt = level_format()
@@ -172,6 +177,7 @@ def init_app(app):
             "column_label": column_label,
             "level_format": level_format,
             "level_text": level_text,
+            "level_texts": level_texts,
             "level_hint": level_hint,
             "skill_labels": skill_labels,
             "specialty_name": specialty_name,

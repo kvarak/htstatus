@@ -1,16 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="{{ url_for('feedback.list_feedback') }}">Feedback</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ feedback.title }}</li>
-          </ol>
-        </nav>
+        {{ page_header([('Feedback', url_for('feedback.list_feedback') ), (feedback.title, None)]) }}
         <div class="card card-custom mb-4">
           <div class="card-header">
             <div class="d-flex justify-content-between align-items-start">

@@ -3,26 +3,36 @@
  * Centralized chart configuration and common patterns
  */
 
+// One restrained palette for every chart: green and slate (the two accents)
+// in light/dark shades, plus one gray. Red only for "bad" values (errors, losses).
+const CHART_PALETTE = [
+    [125, 35, 30],
+    [215, 28, 45],
+    [125, 25, 55],
+    [215, 25, 68],
+    [0, 0, 55],
+    [125, 20, 75],
+    [215, 30, 28],
+];
+const CHART_DANGER = 'hsl(0, 65%, 50%)';
+
+function chartColor(index, alpha = 1) {
+    const [h, s, l] = CHART_PALETTE[index % CHART_PALETTE.length];
+    return `hsla(${h}, ${s}%, ${l}%, ${alpha})`;
+}
+
 class HattrickCharts {
     constructor() {
         this.defaultColors = {
-            primary: 'hsl(120, 45%, 25%)',      // Football green
-            success: 'hsl(120, 70%, 35%)',      // Success green
-            warning: 'hsl(45, 90%, 55%)',       // Warning yellow
-            danger: 'hsl(0, 84%, 60%)',         // Danger red
-            secondary: 'hsl(0, 0%, 75%)',       // Gray
-            background: 'hsl(120, 8%, 97%)'     // Light background
+            primary: chartColor(0),
+            success: chartColor(0),
+            warning: 'hsl(40, 90%, 50%)',
+            danger: CHART_DANGER,
+            secondary: chartColor(3),
+            background: 'hsl(0, 0%, 98%)'
         };
 
-        this.skillColors = [
-            'hsl(120, 45%, 25%)',   // Keeper - primary green
-            'hsl(140, 50%, 30%)',   // Defender - darker green
-            'hsl(100, 60%, 35%)',   // Playmaker - lighter green
-            'hsl(80, 55%, 40%)',    // Winger - yellow-green
-            'hsl(60, 70%, 45%)',    // Passing - yellow
-            'hsl(40, 80%, 50%)',    // Scorer - orange
-            'hsl(20, 85%, 55%)'     // Set pieces - red-orange
-        ];
+        this.skillColors = CHART_PALETTE.map((_, i) => chartColor(i));
     }
 
     /**
@@ -73,7 +83,7 @@ class HattrickCharts {
                 label: skillName,
                 data: playerData.values,
                 borderColor: this.defaultColors.primary,
-                backgroundColor: this.defaultColors.primary + '20',
+                backgroundColor: chartColor(0, 0.12),
                 tension: 0.3,
                 fill: true
             }]
@@ -103,7 +113,7 @@ class HattrickCharts {
                 label: skill.name,
                 data: skill.values,
                 borderColor: this.skillColors[index % this.skillColors.length],
-                backgroundColor: this.skillColors[index % this.skillColors.length] + '20',
+                backgroundColor: chartColor(index, 0.12),
                 tension: 0.3
             }))
         };
@@ -172,6 +182,9 @@ class HattrickCharts {
 
 // Global instance for use across templates
 window.hattrickCharts = new HattrickCharts();
+
+window.chartColor = chartColor;
+window.CHART_DANGER = CHART_DANGER;
 
 // Global utility functions for backward compatibility
 window.createPlayerChart = function(canvasId, playerData, skillName) {

@@ -27,12 +27,12 @@
 }
 
 .drag-over {
-    border: 2px dashed #007bff;
-    background-color: rgba(0, 123, 255, 0.1);
+    border: 2px dashed hsl(var(--primary));
+    background-color: hsl(var(--primary) / 0.1);
 }
 
 [data-chart-id]:hover .chart-drag-handle {
-    color: #007bff;
+    color: hsl(var(--primary));
 }
 
 /* Chart Display Modes */
@@ -155,15 +155,15 @@
 }
 
 .chart-drop-target {
-    background-color: rgba(0, 123, 255, 0.1);
-    border: 2px dashed #007bff;
+    background-color: hsl(var(--primary) / 0.1);
+    border: 2px dashed hsl(var(--primary));
     border-radius: 0.375rem;
 }
 
 /* Filter Controls */
 .filter-controls {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
+    background-color: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.375rem;
     padding: 10px;
     margin-bottom: 15px;
@@ -214,7 +214,7 @@
 /* Activity Table Enhancements */
 .table-responsive {
     border-radius: 0.375rem;
-    border: 1px solid #dee2e6;
+    border: 1px solid hsl(var(--border));
 }
 
 .table-responsive::-webkit-scrollbar {
@@ -223,15 +223,15 @@
 }
 
 .table-responsive::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: hsl(var(--muted));
     border-radius: 4px;
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: hsl(var(--input));
     border-radius: 4px;
 }
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: hsl(var(--muted-foreground));
 }
