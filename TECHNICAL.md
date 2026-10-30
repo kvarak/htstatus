@@ -166,7 +166,10 @@ HattrickPlanner uses a **logical component CSS architecture** organized by featu
 - **Entry Point**: `/app/static/css/components.css` - Main CSS loader using @import statements
 - **Core Components**: Reusable UI elements organized by logical concern and function
 - **Feature Components**: Domain-specific CSS for complex features (timeline, formations)
-- **Design System**: `/app/templates/base.html` - Global design tokens and CSS variables
+- **Design System**: `/app/templates/base.html` - Global design tokens and CSS variables (neutral grays, green `--primary` for actions/our team, slate `--accent2` for links/selection/info)
+- **Theme**: `/app/static/css/theme.css` - The one look for every page: maps Bootstrap colors to the accent, flat bordered cards, light table headers, page header and footer; the background photo is recolored to the accent via `body::before` (`--background-photo-opacity`). Loaded after the page styles, before `dark-mode.css`
+- **Page skeleton**: every page starts with the `page_header` macro (`templates/_page.html`); the footer is included once by `_skeleton.html`
+- **Charts**: one palette in `static/js/chart-utils.js` (`chartColor(i, alpha)`, `CHART_DANGER` for bad values); country charts keep their flag colors
 
 **Rationale**: Organizes CSS by logical feature and reusability rather than page location. Reusable components can be found easily and maintained independently while preserving load performance.
 
@@ -176,7 +179,7 @@ HattrickPlanner uses a **logical component CSS architecture** organized by featu
 - `components.css` - Main entry point with @import statements (11 lines)
 - `ui-components.css` - Reusable interface elements (sections, containers, comments) (85+ lines)
 - `dark-mode.css` - Dark theme, loaded separately after the page styles; every rule is scoped to `html.dark-mode` (toggle: `js/dark-mode.js`, pre-paint snippet in `_skeleton.html`)
-- `utilities.css` - Helper classes for spacing, colors, display utilities (50+ lines)
+- `utilities.css` - Only helpers Bootstrap lacks (muted text, selectable list items)
 - `layout.css` - Grid systems, positioning, empty states (25+ lines)
 - `charts.css` - Chart.js styling and data visualization (30+ lines)
 - `animations.css` - UI transitions and interactive effects (25 lines)

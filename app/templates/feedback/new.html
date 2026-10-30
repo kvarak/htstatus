@@ -1,12 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
+    {{ page_header([('Feedback', url_for('feedback.list_feedback') ), ('Submit feedback', None)]) }}
     <div class="row justify-content-center">
       <div class="col-md-8 col-lg-6">
-        <div class="card card-custom">
-          <div class="card-header">
-            <h3 class="mb-0">Submit Feedback</h3>
-          </div>
+        <div class="card">
           <div class="card-body">
             <!-- Flash Messages -->
             {% for category, message in get_flashed_messages(with_categories=true) %}

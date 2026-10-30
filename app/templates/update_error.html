@@ -2,19 +2,10 @@
 {% block scripts %}{{ super() }}{% endblock %}
 {% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="update-content">
     <div class="container">
-      <!-- Breadcrumb/Title -->
-      <div class="page-title-box">
-        <nav aria-label="breadcrumb" class="mb-0">
-          <ol class="breadcrumb"
-              style="background: transparent;
-                     padding: 0;
-                     margin: 0">
-            <li class="breadcrumb-item active">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
+      {{ page_header([(title, None) ]) }}
       <!-- Status Messages -->
       {% if error %}
         <div class="status-message status-error">
@@ -43,7 +34,7 @@
           <div class="updated-teams-box">
             {% for key, value in updated.items() %}
               <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-                <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ value[0] }}:</span>
+                <span class="font-weight-bold text-primary">{{ value[0] }}:</span>
                 <a href="{{ value[1] }}" class="team-link">{{ value[2] }}</a>
               </p>
             {% endfor %}
@@ -97,7 +88,9 @@
                   </div>
                 </div>
               {% else %}
-                {% if not changes_day %}<div class="empty-state">No player changes recorded</div>{% endif %}
+                {% if not changes_day %}
+                  <div class="empty-state">No player changes recorded</div>
+                {% endif %}
               {% endif %}
             </div>
           {% endif %}

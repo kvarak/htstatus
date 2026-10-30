@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
             html += `
                 <div class="row align-items-center mb-2">
                     <div class="col-4">
-                        <span class="badge ${getPositionBadgeClass(parseInt(positionId))}" style="font-size: 0.6rem;">
+                        <span class="badge badge-secondary" style="font-size: 0.6rem;">
                             ${positionAbbr}
                         </span>
                     </div>
@@ -253,13 +253,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Get badge class for position
-    function getPositionBadgeClass(positionId) {
-        if (positionId === 100) return 'bg-warning text-dark';
-        if (positionId <= 105) return 'bg-primary text-white';
-        if (positionId <= 110) return 'bg-info text-white';
-        return 'bg-danger text-white';
-    }
-
     function handleDragStart(e) {
         draggedElement = this;
         this.classList.add('dragging');
@@ -562,6 +555,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const SPECIALTY_NAMES = {{ specialty_names() | tojson }};
         const SKILL_LABELS = {{ skill_labels() | tojson }};
+        const LEVEL_TEXT = {{ level_texts() | tojson }};
+
+        function levelText(value) {
+            return LEVEL_TEXT[value] ?? String(value);
+        }
 
         function getSpecialtyName(specialty) {
             return SPECIALTY_NAMES[specialty] || SPECIALTY_NAMES[0];
@@ -628,14 +626,14 @@ document.addEventListener('DOMContentLoaded', function() {
             tooltip.innerHTML = `
                 <div class="tooltip-name">${playerName}</div>
                 <div class="tooltip-stats">
-                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.keeper}:</span> <span class="stat-value">${data.keeper || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.defender}:</span> <span class="stat-value">${data.defender || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.playmaker}:</span> <span class="stat-value">${data.playmaker || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.winger}:</span> <span class="stat-value">${data.winger || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.passing}:</span> <span class="stat-value">${data.passing || 0}</span></div>
-                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.scorer}:</span> <span class="stat-value">${data.scorer || 0}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.keeper}:</span> <span class="stat-value">${levelText(data.keeper || 0)}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.defender}:</span> <span class="stat-value">${levelText(data.defender || 0)}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.playmaker}:</span> <span class="stat-value">${levelText(data.playmaker || 0)}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.winger}:</span> <span class="stat-value">${levelText(data.winger || 0)}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.passing}:</span> <span class="stat-value">${levelText(data.passing || 0)}</span></div>
+                    <div class="stat-item"><span class="stat-label">${SKILL_LABELS.scorer}:</span> <span class="stat-value">${levelText(data.scorer || 0)}</span></div>
                 </div>
-                <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #555;">
+                <div class="tooltip-extra">
                     <div class="stat-item"><span class="stat-label">Best Pos:</span> <span class="stat-value">${calculateBestPosition(data)}</span></div>
                     <div class="stat-item"><span class="stat-label">${SKILL_LABELS.specialty}:</span> <span class="stat-value">${getSpecialtyName(data.specialty)}</span></div>
                 </div>
@@ -705,23 +703,12 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 {% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <!-- Work in Progress Sticker -->
-  <div class="wip-sticker">
-    <span>🚧 Work in Progress</span>
-  </div>
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="/">{{ teamname }}</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {% call page_header([(teamname, '/'), (title, None)]) %}
+      <span class="wip-sticker">Work in progress</span>
+    {% endcall %}
     {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
     <!-- Two Column Layout: Formation Layout | Live Analysis -->
     <div class="row mb-4">
@@ -741,33 +728,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 <span id="formation-status" class="badge bg-info text-white">{{ selected_formation }}</span>
               </div>
               <!-- Football Pitch Visual -->
-              <div class="position-relative bg-success"
-                   style="background: linear-gradient(90deg, #228B22 0%, #32CD32 50%, #228B22 100%);
-                          border-radius: 8px;
-                          padding: 20px;
-                          min-height: 400px">
+              <div class="pitch">
                 <div class="text-center text-white">
                   <!-- Available Players Pool -->
                   <div class="mb-4">
                     <h6 class="mb-2">🏃 Available Players</h6>
-                    <div id="player-pool"
-                         class="d-flex justify-content-center flex-wrap gap-2"
-                         style="min-height: 50px;
-                                background: rgba(255,255,255,0.1);
-                                border-radius: 8px;
-                                padding: 10px">
+                    <div id="player-pool">
                       {% for player in current_players %}
                         <div class="position-player available-player"
                              draggable="true"
                              data-player-id="{{ player.ht_id }}"
                              data-player-number="{{ player.number or '#' }}"
                              data-player-name="{{ player.first_name }} {{ player.last_name }}"
-                             data-player-data='{"ht_id": {{ player.ht_id }}, "keeper": {{ player.keeper or 0 }}, "defender": {{ player.defender or 0 }}, "playmaker": {{ player.playmaker or 0 }}, "winger": {{ player.winger or 0 }}, "passing": {{ player.passing or 0 }}, "scorer": {{ player.scorer or 0 }}, "set_pieces": {{ player.set_pieces or 0 }}, "form": {{ player.form or 7 }}, "experience": {{ player.experience or 0 }}, "loyalty": {{ player.loyalty or 0 }}, "specialty": {{ player.specialty or 0 }}}'
-                             style="padding: 4px 8px;
-                                    border-radius: 4px;
-                                    cursor: grab;
-                                    font-size: 0.8rem;
-                                    font-weight: bold">
+                             data-player-data='{"ht_id": {{ player.ht_id }}, "keeper": {{ player.keeper or 0 }}, "defender": {{ player.defender or 0 }}, "playmaker": {{ player.playmaker or 0 }}, "winger": {{ player.winger or 0 }}, "passing": {{ player.passing or 0 }}, "scorer": {{ player.scorer or 0 }}, "set_pieces": {{ player.set_pieces or 0 }}, "form": {{ player.form or 7 }}, "experience": {{ player.experience or 0 }}, "loyalty": {{ player.loyalty or 0 }}, "specialty": {{ player.specialty or 0 }}}'>
                           {% if player.number %}
                             #{{ player.number }}
                           {% else %}
@@ -785,16 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="position-slot goalkeeper-slot"
                              data-position-id="100"
                              data-position-name="Goalkeeper"
-                             data-position-type="GK"
-                             style="min-width: 80px;
-                                    min-height: 50px;
-                                    background: rgba(255,193,7,0.3);
-                                    border: 2px dashed rgba(255,193,7,0.6);
-                                    border-radius: 8px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    margin: 5px">
+                             data-position-type="GK">
                           <span class="position-label">GK</span>
                         </div>
                       </div>
@@ -805,16 +769,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="position-slot defender-slot"
                              data-position-id="101"
                              data-position-name="Right Back"
-                             data-position-type="DEF"
-                             style="min-width: 60px;
-                                    min-height: 40px;
-                                    background: rgba(0,123,255,0.3);
-                                    border: 2px dashed rgba(0,123,255,0.6);
-                                    border-radius: 6px;
-                                    display: flex;
-                                    align-items: center;
-                                    justify-content: center;
-                                    margin: 2px">
+                             data-position-type="DEF">
                           <span class="position-label small">RB</span>
                         </div>
                         <div class="position-slot defender-slot"
@@ -979,9 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   {% for position_id, score_data in formation_analysis.position_scores.items() %}
                     <div class="row align-items-center mb-3">
                       <div class="col-md-4">
-                        <span class="badge {% if position_id == 100 %}bg-warning text-dark{% elif position_id <= 105 %}bg-primary{% elif position_id <= 110 %}bg-info{% else %}bg-danger{% endif %} me-2">
-                          {{ position_id }}
-                        </span>
+                        <span class="badge badge-secondary mr-2">{{ position_id }}</span>
                         <strong>{{ score_data.position_name }}</strong>
                       </div>
                       <div class="col-md-6">
@@ -1013,6 +966,4 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
     {% endif %}
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

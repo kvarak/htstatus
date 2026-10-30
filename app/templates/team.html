@@ -1,24 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <div class="jumbotron">
-          <img src="{{ url_for('static', filename='team.jpg') }}"
-               class="rounded float-right img-fluid-2"
-               height="200">
-          <div class="container">
-            <h1 class="display-4">{{ team }}</h1>
-            <p class="lead">{{ current_user }}</p>
-            <hr class="my-4">
-            <p>
-              <i>Under construction</i>
-            </p>
-          </div>
-        </div>
+    {{ page_header([(team, None) ]) }}
+    <div class="card">
+      <div class="card-body">
+        <p class="text-muted mb-0">{{ current_user }}: under construction</p>
       </div>
     </div>
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

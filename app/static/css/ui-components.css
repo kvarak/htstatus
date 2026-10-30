@@ -5,22 +5,22 @@
 .section-title {
     font-size: 1rem;
     font-weight: 600;
-    color: hsl(120, 45%, 25%);
+    color: hsl(var(--primary));
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
-    background: rgba(255, 255, 255, 0.95);
+    background: hsl(var(--card));
     padding: 0.75rem;
-    border: 1px solid hsl(120, 20%, 85%);
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
 }
 
 .section-subtitle {
     font-size: 0.8rem;
-    color: hsl(120, 15%, 50%);
+    color: hsl(var(--muted-foreground));
     font-style: italic;
-    background: rgba(255, 255, 255, 0.90);
+    background: hsl(var(--card));
     padding: 0.5rem 0.75rem;
-    border: 1px solid hsl(120, 15%, 90%);
+    border: 1px solid hsl(var(--border));
     border-top: none;
     border-radius: 0 0 0.25rem 0.25rem;
     margin: 0 0 0.75rem 0;
@@ -28,16 +28,16 @@
 
 /* Content Containers */
 .changes-box {
-    background: hsl(120, 8%, 97%);
-    border: 1px solid hsl(120, 20%, 85%);
+    background: hsl(var(--muted));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
     padding: 0.75rem;
     margin-bottom: 1rem;
 }
 
 .changes-container {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid hsl(120, 20%, 85%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     border-radius: 0.25rem;
     padding: 0.75rem;
     margin-bottom: 1rem;
@@ -46,10 +46,10 @@
 .changes-container-title {
     font-size: 1rem;
     font-weight: 600;
-    color: hsl(120, 45%, 25%);
+    color: hsl(var(--primary));
     margin-bottom: 0.75rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid hsl(120, 20%, 85%);
+    border-bottom: 1px solid hsl(var(--border));
 }
 
 .changes-section {
@@ -62,11 +62,11 @@
 
 .changes-section-label {
     font-size: 0.85rem;
-    color: hsl(120, 15%, 50%);
+    color: hsl(var(--muted-foreground));
     font-style: italic;
     margin-bottom: 0.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid hsl(120, 15%, 90%);
+    border-bottom: 1px solid hsl(var(--border));
 }
 
 .updated-teams-box p {
@@ -105,10 +105,10 @@
 
 /* Match Tables */
 .table-custom thead th {
-    background-color: hsl(120, 8%, 97%);
-    border-bottom: 2px solid hsl(120, 20%, 85%);
+    background-color: hsl(var(--muted));
+    border-bottom: 2px solid hsl(var(--border));
     font-weight: 600;
-    color: hsl(120, 45%, 25%);
+    color: hsl(var(--primary));
     font-size: 0.875rem;
 }
 
@@ -117,7 +117,7 @@
 }
 
 .match-row:hover {
-    background-color: hsl(120, 8%, 97%) !important;
+    background-color: hsl(var(--muted)) !important;
 }
 
 .badge {
@@ -130,57 +130,8 @@
 }
 
 .filter-btn.active {
-    background-color: hsl(120, 45%, 25%) !important;
-    border-color: hsl(120, 45%, 25%) !important;
+    background-color: hsl(var(--primary)) !important;
+    border-color: hsl(var(--primary)) !important;
     color: white !important;
 }
 
-/* Work in Progress Sticker */
-.wip-sticker {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    padding: 10px 15px;
-    border-radius: 10px;
-    transform: rotate(8deg);
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
-    z-index: 1000;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    animation: gentle-pulse 3s infinite;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: default;
-    user-select: none;
-}
-
-@keyframes gentle-pulse {
-    0%, 100% {
-        transform: rotate(8deg) scale(1);
-    }
-    50% {
-        transform: rotate(8deg) scale(1.02);
-    }
-}
-
-.wip-sticker:hover {
-    transform: rotate(12deg) scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.6);
-}
-
-.wip-sticker::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-    border-radius: 12px;
-    pointer-events: none;
-}

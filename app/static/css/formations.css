@@ -2,11 +2,21 @@
 /* Used in: formations.html */
 
 /* Formation System Base */
+/* The pitch: one flat green; empty slots are white outlines */
+.pitch {
+    position: relative;
+    background: hsl(125, 30%, 36%);
+    border-radius: var(--radius, 8px);
+    padding: 20px;
+    min-height: 400px;
+}
+
 .position-slot {
     min-width: 60px;
     min-height: 40px;
-    border: 2px dashed rgba(0,0,0,0.3);
-    border-radius: 8px;
+    background: rgba(255,255,255,0.12);
+    border: 2px dashed rgba(255,255,255,0.6);
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,70 +26,52 @@
     margin: 2px;
 }
 
-/* Position Type Styling */
 .position-slot.goalkeeper-slot {
-    background: rgba(255,193,7,0.3);
-    border-color: rgba(255,193,7,0.6);
     min-width: 80px;
     min-height: 50px;
 }
 
-.position-slot.defender-slot {
-    background: rgba(0,123,255,0.3);
-    border-color: rgba(0,123,255,0.6);
-}
-
-.position-slot.midfielder-slot {
-    background: rgba(40,167,69,0.3);
-    border-color: rgba(40,167,69,0.6);
-}
-
-.position-slot.forward-slot {
-    background: rgba(220,53,69,0.3);
-    border-color: rgba(220,53,69,0.6);
-}
-
 .position-slot.occupied {
-    background: rgba(76, 175, 80, 0.9) !important;
-    border-color: rgba(76, 175, 80, 1) !important;
+    background: rgba(255,255,255,0.9) !important;
+    border-color: #fff !important;
     border-style: solid;
 }
 
-/* Live effectiveness of the assigned player (set by formations.html JS) */
+/* Live effectiveness of the assigned player (set by formations.html JS):
+   the only colors on the pitch, because they mean something */
 .position-slot.occupied.effect-high {
-    background: rgba(40, 167, 69, 0.9) !important;
-    border-color: rgba(30, 126, 52, 1) !important;
+    background: hsl(var(--primary)) !important;
+    border-color: #fff !important;
 }
 
 .position-slot.occupied.effect-mid {
-    background: rgba(255, 193, 7, 0.9) !important;
-    border-color: rgba(224, 168, 0, 1) !important;
+    background: hsl(var(--warning)) !important;
+    border-color: #fff !important;
 }
 
 .position-slot.occupied.effect-low {
-    background: rgba(220, 53, 69, 0.85) !important;
-    border-color: rgba(189, 33, 48, 1) !important;
+    background: hsl(var(--destructive)) !important;
+    border-color: #fff !important;
 }
 
 .position-slot.drag-over {
     transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.3);
 }
 
 /* Position Labels */
 .position-label {
     font-size: 0.7rem;
-    color: rgba(0,0,0,0.7);
+    color: rgba(255,255,255,0.85);
     font-weight: bold;
     pointer-events: none;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 /* Positioned Players */
 .positioned-player {
-    background: rgba(255,255,255,0.95);
-    color: #333;
-    border: 2px solid #28a745;
+    background: #fff;
+    color: hsl(var(--foreground));
+    border: 2px solid hsl(var(--primary));
     border-radius: 50%;
     width: 35px;
     height: 35px;
@@ -109,81 +101,15 @@
 /* Player Pool */
 #player-pool {
     min-height: 60px;
-    border: 2px dashed rgba(0,123,255,0.5);
+    border: 2px dashed rgba(255,255,255,0.5);
     border-radius: 8px;
     padding: 10px;
-    background: rgba(248,249,250,0.8);
+    background: rgba(255,255,255,0.1);
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     align-items: center;
     justify-content: center;
-}
-
-/* Legacy Compatibility Classes */
-.defender-slot, .midfielder-slot, .forward-slot {
-    background: rgba(0,123,255,0.3);
-    border: 2px dashed rgba(0,123,255,0.6);
-}
-
-.midfielder-slot {
-    background: rgba(23,162,184,0.3);
-    border: 2px dashed rgba(23,162,184,0.6);
-}
-
-.forward-slot {
-    background: rgba(220,53,69,0.3);
-    border: 2px dashed rgba(220,53,69,0.6);
-}
-
-/* Work in Progress Sticker */
-.wip-sticker {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: linear-gradient(135deg, #ff6b35, #f7931e);
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    padding: 10px 15px;
-    border-radius: 10px;
-    transform: rotate(8deg);
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
-    z-index: 1000;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    animation: gentle-pulse 3s infinite;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    cursor: default;
-    user-select: none;
-}
-
-@keyframes gentle-pulse {
-    0%, 100% {
-        transform: rotate(8deg) scale(1);
-    }
-    50% {
-        transform: rotate(8deg) scale(1.02);
-    }
-}
-
-.wip-sticker:hover {
-    transform: rotate(12deg) scale(1.05);
-    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.6);
-}
-
-.wip-sticker::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
-    border-radius: 12px;
-    pointer-events: none;
 }
 
 /* Player Elements */
@@ -218,22 +144,22 @@
 }
 
 .available-player {
-    background: white;
-    color: #333;
+    background: #fff;
+    color: hsl(var(--foreground));
     padding: 4px 8px;
     border-radius: 4px;
     cursor: grab;
     font-size: 0.8rem;
     margin: 2px 0;
-    border: 1px solid #ddd;
+    border: 1px solid hsl(var(--border));
     transition: all 0.2s ease;
     font-weight: bold;
 }
 
 .available-player:hover {
-    background: #f8f9fa;
-    border-color: #007bff;
-    color: white;
+    background: hsl(var(--muted));
+    border-color: hsl(var(--primary));
+    color: hsl(var(--foreground));
     transform: translateY(-2px);
 }
 
@@ -259,7 +185,7 @@
     font-weight: bold;
     font-size: 0.85rem;
     margin-bottom: 4px;
-    color: #4CAF50;
+    color: hsl(125, 35%, 70%);
 }
 
 .tooltip-stats {
@@ -281,4 +207,10 @@
 .stat-value {
     font-weight: bold;
     color: white;
+}
+
+.tooltip-extra {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.3);
 }

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **One look for every page** - minimal style with neutral grays, a green accent (buttons, our team) and a slate blue second accent (links, selections, info) to balance it: the background photo is tinted green-to-slate, no gradients or Bootstrap blues; the same page header, cards, tables and footer everywhere; charts share one calm palette (except the country charts, which keep the flag colors); match ratings show our team in green vs the opponent in gray
+- **Hattrick terms and level format everywhere** - training, compare, stats, formations and the update timeline now use your Hattrick language and your "show levels as" setting, like the player page
+
+### Fixed
+- Offline/PWA: our own CSS/JS are now fetched fresh after a deploy (service worker no longer serves stale files); its pre-cache no longer lists files that don't exist
+- Compare page loaded a second, unpinned copy of Chart.js
+
 ### Added
 - **New player table columns reach everyone** - a column added to HattrickPlanner now appears at the end of every user's player table once (including saved column lists), so it's easy to notice; hide it in Settings if you don't want it
 - **Current bid on transfer-listed players** (FEAT-025, #27) - new "Current bid" column (shown for everyone, also users with their own saved columns) and a line in the player popup: highest bid, asking price, deadline and highest bidder, with "ends soon" / "deadline passed" badges. Bids are updated with Update, at no extra Hattrick calls

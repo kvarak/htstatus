@@ -1,0 +1,2909 @@
+
+<!DOCTYPE html>
+  <html lang="en">
+      <head>
+          <title>Debug</title>
+          <script>
+            // Applies the saved dark mode choice before the page paints, so light mode does not flash.
+            (function () {
+              var stored = localStorage.getItem("htstatus-dark-mode");
+              var dark = stored !== null ? stored === "true" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+              if (dark) document.documentElement.classList.add("dark-mode");
+            })();
+          </script>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="icon" href="/static/ico.jpg">
+  <link rel="manifest"
+        href="/static/manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="app-version" content="3.23">
+  <!-- Bootstrap: Latest compiled and minified CSS -->
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <!-- HattrickPlanner Component Styles -->
+  <link rel="stylesheet"
+        href="/static/css/components.css">
+  <style>
+  /* ========================================
+     HattrickPlanner Design System
+     Football-themed unified design tokens
+     ======================================== */
+
+  :root {
+    /* Color System - minimal: neutral grays + one green accent.
+       Warning/destructive are for warnings and errors only. */
+    /* Using HSL without hsl() wrapper for consistent color management */
+
+    --primary: 125 35% 30%;                    /* The one accent: football green */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 125 35% 30%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 15%;
+
+    --success: 125 35% 30%;                    /* Same as the accent */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 40 90% 50%;
+    --warning-foreground: 40 30% 12%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 125 35% 30%;
+    --accent-foreground: 0 0% 100%;
+
+    --accent2: 215 28% 42%;                    /* Second accent: slate blue, balances the green */
+    --accent2-foreground: 0 0% 100%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+
+    --border: 0 0% 88%;
+    --input: 0 0% 82%;
+    --ring: 125 35% 30%;
+
+    /* Legacy color aliases for existing Flask templates */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(125, 35%, 24%);
+    --color-primary-light: hsl(125, 30%, 40%);
+    --color-success: hsl(var(--success));
+    --color-success-hover: hsl(125, 35%, 24%);
+    --color-warning: hsl(var(--warning));
+    --color-warning-hover: hsl(40, 90%, 42%);
+    --color-destructive: hsl(var(--destructive));
+    --color-destructive-hover: hsl(0, 65%, 42%);
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
+
+    /* No gradients or glows: flat surfaces */
+    --gradient-pitch: hsl(var(--primary));
+    --gradient-hero: hsl(var(--primary));
+    --gradient-subtle: hsl(var(--muted));
+
+    --shadow-football: none;
+    --shadow-glow: none;
+    --shadow-elegant: none;
+
+    /* Border Radius */
+    --radius: 0.5rem;       /* 8px - default */
+
+    /* Typography Scale */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 2rem;      /* 32px */
+    --font-size-4xl: 2.5rem;    /* 40px */
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Spacing Scale (0.25rem increments) */
+    --spacing-1: 0.25rem;   /* 4px */
+    --spacing-2: 0.5rem;    /* 8px */
+    --spacing-3: 0.75rem;   /* 12px */
+    --spacing-4: 1rem;      /* 16px */
+    --spacing-6: 1.5rem;    /* 24px */
+    --spacing-8: 2rem;      /* 32px */
+    --spacing-12: 3rem;     /* 48px */
+    --spacing-16: 4rem;     /* 64px */
+
+    /* Border Radius */
+    --radius-sm: 0.125rem;  /* 2px */
+    --radius-md: 0.375rem;  /* 6px */
+    --radius-lg: 0.5rem;    /* 8px */
+    --radius-xl: 0.75rem;   /* 12px */
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+
+  /* ========================================
+     Component Classes - Unified System
+     ======================================== */
+
+  /* Button Components */
+  .btn-primary-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    border: none;
+    border-radius: var(--radius);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-football);
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:hover {
+    background-color: hsl(var(--primary) / 0.9);
+    box-shadow: var(--shadow-glow);
+    color: hsl(var(--primary-foreground));
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:focus {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  .btn-primary-custom:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success-custom {
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+  }
+
+  .btn-success-custom:hover {
+    background-color: hsl(var(--success) / 0.9);
+  }
+
+  .btn-warning-custom {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+  }
+
+  .btn-warning-custom:hover {
+    background-color: hsl(var(--warning) / 0.9);
+  }
+
+  .btn-destructive-custom {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+  }
+
+  .btn-destructive-custom:hover {
+    background-color: hsl(var(--destructive) / 0.9);
+  }
+
+  /* Table Components */
+  .table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-xs);
+    background-color: hsl(var(--card));
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-football);
+  }
+
+  .table-custom thead {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .table-custom thead th {
+    padding: var(--spacing-2);
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    border-bottom: 2px solid hsl(var(--primary) / 0.9);
+    vertical-align: bottom;
+  }
+
+  /* Special styling for player table with rotated headers */
+  .table-custom.table-rotated thead th {
+    padding-top: 4rem;
+    height: 5rem;
+  }
+
+  .table-custom tbody tr {
+    border-bottom: 1px solid hsl(var(--border));
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .table-custom tbody tr:hover {
+    background-color: hsl(var(--muted));
+  }
+
+  .table-custom tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table-custom tbody td {
+    padding: var(--spacing-1) var(--spacing-2);
+    line-height: var(--line-height-tight);
+  }
+
+  .table-custom.table-striped tbody tr:nth-child(even) {
+    background-color: hsl(var(--background));
+  }
+
+  /* Card Components */
+  .card-custom {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-football);
+    overflow: hidden;
+  }
+
+  .card-custom-header {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-bottom: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  .card-custom-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: hsl(var(--foreground));
+    margin: 0;
+  }
+
+  .card-custom-body {
+    padding: var(--spacing-6);
+  }
+
+  .card-custom-footer {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  /* Typography Utilities */
+  .text-primary-custom {
+    color: hsl(var(--primary));
+  }
+
+  .text-success-custom {
+    color: hsl(var(--success));
+  }
+
+  .text-warning-custom {
+    color: hsl(var(--warning));
+  }
+
+  .text-destructive-custom {
+    color: hsl(var(--destructive));
+  }
+
+  .text-muted-custom {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Background Utilities */
+  .bg-primary-custom {
+    background-color: hsl(var(--primary));
+  }
+
+  .bg-success-custom {
+    background-color: hsl(var(--success));
+  }
+
+  .bg-muted-custom {
+    background-color: hsl(var(--muted));
+  }
+
+  /* ========================================
+     Original Styles (Legacy - To Review)
+     ======================================== */
+
+  body, html {
+    height: 100%;
+  }
+  body {
+    height: 100%;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  .bg-off {
+    background-color:#d6d6d6!important
+  }
+  .bg-roundup {
+    background-color:#34c8db!important
+  }
+  .img-fluid-2 {
+    max-height: 100%;
+    width: auto;
+  }
+
+  .text-small {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .table-scroll{
+    display: inline-block;
+    overflow: auto;
+    padding-bottom: 2rem;
+  }
+
+  .td-fixed {
+    background-color:#ffffff!important;
+    position: absolute;
+  }
+
+  .text-sm10 {
+    font-size: 10px;
+  }
+
+  .text-sm11 {
+    font-size: 11px;
+  }
+
+  .text-sm13 {
+    font-size: 13px;
+  }
+
+  /* Sortable tables */
+  table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+  }
+
+  .parent {
+    overflow: hidden; /* required */
+    height: 1px; /* some non-zero number */
+  }
+
+  .ribbon {
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 13, 165);
+    color:white;
+    padding:1em 0;
+    position: absolute;
+    top:0;
+    right:0;
+    transform: translateX(30%) translateY(0%) rotate(45deg);
+    transform-origin: top left;
+    z-index: 100;
+  }
+  .ribbon:before,
+  .ribbon:after {
+    content: '';
+    position: absolute;
+    top:0;
+    margin: 0 -1px; /* tweak */
+    width: 100%;
+    height: 100%;
+    background: rgb(36, 13, 165);
+  }
+  .ribbon:before {
+    right:100%;
+  }
+
+  .ribbon:after {
+    left:100%;
+  }
+
+  .chart {
+    vertical-align: middle;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    display: inline-block;
+  }
+
+  canvas {
+    height: 100%;
+  }
+
+  .loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+    margin: -76px 0 0 -76px;
+    /* border-top: 10px solid rgb(0, 0, 223);
+    border-right: 10px solid rgb(70, 235, 70);
+    border-bottom: 10px solid rgb(70, 235, 70);
+    border-left: 10px solid rgb(70, 235, 70); */
+    border-radius: 70%;
+    /* -webkit-animation: spin 1s alternate infinite;
+    animation: spin 1s alternate infinite; */
+    -webkit-animation: spin 1.7s linear infinite;
+    animation: spin 1.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .list-group-item {
+    padding: 0.25rem 1.25rem;
+  }
+
+  div.vertical {
+    margin-left: -10px;
+    /* position: absolute; */
+    width: 24px;
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg); /* Safari/Chrome */
+    -moz-transform: rotate(-90deg);    /* Firefox */
+    -o-transform: rotate(-90deg);      /* Opera */
+    -ms-transform: rotate(-90deg);     /* IE 9 */
+  }
+
+  th.vertical {
+    max-width: 50px;
+    height: 85px;
+    line-height: 14px;
+    padding-left: 15px;
+    padding-bottom: 10px;
+    text-align: inherit;
+  }
+
+  /* PWA Mobile Optimizations */
+  @media (max-width: 768px) {
+    .container {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .table-responsive {
+      font-size: 12px;
+    }
+
+    .navbar-nav {
+      text-align: center;
+    }
+
+    .table th, .table td {
+      padding: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    /* Hide non-essential columns on mobile */
+    .table .d-none-mobile {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .table th, .table td {
+      padding: 0.3rem;
+      font-size: 0.8rem;
+    }
+
+    .navbar-brand {
+      font-size: 1rem;
+    }
+  }
+
+  /* PWA Install Button */
+  #install-pwa {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1f2937;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-size: 14px;
+  }
+
+  </style>
+  <link rel="stylesheet"
+        href="/static/css/theme.css">
+  <link rel="stylesheet"
+        href="/static/css/dark-mode.css">
+
+      </head>
+      <body >
+        
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      
+        <!-- Authenticated navigation -->
+        <ul class="navbar-nav" id="navbar-authenticated">
+          <li>
+            <img height="30" src="/static/chpp.png">
+            &nbsp;&nbsp;&nbsp;
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
+          </li>
+          
+            
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="navbar-team-dropdown-0"
+                   role="button"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">Test Team</a>
+                <div class="dropdown-menu"
+                     aria-labelledby="navbar-team-dropdown-0">
+                  <!-- <a class="dropdown-item" href="/team?id=12345">Team</a> -->
+                  <a id="navbar-players-link-0"
+                     class="dropdown-item"
+                     href="/player?id=12345"
+                     onclick="loading();">Players</a>
+                  <a id="navbar-formations-link-0"
+                     class="dropdown-item"
+                     href="/formations?id=12345"
+                     onclick="loading();">Formations</a>
+                  <a id="navbar-matches-link-0"
+                     class="dropdown-item"
+                     href="/matches?id=12345"
+                     onclick="loading();">Matches</a>
+                  <a id="navbar-training-link-0"
+                     class="dropdown-item"
+                     href="/training?id=12345"
+                     onclick="loading();">Training</a>
+                  <a id="navbar-stats-link-0"
+                     class="dropdown-item"
+                     href="/stats?id=12345"
+                     onclick="loading();">Statistics</a>
+                </div>
+              </li>
+            
+          
+          <li class="nav-item">
+            <a id="navbar-update-link"
+               class="nav-link"
+               href="/update"
+               onclick="loading();">Update data</a>
+          </li>
+          <li class="nav-item">
+            <a id="navbar-settings-link"
+               class="nav-link"
+               href="/settings"
+               onclick="loading();">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
+          </li>
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
+            </li>
+          
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
+            
+          </li>
+        </ul>
+      
+    </div>
+    <button type="button"
+            id="dark-mode-toggle"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode">
+      <span id="dark-mode-icon">&#127769;</span>
+    </button>
+  </nav>
+  <!-- PWA Install Button and Session Persistence -->
+  <button id="install-pwa"
+          title="Install HTStatus as an app"
+          style="display: none">📱 Install App</button>
+  <!-- Password Migration Notice -->
+  
+  <div class="container"
+       data-current-user="kvarak">
+    <div class="row">
+      <div class="col-sm">
+        <p></p>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="parent">
+  <h8 class="ribbon">Beta version 3.23</h8>
+</div> -->
+  <div class="loader" id="loading">
+    <img src="/static/soccer_ball.png" width="100">
+  </div>
+
+          
+  
+  <style>
+    .vertical-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      white-space: nowrap;
+      height: 120px;
+      vertical-align: bottom;
+      padding: 8px 4px !important;
+      transform: rotate(180deg);
+    }
+  </style>
+  <div class="container">
+    
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        
+          
+            <li class="breadcrumb-item active" aria-current="page">Debug</li>
+          
+        
+      </ol>
+    </nav>
+    
+  </div>
+
+    
+    <!-- Production Errors Table -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-exclamation-triangle text-warning mr-2"></i>Recent Production Errors
+              <small class="text-muted">(Last 10 errors)</small>
+            </h5>
+            
+              <p class="card-text">
+                <span class="text-success">
+                  <i class="fas fa-check-circle mr-2"></i>No production errors found! System is healthy.
+                </span>
+              </p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Full-Width Activity Table -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">
+              <i class="fas fa-users mr-2"></i>User Activity Dashboard
+              <small class="text-muted">(All user interactions and admin management)</small>
+            </h5>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+              <table class="table-custom table-scroll sortable">
+                <thead>
+                  <tr>
+                    <th scope="col" class="text-small">Admin</th>
+                    <th scope="col" class="text-small">ID</th>
+                    <th scope="col" class="text-small">Name</th>
+                    <th scope="col" class="text-small">Active time</th>
+                    <th scope="col" class="text-small">Last usage</th>
+                    <th scope="col" class="text-small vertical-text">#login</th>
+                    <th scope="col" class="text-small vertical-text">#team</th>
+                    <th scope="col" class="text-small vertical-text">#training</th>
+                    <th scope="col" class="text-small vertical-text">#matches</th>
+                    <th scope="col" class="text-small vertical-text">#matches_archive</th>
+                    <th scope="col" class="text-small vertical-text">#player</th>
+                    <th scope="col" class="text-small vertical-text">#update</th>
+                    <th scope="col" class="text-small vertical-text">#settings</th>
+                    <th scope="col" class="text-small vertical-text">#tour_welcome_ok</th>
+                    <th scope="col" class="text-small vertical-text">#tour_welcome_skip</th>
+                    <th scope="col" class="text-small vertical-text">#tour_player_ok</th>
+                    <th scope="col" class="text-small vertical-text">#tour_player_skip</th>
+                    <th scope="col" class="text-small vertical-text">#tour_update_ok</th>
+                    <th scope="col" class="text-small vertical-text">#tour_reset</th>
+                    <th scope="col" class="text-small vertical-text">#tour_help</th>
+                    <th scope="col" class="text-small vertical-text">#changes</th>
+                    <th scope="col" class="text-small vertical-text">#feedback</th>
+                    <th scope="col" class="text-small vertical-text">#formation</th>
+                    <th scope="col" class="text-small vertical-text">#stats</th>
+                    <th scope="col" class="text-small">Last update</th>
+                    <th scope="col" class="text-small">Last archive</th>
+                    <th scope="col" class="text-small">Last login</th>
+                    <th scope="col" class="text-small">Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                    
+                      <tr>
+                      
+                        <td class="text-small">
+                          
+                            Admin
+                          
+                        </td>
+                        <td class="text-small">12345</td>
+                        <td class="text-small">kvarak</td>
+                        <td class="text-small">&lt; 1 day</td>
+                        <td class="text-small">2026-10-30 08:29:21</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">0</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">1</td>
+                        <td class="text-small">2026-10-30 08:29:21</td>
+                        <td class="text-small">-</td>
+                        <td class="text-small">2026-10-30 08:29:21</td>
+                        <td class="text-small">2026-10-30 08:29:21</td>
+                      </tr>
+                    
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">1 users • Full activity dashboard</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Chart Control Bar -->
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                  <i class="fas fa-chart-bar mr-2" aria-hidden="true"></i>Chart Controls
+                </h6>
+                <div class="d-flex align-items-center">
+                  <div class="form-check mr-4">
+                    <input class="form-check-input" type="checkbox" id="filterAdmins" checked>
+                    <label class="form-check-label" for="filterAdmins">Hide Admin users from charts</label>
+                  </div>
+                  <button type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          id="resetCharts">
+                    <i class="fas fa-undo mr-1" aria-hidden="true"></i>Reset Charts
+                  </button>
+                </div>
+              </div>
+              <!-- Date Range Filters -->
+              <fieldset class="mt-3 chart-filters" aria-describedby="dateRangeHint">
+                <legend class="sr-only">Chart date range</legend>
+                <p id="dateRangeHint" class="sr-only">
+                  Charts include users registered or active between the start and end date (inclusive).
+                </p>
+                <div class="row">
+                  <div class="col-md-4">
+                    <label for="dateRangeStart" class="form-label text-small">Start Date</label>
+                    <input type="date"
+                           class="form-control form-control-sm"
+                           id="dateRangeStart"
+                           name="dateRangeStart"
+                           aria-describedby="dateRangeError">
+                  </div>
+                  <div class="col-md-4">
+                    <label for="dateRangeEnd" class="form-label text-small">End Date</label>
+                    <input type="date"
+                           class="form-control form-control-sm"
+                           id="dateRangeEnd"
+                           name="dateRangeEnd"
+                           aria-describedby="dateRangeError">
+                  </div>
+                  <div class="col-md-4 d-flex align-items-end">
+                    <div class="btn-group" role="group" aria-label="Date range actions">
+                      <button type="button"
+                              class="btn btn-primary-custom btn-sm"
+                              onclick="updateChartsDateRange()">
+                        <i class="fas fa-sync mr-1" aria-hidden="true"></i>Update Charts
+                      </button>
+                      <button type="button"
+                              class="btn btn-outline-secondary btn-sm"
+                              onclick="resetDateRangeToDefault()"
+                              aria-label="Reset date range to the last 6 months">
+                        <i class="fas fa-calendar mr-1" aria-hidden="true"></i>6 Months
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div id="dateRangeError"
+                     class="text-danger small mt-2 d-none"
+                     role="alert"></div>
+              </fieldset>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Charts Section -->
+      <div class="row">
+        <div class="col-md-12">
+          <!-- Chart Configuration -->
+          
+          <!-- Chart Rendering -->
+          <div id="chartOrderStatus" class="sr-only" aria-live="polite"></div>
+          <div class="row" id="chartsContainer">
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="tutorialCompletionChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Tutorial Completion Rates chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-graduation-cap" aria-hidden="true"></i> Tutorial Completion Rates
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Tutorial Completion Rates chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Tutorial Completion Rates chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="tutorialCompletionChartDescription">Completion vs skip rates for each tutorial tour</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="tutorialCompletionChart"
+                            role="img"
+                            aria-label="Tutorial Completion Rates chart"
+                            aria-describedby="tutorialCompletionChartDescription"
+                            style="max-height: 200px">Tutorial Completion Rates: Completion vs skip rates for each tutorial tour</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="tutorialHelpChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Tutorial Help Usage chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-question-circle" aria-hidden="true"></i> Tutorial Help Usage
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Tutorial Help Usage chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Tutorial Help Usage chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="tutorialHelpChartDescription">Help button clicks across different tutorial tours</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="tutorialHelpChart"
+                            role="img"
+                            aria-label="Tutorial Help Usage chart"
+                            aria-describedby="tutorialHelpChartDescription"
+                            style="max-height: 200px">Tutorial Help Usage: Help button clicks across different tutorial tours</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="tutorialResetChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Tutorial Reset Behavior chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-redo-alt" aria-hidden="true"></i> Tutorial Reset Behavior
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Tutorial Reset Behavior chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Tutorial Reset Behavior chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="tutorialResetChartDescription">Tutorial reset frequency and user re-learning patterns</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="tutorialResetChart"
+                            role="img"
+                            aria-label="Tutorial Reset Behavior chart"
+                            aria-describedby="tutorialResetChartDescription"
+                            style="max-height: 200px">Tutorial Reset Behavior: Tutorial reset frequency and user re-learning patterns</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="userActivityChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move User Activity chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-users" aria-hidden="true"></i> User Activity
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink User Activity chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand User Activity chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="userActivityChartDescription">Shows users active in the last 30 days vs inactive users</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="userActivityChart"
+                            role="img"
+                            aria-label="User Activity chart"
+                            aria-describedby="userActivityChartDescription"
+                            style="max-height: 200px">User Activity: Shows users active in the last 30 days vs inactive users</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="featureUsageChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Feature Usage chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-chart-line" aria-hidden="true"></i> Feature Usage
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Feature Usage chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Feature Usage chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="featureUsageChartDescription">Total usage count for each application feature across all users</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="featureUsageChart"
+                            role="img"
+                            aria-label="Feature Usage chart"
+                            aria-describedby="featureUsageChartDescription"
+                            style="max-height: 200px">Feature Usage: Total usage count for each application feature across all users</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="registrationChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Registration Timeline chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-calendar-alt" aria-hidden="true"></i> Registration Timeline
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Registration Timeline chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Registration Timeline chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="registrationChartDescription">New user registrations per month over time</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="registrationChart"
+                            role="img"
+                            aria-label="Registration Timeline chart"
+                            aria-describedby="registrationChartDescription"
+                            style="max-height: 150px">Registration Timeline: New user registrations per month over time</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="usageFrequencyChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Usage Frequency chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-clock" aria-hidden="true"></i> Usage Frequency
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Usage Frequency chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Usage Frequency chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="usageFrequencyChartDescription">Distribution of users by their total feature usage activity levels</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="usageFrequencyChart"
+                            role="img"
+                            aria-label="Usage Frequency chart"
+                            aria-describedby="usageFrequencyChartDescription"
+                            style="max-height: 200px">Usage Frequency: Distribution of users by their total feature usage activity levels</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="topUsersChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Top Users chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-trophy" aria-hidden="true"></i> Top Users
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Top Users chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Top Users chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="topUsersChartDescription">Most engaged users ranked by total feature usage activity</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="topUsersChart"
+                            role="img"
+                            aria-label="Top Users chart"
+                            aria-describedby="topUsersChartDescription"
+                            style="max-height: 200px">Top Users: Most engaged users ranked by total feature usage activity</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="loginTimelineChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Login Activity Over Time chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-chart-line" aria-hidden="true"></i> Login Activity Over Time
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Login Activity Over Time chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Login Activity Over Time chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="loginTimelineChartDescription">Weekly login activity trends over the last 12 weeks</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="loginTimelineChart"
+                            role="img"
+                            aria-label="Login Activity Over Time chart"
+                            aria-describedby="loginTimelineChartDescription"
+                            style="max-height: 200px">Login Activity Over Time: Weekly login activity trends over the last 12 weeks</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="adoptionRateChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Feature Adoption Rate chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-percentage" aria-hidden="true"></i> Feature Adoption Rate
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Feature Adoption Rate chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Feature Adoption Rate chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="adoptionRateChartDescription">Percentage of users who have tried each application feature</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="adoptionRateChart"
+                            role="img"
+                            aria-label="Feature Adoption Rate chart"
+                            aria-describedby="adoptionRateChartDescription"
+                            style="max-height: 200px">Feature Adoption Rate: Percentage of users who have tried each application feature</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="retentionChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move User Retention by Month chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-calendar" aria-hidden="true"></i> User Retention by Month
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink User Retention by Month chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand User Retention by Month chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="retentionChartDescription">Percentage of new users still active 30 days after registration</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="retentionChart"
+                            role="img"
+                            aria-label="User Retention by Month chart"
+                            aria-describedby="retentionChartDescription"
+                            style="max-height: 200px">User Retention by Month: Percentage of new users still active 30 days after registration</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="hourlyActivityChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Activity by Hour chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-clock" aria-hidden="true"></i> Activity by Hour
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Activity by Hour chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Activity by Hour chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="hourlyActivityChartDescription">User activity distribution across 24-hour time periods</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="hourlyActivityChart"
+                            role="img"
+                            aria-label="Activity by Hour chart"
+                            aria-describedby="hourlyActivityChartDescription"
+                            style="max-height: 200px">Activity by Hour: User activity distribution across 24-hour time periods</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="activityFocusChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Team vs Player Focus chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-balance-scale" aria-hidden="true"></i> Team vs Player Focus
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Team vs Player Focus chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Team vs Player Focus chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="activityFocusChartDescription">User preferences: team management vs individual player development</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="activityFocusChart"
+                            role="img"
+                            aria-label="Team vs Player Focus chart"
+                            aria-describedby="activityFocusChartDescription"
+                            style="max-height: 200px">Team vs Player Focus: User preferences: team management vs individual player development</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="playerBreakdownChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Player Activity Breakdown chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-running" aria-hidden="true"></i> Player Activity Breakdown
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Player Activity Breakdown chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Player Activity Breakdown chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="playerBreakdownChartDescription">Detailed breakdown of player-related activities and training focus</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="playerBreakdownChart"
+                            role="img"
+                            aria-label="Player Activity Breakdown chart"
+                            aria-describedby="playerBreakdownChartDescription"
+                            style="max-height: 200px">Player Activity Breakdown: Detailed breakdown of player-related activities and training focus</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="teamBreakdownChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Team Management Activity chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-users-cog" aria-hidden="true"></i> Team Management Activity
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Team Management Activity chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Team Management Activity chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="teamBreakdownChartDescription">Usage of team management features: team views, matches, formations</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="teamBreakdownChart"
+                            role="img"
+                            aria-label="Team Management Activity chart"
+                            aria-describedby="teamBreakdownChartDescription"
+                            style="max-height: 200px">Team Management Activity: Usage of team management features: team views, matches, formations</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="updateFrequencyChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Update Frequency Distribution chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Update Frequency Distribution
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Update Frequency Distribution chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Update Frequency Distribution chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="updateFrequencyChartDescription">How frequently users sync their data with Hattrick servers</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="updateFrequencyChart"
+                            role="img"
+                            aria-label="Update Frequency Distribution chart"
+                            aria-describedby="updateFrequencyChartDescription"
+                            style="max-height: 200px">Update Frequency Distribution: How frequently users sync their data with Hattrick servers</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="featureRadarChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move Feature Usage Radar chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-chart-radar" aria-hidden="true"></i> Feature Usage Radar
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink Feature Usage Radar chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand Feature Usage Radar chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="featureRadarChartDescription">Radar view of feature adoption showing usage patterns across all features</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="featureRadarChart"
+                            role="img"
+                            aria-label="Feature Usage Radar chart"
+                            aria-describedby="featureRadarChartDescription"
+                            style="max-height: 200px">Feature Usage Radar: Radar view of feature adoption showing usage patterns across all features</canvas>
+                  </div>
+                </div>
+              </div>
+            
+              <div class="col-lg-6 col-md-12 mb-3 chart-normal"
+                   data-chart-id="engagementScoreChart">
+                <div class="card chart-card" data-mode="normal">
+                  <div class="card-header py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <h6 class="card-title mb-0 chart-drag-handle"
+                          style="cursor: move"
+                          tabindex="0"
+                          role="button"
+                          aria-label="Move User Engagement Score chart. Use Arrow Up and Arrow Down to reorder.">
+                        <i class="fas fa-star" aria-hidden="true"></i> User Engagement Score
+                        <small class="text-muted ml-2"><i class="fas fa-arrows-alt" aria-hidden="true"></i></small>
+                      </h6>
+                      <div class="chart-controls">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-shrink"
+                                title="Shrink Chart"
+                                aria-label="Shrink User Engagement Score chart">
+                          <i class="fas fa-minus" aria-hidden="true"></i>
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-secondary chart-expand"
+                                title="Expand"
+                                aria-label="Expand User Engagement Score chart">
+                          <i class="fas fa-expand-arrows-alt" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <small class="text-muted d-block" id="engagementScoreChartDescription">Calculated engagement scores based on overall activity and feature diversity</small>
+                  </div>
+                  <div class="card-body chart-content">
+                    <canvas id="engagementScoreChart"
+                            role="img"
+                            aria-label="User Engagement Score chart"
+                            aria-describedby="engagementScoreChartDescription"
+                            style="max-height: 200px">User Engagement Score: Calculated engagement scores based on overall activity and feature diversity</canvas>
+                  </div>
+                </div>
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  
+          
+            <!-- Footer Component -->
+<footer class="site-footer mt-3 py-2">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <p class="text-muted small mb-0">
+          © 2026 HattrickPlanner - Hattrick Statistics Tool |
+          Uses <a href="https://www.goatcounter.com/"
+    target="_blank"
+    rel="noopener"
+    class="text-muted">GoatCounter</a> for anonymous analytics (no cookies or personal data)
+        </p>
+      </div>
+      <div class="col-md-4 text-md-right">
+        <p class="text-muted small mb-0">
+          v3.23 |
+          Approved CHPP product | Made by Kvarak
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+          
+          
+    
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+          integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+          crossorigin="anonymous"></script>
+  <script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+// Fix undefined option variable - initialize toasts properly
+$('.toast').toast('show')
+
+  </script>
+  <script src="/static/sorttable.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/static/Sortable.js"></script>
+  <!-- https://jsuites.net/v3/color-picker -->
+  <link rel="stylesheet"
+        href="/static/jsuites.css"
+        media="screen">
+  <script type="text/javascript"
+          src="/static/jsuites.js"></script>
+  <!-- PWA Session Persistence -->
+  <script src="/static/js/session-persistence.js"></script>
+  <!-- Chart.js Utilities -->
+  <script src="/static/js/chart-utils.js"></script>
+  <script src="/static/js/dark-mode.js"></script>
+  <!-- Intro.js Tutorial Library -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+  <!-- Tutorial Custom Styles - Must load AFTER intro.js CSS -->
+  <style>
+/* Tutorial System Overrides - Maximum specificity to override intro.js defaults */
+.introjs-tooltip.introjs-custom-tooltip {
+    max-width: 400px !important;
+    min-width: 250px !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-header {
+    padding: 4px 16px !important;
+    background: hsl(120, 45%, 25%) !important;
+    border-radius: 0.375rem 0.375rem 0 0 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltiptext {
+    padding: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-buttons {
+    padding: 0.75rem 1rem !important;
+    border-top: 1px solid hsl(120, 20%, 90%) !important;
+    text-align: right !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button {
+    padding: 0.375rem 0.75rem !important;
+    margin: 0 !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid hsl(120, 20%, 75%) !important;
+    background: white !important;
+    color: hsl(120, 45%, 25%) !important;
+    transition: all 0.2s ease !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button:hover {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton:hover {
+    background: hsl(120, 45%, 20%) !important;
+    border-color: hsl(120, 45%, 20%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton {
+    padding: 2px 16px !important;
+    font-size: 0.75rem !important;
+    color: hsl(120, 15%, 50%) !important;
+    border: none !important;
+    background: transparent !important;
+    white-space: nowrap !important;
+    min-width: 80px !important;
+    line-height: 1.2 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton:hover {
+    color: hsl(120, 45%, 25%) !important;
+    background: hsl(120, 8%, 97%) !important;
+}
+
+.introjs-helperNumberLayer.introjs-custom-highlight {
+    border: 3px solid hsl(120, 70%, 45%) !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 0 0 4px hsla(120, 70%, 45%, 0.3) !important;
+}
+  </style>
+  <!-- Tutorial Manager -->
+  <script src="/static/js/tutorial-manager.js"></script>
+  <script type="text/javascript">// <![CDATA[
+  function loading(){
+    $("#loading").show();
+    $("#content").hide();
+  }
+// ]]>
+  </script>
+  <!-- PWA Service Worker Registration -->
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/static/sw.js')
+      .then(function(registration) {
+        console.log('HTStatus PWA: Service Worker registered with scope: ', registration.scope);
+
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content available, prompt user to refresh
+              if (confirm('HTStatus has been updated. Refresh to get the latest version?')) {
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(function(err) {
+        console.log('HTStatus PWA: Service Worker registration failed: ', err);
+      });
+  });
+}
+
+// PWA install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show install button or notification
+  const installButton = document.getElementById('install-pwa');
+  if (installButton) {
+    installButton.style.display = 'block';
+    installButton.addEventListener('click', () => {
+      installButton.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('HTStatus PWA installed');
+        }
+        deferredPrompt = null;
+      });
+    });
+  }
+});
+  </script>
+  <!-- GoatCounter Analytics -->
+  <script>
+      window.goatcounter = {
+          path: function (path) {
+              return location.hostname + path.split('?')[0];
+          }
+      };
+  </script>
+  <script data-goatcounter="https://stats.kvarak.net/count"
+          async
+          src="//stats.kvarak.net/count.js"></script>
+
+    <script src="/static/js/debug-date-filter.js"></script>
+    <script src="/static/js/debug-charts.js"></script>
+    <script>
+// User data from backend
+const usersData = JSON.parse('[{"active_time": "\u003c 1 day", "c_changes": 0, "c_feedback": 0, "c_formation": 1, "c_login": 1, "c_matches": 1, "c_matches_archive": 0, "c_player": 1, "c_player_complete": 0, "c_player_help": 0, "c_player_skip": 0, "c_settings": 1, "c_stats": 1, "c_team": 0, "c_training": 1, "c_tutorial_reset": 0, "c_update": 0, "c_update_complete": 0, "c_update_help": 0, "c_update_skip": 0, "c_welcome_complete": 0, "c_welcome_help": 0, "c_welcome_skip": 0, "created": "Fri, 30 Oct 2026 08:29:21 GMT", "id": 12345, "last_login": "Fri, 30 Oct 2026 08:29:21 GMT", "last_matches_archive": null, "last_update": "Fri, 30 Oct 2026 08:29:21 GMT", "last_usage": "Fri, 30 Oct 2026 08:29:21 GMT", "name": "kvarak", "role": "Admin"}]');
+
+// Chart instances by key, so a redraw can destroy the previous chart
+let charts = {};
+
+// Create (or recreate) a chart; all charts share the responsive defaults
+function renderChart(key, canvasId, config) {
+    if (charts[key]) {
+        charts[key].destroy();
+    }
+    config.options = { responsive: true, maintainAspectRatio: false, ...config.options };
+    charts[key] = new Chart(document.getElementById(canvasId).getContext('2d'), config);
+}
+
+// Date range state
+let currentDateRange = {
+    start: null,
+    end: null,
+    defaultMonths: 6
+};
+
+const { parseDate, formatDateForInput, defaultDateRange, validateDateRange, filterUsers } = window.DebugDateFilter;
+
+// Initialize default date range (6 months ago to now)
+function initializeDateRange() {
+    const range = defaultDateRange(new Date(), currentDateRange.defaultMonths);
+    currentDateRange.start = range.start;
+    currentDateRange.end = range.end;
+
+    document.getElementById('dateRangeStart').value = formatDateForInput(range.start);
+    document.getElementById('dateRangeEnd').value = formatDateForInput(range.end);
+    showDateRangeError('');
+}
+
+// Show (or clear) the inline, screen-reader-announced date range error
+function showDateRangeError(message) {
+    const errorEl = document.getElementById('dateRangeError');
+    const invalid = Boolean(message);
+    errorEl.textContent = message;
+    errorEl.classList.toggle('d-none', !invalid);
+    ['dateRangeStart', 'dateRangeEnd'].forEach(id => {
+        document.getElementById(id).setAttribute('aria-invalid', String(invalid));
+    });
+}
+
+// Update charts with date range
+function updateChartsDateRange() {
+    const range = validateDateRange(
+        document.getElementById('dateRangeStart').value,
+        document.getElementById('dateRangeEnd').value
+    );
+    if (range.error) {
+        showDateRangeError(range.error);
+        document.getElementById('dateRangeStart').focus();
+        return;
+    }
+    showDateRangeError('');
+
+    currentDateRange.start = range.start;
+    currentDateRange.end = range.end;
+
+    // Update all charts with new date range
+    updateAllCharts();
+
+    // Save date range preference
+    saveDateRangePreference();
+}
+
+// Reset to default date range (6 months)
+function resetDateRangeToDefault() {
+    initializeDateRange();
+    updateAllCharts();
+    saveDateRangePreference();
+}
+
+// Save date range preference
+async function saveDateRangePreference() {
+    try {
+        const preferences = {
+            filter_settings: {
+                date_range: {
+                    start_date: currentDateRange.start?.toISOString(),
+                    end_date: currentDateRange.end?.toISOString(),
+                    default_months: currentDateRange.defaultMonths
+                },
+                hide_admin_users: document.getElementById('filterAdmins').checked
+            }
+        };
+
+        await fetch('/api/admin/preferences', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(preferences)
+        });
+    } catch (error) {
+        console.error('Error saving date range preference:', error);
+    }
+}
+
+// Load date range preference
+async function loadDateRangePreference() {
+    try {
+        const response = await fetch('/api/admin/preferences');
+        if (response.ok) {
+            const data = await response.json();
+            const dateRange = data.filter_settings?.date_range;
+
+            if (dateRange?.start_date && dateRange?.end_date) {
+                currentDateRange.start = new Date(dateRange.start_date);
+                currentDateRange.end = new Date(dateRange.end_date);
+
+                document.getElementById('dateRangeStart').value = formatDateForInput(currentDateRange.start);
+                document.getElementById('dateRangeEnd').value = formatDateForInput(currentDateRange.end);
+            } else {
+                initializeDateRange();
+            }
+        } else {
+            initializeDateRange();
+        }
+    } catch (error) {
+        console.error('Error loading date range preference:', error);
+        initializeDateRange();
+    }
+}
+
+// Filter function
+function getFilteredUsers() {
+    return filterUsers(usersData, {
+        hideAdmins: document.getElementById('filterAdmins').checked,
+        start: currentDateRange.start,
+        end: currentDateRange.end,
+    });
+}
+
+// Function to update all charts
+function updateAllCharts() {
+    const filteredUsers = getFilteredUsers();
+
+    // Update tutorial charts
+    updateTutorialCompletionChart(filteredUsers);
+    updateTutorialHelpChart(filteredUsers);
+    updateTutorialResetChart(filteredUsers);
+
+    // Update existing charts
+    updateUserActivityChart(filteredUsers);
+    updateFeatureUsageChart(filteredUsers);
+    updateRegistrationTimelineChart(filteredUsers);
+    updateUsageFrequencyChart(filteredUsers);
+    updateTopUsersChart(filteredUsers);
+
+    // Update new charts
+    updateLoginTimelineChart(filteredUsers);
+    updateAdoptionRateChart(filteredUsers);
+    updateRetentionChart(filteredUsers);
+    updateHourlyActivityChart(filteredUsers);
+    updateActivityFocusChart(filteredUsers);
+
+    // Update additional charts
+    updatePlayerBreakdownChart(filteredUsers);
+    updateTeamBreakdownChart(filteredUsers);
+    updateUpdateFrequencyChart(filteredUsers);
+    updateFeatureRadarChart(filteredUsers);
+    updateEngagementScoreChart(filteredUsers);
+}
+
+// Tutorial Chart 1: Tutorial Completion Rates
+function updateTutorialCompletionChart(filteredUsers) {
+    let tutorialData = {
+        welcome_complete: 0,
+        welcome_skip: 0,
+        player_complete: 0,
+        player_skip: 0,
+        update_complete: 0,
+        update_skip: 0
+    };
+
+    filteredUsers.forEach(user => {
+        tutorialData.welcome_complete += user.c_welcome_complete || 0;
+        tutorialData.welcome_skip += user.c_welcome_skip || 0;
+        tutorialData.player_complete += user.c_player_complete || 0;
+        tutorialData.player_skip += user.c_player_skip || 0;
+        tutorialData.update_complete += user.c_update_complete || 0;
+        tutorialData.update_skip += user.c_update_skip || 0;
+    });
+
+    renderChart('tutorialCompletion', 'tutorialCompletionChart', {
+        type: 'bar',
+        data: {
+            labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
+            datasets: [{
+                label: 'Completed',
+                data: [tutorialData.welcome_complete, tutorialData.player_complete, tutorialData.update_complete],
+                backgroundColor: chartColor(0),
+                borderColor: chartColor(0),
+                borderWidth: 1
+            }, {
+                label: 'Skipped',
+                data: [tutorialData.welcome_skip, tutorialData.player_skip, tutorialData.update_skip],
+                backgroundColor: chartColor(5),
+                borderColor: chartColor(5),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });
+}
+
+// Tutorial Chart 2: Tutorial Help Usage
+function updateTutorialHelpChart(filteredUsers) {
+    let helpData = {
+        welcome_help: 0,
+        player_help: 0,
+        update_help: 0
+    };
+
+    filteredUsers.forEach(user => {
+        helpData.welcome_help += user.c_welcome_help || 0;
+        helpData.player_help += user.c_player_help || 0;
+        helpData.update_help += user.c_update_help || 0;
+    });
+
+    renderChart('tutorialHelp', 'tutorialHelpChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
+            datasets: [{
+                data: [helpData.welcome_help, helpData.player_help, helpData.update_help],
+                backgroundColor: [chartColor(1), chartColor(2), chartColor(4)],
+                borderColor: [chartColor(1), chartColor(2), chartColor(4)],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Tutorial Chart 3: Tutorial Reset Behavior
+function updateTutorialResetChart(filteredUsers) {
+    let resetBuckets = {
+        'No Resets': 0,
+        '1 Reset': 0,
+        '2-3 Resets': 0,
+        '4+ Resets': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const resets = user.c_tutorial_reset || 0;
+        if (resets === 0) {
+            resetBuckets['No Resets']++;
+        } else if (resets === 1) {
+            resetBuckets['1 Reset']++;
+        } else if (resets <= 3) {
+            resetBuckets['2-3 Resets']++;
+        } else {
+            resetBuckets['4+ Resets']++;
+        }
+    });
+
+    renderChart('tutorialReset', 'tutorialResetChart', {
+        type: 'pie',
+        data: {
+            labels: Object.keys(resetBuckets),
+            datasets: [{
+                data: Object.values(resetBuckets),
+                backgroundColor: [chartColor(0), chartColor(5), chartColor(6), CHART_DANGER],
+                borderColor: [chartColor(0), chartColor(5), chartColor(6), CHART_DANGER],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 1: User Activity Distribution
+function updateUserActivityChart(filteredUsers) {
+    let activeUsers = 0;
+    let inactiveUsers = 0;
+
+    filteredUsers.forEach(user => {
+        const lastUsage = parseDate(user.last_usage);
+        const now = new Date();
+        const daysSinceUsage = lastUsage ? Math.floor((now - lastUsage) / (1000 * 60 * 60 * 24)) : 999;
+
+        if (daysSinceUsage <= 30) {
+            activeUsers++;
+        } else {
+            inactiveUsers++;
+        }
+    });
+
+    renderChart('userActivity', 'userActivityChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Active (30d)', 'Inactive'],
+            datasets: [{
+                data: [activeUsers, inactiveUsers],
+                backgroundColor: [chartColor(0), CHART_DANGER],
+                borderColor: [chartColor(0), CHART_DANGER],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 2: Feature Usage Distribution
+function updateFeatureUsageChart(filteredUsers) {
+    let featureData = {
+        team: 0, training: 0, matches: 0, player: 0, update: 0,
+        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
+    };
+
+    filteredUsers.forEach(user => {
+        featureData.team += user.c_team || 0;
+        featureData.training += user.c_training || 0;
+        featureData.matches += user.c_matches || 0;
+        featureData.player += user.c_player || 0;
+        featureData.update += user.c_update || 0;
+        featureData.settings += user.c_settings || 0;
+        featureData.changes += user.c_changes || 0;
+        featureData.feedback += user.c_feedback || 0;
+        featureData.formation += user.c_formation || 0;
+        featureData.stats += user.c_stats || 0;
+    });
+
+    renderChart('featureUsage', 'featureUsageChart', {
+        type: 'bar',
+        data: {
+            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
+            datasets: [{
+                label: 'Total Usage',
+                data: [featureData.team, featureData.training, featureData.matches, featureData.player, featureData.update, featureData.settings, featureData.changes, featureData.feedback, featureData.formation, featureData.stats],
+                backgroundColor: chartColor(1),
+                borderColor: chartColor(1),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 3: Registration Timeline
+function updateRegistrationTimelineChart(filteredUsers) {
+    let monthlyRegistrations = {};
+
+    filteredUsers.forEach(user => {
+        const created = parseDate(user.created);
+        if (created) {
+            const monthKey = created.getFullYear() + '-' + String(created.getMonth() + 1).padStart(2, '0');
+            monthlyRegistrations[monthKey] = (monthlyRegistrations[monthKey] || 0) + 1;
+        }
+    });
+
+    const sortedMonths = Object.keys(monthlyRegistrations).sort();
+    const registrationCounts = sortedMonths.map(month => monthlyRegistrations[month]);
+
+    renderChart('registrationTimeline', 'registrationChart', {
+        type: 'line',
+        data: {
+            labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
+            datasets: [{
+                label: 'New Users',
+                data: registrationCounts,
+                borderColor: chartColor(0),
+                backgroundColor: chartColor(0, 0.2),
+                borderWidth: 2,
+                fill: true
+            }]
+        },
+        options: {
+            maintainAspectRatio: true,
+            aspectRatio: 2,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 4: Usage Frequency Distribution
+function updateUsageFrequencyChart(filteredUsers) {
+    let frequencyBuckets = {
+        'Minimal (1-10)': 0,
+        'Light (11-50)': 0,
+        'Moderate (51-150)': 0,
+        'Heavy (150+)': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const totalActivity =
+            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
+            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
+            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
+            (user.c_stats || 0);
+
+        if (totalActivity >= 150) {
+            frequencyBuckets['Heavy (150+)']++;
+        } else if (totalActivity >= 51) {
+            frequencyBuckets['Moderate (51-150)']++;
+        } else if (totalActivity >= 11) {
+            frequencyBuckets['Light (11-50)']++;
+        } else if (totalActivity >= 1) {
+            frequencyBuckets['Minimal (1-10)']++;
+        }
+        // Users with 0 activity are not included
+    });
+
+    renderChart('usageFrequency', 'usageFrequencyChart', {
+        type: 'pie',
+        data: {
+            labels: Object.keys(frequencyBuckets),
+            datasets: [{
+                data: Object.values(frequencyBuckets),
+                backgroundColor: [chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
+                borderColor: [chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 5: Top Users by Activity
+function updateTopUsersChart(filteredUsers) {
+    const usersWithTotalActivity = filteredUsers.map(user => {
+        const totalActivity =
+            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
+            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
+            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
+            (user.c_stats || 0);
+
+        return {
+            name: user.name.length > 12 ? user.name.slice(0, 12) + '...' : user.name,
+            activity: totalActivity
+        };
+    })
+    .filter(user => user.activity > 0)
+    .sort((a, b) => b.activity - a.activity)
+    .slice(0, 5);
+
+    const topUserNames = usersWithTotalActivity.map(user => user.name);
+    const topUserActivity = usersWithTotalActivity.map(user => user.activity);
+
+    renderChart('topUsers', 'topUsersChart', {
+        type: 'bar',
+        data: {
+            labels: topUserNames,
+            datasets: [{
+                label: 'Total Activity',
+                data: topUserActivity,
+                backgroundColor: chartColor(3),
+                borderColor: chartColor(3),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            maintainAspectRatio: true,
+            aspectRatio: 1.5,
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 6: Login Activity Over Time
+function updateLoginTimelineChart(filteredUsers) {
+    // Group logins by week for the last 12 weeks
+    const weekData = {};
+    const now = new Date();
+
+    // Initialize last 12 weeks
+    for (let i = 11; i >= 0; i--) {
+        const weekStart = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+        const weekKey = weekStart.getFullYear() + '-W' + Math.ceil((weekStart.getTime() - new Date(weekStart.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+        weekData[weekKey] = 0;
+    }
+
+    filteredUsers.forEach(user => {
+        const lastLogin = parseDate(user.last_login);
+        if (lastLogin && lastLogin >= new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000))) {
+            const weekKey = lastLogin.getFullYear() + '-W' + Math.ceil((lastLogin.getTime() - new Date(lastLogin.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+            if (weekData.hasOwnProperty(weekKey)) {
+                weekData[weekKey]++;
+            }
+        }
+    });
+
+    renderChart('loginTimeline', 'loginTimelineChart', {
+        type: 'line',
+        data: {
+            labels: Object.keys(weekData),
+            datasets: [{
+                label: 'Weekly Logins',
+                data: Object.values(weekData),
+                borderColor: chartColor(2),
+                backgroundColor: chartColor(2, 0.1),
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 7: Feature Adoption Rate
+function updateAdoptionRateChart(filteredUsers) {
+    const totalUsers = filteredUsers.length;
+    if (totalUsers === 0) return;
+
+    const adoptionData = {
+        team: 0, training: 0, matches: 0, player: 0, update: 0,
+        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
+    };
+
+    filteredUsers.forEach(user => {
+        if ((user.c_team || 0) > 0) adoptionData.team++;
+        if ((user.c_training || 0) > 0) adoptionData.training++;
+        if ((user.c_matches || 0) > 0) adoptionData.matches++;
+        if ((user.c_player || 0) > 0) adoptionData.player++;
+        if ((user.c_update || 0) > 0) adoptionData.update++;
+        if ((user.c_settings || 0) > 0) adoptionData.settings++;
+        if ((user.c_changes || 0) > 0) adoptionData.changes++;
+        if ((user.c_feedback || 0) > 0) adoptionData.feedback++;
+        if ((user.c_formation || 0) > 0) adoptionData.formation++;
+        if ((user.c_stats || 0) > 0) adoptionData.stats++;
+    });
+
+    // Convert to percentages
+    const adoptionPercentages = Object.keys(adoptionData).map(key =>
+        Math.round((adoptionData[key] / totalUsers) * 100)
+    );
+
+    renderChart('adoptionRate', 'adoptionRateChart', {
+        type: 'bar',
+        data: {
+            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
+            datasets: [{
+                label: 'Adoption Rate (%)',
+                data: adoptionPercentages,
+                backgroundColor: chartColor(0),
+                borderColor: chartColor(0),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 8: User Retention by Registration Month
+function updateRetentionChart(filteredUsers) {
+    const retentionData = {};
+    const now = new Date();
+    const threeMonthsAgo = new Date(now.getTime() - (90 * 24 * 60 * 60 * 1000));
+
+    filteredUsers.forEach(user => {
+        const created = parseDate(user.created);
+        const lastUsage = parseDate(user.last_usage);
+
+        if (created && created >= threeMonthsAgo) {
+            const monthKey = created.getFullYear() + '-' + String(created.getMonth() + 1).padStart(2, '0');
+
+            if (!retentionData[monthKey]) {
+                retentionData[monthKey] = { total: 0, active: 0 };
+            }
+
+            retentionData[monthKey].total++;
+
+            if (lastUsage && lastUsage >= new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000))) {
+                retentionData[monthKey].active++;
+            }
+        }
+    });
+
+    const sortedMonths = Object.keys(retentionData).sort();
+    const retentionRates = sortedMonths.map(month => {
+        const data = retentionData[month];
+        return data.total > 0 ? Math.round((data.active / data.total) * 100) : 0;
+    });
+
+    renderChart('retention', 'retentionChart', {
+        type: 'bar',
+        data: {
+            labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
+            datasets: [{
+                label: 'Retention Rate (%)',
+                data: retentionRates,
+                backgroundColor: chartColor(6),
+                borderColor: chartColor(6),
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 9: Activity by Hour of Day
+function updateHourlyActivityChart(filteredUsers) {
+    const hourlyData = new Array(24).fill(0);
+
+    filteredUsers.forEach(user => {
+        const lastUsage = parseDate(user.last_usage);
+        if (lastUsage) {
+            const hour = lastUsage.getHours();
+            hourlyData[hour]++;
+        }
+    });
+
+    const hours = [];
+    for (let i = 0; i < 24; i++) {
+        hours.push(i + ':00');
+    }
+
+    renderChart('hourlyActivity', 'hourlyActivityChart', {
+        type: 'line',
+        data: {
+            labels: hours,
+            datasets: [{
+                label: 'Activity Count',
+                data: hourlyData,
+                borderColor: chartColor(4),
+                backgroundColor: chartColor(4, 0.1),
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                },
+                x: {
+                    ticks: {
+                        maxTicksLimit: 12
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 10: Team vs Player Activity Focus
+function updateActivityFocusChart(filteredUsers) {
+    let teamFocused = 0;
+    let playerFocused = 0;
+    let balanced = 0;
+
+    filteredUsers.forEach(user => {
+        const teamActivity = (user.c_team || 0) + (user.c_matches || 0) + (user.c_formation || 0);
+        const playerActivity = (user.c_player || 0) + (user.c_training || 0);
+        const totalActivity = teamActivity + playerActivity;
+
+        if (totalActivity === 0) return;
+
+        const teamRatio = teamActivity / totalActivity;
+
+        if (teamRatio > 0.6) {
+            teamFocused++;
+        } else if (teamRatio < 0.4) {
+            playerFocused++;
+        } else {
+            balanced++;
+        }
+    });
+
+    renderChart('activityFocus', 'activityFocusChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Team Focused', 'Player Focused', 'Balanced'],
+            datasets: [{
+                data: [teamFocused, playerFocused, balanced],
+                backgroundColor: [chartColor(1), chartColor(0), chartColor(5)],
+                borderColor: [chartColor(1), chartColor(0), chartColor(5)],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 11: Player Activity Breakdown
+function updatePlayerBreakdownChart(filteredUsers) {
+    let playerData = {
+        player: 0,
+        training: 0,
+        formation: 0
+    };
+
+    filteredUsers.forEach(user => {
+        playerData.player += user.c_player || 0;
+        playerData.training += user.c_training || 0;
+        playerData.formation += user.c_formation || 0;
+    });
+
+    renderChart('playerBreakdown', 'playerBreakdownChart', {
+        type: 'bar',
+        data: {
+            labels: ['Player Views', 'Training Analysis', 'Formation Planning'],
+            datasets: [{
+                label: 'Usage Count',
+                data: [playerData.player, playerData.training, playerData.formation],
+                backgroundColor: [chartColor(0), chartColor(2), chartColor(6)],
+                borderColor: [chartColor(0), chartColor(2), chartColor(6)],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 12: Team Management Activity
+function updateTeamBreakdownChart(filteredUsers) {
+    let teamData = {
+        team: 0,
+        matches: 0,
+        stats: 0
+    };
+
+    filteredUsers.forEach(user => {
+        teamData.team += user.c_team || 0;
+        teamData.matches += user.c_matches || 0;
+        teamData.stats += user.c_stats || 0;
+    });
+
+    // Debug: Check if we have any data
+    console.log('Team Management Data:', teamData);
+
+    // If no data, use some sample data to show the chart structure
+    if (teamData.team === 0 && teamData.matches === 0 && teamData.stats === 0) {
+        teamData = { team: 1, matches: 1, stats: 1 };
+    }
+
+    renderChart('teamBreakdown', 'teamBreakdownChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Team Overview', 'Match Analysis', 'Statistics'],
+            datasets: [{
+                data: [teamData.team, teamData.matches, teamData.stats],
+                backgroundColor: [chartColor(1), chartColor(6), chartColor(2)],
+                borderColor: [chartColor(1), chartColor(6), chartColor(2)],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 13: Update Frequency Distribution
+function updateUpdateFrequencyChart(filteredUsers) {
+    let updateBuckets = {
+        'Never (0)': 0,
+        'Rare (1-2)': 0,
+        'Occasional (3-10)': 0,
+        'Regular (11-25)': 0,
+        'Frequent (25+)': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const updates = user.c_update || 0;
+        if (updates === 0) {
+            updateBuckets['Never (0)']++;
+        } else if (updates <= 2) {
+            updateBuckets['Rare (1-2)']++;
+        } else if (updates <= 10) {
+            updateBuckets['Occasional (3-10)']++;
+        } else if (updates <= 25) {
+            updateBuckets['Regular (11-25)']++;
+        } else {
+            updateBuckets['Frequent (25+)']++;
+        }
+    });
+
+    renderChart('updateFrequency', 'updateFrequencyChart', {
+        type: 'pie',
+        data: {
+            labels: Object.keys(updateBuckets),
+            datasets: [{
+                data: Object.values(updateBuckets),
+                backgroundColor: [chartColor(3), chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
+                borderColor: [chartColor(3), chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Chart 14: Feature Usage Radar
+function updateFeatureRadarChart(filteredUsers) {
+    let featureData = {
+        team: 0, training: 0, matches: 0, player: 0, update: 0,
+        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
+    };
+
+    const totalUsers = filteredUsers.length;
+    if (totalUsers === 0) return;
+
+    filteredUsers.forEach(user => {
+        if ((user.c_team || 0) > 0) featureData.team++;
+        if ((user.c_training || 0) > 0) featureData.training++;
+        if ((user.c_matches || 0) > 0) featureData.matches++;
+        if ((user.c_player || 0) > 0) featureData.player++;
+        if ((user.c_update || 0) > 0) featureData.update++;
+        if ((user.c_settings || 0) > 0) featureData.settings++;
+        if ((user.c_changes || 0) > 0) featureData.changes++;
+        if ((user.c_feedback || 0) > 0) featureData.feedback++;
+        if ((user.c_formation || 0) > 0) featureData.formation++;
+        if ((user.c_stats || 0) > 0) featureData.stats++;
+    });
+
+    // Convert to percentages
+    const adoptionPercentages = Object.keys(featureData).map(key =>
+        Math.round((featureData[key] / totalUsers) * 100)
+    );
+
+    renderChart('featureRadar', 'featureRadarChart', {
+        type: 'radar',
+        data: {
+            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
+            datasets: [{
+                label: 'Adoption Rate (%)',
+                data: adoptionPercentages,
+                borderColor: chartColor(4),
+                backgroundColor: chartColor(4, 0.2),
+                borderWidth: 2,
+                pointBackgroundColor: chartColor(4)
+            }]
+        },
+        options: {
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Chart 15: User Engagement Score
+function updateEngagementScoreChart(filteredUsers) {
+    const engagementScoreBuckets = {
+        'Low (0-25)': 0,
+        'Medium (26-50)': 0,
+        'High (51-75)': 0,
+        'Very High (76-100)': 0
+    };
+
+    filteredUsers.forEach(user => {
+        const activities = [
+            user.c_team || 0, user.c_training || 0, user.c_matches || 0,
+            user.c_player || 0, user.c_update || 0, user.c_settings || 0,
+            user.c_changes || 0, user.c_feedback || 0, user.c_formation || 0,
+            user.c_stats || 0
+        ];
+        const totalActivity = activities.reduce((sum, val) => sum + val, 0);
+        const activeFeatures = activities.filter(val => val > 0).length;
+        const score = Math.min(totalActivity + (activeFeatures * 5), 100);
+
+        if (score <= 25) engagementScoreBuckets['Low (0-25)']++;
+        else if (score <= 50) engagementScoreBuckets['Medium (26-50)']++;
+        else if (score <= 75) engagementScoreBuckets['High (51-75)']++;
+        else engagementScoreBuckets['Very High (76-100)']++;
+    });
+
+    renderChart('engagementScore', 'engagementScoreChart', {
+        type: 'bar',
+        data: {
+            labels: Object.keys(engagementScoreBuckets),
+            datasets: [{
+                label: 'Number of Users',
+                data: Object.values(engagementScoreBuckets),
+                backgroundColor: [CHART_DANGER, chartColor(5), chartColor(0), chartColor(4)],
+                borderColor: [CHART_DANGER, chartColor(5), chartColor(0), chartColor(4)],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+// Initialize all charts on page load and add event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // Load date range preference first, then update charts
+    loadDateRangePreference().then(() => {
+        updateAllCharts();
+    });
+
+    document.getElementById('filterAdmins').addEventListener('change', updateAllCharts);
+
+    // Initialize chart manager for drag-and-drop functionality
+    if (typeof DebugChartManager !== 'undefined') {
+        window.chartManager = new DebugChartManager();
+        window.chartManager.init();
+    }
+});
+    </script>
+  
+      </body>
+  </html>

@@ -1,0 +1,1956 @@
+
+<!DOCTYPE html>
+  <html lang="en">
+      <head>
+          <title>Stats</title>
+          <script>
+            // Applies the saved dark mode choice before the page paints, so light mode does not flash.
+            (function () {
+              var stored = localStorage.getItem("htstatus-dark-mode");
+              var dark = stored !== null ? stored === "true" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+              if (dark) document.documentElement.classList.add("dark-mode");
+            })();
+          </script>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="icon" href="/static/ico.jpg">
+  <link rel="manifest"
+        href="/static/manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="app-version" content="3.23">
+  <!-- Bootstrap: Latest compiled and minified CSS -->
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <!-- HattrickPlanner Component Styles -->
+  <link rel="stylesheet"
+        href="/static/css/components.css">
+  <style>
+  /* ========================================
+     HattrickPlanner Design System
+     Football-themed unified design tokens
+     ======================================== */
+
+  :root {
+    /* Color System - minimal: neutral grays + one green accent.
+       Warning/destructive are for warnings and errors only. */
+    /* Using HSL without hsl() wrapper for consistent color management */
+
+    --primary: 125 35% 30%;                    /* The one accent: football green */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 125 35% 30%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 15%;
+
+    --success: 125 35% 30%;                    /* Same as the accent */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 40 90% 50%;
+    --warning-foreground: 40 30% 12%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 125 35% 30%;
+    --accent-foreground: 0 0% 100%;
+
+    --accent2: 215 28% 42%;                    /* Second accent: slate blue, balances the green */
+    --accent2-foreground: 0 0% 100%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+
+    --border: 0 0% 88%;
+    --input: 0 0% 82%;
+    --ring: 125 35% 30%;
+
+    /* Legacy color aliases for existing Flask templates */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(125, 35%, 24%);
+    --color-primary-light: hsl(125, 30%, 40%);
+    --color-success: hsl(var(--success));
+    --color-success-hover: hsl(125, 35%, 24%);
+    --color-warning: hsl(var(--warning));
+    --color-warning-hover: hsl(40, 90%, 42%);
+    --color-destructive: hsl(var(--destructive));
+    --color-destructive-hover: hsl(0, 65%, 42%);
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
+
+    /* No gradients or glows: flat surfaces */
+    --gradient-pitch: hsl(var(--primary));
+    --gradient-hero: hsl(var(--primary));
+    --gradient-subtle: hsl(var(--muted));
+
+    --shadow-football: none;
+    --shadow-glow: none;
+    --shadow-elegant: none;
+
+    /* Border Radius */
+    --radius: 0.5rem;       /* 8px - default */
+
+    /* Typography Scale */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 2rem;      /* 32px */
+    --font-size-4xl: 2.5rem;    /* 40px */
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Spacing Scale (0.25rem increments) */
+    --spacing-1: 0.25rem;   /* 4px */
+    --spacing-2: 0.5rem;    /* 8px */
+    --spacing-3: 0.75rem;   /* 12px */
+    --spacing-4: 1rem;      /* 16px */
+    --spacing-6: 1.5rem;    /* 24px */
+    --spacing-8: 2rem;      /* 32px */
+    --spacing-12: 3rem;     /* 48px */
+    --spacing-16: 4rem;     /* 64px */
+
+    /* Border Radius */
+    --radius-sm: 0.125rem;  /* 2px */
+    --radius-md: 0.375rem;  /* 6px */
+    --radius-lg: 0.5rem;    /* 8px */
+    --radius-xl: 0.75rem;   /* 12px */
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+
+  /* ========================================
+     Component Classes - Unified System
+     ======================================== */
+
+  /* Button Components */
+  .btn-primary-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    border: none;
+    border-radius: var(--radius);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-football);
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:hover {
+    background-color: hsl(var(--primary) / 0.9);
+    box-shadow: var(--shadow-glow);
+    color: hsl(var(--primary-foreground));
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:focus {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  .btn-primary-custom:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success-custom {
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+  }
+
+  .btn-success-custom:hover {
+    background-color: hsl(var(--success) / 0.9);
+  }
+
+  .btn-warning-custom {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+  }
+
+  .btn-warning-custom:hover {
+    background-color: hsl(var(--warning) / 0.9);
+  }
+
+  .btn-destructive-custom {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+  }
+
+  .btn-destructive-custom:hover {
+    background-color: hsl(var(--destructive) / 0.9);
+  }
+
+  /* Table Components */
+  .table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-xs);
+    background-color: hsl(var(--card));
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-football);
+  }
+
+  .table-custom thead {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .table-custom thead th {
+    padding: var(--spacing-2);
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    border-bottom: 2px solid hsl(var(--primary) / 0.9);
+    vertical-align: bottom;
+  }
+
+  /* Special styling for player table with rotated headers */
+  .table-custom.table-rotated thead th {
+    padding-top: 4rem;
+    height: 5rem;
+  }
+
+  .table-custom tbody tr {
+    border-bottom: 1px solid hsl(var(--border));
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .table-custom tbody tr:hover {
+    background-color: hsl(var(--muted));
+  }
+
+  .table-custom tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table-custom tbody td {
+    padding: var(--spacing-1) var(--spacing-2);
+    line-height: var(--line-height-tight);
+  }
+
+  .table-custom.table-striped tbody tr:nth-child(even) {
+    background-color: hsl(var(--background));
+  }
+
+  /* Card Components */
+  .card-custom {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-football);
+    overflow: hidden;
+  }
+
+  .card-custom-header {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-bottom: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  .card-custom-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: hsl(var(--foreground));
+    margin: 0;
+  }
+
+  .card-custom-body {
+    padding: var(--spacing-6);
+  }
+
+  .card-custom-footer {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  /* Typography Utilities */
+  .text-primary-custom {
+    color: hsl(var(--primary));
+  }
+
+  .text-success-custom {
+    color: hsl(var(--success));
+  }
+
+  .text-warning-custom {
+    color: hsl(var(--warning));
+  }
+
+  .text-destructive-custom {
+    color: hsl(var(--destructive));
+  }
+
+  .text-muted-custom {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Background Utilities */
+  .bg-primary-custom {
+    background-color: hsl(var(--primary));
+  }
+
+  .bg-success-custom {
+    background-color: hsl(var(--success));
+  }
+
+  .bg-muted-custom {
+    background-color: hsl(var(--muted));
+  }
+
+  /* ========================================
+     Original Styles (Legacy - To Review)
+     ======================================== */
+
+  body, html {
+    height: 100%;
+  }
+  body {
+    height: 100%;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  .bg-off {
+    background-color:#d6d6d6!important
+  }
+  .bg-roundup {
+    background-color:#34c8db!important
+  }
+  .img-fluid-2 {
+    max-height: 100%;
+    width: auto;
+  }
+
+  .text-small {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .table-scroll{
+    display: inline-block;
+    overflow: auto;
+    padding-bottom: 2rem;
+  }
+
+  .td-fixed {
+    background-color:#ffffff!important;
+    position: absolute;
+  }
+
+  .text-sm10 {
+    font-size: 10px;
+  }
+
+  .text-sm11 {
+    font-size: 11px;
+  }
+
+  .text-sm13 {
+    font-size: 13px;
+  }
+
+  /* Sortable tables */
+  table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+  }
+
+  .parent {
+    overflow: hidden; /* required */
+    height: 1px; /* some non-zero number */
+  }
+
+  .ribbon {
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 13, 165);
+    color:white;
+    padding:1em 0;
+    position: absolute;
+    top:0;
+    right:0;
+    transform: translateX(30%) translateY(0%) rotate(45deg);
+    transform-origin: top left;
+    z-index: 100;
+  }
+  .ribbon:before,
+  .ribbon:after {
+    content: '';
+    position: absolute;
+    top:0;
+    margin: 0 -1px; /* tweak */
+    width: 100%;
+    height: 100%;
+    background: rgb(36, 13, 165);
+  }
+  .ribbon:before {
+    right:100%;
+  }
+
+  .ribbon:after {
+    left:100%;
+  }
+
+  .chart {
+    vertical-align: middle;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    display: inline-block;
+  }
+
+  canvas {
+    height: 100%;
+  }
+
+  .loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+    margin: -76px 0 0 -76px;
+    /* border-top: 10px solid rgb(0, 0, 223);
+    border-right: 10px solid rgb(70, 235, 70);
+    border-bottom: 10px solid rgb(70, 235, 70);
+    border-left: 10px solid rgb(70, 235, 70); */
+    border-radius: 70%;
+    /* -webkit-animation: spin 1s alternate infinite;
+    animation: spin 1s alternate infinite; */
+    -webkit-animation: spin 1.7s linear infinite;
+    animation: spin 1.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .list-group-item {
+    padding: 0.25rem 1.25rem;
+  }
+
+  div.vertical {
+    margin-left: -10px;
+    /* position: absolute; */
+    width: 24px;
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg); /* Safari/Chrome */
+    -moz-transform: rotate(-90deg);    /* Firefox */
+    -o-transform: rotate(-90deg);      /* Opera */
+    -ms-transform: rotate(-90deg);     /* IE 9 */
+  }
+
+  th.vertical {
+    max-width: 50px;
+    height: 85px;
+    line-height: 14px;
+    padding-left: 15px;
+    padding-bottom: 10px;
+    text-align: inherit;
+  }
+
+  /* PWA Mobile Optimizations */
+  @media (max-width: 768px) {
+    .container {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .table-responsive {
+      font-size: 12px;
+    }
+
+    .navbar-nav {
+      text-align: center;
+    }
+
+    .table th, .table td {
+      padding: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    /* Hide non-essential columns on mobile */
+    .table .d-none-mobile {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .table th, .table td {
+      padding: 0.3rem;
+      font-size: 0.8rem;
+    }
+
+    .navbar-brand {
+      font-size: 1rem;
+    }
+  }
+
+  /* PWA Install Button */
+  #install-pwa {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1f2937;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-size: 14px;
+  }
+
+  </style>
+  <link rel="stylesheet"
+        href="/static/css/theme.css">
+  <link rel="stylesheet"
+        href="/static/css/dark-mode.css">
+
+      </head>
+      <body >
+        
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      
+        <!-- Authenticated navigation -->
+        <ul class="navbar-nav" id="navbar-authenticated">
+          <li>
+            <img height="30" src="/static/chpp.png">
+            &nbsp;&nbsp;&nbsp;
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
+          </li>
+          
+            
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="navbar-team-dropdown-0"
+                   role="button"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">Test Team</a>
+                <div class="dropdown-menu"
+                     aria-labelledby="navbar-team-dropdown-0">
+                  <!-- <a class="dropdown-item" href="/team?id=12345">Team</a> -->
+                  <a id="navbar-players-link-0"
+                     class="dropdown-item"
+                     href="/player?id=12345"
+                     onclick="loading();">Players</a>
+                  <a id="navbar-formations-link-0"
+                     class="dropdown-item"
+                     href="/formations?id=12345"
+                     onclick="loading();">Formations</a>
+                  <a id="navbar-matches-link-0"
+                     class="dropdown-item"
+                     href="/matches?id=12345"
+                     onclick="loading();">Matches</a>
+                  <a id="navbar-training-link-0"
+                     class="dropdown-item"
+                     href="/training?id=12345"
+                     onclick="loading();">Training</a>
+                  <a id="navbar-stats-link-0"
+                     class="dropdown-item"
+                     href="/stats?id=12345"
+                     onclick="loading();">Statistics</a>
+                </div>
+              </li>
+            
+          
+          <li class="nav-item">
+            <a id="navbar-update-link"
+               class="nav-link"
+               href="/update"
+               onclick="loading();">Update data</a>
+          </li>
+          <li class="nav-item">
+            <a id="navbar-settings-link"
+               class="nav-link"
+               href="/settings"
+               onclick="loading();">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
+          </li>
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
+            </li>
+          
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
+            
+          </li>
+        </ul>
+      
+    </div>
+    <button type="button"
+            id="dark-mode-toggle"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode">
+      <span id="dark-mode-icon">&#127769;</span>
+    </button>
+  </nav>
+  <!-- PWA Install Button and Session Persistence -->
+  <button id="install-pwa"
+          title="Install HTStatus as an app"
+          style="display: none">📱 Install App</button>
+  <!-- Password Migration Notice -->
+  
+  <div class="container"
+       data-current-user="kvarak">
+    <div class="row">
+      <div class="col-sm">
+        <p></p>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="parent">
+  <h8 class="ribbon">Beta version 3.23</h8>
+</div> -->
+  <div class="loader" id="loading">
+    <img src="/static/soccer_ball.png" width="100">
+  </div>
+
+          
+  
+  <div class="container">
+    
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        
+          
+            <li class="breadcrumb-item">
+              <a href="/">Test Team</a>
+            </li>
+          
+        
+          
+            <li class="breadcrumb-item active" aria-current="page">Stats</li>
+          
+        
+      </ol>
+    </nav>
+    
+  </div>
+
+    
+    <!-- Current Competition Status -->
+    <div class="row mb-3 g-2">
+      <!-- Team Kits Section - Half Width -->
+      
+      <!-- League Competition - Quarter Width -->
+      
+      <!-- Power Rating - Quarter Width -->
+      
+      <!-- Cup Competition - Quarter Width if needed -->
+      
+    </div>
+    <!-- Team Overview Statistics -->
+    <div class="row mb-3 g-2">
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body p-3">
+            <h6 class="card-title mb-1">3</h6>
+            <p class="card-text text-muted small mb-0">Total Players</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body p-3">
+            <h6 class="card-title mb-1">0</h6>
+            <p class="card-text text-muted small mb-0">Career Goals</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body p-3">
+            <h6 class="card-title mb-1">25.0 years</h6>
+            <p class="card-text text-muted small mb-0">Average Age</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center">
+          <div class="card-body p-3">
+            <h6 class="card-title mb-1">1,000</h6>
+            <p class="card-text text-muted small mb-0">Average TSI</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Charts Row -->
+    <div class="row mb-3 g-2">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body p-3">
+            <canvas id="ageChart" width="400" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-body p-3">
+            <canvas id="matchResultsChart" width="400" height="300"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Top Performers Tables -->
+    <div class="row mb-3 g-2">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Top Scorers</h6>
+          </div>
+          <div class="card-body p-2">
+            
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Player</th>
+                    <th>Goals</th>
+                    <th>Matches</th>
+                    <th>Goals/Match</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                    <tr>
+                      <td>Anna Scorer</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>
+                        N/A
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td>Yngve Winger</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>
+                        N/A
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td>Michal Keeper</td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>
+                        N/A
+                      </td>
+                    </tr>
+                  
+                </tbody>
+              </table>
+            
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Top Performers (TSI)</h6>
+          </div>
+          <div class="card-body p-2">
+            
+              <table class="table-custom">
+                <thead>
+                  <tr>
+                    <th>Player</th>
+                    <th>TSI</th>
+                    <th>Age</th>
+                    <th>Country</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                    <tr>
+                      <td>Anna Scorer</td>
+                      <td>1,000</td>
+                      <td>25</td>
+                      <td>🏳️ Unknown</td>
+                    </tr>
+                  
+                    <tr>
+                      <td>Yngve Winger</td>
+                      <td>1,000</td>
+                      <td>25</td>
+                      <td>🏳️ Unknown</td>
+                    </tr>
+                  
+                    <tr>
+                      <td>Michal Keeper</td>
+                      <td>1,000</td>
+                      <td>25</td>
+                      <td>🏳️ Unknown</td>
+                    </tr>
+                  
+                </tbody>
+              </table>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Match Statistics - Hidden until data is available
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header py-2">
+          <h6 class="mb-0">Match Statistics (Last 10 Games)</h6>
+        </div>
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-md-2">
+              <strong>0</strong><br>
+              <small class="text-muted">Total Matches</small>
+            </div>
+            <div class="col-md-2">
+              <strong>0</strong><br>
+              <small class="text-muted">Wins</small>
+            </div>
+            <div class="col-md-2">
+              <strong>0</strong><br>
+              <small class="text-muted">Draws</small>
+            </div>
+            <div class="col-md-2">
+              <strong>0</strong><br>
+              <small class="text-muted">Losses</small>
+            </div>
+            <div class="col-md-2">
+              <strong>0</strong><br>
+              <small class="text-muted">Goals For</small>
+            </div>
+            <div class="col-md-2">
+              <strong>0</strong><br>
+              <small class="text-muted">Goal Diff</small>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+-->
+    <!-- Team Skill Averages -->
+    <div class="row mb-3 g-2">
+      <!-- All Players Skill Averages - Half Width -->
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Team Skill Averages</h6>
+          </div>
+          <div class="card-body p-2">
+            
+              <table class="table-custom">
+                <tbody>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">keeper</td>
+                      <td class="text-small">8.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 40.0%"
+                               aria-valuenow="40.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">defender</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">playmaker</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">winger</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">passing</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">scorer</td>
+                      <td class="text-small">7.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 35.0%"
+                               aria-valuenow="35.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">set pieces</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">leadership</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                </tbody>
+              </table>
+            
+          </div>
+        </div>
+      </div>
+      <!-- Top 11 TSI Players Skill Averages - Half Width -->
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Top 11 Players Skill Averages</h6>
+          </div>
+          <div class="card-body p-2">
+            
+              <table class="table-custom">
+                <tbody>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">keeper</td>
+                      <td class="text-small">8.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 40.0%"
+                               aria-valuenow="40.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">defender</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">playmaker</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">winger</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">passing</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">scorer</td>
+                      <td class="text-small">7.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 35.0%"
+                               aria-valuenow="35.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">set pieces</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                    <tr>
+                      <td class="text-small text-capitalize">leadership</td>
+                      <td class="text-small">5.0</td>
+                      <td class="text-small" style="width: 80%">
+                        <div class="progress" style="height: 13px;">
+                          <div class="progress-bar"
+                               role="progressbar"
+                               style="width: 25.0%"
+                               aria-valuenow="25.0"
+                               aria-valuemin="0"
+                               aria-valuemax="100"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  
+                </tbody>
+              </table>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Age Distribution -->
+    <div class="row mb-3 g-2">
+      <!-- All Players Age Distribution - Half Width -->
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Age Distribution (All Players)</h6>
+          </div>
+          <div class="card-body p-2">
+            <canvas id="ageDistributionAllChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+      <!-- Top 11 TSI Players Age Distribution - Half Width -->
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Top 11 Players Age Distribution</h6>
+          </div>
+          <div class="card-body p-2">
+            <canvas id="ageDistributionTop11Chart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Country Distribution -->
+    <div class="row mb-3 g-2">
+      <!-- All Players Country Distribution - Half Width -->
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Country Distribution (All Players)</h6>
+          </div>
+          <div class="card-body p-2">
+            <canvas id="countryDistributionAllChart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+      <!-- Top 11 TSI Players Country Distribution - Half Width -->
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header py-2">
+            <h6 class="mb-0">Top 11 Players Country Distribution</h6>
+          </div>
+          <div class="card-body p-2">
+            <canvas id="countryDistributionTop11Chart" height="250"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Additional Team Stats -->
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5>Additional Team Statistics</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <strong>0</strong>
+                <br>
+                <small class="text-muted">Total Career Goals</small>
+              </div>
+              <div class="col-md-3">
+                <strong>0</strong>
+                <br>
+                <small class="text-muted">Total Team Matches</small>
+              </div>
+              <div class="col-md-3">
+                <strong>0</strong>
+                <br>
+                <small class="text-muted">Goals per Match</small>
+              </div>
+              <div class="col-md-3">
+                <strong>5,000</strong>
+                <br>
+                <small class="text-muted">Average Wage</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+          
+            <!-- Footer Component -->
+<footer class="site-footer mt-3 py-2">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <p class="text-muted small mb-0">
+          © 2026 HattrickPlanner - Hattrick Statistics Tool |
+          Uses <a href="https://www.goatcounter.com/"
+    target="_blank"
+    rel="noopener"
+    class="text-muted">GoatCounter</a> for anonymous analytics (no cookies or personal data)
+        </p>
+      </div>
+      <div class="col-md-4 text-md-right">
+        <p class="text-muted small mb-0">
+          v3.23 |
+          Approved CHPP product | Made by Kvarak
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+          
+          
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+          integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+          crossorigin="anonymous"></script>
+  <script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+// Fix undefined option variable - initialize toasts properly
+$('.toast').toast('show')
+
+  </script>
+  <script src="/static/sorttable.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/static/Sortable.js"></script>
+  <!-- https://jsuites.net/v3/color-picker -->
+  <link rel="stylesheet"
+        href="/static/jsuites.css"
+        media="screen">
+  <script type="text/javascript"
+          src="/static/jsuites.js"></script>
+  <!-- PWA Session Persistence -->
+  <script src="/static/js/session-persistence.js"></script>
+  <!-- Chart.js Utilities -->
+  <script src="/static/js/chart-utils.js"></script>
+  <script src="/static/js/dark-mode.js"></script>
+  <!-- Intro.js Tutorial Library -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+  <!-- Tutorial Custom Styles - Must load AFTER intro.js CSS -->
+  <style>
+/* Tutorial System Overrides - Maximum specificity to override intro.js defaults */
+.introjs-tooltip.introjs-custom-tooltip {
+    max-width: 400px !important;
+    min-width: 250px !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-header {
+    padding: 4px 16px !important;
+    background: hsl(120, 45%, 25%) !important;
+    border-radius: 0.375rem 0.375rem 0 0 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltiptext {
+    padding: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-buttons {
+    padding: 0.75rem 1rem !important;
+    border-top: 1px solid hsl(120, 20%, 90%) !important;
+    text-align: right !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button {
+    padding: 0.375rem 0.75rem !important;
+    margin: 0 !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid hsl(120, 20%, 75%) !important;
+    background: white !important;
+    color: hsl(120, 45%, 25%) !important;
+    transition: all 0.2s ease !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button:hover {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton:hover {
+    background: hsl(120, 45%, 20%) !important;
+    border-color: hsl(120, 45%, 20%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton {
+    padding: 2px 16px !important;
+    font-size: 0.75rem !important;
+    color: hsl(120, 15%, 50%) !important;
+    border: none !important;
+    background: transparent !important;
+    white-space: nowrap !important;
+    min-width: 80px !important;
+    line-height: 1.2 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton:hover {
+    color: hsl(120, 45%, 25%) !important;
+    background: hsl(120, 8%, 97%) !important;
+}
+
+.introjs-helperNumberLayer.introjs-custom-highlight {
+    border: 3px solid hsl(120, 70%, 45%) !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 0 0 4px hsla(120, 70%, 45%, 0.3) !important;
+}
+  </style>
+  <!-- Tutorial Manager -->
+  <script src="/static/js/tutorial-manager.js"></script>
+  <script type="text/javascript">// <![CDATA[
+  function loading(){
+    $("#loading").show();
+    $("#content").hide();
+  }
+// ]]>
+  </script>
+  <!-- PWA Service Worker Registration -->
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/static/sw.js')
+      .then(function(registration) {
+        console.log('HTStatus PWA: Service Worker registered with scope: ', registration.scope);
+
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content available, prompt user to refresh
+              if (confirm('HTStatus has been updated. Refresh to get the latest version?')) {
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(function(err) {
+        console.log('HTStatus PWA: Service Worker registration failed: ', err);
+      });
+  });
+}
+
+// PWA install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show install button or notification
+  const installButton = document.getElementById('install-pwa');
+  if (installButton) {
+    installButton.style.display = 'block';
+    installButton.addEventListener('click', () => {
+      installButton.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('HTStatus PWA installed');
+        }
+        deferredPrompt = null;
+      });
+    });
+  }
+});
+  </script>
+  <!-- GoatCounter Analytics -->
+  <script>
+      window.goatcounter = {
+          path: function (path) {
+              return location.hostname + path.split('?')[0];
+          }
+      };
+  </script>
+  <script data-goatcounter="https://stats.kvarak.net/count"
+          async
+          src="//stats.kvarak.net/count.js"></script>
+
+  <script>
+// Team Statistics Charts
+document.addEventListener('DOMContentLoaded', function() {
+
+// Team Squad Composition Chart
+  var ctx1 = document.getElementById('ageChart');
+  if (ctx1) {
+    // Calculate positions based on player skills (same as "Best Position" logic)
+    var positionCounts = {
+      'Goalkeepers': 0,
+      'Defenders': 0,
+      'Wing Defenders': 0,
+      'Midfielders': 0,
+      'Wingers': 0,
+      'Forwards': 0
+    };
+
+    // Use ALL current players for accurate squad composition
+    var players = [];
+    
+      
+      players.push({
+        keeper: 9,
+        defender: 5,
+        playmaker: 5,
+        winger: 5,
+        passing: 5,
+        scorer: 8
+      });
+      
+      players.push({
+        keeper: 7,
+        defender: 5,
+        playmaker: 5,
+        winger: 5,
+        passing: 5,
+        scorer: 6
+      });
+      
+      players.push({
+        keeper: 8,
+        defender: 5,
+        playmaker: 5,
+        winger: 5,
+        passing: 5,
+        scorer: 7
+      });
+      
+    
+
+    players.forEach(function(player) {
+      var bestPosition = 'Midfielders'; // default
+      var maxContribution = 0;
+
+      // Position calculations based on your groupings
+      var contributions = {
+        'Goalkeepers': player.keeper, // GC
+        'Defenders': player.defender * 0.8 + player.passing * 0.2, // CD, CDO, CDTW
+        'Wing Defenders': player.defender * 0.7 + player.passing * 0.3, // WBD, WBN, WBO, WBTM
+        'Midfielders': player.playmaker * 0.6 + player.passing * 0.4, // IMN, IMD, IMO, IMTW
+        'Wingers': player.winger * 0.7 + player.passing * 0.3, // WO, WTM, WN, WD
+        'Forwards': player.scorer * 0.8 + player.passing * 0.2 // FW, FTW, DF
+      };
+
+      for (var pos in contributions) {
+        if (contributions[pos] > maxContribution) {
+          maxContribution = contributions[pos];
+          bestPosition = pos;
+        }
+      }
+
+      positionCounts[bestPosition]++;
+    });
+
+    var ageChart = new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: [
+          "Goalkeepers",
+          "Defenders",
+          "Wing Defenders",
+          "Midfielders",
+          "Wingers",
+          "Forwards"
+        ],
+        datasets: [{
+          data: [
+            positionCounts['Goalkeepers'],
+            positionCounts['Defenders'],
+            positionCounts['Wing Defenders'],
+            positionCounts['Midfielders'],
+            positionCounts['Wingers'],
+            positionCounts['Forwards']
+          ],
+          backgroundColor: [0, 1, 2, 3, 4, 5].map(i => chartColor(i)),
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Squad Composition by Best Position'
+          }
+        }
+      }
+    });
+  }
+
+// Simple Team Age Distribution
+  var ctx2 = document.getElementById('matchResultsChart');
+  if (ctx2) {
+    // Simple team development metrics
+    var developmentChart = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels: ['Youth (≤21)', 'Prime (22-28)', 'Veterans (29+)'],
+        datasets: [{
+          data: [
+            
+            (function() {
+              var youth = 0, prime = 0, veterans = 0;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              return youth;
+            })(),
+            (function() {
+              var youth = 0, prime = 0, veterans = 0;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              return prime;
+            })(),
+            (function() {
+              var youth = 0, prime = 0, veterans = 0;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              var age = 25;
+              if (age <= 21) youth++;
+              else if (age <= 28) prime++;
+              else veterans++;
+              
+              return veterans;
+            })()
+            
+          ],
+          backgroundColor: [
+            chartColor(0), chartColor(1), chartColor(2)
+          ],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Team Age Distribution'
+          }
+        }
+      }
+    });
+  }
+
+  // Age Distribution Chart - All Players
+  var ctx3 = document.getElementById('ageDistributionAllChart');
+  if (ctx3) {
+    var ageDistChart = new Chart(ctx3, {
+      type: 'bar',
+      data: {
+        labels: [
+          
+          '25'
+          
+        ],
+        datasets: [{
+          label: 'Number of Players',
+          data: [
+            
+            3
+            
+          ],
+          backgroundColor: chartColor(0, 0.8),
+          borderColor: chartColor(0),
+          borderWidth: 2,
+          barThickness: 20
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: 3,
+            ticks: {
+              stepSize: 1,
+              precision: 0,
+              callback: function(value) {
+                return Number.isInteger(value) ? value : '';
+              }
+            }
+          },
+          x: {
+            type: 'category',
+            title: {
+              display: true,
+              text: 'Age (years)'
+            },
+            ticks: {
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            }
+          }
+        }
+      }
+    });
+  } else {
+    console.log('Canvas element not found for all players chart');
+  }
+
+  // Age Distribution Chart - Top 11 Players
+  var ctx4 = document.getElementById('ageDistributionTop11Chart');
+  if (ctx4) {
+    var ageDistTop11Chart = new Chart(ctx4, {
+      type: 'bar',
+      data: {
+        labels: [
+          
+          '25'
+          
+        ],
+        datasets: [{
+          label: 'Number of Players',
+          data: [
+            
+            3
+            
+          ],
+          backgroundColor: chartColor(0, 0.8),
+          borderColor: chartColor(0),
+          borderWidth: 2,
+          barThickness: 20
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: 3,
+            ticks: {
+              stepSize: 1,
+              precision: 0,
+              callback: function(value) {
+                return Number.isInteger(value) ? value : '';
+              }
+            }
+          },
+          x: {
+            type: 'category',
+            title: {
+              display: true,
+              text: 'Age (years)'
+            },
+            ticks: {
+              autoSkip: false,
+              maxRotation: 0,
+              minRotation: 0
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Country Distribution Pie Chart - All Players
+  var ctx5 = document.getElementById('countryDistributionAllChart');
+  if (ctx5) {
+    new Chart(ctx5, {
+      type: 'pie',
+      data: {
+        labels: [
+          
+          '🏳️ Unknown'
+          
+        ],
+        datasets: [{
+          data: [
+            
+            3
+            
+          ],
+          backgroundColor: [
+            "#6B7280"
+            
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 0,
+            padding: 8,
+            fontSize: 11,
+            generateLabels: function(chart) {
+              var data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                return data.labels.map(function(label, i) {
+                  var dataset = data.datasets[0];
+                  return {
+                    text: label + ' (' + dataset.data[i] + ')',
+                    fillStyle: 'transparent',
+                    strokeStyle: 'transparent',
+                    lineWidth: 0,
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem, data) {
+              var dataset = data.datasets[tooltipItem.datasetIndex];
+              var total = dataset.data.reduce((a, b) => a + b, 0);
+              var currentValue = dataset.data[tooltipItem.index];
+              var percentage = Math.round((currentValue / total) * 100);
+              return data.labels[tooltipItem.index] + ': ' + currentValue + ' players (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Country Distribution Pie Chart - Top 11 Players
+  var ctx6 = document.getElementById('countryDistributionTop11Chart');
+  if (ctx6) {
+    new Chart(ctx6, {
+      type: 'pie',
+      data: {
+        labels: [
+          
+          '🏳️ Unknown'
+          
+        ],
+        datasets: [{
+          data: [
+            
+            3
+            
+          ],
+          backgroundColor: [
+            "#6B7280"
+            
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'right',
+          labels: {
+            boxWidth: 0,
+            padding: 8,
+            fontSize: 11,
+            generateLabels: function(chart) {
+              var data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                return data.labels.map(function(label, i) {
+                  var dataset = data.datasets[0];
+                  return {
+                    text: label + ' (' + dataset.data[i] + ')',
+                    fillStyle: 'transparent',
+                    strokeStyle: 'transparent',
+                    lineWidth: 0,
+                    hidden: false,
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          }
+        },
+        tooltips: {
+          callbacks: {
+            label: function(tooltipItem, data) {
+              var dataset = data.datasets[tooltipItem.datasetIndex];
+              var total = dataset.data.reduce((a, b) => a + b, 0);
+              var currentValue = dataset.data[tooltipItem.index];
+              var percentage = Math.round((currentValue / total) * 100);
+              return data.labels[tooltipItem.index] + ': ' + currentValue + ' players (' + percentage + '%)';
+            }
+          }
+        }
+      }
+    });
+  }
+
+
+
+});
+  </script>
+
+      </body>
+  </html>

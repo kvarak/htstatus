@@ -4,39 +4,19 @@
   <script>
   // Initialize data for skill charts using HattrickCharts utility
   const playerCharts = {};
-  const skillNames = ['Keeper', 'Defender', 'Playmaker', 'Winger', 'Passing', 'Scoring', 'Set Pieces'];
+  {% set skill_keys = ["keeper", "defender", "playmaker", "winger", "passing", "scorer", "set_pieces"] %}
+  {% set skill_names = skill_labels() %}
 
   {% for ht_id in allplayerids %}
     // Prepare skill data for player {{ ht_id }}
     const skillData{{ ht_id }} = [
+      {% for key in skill_keys %}
+      {% set skill_index = loop.index0 %}
       {
-        name: 'Keeper',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[0] }},{% endfor %}]
+        name: {{ skill_names[key] | tojson }},
+        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[skill_index] }},{% endfor %}]
       },
-      {
-        name: 'Defender',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[1] }},{% endfor %}]
-      },
-      {
-        name: 'Playmaker',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[2] }},{% endfor %}]
-      },
-      {
-        name: 'Winger',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[3] }},{% endfor %}]
-      },
-      {
-        name: 'Passing',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[4] }},{% endfor %}]
-      },
-      {
-        name: 'Scoring',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[5] }},{% endfor %}]
-      },
-      {
-        name: 'Set Pieces',
-        values: [{% for (dat, skills) in allplayers[ht_id] %}{{ skills[6] }},{% endfor %}]
-      }
+      {% endfor %}
     ];
 
     const playerData{{ ht_id }} = {
@@ -81,7 +61,7 @@
       card.style.display = 'none';
     });
     document.querySelectorAll('[data-player-item]').forEach(item => {
-      item.classList.remove('active', 'bg-blue-50', 'border-blue-300');
+      item.classList.remove('active');
     });
 
     const selectedCard = document.getElementById('playerCard' + ht_id);
@@ -89,7 +69,7 @@
 
     const selectedItem = document.getElementById('playerItem' + ht_id);
     if (selectedItem) {
-      selectedItem.classList.add('active', 'bg-blue-50', 'border-blue-300');
+      selectedItem.classList.add('active');
     }
   }
 
@@ -102,19 +82,11 @@
   </script>
 {% endblock %}
 {% block content %}
+  {% set skill_keys = ["keeper", "defender", "playmaker", "winger", "passing", "scorer", "set_pieces"] %}
+  {% set skill_names = skill_labels() %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="/">{{ teamname }}</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([(teamname, '/') , (title, None)]) }}
     {% if error %}
       <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ error }}
@@ -137,7 +109,7 @@
               {% if allplayerids %}
                 {% for ht_id in allplayerids %}
                   <button type="button"
-                          class="w-100 btn btn-sm btn-outline-primary text-start mb-2 p-2 d-flex justify-content-between align-items-center"
+                          class="w-100 btn btn-sm btn-outline-info text-left mb-2 p-2 d-flex justify-content-between align-items-center"
                           id="playerItem{{ ht_id }}"
                           data-player-item
                           onclick="selectPlayer({{ ht_id }})"
@@ -298,14 +270,14 @@
                       <div class="card-body p-2">
                         <table class="table-custom">
                           <tbody>
-                            {% set skill_names = ["Keeper", "Defender", "Playmaker", "Winger", "Passing", "Scorer", "Set Pieces"] %}
                             {% for i in range(7) %}
                               {% set current_skill = latest[1][i] %}
                               {% set change = latest[1][i] - earliest[1][i] %}
                               <tr style="height: 25px;">
-                                <td class="text-small text-capitalize">{{ skill_names[i].lower() }}</td>
-                                <td class="text-small">
-                                  {{ current_skill }}
+                                <td class="text-small">{{ skill_names[skill_keys[i]] }}</td>
+                                <td class="text-small text-center"
+                                    title="{{ level_hint(current_skill) }}">
+                                  {{ level_text(current_skill) }}
                                   {% if change != 0 %}
                                     <small class="{% if change > 0 %}text-success{% else %}text-danger{% endif %}">
                                       (
@@ -375,13 +347,7 @@
                         <thead class="table-light">
                           <tr>
                             <th>Date</th>
-                            <th class="text-end">Keeper</th>
-                            <th class="text-end">Defender</th>
-                            <th class="text-end">Playmaker</th>
-                            <th class="text-end">Winger</th>
-                            <th class="text-end">Passing</th>
-                            <th class="text-end">Scoring</th>
-                            <th class="text-end">Set Pieces</th>
+                            {% for key in skill_keys %}<th class="text-center">{{ skill_names[key] }}</th>{% endfor %}
                           </tr>
                         </thead>
                         <tbody>
@@ -393,16 +359,16 @@
                               {% for i in range(7) %}
                                 {% set val = skills[i] %}
                                 {% set change = changes[i] %}
-                                <td class="text-end">
+                                <td class="text-center" title="{{ level_hint(val) }}">
                                   <small>
                                     {% if change > 0 %}
-                                      <span style="color: #22c55e; font-weight: bold;">↑</span>
+                                      <span class="change-up">↑</span>
                                     {% elif change < 0 %}
-                                      <span style="color: #ef4444; font-weight: bold;">↓</span>
+                                      <span class="change-down">↓</span>
                                     {% else %}
-                                      <span style="color: #999;"></span>
+                                      <span class="text-muted"></span>
                                     {% endif %}
-                                    {{ val }}
+                                    {{ level_text(val) }}
                                   </small>
                                 </td>
                               {% endfor %}
@@ -420,6 +386,4 @@
       </div>
     </div>
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

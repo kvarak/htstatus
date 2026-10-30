@@ -3,15 +3,9 @@
   {{ super() }}
   <style>
     .comparison-card {
-      border: 1px solid #ddd;
+      border: 1px solid hsl(var(--border));
       border-radius: 8px;
       margin-bottom: 20px;
-    }
-
-    .skill-comparison-table th {
-      background-color: hsl(var(--primary));
-      color: hsl(var(--primary-foreground));
-      text-align: center;
     }
 
     .skill-value {
@@ -31,7 +25,8 @@
     }
 
     .player-summary {
-      background-color: hsl(var(--muted));
+      background-color: hsl(var(--card));
+      border: 1px solid hsl(var(--border));
       border-radius: 8px;
       padding: 15px;
       margin-bottom: 15px;
@@ -40,12 +35,18 @@
 {% endblock %}
 {% block scripts %}
   {{ super() }}
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Radar chart for skill comparison
       const ctx = document.getElementById('skillsChart').getContext('2d');
       const chartData = {{ chart_data | tojson }};
+      const skillLabels = {{ skill_labels() | tojson }};
+      chartData.labels = chartData.labels.map(key => skillLabels[key] || key);
+      chartData.datasets.forEach((dataset, i) => {
+        dataset.backgroundColor = chartColor(i, 0.15);
+        dataset.borderColor = chartColor(i);
+        dataset.pointBackgroundColor = chartColor(i);
+      });
 
       new Chart(ctx, {
         type: 'radar',
@@ -77,15 +78,9 @@
   </script>
 {% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-          <h1>Player Comparison</h1>
-          <a href="/player?id={{ team_id }}" class="btn btn-outline-secondary">← Back to Players</a>
-        </div>
-      </div>
-    </div>
+    {{ page_header([('Players', '/player?id=' ~ team_id) , ('Player comparison', None)]) }}
     <!-- Player Summary Cards -->
     <div class="row">
       {% for player in players_data %}
@@ -156,7 +151,7 @@
                   {% for skill in skill_names %}
                     <tr>
                       <td>
-                        <strong>{{ skill.replace('_', ' ').title() }}</strong>
+                        <strong>{{ column_label(skill.replace('_', ' ').capitalize(), skill) }}</strong>
                       </td>
                       {% set skill_values = [] %}
                       {% for player in players_data %}
@@ -167,8 +162,9 @@
                       {% for player in players_data %}
                         {% set value = player[skill] %}
                         {% set oldest_value = players_oldest.get(player.ht_id, {}).get(skill, 0) %}
-                        <td class="skill-value {% if value == max_value and value > 0 %}skill-best{% endif %}">
-                          {{ value or 0 }}
+                        <td class="skill-value {% if value == max_value and value > 0 %}skill-best{% endif %}"
+                            title="{{ level_hint(value or 0) }}">
+                          {{ level_text(value or 0) }}
                           {% if oldest_value and oldest_value != value %}
                             {% if value > oldest_value %}
                               <small class="text-success">(+{{ value - oldest_value }})</small>
@@ -183,15 +179,19 @@
                   <!-- Additional stats -->
                   <tr>
                     <td>
-                      <strong>Form</strong>
+                      <strong>{{ column_label('Form', 'form') }}</strong>
                     </td>
-                    {% for player in players_data %}<td class="skill-value">{{ player.form or 'N/A' }}</td>{% endfor %}
+                    {% for player in players_data %}
+                      <td class="skill-value">{{ level_text(player.form) if player.form else 'N/A' }}</td>
+                    {% endfor %}
                   </tr>
                   <tr>
                     <td>
-                      <strong>Stamina</strong>
+                      <strong>{{ column_label('Stamina', 'stamina') }}</strong>
                     </td>
-                    {% for player in players_data %}<td class="skill-value">{{ player.stamina or 'N/A' }}</td>{% endfor %}
+                    {% for player in players_data %}
+                      <td class="skill-value">{{ level_text(player.stamina) if player.stamina else 'N/A' }}</td>
+                    {% endfor %}
                   </tr>
                 </tbody>
               </table>
@@ -231,7 +231,7 @@
                           {{ player.first_name }} {{ player.last_name }}
                         </td>
                         <td>{{ player.age if player.age else 'N/A' }}</td>
-                        <td>{{ player.loyalty if player.loyalty else 'N/A' }}</td>
+                        <td>{{ level_text(player.loyalty) if player.loyalty else 'N/A' }}</td>
                         <td>{{ player.best_position }}</td>
                         <td>{{ player.group_name }}</td>
                         <td>{{ "{:,}".format(player.tsi) if player.tsi else 'N/A' }}</td>

@@ -170,29 +170,12 @@ def compare_players():
         ]
         chart_data = {"labels": skill_names, "datasets": []}
 
-        colors = [
-            "rgba(255, 99, 132, 0.6)",  # Red
-            "rgba(54, 162, 235, 0.6)",  # Blue
-            "rgba(255, 205, 86, 0.6)",  # Yellow
-            "rgba(75, 192, 192, 0.6)",  # Teal
-            "rgba(153, 102, 255, 0.6)",  # Purple
-            "rgba(255, 159, 64, 0.6)",  # Orange
-        ]
-
-        for i, player in enumerate(players_data):
-            player_name = f"{player['first_name']} {player['last_name']}"
-            color = colors[i % len(colors)]
-
+        # Colors and translated labels are applied in the template
+        for player in players_data:
             chart_data["datasets"].append(
                 {
-                    "label": player_name,
+                    "label": f"{player['first_name']} {player['last_name']}",
                     "data": [player[skill] for skill in skill_names],
-                    "backgroundColor": color,
-                    "borderColor": color.replace("0.6", "1.0"),
-                    "pointBackgroundColor": color.replace("0.6", "1.0"),
-                    "pointBorderColor": "#fff",
-                    "pointHoverBackgroundColor": "#fff",
-                    "pointHoverBorderColor": color.replace("0.6", "1.0"),
                 }
             )
 

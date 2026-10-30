@@ -4,51 +4,56 @@
 /* ---- Design tokens (override the :root values in base.html) ---- */
 html.dark-mode {
   color-scheme: dark;
+  --background-photo-opacity: 0.07;
+  --accent2: 215 35% 68%;
+  --accent2-foreground: 215 30% 12%;
 
-  --primary: 120 45% 40%;
+  /* Near-black neutral surfaces; the two accents are toned down so green
+     stays an accent, not the whole page */
+  --primary: 125 28% 42%;
   --primary-foreground: 0 0% 98%;
-  --primary-glow: 120 55% 50%;
-  --secondary: 120 15% 22%;
-  --secondary-foreground: 120 10% 90%;
-  --success: 120 55% 40%;
+  --primary-glow: 125 28% 42%;
+  --secondary: 0 0% 16%;
+  --secondary-foreground: 0 0% 90%;
+  --success: 125 28% 42%;
   --success-foreground: 0 0% 98%;
-  --warning: 45 90% 55%;
-  --warning-foreground: 45 20% 12%;
-  --destructive: 0 70% 55%;
+  --warning: 40 85% 55%;
+  --warning-foreground: 40 30% 10%;
+  --destructive: 0 65% 55%;
   --destructive-foreground: 0 0% 98%;
-  --muted: 120 8% 18%;
-  --muted-foreground: 120 6% 68%;
-  --accent: 120 50% 45%;
+  --muted: 0 0% 14%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 125 28% 42%;
   --accent-foreground: 0 0% 98%;
-  --background: 120 8% 8%;
-  --foreground: 120 10% 90%;
-  --card: 120 6% 12%;
-  --card-foreground: 120 10% 90%;
-  --border: 120 6% 24%;
-  --input: 120 6% 24%;
-  --ring: 120 45% 45%;
+  --background: 0 0% 6%;
+  --foreground: 0 0% 90%;
+  --card: 0 0% 9%;
+  --card-foreground: 0 0% 90%;
+  --border: 0 0% 20%;
+  --input: 0 0% 24%;
+  --ring: 125 28% 42%;
 
-  --color-primary: hsl(120, 45%, 40%);
-  --color-primary-hover: hsl(120, 45%, 46%);
-  --color-primary-light: hsl(120, 45%, 50%);
-  --color-success: hsl(120, 55%, 40%);
-  --color-success-hover: hsl(120, 55%, 46%);
-  --color-background: hsl(120, 8%, 8%);
-  --color-foreground: hsl(120, 10%, 90%);
-  --color-muted: hsl(120, 8%, 18%);
-  --color-muted-foreground: hsl(120, 6%, 68%);
-  --color-border: hsl(120, 6%, 24%);
-  --color-input: hsl(120, 6%, 20%);
-  --gradient-subtle: linear-gradient(180deg, hsl(120, 8%, 10%), hsl(120, 8%, 14%));
+  --color-primary: hsl(var(--primary));
+  --color-primary-hover: hsl(125, 28%, 48%);
+  --color-primary-light: hsl(125, 28%, 52%);
+  --color-success: hsl(var(--success));
+  --color-success-hover: hsl(125, 28%, 48%);
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --gradient-subtle: hsl(var(--muted));
 
   /* Shared dark palette for the overrides below */
-  --dm-page: #121412;
-  --dm-surface: #1c201c;
-  --dm-surface-muted: #262b26;
-  --dm-border: #3a413a;
-  --dm-text: #e4e8e4;
-  --dm-text-muted: #a3aca4;
-  --dm-link: #7cc47f;
+  --dm-page: hsl(var(--background));
+  --dm-surface: hsl(var(--card));
+  --dm-surface-muted: hsl(var(--muted));
+  --dm-border: hsl(var(--border));
+  --dm-text: hsl(var(--foreground));
+  --dm-text-muted: hsl(var(--muted-foreground));
+  --dm-link: hsl(var(--accent2));
 }
 
 html.dark-mode body {
@@ -98,12 +103,8 @@ html.dark-mode .toast {
   border-color: var(--dm-border);
 }
 
-html.dark-mode .card-header,
-html.dark-mode .card-footer,
 html.dark-mode .modal-header,
 html.dark-mode .modal-footer,
-html.dark-mode .breadcrumb,
-html.dark-mode .jumbotron,
 html.dark-mode .input-group-text,
 html.dark-mode .toast-header {
   background-color: var(--dm-surface-muted);
@@ -243,7 +244,7 @@ html.dark-mode .td-fixed {
 
 html.dark-mode .table-custom thead th {
   background-color: var(--dm-surface-muted);
-  color: #8fd18f;
+  color: var(--dm-text);
 }
 
 html.dark-mode table.sortable thead {
@@ -254,11 +255,10 @@ html.dark-mode table.sortable thead {
 html.dark-mode .section-title,
 html.dark-mode .section-subtitle,
 html.dark-mode .changes-container,
-html.dark-mode .page-title-box,
 html.dark-mode .status-message,
 html.dark-mode .updated-teams-box,
 html.dark-mode .positioned-player {
-  background: rgba(28, 32, 28, 0.95);
+  background: var(--dm-surface);
   color: var(--dm-text);
 }
 

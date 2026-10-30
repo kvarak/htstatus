@@ -28,9 +28,9 @@
   padding: 0.25rem 0.6rem;
   margin: 0.15rem;
   border-radius: 1rem;
-  background-color: #f8f9fa;
-  border: 2px solid #dee2e6;
-  color: #495057;
+  background-color: hsl(var(--muted));
+  border: 2px solid hsl(var(--border));
+  color: hsl(var(--foreground));
   font-size: 0.8rem;
   font-weight: 500;
   transition: all 0.2s ease;
@@ -39,38 +39,38 @@
 }
 
 .group-pill:hover {
-  border-color: #007bff;
-  background-color: #e7f3ff;
+  border-color: hsl(var(--accent2));
+  background-color: hsl(var(--muted));
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+  box-shadow: 0 2px 4px hsl(var(--accent2) / 0.2);
 }
 
 .group-filter-item input[type="checkbox"]:checked + .group-pill {
-  border-color: #007bff;
-  background-color: #007bff;
+  border-color: hsl(var(--accent2));
+  background-color: hsl(var(--accent2));
   color: white;
-  box-shadow: 0 2px 6px rgba(0,123,255,0.3);
+  box-shadow: 0 2px 6px hsl(var(--accent2) / 0.3);
 }
 
 /* Override for colored group pills when selected */
 .group-filter-item input[type="checkbox"]:checked + .group-pill[style] {
-  border-color: #007bff !important;
-  box-shadow: 0 2px 6px rgba(0,123,255,0.3) !important;
+  border-color: hsl(var(--accent2)) !important;
+  box-shadow: 0 2px 6px hsl(var(--accent2) / 0.3) !important;
   opacity: 0.9;
 }
 
 /* Bulk action toolbar styling */
 #bulk-toolbar {
-  background-color: hsl(var(--primary) / 0.1);
+  background-color: hsl(var(--accent2) / 0.1);
   border-radius: var(--radius);
   padding: var(--spacing-3);
-  border: 1px solid hsl(var(--primary));
-  border-left: 4px solid hsl(var(--primary));
+  border: 1px solid hsl(var(--accent2));
+  border-left: 4px solid hsl(var(--accent2));
 }
 
 #selection-count {
   font-weight: var(--font-weight-semibold);
-  color: hsl(var(--primary));
+  color: hsl(var(--accent2));
 }
 
 /* Checkbox styling */
@@ -94,15 +94,15 @@
 }
 
 .player-row.selected {
-  background-color: hsl(var(--primary) / 0.1) !important;
-  border-left: 3px solid hsl(var(--primary));
+  background-color: hsl(var(--accent2) / 0.1) !important;
+  border-left: 3px solid hsl(var(--accent2));
 }
 
 /* Filter input focus states */
 #filter-toolbar input:focus,
 #filter-toolbar select:focus {
-  border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 2px hsl(var(--primary) / 0.2);
+  border-color: hsl(var(--accent2));
+  box-shadow: 0 0 0 2px hsl(var(--accent2) / 0.2);
 }
 
 /* Button styling consistency */
@@ -118,7 +118,7 @@
 
 #clear-filters:hover {
   background-color: hsl(var(--muted));
-  border-color: hsl(var(--primary));
+  border-color: hsl(var(--accent2));
 }
 
 /* Loading state for bulk operations */
@@ -163,8 +163,8 @@
 
 /* Filter active states */
 .filter-active {
-  background-color: hsl(var(--primary) / 0.1);
-  border-color: hsl(var(--primary));
+  background-color: hsl(var(--accent2) / 0.1);
+  border-color: hsl(var(--accent2));
 }
 
 /* Player comparison specific styles */
@@ -190,11 +190,11 @@
 /* Focus indicators for keyboard navigation */
 .player-checkbox:focus,
 #select-all:focus {
-  outline: 2px solid hsl(var(--primary));
+  outline: 2px solid hsl(var(--accent2));
   outline-offset: 2px;
 }
 
 .btn:focus {
-  outline: 2px solid hsl(var(--primary));
+  outline: 2px solid hsl(var(--accent2));
   outline-offset: 2px;
 }

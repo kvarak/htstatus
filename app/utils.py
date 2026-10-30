@@ -517,7 +517,7 @@ TIMELINE_ATTRIBUTES = {
 
 
 def _record_changes(old_record, new_record, display_data):
-    """List [display_data, attribute, old, new, change_type] for changed attributes."""
+    """List [display_data, attribute name, old, new, change_type, attribute key]."""
     changes = []
     for attr, change_type in TIMELINE_ATTRIBUTES.items():
         old_val = getattr(old_record, attr, None) or 0
@@ -530,6 +530,7 @@ def _record_changes(old_record, new_record, display_data):
                     old_val,
                     new_val,
                     change_type,
+                    attr,
                 ]
             )
     return changes
@@ -1892,7 +1893,7 @@ def get_team_timeline(team_id, weeks=4):
 
     Returns:
         dict: {"week_1": {"week_label", "is_current", "days_ago_start",
-        "days_ago_end", "changes": [[display_data, attr, old, new, type], ...]}, ...}
+        "days_ago_end", "changes": [[display_data, name, old, new, type, attr], ...]}, ...}
     """
     try:
         from datetime import timedelta

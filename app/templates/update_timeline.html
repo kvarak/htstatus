@@ -1,19 +1,10 @@
 {% extends 'base.html' %}
 {% block scripts %}{{ super() }}{% endblock %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="update-content">
     <div class="container">
-      <!-- Breadcrumb/Title -->
-      <div class="page-title-box">
-        <nav aria-label="breadcrumb" class="mb-0">
-          <ol class="breadcrumb"
-              style="background: transparent;
-                     padding: 0;
-                     margin: 0">
-            <li class="breadcrumb-item active">Update Complete - Player Change Timeline</li>
-          </ol>
-        </nav>
-      </div>
+      {{ page_header([('Update complete - player change timeline', None) ]) }}
       <!-- Status Messages -->
       {% if request.args.get('success') %}
         <div class="status-message status-success">✓ Data downloaded successfully</div>
@@ -57,7 +48,7 @@
         <div class="updated-teams-box">
           {% for teamid, team_data in updated.items() %}
             <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-              <span style="color: hsl(120, 45%, 25%); font-weight: 600;">{{ team_data[0] }}:</span>
+              <span class="font-weight-bold text-primary">{{ team_data[0] }}:</span>
               <a href="{{ team_data[1] }}" class="team-link">{{ team_data[2] }}</a>
             </p>
           {% endfor %}
@@ -124,28 +115,28 @@
                                 <div class="change-item">
                                   {% if change[4] == 'skill' %}
                                     {% if change[3] > change[2] %}
-                                      <span class="skill-up">📈 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
+                                      <span class="skill-up">📈 {{ column_label(change[1], change[5]) }}: {{ level_text(change[2]) }} → {{ level_text(change[3]) }}</span>
                                     {% else %}
-                                      <span class="skill-down">📉 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
+                                      <span class="skill-down">📉 {{ column_label(change[1], change[5]) }}: {{ level_text(change[2]) }} → {{ level_text(change[3]) }}</span>
                                     {% endif %}
                                   {% elif change[4] == 'cards' %}
                                     {% if change[3] == 3 %}
                                       <span class="skill-down">
                                         <img src="{{ url_for('static', filename='ico-red.png') }}"
                                              height="13"
-                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                             class="table-icon">
                                       Red card received</span>
                                     {% elif change[3] == 2 %}
                                       <span class="other-change">
                                         <img src="{{ url_for('static', filename='ico-yellow-2.png') }}"
                                              height="13"
-                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                             class="table-icon">
                                       2 yellow cards</span>
                                     {% elif change[3] == 1 %}
                                       <span class="other-change">
                                         <img src="{{ url_for('static', filename='ico-yellow-1.png') }}"
                                              height="13"
-                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                             class="table-icon">
                                       Yellow card</span>
                                     {% elif change[3] == 0 and change[2] > 0 %}
                                       <span class="skill-up">✓ Cards cleared</span>
@@ -159,20 +150,20 @@
                                       <span class="skill-down">
                                         <img src="{{ url_for('static', filename='ico-injury.png') }}"
                                              height="13"
-                                             style="background-color:rgba(255, 255, 255, 0.5)">
+                                             class="table-icon">
                                       Injured ({{ new_level }} weeks)</span>
                                     {% elif new_level == 0 %}
                                       {% if old_level > 0 %}
                                         <span class="skill-up">
                                           <img src="{{ url_for('static', filename='ico-damage.png') }}"
                                                height="13"
-                                               style="background-color:rgba(255, 255, 255, 0.5)">
+                                               class="table-icon">
                                         Injury improved to bruised</span>
                                       {% elif old_level == -1 %}
                                         <span class="skill-down">
                                           <img src="{{ url_for('static', filename='ico-damage.png') }}"
                                                height="13"
-                                               style="background-color:rgba(255, 255, 255, 0.5)">
+                                               class="table-icon">
                                         Got bruised</span>
                                       {% endif %}
                                     {% elif new_level == -1 %}
@@ -183,7 +174,7 @@
                                   {% elif change[4] == 'age' %}
                                     <span class="age-change">🎂 {{ change[1] }}: {{ change[2] }} → {{ change[3] }} years</span>
                                   {% else %}
-                                    <span class="other-change">🔄 {{ change[1] }}: {{ change[2] }} → {{ change[3] }}</span>
+                                    <span class="other-change">🔄 {{ column_label(change[1], change[5]) }}: {{ level_text(change[2]) }} → {{ level_text(change[3]) }}</span>
                                   {% endif %}
                                 </div>
                               {% endfor %}

@@ -157,15 +157,15 @@ players = team.players()  # Live data from Hattrick
 
 ### 4. UI Design System
 
-#### Color System (Football Theme)
-- Primary: `hsl(120, 45%, 25%)` (football green)
-- Success: `hsl(120, 70%, 35%)`
-- Warning: `hsl(45, 90%, 55%)`
-- Destructive: `hsl(0, 84%, 60%)`
-- Background: `hsl(120, 8%, 97%)`
+#### Look and feel: minimal, few colors
+- Neutral grays + **two accents**: football green `--primary` (`hsl(125, 35%, 30%)`: buttons, progress, our team) and slate blue `--accent2` (`hsl(215, 28%, 42%)`: links, selected items, info, second chart series). Red/amber only for errors, warnings and "bad" values
+- Tokens: `:root` in `base.html`; Bootstrap remap + flat cards/tables: `static/css/theme.css`; dark mode overrides the same variables (`dark-mode.css`)
+- Never hard-code colors in templates: use the CSS variables/classes; charts use `chartColor(i, alpha)` / `CHART_DANGER` from `chart-utils.js` (exception: country charts keep flag colors from `hattrick_countries.py`)
+- Every page starts with `{{ page_header([(label, url), ..., (current, None)]) }}` from `templates/_page.html` (actions via `{% call page_header(...) %}`); the footer comes from `_skeleton.html`
+- Hattrick terms and levels: `column_label`, `ht_term`, `specialty_name`, `level_text`/`level_hint` (never print raw skill numbers or English skill names)
 
 #### Framework Conventions
-- **Flask**: Use `.btn-primary-custom`, `.table-custom`, `.card-custom` classes
+- **Flask**: Use `.table-custom`, `.card`, Bootstrap buttons (`btn-primary` = accent, `btn-outline-secondary` = neutral)
 - **Typography**: h1: 2.5rem/700, h2: 2rem/600, body: 1rem/1.6 line-height
 - **Spacing**: 0.25rem increments (1=4px, 4=16px, 6=24px, 8=32px)
 

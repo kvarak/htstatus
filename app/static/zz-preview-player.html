@@ -1,0 +1,2877 @@
+
+<!DOCTYPE html>
+  <html lang="en">
+      <head>
+          <title>Test Team</title>
+          <script>
+            // Applies the saved dark mode choice before the page paints, so light mode does not flash.
+            (function () {
+              var stored = localStorage.getItem("htstatus-dark-mode");
+              var dark = stored !== null ? stored === "true" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+              if (dark) document.documentElement.classList.add("dark-mode");
+            })();
+          </script>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta charset="utf-8">
+  <link rel="icon" href="/static/ico.jpg">
+  <link rel="manifest"
+        href="/static/manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="app-version" content="3.23">
+  <!-- Bootstrap: Latest compiled and minified CSS -->
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <!-- HattrickPlanner Component Styles -->
+  <link rel="stylesheet"
+        href="/static/css/components.css">
+  <style>
+  /* ========================================
+     HattrickPlanner Design System
+     Football-themed unified design tokens
+     ======================================== */
+
+  :root {
+    /* Color System - minimal: neutral grays + one green accent.
+       Warning/destructive are for warnings and errors only. */
+    /* Using HSL without hsl() wrapper for consistent color management */
+
+    --primary: 125 35% 30%;                    /* The one accent: football green */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 125 35% 30%;
+
+    --secondary: 0 0% 95%;
+    --secondary-foreground: 0 0% 15%;
+
+    --success: 125 35% 30%;                    /* Same as the accent */
+    --success-foreground: 0 0% 100%;
+
+    --warning: 40 90% 50%;
+    --warning-foreground: 40 30% 12%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 42%;
+
+    --accent: 125 35% 30%;
+    --accent-foreground: 0 0% 100%;
+
+    --accent2: 215 28% 42%;                    /* Second accent: slate blue, balances the green */
+    --accent2-foreground: 0 0% 100%;
+
+    --background: 0 0% 98%;
+    --foreground: 0 0% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+
+    --border: 0 0% 88%;
+    --input: 0 0% 82%;
+    --ring: 125 35% 30%;
+
+    /* Legacy color aliases for existing Flask templates */
+    --color-primary: hsl(var(--primary));
+    --color-primary-hover: hsl(125, 35%, 24%);
+    --color-primary-light: hsl(125, 30%, 40%);
+    --color-success: hsl(var(--success));
+    --color-success-hover: hsl(125, 35%, 24%);
+    --color-warning: hsl(var(--warning));
+    --color-warning-hover: hsl(40, 90%, 42%);
+    --color-destructive: hsl(var(--destructive));
+    --color-destructive-hover: hsl(0, 65%, 42%);
+    --color-background: hsl(var(--background));
+    --color-foreground: hsl(var(--foreground));
+    --color-muted: hsl(var(--muted));
+    --color-muted-foreground: hsl(var(--muted-foreground));
+    --color-border: hsl(var(--border));
+    --color-input: hsl(var(--input));
+
+    /* No gradients or glows: flat surfaces */
+    --gradient-pitch: hsl(var(--primary));
+    --gradient-hero: hsl(var(--primary));
+    --gradient-subtle: hsl(var(--muted));
+
+    --shadow-football: none;
+    --shadow-glow: none;
+    --shadow-elegant: none;
+
+    /* Border Radius */
+    --radius: 0.5rem;       /* 8px - default */
+
+    /* Typography Scale */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 2rem;      /* 32px */
+    --font-size-4xl: 2.5rem;    /* 40px */
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* Spacing Scale (0.25rem increments) */
+    --spacing-1: 0.25rem;   /* 4px */
+    --spacing-2: 0.5rem;    /* 8px */
+    --spacing-3: 0.75rem;   /* 12px */
+    --spacing-4: 1rem;      /* 16px */
+    --spacing-6: 1.5rem;    /* 24px */
+    --spacing-8: 2rem;      /* 32px */
+    --spacing-12: 3rem;     /* 48px */
+    --spacing-16: 4rem;     /* 64px */
+
+    /* Border Radius */
+    --radius-sm: 0.125rem;  /* 2px */
+    --radius-md: 0.375rem;  /* 6px */
+    --radius-lg: 0.5rem;    /* 8px */
+    --radius-xl: 0.75rem;   /* 12px */
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  }
+
+  /* ========================================
+     Component Classes - Unified System
+     ======================================== */
+
+  /* Button Components */
+  .btn-primary-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    line-height: var(--line-height-normal);
+    border: none;
+    border-radius: var(--radius);
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: var(--shadow-football);
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:hover {
+    background-color: hsl(var(--primary) / 0.9);
+    box-shadow: var(--shadow-glow);
+    color: hsl(var(--primary-foreground));
+    text-decoration: none;
+  }
+
+  .btn-primary-custom:focus {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  .btn-primary-custom:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-success-custom {
+    background-color: hsl(var(--success));
+    color: hsl(var(--success-foreground));
+  }
+
+  .btn-success-custom:hover {
+    background-color: hsl(var(--success) / 0.9);
+  }
+
+  .btn-warning-custom {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--warning-foreground));
+  }
+
+  .btn-warning-custom:hover {
+    background-color: hsl(var(--warning) / 0.9);
+  }
+
+  .btn-destructive-custom {
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+  }
+
+  .btn-destructive-custom:hover {
+    background-color: hsl(var(--destructive) / 0.9);
+  }
+
+  /* Table Components */
+  .table-custom {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-xs);
+    background-color: hsl(var(--card));
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-football);
+  }
+
+  .table-custom thead {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .table-custom thead th {
+    padding: var(--spacing-2);
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    border-bottom: 2px solid hsl(var(--primary) / 0.9);
+    vertical-align: bottom;
+  }
+
+  /* Special styling for player table with rotated headers */
+  .table-custom.table-rotated thead th {
+    padding-top: 4rem;
+    height: 5rem;
+  }
+
+  .table-custom tbody tr {
+    border-bottom: 1px solid hsl(var(--border));
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .table-custom tbody tr:hover {
+    background-color: hsl(var(--muted));
+  }
+
+  .table-custom tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .table-custom tbody td {
+    padding: var(--spacing-1) var(--spacing-2);
+    line-height: var(--line-height-tight);
+  }
+
+  .table-custom.table-striped tbody tr:nth-child(even) {
+    background-color: hsl(var(--background));
+  }
+
+  /* Card Components */
+  .card-custom {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-football);
+    overflow: hidden;
+  }
+
+  .card-custom-header {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-bottom: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  .card-custom-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: hsl(var(--foreground));
+    margin: 0;
+  }
+
+  .card-custom-body {
+    padding: var(--spacing-6);
+  }
+
+  .card-custom-footer {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted));
+  }
+
+  /* Typography Utilities */
+  .text-primary-custom {
+    color: hsl(var(--primary));
+  }
+
+  .text-success-custom {
+    color: hsl(var(--success));
+  }
+
+  .text-warning-custom {
+    color: hsl(var(--warning));
+  }
+
+  .text-destructive-custom {
+    color: hsl(var(--destructive));
+  }
+
+  .text-muted-custom {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Background Utilities */
+  .bg-primary-custom {
+    background-color: hsl(var(--primary));
+  }
+
+  .bg-success-custom {
+    background-color: hsl(var(--success));
+  }
+
+  .bg-muted-custom {
+    background-color: hsl(var(--muted));
+  }
+
+  /* ========================================
+     Original Styles (Legacy - To Review)
+     ======================================== */
+
+  body, html {
+    height: 100%;
+  }
+  body {
+    height: 100%;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
+  .bg-off {
+    background-color:#d6d6d6!important
+  }
+  .bg-roundup {
+    background-color:#34c8db!important
+  }
+  .img-fluid-2 {
+    max-height: 100%;
+    width: auto;
+  }
+
+  .text-small {
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .table-scroll{
+    display: inline-block;
+    overflow: auto;
+    padding-bottom: 2rem;
+  }
+
+  .td-fixed {
+    background-color:#ffffff!important;
+    position: absolute;
+  }
+
+  .text-sm10 {
+    font-size: 10px;
+  }
+
+  .text-sm11 {
+    font-size: 11px;
+  }
+
+  .text-sm13 {
+    font-size: 13px;
+  }
+
+  /* Sortable tables */
+  table.sortable thead {
+    background-color:#eee;
+    color:#666666;
+    font-weight: bold;
+    cursor: default;
+  }
+
+  .parent {
+    overflow: hidden; /* required */
+    height: 1px; /* some non-zero number */
+  }
+
+  .ribbon {
+    margin: 0;
+    padding: 0;
+    background: rgb(36, 13, 165);
+    color:white;
+    padding:1em 0;
+    position: absolute;
+    top:0;
+    right:0;
+    transform: translateX(30%) translateY(0%) rotate(45deg);
+    transform-origin: top left;
+    z-index: 100;
+  }
+  .ribbon:before,
+  .ribbon:after {
+    content: '';
+    position: absolute;
+    top:0;
+    margin: 0 -1px; /* tweak */
+    width: 100%;
+    height: 100%;
+    background: rgb(36, 13, 165);
+  }
+  .ribbon:before {
+    right:100%;
+  }
+
+  .ribbon:after {
+    left:100%;
+  }
+
+  .chart {
+    vertical-align: middle;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    display: inline-block;
+  }
+
+  canvas {
+    height: 100%;
+  }
+
+  .loader {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 100px;
+    height: 100px;
+    margin: -76px 0 0 -76px;
+    /* border-top: 10px solid rgb(0, 0, 223);
+    border-right: 10px solid rgb(70, 235, 70);
+    border-bottom: 10px solid rgb(70, 235, 70);
+    border-left: 10px solid rgb(70, 235, 70); */
+    border-radius: 70%;
+    /* -webkit-animation: spin 1s alternate infinite;
+    animation: spin 1s alternate infinite; */
+    -webkit-animation: spin 1.7s linear infinite;
+    animation: spin 1.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .list-group-item {
+    padding: 0.25rem 1.25rem;
+  }
+
+  div.vertical {
+    margin-left: -10px;
+    /* position: absolute; */
+    width: 24px;
+    transform: rotate(-90deg);
+    -webkit-transform: rotate(-90deg); /* Safari/Chrome */
+    -moz-transform: rotate(-90deg);    /* Firefox */
+    -o-transform: rotate(-90deg);      /* Opera */
+    -ms-transform: rotate(-90deg);     /* IE 9 */
+  }
+
+  th.vertical {
+    max-width: 50px;
+    height: 85px;
+    line-height: 14px;
+    padding-left: 15px;
+    padding-bottom: 10px;
+    text-align: inherit;
+  }
+
+  /* PWA Mobile Optimizations */
+  @media (max-width: 768px) {
+    .container {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .table-responsive {
+      font-size: 12px;
+    }
+
+    .navbar-nav {
+      text-align: center;
+    }
+
+    .table th, .table td {
+      padding: 0.4rem;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      font-size: 0.9rem;
+      padding: 0.4rem 0.8rem;
+    }
+
+    /* Hide non-essential columns on mobile */
+    .table .d-none-mobile {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    .table th, .table td {
+      padding: 0.3rem;
+      font-size: 0.8rem;
+    }
+
+    .navbar-brand {
+      font-size: 1rem;
+    }
+  }
+
+  /* PWA Install Button */
+  #install-pwa {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #1f2937;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1000;
+    font-size: 14px;
+  }
+
+  </style>
+  <link rel="stylesheet"
+        href="/static/css/theme.css">
+  <link rel="stylesheet"
+        href="/static/css/dark-mode.css">
+
+  <link rel="stylesheet"
+        href="/static/css/player-table-enhanced.css">
+  <style>
+.player-name-link {
+  text-decoration: none !important;
+  cursor: pointer;
+}
+
+.player-name-link:hover {
+  text-decoration: underline !important;
+  opacity: 0.8;
+}
+  </style>
+  </style>
+
+      </head>
+      <body >
+        
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <button class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNavDropdown"
+            aria-controls="navbarNavDropdown"
+            aria-expanded="false"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      
+        <!-- Authenticated navigation -->
+        <ul class="navbar-nav" id="navbar-authenticated">
+          <li>
+            <img height="30" src="/static/chpp.png">
+            &nbsp;&nbsp;&nbsp;
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" href="/" onclick="loading();">Home<span class="sr-only">(current)</span></a>
+          </li>
+          
+            
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle"
+                   href="#"
+                   id="navbar-team-dropdown-0"
+                   role="button"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">Test Team</a>
+                <div class="dropdown-menu"
+                     aria-labelledby="navbar-team-dropdown-0">
+                  <!-- <a class="dropdown-item" href="/team?id=12345">Team</a> -->
+                  <a id="navbar-players-link-0"
+                     class="dropdown-item"
+                     href="/player?id=12345"
+                     onclick="loading();">Players</a>
+                  <a id="navbar-formations-link-0"
+                     class="dropdown-item"
+                     href="/formations?id=12345"
+                     onclick="loading();">Formations</a>
+                  <a id="navbar-matches-link-0"
+                     class="dropdown-item"
+                     href="/matches?id=12345"
+                     onclick="loading();">Matches</a>
+                  <a id="navbar-training-link-0"
+                     class="dropdown-item"
+                     href="/training?id=12345"
+                     onclick="loading();">Training</a>
+                  <a id="navbar-stats-link-0"
+                     class="dropdown-item"
+                     href="/stats?id=12345"
+                     onclick="loading();">Statistics</a>
+                </div>
+              </li>
+            
+          
+          <li class="nav-item">
+            <a id="navbar-update-link"
+               class="nav-link"
+               href="/update"
+               onclick="loading();">Update data</a>
+          </li>
+          <li class="nav-item">
+            <a id="navbar-settings-link"
+               class="nav-link"
+               href="/settings"
+               onclick="loading();">Settings</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout" onclick="loading();">Logout</a>
+          </li>
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/debug" onclick="loading();"><i>Debug</i></a>
+            </li>
+          
+          <li class="nav-item">
+            
+              <a class="nav-link" href="/feedback" onclick="loading();">Feedback</a>
+            
+          </li>
+        </ul>
+      
+    </div>
+    <button type="button"
+            id="dark-mode-toggle"
+            aria-label="Toggle dark mode"
+            title="Toggle dark mode">
+      <span id="dark-mode-icon">&#127769;</span>
+    </button>
+  </nav>
+  <!-- PWA Install Button and Session Persistence -->
+  <button id="install-pwa"
+          title="Install HTStatus as an app"
+          style="display: none">📱 Install App</button>
+  <!-- Password Migration Notice -->
+  
+  <div class="container"
+       data-current-user="kvarak">
+    <div class="row">
+      <div class="col-sm">
+        <p></p>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="parent">
+  <h8 class="ribbon">Beta version 3.23</h8>
+</div> -->
+  <div class="loader" id="loading">
+    <img src="/static/soccer_ball.png" width="100">
+  </div>
+
+          
+  
+  
+  <div class="container">
+    
+  <div class="page-header">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        
+          
+            <li class="breadcrumb-item">
+              <a href="/">Test Team</a>
+            </li>
+          
+        
+          
+            <li class="breadcrumb-item active" aria-current="page">Players</li>
+          
+        
+      </ol>
+    </nav>
+    
+  </div>
+
+    
+    <div class="row">
+      <div class="col-12">
+        <div class="card-deck">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Players</h5>
+              <!-- Filter Toolbar -->
+              <div id="filter-toolbar" class="mb-3">
+                <div class="row">
+                  <div class="col-md-3">
+                    <input type="text"
+                           id="name-filter"
+                           class="form-control form-control-sm"
+                           placeholder="Filter by name...">
+                  </div>
+                  <div class="col-md-9">
+                    <div id="group-filter-container" class="d-flex flex-wrap gap-2">
+                      <label class="group-filter-item">
+                        <input type="checkbox" class="group-checkbox" value="" checked>
+                        <span class="group-pill">All Groups</span>
+                      </label>
+                      
+                        
+                          <label class="group-filter-item">
+                            <input type="checkbox" class="group-checkbox" value="1">
+                            <span class="group-pill"
+                                  style="background-color: #2e7d32;
+                                         color: #ffffff">Main Squad</span>
+                          </label>
+                        
+                      
+                        
+                      
+                    </div>
+                    <small class="text-muted mt-2">
+                      <i class="fas fa-info-circle"></i>
+                      To create or edit player groups, visit the <a href="/settings">Settings page</a>
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <!-- Bulk Action Toolbar -->
+              <div id="bulk-toolbar" class="mb-3">
+                <div class="row">
+                  <div class="col-md-5">
+                    <small id="selection-count" class="text-muted">Select players to assign to groups or compare (max 8)</small>
+                  </div>
+                  <div class="col-md-3">
+                    <select id="bulk-group-select" class="form-control form-control-sm">
+                      <option value="">Assign to Group...</option>
+                      
+                        
+                          <option value="1">Main Squad</option>
+                        
+                      
+                        
+                      
+                      <option value="-1">Remove from Group</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button"
+                            id="bulk-assign-btn"
+                            class="btn btn-primary-custom btn-sm mr-2"
+                            disabled>Apply</button>
+                    <button type="button"
+                            id="compare-players-btn"
+                            class="btn btn-outline-primary btn-sm"
+                            disabled>Compare</button>
+                  </div>
+                </div>
+              </div>
+              <p class="card-text">
+                
+                
+                <table id="player-table"
+                       class="table-custom  table-scroll sortable">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="text-small">
+                        <input type="checkbox" id="select-all" title="Select All">
+                      </th>
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Group</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Number</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Specialty</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Name</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Age</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Keeper</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Defence</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Playmaking</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Winger</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Passing</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Scorer</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Set pieces</div>
+                          </th>
+                          
+                            <th scope="col" class="text-small"></th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Max stars</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Last stars</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Status</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">First seen</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  ">
+                            <div class=" ">Best position</div>
+                          </th>
+                          
+                        
+                      
+                        
+                          
+                          <th scope="col"
+                              class="text-small  text-center">
+                            <div class=" ">Current bid</div>
+                          </th>
+                          
+                        
+                      
+                    </tr>
+                  </thead>
+                  <tbody>
+                    
+                      
+                      
+                        
+                          <tr class="player-row"
+                              data-player-id="601"
+                              data-player-name="Michal Keeper"
+                              data-player-group-id="1"
+                              data-player-group-name="Main Squad"
+                              data-player-position=""
+                              style="color: #ffffff; background: #2e7d32">
+                            <td class="text-small">
+                              <input type="checkbox" class="player-checkbox" value="601">
+                            </td>
+                            
+                              
+                                <td class="text-small">Main Squad</td>
+                              
+                            
+                              
+                                
+                                  <td class="text-small">1</td>
+                                
+                              
+                            
+                              
+                                <td class="text-small">
+                                  
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" scope="row">
+                                    <a class="player-name-link"
+                                       data-toggle="modal"
+                                       href="#player-modal-601"
+                                       role="button"
+                                       style="color: #ffffff">
+                                      Michal Keeper
+                                    </a>
+                                  </td>
+                                
+                            
+                              
+                                  
+                                  <td class="text-small" align="center">25</td>
+                                
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="8">8</td>
+                                <td class="text-small">
+                                  (+1)
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="7">7</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id=12345&m="
+                                       style="color: #ffffff; background: #2e7d32">-</a>
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id=12345&m="
+                                       style="color: #ffffff; background: #2e7d32">-</a>
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    
+                                    
+                                    
+                                    
+                                    <img src="/static/ico-damage.png"
+                                         height="13"
+                                         class="table-icon">
+                                  
+                                  </td>
+                                
+                            
+                              
+                                  
+                                  
+                                  <td class="text-small" align="center">2026-10-10</td>
+                                
+                            
+                              
+                                  
+                                  <td class="text-small" align="center">GC</td>
+                                
+                              
+                            
+                              
+                                  
+                                  <td class="text-small text-center"
+                                      sorttable_customkey="-1"
+                                      title="">
+                                    
+                                  </td>
+                                
+                            
+                          </tr>
+                        
+                      
+                    
+                      
+                      
+                        
+                          <tr class="player-row"
+                              data-player-id="602"
+                              data-player-name="Yngve Winger"
+                              data-player-group-id="None"
+                              data-player-group-name=""
+                              data-player-position=""
+                              >
+                            <td class="text-small">
+                              <input type="checkbox" class="player-checkbox" value="602">
+                            </td>
+                            
+                              
+                                <td class="text-small"></td>
+                              
+                            
+                              
+                                
+                                  <td class="text-small">2</td>
+                                
+                              
+                            
+                              
+                                <td class="text-small">
+                                  
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" scope="row">
+                                    <a class="player-name-link"
+                                       data-toggle="modal"
+                                       href="#player-modal-602"
+                                       role="button"
+                                       style="color: inherit">
+                                      Yngve Winger
+                                    </a>
+                                  </td>
+                                
+                            
+                              
+                                  
+                                  <td class="text-small" align="center">25</td>
+                                
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="7">7</td>
+                                <td class="text-small">
+                                  (+1)
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="6">6</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id=12345&m="
+                                       style="color: inherit">-</a>
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id=12345&m="
+                                       style="color: inherit">-</a>
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    
+                                    
+                                    
+                                    
+                                    <img src="/static/ico-damage.png"
+                                         height="13"
+                                         class="table-icon">
+                                  
+                                  </td>
+                                
+                            
+                              
+                                  
+                                  
+                                  <td class="text-small" align="center">2026-10-10</td>
+                                
+                            
+                              
+                                  
+                                  <td class="text-small" align="center">GC</td>
+                                
+                              
+                            
+                              
+                                  
+                                  <td class="text-small text-center"
+                                      sorttable_customkey="-1"
+                                      title="">
+                                    
+                                  </td>
+                                
+                            
+                          </tr>
+                        
+                          <tr class="player-row"
+                              data-player-id="603"
+                              data-player-name="Anna Scorer"
+                              data-player-group-id="None"
+                              data-player-group-name=""
+                              data-player-position=""
+                              >
+                            <td class="text-small">
+                              <input type="checkbox" class="player-checkbox" value="603">
+                            </td>
+                            
+                              
+                                <td class="text-small"></td>
+                              
+                            
+                              
+                                
+                                  <td class="text-small">3</td>
+                                
+                              
+                            
+                              
+                                <td class="text-small">
+                                  
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" scope="row">
+                                    <a class="player-name-link"
+                                       data-toggle="modal"
+                                       href="#player-modal-603"
+                                       role="button"
+                                       style="color: inherit">
+                                      Anna Scorer
+                                    </a>
+                                  </td>
+                                
+                            
+                              
+                                  
+                                  <td class="text-small" align="center">25</td>
+                                
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="9">9</td>
+                                <td class="text-small">
+                                  (+1)
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="8">8</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                <td class="text-small text-center"
+                                    title=""
+                                    sorttable_customkey="5">5</td>
+                                <td class="text-small">
+                                  
+                                  
+                                </td>
+                              
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id=12345&m="
+                                       style="color: inherit">-</a>
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    <a href="/matches?id=12345&m="
+                                       style="color: inherit">-</a>
+                                  </td>
+                                
+                            
+                              
+                                  <td class="text-small" align="center">
+                                    
+                                    
+                                    
+                                    
+                                    <img src="/static/ico-damage.png"
+                                         height="13"
+                                         class="table-icon">
+                                  
+                                  </td>
+                                
+                            
+                              
+                                  
+                                  
+                                  <td class="text-small" align="center">2026-10-10</td>
+                                
+                            
+                              
+                                  
+                                  <td class="text-small" align="center">GC</td>
+                                
+                              
+                            
+                              
+                                  
+                                  <td class="text-small text-center"
+                                      sorttable_customkey="-1"
+                                      title="">
+                                    
+                                  </td>
+                                
+                            
+                          </tr>
+                        
+                      
+                    
+                  </tbody>
+                </table>
+              </p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Last updated 2026-10-30 08:29:21</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Player Details Modals -->
+      
+        
+        
+          <div class="modal fade"
+               id="player-modal-601"
+               tabindex="-1"
+               role="dialog"
+               aria-labelledby="player-modal-label-601"
+               aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="player-modal-label-601">
+                    1.
+                    Michal Keeper
+                    
+                      
+                      
+                      
+                      <img src="/static/ico-damage.png" height="25">
+                    
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Group Management Section -->
+                    <div class="row mb-3" style="max-width: 450px;">
+                      <div class="col-md-4">
+                        <form method="POST" action="/player" class="mb-0">
+                          <input type="hidden" id="playerid" name="playerid" value="601">
+                          <input type="hidden" id="id" name="id" value="12345">
+                          <div class="form-row align-items-center">
+                            <div class="col-12 mb-2">
+                              <label class="mr-sm-2" for="inlineFormCustomSelect">Player Group:</label>
+                              <select class="custom-select" name="groupid">
+                                
+                                
+                                  
+                                    <option selected
+                                            value="1"
+                                            id="groupid">Main Squad</option>
+                                  
+                                
+                                  
+                                
+                                <option value="-1" id="groupid">Clear group</option>
+                              </select>
+                            </div>
+                            <div class="col-12">
+                              <button type="submit"
+                                      class="btn btn-outline-secondary btn-sm"
+                                      name="updategroup"
+                                      value="updatebutton">Update Group</button>
+                            </div>
+                            
+                            
+                          </div>
+                        </form>
+                      </div>
+                      <div class="col-md-8">
+                        <!-- Player Description Section -->
+                        
+                        
+                        
+                        <p class="card-text text-sm11">
+                          Michal is 25. He
+                          has played <b>0</b> matches
+                          and scored <b>0</b> goals for
+                           since None.
+                          In his career, Michal has scored 0
+                          goal
+                          s
+                          and made 0
+                          hattrick
+                          s
+                          .
+                          
+                          
+                        </p>
+                        <p class="card-text text-sm11">
+                          Leadership: <span title="">5</span>,
+                          Agreeability: <span title="">0</span>,
+                          Aggressiveness: <span title="">0</span>,
+                          Honesty: <span title="">0</span>,
+                          Experience: <span title="">5</span>,
+                          Loyalty: <span title="">5</span>
+                        </br>
+                        TSI: 1000,
+                        Salary: 5000
+                        
+                      </p>
+                    </div>
+                  </div>
+                  <table class="table-custom" style="max-width: 450px;">
+                    
+                      
+                      <tr>
+                        <td class="text-small">Keeper</td>
+                        <td class="text-small text-center" title="">8</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 40.0%"
+                                 aria-valuenow="40.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Defender</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Playmaker</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Winger</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Passing</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Scorer</td>
+                        <td class="text-small text-center" title="">7</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 35.0%"
+                                 aria-valuenow="35.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Set pieces</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Form</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 62.5%"
+                                 aria-valuenow="62.5"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Stamina</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 55.55555555555556%"
+                                 aria-valuenow="55.55555555555556"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                  </table>
+                  <div class="player-chart"
+                       style="margin: 1rem 0;
+                              padding: 0.5rem;
+                              background: #f8f9fa;
+                              border-radius: 0.25rem;
+                              max-width: 470px;
+                              max-height: 320px">
+                    <canvas id="myLineChart601" width="450" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  
+        
+        
+          <div class="modal fade"
+               id="player-modal-602"
+               tabindex="-1"
+               role="dialog"
+               aria-labelledby="player-modal-label-602"
+               aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="player-modal-label-602">
+                    2.
+                    Yngve Winger
+                    
+                      
+                      
+                      
+                      <img src="/static/ico-damage.png" height="25">
+                    
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Group Management Section -->
+                    <div class="row mb-3" style="max-width: 450px;">
+                      <div class="col-md-4">
+                        <form method="POST" action="/player" class="mb-0">
+                          <input type="hidden" id="playerid" name="playerid" value="602">
+                          <input type="hidden" id="id" name="id" value="12345">
+                          <div class="form-row align-items-center">
+                            <div class="col-12 mb-2">
+                              <label class="mr-sm-2" for="inlineFormCustomSelect">Player Group:</label>
+                              <select class="custom-select" name="groupid">
+                                <option selected>Select group</option>
+                                
+                                  
+                                    <option 
+                                            value="1"
+                                            id="groupid">Main Squad</option>
+                                  
+                                
+                                  
+                                
+                                <option value="-1" id="groupid">Clear group</option>
+                              </select>
+                            </div>
+                            <div class="col-12">
+                              <button type="submit"
+                                      class="btn btn-outline-secondary btn-sm"
+                                      name="updategroup"
+                                      value="updatebutton">Update Group</button>
+                            </div>
+                            
+                            
+                          </div>
+                        </form>
+                      </div>
+                      <div class="col-md-8">
+                        <!-- Player Description Section -->
+                        
+                        
+                        
+                        <p class="card-text text-sm11">
+                          Yngve is 25. He
+                          has played <b>0</b> matches
+                          and scored <b>0</b> goals for
+                           since None.
+                          In his career, Yngve has scored 0
+                          goal
+                          s
+                          and made 0
+                          hattrick
+                          s
+                          .
+                          
+                          
+                        </p>
+                        <p class="card-text text-sm11">
+                          Leadership: <span title="">5</span>,
+                          Agreeability: <span title="">0</span>,
+                          Aggressiveness: <span title="">0</span>,
+                          Honesty: <span title="">0</span>,
+                          Experience: <span title="">5</span>,
+                          Loyalty: <span title="">5</span>
+                        </br>
+                        TSI: 1000,
+                        Salary: 5000
+                        
+                      </p>
+                    </div>
+                  </div>
+                  <table class="table-custom" style="max-width: 450px;">
+                    
+                      
+                      <tr>
+                        <td class="text-small">Keeper</td>
+                        <td class="text-small text-center" title="">7</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 35.0%"
+                                 aria-valuenow="35.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Defender</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Playmaker</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Winger</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Passing</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Scorer</td>
+                        <td class="text-small text-center" title="">6</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 30.0%"
+                                 aria-valuenow="30.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Set pieces</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Form</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 62.5%"
+                                 aria-valuenow="62.5"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Stamina</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 55.55555555555556%"
+                                 aria-valuenow="55.55555555555556"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                  </table>
+                  <div class="player-chart"
+                       style="margin: 1rem 0;
+                              padding: 0.5rem;
+                              background: #f8f9fa;
+                              border-radius: 0.25rem;
+                              max-width: 470px;
+                              max-height: 320px">
+                    <canvas id="myLineChart602" width="450" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+          <div class="modal fade"
+               id="player-modal-603"
+               tabindex="-1"
+               role="dialog"
+               aria-labelledby="player-modal-label-603"
+               aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="player-modal-label-603">
+                    3.
+                    Anna Scorer
+                    
+                      
+                      
+                      
+                      <img src="/static/ico-damage.png" height="25">
+                    
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <!-- Group Management Section -->
+                    <div class="row mb-3" style="max-width: 450px;">
+                      <div class="col-md-4">
+                        <form method="POST" action="/player" class="mb-0">
+                          <input type="hidden" id="playerid" name="playerid" value="603">
+                          <input type="hidden" id="id" name="id" value="12345">
+                          <div class="form-row align-items-center">
+                            <div class="col-12 mb-2">
+                              <label class="mr-sm-2" for="inlineFormCustomSelect">Player Group:</label>
+                              <select class="custom-select" name="groupid">
+                                <option selected>Select group</option>
+                                
+                                  
+                                    <option 
+                                            value="1"
+                                            id="groupid">Main Squad</option>
+                                  
+                                
+                                  
+                                
+                                <option value="-1" id="groupid">Clear group</option>
+                              </select>
+                            </div>
+                            <div class="col-12">
+                              <button type="submit"
+                                      class="btn btn-outline-secondary btn-sm"
+                                      name="updategroup"
+                                      value="updatebutton">Update Group</button>
+                            </div>
+                            
+                            
+                          </div>
+                        </form>
+                      </div>
+                      <div class="col-md-8">
+                        <!-- Player Description Section -->
+                        
+                        
+                        
+                        <p class="card-text text-sm11">
+                          Anna is 25. He
+                          has played <b>0</b> matches
+                          and scored <b>0</b> goals for
+                           since None.
+                          In his career, Anna has scored 0
+                          goal
+                          s
+                          and made 0
+                          hattrick
+                          s
+                          .
+                          
+                          
+                        </p>
+                        <p class="card-text text-sm11">
+                          Leadership: <span title="">5</span>,
+                          Agreeability: <span title="">0</span>,
+                          Aggressiveness: <span title="">0</span>,
+                          Honesty: <span title="">0</span>,
+                          Experience: <span title="">5</span>,
+                          Loyalty: <span title="">5</span>
+                        </br>
+                        TSI: 1000,
+                        Salary: 5000
+                        
+                      </p>
+                    </div>
+                  </div>
+                  <table class="table-custom" style="max-width: 450px;">
+                    
+                      
+                      <tr>
+                        <td class="text-small">Keeper</td>
+                        <td class="text-small text-center" title="">9</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 45.0%"
+                                 aria-valuenow="45.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Defender</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Playmaker</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Winger</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Passing</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Scorer</td>
+                        <td class="text-small text-center" title="">8</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 40.0%"
+                                 aria-valuenow="40.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Set pieces</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 25.0%"
+                                 aria-valuenow="25.0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Form</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 62.5%"
+                                 aria-valuenow="62.5"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      
+                      <tr>
+                        <td class="text-small">Stamina</td>
+                        <td class="text-small text-center" title="">5</td>
+                        <td class="text-small" style="width: 80%">
+                          <div class="progress" style="height: 13px;">
+                            <div class="progress-bar"
+                                 role="progressbar"
+                                 style="width: 55.55555555555556%"
+                                 aria-valuenow="55.55555555555556"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"></div>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                  </table>
+                  <div class="player-chart"
+                       style="margin: 1rem 0;
+                              padding: 0.5rem;
+                              background: #f8f9fa;
+                              border-radius: 0.25rem;
+                              max-width: 470px;
+                              max-height: 320px">
+                    <canvas id="myLineChart603" width="450" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  
+</div>
+
+          
+            <!-- Footer Component -->
+<footer class="site-footer mt-3 py-2">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <p class="text-muted small mb-0">
+          © 2026 HattrickPlanner - Hattrick Statistics Tool |
+          Uses <a href="https://www.goatcounter.com/"
+    target="_blank"
+    rel="noopener"
+    class="text-muted">GoatCounter</a> for anonymous analytics (no cookies or personal data)
+        </p>
+      </div>
+      <div class="col-md-4 text-md-right">
+        <p class="text-muted small mb-0">
+          v3.23 |
+          Approved CHPP product | Made by Kvarak
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+          
+          
+  
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+          integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+          integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+          crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+          integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+          crossorigin="anonymous"></script>
+  <script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+
+// Fix undefined option variable - initialize toasts properly
+$('.toast').toast('show')
+
+  </script>
+  <script src="/static/sorttable.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/static/Sortable.js"></script>
+  <!-- https://jsuites.net/v3/color-picker -->
+  <link rel="stylesheet"
+        href="/static/jsuites.css"
+        media="screen">
+  <script type="text/javascript"
+          src="/static/jsuites.js"></script>
+  <!-- PWA Session Persistence -->
+  <script src="/static/js/session-persistence.js"></script>
+  <!-- Chart.js Utilities -->
+  <script src="/static/js/chart-utils.js"></script>
+  <script src="/static/js/dark-mode.js"></script>
+  <!-- Intro.js Tutorial Library -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/introjs.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@7.2.0/minified/intro.min.js"></script>
+  <!-- Tutorial Custom Styles - Must load AFTER intro.js CSS -->
+  <style>
+/* Tutorial System Overrides - Maximum specificity to override intro.js defaults */
+.introjs-tooltip.introjs-custom-tooltip {
+    max-width: 400px !important;
+    min-width: 250px !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-header {
+    padding: 4px 16px !important;
+    background: hsl(120, 45%, 25%) !important;
+    border-radius: 0.375rem 0.375rem 0 0 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-title {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-tooltiptext {
+    padding: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-buttons {
+    padding: 0.75rem 1rem !important;
+    border-top: 1px solid hsl(120, 20%, 90%) !important;
+    text-align: right !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button {
+    padding: 0.375rem 0.75rem !important;
+    margin: 0 !important;
+    font-size: 0.875rem !important;
+    border-radius: 0.25rem !important;
+    border: 1px solid hsl(120, 20%, 75%) !important;
+    background: white !important;
+    color: hsl(120, 45%, 25%) !important;
+    transition: all 0.2s ease !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-button:hover {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton {
+    background: hsl(120, 45%, 25%) !important;
+    color: white !important;
+    border-color: hsl(120, 45%, 25%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton:hover {
+    background: hsl(120, 45%, 20%) !important;
+    border-color: hsl(120, 45%, 20%) !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton {
+    padding: 2px 16px !important;
+    font-size: 0.75rem !important;
+    color: hsl(120, 15%, 50%) !important;
+    border: none !important;
+    background: transparent !important;
+    white-space: nowrap !important;
+    min-width: 80px !important;
+    line-height: 1.2 !important;
+}
+
+.introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton:hover {
+    color: hsl(120, 45%, 25%) !important;
+    background: hsl(120, 8%, 97%) !important;
+}
+
+.introjs-helperNumberLayer.introjs-custom-highlight {
+    border: 3px solid hsl(120, 70%, 45%) !important;
+    border-radius: 0.25rem !important;
+    box-shadow: 0 0 0 4px hsla(120, 70%, 45%, 0.3) !important;
+}
+  </style>
+  <!-- Tutorial Manager -->
+  <script src="/static/js/tutorial-manager.js"></script>
+  <script type="text/javascript">// <![CDATA[
+  function loading(){
+    $("#loading").show();
+    $("#content").hide();
+  }
+// ]]>
+  </script>
+  <!-- PWA Service Worker Registration -->
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/static/sw.js')
+      .then(function(registration) {
+        console.log('HTStatus PWA: Service Worker registered with scope: ', registration.scope);
+
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content available, prompt user to refresh
+              if (confirm('HTStatus has been updated. Refresh to get the latest version?')) {
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(function(err) {
+        console.log('HTStatus PWA: Service Worker registration failed: ', err);
+      });
+  });
+}
+
+// PWA install prompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  // Show install button or notification
+  const installButton = document.getElementById('install-pwa');
+  if (installButton) {
+    installButton.style.display = 'block';
+    installButton.addEventListener('click', () => {
+      installButton.style.display = 'none';
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('HTStatus PWA installed');
+        }
+        deferredPrompt = null;
+      });
+    });
+  }
+});
+  </script>
+  <!-- GoatCounter Analytics -->
+  <script>
+      window.goatcounter = {
+          path: function (path) {
+              return location.hostname + path.split('?')[0];
+          }
+      };
+  </script>
+  <script data-goatcounter="https://stats.kvarak.net/count"
+          async
+          src="//stats.kvarak.net/count.js"></script>
+
+  <script>
+  // Data
+
+  
+  
+
+  
+
+  var data601 = {
+
+    labels: [
+      
+      "2026-10-10",
+      
+      "2026-10-28",
+      
+    ],
+
+    datasets: [
+      
+      {
+      label: "Keeper",
+      backgroundColor: chartColor(0, 0.15),
+      borderColor: chartColor(0),
+      data: [
+        
+        7,
+        
+        8,
+        
+        ]
+    },
+    
+      {
+      label: "Defence",
+      backgroundColor: chartColor(1, 0.15),
+      borderColor: chartColor(1),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Playmaking",
+      backgroundColor: chartColor(2, 0.15),
+      borderColor: chartColor(2),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Winger",
+      backgroundColor: chartColor(3, 0.15),
+      borderColor: chartColor(3),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Passing",
+      backgroundColor: chartColor(4, 0.15),
+      borderColor: chartColor(4),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Scorer",
+      backgroundColor: chartColor(5, 0.15),
+      borderColor: chartColor(5),
+      data: [
+        
+        7,
+        
+        7,
+        
+        ]
+    },
+    
+      {
+      label: "Set pieces",
+      backgroundColor: chartColor(6, 0.15),
+      borderColor: chartColor(6),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+    ]
+  };
+
+  
+
+  
+
+  var data602 = {
+
+    labels: [
+      
+      "2026-10-10",
+      
+      "2026-10-28",
+      
+    ],
+
+    datasets: [
+      
+      {
+      label: "Keeper",
+      backgroundColor: chartColor(0, 0.15),
+      borderColor: chartColor(0),
+      data: [
+        
+        6,
+        
+        7,
+        
+        ]
+    },
+    
+      {
+      label: "Defence",
+      backgroundColor: chartColor(1, 0.15),
+      borderColor: chartColor(1),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Playmaking",
+      backgroundColor: chartColor(2, 0.15),
+      borderColor: chartColor(2),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Winger",
+      backgroundColor: chartColor(3, 0.15),
+      borderColor: chartColor(3),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Passing",
+      backgroundColor: chartColor(4, 0.15),
+      borderColor: chartColor(4),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Scorer",
+      backgroundColor: chartColor(5, 0.15),
+      borderColor: chartColor(5),
+      data: [
+        
+        6,
+        
+        6,
+        
+        ]
+    },
+    
+      {
+      label: "Set pieces",
+      backgroundColor: chartColor(6, 0.15),
+      borderColor: chartColor(6),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+    ]
+  };
+
+  
+
+  
+
+  var data603 = {
+
+    labels: [
+      
+      "2026-10-10",
+      
+      "2026-10-28",
+      
+    ],
+
+    datasets: [
+      
+      {
+      label: "Keeper",
+      backgroundColor: chartColor(0, 0.15),
+      borderColor: chartColor(0),
+      data: [
+        
+        8,
+        
+        9,
+        
+        ]
+    },
+    
+      {
+      label: "Defence",
+      backgroundColor: chartColor(1, 0.15),
+      borderColor: chartColor(1),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Playmaking",
+      backgroundColor: chartColor(2, 0.15),
+      borderColor: chartColor(2),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Winger",
+      backgroundColor: chartColor(3, 0.15),
+      borderColor: chartColor(3),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Passing",
+      backgroundColor: chartColor(4, 0.15),
+      borderColor: chartColor(4),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+      {
+      label: "Scorer",
+      backgroundColor: chartColor(5, 0.15),
+      borderColor: chartColor(5),
+      data: [
+        
+        8,
+        
+        8,
+        
+        ]
+    },
+    
+      {
+      label: "Set pieces",
+      backgroundColor: chartColor(6, 0.15),
+      borderColor: chartColor(6),
+      data: [
+        
+        5,
+        
+        5,
+        
+        ]
+    },
+    
+    ]
+  };
+
+  
+
+  // Global + Custom Chart Config Options
+
+  var options = {
+    responsive: false,
+    maintainAspectRatio: false,
+    bezierCurve: false,
+    animation: true,
+    animationEasing: "easeOutQuart",
+    showScale: false,
+    tooltipEvents: ["mousemove", "touchstart", "touchmove"],
+    tooltipCornerRadius: 3,
+    pointDot : true,
+    pointDotRadius : 4,
+    datasetFill : true,
+    scaleShowLine : true,
+    animationEasing : "easeOutBounce",
+    animateRotate : true,
+    animateScale : true,
+  };
+
+  
+  var ctx601 = document.getElementById('myLineChart601');
+  var myLineChart601 = new Chart(ctx601, {
+    type: 'line',
+    data: data601,
+    options: options
+  });
+  
+  var ctx602 = document.getElementById('myLineChart602');
+  var myLineChart602 = new Chart(ctx602, {
+    type: 'line',
+    data: data602,
+    options: options
+  });
+  
+  var ctx603 = document.getElementById('myLineChart603');
+  var myLineChart603 = new Chart(ctx603, {
+    type: 'line',
+    data: data603,
+    options: options
+  });
+  
+
+  </script>
+  <!-- Enhanced Player Table with Filtering and Bulk Actions -->
+  <script src="/static/js/player-table-enhanced.js"></script>
+  <script>
+    // Initialize the enhanced player table
+    document.addEventListener('DOMContentLoaded', function() {
+        const playerTable = new PlayerTableEnhanced();
+        console.log('Player table enhanced features initialized');
+    });
+  </script>
+
+      </body>
+  </html>

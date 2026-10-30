@@ -1,15 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">Hattrick Planner</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([('Hattrick Planner', None) ]) }}
     {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
     <!-- <div class="alert alert-warning" role="alert">
     <p class="card-text">
@@ -91,7 +84,7 @@
             {% if releases %}
               <div class="text-sm11">
                 {% for release in releases %}
-                  <div class="mb-2 pb-2" style="border-bottom: 1px solid #e9ecef;">
+                  <div class="mb-2 pb-2 border-bottom">
                     <h6 class="mb-1 text-primary">
                       {{ release.version }} <small class="text-muted">{{ release.date }}</small>
                     </h6>
@@ -195,6 +188,4 @@
       </div>
     </div>
   </div>
-  <!-- Footer -->
-  {% include 'footer.html' %}
 {% endblock %}

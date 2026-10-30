@@ -1,18 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
+  {% from "_page.html" import page_header %}
   <div class="container">
-    <div class="row">
-      <div class="col-sm">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a href="{{ url_for('main.index') }}">Home</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
+    {{ page_header([('Home', url_for('main.index') ), (title, None)]) }}
     <div class="row">
       <div class="col-sm">
         <div class="card">

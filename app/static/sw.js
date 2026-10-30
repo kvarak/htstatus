@@ -1,20 +1,17 @@
 // Service Worker for HTStatus PWA
 // Cache strategy: Cache First for static assets, Network First for dynamic content
 
-const CACHE_NAME = 'htstatus-v1';
-const STATIC_CACHE = 'htstatus-static-v1';
-const DYNAMIC_CACHE = 'htstatus-dynamic-v1';
+const CACHE_NAME = 'htstatus-v3';
+const STATIC_CACHE = 'htstatus-static-v3';
+const DYNAMIC_CACHE = 'htstatus-dynamic-v3';
 
 // Core files to cache immediately
 const CORE_ASSETS = [
   '/',
-  '/static/Chart.bundle.js',
   '/static/jsuites.js',
   '/static/jsuites.css',
   '/static/ico.png',
   '/static/soccer_ball.png',
-  '/static/background.jpg',
-  '/static/plotly-latest.min.js',
   '/static/Sortable.js'
 ];
 
@@ -62,7 +59,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets - Cache First
+  // Our own CSS/JS - Network First, so a deploy is picked up at once (cache = offline copy)
+  if (url.pathname.startsWith('/static/') && /\.(css|js)$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const responseClone = response.clone();
+          caches.open(STATIC_CACHE).then(cache => cache.put(request, responseClone));
+          return response;
+        })
+        .catch(() => caches.match(request).then(cached => cached || new Response(
+          url.pathname.endsWith('.js') ? '// Offline - JS file unavailable' : '/* Offline - CSS file unavailable */',
+          { headers: { 'Content-Type': url.pathname.endsWith('.js') ? 'application/javascript' : 'text/css' } }
+        )))
+    );
+    return;
+  }
+
+  // Other static assets (images, icons) - Cache First
   if (request.url.includes('/static/')) {
     event.respondWith(
       caches.match(request)
