@@ -25,6 +25,7 @@ from app.auth_utils import (
     require_authentication,
     track_activity,
 )
+from app.columns import save_user_columns, user_columns
 from app.utils import create_page, diff_month, dprint
 
 # Create Blueprint for main routes
@@ -179,9 +180,7 @@ def settings():
         bgcolor = "#FFFFFF"
 
     user = get_current_user()
-    columns = user.getColumns() if user else []
-    if len(columns) == 0:
-        columns = defaultcolumns
+    columns = user_columns(user)
 
     columnsorder = request.form.get("columnsorder")
     setcolumnsdefault = request.form.get("defaultcolumns")
@@ -199,7 +198,7 @@ def settings():
             if key:
                 columns.append((text_match.group(1), key.group(1)))
         if user:
-            user.updateColumns(columns)
+            save_user_columns(user, columns, allcolumns)
         db.session.commit()
     elif setcolumnsdefault == "defaultcolumns":
         columns = defaultcolumns

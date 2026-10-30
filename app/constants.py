@@ -115,7 +115,6 @@ ALL_COLUMNS = [
     ("Max stars", "max_stars"),
     ("Last stars", "last_stars"),
     ("Status", "status"),
-    ("Current bid", "current_bid"),
     ("First seen", "firstseen"),
     ("Player notes", "owner_notes"),
     ("Leadership", "leadership"),
@@ -151,6 +150,8 @@ ALL_COLUMNS = [
     ("Defensive Forward (DF)", "DF"),
     ("Best position", "bestposition"),
     ("Man marking capability", "MMC"),
+    # Add new columns at the end: everyone gets them (see COLUMNS_BEFORE_AUTO_ADD)
+    ("Current bid", "current_bid"),
 ]
 
 DEFAULT_COLUMNS = [
@@ -169,10 +170,17 @@ DEFAULT_COLUMNS = [
     ("Max stars", "max_stars"),
     ("Last stars", "last_stars"),
     ("Status", "status"),
-    ("Current bid", "current_bid"),
     ("First seen", "firstseen"),
     ("Best position", "bestposition"),
 ]
+
+# Every column that existed before new columns were added automatically.
+# Never extend this: columns added to ALL_COLUMNS later are shown by default and
+# appended once to every user's saved column list (app/columns.py).
+COLUMNS_BEFORE_AUTO_ADD = frozenset(
+    key for _title, key in ALL_COLUMNS if key not in {"current_bid"}
+)
+DEFAULT_COLUMNS += [c for c in ALL_COLUMNS if c[1] not in COLUMNS_BEFORE_AUTO_ADD]
 
 TRACE_COLUMNS = [
     "keeper",

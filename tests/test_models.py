@@ -123,21 +123,28 @@ class TestUserModel:
         assert user.c_update == initial_update + 1
 
     def test_user_columns_management(self):
-        """Test User column preferences functionality."""
+        """Columns are (title, key) pairs; saving remembers every column seen."""
         user = User(12345, "test", "user", "pass", "key", "secret")
-
-        # Test default columns (empty list)
         assert user.getColumns() == []
+        assert user.getKnownColumns() is None
 
-        # Test setting columns
-        test_columns = ["name", "age", "form"]
-        user.updateColumns(test_columns)
-        assert user.getColumns() == test_columns
+        columns = [("Name", "name"), ("Age", "age_years")]
+        user.updateColumns(columns, known_keys=["name", "age_years", "tsi"])
+        assert user.getColumns() == columns
+        assert user.getKnownColumns() == {"name", "age_years", "tsi"}
 
-        # Test updating columns
-        new_columns = ["name", "stamina", "keeper"]
-        user.updateColumns(new_columns)
-        assert user.getColumns() == new_columns
+        user.updateColumns([("TSI", "tsi")])
+        assert user.getColumns() == [("TSI", "tsi")]
+        assert user.getKnownColumns() == {"tsi"}
+
+    def test_user_columns_saved_before_tracking(self):
+        """Rows saved as a plain list still load; their seen columns are unknown."""
+        import pickle
+
+        user = User(12345, "test", "user", "pass", "key", "secret")
+        user.player_columns = pickle.dumps([("Name", "name")])
+        assert user.getColumns() == [("Name", "name")]
+        assert user.getKnownColumns() is None
 
     def test_user_columns_error_handling(self):
         """Test User columns error handling with corrupted data."""

@@ -479,17 +479,15 @@ class TestPlayerBlueprintSetup:
         with app.app_context():
             from app.blueprints.player import setup_player_blueprint
 
-            def_cols = [("Name", "name"), ("Age", "age")]
             calc_cols = [("TSI", "tsi")]
             trace_cols = [("Form", "form")]
 
-            setup_player_blueprint(db, def_cols, calc_cols, trace_cols, 50)
+            setup_player_blueprint(db, calc_cols, trace_cols, 50)
 
             # Verify globals are set
             from app.blueprints import player
 
             assert player.db == db
-            assert player.defaultcolumns == def_cols
             assert player.calccolumns == calc_cols
             assert player.tracecolumns == trace_cols
             assert player.default_group_order == 50

@@ -147,7 +147,7 @@ def setup_routes(app_instance, db_instance):
     setup_main_blueprint(db_instance, DEFAULT_COLUMNS, ALL_COLUMNS, DEFAULT_GROUP_ORDER)
 
     setup_player_blueprint(
-        db_instance, DEFAULT_COLUMNS, CALC_COLUMNS, TRACE_COLUMNS, DEFAULT_GROUP_ORDER
+        db_instance, CALC_COLUMNS, TRACE_COLUMNS, DEFAULT_GROUP_ORDER
     )
 
     setup_team_blueprint(db_instance)

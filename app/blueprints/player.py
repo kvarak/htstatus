@@ -12,6 +12,7 @@ from app.auth_utils import (
     require_authentication,
     track_activity,
 )
+from app.columns import user_columns
 from app.error_handlers import (
     handle_error,
     TeamAccessError,
@@ -25,19 +26,15 @@ player_bp = Blueprint("player", __name__)
 
 # These will be set by setup_player_blueprint()
 db = None
-defaultcolumns = []
 calccolumns = []
 tracecolumns = []
 default_group_order = 99
 
 
-def setup_player_blueprint(
-    db_instance, def_cols, calc_cols, trace_cols, group_order=99
-):
+def setup_player_blueprint(db_instance, calc_cols, trace_cols, group_order=99):
     """Initialize player blueprint with db instance and column definitions."""
-    global db, defaultcolumns, calccolumns, tracecolumns, default_group_order
+    global db, calccolumns, tracecolumns, default_group_order
     db = db_instance
-    defaultcolumns = def_cols
     calccolumns = calc_cols
     tracecolumns = trace_cols
     default_group_order = group_order
@@ -199,9 +196,7 @@ def player():
 
     # Get the columns
     user = get_current_user()
-    columns = user.getColumns() if user else []
-    if len(columns) == 0:
-        columns = defaultcolumns
+    columns = user_columns(user)
 
     # Import calculateContribution from routes module for backward compatibility
     from app.utils import calculateContribution, calculateManmark

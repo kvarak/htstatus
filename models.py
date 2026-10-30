@@ -492,16 +492,31 @@ class User(db.Model):
     def stats(self):
         self._count_visit("c_stats")
 
-    def updateColumns(self, cols):
-        pcols = pickle.dumps(cols)
-        self.player_columns = pcols
+    def updateColumns(self, cols, known_keys=()):
+        """Save the shown columns and every column key the user has seen.
 
-    def getColumns(self):
+        Stored as ``{"shown": [(title, key)...], "known": [key...]}``; older rows
+        hold just the list of shown columns (still readable).
+        """
+        known = sorted(set(known_keys) | {key for _title, key in cols})
+        self.player_columns = pickle.dumps({"shown": list(cols), "known": known})
+
+    def _columnData(self):
         try:
-            pcols = pickle.loads(self.player_columns)
-            return pcols
+            return pickle.loads(self.player_columns)
         except Exception:
             return []
+
+    def getColumns(self):
+        data = self._columnData()
+        if isinstance(data, dict):
+            return list(data.get("shown", []))
+        return list(data or [])
+
+    def getKnownColumns(self):
+        """Column keys the user has seen, or None for lists saved before tracking."""
+        data = self._columnData()
+        return set(data.get("known", [])) if isinstance(data, dict) else None
 
 
 # --------------------------------------------------------------------------------
