@@ -8,19 +8,27 @@
 
 ---
 
+## 3.25 - November 1, 2026
+
+- **Football poster look**: flat brown, green, sand and orange tiles, a scoreboard font and football icons, also in dark mode
+- **New home page**: one tile per team with direct links to all its pages
+- **Scoreboards**: matches start with a "Home 2 1 Away" bar; stats and series show their key numbers as big tiles
+- **Striped pitch** in the formation tester
+- **Fixes**: the spinning ball no longer sticks after Back, and the footer shows the full version (3.25.0)
+
+*HattrickPlanner now looks like a football poster*
+
 ## 3.24 - November 1, 2026
 
-- **A new look**: every page now shares one calm, minimal style with a football-green and slate-blue accent, and the same page header, cards and tables everywhere
-- **Dark mode**: 🌙/☀️ toggle in the navbar for a near-black dark mode; it follows your system setting until you pick one
-- **Hattrick in your language**: skill names, skill levels, specialties and personality traits use the words Hattrick uses in your language, on every page (choose another language in Settings)
-- **Levels as words, numbers or both**: pick in Settings whether you see "solid (7)", "7" or "solid"
-- **Series page**: your league table with form, points behind the leader, the next round, your next opponent and your remaining matches
-- **Current bid on transfer-listed players**: a new "Current bid" column and details in the player popup (highest bid, asking price, deadline, highest bidder)
-- **New columns show up for everyone**: when HattrickPlanner adds a player table column, it appears at the end of your table once, even if you saved your own columns
-- **Better stats page**: squad composition uses the same best position as the player table, country charts show counts and percentages, Top Scorers counts goals for your club only
-- **Fixes**: sold players no longer stay in your team, "Assign to group" for selected players works again, a failed Update tells you why, the welcome tour no longer skips steps, multiple teams and odd links no longer crash pages, and new releases no longer show old styles from the browser cache
+- **One look on every page**, plus a dark mode (🌙/☀️) that follows your system setting
+- **Hattrick in your language**: skills, levels, specialties and traits use Hattrick's own words; show levels as words, numbers or both (Settings)
+- **Series page**: league table, form, next round and your remaining matches
+- **Current bid** column and popup details for transfer-listed players
+- **New columns** show up in your table automatically
+- **Better stats**: squad by best position, country counts and percentages, club-only top scorers
+- **Fixes**: sold players leave your team, "Assign to group" works, a failed Update says why, and fewer crashes
 
-*The biggest update in a long time: a fresh, consistent look in your own Hattrick language*
+*A consistent look in your own Hattrick language*
 
 ## 3.23 - February 6, 2026
 

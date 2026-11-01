@@ -8,70 +8,81 @@
 
 ---
 
+## 3.25 - November 1, 2026
+
+**Docker hosting and the "football poster" redesign** (8 commits since 3.24)
+
+### Hosting (INFRA-090)
+- **Docker:** a multi-stage `Dockerfile` with gunicorn; `docker/entrypoint.sh` runs the migrations on start
+- **CI:** publishes a multi-arch image to ghcr.io, with `APP_VERSION` set from `git describe`
+- **Server:** the files in `deploy/`; cron runs `update.sh`, which takes a backup before starting a new image
+- **Removed:** the git-checkout deploy and its scripts
+- **Settings moved to `.env`:** `ADMIN_HT_ID` (was the hard-coded `SUPERADMIN_HT_ID`) and `GOATCOUNTER_URL`
+
+### UI-024 redesign
+- **Tokens:** poster colors `--brown`, `--green`, `--sand`, `--cream`, `--orange`; `--accent2` is now burnt orange; dark mode uses brown surfaces; WCAG AA checked
+- **Macros:** `icon()` with a sprite (`static/img/icons.svg`) and `scoreboard()`
+- **Classes:** `.mosaic`/`.tile-*` and `.scoreboard-number`
+- **Font:** Oswald, self-hosted (OFL)
+- **Background:** `pattern.svg` used as a CSS mask
+- **Charts:** a new `CHART_PALETTE`
+- **Removed:** `background.jpg` and dead CSS
+- **Service worker:** images are cache-first, so bump the `sw.js` cache version when the SVGs change
+
+### Other
+- **Version:** the footer version is x.y.z (`get_version_info()`)
+- **Spinner:** a `pageshow` handler hides it after back/forward navigation
+- **Docs:** `TECHNICAL.md`, `CHANGELOG.md` and the agent file removed; the repo lives in `htstatus-2.0/` inside the VS Code workspace
+- **Makefile:** `make dev` is now `make serve`
+
+### Database, tests and deployment
+- **Database:** no schema changes
+- **Tests:** 466 pytest tests (74% coverage) and 15 Node tests
+- **Server `.env`:** needs `ADMIN_HT_ID` and `GOATCOUNTER_URL` (see `deploy/.env.example`)
+
 ## 3.24 - November 1, 2026
 
-**Big UI and code-health release: one look, Hattrick terms, new pages, and a deep cleanup** (63 commits since 3.23)
+**One look, Hattrick terms, new pages and a deep cleanup** (63 commits since 3.23)
 
 ### Features
-- **FEAT-030** Series page (`app/blueprints/series.py`): league table, form, next round and remaining matches, fetched during `/update`
-- **FEAT-025** Transfer bids: the `current_bid` column and popup details, from transfer data fetched during `/update` (no extra CHPP calls)
-- **FEAT-027** Hattrick terms (`app/translations.py`): `ht_term`, `column_label`, `level_text`/`level_hint` and `specialty_name` in every template
-- Level format setting (cookie: `both`, `numbers` or `words`) applied everywhere
-- **UI-014** Dark mode (`dark-mode.css`, `dark-mode.js`): follows the system setting with no light flash on load
-- New columns are auto-added for every user (`COLUMNS_BEFORE_AUTO_ADD` in `app/constants.py`, `app/columns.py`)
-- **FEAT-033** Debug charts date range (`debug-date-filter.js` with Node unit tests, `AdminPreferences`)
+- **FEAT-030** Series page (`app/blueprints/series.py`), fetched during `/update`
+- **FEAT-025** Transfer bids (`current_bid` column and popup), from the existing `/update` data
+- **FEAT-027** Hattrick terms (`app/translations.py`: `ht_term`, `column_label`, `level_text`, `specialty_name`) plus a level-format cookie
+- **UI-014** Dark mode (`dark-mode.css`/`.js`), with no flash on load
+- **New columns:** auto-added for every user (`COLUMNS_BEFORE_AUTO_ADD`)
+- **FEAT-033** Debug charts date range
 
 ### UI system
-- **Tokens and theme:** `:root` tokens in `base.html`; `static/css/theme.css` remaps Bootstrap with flat cards and tables
-- **Accents:** green `--primary` and slate `--accent2`; the tinted background photo is kept
-- **Shared page parts:** a `page_header` macro (`templates/_page.html`) on every page, with the footer from `_skeleton.html`
-- **Charts:** use `chartColor()`/`CHART_DANGER` from `chart-utils.js`; the country charts keep their flag colors
-- **Service worker:** network-first for our own CSS/JS, so no stale assets after a deploy
+- **Tokens:** in `base.html`, with the Bootstrap remap in `theme.css`
+- **Shared parts:** the `page_header` macro; `chartColor()` for charts
+- **Service worker:** network-first for our own CSS/JS
 
-### Refactoring and cleanup
+### Refactoring
 - **Removed:**
-  - routes: `/team` (it called CHPP on view), `/debug/session`, `/index`, `/api/players/filter`, `/debug/chpp_*`
-  - the `app/routes_bp.py` shim, the model registry and Flask-Bootstrap
-  - the CHPP playerevents chain, about 30 dead helpers, dead JS (`chart-utils.js` went from 196 to 61 lines) and about 200 lines of unused CSS
-  - Redis, the docker-compose overrides, the quality-intelligence reporting and one-off scripts
-- **`current_team()` in `auth_utils.py`:** one team lookup replaces `get_user_teams`, `get_team_info` and `validate_team_id`, which also fixes the crashes on non-numeric ids
-- **`app/roster.py`:** latest/oldest player records are queried in the database, and departed players are released during update
-- **`app/team_stats.py`:** pure stats calculations; the stats route went from ~240 to ~70 lines
-- **`best_position()`:** shared by the player, compare and stats pages
-- **`/update`, login and OAuth:** split into small helpers; team data is saved atomically
-- **Activity tracking:** one `@track_activity` decorator; the user is loaded once per request (`get_current_user`)
-- **Duplicated templates removed:**
-  - stats charts and skill-average cards, training change rows and the feedback vote JS (`js/feedback-vote.js`)
-  - formations drag parsing and `DEFAULT_COLUMNS`
+  - `/team` (it called CHPP on view) and other dead routes
+  - Flask-Bootstrap, Redis and the CHPP playerevents chain
+  - about 30 dead helpers and about 200 lines of unused CSS
+- **Team lookup:** `current_team()` replaces three lookups and fixes the crashes on bad ids
+- **New modules:** `app/roster.py` (latest records queried in SQL, departed players released) and `app/team_stats.py`
+- **Smaller pieces:**
+  - `/update`, login and OAuth split into helpers; team data saved atomically
+  - one `@track_activity` decorator; `get_current_user()` loads the user once per request
 
-### Bug fixes (technical)
-- **`update_error.html`:** a stray `{% endblock %}` made every failed update return a 500
-- **Bulk group assign:** a nested `db.session.begin()` failed inside the transaction `@require_authentication` had already opened
-- **`User.is_admin()`:** ignored role-based admins
-- **Changelog page:** the commit message HTML was not escaped
-- **Error log:** now deduplicated within an hour, keeps 90 days, and survives failed transactions
-- **Positions:** tactical variants now use their own weights
-- **Formation tester:** empty slots count as 0
-- **Welcome tour:** targeted IDs that don't exist
-- **`charts.css`:** had an unbalanced brace
+### Bug fixes
+- **Pages:**
+  - `update_error.html` returned a 500
+  - bulk group assign used a nested transaction
+  - the changelog didn't escape HTML
+- **Logic:** `is_admin()` ignored role-based admins; position variants used the wrong weights
+- **Error log:** deduplicated, with 90-day retention
 
-### Database
-- **One migration:** `d090b5ccb65f` adds the `adminpreferences` table (additive, safe)
-- **No other schema changes:** `User.team()` was removed, but the `c_team` column is kept
-- **Instance folder:** must be writable; transfer bids, series data and Hattrick terms are cached there as JSON
-
-### Testing and quality
-- **Tests:** 476 pytest tests (73% coverage, up from ~67%) plus 15 Node tests (`node --test tests/js/`)
-- **Template compile check:** every template is compiled in CI, which would have caught the `update_error.html` crash
-- **Removed weak tests:** existence-only and import-only tests and `status_code in [..., 500]` assertions, now replaced with exact expectations
-- **`make test-all` runs these gates:**
-  - tests and file format
-  - lint (ruff and black) and template lint (djlint)
-  - bandit and the CHPP policy check
-
-### Deployment
-- **Steps:** unchanged (`make deploy`); run `make db-backup` before the deploy because of the migration
-- **Next:** INFRA-090 moves production to Docker Compose (see the `docker-hosting` skill)
+### Database, tests and deployment
+- **Database:** migration `d090b5ccb65f` adds `adminpreferences` (additive); the instance folder must be writable (JSON caches)
+- **Tests:**
+  - 476 pytest tests (73% coverage) and 15 Node tests
+  - every template is compiled in CI
+  - weak tests replaced
+- **Deployment:** `make db-backup` before the deploy (migration)
 
 ## 3.23 - February 5, 2026
 
