@@ -345,6 +345,14 @@
                                       {{ change }})
                                     </small>
                                   {% endif %}
+                                  {% set est = speed.get(ht_id, {}).get(skill_keys[i]) %}
+                                  {% if est and est.per_level is not none %}
+                                    <small class="d-block text-muted"
+                                           title="Measured: about {{ '%.1f'|format(est.per_level) }} effective weeks per level{% if est.next_in is not none %}; next level in about {{ '%.1f'|format(est.next_in) }} weeks of full training{% endif %}">
+                                      ≈{{ "%.1f"|format(est.per_level) }} wk/level
+                                      {% if est.next_in is not none %}· next ≈{{ "%.1f"|format(est.next_in) }}{% endif %}
+                                    </small>
+                                  {% endif %}
                                 </td>
                                 <td class="text-small" style="width: 60%">
                                   <div class="progress" style="height: 13px;">
@@ -377,6 +385,11 @@
                             {% endfor %}
                           </tbody>
                         </table>
+                        {% if not (speed.get(ht_id, {}).values()|selectattr('per_level')|list) %}
+                          <p class="text-muted small mb-0 mt-2">
+                            Training speed shows here after two measured skill-ups. Update every week: Hattrick only reports last week's training.
+                          </p>
+                        {% endif %}
                       </div>
                     </div>
                   </div>
@@ -430,6 +443,16 @@
                                     {% endif %}
                                     {{ level_text(val) }}
                                   </small>
+                                  {% set pop = pop_marks[ht_id].get((date, i)) %}
+                                  {% if pop and pop.status == "measured" %}
+                                    <small class="d-block text-muted"
+                                           title="{{ level_text(pop['from']) }} → {{ level_text(pop['to']) }} took {{ '%.1f'|format(pop.weeks) }} effective training weeks">
+                                      {{ "%.1f"|format(pop.weeks) }} wk
+                                    </small>
+                                  {% elif pop %}
+                                    <small class="d-block text-muted"
+                                           title="Training speed not measured: {{ pop.status }}">·</small>
+                                  {% endif %}
                                 </td>
                               {% endfor %}
                             </tr>

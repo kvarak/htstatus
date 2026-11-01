@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from flask import Blueprint
 
-from app import trainees, training_log
+from app import trainees, training_log, training_speed
 from app.auth_utils import (
     current_team,
     require_authentication,
@@ -169,6 +169,15 @@ def training():
         for player_id in allplayerids
     }
 
+    snapshots = {}
+    for record in players_data:
+        snapshots.setdefault(record.ht_id, []).append(record)
+    speed = training_speed.measure_team(teamid, snapshots)
+    pop_marks = {
+        player_id: training_speed.history_marks(rows, speed.get(player_id, {}))
+        for player_id, rows in skill_changes.items()
+    }
+
     training_weeks = training_log.history(teamid)
     squad = {
         p.ht_id: playernames[p.ht_id] for p in latest_player_records(Players, teamid)
@@ -187,6 +196,8 @@ def training():
         player_info=player_info,
         training_weeks=training_weeks,
         trained=trainees.weekly_reports(teamid, training_weeks, squad),
+        speed=speed,
+        pop_marks=pop_marks,
         training_type_name=training_log.type_name,
         title="Training",
     )

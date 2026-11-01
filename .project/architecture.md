@@ -13,6 +13,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 | `app/auth_utils.py` | `@require_authentication`, `get_current_user()`, `current_team()`, `@track_activity` |
 | `app/roster.py`, `app/team_stats.py`, `app/utils.py` | Roster queries, stats calculations, shared helpers (`create_page`, `dprint`, contributions, match downloads) |
 | `app/training_log.py` | The team's weekly training (`TrainingWeek`), saved at Update; CHPP only gives this week and last week, so the table is the only history |
+| `app/training_speed.py` | Measured training speed: skill-ups from the player snapshots and the effective training weeks between them (page view only, nothing stored) |
 | `app/training_rules.py`, `app/match_minutes.py`, `app/trainees.py` | Which positions each training trains (from HO and the wiki; change only with a source), minutes per player and position from a match lineup, and who got trained per week |
 | `app/translations.py`, `app/instance_cache.py` | Hattrick's own terms per language, cached as JSON in `instance/` (also transfer bids and series data) |
 | `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `TrainingWeek`, `MatchPositionMinutes`, `Feedback*`, `ErrorLog`, ...) |

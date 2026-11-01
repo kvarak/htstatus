@@ -34,15 +34,20 @@ def training_date_of(day):
     return day + timedelta(days=(TRAINING_WEEKDAY - day.weekday()) % 7)
 
 
-def _week_minutes(team_id, weeks):
-    """{training_date: {player_id: {role_id: minutes}}} for the given weeks."""
+def week_minutes(team_id, dates):
+    """Minutes per player and role per training week, and the weeks with gaps.
+
+    Returns ``({training_date: {player_id: {role_id: minutes}}}, missing)``;
+    ``missing`` holds the weeks with a played training match whose lineup
+    (minutes) we don't have, so nobody's training that week is known.
+    """
     from sqlalchemy import or_
 
     from models import Match, MatchPositionMinutes
 
-    dates = {w.training_date for w in weeks}
+    dates = set(dates)
     if not dates:
-        return {}
+        return {}, set()
     start = datetime.combine(min(dates) - timedelta(days=6), time.min)
     end = datetime.combine(max(dates), time.max)
     matches = Match.query.filter(
@@ -50,22 +55,26 @@ def _week_minutes(team_id, weeks):
         Match.matchtype.in_(TRAINING_MATCH_TYPES),
         Match.datetime >= start,
         Match.datetime <= end,
+        Match.home_goals.isnot(None),
     ).all()
     match_week = {m.ht_id: training_date_of(m.datetime.date()) for m in matches}
     result = {d: {} for d in dates}
     if not match_week:
-        return result
+        return result, set()
     rows = MatchPositionMinutes.query.filter(
         MatchPositionMinutes.team_id == team_id,
         MatchPositionMinutes.match_id.in_(match_week),
     ).all()
+    with_lineup = set()
     for row in rows:
+        with_lineup.add(row.match_id)
         week = result.get(match_week[row.match_id])
         if week is None:
             continue
         per_role = week.setdefault(row.player_id, {})
         per_role[row.role_id] = per_role.get(row.role_id, 0) + row.minutes
-    return result
+    missing = {w for m, w in match_week.items() if m not in with_lineup and w in dates}
+    return result, missing
 
 
 def _status(counted):
@@ -87,7 +96,7 @@ def weekly_reports(team_id, weeks, squad):
     doesn't depend on positions (stamina, general) are left out.
     """
     weeks = [w for w in weeks if w.training_type in TRAINING_POSITION_EFFECTS]
-    minutes = _week_minutes(team_id, weeks)
+    minutes, _missing = week_minutes(team_id, [w.training_date for w in weeks])
     reports = {}
     for week in weeks:
         played = minutes.get(week.training_date, {})
