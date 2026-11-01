@@ -24,6 +24,15 @@ FORCE_DEPLOY=true make deploy  # deploy even with unpushed/uncommitted changes
 
 You can run any of them by hand on the Pi when something goes wrong.
 
+## Releasing
+
+A release is a git tag (`3.24`). The footer version and the /changes page come from tags.
+
+1. Write the notes by hand: a user section in `RELEASES.md`, a technical one in `RELEASES-INTERNAL.md`, and `[Unreleased]` → `[X.Y] - date` in `CHANGELOG.md`. Use top-level `- ` bullets in `RELEASES.md`; the /changes page ignores indented ones.
+2. Commit them ("Update release documentation for vX.Y").
+3. Run `make release-tag VERSION=X.Y MESSAGE="..."`, then `make release-docs` to check that /changes picks up the release (the generated JSON is not committed).
+4. Push the commit and the tag (`git push && git push origin X.Y`), then `make deploy`. `deploy-docs` regenerates /changes on the Pi.
+
 ## Configuration on the Pi
 
 The app reads everything from `.env` in the repo directory (see `.env.example` and `config.py`). The important ones:

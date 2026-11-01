@@ -75,7 +75,7 @@
         "PHASE 3 - Release Detection: Run 'make release-detect' to check for version-worthy changes.",
         "PHASE 4 - Version Release (if detected): Determine version (minor=features, patch=fixes), create tag with 'make release-tag VERSION=X.Y MESSAGE=\"description\"'.",
         "PHASE 5 - Documentation: ALWAYS update RELEASES-INTERNAL.md manually for all tagged releases with technical details.",
-        "PHASE 6 - User-Facing Documentation: IF feature is user-visible (UI changes, new functionality users interact with), THEN generate user-facing release notes with 'make release-notes VERSION=X.Y' to update RELEASES.md.",
+        "PHASE 6 - User-Facing Documentation: IF feature is user-visible (UI changes, new functionality users interact with), THEN add a short user-facing note for the next release in RELEASES.md (written by hand; see the latest entry for the format).",
         "PHASE 7 - Finalize: Run 'make release-docs' to regenerate changelog. Commit any docs updates. Verify git status is clean.",
         "Feature patterns: FEAT- task completion, new functionality, 'Add', 'Implement' in changes.",
         "User-facing criteria: UI changes, new user features, workflow improvements.",

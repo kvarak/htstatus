@@ -1,13 +1,7 @@
-#!/usr/bin/env python3
-"""
-Tests for release automation scripts
-Purpose: Ensure release generation works correctly
-"""
+"""Tests for the release tooling (scripts/release, release notes format)."""
 
 import re
-import shutil
 import subprocess
-import tempfile
 
 import pytest
 
@@ -38,71 +32,11 @@ def test_detect_version_changes():
         )
 
 
-def test_generate_release_content():
-    """Test release content generation"""
-    result = subprocess.run(
-        ["./scripts/release/generate_release_content.sh", "v3.1"],
-        capture_output=True,
-        text=True,
-    )
-
-    assert result.returncode == 0, f"Content generation failed: {result.stderr}"
-    assert "## v3.1 - " in result.stdout
-    # Check for valid month format (e.g., "January 2026", "February 2026", etc.)
-    assert re.search(
-        r"(January|February|March|April|May|June|July|August|September|October|November|December) 202\d",
-        result.stdout,
-    ), f"Expected month and year format not found in output: {result.stdout}"
-    assert "-" in result.stdout  # Should have bullet points
-
-
-def test_update_releases():
-    """Test RELEASES.md update process"""
-    # Create a temporary RELEASES.md file
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".md") as temp_file:
-        temp_file.write("""# Releases
-
-**Purpose**: User-focused summaries
----
-
-## v3.0 - January 2026
-- Existing content
-""")
-        temp_file_path = temp_file.name
-
-    # Backup original and replace with test file
-    original_path = "RELEASES.md"
-    backup_path = "RELEASES.md.backup"
-
-    shutil.move(original_path, backup_path)
-    shutil.move(temp_file_path, original_path)
-
-    try:
-        # Run update script
-        result = subprocess.run(
-            ["./scripts/release/update_releases.sh", "v3.2"],
-            capture_output=True,
-            text=True,
-        )
-
-        assert result.returncode == 0, f"Update script failed: {result.stderr}"
-
-        # Check the updated file
-        with open(original_path) as f:
-            content = f.read()
-
-        assert "## v3.2 - " in content
-        assert "## v3.0 - January 2026" in content  # Original content preserved
-
-    finally:
-        # Restore original file
-        shutil.move(backup_path, original_path)
-
-
-if __name__ == "__main__":
-    test_detect_version_changes()
-    test_generate_release_content()
-    test_update_releases()
-    print("✅ All release automation tests passed!")
-
-# To run: uv run python tests/test_release_automation.py
+@pytest.mark.parametrize("notes", ["RELEASES.md", "RELEASES-INTERNAL.md"])
+def test_release_headings_parse_for_changes_page(notes):
+    """scripts/changelog.sh only picks up "## X.Y - <date>" headings (no "v")."""
+    with open(notes) as f:
+        headings = [line.rstrip() for line in f if line.startswith("## ")]
+    assert headings
+    bad = [h for h in headings if not re.match(r"^## \d+\.\d+ - .+$", h)]
+    assert not bad, f"{notes}: headings /changes cannot parse: {bad}"

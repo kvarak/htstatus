@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-notes release-tag release-docs db-migrate db-upgrade db-apply check-uv lint-templates lint-templates-fix
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-tag release-docs db-migrate db-upgrade db-apply check-uv lint-templates lint-templates-fix
 
 # Variables
 PYTHON := uv run python
@@ -250,11 +250,6 @@ changelog: ## Generate changelog (from scripts/changelog.sh)
 release-detect: ## Detect if changes warrant a version release
 	@echo "🔍 Detecting release-worthy changes..."
 	@./scripts/release/detect_version_changes.sh
-
-release-notes: ## Generate release notes (usage: make release-notes VERSION=1.2)
-	@test -n "$(VERSION)" || { echo "❌ Usage: make release-notes VERSION=1.2"; exit 1; }
-	@echo "📝 Generating release notes for version $(VERSION)..."
-	@./scripts/release/update_releases.sh $(VERSION)
 
 release-tag: ## Create git tag (usage: make release-tag VERSION=1.2 MESSAGE="Release description")
 	@test -n "$(VERSION)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
