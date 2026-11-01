@@ -111,7 +111,7 @@ HattrickPlanner uses a modern Flask blueprint architecture with clean separation
 - `/models.py`: SQLAlchemy database models
 - `/app/templates/`: Jinja2 templates (`base.html` extends `_skeleton.html`)
 - `/app/static/css/`: CSS architecture (see CSS Architecture below)
-- `/scripts/`: Development, database and deployment scripts (see `scripts/README.md`)
+- `/scripts/`: Development and database scripts (see `scripts/README.md`)
 - `docker-compose.yml`: local dev PostgreSQL (and optional pgAdmin), plus the app image (`web`, `make docker-up`) and tests in the image (`test`, `make docker-check`)
 - `Dockerfile`, `docker/entrypoint.sh`, `gunicorn.conf.py`: the production image (migrations on start, then gunicorn)
 - `/deploy/`: production files for the Pi (compose, `.env.example`, `update.sh`, `backup.sh`); see DEPLOYMENT.md

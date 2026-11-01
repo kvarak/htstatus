@@ -100,7 +100,7 @@ docker-build: ## Build the production image locally (htstatus-web:local)
 	@bash scripts/changelog.sh >/dev/null
 	@docker compose --profile web build --build-arg APP_VERSION=$$(git describe --tags) web
 
-docker-up: docker-build ## Run the production image locally on http://localhost:$${WEB_PORT:-5010}
+docker-up: docker-build ## Run the production image locally on http://localhost:5010 (WEB_PORT to change)
 	@docker compose --profile web up -d --wait postgres web
 	@echo "✅ Running at http://localhost:$${WEB_PORT:-5010} (make docker-logs, make stop)"
 
@@ -115,31 +115,6 @@ services-stop: ## Stop all Docker Compose services
 	@echo "🛑 Stopping Docker Compose services..."
 	@$(DOCKER_COMPOSE) down 2>&1 | tee -a /tmp/docker-down.log || docker compose down 2>&1 | tee -a /tmp/docker-down.log || true
 	@echo "✅ Services stopped"
-
-config-validate: check-uv ## Validate configuration for current environment
-	@echo "🔍 Validating configuration..."
-	@$(PYTHON) -c "from config import get_config; cfg = get_config(); cfg.validate_config(); print('✅ Configuration is valid')"
-
-config-help: ## Show configuration setup help
-	@echo "⚙️  HTStatus Configuration Help"
-	@echo "=============================="
-	@echo ""
-	@echo "Environment Templates:"
-	@echo "  Development: cp environments/.env.development.example .env"
-	@echo "  Staging:     cp environments/.env.staging.example .env"
-	@echo "  Production:  cp environments/.env.production.example .env"
-	@echo ""
-	@echo "Environment Detection:"
-	@echo "  Set FLASK_ENV=development|staging|production"
-	@echo ""
-	@echo "Validation:"
-	@echo "  make config-validate  # Check current configuration"
-	@echo ""
-	@echo "Templates provide:"
-	@echo "  - Environment-specific defaults"
-	@echo "  - Security guidelines"
-	@echo "  - Required vs optional settings"
-	@echo "  - Deployment instructions"
 
 # Python Development Commands
 install: check-uv ## Install dependencies using UV
@@ -314,103 +289,5 @@ db-restore: check-uv ## Restore database from backup file (usage: make db-restor
 	fi
 	@uv run python scripts/database/restore_database.py "$(BACKUP_FILE)"
 
-db-backup-auto: check-uv ## Run automated backup to kloker.local (for cron/deployment)
-	@echo "🔄 Running automated backup to kloker.local..."
-	@./scripts/database/backup_to_kloker.sh
-
-# Deployment Commands
-deploy-prepare: ## Prepare deployment environment (git, dependencies)
-	@echo "🚀 Preparing deployment environment..."
-	@echo "Checking system dependencies..."
-	@if command -v jq >/dev/null 2>&1; then \
-		echo "✓ jq already installed"; \
-	elif command -v apt-get >/dev/null 2>&1; then \
-		sudo apt-get update -qq && sudo apt-get install -y jq; \
-	elif command -v yum >/dev/null 2>&1; then \
-		sudo yum install -y jq; \
-	elif command -v brew >/dev/null 2>&1; then \
-		brew install jq; \
-	else \
-		echo "⚠️  Could not detect package manager - please install jq manually"; \
-	fi
-	@echo "Installing uv..."
-	@export PATH="$$HOME/.local/bin:$$PATH"; \
-	if ! command -v uv >/dev/null 2>&1; then \
-		pip3 install --user uv; \
-	fi
-	@echo "Ensuring ~/.local/bin in PATH..."
-	@if ! grep -q 'export PATH="$$HOME/.local/bin:$$PATH"' ~/.bashrc 2>/dev/null; then \
-		echo 'export PATH="$$HOME/.local/bin:$$PATH"' >> ~/.bashrc; \
-		echo "✓ Added ~/.local/bin to PATH in ~/.bashrc"; \
-	fi
-	@echo "✅ Environment prepared"
-
-deploy-sync: check-uv ## Sync code and dependencies
-	@echo "🔄 Syncing code and dependencies..."
-	@git fetch --all
-	@git reset --hard $${DEPLOY_GIT_BRANCH:-next/main}
-	@echo "Cleaning migration conflicts..."
-	@find migrations/versions/ -name "*.py" -not -path "*/__pycache__/*" | while read -r file; do \
-		if ! git ls-files --error-unmatch "$$file" >/dev/null 2>&1; then \
-			echo "Removing untracked migration file: $$file"; \
-			rm -f "$$file"; \
-		fi; \
-	done
-	@export PATH="$$HOME/.local/bin:$$PATH"; \
-	rm -rf .venv 2>/dev/null || true; \
-	uv sync --python 3.14; \
-	uv pip install requests requests-oauthlib
-	@echo "✅ Code and dependencies synced"
-
-deploy-docs: ## Update release documentation and changelog
-	@echo "📚 Updating documentation..."
-	@if $(MAKE) release-detect 2>/dev/null; then \
-		echo "Version changes detected - updating release documentation..."; \
-		$(MAKE) release-docs || echo "Release update failed, continuing..."; \
-	else \
-		echo "No version changes detected - generating changelog only..."; \
-		$(MAKE) changelog; \
-	fi
-	@echo "✅ Documentation updated"
-
-deploy-migrate: check-uv ## Apply database migrations safely
-	@echo "🗄️  Applying database migrations..."
-	@export PATH="$$HOME/.local/bin:$$PATH"; \
-	uv run python scripts/database/apply_migrations.py
-	@echo "✅ Database migrations completed"
-
-deploy-finalize: ## Finalize deployment (restart service, cleanup)
-	@echo "🏁 Finalizing deployment..."
-	@find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-	@find . -type f -name "*.pyc" -delete 2>/dev/null || true
-	@sudo systemctl restart htstatus
-	@if [ $$? -eq 0 ]; then \
-		echo "✅ Service restarted successfully"; \
-		sudo systemctl status htstatus --no-pager -l | head -10; \
-	else \
-		echo "❌ Service restart failed!"; \
-		exit 1; \
-	fi
-	@echo "✅ Finalization completed"
-
-deploy: ## Smart deployment: --run if pushed, --dry-run if not (override with FORCE_DEPLOY=true)
-	@echo "🚀 Preparing deployment..."
-	@if [ "$${FORCE_DEPLOY}" = "true" ]; then \
-		echo "🔓 FORCE_DEPLOY=true - skipping git push check"; \
-		./scripts/deployment/deploy.sh --run; \
-	elif git diff --quiet && git diff --cached --quiet; then \
-		if git log --oneline @{u}.. 2>/dev/null | grep -q .; then \
-			echo "⚠️  WARNING: Local commits not pushed to remote"; \
-			echo "   Use 'git push' first or set FORCE_DEPLOY=true"; \
-			echo "   Running dry-run instead..."; \
-			./scripts/deployment/deploy.sh --run --dry-run; \
-		else \
-			echo "✅ Working directory clean and up to date with remote"; \
-			./scripts/deployment/deploy.sh --run; \
-		fi; \
-	else \
-		echo "⚠️  WARNING: Uncommitted changes detected"; \
-		echo "   Commit and push changes first or set FORCE_DEPLOY=true"; \
-		echo "   Running dry-run instead..."; \
-		./scripts/deployment/deploy.sh --run --dry-run; \
-	fi
+db-copy-production: services ## Replace the local dev database with a copy of production (PROD_SERVER/PROD_APP_DIR in .env)
+	@./scripts/database/copy_production_db.sh

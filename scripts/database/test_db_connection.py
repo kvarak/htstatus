@@ -31,7 +31,6 @@ Common Issues:
 
 Related Commands:
     make services       # Start Docker PostgreSQL
-    make config-validate # Check environment configuration
 
 Author: HTStatus Development Team
 Created: January 13, 2026 (INFRA-011 authentication fix)

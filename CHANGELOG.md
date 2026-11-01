@@ -9,11 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Docker image for production (INFRA-090): gunicorn instead of the Flask dev server, migrations on start, non-root user; CI publishes `ghcr.io/<owner>/htstatus-web` for amd64/arm64 on pushes to `main`
-- `deploy/` with the server's compose file, `update.sh` (back up, then deploy a new image) and `backup.sh` (nightly dump, optionally copied to another host over ssh); DEPLOYMENT.md has a rehearsed cut-over runbook
+- `deploy/` with the server's compose file, `update.sh` (back up, then deploy a new image) and `backup.sh` (nightly dump, optionally copied to another host over ssh)
 - `make docker-up` (run the production image locally) and `make docker-check` (lint and tests inside the image)
+- `make db-copy-production`: replace the local dev database with a copy of production, to test migrations on real data
 
 ### Changed
 - The version shown in the footer comes from `APP_VERSION` when set (the image has no `.git`) instead of running `git describe` on every page view
+- Production now runs the Docker image with PostgreSQL 17 (cut over on 2026-11-01); dev (`docker-compose.yml`) and CI tests also use PostgreSQL 17. Recreate the local dev database volume once (`make db-copy-production` refills it)
+- The release push is `git push --atomic origin main X.Y`, so CI sees the tag when it builds the image
+
+### Removed
+- The old deploy: `make deploy` and `deploy-*`, `scripts/deployment/deploy.sh`, `scripts/run.sh`, the systemd service on the server
+- `backup_to_kloker.sh` / `make db-backup-auto` (it had failed every night since it was added) and `restore_production_backup.sh`; replaced by `deploy/backup.sh` and `make db-copy-production`
+- Broken `make config-validate` / `config-help` and unused `.env.example` variables (deploy settings, `LOCAL_RUN`, `DEVELOPMENT_LOGGING`, `SQLALCHEMY_ECHO`)
 
 ## [3.24] - 2026-11-01
 

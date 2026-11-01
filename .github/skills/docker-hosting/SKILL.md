@@ -385,11 +385,15 @@ The database is the one thing that must not break.
    - copy the data folders, then `chown 10001`;
    - set the old port and `up -d --wait`.
 
-   Keep the old `SECRET_KEY` (sessions stay valid) and the CHPP/OAuth `CALLBACK_URL`. Keep the cut-over dump somewhere safe.
+   Keep the old `SECRET_KEY` (sessions stay valid) and the CHPP/OAuth `CALLBACK_URL`. Keep the cut-over dump somewhere safe (`chmod 600`: it has user data).
+
+   **Run the switch as a script file on the server** (`scp` it, then `bash cutover.sh </dev/null`), with `set -euo pipefail` and a `trap ... ERR` that stops `web` and restarts the old service. Never pipe a script over `ssh ... 'bash -s' <<EOF`: `docker compose exec -T` forwards stdin, so the first `exec` silently swallows the rest of the script.
 6. **Rollback:** `docker compose stop web` and re-enable the old service. The old database was never changed; only data written since the switch is lost.
 7. **Make it permanent:**
    - disable the old service (it must not take the port on reboot);
-   - replace its cron lines with `backup.sh` and `update.sh`, using absolute paths.
+   - save the old crontab, then replace its lines with `backup.sh` and `update.sh`, using absolute paths and `PATH=/usr/local/bin:/usr/bin:/bin`;
+   - test `update.sh` the way cron runs it: `env -i HOME=$HOME PATH=/usr/local/bin:/usr/bin:/bin ./update.sh`.
+   - Also check that the old backup job actually worked; it may have been failing quietly.
 8. **After a couple of weeks:**
    - remove the old checkout, unit and database (dump once more first), plus the old deploy scripts and targets;
    - make DEPLOYMENT.md Docker-only.

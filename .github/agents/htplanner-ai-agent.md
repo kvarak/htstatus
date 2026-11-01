@@ -74,8 +74,8 @@ This principle applies at all levels: individual functions, modules, documentati
 #### Database Standards (CRITICAL - HIGHEST PRIORITY)
 **NEVER COMPROMISE DATABASE INTEGRITY**: This is a hobby project's most valuable asset.
 - All schema changes must maintain backwards compatibility
-- Use `uv run python scripts/database/apply_migrations.py` for safe migrations
-- Test migrations on production-like structure copies before deployment
+- Migrations run automatically when a new image starts in production (after `update.sh` backs up the database)
+- Test migrations on a copy of production first: `make db-copy-production`, then `make db-upgrade`
 - Document migration rationale in version files
 - Backup validation before any database modifications
 - Model changes require extra review and testing
@@ -260,7 +260,7 @@ make lint
 make db-backup                       # Always back up first
 make db-migrate MESSAGE="describe"   # Generate migration
 make db-upgrade                      # Apply migration locally
-make db-apply                        # Production-safe apply script
+make db-copy-production              # Test migrations on a copy of production
 ```
 
 ### 8. Technology Stack & Configuration
@@ -270,7 +270,7 @@ make db-apply                        # Production-safe apply script
 - **Database**: PostgreSQL with SQLAlchemy ORM
 - **Authentication**: Hattrick OAuth via the custom CHPP client in `app/chpp/`
 - **Testing**: pytest with transaction isolation
-- **Deployment**: systemd service on a Raspberry Pi via `make deploy` (see DEPLOYMENT.md)
+- **Deployment**: Docker image published by CI (`ghcr.io`), run on the server with `deploy/docker-compose.yml`; cron deploys new images after a backup (see DEPLOYMENT.md)
 
 #### Frontend
 - **Templates**: Server-rendered Jinja2 templates with Bootstrap 4 (CDN)
@@ -278,7 +278,7 @@ make db-apply                        # Production-safe apply script
 - **PWA**: Service Worker with cache-first strategy
 
 #### DevOps & Commands
-- `./scripts/run.sh` - Flask dev server (port 5000)
+- `make dev` - Flask dev server; `make docker-up` / `make docker-check` - the production image locally
 - `make test-all` - Run full test suite with coverage
 - `make lint` - Run linter
 - `make db-migrate` / `make db-upgrade` - Database migrations

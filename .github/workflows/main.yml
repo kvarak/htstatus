@@ -33,7 +33,7 @@ jobs:
     name: Tests
     services:
       postgres:
-        image: postgres:13-alpine
+        image: postgres:17-alpine
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
