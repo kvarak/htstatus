@@ -55,9 +55,11 @@ def create_app(config_object=None, include_routes=True):
             return f"{years} y {days} d"
         return str(age_string)
 
+    from app.seo import init_app as init_seo
     from app.translations import init_app as init_translations
 
     init_translations(app)
+    init_seo(app)
 
     # Set up routes only if requested (allows testing without complex routes)
     if include_routes:
@@ -152,6 +154,10 @@ def setup_routes(app_instance, db_instance):
     app_instance.register_blueprint(training_bp)
     app_instance.register_blueprint(api_bp)
     app_instance.register_blueprint(compare_bp)
+
+    from app.seo import seo_bp
+
+    app_instance.register_blueprint(seo_bp)
 
 
 def _display_startup_status():

@@ -39,6 +39,10 @@ CHPP is called **only** at login/OAuth callback and on the explicit Update (`/up
 - Show skills and levels with `column_label`, `ht_term`, `specialty_name`, `level_text`/`level_hint`, so the user's language and level format apply.
 - CSS by function: `ui-components.css`, `utilities.css`, `layout.css`, `charts.css`, `animations.css`; feature files `timeline.css`, `formations.css`, `player-table-enhanced.css` (`components.css` imports them).
 
+## Search engines
+
+`app/seo.py`: only `/`, `/changes` and `/login` are public (`PUBLIC_PAGES`, with their titles and descriptions); every other page gets `noindex` and is disallowed in `/robots.txt`. `/sitemap.xml`, canonical links and Open Graph/Twitter tags use the public address from `CALLBACK_URL`. The tags come from `templates/_seo_meta.html` (included by `_skeleton.html`); the home page also has WebApplication JSON-LD. The share image is `static/img/share.png` (1200×630). The site icon is the tactics-board icon on a brown tile: `static/img/icon.svg` (master) with PNG sizes, `apple-touch-icon.png`, a maskable version and `/favicon.ico`; regenerate the PNGs when the SVG changes and bump the cache version in `sw.js`. Never put team or player data in these tags.
+
 ## Database rules
 
 The production database is the most important asset.

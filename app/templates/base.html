@@ -4,7 +4,12 @@
 ##########################
 {% block styles %}
   <meta charset="utf-8">
-  <link rel="icon" href="{{ url_for('static', filename='ico.jpg') }}">
+  <link rel="icon"
+        href="{{ url_for('static', filename='img/icon.svg') }}"
+        type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="48x48">
+  <link rel="apple-touch-icon"
+        href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
   <link rel="manifest"
         href="{{ url_for('static', filename='manifest.json') }}">
   <meta name="theme-color" content="#3b2a26">

@@ -1,0 +1,32 @@
+{# Search engine and link preview tags (app/seo.py); logged-in pages are noindex #}
+{% set meta = page_meta(title) %}
+<meta name="description" content="{{ meta.description }}">
+{% if meta.index %}
+  <link rel="canonical" href="{{ meta.canonical }}">
+{% else %}
+  <meta name="robots" content="noindex, nofollow">
+{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ meta.site_name }}">
+<meta property="og:title" content="{{ meta.title }}">
+<meta property="og:description" content="{{ meta.description }}">
+<meta property="og:url" content="{{ meta.canonical }}">
+<meta property="og:image" content="{{ meta.image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+{% if meta.is_home %}
+  <script type="application/ld+json">
+    {{ {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": meta.site_name,
+      "url": meta.site_url + "/",
+      "description": meta.description,
+      "applicationCategory": "SportsApplication",
+      "operatingSystem": "Any (web browser)",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
+      "image": meta.image,
+    }|tojson }}
+  </script>
+{% endif %}

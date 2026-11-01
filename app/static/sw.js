@@ -1,16 +1,16 @@
 // Service Worker for HTStatus PWA
 // Cache strategy: Cache First for static assets, Network First for dynamic content
 
-const CACHE_NAME = 'htstatus-v3';
-const STATIC_CACHE = 'htstatus-static-v3';
-const DYNAMIC_CACHE = 'htstatus-dynamic-v3';
+const CACHE_NAME = 'htstatus-v4';
+const STATIC_CACHE = 'htstatus-static-v4';
+const DYNAMIC_CACHE = 'htstatus-dynamic-v4';
 
 // Core files to cache immediately
 const CORE_ASSETS = [
   '/',
   '/static/jsuites.js',
   '/static/jsuites.css',
-  '/static/ico.png',
+  '/static/img/icon-192.png',
   '/static/soccer_ball.png',
   '/static/Sortable.js'
 ];
@@ -159,8 +159,8 @@ self.addEventListener('push', (event) => {
     const data = event.data.json();
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/static/ico.png',
-      badge: '/static/soccer_ball.png'
+      icon: '/static/img/icon-192.png',
+      badge: '/static/img/icon-192.png'
     });
   }
 });

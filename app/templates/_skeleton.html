@@ -5,7 +5,8 @@
     {%- block html %}
       <head>
         {%- block head %}
-          <title>{% block title %}{{ title|default }}{% endblock title %}</title>
+          <title>{% block title %}{{ page_meta(title).title }}{% endblock title %}</title>
+          {% include "_seo_meta.html" %}
           <script>
             // Applies the saved dark mode choice before the page paints, so light mode does not flash.
             (function () {

@@ -7,7 +7,6 @@
 ## Next Up 🎯
 
 - **[FEAT-008]** Next Game Analyser → [Details](tasks/FEAT-008.md)
-- **[FEAT-034]** Search Engine Optimization (SEO) Implementation - Add comprehensive SEO features including meta tags, robots.txt, sitemap.xml, structured data, and social sharing optimization to improve search engine discoverability for Hattrick enthusiasts → [Details](tasks/FEAT-034.md)
 
 ## Later 🔮
 

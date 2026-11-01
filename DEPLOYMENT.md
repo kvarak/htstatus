@@ -18,7 +18,7 @@ On the server, everything lives in one folder (called `<app dir>` below, e.g. `~
 
 The container runs the migrations every time it starts. If one fails, the container stops instead of serving a half-migrated database.
 
-The reverse proxy forwards your domain to `http://127.0.0.1:$WEB_PORT` (default 5000), passing the `Host` header. `CALLBACK_URL` in `.env` must be `https://<your domain>/login`, the URL registered for your CHPP app.
+The reverse proxy forwards your domain to `http://127.0.0.1:$WEB_PORT` (default 5000), passing the `Host` header. `CALLBACK_URL` in `.env` must be `https://<your domain>/login`, the URL registered for your CHPP app. The app also takes its public address from it (canonical links, `/robots.txt`, `/sitemap.xml`, link previews).
 
 ### Day to day (on the server, in `<app dir>`)
 

@@ -13,6 +13,7 @@
 
 ## P2: Worth doing 🎯
 
+- **[BUG-124]** A match that is still being played shows up under Recent Matches as a 0-0 draw ("D" badge, scoreboard 0 0) with a "Limited Match Data, click Update data" box that doesn't help, because its details can't be fetched yet. Hattrick's match status isn't stored. Good enough: save the status from the matches data during `/update` and show an unfinished match as "in progress" (no W/L/D badge or score, a note that the result comes with the next Update after the match), then fetch its details on the first Update after it ends
 - **[INFRA-091]** A fresh install can't start from an empty database: the old migration chain doesn't build the schema. Good enough: when the database has no tables, create them from the models and `alembic stamp head` (in the entrypoint), tested with an empty database in CI
 - **[REFACTOR-121]** `app/utils.py` (~1460 lines) mixes match downloading/CHPP enhancement (`downloadMatches`, `downloadRecentMatches`, `fetch_enhanced_match_data`, `_process_matches_enhanced`) with small helpers; move the match download code to its own module so utils is just helpers
 - **[REFACTOR-122]** Blueprints get `db`/columns through `setup_*_blueprint()` module globals (9 blueprints plus `initialize_utils`); import `db` and `app.constants` directly like `series`/`stats` do. Auth's injected `app`, `consumer_key` and `consumer_secret` are never read
