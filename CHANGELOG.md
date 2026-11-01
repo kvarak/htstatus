@@ -7,22 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- **One look for every page** - minimal style with neutral grays, a green accent (buttons, our team) and a slate blue second accent (links, selections, info) to balance it: the background photo is tinted green-to-slate, no gradients or Bootstrap blues; the same page header, cards, tables and footer everywhere; charts share one calm palette (except the country charts, which keep the flag colors); match ratings show our team in green vs the opponent in gray
-- **Calmer dark mode** - near-black neutral surfaces instead of green-tinted ones, softer accents, a fainter background photo and a dim pitch on the formations page
-- **Hattrick terms and level format everywhere** - training, compare, stats, formations and the update timeline now use your Hattrick language and your "show levels as" setting, like the player page
-
-- **Stats page** - "Squad Composition by Best Position" now uses the same best position as the player table (it had its own rough formula); skill averages use Hattrick skill names; the country charts' legend and tooltips work again (counts and percentages); Top Scorers shows goals and matches for your club only instead of mixing in career goals; removed boxes that always showed "N/A"
-- Removed the unused Team page (`/team`) and the debug-only `/debug/session` and `/index` routes
-
-### Fixed
-- Update: when an update failed, the error page itself crashed (template error), so you got a generic server error instead of the reason; it now shows the error and its details
-- Welcome tour: the steps pointing at the team menu found nothing and were skipped
-- Pages given a non-numeric team id (`?id=abc`) crashed instead of saying "Wrong teamid"
-- Home page no longer loads every user from the database just to count them
-- Players page: "Assign to group" for selected players failed with a server error (nested database transaction); failures now show a message instead of only logging "undefined"
-- Offline/PWA: our own CSS/JS are now fetched fresh after a deploy (service worker no longer serves stale files); its pre-cache no longer lists files that don't exist
-- Compare page loaded a second, unpinned copy of Chart.js
+## [3.24] - 2026-11-01
 
 ### Added
 - **Series page** (FEAT-030) - new "Series" page in each team's menu: league table with your team highlighted and form, points behind the leader, the next round (matches with teams within 3 points of you are tagged), your next opponent and your remaining matches. Fetched with Update
@@ -42,8 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Welcome tour for new users introducing key navigation and features
   - Context-aware feature tours for Players, Training, and Data Updates
   - Progressive disclosure: tours appear automatically based on page visits and user progress
-  - Persistent progress tracking with localStorage and version-aware feature alerts
-  - Floating help button for easy access to tutorials and help menu
+  - Persistent progress tracking with localStorage
+  - Floating help button that starts the tour available on the current page
   - Full accessibility support with keyboard navigation and screen reader compatibility
   - Built with Intro.js for professional guided tour experience
 - **Default Player Groups for New Users** - Automatically create 7 sensible player groups when users first sign up
@@ -51,18 +36,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Football-themed color scheme with proper spacing for user customization (order 10, 20, 30, etc.)
   - Integrated into both auth flow and player page fallback for comprehensive coverage
   - Comprehensive test coverage for group creation, existing user handling, and error scenarios
-- Integration test resolution task (TEST-002) in project backlog
 
 ### Changed
+- **One look for every page** - minimal style with neutral grays, a green accent (buttons, our team) and a slate blue second accent (links, selections, info) to balance it: the background photo is tinted green-to-slate, no gradients or Bootstrap blues; the same page header, cards, tables and footer everywhere; charts share one calm palette (except the country charts, which keep the flag colors); match ratings show our team in green vs the opponent in gray
+- **Calmer dark mode** - near-black neutral surfaces instead of green-tinted ones, softer accents, a fainter background photo and a dim pitch on the formations page
+- **Hattrick terms and level format everywhere** - training, compare, stats, formations and the update timeline now use your Hattrick language and your "show levels as" setting, like the player page
+- **Stats page** - "Squad Composition by Best Position" now uses the same best position as the player table (it had its own rough formula); skill averages use Hattrick skill names; the country charts' legend and tooltips work again (counts and percentages); Top Scorers shows goals and matches for your club only instead of mixing in career goals; removed boxes that always showed "N/A"
 - Enhanced navbar with tutorial target IDs for guided tours
 - Player table includes tutorial integration with ID targeting
-- App version meta tag added for tutorial feature detection
-- Project documentation updated with completion status and metrics
-- Backlog dependencies updated to reflect infrastructure readiness
 - Feature ideas moved from `.project/backlog.md` to new `.project/features.md`; backlog now holds improvements, bug fixes, refactoring, tests and infra only
 - Stats, formation, training, compare and player pages load the current roster with shared database-side queries (`app/roster.py`) instead of per-page history scans and per-player queries
 - `make lint` uses ruff + black (flake8/isort were not installed); CI also runs file-format, CHPP-policy and the full test suite against PostgreSQL
-
 - Page-visit tracking uses one `@track_activity` decorator; the logged-in user is loaded once per request (`get_current_user`) instead of up to four times
 - Admin debug charts: date-range logic moved to `app/static/js/debug-date-filter.js` with Node unit tests; inline error messages instead of pop-up alerts
 - Formation tester: players on the pitch show the same hover tooltip as the player list, and positions are coloured green/yellow/red by effectiveness
@@ -78,6 +62,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin debug charts accessibility: labelled date range fieldset, screen-reader chart descriptions, labelled shrink/expand buttons, keyboard chart reordering (Arrow Up/Down) with announcements
 
 ### Removed
+- Broken `make release-notes` generator (wrote `## vX.Y` headers the /changes page cannot parse); release notes are written by hand, see DEPLOYMENT.md "Releasing"
+- Unused Team page (`/team`) and the debug-only `/debug/session` and `/index` routes
 - Redis (never used by the app), the `configs/` docker-compose overrides (one `docker-compose.yml` remains, pgAdmin via `make pgadmin`), broken `services-staging` target
 - Unused dev dependencies (safety, pre-commit, pytest-json-report) and one-off scripts (old user cleanup, historical match cleanup, unknown-country check, match data query)
 - Unused code: `/api/players/filter`, admin `/debug/chpp_teams` and `/debug/chpp_raw` (violated CHPP policy), `logout.html`, unused helpers in `utils.py`, `auth_utils.py`, `error_handlers.py`, `chpp_utilities.py`, `hattrick_countries.py`, XML debug printing in the player parser
@@ -85,6 +71,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 21 permanently skipped, broken tests; TODO-only test stubs replaced with real tests
 
 ### Fixed
+- Update: when an update failed, the error page itself crashed (template error), so you got a generic server error instead of the reason; it now shows the error and its details
+- Welcome tour: the steps pointing at the team menu found nothing and were skipped
+- Pages given a non-numeric team id (`?id=abc`) crashed instead of saying "Wrong teamid"
+- Home page no longer loads every user from the database just to count them
+- Players page: "Assign to group" for selected players failed with a server error (nested database transaction); failures now show a message instead of only logging "undefined"
+- Offline/PWA: our own CSS/JS are now fetched fresh after a deploy (service worker no longer serves stale files); its pre-cache no longer lists files that don't exist
+- Compare page loaded a second, unpinned copy of Chart.js
 - Players sold some time ago remained listed in the team; the update now releases every departed player
 - Changelog page escapes commit messages (they were rendered as raw HTML)
 - Test isolation: tests no longer drop shared tables or leave the model registry mocked
