@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Compare page loaded a second, unpinned copy of Chart.js
 
 ### Added
+- **Series page** (FEAT-030) - new "Series" page in each team's menu: league table with your team highlighted and form, points behind the leader, the next round (matches with teams within 3 points of you are tagged), your next opponent and your remaining matches. Fetched with Update
 - **New player table columns reach everyone** - a column added to HattrickPlanner now appears at the end of every user's player table once (including saved column lists), so it's easy to notice; hide it in Settings if you don't want it
 - **Current bid on transfer-listed players** (FEAT-025, #27) - new "Current bid" column (shown for everyone, also users with their own saved columns) and a line in the player popup: highest bid, asking price, deadline and highest bidder, with "ends soon" / "deadline passed" badges. Bids are updated with Update, at no extra Hattrick calls
 - **Levels as numbers or words** - choose in Settings whether skill and personality levels show as both Hattrick's word and the number (solid (7), the default), just numbers (7) or just words (solid); with one form, the other is shown on hover, the player table still sorts by number, and its headers are only rotated 90° in numbers mode

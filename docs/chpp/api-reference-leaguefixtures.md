@@ -192,3 +192,6 @@ def compare_season_progress(current_fixtures, historical_fixtures, team_id):
 ---
 
 *This comprehensive fixtures endpoint enables sophisticated season analysis, fixture planning, and multi-division monitoring for strategic team management and competitive intelligence.*
+
+## HattrickPlanner usage
+- Fetched at Update with version 1.2 for the `/series` page (`app/series.py`); results cached per team in `instance/series/`.

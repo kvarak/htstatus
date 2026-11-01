@@ -403,6 +403,7 @@ class TestUpdateRoute:
 
         team = SimpleNamespace(
             name="Dalby Stenbrotters FC",
+            league_level_unit_id=288,
             players=lambda: [
                 _fake_chpp_player(801, "Ann", "Keeper", keeper=0),
                 _fake_chpp_player(803, "New", "Signing"),
@@ -421,12 +422,14 @@ class TestUpdateRoute:
         with (
             patch("app.blueprints.team.get_chpp_client", return_value=chpp),
             patch("app.utils.downloadRecentMatches", return_value=no_matches),
+            patch("app.blueprints.team.series.refresh") as refresh_series,
         ):
             response = client.get("/update")
 
         html = response.get_data(as_text=True)
         assert response.status_code == 200, html[:500]
         assert "New Signing" in html and "Old Sold" in html
+        refresh_series.assert_called_once_with(chpp, self.TEAM, 288)  # FEAT-030
 
         owned = {
             p.ht_id for p in db_session.query(Players).filter_by(owner=self.TEAM).all()

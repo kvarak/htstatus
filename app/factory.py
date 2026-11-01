@@ -115,6 +115,7 @@ def setup_routes(app_instance, db_instance):
         setup_matches_blueprint,
     )
     from app.blueprints.player import player_bp, setup_player_blueprint
+    from app.blueprints.series import series_bp
     from app.blueprints.stats import (
         setup_stats_blueprint,
         stats_bp,
@@ -173,6 +174,7 @@ def setup_routes(app_instance, db_instance):
     app_instance.register_blueprint(player_bp)
     app_instance.register_blueprint(team_bp)
     app_instance.register_blueprint(matches_bp)
+    app_instance.register_blueprint(series_bp)
     app_instance.register_blueprint(stats_bp)
     app_instance.register_blueprint(training_bp)
     app_instance.register_blueprint(api_bp)

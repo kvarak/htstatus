@@ -6,7 +6,7 @@ import traceback
 
 from flask import Blueprint, flash, redirect, request, session, url_for
 
-from app import transfers, translations
+from app import series, transfers, translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
@@ -369,6 +369,9 @@ def update():
             session.modified = True
             # Stored so stats pages don't need CHPP calls
             save_team_competition_data(teamid, the_team, get_current_user_id())
+            series.refresh(
+                chpp, teamid, getattr(the_team, "league_level_unit_id", None)
+            )
         except Exception as e:
             return update_error_page(
                 f"Failed to fetch team data for team {teamid}: {e}",

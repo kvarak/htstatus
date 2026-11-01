@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% from "_page.html" import page_header %}
+  {% macro form_badges(results) %}
+    {% for r in results %}<span class="form-badge form-{{ r }}">{{ r }}</span>{% endfor %}
+  {% endmacro %}
+  {% macro team_label(name, position, is_us) %}
+    <span class="{{ 'font-weight-bold' if is_us }}">{{ name }}</span>
+    {% if position %}<span class="text-muted small">({{ position }})</span>{% endif %}
+  {% endmacro %}
+  <div class="container">
+    {% if view %}
+      {% set d = view.details %}
+      {% call page_header([(teamname, '/'), ('Series ' ~ d.unit_name, None)]) %}
+        <span class="text-muted small">{{ d.league_name }} · season {{ view.season }} · round {{ d.current_round }}</span>
+      {% endcall %}
+    {% else %}
+      {{ page_header([(teamname or 'Series', '/') , ('Series', None)]) }}
+    {% endif %}
+    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+    {% if not view and not error %}
+      <div class="card">
+        <div class="card-body">
+          <p class="mb-0">
+            No series data yet. Click <a href="/update">Update</a> to fetch the table and fixtures from Hattrick.
+          </p>
+        </div>
+      </div>
+    {% elif view %}
+      {% set us = view.us %}
+      {% if us %}
+        <div class="row">
+          <div class="col-sm-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="series-stat">{{ us.position }}</div>
+                <div class="text-muted small">Position · {{ us.points }} points</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                {% if us.position == 1 %}
+                  <div class="series-stat">1st</div>
+                  <div class="text-muted small">You lead the series</div>
+                {% else %}
+                  <div class="series-stat">{{ view.behind_leader }}</div>
+                  <div class="text-muted small">Points behind the leader</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <div class="card h-100">
+              <div class="card-body text-center">
+                <div class="series-stat">{{ form_badges(us.form) if us.form else '—' }}</div>
+                <div class="text-muted small">Your form</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+      <div class="row">
+        <div class="col-lg-7 mb-3">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title">League table</h5>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-sm sortable series-table mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-center">#</th>
+                      <th>Team</th>
+                      <th class="text-center" title="Matches played">P</th>
+                      <th class="text-center d-none d-md-table-cell" title="Won">W</th>
+                      <th class="text-center d-none d-md-table-cell" title="Draws">D</th>
+                      <th class="text-center d-none d-md-table-cell" title="Lost">L</th>
+                      <th class="text-center d-none d-md-table-cell"
+                          title="Goals for - against">Goals</th>
+                      <th class="text-center" title="Goal difference">+/-</th>
+                      <th class="text-center" title="Points">Pts</th>
+                      <th class="text-center d-none d-sm-table-cell sorttable_nosort">Form</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for row in view.table %}
+                      <tr class="{{ 'series-us' if row.is_us }}">
+                        <td class="text-center">
+                          {{ row.position }}
+                          {% if row.position_change and row.position_change > 0 %}
+                            <span class="change-up small">↑</span>
+                          {% elif row.position_change and row.position_change < 0 %}
+                            <span class="change-down small">↓</span>
+                          {% endif %}
+                        </td>
+                        <td>{{ team_label(row.team_name, None, row.is_us) }}</td>
+                        <td class="text-center">{{ row.matches }}</td>
+                        <td class="text-center d-none d-md-table-cell">{{ row.won }}</td>
+                        <td class="text-center d-none d-md-table-cell">{{ row.draws }}</td>
+                        <td class="text-center d-none d-md-table-cell">{{ row.lost }}</td>
+                        <td class="text-center d-none d-md-table-cell"
+                            sorttable_customkey="{{ row.goals_for }}">{{ row.goals_for }}-{{ row.goals_against }}</td>
+                        <td class="text-center">{{ '%+d' % row.goal_difference if row.goal_difference else 0 }}</td>
+                        <td class="text-center font-weight-bold">{{ row.points }}</td>
+                        <td class="text-center d-none d-sm-table-cell">{{ form_badges(row.form) }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card-footer small text-muted">Updated {{ view.fetched }}</div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          {% set opp = view.next_opponent %}
+          {% if opp %}
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5 class="card-title">Next opponent</h5>
+              </div>
+              <div class="card-body">
+                <h6 class="mb-1">{{ opp.opponent_name }}</h6>
+                <p class="text-muted small mb-2">
+                  Round {{ opp.round }} · {{ opp.date }} · {{ 'Home' if opp.venue == 'home' else 'Away' }}
+                </p>
+                {% if opp.row %}
+                  <p class="mb-2">
+                    {{ opp.row.position }}. place · {{ opp.row.points }} points ·
+                    goals {{ opp.row.goals_for }}-{{ opp.row.goals_against }}
+                  </p>
+                  <p class="mb-2">Form {{ form_badges(opp.row.form) }}</p>
+                {% endif %}
+                {% for earlier in opp.earlier_results %}
+                  <p class="small mb-0">
+                    Earlier this season:
+                    {{ earlier.match.home_name }} {{ earlier.match.home_goals }}-{{ earlier.match.away_goals }} {{ earlier.match.away_name }}
+                    {{ form_badges([earlier.result]) }}
+                  </p>
+                {% endfor %}
+                <p class="mt-3 mb-0">
+                  <a href="/formations?id={{ teamid }}">Plan your lineup →</a>
+                </p>
+              </div>
+            </div>
+          {% endif %}
+          {% if view.next_round_matches %}
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5 class="card-title">Round {{ view.next_round }}</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                {% for m in view.next_round_matches %}
+                  <li class="list-group-item small d-flex justify-content-between align-items-center {{ 'series-us' if m.is_ours }}">
+                    <span>
+                      {{ team_label(m.home_name, m.home_position, m.home_id == teamid) }}
+                      –
+                      {{ team_label(m.away_name, m.away_position, m.away_id == teamid) }}
+                    </span>
+                    {% if m.is_key and not m.is_ours %}
+                      <span class="badge badge-info"
+                            title="Involves a team within 3 points of you">within 3 pts</span>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% if view.our_remaining %}
+            <div class="card mb-3">
+              <div class="card-header">
+                <h5 class="card-title">Your remaining matches</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                {% for f in view.our_remaining %}
+                  <li class="list-group-item small d-flex justify-content-between">
+                    <span>
+                      <span class="text-muted">R{{ f.round }}</span>
+                      {{ 'vs' if f.venue == 'home' else '@' }}
+                      {{ team_label(f.opponent_name, f.opponent_position, False) }}
+                    </span>
+                    <span class="text-muted">{{ f.date[:10] }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

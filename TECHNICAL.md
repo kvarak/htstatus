@@ -57,6 +57,7 @@ See [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md#
     - `player(id_)` - Get individual player details
     - `matches_archive(id_, is_youth)` - Get team match history
     - `translations(language_id)` / `worldlanguages()` - Hattrick's own words for game terms, and the language list
+    - `league_details(unit_id)` / `league_fixtures(unit_id)` - Series table (leaguedetails 1.6) and the season's matches (leaguefixtures 1.2)
     - YouthTeamId bug fixed (handles as optional field)
     - XML parsing with safe field extraction
     - Zero breaking changes from pychpp interface
@@ -69,6 +70,7 @@ See [.github/agents/htplanner-ai-agent.md](.github/agents/htplanner-ai-agent.md#
   - Fetched only at login and Update, cached as JSON in `instance/translations/`, refreshed after 30 days; failures are logged and ignored
   - Templates use `column_label(title, key)`, `ht_term(section, key)`, `specialty_name(n)`; anything missing falls back to the English text
   - Levels: `level_text(value, section)` shows a number, Hattrick's word or `word (n)` per the Settings choice (cookie `htstatus-level-format`: both (default) / numbers / words); `level_hint` gives the other form for tooltips. Sortable cells keep `sorttable_customkey` with the number
+- **Series page** (`/series?id=<team>`, `app/series.py`, FEAT-030): Update fetches the team's series table and fixtures (2 CHPP calls per team) and stores them as JSON in `instance/series/<team_id>.json` (no DB change). The page computes everything from that: table with our team highlighted (only Hattrick data: no guessed promotion/relegation zones), last-5 form, the next round (matches with a team within 3 points of us are tagged), next opponent with earlier result, and our remaining matches
 - **Transfer bids** (`app/transfers.py`, FEAT-025): Update keeps the `TransferDetails` from the `playerdetails` call it already makes, and stores them per team as JSON in `instance/transfers/<team_id>.json` (no DB change). The player page shows them only for players whose latest snapshot is transfer listed. Status: active / ending soon (< 24 h) / deadline passed; a sold player simply leaves the roster at the next Update
 - **Player table columns** (`app/columns.py`): a user's saved columns store the shown `(title, key)` list plus every column key they have seen (pickled in `User.player_columns`; old plain lists still load). Columns appended to `ALL_COLUMNS` after `COLUMNS_BEFORE_AUTO_ADD` are default columns and are appended once to every saved list; hiding them in Settings sticks
 - **Instance cache** (`app/instance_cache.py`): shared atomic JSON read/write for data fetched from CHPP at login/Update (translations, transfer bids). Tests get a temp instance folder per app from `conftest.py`

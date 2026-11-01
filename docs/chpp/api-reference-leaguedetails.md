@@ -171,3 +171,6 @@ def analyze_league_context(league_data):
 ---
 
 *This comprehensive league endpoint enables sophisticated competitive analysis and tactical preparation features for strategic team management.*
+
+## HattrickPlanner usage
+- Fetched at Update with version 1.6 for the `/series` page (`app/series.py`); results cached per team in `instance/series/`.

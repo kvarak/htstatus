@@ -142,6 +142,58 @@ def parse_translations(root: ET.Element) -> dict:
     }
 
 
+def parse_leaguedetails(root: ET.Element) -> dict:
+    """Parse leaguedetails XML into series info plus the league table rows."""
+    teams = [
+        {
+            "team_id": safe_find_int(node, "TeamID"),
+            "team_name": safe_find_text(node, "TeamName", ""),
+            "user_id": safe_find_int(node, "UserId"),
+            "position": safe_find_int(node, "Position"),
+            "position_change": safe_find_int(node, "PositionChange"),
+            "matches": safe_find_int(node, "Matches"),
+            "won": safe_find_int(node, "Won"),
+            "draws": safe_find_int(node, "Draws"),
+            "lost": safe_find_int(node, "Lost"),
+            "goals_for": safe_find_int(node, "GoalsFor"),
+            "goals_against": safe_find_int(node, "GoalsAgainst"),
+            "points": safe_find_int(node, "Points"),
+        }
+        for node in root.findall(".//Team")
+    ]
+    return {
+        "league_name": safe_find_text(root, "LeagueName", ""),
+        "league_level": safe_find_int(root, "LeagueLevel", None),
+        "max_level": safe_find_int(root, "MaxLevel", None),
+        "unit_id": safe_find_int(root, "LeagueLevelUnitID", None),
+        "unit_name": safe_find_text(root, "LeagueLevelUnitName", ""),
+        "current_round": safe_find_int(root, "CurrentMatchRound", None),
+        "teams": sorted(teams, key=lambda t: t["position"] or 99),
+    }
+
+
+def parse_leaguefixtures(root: ET.Element) -> dict:
+    """Parse leaguefixtures XML; unplayed matches have ``None`` goals."""
+    matches = [
+        {
+            "match_id": safe_find_int(node, "MatchID"),
+            "round": safe_find_int(node, "MatchRound"),
+            "date": safe_find_text(node, "MatchDate", ""),
+            "home_id": safe_find_int(node, "HomeTeam/HomeTeamID"),
+            "home_name": safe_find_text(node, "HomeTeam/HomeTeamName", ""),
+            "away_id": safe_find_int(node, "AwayTeam/AwayTeamID"),
+            "away_name": safe_find_text(node, "AwayTeam/AwayTeamName", ""),
+            "home_goals": safe_find_int(node, "HomeGoals", None),
+            "away_goals": safe_find_int(node, "AwayGoals", None),
+        }
+        for node in root.findall(".//Match")
+    ]
+    return {
+        "season": safe_find_int(root, "Season", None),
+        "matches": sorted(matches, key=lambda m: (m["round"] or 0, m["match_id"] or 0)),
+    }
+
+
 def parse_worldlanguages(root: ET.Element) -> list[tuple[int, str]]:
     """Parse worldlanguages XML into ``(language_id, name)`` pairs sorted by name."""
     languages = [

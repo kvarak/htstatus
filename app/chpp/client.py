@@ -31,6 +31,8 @@ from app.chpp.models import (
     CHPPUser,
 )
 from app.chpp.parsers import (
+    parse_leaguedetails,
+    parse_leaguefixtures,
     parse_players,
     parse_team,
     parse_translations,
@@ -326,6 +328,16 @@ class CHPP:
         """Get Hattrick's own names for skills, levels, specialties etc."""
         root = self.request("translations", "1.2", languageId=language_id)
         return parse_translations(root)
+
+    def league_details(self, unit_id: int) -> dict:
+        """Get a series' standings (leaguedetails)."""
+        root = self.request("leaguedetails", "1.6", leagueLevelUnitID=unit_id)
+        return parse_leaguedetails(root)
+
+    def league_fixtures(self, unit_id: int) -> dict:
+        """Get all matches of a series' current season (leaguefixtures)."""
+        root = self.request("leaguefixtures", "1.2", leagueLevelUnitID=unit_id)
+        return parse_leaguefixtures(root)
 
     def worldlanguages(self) -> list[tuple[int, str]]:
         """Get all Hattrick languages as ``(language_id, name)`` pairs."""

@@ -492,6 +492,10 @@ class User(db.Model):
     def stats(self):
         self._count_visit("c_stats")
 
+    def series(self):
+        """Series page visit: no counter column (avoids a migration), just activity."""
+        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+
     def updateColumns(self, cols, known_keys=()):
         """Save the shown columns and every column key the user has seen.
 

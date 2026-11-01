@@ -791,6 +791,10 @@ window.addEventListener('beforeinstallprompt', (e) => {
                      class="dropdown-item"
                      href="/matches?id={{ all_teams[team_idx] }}"
                      onclick="loading();">Matches</a>
+                  <a id="navbar-series-link-{{ team_idx }}"
+                     class="dropdown-item"
+                     href="/series?id={{ all_teams[team_idx] }}"
+                     onclick="loading();">Series</a>
                   <a id="navbar-training-link-{{ team_idx }}"
                      class="dropdown-item"
                      href="/training?id={{ all_teams[team_idx] }}"

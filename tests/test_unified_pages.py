@@ -20,6 +20,7 @@ PAGES = {
     "compare": f"/player/compare?team_id={TEAM}&player_ids=601&player_ids=602",
     "settings": "/settings",
     "matches": f"/matches?id={TEAM}",
+    "series": f"/series?id={TEAM}",
     "feedback": "/feedback/",
     "feedback-new": "/feedback/new",
     "main": "/",
