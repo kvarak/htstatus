@@ -12,7 +12,7 @@ DOCKER_COMPOSE := docker-compose
 # Common service startup function (consolidation)
 define start_services
 	@echo "🐳 Starting Docker Compose services..."
-	@$(DOCKER_COMPOSE) up -d postgres 2>&1 | tee -a /tmp/docker-services.log
+	@$(DOCKER_COMPOSE) up -d --remove-orphans postgres 2>&1 | tee -a /tmp/docker-services.log
 	@echo "✅ Services started (PostgreSQL)"
 endef
 
@@ -92,7 +92,7 @@ services: ## Start Docker Compose services only
 	$(call start_services)
 
 pgadmin: ## Start pgAdmin (http://localhost:5050) next to PostgreSQL
-	@$(DOCKER_COMPOSE) --profile admin up -d postgres pgadmin
+	@$(DOCKER_COMPOSE) --profile admin up -d --remove-orphans postgres pgadmin
 
 services-stop: ## Stop all Docker Compose services
 	@echo "🛑 Stopping Docker Compose services..."
