@@ -10,9 +10,8 @@
 
 ## Cycle training 🔁
 
-Built in this order; each step is useful on its own. Design notes: [tasks/FEAT-035.md](tasks/FEAT-035.md)
+Built in this order; each step is useful on its own. Design notes: [tasks/cycle-training.md](tasks/cycle-training.md). Done: FEAT-035 training log (`app/training_log.py`)
 
-- **[FEAT-035]** Training log: fetch the team's training (type, intensity, stamina share, coach) during Update and show this week's and past weeks' training on the Training page
 - **[FEAT-036]** Who got trained: per player and week, the minutes (max 90) played in a position that counts for that week's training (from MatchLineup), shown as full / partial / none on the Training page, plus "still needs minutes this week" so you know whom to play in a friendly
 - **[FEAT-037]** Measured training speed: from the history, how many trained weeks each player needed per skill level, and "next level expected in about N weeks"; also calibrates the speed model (anonymous aggregates across users); no formulas, only what we observed
 - **[FEAT-038]** Cycle plan: a saved plan per team with ordered phases (training type + weeks) and players marked full / half / not trained; timeline with dates, seasons and each player's age at every phase, and how many trainees each phase needs vs how many fit

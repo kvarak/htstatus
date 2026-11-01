@@ -1009,6 +1009,29 @@ class TutorialAnalytics(db.Model):
         return f"<TutorialAnalytics {self.event_type} {self.tour_id} by user {self.user_id} at {self.timestamp}>"
 
 
+class TrainingWeek(db.Model):
+    """One week of a team's training (FEAT-035), saved at Update.
+
+    CHPP only returns this week's settings and the last training, so this table
+    is the only history. ``training_date`` is the Thursday of the training update.
+    The coming week's row is ``planned`` until an Update after that training.
+    """
+
+    __tablename__ = "training_week"
+    __table_args__ = (db.UniqueConstraint("team_id", "training_date"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    team_id = db.Column(db.Integer, nullable=False, index=True)
+    training_date = db.Column(db.Date, nullable=False)
+    training_type = db.Column(db.Integer)
+    intensity = db.Column(db.Integer)
+    stamina_share = db.Column(db.Integer)
+    trainer_id = db.Column(db.Integer)
+    trainer_name = db.Column(db.String(100))
+    planned = db.Column(db.Boolean, nullable=False, default=False)
+    updated = db.Column(db.DateTime, default=utc_now, onupdate=utc_now)
+
+
 # --------------------------------------------------------------------------------
 
 

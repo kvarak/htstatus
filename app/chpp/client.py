@@ -34,6 +34,7 @@ from app.chpp.parsers import (
     parse_leaguefixtures,
     parse_players,
     parse_team,
+    parse_training,
     parse_translations,
     parse_user,
     parse_worldlanguages,
@@ -334,6 +335,11 @@ class CHPP:
         """Get all matches of a series' current season (leaguefixtures)."""
         root = self.request("leaguefixtures", "1.2", leagueLevelUnitID=unit_id)
         return parse_leaguefixtures(root)
+
+    def training(self, team_id: int) -> dict:
+        """Get a senior team's training settings and last training (training)."""
+        root = self.request("training", "2.1", actionType="view", teamId=team_id)
+        return parse_training(root)
 
     def worldlanguages(self) -> list[tuple[int, str]]:
         """Get all Hattrick languages as ``(language_id, name)`` pairs."""

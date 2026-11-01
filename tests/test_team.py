@@ -265,6 +265,7 @@ class TestUpdateRoute:
             patch("app.blueprints.team.get_chpp_client", return_value=chpp),
             patch("app.utils.downloadRecentMatches", return_value=no_matches),
             patch("app.blueprints.team.series.refresh") as refresh_series,
+            patch("app.blueprints.team.training_log.refresh") as refresh_training,
         ):
             response = client.get("/update")
 
@@ -272,6 +273,8 @@ class TestUpdateRoute:
         assert response.status_code == 200, html[:500]
         assert "New Signing" in html and "Old Sold" in html
         refresh_series.assert_called_once_with(chpp, self.TEAM, 288)  # FEAT-030
+        refresh_training.assert_called_once()  # FEAT-035
+        assert refresh_training.call_args.args[2] == self.TEAM
 
         owned = {
             p.ht_id for p in db_session.query(Players).filter_by(owner=self.TEAM).all()

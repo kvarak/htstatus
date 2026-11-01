@@ -4,6 +4,7 @@ from datetime import date, timedelta
 
 from flask import Blueprint
 
+from app import training_log
 from app.auth_utils import (
     current_team,
     require_authentication,
@@ -179,5 +180,7 @@ def training():
         allplayers=allplayers,
         skill_changes=skill_changes,
         player_info=player_info,
+        training_weeks=training_log.history(teamid),
+        training_type_name=training_log.type_name,
         title="Training",
     )

@@ -141,6 +141,26 @@ def parse_translations(root: ET.Element) -> dict:
     }
 
 
+def parse_training(root: ET.Element) -> dict:
+    """Parse training XML: this week's settings, last week's training and the trainer."""
+    team = root.find(".//Team")
+    if team is None:
+        team = root
+    return {
+        "team_id": safe_find_int(team, "TeamID", None),
+        "training_type": safe_find_int(team, "TrainingType", None),
+        "intensity": safe_find_int(team, "TrainingLevel", None),
+        "stamina_share": safe_find_int(team, "StaminaTrainingPart", None),
+        "last_training_type": safe_find_int(team, "LastTrainingTrainingType", None),
+        "last_intensity": safe_find_int(team, "LastTrainingTrainingLevel", None),
+        "last_stamina_share": safe_find_int(
+            team, "LastTrainingStaminaTrainingPart", None
+        ),
+        "trainer_id": safe_find_int(team, "Trainer/TrainerID", None),
+        "trainer_name": safe_find_text(team, "Trainer/TrainerName", ""),
+    }
+
+
 def parse_leaguedetails(root: ET.Element) -> dict:
     """Parse leaguedetails XML into series info plus the league table rows."""
     teams = [

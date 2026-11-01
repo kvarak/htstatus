@@ -27,4 +27,4 @@ def stats():
     ...                                 # database queries only
 ```
 
-Data that only CHPP has (bids, series, translations) is fetched during `/update` and stored in the database or the `instance/` JSON cache, then read from there.
+Data that only CHPP has (bids, series, translations, training) is fetched during `/update` and stored in the database or the `instance/` JSON cache, then read from there.

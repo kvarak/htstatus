@@ -74,7 +74,7 @@
 {% block content %}
   {% set skill_keys = ["keeper", "defender", "playmaker", "winger", "passing", "scorer", "set_pieces"] %}
   {% set skill_names = skill_labels() %}
-  {% from "_page.html" import page_header %}
+  {% from "_page.html" import page_header, icon %}
   {# One "first vs current" row; levels (as_level) use the user's level format #}
   {% macro change_row(label, first, latest, scale=1, suffix='', as_level=False) %}
     {% set a = first or 0 %}
@@ -104,6 +104,51 @@
                 aria-label="Close"></button>
       </div>
     {% endif %}
+    {# FEAT-035: what the team trained, saved at each Update #}
+    <div class="card mb-4" id="training-log">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">{{ icon("stopwatch") }} Training log</h5>
+        {% set coming = training_weeks|selectattr('planned')|first if training_weeks else none %}
+        {% if coming %}
+          <span class="wip-sticker">This week: {{ training_type_name(coming.training_type) }} · {{ coming.intensity }}%</span>
+        {% endif %}
+      </div>
+      <div class="card-body p-2">
+        {% if training_weeks %}
+          <div class="tile-scroll tile-scroll-sm">
+            <table class="table table-sm mb-0 small">
+              <thead>
+                <tr>
+                  <th>Training update</th>
+                  <th>{{ ht_label('TrainingTypes', 'Training') }}</th>
+                  <th>Intensity</th>
+                  <th>Stamina</th>
+                  <th>Coach</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for week in training_weeks %}
+                  <tr {% if week.planned %}class="text-muted"{% endif %}>
+                    <td>
+                      {{ week.training_date.strftime("%Y-%m-%d") }}
+                      {% if week.planned %}<em>(planned)</em>{% endif %}
+                    </td>
+                    <td>{{ training_type_name(week.training_type) }}</td>
+                    <td>{{ week.intensity if week.intensity is not none else "–" }}%</td>
+                    <td>{{ week.stamina_share if week.stamina_share is not none else "–" }}%</td>
+                    <td>{{ week.trainer_name or "–" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">
+            Click <a href="/update" onclick="loading();">Update data</a> to start the log. Hattrick only tells us this week's and last week's training, so the log grows with every Update.
+          </p>
+        {% endif %}
+      </div>
+    </div>
     <!-- Main Content Grid -->
     <div class="row g-4">
       <!-- Player List Sidebar -->

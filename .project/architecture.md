@@ -12,8 +12,9 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 | `app/chpp/` | Own CHPP client: OAuth 1.0, XML parsing (`CHPP` in `client.py`) |
 | `app/auth_utils.py` | `@require_authentication`, `get_current_user()`, `current_team()`, `@track_activity` |
 | `app/roster.py`, `app/team_stats.py`, `app/utils.py` | Roster queries, stats calculations, shared helpers (`create_page`, `dprint`, contributions, match downloads) |
+| `app/training_log.py` | The team's weekly training (`TrainingWeek`), saved at Update; CHPP only gives this week and last week, so the table is the only history |
 | `app/translations.py`, `app/instance_cache.py` | Hattrick's own terms per language, cached as JSON in `instance/` (also transfer bids and series data) |
-| `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `Feedback*`, `ErrorLog`, ...) |
+| `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `TrainingWeek`, `Feedback*`, `ErrorLog`, ...) |
 | `migrations/` | Alembic migrations |
 | `app/templates/`, `app/static/` | Jinja2 + Bootstrap 4 (CDN), CSS, Chart.js |
 | `tests/` | pytest (PostgreSQL, CHPP mocked) and `tests/js/` (node --test) |
@@ -23,6 +24,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 
 - A **user** (Hattrick manager, `User.ht_id`) owns one or more **teams**; a team owns **players**.
 - `Players` rows are snapshots: one row per player per Update (`data_date`); `Players.owner` is the team id, `0` once sold. `app/roster.py` gets the latest/oldest record per player.
+- `TrainingWeek`: one row per team and training Thursday (`training_date`): type, intensity, stamina share, coach. The coming week is `planned` until an Update after it; finished weeks are never overwritten.
 - Session: `current_user_id` = user id, `all_teams` / `all_team_names` = the user's team ids and names. Never use a user id where a team id is expected.
 
 ## CHPP usage (rate-limited, expensive)
