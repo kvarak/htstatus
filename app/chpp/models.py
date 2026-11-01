@@ -1,7 +1,6 @@
 """Data model classes for CHPP API responses.
 
-Matches pychpp interface exactly for zero breaking changes.
-Supports dict-like access for backward compatibility.
+Objects with attribute and dict-like access.
 """
 
 from dataclasses import dataclass, field
@@ -57,7 +56,7 @@ class CHPPUser:
         ht_id: Hattrick user ID
         username: Hattrick login name
         _teams_ht_id: List of team IDs owned by user
-        youth_team_id: Youth team ID (optional, fixes pychpp bug)
+        youth_team_id: Youth team ID (optional: not every user has one)
         language_id: Hattrick language the user plays in (optional)
         _SOURCE_FILE: CHPP file name (for compatibility)
     """
@@ -228,12 +227,12 @@ class CHPPPlayer:
 
     @property
     def id(self) -> int:
-        """Alias for player_id to match pychpp interface."""
+        """Alias for player_id."""
         return self.player_id
 
     @property
     def number(self) -> int:
-        """Alias for player_number to match pychpp interface."""
+        """Alias for player_number."""
         return self.player_number
 
     def __getitem__(self, key: str) -> Any:

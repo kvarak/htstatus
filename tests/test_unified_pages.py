@@ -110,3 +110,18 @@ def test_all_templates_compile(app_with_routes):
     env = app_with_routes.jinja_env
     for name in env.list_templates(filter_func=lambda n: n.endswith(".html")):
         env.get_template(name)
+
+
+def test_analytics_only_when_goatcounter_url_set(app_with_routes):
+    client = app_with_routes.test_client()
+
+    app_with_routes.config["GOATCOUNTER_URL"] = ""
+    html = client.get("/").get_data(as_text=True)
+    assert "data-goatcounter" not in html
+    assert "anonymous analytics" not in html
+
+    app_with_routes.config["GOATCOUNTER_URL"] = "https://stats.example.com/count"
+    html = client.get("/").get_data(as_text=True)
+    assert 'data-goatcounter="https://stats.example.com/count"' in html
+    assert 'src="https://stats.example.com/count.js"' in html
+    assert "anonymous analytics" in html

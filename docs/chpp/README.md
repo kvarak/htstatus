@@ -205,5 +205,5 @@ When adding new API documentation:
 ## Resources
 
 - [Official CHPP Documentation](http://hattrick.org/goto.ashx?path=/Help/Rules/CHPP.aspx)
-- [HattrickPlanner Technical Documentation](../../TECHNICAL.md)
-- [OAuth Implementation Guide](../CHPP-ENFORCEMENT.md)
+- [HattrickPlanner Architecture](../../.project/architecture.md)
+- [When the app may call CHPP](../CHPP-ENFORCEMENT.md)

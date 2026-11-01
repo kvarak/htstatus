@@ -1,14 +1,8 @@
 """Custom CHPP (Community Hattrick Public Platform) client.
 
-This module provides a drop-in replacement for pychpp with:
-- Zero breaking changes (matches pychpp interface exactly)
 - OAuth 1.0 authentication with HMAC-SHA1 signatures
-- XML parsing for 4 endpoints (managercompendium, teamdetails, players, match)
-- YouthTeamId bug fix (handles as optional field)
-- Comprehensive error handling
-- Easy testing with OAuth1Session mocking
-
-Version: 1.0.0
+- XML parsing of the CHPP files we use (see CHPP in client.py)
+- YouthTeamId is optional (users without a youth team)
 """
 
 from app.chpp.client import CHPP

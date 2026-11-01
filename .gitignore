@@ -42,7 +42,6 @@ coverage.xml
 out/
 
 # Development tools
-.mypy_cache/
 .ruff_cache/
 *.swp
 *.swo
@@ -62,8 +61,6 @@ docker-compose.override.yml
 .vscode/
 .idea/
 
-# pyCHPP reference code
-pychpp/
 production_db_dump.sql
 
 # Local database backups (data, not code)

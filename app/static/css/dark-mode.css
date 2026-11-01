@@ -293,7 +293,7 @@ html.dark-mode .introjs-tooltip {
   color: var(--dm-text);
 }
 
-/* ---- Toggle button (same look as the other kvarak projects) ---- */
+/* ---- Toggle button ---- */
 #dark-mode-toggle {
   background: transparent;
   border: 1px solid rgba(0, 0, 0, 0.2);

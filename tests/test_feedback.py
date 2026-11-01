@@ -5,7 +5,7 @@ from unittest.mock import patch
 from models import Feedback, FeedbackComment, FeedbackVote, User
 
 # NOTE: Feedback routes follow CHPP prevention policy (session + database only).
-# See .github/agents/htplanner-ai-agent.md for CHPP API usage guidelines.
+# See .project/architecture.md ("CHPP usage") for the CHPP policy.
 
 
 class TestFeedbackModels:
@@ -97,7 +97,7 @@ class TestFeedbackModels:
         assert feedback_vote.user_id == 12345
         assert feedback_vote.vote_type == "upvote"
 
-    def test_feedback_admin_role(self):
+    def test_feedback_admin_role(self, monkeypatch):
         """Test feedback admin role detection."""
         with patch("time.strftime", return_value="2024-01-01 12:00:00"):
             # Test regular user
@@ -112,9 +112,10 @@ class TestFeedbackModels:
 
             assert not user.is_admin()
 
-            # Test admin user (hardcoded ID)
+            # The ADMIN_HT_ID user is admin without a role
+            monkeypatch.setenv("ADMIN_HT_ID", "182085")
             admin_user = User(
-                ht_id=182085,  # Hardcoded admin ID
+                ht_id=182085,  # ADMIN_HT_ID
                 ht_user="admin",
                 username="admin",
                 password="password",

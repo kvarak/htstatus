@@ -66,31 +66,8 @@ services:
     profiles:
       - test
 
-  # pgAdmin for database administration (development only)
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: htplanner_pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@htplanner.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-development}
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - htplanner_network
-    profiles:
-      - admin
-
 volumes:
   postgres_data:
-    driver: local
-  pgadmin_data:
     driver: local
   web_instance:
     driver: local

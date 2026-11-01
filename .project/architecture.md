@@ -1,278 +1,49 @@
 # HattrickPlanner Architecture
 
-> **Purpose**: System structure, components, data flow, and technical architecture of HattrickPlanner
-> **Audience**: Developers understanding or modifying the system structure
-> **Update Frequency**: When architecture changes, new components added, or data flow modified
-> **Standards**: Follow [htplanner-ai-agent.md](../.github/agents/htplanner-ai-agent.md) for editing guidelines
+A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players and matches from the Hattrick CHPP API and shows player development, statistics, training, formations and the league table. Hosting: [DEPLOYMENT.md](../DEPLOYMENT.md).
 
-## Quick Navigation
-🔗 **Project Context**: [Goals](goals.md) • [Backlog](backlog.md) • [Features](features.md)
-🛠️ **Setup Instructions**: [README.md](../README.md) for user setup • [DEPLOYMENT.md](../DEPLOYMENT.md) for production
+## Layout
 
-*This file preserves all 2.0 architecture documentation, adapted to the new format. Update as the project evolves.*
+| Path | What |
+|---|---|
+| `app/factory.py` | App factory: config, extensions, blueprint registration |
+| `app/blueprints/` | Routes by feature: `auth` (login/OAuth), `main` (home, settings, admin `/debug`, changes), `team` (the Update action), `player`, `stats`, `training`, `matches` (also formations), `series`, `compare`, `feedback` |
+| `app/api/players.py` | JSON API (bulk group assignment) |
+| `app/chpp/` | Own CHPP client: OAuth 1.0, XML parsing (`CHPP` in `client.py`) |
+| `app/auth_utils.py` | `@require_authentication`, `get_current_user()`, `current_team()`, `@track_activity` |
+| `app/roster.py`, `app/team_stats.py`, `app/utils.py` | Roster queries, stats calculations, shared helpers (`create_page`, `dprint`, contributions, match downloads) |
+| `app/translations.py`, `app/instance_cache.py` | Hattrick's own terms per language, cached as JSON in `instance/` (also transfer bids and series data) |
+| `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `Feedback*`, `ErrorLog`, ...) |
+| `migrations/` | Alembic migrations |
+| `app/templates/`, `app/static/` | Jinja2 + Bootstrap 4 (CDN), CSS, Chart.js |
+| `tests/` | pytest (PostgreSQL, CHPP mocked) and `tests/js/` (node --test) |
+| `Dockerfile`, `deploy/` | Production image and the server's compose/update/backup files |
 
-## System Overview
+## Hattrick data model
 
-HT Status is a **hobby project** for Hattrick team management built with Flask and server-side templates, integrating with Hattrick's official CHPP API to provide comprehensive team and player analysis tools.
+- A **user** (Hattrick manager, `User.ht_id`) owns one or more **teams**; a team owns **players**.
+- `Players` rows are snapshots: one row per player per Update (`data_date`); `Players.owner` is the team id, `0` once sold. `app/roster.py` gets the latest/oldest record per player.
+- Session: `current_user_id` = user id, `all_teams` / `all_team_names` = the user's team ids and names. Never use a user id where a team id is expected.
 
-**Target Audience**: Hattrick game enthusiasts and data geeks who love diving deep into player statistics and team optimization.
+## CHPP usage (rate-limited, expensive)
 
-**Project Philosophy**:
-- **Simplicity Over Enterprise Features**: Built for spare-time maintenance, not enterprise scalability
-- **Database Protection Priority**: Production data integrity is the highest priority
-- **Hattrick-Centric Design**: Features focus on enhancing actual Hattrick gameplay experience
+CHPP is called **only** at login/OAuth callback and on the explicit Update (`/update`). Page views, settings, voting and admin checks use the session and the database. `make check-chpp` (in `make test-all` and CI) enforces this.
 
-## High-Level Architecture
+## UI conventions
 
-```
-┌──────────────┐    ┌───────────────┐    ┌──────────────┐
-│  Flask Web   │    │  Flask Backend│    │   Hattrick   │
-│ (Jinja2 UI)  │◄──►│  (Routes/API) │◄──►│   CHPP API   │
-│  Port 5000   │    │  Port 5000    │    │              │
-└──────────────┘    └───────────────┘    └──────────────┘
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │   PostgreSQL     │
-                    │   Database       │
-		       └──────────────────┘
-```
+- One look: tokens in `:root` of `base.html`, Bootstrap remap in `static/css/theme.css`, dark mode in `dark-mode.css` (all rules under `html.dark-mode`). Green `--primary` for actions/our team, slate `--accent2` for links/selection/info; red/amber only for errors and bad values. No hard-coded colors in templates.
+- Every page starts with `page_header` from `templates/_page.html`; the footer comes from `_skeleton.html`.
+- Charts take colors from `chartColor(i, alpha)` / `CHART_DANGER` in `static/js/chart-utils.js` (country charts keep flag colors).
+- Show skills and levels with `column_label`, `ht_term`, `specialty_name`, `level_text`/`level_hint`, so the user's language and level format apply.
+- CSS by function: `ui-components.css`, `utilities.css`, `layout.css`, `charts.css`, `animations.css`; feature files `timeline.css`, `formations.css`, `player-table-enhanced.css` (`components.css` imports them).
 
-## Component Breakdown
+## Database rules
 
-### 1. Frontend Layer (Flask-Only Architecture)
+The production database is the most important asset.
+- Schema changes only through Alembic migrations (`make db-migrate`), reviewed, and tested on a copy of production (`make db-copy-production`, then `make db-upgrade`).
+- Keep migrations backward compatible: add nullable columns or columns with defaults, add indexes; don't drop, rename or make columns non-nullable while code still uses them.
+- Production runs the migrations when a new image starts, right after `update.sh` made a backup.
 
-#### Flask Frontend
-- **Location**: `/app/templates/`
-- **Technology**: Jinja2 templates + Bootstrap 4 (CDN) + CSS; `base.html` extends `_skeleton.html`
-- **Purpose**: Server-rendered HTML pages for all application functionality
-- **Key Templates**: `player.html`, `matches.html`, `stats.html`, `main.html`
-- **Features**: Responsive design, WCAG 2.1 accessibility, football-themed UI
+## Configuration
 
-### 2. Backend Layer
-
-#### Flask Application Core
-- **Application Factory**: `/app/factory.py` - Creates and configures Flask application with blueprint registration
-- **Blueprint Organization**: `/app/blueprints/` - Modular route organization (**100% COMPLETE** ✅ REFACTOR-007)
-  - `auth.py` - Authentication and OAuth handling
-  - `main.py` - Home page and administrative functions
-  - `player.py` - Player management and skill tracking
-  - `team.py` - The Update action (CHPP sync) and its result pages
-  - `matches.py` - Match history, analysis and formations
-  - `training.py` - Player training progression
-  - `stats.py`, `series.py`, `compare.py`, `feedback.py` - Stats, league table, player comparison, feedback board
-  - `app/api/players.py` - JSON API (bulk group assignment)
-- **Authentication Utilities**: `/app/auth_utils.py` - Unified authentication patterns with @require_authentication decorator (**NEW** ✅ REFACTOR-008)
-- **Error Handling**: `/app/error_handlers.py` - 404/500 pages and production error logging to the `ErrorLog` table
-- **Current Team**: `current_team()` in `/app/auth_utils.py` - resolves `?id=` against the session's teams (`WRONG_TEAM` message otherwise)
-- **Test Utilities**: `/tests/factories.py` - Simplified fixture creation for testing infrastructure
-- **Constants Module**: `/app/constants.py` - Player column specs and position lists
-- **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, contributions/best_position, match downloads)
-- **Team Statistics**: `/app/team_stats.py` - Pure functions behind the stats page
-- **Roster Queries**: `/app/roster.py` - Latest/oldest record per player for a team (DB-side); sold players (`owner=0`) are excluded
-- **Database**: `/models.py` - SQLAlchemy models
-- **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig classes (template: `config.py.example`)
-- **Route Architecture**: Pure blueprint-based architecture - legacy routes.py monolith eliminated (2,335 lines removed)
-
-#### Authentication & API Integration
-- **Hattrick OAuth**: CHPP (Community Hattrick Public Platform) integration using `pychpp` library
-- **Session Management**: Flask sessions store OAuth tokens and team data
-- **Error Handling**: Enhanced with comprehensive try/catch blocks and user-friendly error messages (FEAT-020)
-
-#### Database Layer
-- **PostgreSQL**: Production database with SQLAlchemy ORM
-- **Hosting**: Docker image (`ghcr.io/<owner>/htstatus-web`, gunicorn) published by CI; on the server `deploy/docker-compose.yml` runs it with PostgreSQL 17 behind a reverse proxy (see DEPLOYMENT.md)
-- **Migrations**: Alembic-based with 30 migration files in `/migrations/versions/`
-- **Models**: Complex schema supporting multi-team management, player tracking, match analysis
-- **Current Status**: Database schema stable and fully functional with comprehensive testing
-
-#### Testing Infrastructure
-- **Framework**: pytest with 218 total tests, 198 passing (90.8% success rate)
-- **Coverage**: 41% overall project coverage (improved from 25%, target 80%)
-- **Integration**: Docker-based services for realistic testing
-- **Mock Systems**: CHPP API mocking in `/tests/mock_chpp.py`
-- **Current Status**: Post-refactoring recovery in progress - TEST-006 import fixes needed, then TEST-004/TEST-005 for coverage improvement
-- **Fast Test Suite**: 32/32 fast configuration tests passing (100%)
-
-#### Key Backend Components
-- **Authentication**: OAuth integration with Hattrick via pyCHPP
-- **Data Sync**: Live player/match data fetching from CHPP API
-- **Session Management**: Multi-team support via Flask sessions
-- **Skill Analysis**: Complex tactical contribution calculations
-
-### 3. Database Layer
-
-#### PostgreSQL Schema (via SQLAlchemy)
-```
-Users ──┐
-	├── Players (historical skill tracking)
-	│   └── data_date (time-series player data)
-	├── Match (game records)
-	│   └── MatchPlay (player performance per match)
-	└── PlayerGroup/PlayerSetting (custom player organization)
-```
-
-#### Key Tables
-- **Players**: Historical skill progression with `data_date` timestamps
-- **Match**: Game records with Hattrick match types and results
-- **MatchPlay**: Individual player performance in specific matches
-- **User**: Authentication and OAuth token storage
-- **PlayerGroup/PlayerSetting**: Custom player categorization
-
-### 4. External Integration
-
-#### Hattrick CHPP API
-- **Library**: `pychpp` (Python wrapper)
-- **Authentication**: OAuth 1.0 flow with request/access tokens
-- **Data Sources**: Players, matches, team info, match lineups
-- **Rate Limits**: Managed by pyCHPP library
-- **📚 API Documentation**: Comprehensive CHPP API reference available in [docs/chpp/](../docs/chpp/) with 21+ documented endpoints, implementation examples, and integration patterns
-
-## Data Flow
-
-### 1. Authentication Flow
-```
-User Login → Flask Session → Hattrick OAuth → CHPP Tokens → Session Storage
-```
-
-### 2. Data Update Flow
-```
-/update route → CHPP API calls → Player/Match data → Database storage → UI refresh
-```
-
-### 3. Analysis Flow
-```
-Database queries → Skill calculations → Template rendering → User interface
-```
-
-## Database Protection Standards (CRITICAL)
-
-As a hobby project with valuable user data, **database integrity is the highest priority**:
-
-### Migration Safety
-- **Mandatory Migrations**: All schema changes use tested migration scripts via `apply_migrations.py`
-- **Backwards Compatibility**: Changes must not break existing data
-- **Production Testing**: Migrations tested on production-like data copies
-- **Rollback Plans**: Document rollback procedures for each migration
-
-### Data Integrity Protection
-- **SQLAlchemy Best Practices**: Use proper model relationships and constraints
-- **Transaction Safety**: Database operations wrapped in proper transactions
-- **Validation**: Input validation before database writes
-- **Backup Validation**: Regular backup testing and restore procedures
-
-### Development Standards
-- **Database Changes = P0 Priority**: Any database corruption is highest severity
-- **Review Requirements**: Database modifications require extra validation
-- **Testing**: Database operations must have comprehensive test coverage
-- **Documentation**: Changes to data models require architecture updates
-
-## File Structure
-
-### Root Directory
-```
-htstatus-2.0/
-├── .project/           # Project management (backlog, features, goals, architecture, progress)
-├── app/               # Flask backend application
-│   ├── __init__.py
-│   ├── factory.py     # Application factory pattern with blueprint registration
-│   ├── constants.py   # Player column specs and position lists
-│   ├── utils.py       # Shared utility functions
-│   ├── blueprints/    # Feature-based route modules (auth, main, player, team, matches, training, stats, series, compare, feedback)
-│   ├── static/        # Static assets (CSS, JS, images)
-│   └── templates/     # Jinja2 HTML templates
-├── migrations/        # Alembic database migrations
-├── tests/            # pytest suite (plus tests/js for node --test)
-├── scripts/          # Utility scripts
-├── docker/           # Dev database init SQL, image entrypoint
-├── deploy/           # Production compose, .env.example, update.sh, backup.sh (copied to the server)
-├── Dockerfile        # Production image (gunicorn), test stage
-├── models.py         # SQLAlchemy database models
-├── config.py         # Application configuration
-├── run.py            # Development server entry point
-├── Makefile          # Development commands
-└── README.md         # User documentation
-```
-
-### Key Architectural Notes
-- **Flask-Only Frontend**: Server-rendered Jinja2 templates with Bootstrap 4 and custom CSS
-- **Blueprint Architecture**: Modern Flask blueprint pattern with feature-based blueprints
-  - Factory pattern in `app/factory.py` handles initialization and registration
-  - Most blueprints still get `db` via a `setup_*_blueprint()` function (REFACTOR-122 removes this)
-  - Shared utilities in `app/utils.py` for cross-blueprint functions
-  - Clean separation of concerns by feature domain
-- **Library Versions**: pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8 (stable after BUG-001 resolution, downgrades may be re-evaluated)
-- **Testing Foundation**: 215/246 tests passing (87%) enable confident refactoring
-- **Multi-environment**: Development, staging, test, production configs ready
-
-## Related Documentation
-
-📋 **Project Management**:
-- [Goals](goals.md) - Objectives and principles
-- [Current Progress](progress.md) - Implementation status and recent accomplishments
-- [Strategic Goals](goals.md) - Vision and objectives driving architectural decisions
-
-🛠️ **Implementation Details**:
-- [Technical Documentation](../TECHNICAL.md) - Implementation specifics and development standards
-- [Setup Guide](../README.md) - Local development setup and usage instructions
-- [Change History](../CHANGELOG.md) - Version history and architectural evolution
-
-📋 **Development Tasks**: [Project Backlog](backlog.md) - Architecture-related tasks and technical debt items
-
-## Implementation Standards
-
-### Hattrick Domain Knowledge
-
-**Critical Ownership Hierarchy**:
-- **User ID** (e.g., 182085 "kvarak") owns teams
-- **Team ID** (e.g., 9838 "Dalby Stenbrotters") owns players
-- `Players.owner` field = Team ID (correct in historical data)
-- `session['current_user_id']` = User ID
-- `session['all_teams']` = list of Team IDs owned by user
-
-**Important**: Auth fallback code must not use User ID as Team ID when `_teams_ht_id` fails, as URL patterns like `/player?id=USER_ID` will fail to find players owned by TEAM_ID.
-
-### Development Environment
-
-**Python Execution**: Always use `uv run python` (never direct python calls)
-**Commands**: Use `make help` for available workflow commands
-**Quality Gates**: Run `make test-all` before marking tasks complete
-
-### CHPP Integration
-
-**Feature Flag**: `USE_CUSTOM_CHPP` environment variable toggles between custom CHPP and pychpp client (default: false)
-- `USE_CUSTOM_CHPP=false`: Uses pychpp 0.5.10 (legacy fallback, backward compatible)
-- `USE_CUSTOM_CHPP=true`: Uses custom CHPP client (app/chpp/) - **PRODUCTION READY**
-
-**Custom CHPP Client**: ✅ ALL ENDPOINTS IMPLEMENTED
-- `user()` - Get current user and team IDs
-- `team(ht_id)` - Get team details and players
-- `player(id_)` - Get individual player details
-- `matches_archive(id_, is_youth)` - Get team match history
-- YouthTeamId bug fixed (handles as optional field)
-- Zero breaking changes from pychpp interface
-
-### Database Migration Standards
-
-**Backward Compatibility**: All schema changes must work with multiple application versions simultaneously
-
-**Safe Patterns**:
-- ✅ Adding nullable columns (applications ignore new columns)
-- ✅ Adding indices (improves performance, backward compatible)
-- ✅ Adding constraints with default values
-- ❌ Removing columns in use by active versions
-- ❌ Making columns non-nullable without defaults
-- ❌ Renaming columns without deprecation period
-
-**Migration Commands**:
-```bash
-uv run python scripts/database/apply_migrations.py  # Safe migrations
-uv run alembic revision --autogenerate -m "description"  # Generate
-uv run alembic upgrade head  # Apply
-```
-
-### Security Standards
-
-- Never commit secrets (API keys, tokens, passwords) - use environment variables
-- Subprocess usage limited to static dev tooling only (git version detection)
-- Document security rationale for Bandit B404/B607/B603 skips
+Everything comes from environment variables (`.env` locally, the server's `.env` in production): CHPP credentials, database, `SECRET_KEY`, `ADMIN_HT_ID`, `GOATCOUNTER_URL`, `DEBUG_LEVEL`. `config.py` (from `config.py.example`) has `Config` and `TestConfig`. Never commit secrets.

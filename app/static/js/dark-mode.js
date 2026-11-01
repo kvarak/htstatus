@@ -1,5 +1,5 @@
 /**
- * Dark mode toggle (same behaviour as the other kvarak projects).
+ * Dark mode toggle.
  *
  * The <head> snippet in _skeleton.html applies the saved choice before paint;
  * this script wires up the navbar button, follows the system setting until the

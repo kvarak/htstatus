@@ -1,11 +1,15 @@
 from datetime import datetime, timezone
+import os
 import pickle
 import time
 
 from app import db
 
-# Project owner; always treated as admin regardless of stored role
-SUPERADMIN_HT_ID = 182085
+
+def superadmin_ht_id():
+    """Hattrick user id from ADMIN_HT_ID (.env): always admin, whatever the stored role."""
+    value = os.environ.get("ADMIN_HT_ID", "").strip()
+    return int(value) if value.isdigit() else None
 
 
 def utc_now():
@@ -433,8 +437,8 @@ class User(db.Model):
         self.role = newrole
 
     def is_admin(self):
-        """Admin if the project owner or the stored role is admin (any case)."""
-        return self.ht_id == SUPERADMIN_HT_ID or (self.role or "").lower() == "admin"
+        """Admin if this is the ADMIN_HT_ID user or the stored role is admin (any case)."""
+        return self.ht_id == superadmin_ht_id() or (self.role or "").lower() == "admin"
 
     def claimUser(self, username, password, access_key, access_secret):
         self.username = username

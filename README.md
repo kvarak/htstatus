@@ -20,19 +20,18 @@ cp .env.example .env            # then add your CHPP credentials
 cp config.py.example config.py
 
 # Start development
-make setup  # Install dependencies + start services
-make dev    # Run Flask development server
+make install  # Install dependencies
+make dev      # Start PostgreSQL and the Flask development server
 ```
 
 ## Make Commands
 
 ```bash
-make help          # Show all commands
-make dev           # Start development server
-make test-all      # Run all quality gates (tests, lint, CHPP policy, ...)
-make db-migrate    # Create database migration
-make db-upgrade    # Apply migrations
-make clean         # Clean temporary files
+make help          # The main commands
+make dev           # Start PostgreSQL and the development server
+make test-single FILE=tests/test_x.py   # One test file
+make test-all      # Format, then all quality gates (tests, lint, templates, bandit, CHPP policy)
+make docker-up     # Run the production image locally
 ```
 
 ## Configuration
@@ -62,21 +61,22 @@ DATABASE_URL=postgresql://user:pass@host:port/db  # Auto-configured for dev
 - Training progress monitoring
 - Interactive tutorials and onboarding
 
-**Database Protection** (INFRA-033):
+**Database**:
 ```bash
-make db-backup                    # Create full database backup
-make db-restore BACKUP_FILE=...   # Restore from backup
+make db-migrate MESSAGE="..."     # Create a migration
 make db-copy-production          # Local dev database := copy of production (test migrations)
+make db-upgrade                  # Apply migrations to the dev database
 ```
+Production backs up before every deploy and nightly (see [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 ## Documentation
 
-- **[TECHNICAL.md](TECHNICAL.md)** - Architecture and implementation details
-- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment procedures
-- **[scripts/database/README.md](scripts/database/README.md)** - Database management, backup and restore procedures
-- **[CHANGELOG.md](CHANGELOG.md)** - Technical changes and commits
-- **[RELEASES.md](RELEASES.md)** - User-focused feature releases
+- **[.project/architecture.md](.project/architecture.md)** - Code layout, data model, conventions, database rules
+- **[DEPLOYMENT.md](DEPLOYMENT.md)** - Hosting (Docker), releasing, backups
+- **[docs/CHPP-ENFORCEMENT.md](docs/CHPP-ENFORCEMENT.md)** - When the app may call the Hattrick API
+- **[scripts/database/README.md](scripts/database/README.md)** - Migration and database helper scripts
+- **[RELEASES.md](RELEASES.md)** - What's new for users
 
 ---
 
-**Project Philosophy**: Simple, reliable hobby project focused on database integrity and Hattrick game enhancement. Built for spare-time maintenance with comprehensive CHPP API integration.
+**Project Philosophy**: Simple, reliable hobby project focused on database integrity and Hattrick game enhancement. Built for spare-time maintenance.

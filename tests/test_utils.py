@@ -546,9 +546,10 @@ class TestAdminFeedbackCounts:
     @patch("models.Feedback")
     @patch("models.User")
     def test_get_admin_feedback_counts_hardcoded_admin_id(
-        self, mock_user_model, mock_feedback_model, mock_comment_model
+        self, mock_user_model, mock_feedback_model, mock_comment_model, monkeypatch
     ):
-        """Test get_admin_feedback_counts works for hardcoded admin ID 182085."""
+        monkeypatch.setenv("ADMIN_HT_ID", "182085")
+        """Test get_admin_feedback_counts works for the ADMIN_HT_ID user."""
 
         # Mock user with hardcoded admin ID but no admin role
         mock_user = Mock()

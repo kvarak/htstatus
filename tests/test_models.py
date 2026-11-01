@@ -53,10 +53,21 @@ class TestUserModel:
             (182085, "", True),
         ],
     )
-    def test_is_admin(self, ht_id, role, expected):
+    def test_is_admin(self, ht_id, role, expected, monkeypatch):
+        monkeypatch.setenv("ADMIN_HT_ID", "182085")
         user = User(ht_id, "test", "user", "pass", "key", "secret")
         user.role = role
         assert user.is_admin() is expected
+
+    @pytest.mark.parametrize("setting", [None, "", "not-a-number"])
+    def test_no_superadmin_without_admin_ht_id(self, setting, monkeypatch):
+        if setting is None:
+            monkeypatch.delenv("ADMIN_HT_ID", raising=False)
+        else:
+            monkeypatch.setenv("ADMIN_HT_ID", setting)
+        user = User(182085, "test", "user", "pass", "key", "secret")
+        user.role = ""
+        assert user.is_admin() is False
 
     def test_visit_counters_and_timestamps(self):
         user = User(1, "test", "user", "pass", "key", "secret")

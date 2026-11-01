@@ -1,6 +1,6 @@
 """Main CHPP client class.
 
-Unified interface for CHPP API matching pychpp exactly.
+One entry point for the CHPP files the app uses.
 Orchestrates OAuth, XML parsing, and data models.
 """
 
@@ -43,10 +43,7 @@ logger = logging.getLogger(__name__)
 
 
 class CHPP:
-    """Main CHPP client matching pychpp interface exactly.
-
-    Provides OAuth 1.0 authentication and data access for Hattrick CHPP API.
-    Drop-in replacement for pychpp with zero breaking changes.
+    """CHPP client: OAuth 1.0 authentication and data access for the Hattrick CHPP API.
 
     Attributes:
         consumer_key: CHPP consumer key from config

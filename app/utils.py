@@ -116,7 +116,7 @@ def get_admin_feedback_counts(user=None):
     # Import here to avoid circular imports
     from sqlalchemy import and_, exists
 
-    from models import Feedback, FeedbackComment, SUPERADMIN_HT_ID, User
+    from models import Feedback, FeedbackComment, superadmin_ht_id, User
 
     if not user or not user.is_admin():
         return None
@@ -124,9 +124,10 @@ def get_admin_feedback_counts(user=None):
     # Handle case where feedback tables don't exist (graceful degradation)
     try:
         # Get all admin user IDs for query optimization
-        admin_users = User.query.filter(
-            (User.role == "Admin") | (User.ht_id == SUPERADMIN_HT_ID)
-        ).all()
+        admin_filter = User.role == "Admin"
+        if superadmin_ht_id() is not None:
+            admin_filter = admin_filter | (User.ht_id == superadmin_ht_id())
+        admin_users = User.query.filter(admin_filter).all()
         admin_user_ids = [admin.ht_id for admin in admin_users]
 
         # Count feedback with no admin replies (simple approach for hobby scale)

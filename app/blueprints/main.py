@@ -364,7 +364,7 @@ def changes():
 @require_authentication
 def admin():
     """Admin dashboard for user management."""
-    from models import User
+    from models import superadmin_ht_id, User
 
     form_error = ""
 
@@ -473,6 +473,7 @@ def admin():
         users=users,
         errors=errors,
         form_error=form_error,
+        superadmin_id=superadmin_ht_id(),
     )
 
 

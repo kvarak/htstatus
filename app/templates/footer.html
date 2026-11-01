@@ -4,11 +4,13 @@
     <div class="row align-items-center">
       <div class="col-md-8">
         <p class="text-muted small mb-0">
-          © 2026 HattrickPlanner - Hattrick Statistics Tool |
-          Uses <a href="https://www.goatcounter.com/"
+          © 2026 HattrickPlanner - Hattrick Statistics Tool
+          {% if config.GOATCOUNTER_URL %}
+            | Uses <a href="https://www.goatcounter.com/"
     target="_blank"
     rel="noopener"
     class="text-muted">GoatCounter</a> for anonymous analytics
+          {% endif %}
         </p>
       </div>
       <div class="col-md-4 text-md-right">

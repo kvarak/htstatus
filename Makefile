@@ -1,166 +1,78 @@
-# HT Status Development Makefile
-# Integrates UV (Python dependency management) and Docker Compose (services)
+# HattrickPlanner development commands (`make help`). Production runs the Docker
+# image built by CI; see DEPLOYMENT.md.
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-tag release-docs db-migrate db-upgrade db-apply check-uv lint-templates lint-templates-fix docker-build docker-up docker-logs docker-check
+.PHONY: help install update requirements-txt dev stop services docker-up docker-check \
+	lint lint-templates fileformat security-bandit check-chpp test-python test-single test-all format \
+	clean changelog release-tag db-migrate db-upgrade db-copy-production check-uv check-venv
 
-# Variables
-PYTHON := uv run python
-PIP := uv pip
 UV := uv
-DOCKER_COMPOSE := docker-compose
+PYTHON := uv run python
 
-# Common service startup function (consolidation)
-define start_services
-	@echo "🐳 Starting Docker Compose services..."
-	@$(DOCKER_COMPOSE) up -d --remove-orphans postgres 2>&1 | tee -a /tmp/docker-services.log
-	@echo "✅ Services started (PostgreSQL)"
-endef
+help: ## Show the main commands (the Makefile has a few more)
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-# Check if UV is available, provide helpful error message if not
 check-uv:
-	@command -v uv >/dev/null 2>&1 || { \
-		echo "❌ ERROR: UV is not installed"; \
-		echo ""; \
-		echo "UV is required for this project. Install it using one of these methods:"; \
-		echo ""; \
-		echo "📦 Using package managers:"; \
-		echo "  # macOS:"; \
-		echo "  brew install uv"; \
-		echo ""; \
-		echo "  # Linux (Ubuntu/Debian):"; \
-		echo "  curl -LsSf https://astral.sh/uv/install.sh | sh"; \
-		echo ""; \
-		echo "  # Linux (Arch):"; \
-		echo "  pacman -S uv"; \
-		echo ""; \
-		echo "  # Or using pip (cross-platform):"; \
-		echo "  pip install uv"; \
-		echo ""; \
-		echo "🔄 After installation, restart your terminal and try again."; \
-		echo "📖 For more info: https://docs.astral.sh/uv/getting-started/installation/"; \
-		exit 1; \
-	}
+	@command -v uv >/dev/null 2>&1 || { echo "❌ uv is not installed: https://docs.astral.sh/uv/getting-started/installation/ (macOS: brew install uv)"; exit 1; }
 
-# Default target
-help: ## Show this help message
-	@echo "HT Status Development Commands"
-	@echo "=============================="
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
-	@echo ""
-	@echo "Quick Start:"
-	@echo "  make setup       # Initialize development environment"
-	@echo "  make dev         # Start development server"
-	@echo ""
-
-# Development Environment Commands
-setup: check-uv ## Initialize development environment (UV sync, Docker setup)
-	@echo "🚀 Setting up HT Status development environment..."
-	@$(UV) sync --extra dev
-	@$(DOCKER_COMPOSE) pull
-	@echo "✅ Development environment ready!"
-	@echo "   Next: 'make dev' to start development server"
-
-check-venv: check-uv ## Verify virtual environment is healthy
-	@if [ -d .venv ]; then \
-		if ! .venv/bin/python --version >/dev/null 2>&1; then \
-			echo "❌ ERROR: Virtual environment is broken"; \
-			echo ""; \
-			echo "This usually happens after Python was upgraded via Homebrew."; \
-			echo ""; \
-			echo "🔧 Fix it by recreating the virtual environment:"; \
-			echo "  rm -rf .venv && uv sync --extra dev"; \
-			echo ""; \
-			exit 1; \
-		fi \
+check-venv: check-uv
+	@if [ -d .venv ] && ! .venv/bin/python --version >/dev/null 2>&1; then \
+		echo "❌ .venv is broken (Python upgraded?). Fix: rm -rf .venv && make install"; exit 1; \
 	fi
 
-dev: check-uv check-venv services changelog ## Start development server (equivalent to run.sh)
-	@echo "🌐 Starting HT Status development server..."
+# Setup
+install: check-uv ## Install dependencies (incl. dev tools)
+	@$(UV) sync --extra dev
+
+# Upgrade dependencies and refresh requirements.txt
+update: check-uv
+	@$(UV) sync --upgrade --extra dev
+	@$(UV) lock --upgrade
+	@$(MAKE) --no-print-directory requirements-txt
+
+# Regenerate requirements.txt (the Docker image and Dependabot use it) after changing dependencies
+requirements-txt: check-uv
+	@$(UV) pip compile pyproject.toml -o requirements.txt --quiet
+	@echo "✅ requirements.txt updated"
+
+# Running
+dev: check-venv services changelog ## Start the development server
 	@$(PYTHON) run.py
 
-serve: dev ## Alias for starting the development server
+# Start the dev PostgreSQL
+services:
+	@docker compose up -d --wait --remove-orphans postgres
 
-stop: ## Stop dev server and Docker Compose services
-	@echo "🛑 Stopping HT Status development services..."
-	@$(DOCKER_COMPOSE) stop 2>&1 | tee -a /tmp/docker-stop.log || docker compose stop 2>&1 | tee -a /tmp/docker-stop.log || true
-	@pkill -f "uv run python.*run.py" 2>&1 | tee -a /tmp/flask-stop.log || true
-	@pkill -f "flask run" 2>&1 | tee -a /tmp/flask-stop.log || true
-	@echo "✅ Services stopped (Flask, Docker Compose)"
+stop: ## Stop the dev server and Docker Compose services
+	@docker compose stop || true
+	@pkill -f "uv run python.*run.py" || true
+	@echo "✅ Stopped"
 
-services: ## Start Docker Compose services only
-	$(call start_services)
-
-pgadmin: ## Start pgAdmin (http://localhost:5050) next to PostgreSQL
-	@$(DOCKER_COMPOSE) --profile admin up -d --remove-orphans postgres pgadmin
-
-# Docker image (same as production, see DEPLOYMENT.md). The image has no .git,
-# so the version and the /changes data are prepared here (CI does the same).
-docker-build: ## Build the production image locally (htstatus-web:local)
+# Docker image (same as production). The image has no .git, so the version
+# and the /changes data are prepared here (CI does the same).
+docker-up: ## Build and run the production image on http://localhost:5010 (WEB_PORT to change)
 	@bash scripts/changelog.sh >/dev/null
 	@docker compose --profile web build --build-arg APP_VERSION=$$(git describe --tags) web
-
-docker-up: docker-build ## Run the production image locally on http://localhost:5010 (WEB_PORT to change)
 	@docker compose --profile web up -d --wait postgres web
-	@echo "✅ Running at http://localhost:$${WEB_PORT:-5010} (make docker-logs, make stop)"
-
-docker-logs: ## Follow the logs of the locally running image
-	@docker compose --profile web logs -f --tail=20 web
+	@echo "✅ Running at http://localhost:$${WEB_PORT:-5010} (logs: docker compose logs -f web; make stop)"
 
 docker-check: ## Lint and tests inside the Docker test image
 	@docker compose up -d --wait postgres
 	@docker compose --profile test run --rm --build test
 
-services-stop: ## Stop all Docker Compose services
-	@echo "🛑 Stopping Docker Compose services..."
-	@$(DOCKER_COMPOSE) down 2>&1 | tee -a /tmp/docker-down.log || docker compose down 2>&1 | tee -a /tmp/docker-down.log || true
-	@echo "✅ Services stopped"
-
-# Python Development Commands
-install: check-uv ## Install dependencies using UV
-	@echo "📦 Installing dependencies..."
-	@$(UV) sync --extra dev
-
-update: check-uv ## Update dependencies and sync environment
-	@echo "🔄 Updating dependencies..."
-	@$(UV) sync --upgrade --extra dev
-	@$(UV) lock --upgrade
-	@$(MAKE) requirements-txt
-
-requirements-txt: check-uv ## Generate requirements.txt from uv.lock for Dependabot
-	@echo "📝 Generating requirements.txt for Dependabot..."
-	@$(UV) pip compile pyproject.toml -o requirements.txt --quiet
-	@echo "✅ requirements.txt updated"
-
-shell: check-uv ## Open Python shell in UV environment
-	@echo "🐍 Opening Python shell..."
-	@$(PYTHON) -c "import IPython; IPython.start_ipython()" 2>&1 | tee /tmp/ipython-start.log || $(PYTHON)
-
-# Code Quality Commands
-lint: check-uv ## Run ruff linting and black format check (matches CI)
-	@echo "🔍 Running ruff linting..."
+# Quality gates (test-all runs them all)
+# ruff + black check (as CI)
+lint: check-uv
 	@$(UV) run ruff check .
 	@$(UV) run black --check --quiet .
 
-lint-fix: check-uv ## Auto-fix linting issues
-	@echo "🔧 Auto-fixing linting issues..."
-	@$(UV) run ruff check --fix .
-	@$(UV) run black .
-	@echo "✅ Linting auto-fix completed"
-
-lint-templates: check-uv ## Check Jinja2 template formatting
-	@echo "🔍 Running djlint template linting..."
+# djlint template check
+lint-templates: check-uv
 	@$(UV) run djlint app/templates/ --check
-
-lint-templates-fix: check-uv ## Auto-fix template formatting issues
-	@echo "🔧 Auto-fixing template formatting..."
-	@$(UV) run djlint app/templates/ --reformat || true
-	@echo "✅ Template auto-fix completed"
 
 FORMAT_FILES = git ls-files | grep -E '\.(py|js|ts|tsx|html|css|scss|json|md|txt|yml|yaml|sh|sql|toml|cfg|ini|env)$$|^(Dockerfile|Makefile)'
 
-fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
-	@echo "📝 Checking file formatting..."
+# Check newline at EOF and no trailing whitespace
+fileformat:
 	@failed=0; \
 	for file in $$($(FORMAT_FILES)); do \
 		[ -f "$$file" ] || continue; \
@@ -170,39 +82,36 @@ fileformat: ## Check file formatting (newline EOF, no trailing whitespace)
 	[ "$$failed" -eq 0 ] && echo "✅ File formatting checks passed"; \
 	exit $$failed
 
-fileformat-fix: ## Auto-fix file formatting issues (newline EOF, trailing whitespace)
-	@echo "🔧 Auto-fixing file formatting..."
+# bandit security check (medium+ severity fails)
+security-bandit: check-uv
+	@$(UV) run bandit -r app/ -c .bandit -ll -q
+
+# CHPP API usage policy (only login/OAuth/update may call CHPP)
+check-chpp:
+	@./scripts/check-chpp-usage.sh
+
+# Python tests with coverage
+test-python: check-uv services
+	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov-report=term-missing --cov-report=html
+
+test-single: check-uv services ## One test file: make test-single FILE=tests/test_x.py
+	@test -n "$(FILE)" || { echo "❌ Usage: make test-single FILE=tests/test_something.py"; exit 1; }
+	@$(UV) run pytest $(FILE) $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0
+
+format: check-uv ## Auto-fix formatting: files, ruff/black, templates
 	@for file in $$($(FORMAT_FILES)); do \
 		[ -f "$$file" ] || continue; \
 		if test "$$(tail -c1 "$$file" | wc -l)" -eq 0; then echo "" >> "$$file"; echo "Added newline: $$file"; fi; \
 		if grep -q '[[:space:]]$$' "$$file"; then sed -i '' 's/[[:space:]]*$$//' "$$file"; echo "Cleaned: $$file"; fi; \
 	done
-	@echo "✅ File formatting auto-fix completed"
-
-typecheck: check-uv ## Run mypy type checking
-	@echo "🔬 Running type checking..."
-	@$(UV) run mypy app/ models.py config.py --ignore-missing-imports --exclude="migrations|tests"
-
-security-bandit: check-uv ## Run bandit code security analysis (medium+ severity fails)
-	@echo "🔒 Running bandit code security analysis..."
-	@$(UV) run bandit -r app/ -c .bandit -ll -q
-
-test-single: check-uv services ## 🧪 Run a single test file (usage: make test-single FILE=tests/test_database.py)
-	@test -n "$(FILE)" || { echo "❌ Usage: make test-single FILE=tests/test_something.py"; exit 1; }
-	@$(UV) run pytest $(FILE) $${PYTEST_VERBOSE-"-v"} --tb=short --cov-fail-under=0
-
-test-python: check-uv services ## 🧪 Run all Python tests with coverage
-	@echo "🧪 Running all Python tests with coverage..."
-	@$(UV) run pytest tests/ $${PYTEST_VERBOSE-"-v"} --tb=short --cov-report=term-missing --cov-report=html
-
-check-chpp: ## Check CHPP API usage policy compliance
-	@echo "🔍 Checking CHPP API usage policy..."
-	@./scripts/check-chpp-usage.sh
+	@$(UV) run ruff check --fix --quiet .
+	@$(UV) run black --quiet .
+	@$(UV) run djlint app/templates/ --reformat --quiet >/dev/null || true
+	@echo "✅ Formatted"
 
 GATES = test-python fileformat lint lint-templates security-bandit check-chpp
 
-test-all: check-uv services fileformat-fix lint-fix lint-templates-fix ## 🧪 Run all quality gates and summarise
-	@echo "🚀 Running all quality gates"
+test-all: services format ## Format, then run all quality gates and summarise
 	@failed=""; \
 	for gate in $(GATES); do \
 		if PYTEST_VERBOSE="-q" $(MAKE) --no-print-directory $$gate > /tmp/htstatus-gate-$$gate.log 2>&1; then \
@@ -214,80 +123,29 @@ test-all: check-uv services fileformat-fix lint-fix lint-templates-fix ## 🧪 R
 	if [ -n "$$failed" ]; then echo "Failed gates:$$failed"; exit 1; fi; \
 	echo "🎉 All quality gates passed"
 
-# Utility Commands
-clean: ## Clean up temporary files, caches
-	@echo "🧹 Cleaning up..."
-	@find . -type f -name "*.pyc" -delete
-	@find . -type f -name "*.pyo" -delete
-	@find . -type f -name "*.pyd" -delete
-	@find . -type f -name ".DS_Store" -delete
-	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
-	@find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
-	@rm -rf .coverage htmlcov/ *.log
-	@echo "✅ Cleanup complete"
+# Remove caches and coverage output
+clean:
+	@find . -path ./.venv -prune -o \( -name "__pycache__" -o -name ".pytest_cache" -o -name ".ruff_cache" \) -type d -exec rm -rf {} + 2>/dev/null || true
+	@find . -path ./.venv -prune -o \( -name "*.pyc" -o -name ".DS_Store" \) -type f -exec rm -f {} + 2>/dev/null || true
+	@rm -rf .coverage htmlcov/
 
-reset: clean ## Reset environment (clean + fresh install)
-	@echo "🔄 Resetting environment..."
-	@rm -rf .venv/
-	@$(UV) sync --dev
-	@echo "✅ Environment reset complete"
-
-changelog: ## Generate changelog (from scripts/changelog.sh)
-	@echo "📝 Generating changelog..."
+# Releases (see DEPLOYMENT.md "Releasing")
+# Build the /changes page data from git and the release notes
+changelog:
 	@bash scripts/changelog.sh
 
-# Release Commands
-release-detect: ## Detect if changes warrant a version release
-	@echo "🔍 Detecting release-worthy changes..."
-	@./scripts/release/detect_version_changes.sh
-
-release-tag: ## Create git tag (usage: make release-tag VERSION=1.2 MESSAGE="Release description")
-	@test -n "$(VERSION)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
-	@test -n "$(MESSAGE)" || { echo "❌ Usage: make release-tag VERSION=1.2 MESSAGE=\"description\""; exit 1; }
-	@echo "🏷️  Creating git tag $(VERSION)..."
+release-tag: ## Tag a release: make release-tag VERSION=3.25 MESSAGE="..."
+	@test -n "$(VERSION)" && test -n "$(MESSAGE)" || { echo "❌ Usage: make release-tag VERSION=X.Y MESSAGE=\"description\""; exit 1; }
 	@git tag $(VERSION) -m "Release $(VERSION) - $(MESSAGE)"
 	@echo "✅ Tag $(VERSION) created"
 
-release-docs: ## Update all release documentation after tagging
-	@echo "📚 Updating release documentation..."
-	@$(MAKE) changelog
-	@echo "✅ Release documentation updated"
+# Database (local dev; production migrates on container start)
+db-migrate: check-uv ## New migration: make db-migrate MESSAGE="description"
+	@test -n "$(MESSAGE)" || { echo "❌ Usage: make db-migrate MESSAGE=\"description\""; exit 1; }
+	@$(UV) run alembic -c migrations/alembic.ini revision --autogenerate -m "$(MESSAGE)"
 
-# Database Commands
-db-migrate: check-uv ## Create database migration (usage: make db-migrate MESSAGE="description")
-	@echo "🗄️  Creating database migration..."
-	@if [ -z "$(MESSAGE)" ]; then \
-		echo "❌ Error: MESSAGE parameter required"; \
-		echo "Usage: make db-migrate MESSAGE=\"description\""; \
-		echo "Alternative: uv run alembic -c migrations/alembic.ini revision --autogenerate -m \"description\""; \
-		exit 1; \
-	fi
-	@echo "Using Alembic directly to avoid Flask context issues..."
-	@uv run alembic -c migrations/alembic.ini revision --autogenerate -m "$(MESSAGE)"
+db-upgrade: check-uv services ## Apply migrations to the dev database
+	@$(PYTHON) scripts/database/apply_migrations.py
 
-db-upgrade: check-uv services ## Apply database upgrades
-	@echo "🗄️  Applying database upgrades..."
-	@./scripts/database/upgrade_local_database.sh --force
-
-db-apply: check-uv ## Apply database migrations using production-safe script
-	@echo "🗄️  Applying database migrations (production-safe)..."
-	@uv run python scripts/database/apply_migrations.py
-
-db-backup: check-uv ## Create full database backup
-	@echo "💾 Creating database backup..."
-	@uv run python scripts/database/backup_database.py
-
-db-restore: check-uv ## Restore database from backup file (usage: make db-restore BACKUP_FILE="path/to/backup.sql")
-	@echo "🔄 Restoring database from backup..."
-	@if [ -z "$(BACKUP_FILE)" ]; then \
-		echo "❌ Error: BACKUP_FILE parameter required"; \
-		echo "Usage: make db-restore BACKUP_FILE=\"path/to/backup.sql\""; \
-		echo "Alternative: uv run python scripts/database/restore_database.py backup.sql"; \
-		exit 1; \
-	fi
-	@uv run python scripts/database/restore_database.py "$(BACKUP_FILE)"
-
-db-copy-production: services ## Replace the local dev database with a copy of production (PROD_SERVER/PROD_APP_DIR in .env)
+db-copy-production: services ## Replace the dev database with a copy of production (PROD_SERVER/PROD_APP_DIR in .env)
 	@./scripts/database/copy_production_db.sh

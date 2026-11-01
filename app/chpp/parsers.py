@@ -79,7 +79,7 @@ def safe_find_bool(root: ET.Element, xpath: str, default: bool = False) -> bool:
 def parse_user(root: ET.Element) -> CHPPUser:
     """Parse managercompendium XML to CHPPUser object.
 
-    YouthTeamId is handled as optional field (fixes pychpp bug).
+    YouthTeamId is optional: users without a youth team have none.
 
     Args:
         root: XML root element from managercompendium response

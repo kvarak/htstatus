@@ -29,6 +29,10 @@ class Config(object):
     CHPP_URL = os.environ.get(
         'CHPP_URL', 'https://chpp.hattrick.org/chppxml.ashx')
 
+    # Self-hosted GoatCounter pageview tracking, e.g. https://stats.example.com/count
+    # Empty: no analytics (and no analytics notice in the footer)
+    GOATCOUNTER_URL = os.environ.get('GOATCOUNTER_URL', '')
+
     # Database Configuration
     # Priority: DATABASE_URL > individual components > fallback
     _database_url = os.environ.get('DATABASE_URL')

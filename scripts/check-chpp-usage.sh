@@ -1,7 +1,7 @@
 #!/bin/bash
 # check-chpp-usage.sh
 # Enforce CHPP API usage policy: ONLY login/callback/update routes may call CHPP API
-# See .github/agents/htplanner-ai-agent.md for complete CHPP usage policy
+# See .project/architecture.md ("CHPP usage") for the policy
 
 set -euo pipefail
 
@@ -73,7 +73,7 @@ else
     echo "  ❌ FORBIDDEN: All other routes (use session + database queries)"
     echo ""
     echo "Fix: Remove CHPP calls from unauthorized routes"
-    echo "See: .github/agents/htplanner-ai-agent.md#chpp-api-usage-critical"
+    echo "See: .project/architecture.md (CHPP usage)"
 
     exit 1
 fi

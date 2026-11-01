@@ -48,6 +48,7 @@ Start from the stateless shape and add only what the app needs.
 
 ## Rules that save time
 
+- **Read freely, ask before changing servers or git.** Read-only `git` and `ssh` (looking at files, logs, `docker compose ps`, read-only SQL, dumps) are fine. Anything that changes a server or the repo (edits, restarts, `up`/`down`, crontab, database writes, commits, tags, pushes) needs the user's permission first. The user commits and pushes.
 - **Nothing personal in the repo.** Hostnames, backup hosts, domains, image owners and paths go in the server's `.env` or in placeholders in the docs (`<app dir>`, `<server>`, `<your domain>`, `ghcr.io/<owner>/...`). Scripts read them from `.env`. Optional ones, like an off-site backup host, are skipped when empty.
 - **The image has no `.git`.**
   - Pass the version as a build arg: `APP_VERSION=$(git describe --tags)`, which needs `fetch-depth: 0` in CI. The app reads `APP_VERSION` before falling back to git.

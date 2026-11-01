@@ -15,8 +15,6 @@ Usage:
     teams = fetch_user_teams(chpp)
 """
 
-from typing import Optional
-
 from flask import current_app
 
 from app.chpp import CHPP
@@ -24,8 +22,8 @@ from app.chpp import CHPP
 
 def get_chpp_client(
     flask_session: dict,
-    consumer_key: Optional[str] = None,
-    consumer_secret: Optional[str] = None,
+    consumer_key: str | None = None,
+    consumer_secret: str | None = None,
 ) -> CHPP:
     """Initialize CHPP client with session credentials.
 
@@ -60,8 +58,8 @@ def get_chpp_client(
 
 
 def get_chpp_client_no_auth(
-    consumer_key: Optional[str] = None,
-    consumer_secret: Optional[str] = None,
+    consumer_key: str | None = None,
+    consumer_secret: str | None = None,
 ) -> CHPP:
     """Initialize CHPP client without OAuth tokens (for OAuth flow initiation).
 

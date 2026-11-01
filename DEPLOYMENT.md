@@ -69,9 +69,9 @@ To move the app to another server, take a fresh backup on the old one (`./backup
 
 A release is a git tag (`3.24`). The footer version and the /changes page come from tags.
 
-1. Write the notes by hand: a user section in `RELEASES.md`, a technical one in `RELEASES-INTERNAL.md`, and `[Unreleased]` → `[X.Y] - date` in `CHANGELOG.md`. Use top-level `- ` bullets in `RELEASES.md`; the /changes page ignores indented ones.
+1. Write the notes by hand: a user section in `RELEASES.md`, and a technical one in `RELEASES-INTERNAL.md`. Use top-level `- ` bullets in `RELEASES.md`; the /changes page ignores indented ones.
 2. Commit them ("Update release documentation for vX.Y").
-3. Run `make release-tag VERSION=X.Y MESSAGE="..."`, then `make release-docs` to check that /changes picks up the release (the generated JSON is not committed).
+3. Run `make release-tag VERSION=X.Y MESSAGE="..."`, then `make changelog` to check that /changes picks up the release (the generated JSON is not committed).
 4. Push the commit and the tag together (`git push --atomic origin main X.Y`), so CI sees the tag when it computes the version. CI builds the image with that version and /changes data; the server picks it up within 15 minutes (or run `./update.sh` there).
 
 ## Database safety

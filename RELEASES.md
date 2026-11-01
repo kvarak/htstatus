@@ -4,7 +4,7 @@
 **Audience**: Hattrick managers who want to understand what's new without technical details
 **Format**: Only versions with user-facing changes that you'll actually notice
 
-*For detailed technical changes, see [CHANGELOG.md](CHANGELOG.md)*
+*For technical details, see [RELEASES-INTERNAL.md](RELEASES-INTERNAL.md)*
 
 ---
 

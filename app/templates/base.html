@@ -728,17 +728,19 @@ window.addEventListener('beforeinstallprompt', (e) => {
   }
 });
   </script>
-  <!-- GoatCounter Analytics -->
-  <script>
+  {% if config.GOATCOUNTER_URL %}
+    <!-- GoatCounter Analytics (GOATCOUNTER_URL) -->
+    <script>
       window.goatcounter = {
           path: function (path) {
               return location.hostname + path.split('?')[0];
           }
       };
-  </script>
-  <script data-goatcounter="https://stats.kvarak.net/count"
-          async
-          src="//stats.kvarak.net/count.js"></script>
+    </script>
+    <script data-goatcounter="{{ config.GOATCOUNTER_URL }}"
+            async
+            src="{{ config.GOATCOUNTER_URL.rsplit('/', 1)[0] }}/count.js"></script>
+  {% endif %}
 {% endblock %}
 ##########################
 ## Navbar
