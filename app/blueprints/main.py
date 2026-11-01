@@ -18,7 +18,7 @@ from flask import (
     url_for,
 )
 
-from app import translations
+from app import training_log, training_speed_stats, translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
@@ -474,6 +474,8 @@ def admin():
         errors=errors,
         form_error=form_error,
         superadmin_id=superadmin_ht_id(),
+        speed=training_speed_stats.overview(training_speed_stats.measured_pops()),
+        training_type_name=training_log.type_name,
     )
 
 

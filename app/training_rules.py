@@ -6,6 +6,8 @@ differ (the goalkeeper in Shooting and Crossing) we follow HO. Change rules here
 only with a source.
 """
 
+import math
+
 # Sectors use the keys of Hattrick's MatchPositions translations
 KEEPER = "Keeper"
 WING_BACK = "WingBack"
@@ -155,3 +157,59 @@ def trained_minutes(training_type, minutes_by_role):
         counted[effect] = min(played[effect], left)
         left -= counted[effect]
     return counted
+
+
+# Schum's formula, as used by Hattrick Organizer (WeeklyTrainingType.
+# calculateSkillIncreaseOfTrainingWeek): the share of a level gained in one week
+#   K(train) * f(level) * K(coach) * K(assistants) * intensity * (1 - stamina)
+#   * 54 / (age + 37) * K(time) / 100
+# A reference to compare our measurements with, not the truth.
+SCHUM_TRAINING_FACTORS = {
+    9: 5.1,  # goalkeeping
+    3: 2.88,  # defending
+    4: 3.24,  # scoring
+    5: 4.8,  # crossing
+    6: 1.5,  # shooting
+    7: 3.6,  # short passes
+    8: 3.36,  # playmaking
+    2: 14.7,  # set pieces
+    10: 3.15,  # through passes
+    11: 1.38,  # defensive positions
+    12: 3.12,  # wing attacks
+}
+SCHUM_COACH_FACTORS = {4: 0.7343, 5: 0.8324, 6: 0.92, 7: 1.0, 8: 1.0375}
+SOLID_COACH = 7
+
+
+def schum_level_factor(level):
+    if level < 9:
+        return 16.289 * math.exp(-0.1396 * level)
+    return 54.676 / level - 1.438
+
+
+def schum_weeks_per_level(
+    training_type,
+    level,
+    age,
+    intensity=100,
+    stamina_share=10,
+    coach_level=SOLID_COACH,
+    assistants=0,
+):
+    """Weeks of full training (K(time) = 1) to go from ``level`` to the next, or None."""
+    factor = SCHUM_TRAINING_FACTORS.get(training_type)
+    if factor is None or level is None or age is None:
+        return None
+    per_week = (
+        factor
+        * schum_level_factor(level)
+        * SCHUM_COACH_FACTORS[coach_level]
+        * (1 + assistants * 0.035)
+        * (intensity if intensity is not None else 100)
+        / 100
+        * (1 - (stamina_share if stamina_share is not None else 10) / 100)
+        * 54
+        / (age + 37)
+        / 100
+    )
+    return 1 / min(per_week, 1) if per_week > 0 else None

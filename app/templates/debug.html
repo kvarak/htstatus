@@ -15,6 +15,66 @@
   <div class="container">
     {{ page_header([(title, None) ]) }}
     {% if form_error %}<div class="alert alert-danger" role="alert">{{ form_error }}</div>{% endif %}
+    {# FEAT-042: what all users' measured skill-ups say about training speed #}
+    <div class="card mb-4" id="training-speed">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Training speed (all users)</h5>
+        <small class="text-muted">
+          Effective weeks of full training per level, from {{ speed.total }} measured skill-ups.
+          Schum = Schum's formula (as in Hattrick Organizer) for the same pops, assuming a solid coach and no assistants (not fetched yet); ratio &lt; 1 means faster than that.
+          {% if speed.mixed %}{{ speed.mixed }} skill-ups with mixed training types left out.{% endif %}
+        </small>
+      </div>
+      <div class="card-body p-2">
+        {% if speed.rows %}
+          <div class="table-responsive">
+            <table class="table table-sm mb-0 small">
+              <thead>
+                <tr>
+                  <th>Training</th>
+                  <th>Age</th>
+                  <th>Intensity</th>
+                  <th title="Measured skill-ups (players, teams)">Pops</th>
+                  <th>Weeks/level</th>
+                  <th title="95% confidence interval of the mean">95% CI</th>
+                  <th>Min–max</th>
+                  <th>Schum</th>
+                  <th title="Measured / Schum">Ratio</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in speed.rows %}
+                  <tr {% if row.few %}class="text-muted" title="Few skill-ups: not reliable yet"{% endif %}>
+                    <td>{{ training_type_name(row.training_type) }}</td>
+                    <td>{{ row.age_band }}</td>
+                    <td>{{ row.intensity_band }}</td>
+                    <td>
+                      {{ row.n }} <small>({{ row.players }} pl, {{ row.teams }} t)</small>
+                      {% if row.few %}<span class="badge badge-secondary">few</span>{% endif %}
+                    </td>
+                    <td>{{ "%.1f"|format(row.mean) }}</td>
+                    <td>
+                      {% if row.ci_low is not none %}
+                        {{ "%.1f"|format(row.ci_low) }}–{{ "%.1f"|format(row.ci_high) }}
+                      {% else %}
+                        –
+                      {% endif %}
+                    </td>
+                    <td>{{ "%.1f"|format(row.min) }}–{{ "%.1f"|format(row.max) }}</td>
+                    <td>{{ "%.1f"|format(row.expected) if row.expected is not none else "–" }}</td>
+                    <td>{{ "%.2f"|format(row.ratio) if row.ratio is not none else "–" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">
+            No measured skill-ups yet. They need two skill-ups in a row whose training weeks are all in the training log (weekly Updates after the release of the training log).
+          </p>
+        {% endif %}
+      </div>
+    </div>
     <!-- Production Errors Table -->
     <div class="row mb-4">
       <div class="col-md-12">
