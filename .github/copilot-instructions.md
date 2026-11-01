@@ -26,7 +26,7 @@ Before non-trivial work, read the relevant docs below instead of guessing.
 ## AI tooling (`.github/`)
 
 - [agents/htplanner-ai-agent.md](agents/htplanner-ai-agent.md): full development and UI standards
-- [skills/](skills/): project skills (e.g. `refactor`)
+- [skills/](skills/): project skills (`refactor`, `docker-hosting` for containerizing, hosting and deploying)
 
 ## Code map
 
