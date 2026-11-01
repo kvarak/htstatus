@@ -2,6 +2,7 @@
 
 from datetime import datetime
 import inspect
+import os
 
 from flask import render_template, session
 
@@ -63,28 +64,22 @@ def diff(first, second):
 
 
 def get_version_info():
-    """Get version information using git tags.
+    """Version from the APP_VERSION env var (set in the Docker image) or git tags.
 
     Returns dict with version, fullversion, versionstr for consistent use across app.
-    Uses git describe --tags directly since we now tag all minor releases.
     """
     import subprocess
 
     try:
-        # Get git describe output - this will show the current version
-        versionstr_raw = (
+        versionstr_raw = os.environ.get("APP_VERSION") or (
             subprocess.check_output(["git", "describe", "--tags"]).strip().decode()
         )
 
         # Parse the git describe output
         if "-" in versionstr_raw:
             # Format: "3.12-1-gedd7f4a" (commits ahead of tag)
-            parts = versionstr_raw.split("-")
-            tag_version = parts[0]  # "3.12"
-            # Skip commits_ahead and git_hash as they're not needed
-
-            version = tag_version
-            # Convert format from "3.15-8-g5015d35" to "3.15.8-g5015d35" (replace first hyphen with dot)
+            version = versionstr_raw.split("-")[0]
+            # "3.15-8-g5015d35" -> "3.15.8-g5015d35" (replace first hyphen with dot)
             fullversion = versionstr_raw.replace("-", ".", 1)
             versionstr = fullversion
         else:

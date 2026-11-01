@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Docker image for production (INFRA-090): gunicorn instead of the Flask dev server, migrations on start, non-root user; CI publishes `ghcr.io/<owner>/htstatus-web` for amd64/arm64 on pushes to `main`
+- `deploy/` with the server's compose file, `update.sh` (back up, then deploy a new image) and `backup.sh` (nightly dump, optionally copied to another host over ssh); DEPLOYMENT.md has a rehearsed cut-over runbook
+- `make docker-up` (run the production image locally) and `make docker-check` (lint and tests inside the image)
+
+### Changed
+- The version shown in the footer comes from `APP_VERSION` when set (the image has no `.git`) instead of running `git describe` on every page view
+
 ## [3.24] - 2026-11-01
 
 ### Added

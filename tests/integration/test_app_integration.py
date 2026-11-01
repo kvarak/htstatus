@@ -36,14 +36,6 @@ def test_app_configuration_integration(app):
 
 
 @pytest.mark.integration
-def test_uv_environment_integration():
-    """Test that tests run inside a virtual environment (as uv provides)."""
-    import sys
-
-    assert sys.prefix != sys.base_prefix
-
-
-@pytest.mark.integration
 def test_flask_app_request_context(client):
     """Test that Flask request context works in testing."""
     # Test that the client can make a request without hanging

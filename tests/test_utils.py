@@ -131,6 +131,17 @@ class TestVersionInfo:
     """Test version detection utilities."""
 
     @patch("subprocess.check_output")
+    def test_get_version_info_from_env_skips_git(self, mock_subprocess, monkeypatch):
+        """The Docker image has no .git: APP_VERSION (set at build) is used."""
+        monkeypatch.setenv("APP_VERSION", "3.24-2-gabc1234")
+
+        result = get_version_info()
+
+        mock_subprocess.assert_not_called()
+        assert result["version"] == "3.24"
+        assert result["fullversion"] == "3.24.2-gabc1234"
+
+    @patch("subprocess.check_output")
     def test_get_version_info_with_git_tags(self, mock_subprocess):
         """Test get_version_info with git tag output."""
         # Mock git describe output - commits ahead of tag

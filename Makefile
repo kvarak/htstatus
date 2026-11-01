@@ -1,7 +1,7 @@
 # HT Status Development Makefile
 # Integrates UV (Python dependency management) and Docker Compose (services)
 
-.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-tag release-docs db-migrate db-upgrade db-apply check-uv lint-templates lint-templates-fix
+.PHONY: help setup dev services stop install update shell lint format fileformat fileformat-fix typecheck security test test-coverage test-integration clean reset changelog release-detect release-tag release-docs db-migrate db-upgrade db-apply check-uv lint-templates lint-templates-fix docker-build docker-up docker-logs docker-check
 
 # Variables
 PYTHON := uv run python
@@ -93,6 +93,23 @@ services: ## Start Docker Compose services only
 
 pgadmin: ## Start pgAdmin (http://localhost:5050) next to PostgreSQL
 	@$(DOCKER_COMPOSE) --profile admin up -d --remove-orphans postgres pgadmin
+
+# Docker image (same as production, see DEPLOYMENT.md). The image has no .git,
+# so the version and the /changes data are prepared here (CI does the same).
+docker-build: ## Build the production image locally (htstatus-web:local)
+	@bash scripts/changelog.sh >/dev/null
+	@docker compose --profile web build --build-arg APP_VERSION=$$(git describe --tags) web
+
+docker-up: docker-build ## Run the production image locally on http://localhost:$${WEB_PORT:-5010}
+	@docker compose --profile web up -d --wait postgres web
+	@echo "✅ Running at http://localhost:$${WEB_PORT:-5010} (make docker-logs, make stop)"
+
+docker-logs: ## Follow the logs of the locally running image
+	@docker compose --profile web logs -f --tail=20 web
+
+docker-check: ## Lint and tests inside the Docker test image
+	@docker compose up -d --wait postgres
+	@docker compose --profile test run --rm --build test
 
 services-stop: ## Stop all Docker Compose services
 	@echo "🛑 Stopping Docker Compose services..."

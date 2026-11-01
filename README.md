@@ -66,7 +66,7 @@ DATABASE_URL=postgresql://user:pass@host:port/db  # Auto-configured for dev
 ```bash
 make db-backup                    # Create full database backup
 make db-restore BACKUP_FILE=...   # Restore from backup
-make db-backup-auto              # Automated backup to kloker.local
+make db-backup-auto              # Automated backup, copied to the backup host
 ```
 
 ## Documentation

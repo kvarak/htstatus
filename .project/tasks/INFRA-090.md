@@ -1,5 +1,25 @@
 # INFRA-090: Production with Docker Compose
 
+## Status
+
+- **Done in the repo:**
+  - `Dockerfile`, `docker/entrypoint.sh`, `gunicorn.conf.py` and an allow-list `.dockerignore`
+  - `web`/`test` services in `docker-compose.yml`, plus `make docker-up` and `make docker-check`
+  - the CI "Docker image" job
+  - `deploy/` (production compose, `.env.example`, `update.sh`, `backup.sh`, `table_counts.sql`)
+  - the DEPLOYMENT.md cut-over runbook
+- **Rehearsed locally:**
+  - a production dump restored into PostgreSQL 17, with all 14 table counts and the sequences matching
+  - migrations ran on start, every page rendered for a real user, and a backup restored cleanly
+- **Left on the server:** follow DEPLOYMENT.md "Cut-over from the old setup", steps 0 to 4, then step 5 after a couple of weeks.
+
+Deviations from the plan below:
+- **Production compose:** `deploy/docker-compose.yml` is copied into one folder on the server; the repo compose stays for development.
+- **Machine-specific values:** the backup host and the image name are `.env` settings (`BACKUP_REMOTE`, `WEB_IMAGE`), never hard-coded.
+- **Auto-deploy:** cron runs `update.sh` every 15 min, and it backs up before starting a new image.
+- **CI:** keeps its native lint/test jobs; the image build runs after them.
+- **Dependencies:** the image installs from the pinned `requirements.txt`, because `uv.lock` is not tracked.
+
 ## Problem
 
 Production runs from a git checkout on the Raspberry Pi: `deploy.sh` SSHes in, runs `git reset --hard`, `uv sync`, migrations and `systemctl restart`, against a PostgreSQL installed on the host. Every deploy builds the environment on the Pi, the service file and tools (uv, jq) are set up by hand, and the setup is hard to reproduce or move to another machine.
@@ -61,7 +81,7 @@ Each target fails with a clear message when `.env` is missing (`cp .env.example 
 - **`publish` job**:
   - runs only on pushes to `main`, after `check` passes
   - builds the `runtime` stage for `linux/amd64` and `linux/arm64` with QEMU and Buildx
-  - pushes `ghcr.io/kvarak/htstatus-web` with the tags `latest` and the commit SHA
+  - pushes `ghcr.io/<owner>/htstatus-web` with the tags `latest` and the commit SHA
 - **No 32-bit ARM image**: psycopg2 has no 32-bit ARM build, so the Pi needs a 64-bit OS (`uname -m` prints `aarch64`)
 - **Package access**: the ghcr package is either public, or the Pi logs in once with a `read:packages` token
 
@@ -79,7 +99,7 @@ Each target fails with a clear message when `.env` is missing (`cp .env.example 
   - restore the dump into the new postgres container
   - check the row counts against the old database before switching traffic
   - keep the old host database untouched until the new setup has run for a while
-- **Backups**: the nightly backup and its copy to kloker keep working against the container (`docker compose exec postgres pg_dump`, or the backup script pointed at the container)
+- **Backups**: the nightly backup and its off-site copy keep working against the container (`docker compose exec postgres pg_dump`, or the backup script pointed at the container)
 - **Data**: the database lives in a named volume (or a host path) that `docker compose down` does not delete; document that `down -v` deletes it
 - **Migrations**: run in one place only (app start-up); a failed migration stops the app instead of starting it on a half-migrated schema
 

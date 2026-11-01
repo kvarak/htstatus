@@ -13,7 +13,7 @@
 
 ## P2: Worth doing 🎯
 
-- **[INFRA-090]** Run production with Docker Compose: one compose file for dev, CI and production; CI publishes an amd64/arm64 image to ghcr.io, and the Pi runs app + PostgreSQL with `docker compose` instead of a git checkout, uv and systemd → [Details](tasks/INFRA-090.md)
+- 🚀 **[INFRA-090]** Run production with Docker Compose: one compose file for dev, CI and production; CI publishes an amd64/arm64 image to ghcr.io, and the Pi runs app + PostgreSQL with `docker compose` instead of a git checkout, uv and systemd → [Details](tasks/INFRA-090.md)
 - **[REFACTOR-121]** `app/utils.py` (~1460 lines) mixes match downloading/CHPP enhancement (`downloadMatches`, `downloadRecentMatches`, `fetch_enhanced_match_data`, `_process_matches_enhanced`) with small helpers; move the match download code to its own module so utils is just helpers
 - **[REFACTOR-122]** Blueprints get `db`/columns through `setup_*_blueprint()` module globals (9 blueprints plus `initialize_utils`); import `db` and `app.constants` directly like `series`/`stats` do. Auth's injected `app`, `consumer_key` and `consumer_secret` are never read
 

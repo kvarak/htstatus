@@ -81,6 +81,7 @@ HT Status is a **hobby project** for Hattrick team management built with Flask a
 
 #### Database Layer
 - **PostgreSQL**: Production database with SQLAlchemy ORM
+- **Hosting**: Docker image (`ghcr.io/<owner>/htstatus-web`, gunicorn) published by CI; on the server `deploy/docker-compose.yml` runs it with PostgreSQL 17 behind a reverse proxy (INFRA-090, see DEPLOYMENT.md)
 - **Migrations**: Alembic-based with 30 migration files in `/migrations/versions/`
 - **Models**: Complex schema supporting multi-team management, player tracking, match analysis
 - **Current Status**: Database schema stable and fully functional with comprehensive testing

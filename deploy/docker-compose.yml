@@ -1,0 +1,47 @@
+# Production: copy this file, .env, update.sh and backup.sh into one folder on
+# the server. See DEPLOYMENT.md. Never run `docker compose down -v` here: -v
+# deletes the database volume.
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: htplanner
+      POSTGRES_USER: htplanner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U htplanner -d htplanner"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    image: ${WEB_IMAGE:?Set WEB_IMAGE in .env}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://htplanner:${POSTGRES_PASSWORD}@db:5432/htplanner
+    ports:
+      - "127.0.0.1:${WEB_PORT:-5000}:8000"   # localhost only; nginx terminates TLS
+    volumes:
+      # Data fetched at Update (bids, series, Hattrick terms); dir owned by uid 10001
+      - ./data/instance:/app/instance
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8000), 2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+    depends_on:
+      db:
+        condition: service_healthy
+    logging: *logging
+
+volumes:
+  db-data:

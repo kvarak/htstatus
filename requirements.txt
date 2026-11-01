@@ -28,6 +28,8 @@ flask-sqlalchemy==3.1.1
     # via
     #   htstatus (pyproject.toml)
     #   flask-migrate
+gunicorn==26.2.0
+    # via htstatus (pyproject.toml)
 idna==3.18
     # via requests
 itsdangerous==2.2.0

@@ -1,6 +1,6 @@
 # HattrickPlanner – Copilot Instructions
 
-Flask + PostgreSQL app for Hattrick team management (uses the CHPP API). Production runs on a Raspberry Pi ("glader pi").
+Flask + PostgreSQL app for Hattrick team management (uses the CHPP API). Production runs on a small server (a Raspberry Pi), see DEPLOYMENT.md.
 
 Before non-trivial work, read the relevant docs below instead of guessing.
 
