@@ -89,70 +89,23 @@ def get_releases_data():
 
 
 @main_bp.route("/")
-@main_bp.route("/index")
 def index():
-    """Display home page with user and team statistics."""
+    """Home page: intro, user counts and recent releases."""
     from models import User
 
-    allusers = db.session.query(User).all()
-    time1m = date.today() - relativedelta(months=1)
-    activeusers = db.session.query(User).filter(User.last_usage > time1m).all()
-
-    if "current_user" not in session:
-        return create_page(
-            template="main.html",
-            title="Home",
-            usercount=len(allusers),
-            activeusers=len(activeusers),
-            releases=get_releases_data(),
-        )
-
-    # Check if session has team data (may be missing if CHPP failed during login)
-    if "all_teams" not in session or not session["all_teams"]:
+    # Team data may be missing if CHPP failed during login; the User row may be
+    # gone after a DB reset. Either way: log in again.
+    logged_in = "current_user" in session
+    if logged_in and (not session.get("all_teams") or not get_current_user()):
         session.clear()
         return redirect(url_for("auth.login"))
 
-    all_teams = session["all_teams"]
-    all_team_names = session["all_team_names"]
-    updated = {}
-
-    for i in range(len(all_teams)):
-        updated[all_teams[i]] = all_team_names[i]
-
-    dprint(2, updated)
-
-    thisuserdata = get_current_user()
-
-    if not thisuserdata:
-        # User not found in database, clear session and redirect to login
-        session.clear()
-        return redirect(url_for("auth.login"))
-
-    thisuser = {
-        "id": thisuserdata.ht_id,
-        "name": thisuserdata.ht_user,
-        "role": thisuserdata.role,
-        "c_team": thisuserdata.c_team,
-        "c_training": thisuserdata.c_training,
-        "c_player": thisuserdata.c_player,
-        "c_matches": thisuserdata.c_matches,
-        "c_login": thisuserdata.c_login,
-        "c_update": thisuserdata.c_update,
-        "last_update": thisuserdata.last_update,
-        "last_usage": thisuserdata.last_usage,
-        "last_login": thisuserdata.last_login,
-        "created": thisuserdata.created,
-    }
-
-    dprint(2, thisuser)
-
+    month_ago = date.today() - relativedelta(months=1)
     return create_page(
         template="main.html",
         title="Home",
-        thisuser=thisuser,
-        usercount=len(allusers),
-        activeusers=len(activeusers),
-        updated=updated,
+        usercount=db.session.query(User).count(),
+        activeusers=db.session.query(User).filter(User.last_usage > month_ago).count(),
         releases=get_releases_data(),
     )
 
@@ -407,25 +360,6 @@ def changes():
     )
 
 
-@main_bp.route("/debug/session")
-@require_authentication
-def debug_session():
-    """Debug endpoint to show session data."""
-    forbidden = admin_required_response()
-    if forbidden:
-        return forbidden
-
-    # Return session data for debugging
-    session_data = {
-        "all_teams": session.get("all_teams", []),
-        "all_team_names": session.get("all_team_names", []),
-        "team_id": session.get("team_id"),
-        "current_user": session.get("current_user"),
-        "current_user_id": session.get("current_user_id"),
-    }
-    return jsonify(session_data)
-
-
 @main_bp.route("/debug", methods=["GET", "POST"])
 @require_authentication
 def admin():
@@ -634,7 +568,7 @@ def tutorial_analytics():
         return jsonify({"status": "success"}), 200
 
     except Exception as e:
-        dprint(1, f"Error recording tutorial analytics: {str(e)}")
+        dprint(1, f"Error recording tutorial analytics: {e!s}")
         return jsonify({"error": "Internal server error"}), 500
 
 
@@ -672,7 +606,7 @@ def admin_preferences():
                 200,
             )
 
-        elif request.method == "POST":
+        if request.method == "POST":
             # Save preferences
             data = request.get_json()
             if not data:
@@ -695,5 +629,5 @@ def admin_preferences():
             return jsonify({"status": "success"}), 200
 
     except Exception as e:
-        dprint(1, f"Error handling admin preferences: {str(e)}")
+        dprint(1, f"Error handling admin preferences: {e!s}")
         return jsonify({"error": "Internal server error"}), 500

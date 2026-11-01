@@ -86,15 +86,6 @@
     max-width: 100% !important;
     width: 100% !important;
 }
-    width: 50% !important;
-}
-
-[data-chart-id].chart-full-width {
-    /* Full width for expanded charts */
-    flex: 0 0 100% !important;
-    max-width: 100% !important;
-    width: 100% !important;
-}
 
 /* Full width charts - override the grid column span */
 [data-chart-id] .chart-card[data-mode="full"] {
@@ -131,14 +122,6 @@
     line-height: 1;
 }
 
-.chart-drag {
-    cursor: grab;
-}
-
-.chart-drag:active {
-    cursor: grabbing;
-}
-
 /* Chart Grid Container */
 #chartsContainer {
     min-height: 200px;
@@ -146,27 +129,6 @@
 
 #chartsContainer > div {
     transition: all 0.3s ease;
-}
-
-/* Drag and Drop States */
-.chart-dragging {
-    opacity: 0.5;
-    transform: rotate(2deg);
-}
-
-.chart-drop-target {
-    background-color: hsl(var(--primary) / 0.1);
-    border: 2px dashed hsl(var(--primary));
-    border-radius: 0.375rem;
-}
-
-/* Filter Controls */
-.filter-controls {
-    background-color: hsl(var(--muted));
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.375rem;
-    padding: 10px;
-    margin-bottom: 15px;
 }
 
 /* Chart Responsiveness */

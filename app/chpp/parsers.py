@@ -14,7 +14,6 @@ from app.chpp.models import (
     CHPPMatchLineup,
     CHPPMatchLineupPlayer,
     CHPPPlayer,
-    CHPPPlayerEvent,
     CHPPTeam,
     CHPPUser,
 )
@@ -1072,35 +1071,6 @@ def parse_matchlineup(root: ET.Element) -> "CHPPMatchLineup":
         home_team_tactic=home_team_tactic,
         away_team_tactic=away_team_tactic,
     )
-
-
-def parse_playerevents(root: ET.Element) -> list["CHPPPlayerEvent"]:
-    """Parse playerevents XML response into list of CHPPPlayerEvent objects.
-
-    Args:
-        root: XML root element from playerevents endpoint
-
-    Returns:
-        List of CHPPPlayerEvent objects representing player career events
-    """
-    from app.chpp.models import CHPPPlayerEvent
-
-    events = []
-    for event_elem in root.findall(".//PlayerEvent"):
-        event = CHPPPlayerEvent(
-            player_id=safe_find_int(event_elem, "PlayerID"),
-            match_id=safe_find_int(event_elem, "MatchID"),
-            event_type=safe_find_text(event_elem, "EventType", ""),
-            minute=safe_find_int(event_elem, "Minute"),
-            team_id=safe_find_int(event_elem, "TeamID"),
-            opponent_team_id=safe_find_int(event_elem, "OpponentTeamID"),
-            event_text=safe_find_text(event_elem, "EventText", ""),
-            season=safe_find_int(event_elem, "Season"),
-            match_date=safe_find_text(event_elem, "MatchDate", ""),
-        )
-        events.append(event)
-
-    return events
 
 
 def safe_find_float(

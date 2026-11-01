@@ -9,7 +9,6 @@
         href="{{ url_for('static', filename='manifest.json') }}">
   <meta name="theme-color" content="#1f2937">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="app-version" content="{{ version }}">
   <!-- Bootstrap: Latest compiled and minified CSS -->
   <link rel="stylesheet"
         href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -778,7 +777,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
                    aria-expanded="false">{{ all_team_names[team_idx] }}</a>
                 <div class="dropdown-menu"
                      aria-labelledby="navbar-team-dropdown-{{ team_idx }}">
-                  <!-- <a class="dropdown-item" href="/team?id={{ all_teams[team_idx] }}">Team</a> -->
                   <a id="navbar-players-link-{{ team_idx }}"
                      class="dropdown-item"
                      href="/player?id={{ all_teams[team_idx] }}"
@@ -878,9 +876,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
       </div>
     </div>
   </div>
-  <!-- <div class="parent">
-  <h8 class="ribbon">Beta version {{ version }}</h8>
-</div> -->
   <div class="loader" id="loading">
     <img src="{{ url_for('static', filename='soccer_ball.png') }}" width="100">
   </div>

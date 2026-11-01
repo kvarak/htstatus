@@ -104,9 +104,9 @@ HattrickPlanner uses a modern Flask blueprint architecture with clean separation
 ## File Structure
 - `/app/factory.py`: Application factory with blueprint registration
 - `/app/blueprints/`: Feature-based route modules (auth, main, player, team, matches, training)
-- `/app/constants.py`: Hattrick data definitions (match types, roles, behaviors)
-- `/app/utils.py`: Shared utility functions (create_page, dprint, statistics)
-- `/app/routes_bp.py`: Route initialization (version info, blueprint setup)
+- `/app/constants.py`: Player column specs and position lists
+- `/app/utils.py`: Shared utility functions (create_page, dprint, contributions, match downloads)
+- `/app/team_stats.py`: Stats page calculations
 - `/app/roster.py`: Latest/oldest player record queries for a team
 - `/models.py`: SQLAlchemy database models
 - `/app/templates/`: Jinja2 templates (`base.html` extends `_skeleton.html`)

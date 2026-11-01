@@ -521,17 +521,13 @@ class TestPlayerErrorHandling:
     def test_player_route_invalid_team_conversion(self, authenticated_client):
         """Test player route handles invalid team ID conversion."""
         response = authenticated_client.get("/player?id=invalid")
-        # Should handle gracefully
-        assert response.status_code in [200, 400, 500]
+        assert response.status_code == 200
+        assert b"Wrong teamid" in response.data
 
     def test_player_database_error_handling(self, authenticated_client, sample_players):
         """Test player route handles database errors gracefully."""
-        # Test with valid team ID - route should still work even if mock fails
-        # The mock doesn't actually break the route because the route uses
-        # db.session.query() patterns that work around simple mock.side_effect
         response = authenticated_client.get("/player?id=12345")
-        # Route should handle gracefully and return a valid response
-        assert response.status_code in [200, 500]
+        assert response.status_code == 200
 
 
 class TestPlayerUtilityFunctions:

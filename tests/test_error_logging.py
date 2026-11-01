@@ -71,22 +71,6 @@ def test_check_errors_script_help():
 class TestErrorLogModel:
     """Test ErrorLog model functionality."""
 
-    def test_error_log_model_fields(self):
-        """Test ErrorLog model has required fields."""
-        from models import ErrorLog
-
-        # Test all model fields exist
-        assert hasattr(ErrorLog, "id")
-        assert hasattr(ErrorLog, "timestamp")
-        assert hasattr(ErrorLog, "error_type")
-        assert hasattr(ErrorLog, "message")
-        assert hasattr(ErrorLog, "stack_trace")
-        assert hasattr(ErrorLog, "user_id")
-        assert hasattr(ErrorLog, "request_path")
-        assert hasattr(ErrorLog, "request_method")
-        assert hasattr(ErrorLog, "user_agent")
-        assert hasattr(ErrorLog, "environment")
-
     def test_error_log_creation_with_minimal_data(self):
         """Test ErrorLog can be created with minimal required data."""
         from models import ErrorLog
@@ -187,16 +171,6 @@ class TestErrorHandlerIntegration:
 
         # Should return early without error
         assert result is None
-
-    def test_error_handler_route_integration(self, app):
-        """Test that error handler function can be imported."""
-        from app.error_handlers import register_error_handlers
-
-        # Test that function exists and is callable
-        assert callable(register_error_handlers)
-
-        # Basic smoke test - function should exist without requiring full registration
-        assert hasattr(register_error_handlers, "__name__")
 
 
 class TestErrorLogManagement:

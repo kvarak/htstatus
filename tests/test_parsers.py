@@ -15,13 +15,6 @@ from app.chpp.parsers import (
 )
 
 
-def test_module_imports():
-    """Test that CHPP parsers module imports without errors."""
-    import app.chpp.parsers
-
-    assert app.chpp.parsers is not None
-
-
 class TestSafeFindText:
     """Test safe_find_text utility function."""
 

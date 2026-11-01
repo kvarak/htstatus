@@ -24,11 +24,6 @@ def reload_config_module():
 class TestConfigClass:
     """Test the main Config class functionality."""
 
-    def test_config_class_exists(self):
-        """Test that Config class can be instantiated."""
-        config_instance = config.Config()
-        assert config_instance is not None
-
     def test_default_secret_key(self):
         """Test that default SECRET_KEY is set when not provided via environment."""
         with patch.dict(os.environ, {}, clear=True):
@@ -346,13 +341,6 @@ class TestConfigurationValidation:
             reload_config_module()
             config_instance = config.Config()
             assert config_instance.DEBUG_LEVEL == 100
-
-    @patch("config.load_dotenv")
-    def test_dotenv_loading_called(self, mock_load_dotenv):
-        """Test that load_dotenv is called during module import."""
-        # Since load_dotenv is called at module level, we can only test this indirectly
-        # by verifying the function exists and would be callable
-        assert callable(config.load_dotenv)
 
     def test_all_required_attributes_exist(self):
         """Test that all expected configuration attributes exist."""

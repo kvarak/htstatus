@@ -206,7 +206,6 @@
                               data-player-name="{{ (p['first_name'] or '') }} {{ (p['last_name'] or '') }}"
                               data-player-group-id="{{ group.id }}"
                               data-player-group-name="{{ group.name or '' }}"
-                              data-player-position="{{ p.get('best_position', '') or '' }}"
                               {% if group.id %}style="color: {{ group.textcolor }}; background: {{ group.bgcolor }}"{% endif %}>
                             <td class="text-small">
                               <input type="checkbox" class="player-checkbox" value="{{ p['ht_id'] }}">

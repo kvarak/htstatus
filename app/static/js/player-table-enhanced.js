@@ -94,14 +94,12 @@ class PlayerTableEnhanced {
             const playerName = row.getAttribute('data-player-name') || '';
             const playerGroupId = row.getAttribute('data-player-group-id') || '';
             const playerGroupName = row.getAttribute('data-player-group-name') || '';
-            const playerPosition = row.getAttribute('data-player-position') || '';
 
             return {
                 id: playerId,
                 name: playerName.trim(),
                 groupId: playerGroupId,
                 groupName: playerGroupName,
-                position: playerPosition,
                 element: row
             };
         });
@@ -303,17 +301,8 @@ class PlayerTableEnhanced {
     }
 
     saveFiltersToStorage() {
-        const nameFilter = document.getElementById('name-filter')?.value || '';
-        const groupFilterElement = document.getElementById('group-filter');
-        const selectedGroups = groupFilterElement ?
-            Array.from(groupFilterElement.selectedOptions).map(option => option.value) :
-            [];
-
-        const filters = {
-            name: nameFilter,
-            groups: selectedGroups
-        };
-        localStorage.setItem('player-table-filters', JSON.stringify(filters));
+        const name = document.getElementById('name-filter')?.value || '';
+        localStorage.setItem('player-table-filters', JSON.stringify({ name }));
     }
 
     restoreFiltersFromStorage() {
@@ -323,12 +312,7 @@ class PlayerTableEnhanced {
         try {
             const filters = JSON.parse(saved);
             const nameFilter = document.getElementById('name-filter');
-            const groupFilter = document.getElementById('group-filter');
-            const positionFilter = document.getElementById('position-filter');
-
             if (nameFilter) nameFilter.value = filters.name || '';
-            if (groupFilter) groupFilter.value = filters.group || '';
-            if (positionFilter) positionFilter.value = filters.position || '';
 
             // Apply filters after a short delay to ensure DOM is ready
             setTimeout(() => this.applyFilters(), 100);

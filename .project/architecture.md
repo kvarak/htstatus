@@ -46,10 +46,8 @@ HT Status is a **hobby project** for Hattrick team management built with Flask a
 - **Location**: `/app/templates/`
 - **Technology**: Jinja2 templates + Bootstrap 4 (CDN) + CSS; `base.html` extends `_skeleton.html`
 - **Purpose**: Server-rendered HTML pages for all application functionality
-- **Key Templates**: `player.html`, `matches.html`, `team.html`, `main.html`
+- **Key Templates**: `player.html`, `matches.html`, `stats.html`, `main.html`
 - **Features**: Responsive design, WCAG 2.1 accessibility, football-themed UI
-
-### 2. Backend Layer
 
 ### 2. Backend Layer
 
@@ -59,16 +57,19 @@ HT Status is a **hobby project** for Hattrick team management built with Flask a
   - `auth.py` - Authentication and OAuth handling
   - `main.py` - Home page and administrative functions
   - `player.py` - Player management and skill tracking
-  - `team.py` - Team information and data updates
-  - `matches.py` - Match history and analysis
+  - `team.py` - The Update action (CHPP sync) and its result pages
+  - `matches.py` - Match history, analysis and formations
   - `training.py` - Player training progression
+  - `stats.py`, `series.py`, `compare.py`, `feedback.py` - Stats, league table, player comparison, feedback board
+  - `app/api/players.py` - JSON API (bulk group assignment)
 - **Authentication Utilities**: `/app/auth_utils.py` - Unified authentication patterns with @require_authentication decorator (**NEW** ✅ REFACTOR-008)
-- **Error Handling**: `/app/error_handlers.py` - Standardized error handling with HattrickPlannerError exception hierarchy (**NEW** ✅ REFACTOR-008)
+- **Error Handling**: `/app/error_handlers.py` - 404/500 pages and production error logging to the `ErrorLog` table
+- **Current Team**: `current_team()` in `/app/auth_utils.py` - resolves `?id=` against the session's teams (`WRONG_TEAM` message otherwise)
 - **Test Utilities**: `/tests/factories.py` - Simplified fixture creation for testing infrastructure
-- **Constants Module**: `/app/constants.py` - Hattrick data definitions (match types, roles, behaviors, column specs)
-- **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, team statistics)
+- **Constants Module**: `/app/constants.py` - Player column specs and position lists
+- **Shared Utilities**: `/app/utils.py` - Common functions shared across blueprints (create_page, dprint, contributions/best_position, match downloads)
+- **Team Statistics**: `/app/team_stats.py` - Pure functions behind the stats page
 - **Roster Queries**: `/app/roster.py` - Latest/oldest record per player for a team (DB-side); sold players (`owner=0`) are excluded
-- **Legacy Compatibility**: `/app/routes_bp.py` - Maintained for backward compatibility during migration
 - **Database**: `/models.py` - SQLAlchemy models
 - **Configuration**: `/config.py` - Environment-based configuration with Config/TestConfig classes (template: `config.py.example`)
 - **Route Architecture**: Pure blueprint-based architecture - legacy routes.py monolith eliminated (2,335 lines removed)
@@ -174,19 +175,18 @@ htstatus-2.0/
 ├── app/               # Flask backend application
 │   ├── __init__.py
 │   ├── factory.py     # Application factory pattern with blueprint registration
-│   ├── constants.py   # Hattrick data definitions (166 lines)
+│   ├── constants.py   # Player column specs and position lists
 │   ├── utils.py       # Shared utility functions
-│   ├── routes_bp.py   # Legacy compatibility shim (minimal)
-│   ├── blueprints/    # Feature-based route modules (auth, main, player, team, matches, training)
+│   ├── blueprints/    # Feature-based route modules (auth, main, player, team, matches, training, stats, series, compare, feedback)
 │   ├── static/        # Static assets (CSS, JS, images)
 │   └── templates/     # Jinja2 HTML templates
-├── migrations/        # Database migrations (30 Alembic versions)
-├── tests/            # Test suite (218 tests, 100% passing)
+├── migrations/        # Alembic database migrations
+├── tests/            # pytest suite (plus tests/js for node --test)
 ├── environments/      # Environment configuration templates
 ├── scripts/          # Utility scripts
 ├── docker/           # Docker-related files
-├── models.py         # SQLAlchemy database models (406 lines)
-├── config.py         # Application configuration (58 lines)
+├── models.py         # SQLAlchemy database models
+├── config.py         # Application configuration
 ├── run.py            # Development server entry point
 ├── Makefile          # Development commands
 └── README.md         # User documentation
@@ -194,10 +194,9 @@ htstatus-2.0/
 
 ### Key Architectural Notes
 - **Flask-Only Frontend**: Server-rendered Jinja2 templates with Bootstrap 4 and custom CSS
-- **Blueprint Architecture**: Modern Flask blueprint pattern with 6 feature-based blueprints (REFACTOR-007 completed January 2026)
+- **Blueprint Architecture**: Modern Flask blueprint pattern with feature-based blueprints
   - Factory pattern in `app/factory.py` handles initialization and registration
-  - Each blueprint has `setup_*_blueprint()` function for dependency injection
-  - Constants extracted to `app/constants.py` (166 lines)
+  - Most blueprints still get `db` via a `setup_*_blueprint()` function (REFACTOR-122 removes this)
   - Shared utilities in `app/utils.py` for cross-blueprint functions
   - Clean separation of concerns by feature domain
 - **Library Versions**: pychpp 0.3.12, Flask 2.3.3, werkzeug 2.3.8 (stable after BUG-001 resolution, downgrades may be re-evaluated)

@@ -10,7 +10,6 @@ class TutorialManager {
         this.tourStartTime = null;
         this.stepStartTime = null;
         this.tourCompleted = false; // Track if tour completed to avoid double events
-        console.log('TutorialManager loaded [FIXED VERSION - ' + new Date().toISOString() + ']');
         this.init();
     }
 
@@ -67,8 +66,6 @@ class TutorialManager {
         }
 
         this.progress = this.loadProgress();
-        this.setupTours();
-        this.checkForNewFeatureAlerts();
 
         // Check for context-specific tours (no auto-start)
         this.checkForContextualTours();
@@ -78,24 +75,13 @@ class TutorialManager {
      * Load tutorial progress from localStorage
      */
     loadProgress() {
+        const defaults = { welcomeCompleted: false, toursCompleted: {} };
         try {
             const stored = localStorage.getItem(this.storageKey);
-            return stored ? JSON.parse(stored) : {
-                welcomeCompleted: false,
-                toursCompleted: {},
-                featuresViewed: {},
-                lastVersion: null,
-                tourPromptsDisabled: {}
-            };
+            return stored ? JSON.parse(stored) : defaults;
         } catch (e) {
             console.warn('Failed to load tutorial progress:', e);
-            return {
-                welcomeCompleted: false,
-                toursCompleted: {},
-                featuresViewed: {},
-                lastVersion: null,
-                tourPromptsDisabled: {}
-            };
+            return defaults;
         }
     }
 
@@ -108,86 +94,6 @@ class TutorialManager {
         } catch (e) {
             console.warn('Failed to save tutorial progress:', e);
         }
-    }
-
-    /**
-     * Show tour prompt with "Don't ask again" option
-     */
-    showTourPrompt(message, tourId) {
-        const modal = document.createElement('div');
-        modal.style.cssText = `
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 10000; display: flex;
-            align-items: center; justify-content: center;
-        `;
-
-        const dialog = document.createElement('div');
-        dialog.style.cssText = `
-            background: white; padding: 20px; border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); max-width: 400px;
-            text-align: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-        `;
-
-        dialog.innerHTML = `
-            <p style="margin-bottom: 20px; font-size: 16px;">${message}</p>
-            <div style="margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                    <input type="checkbox" id="dontAskAgain" style="margin-right: 8px;">
-                    Don't ask again
-                </label>
-            </div>
-            <div>
-                <button id="startTour" style="margin-right: 10px; padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Yes, show me
-                </button>
-                <button id="skipTour" style="padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    No thanks
-                </button>
-            </div>
-        `;
-
-        modal.appendChild(dialog);
-        document.body.appendChild(modal);
-
-        return new Promise((resolve) => {
-            const cleanup = () => {
-                document.body.removeChild(modal);
-            };
-
-            const handleChoice = (startTour) => {
-                const dontAskAgain = dialog.querySelector('#dontAskAgain').checked;
-
-                if (dontAskAgain) {
-                    if (!this.progress.tourPromptsDisabled) {
-                        this.progress.tourPromptsDisabled = {};
-                    }
-                    this.progress.tourPromptsDisabled[tourId] = true;
-                    this.saveProgress();
-                }
-
-                cleanup();
-                resolve(startTour);
-            };
-
-            dialog.querySelector('#startTour').onclick = () => handleChoice(true);
-            dialog.querySelector('#skipTour').onclick = () => handleChoice(false);
-            modal.onclick = (e) => {
-                if (e.target === modal) handleChoice(false);
-            };
-        });
-    }
-
-    /**
-     * Check if user should see the welcome tour
-     */
-    shouldShowWelcomeTour() {
-        // Show welcome tour if:
-        // 1. Never completed before
-        // 2. User is authenticated (has session data)
-        // 3. We're on the main page
-        return !this.progress.welcomeCompleted &&
-               window.location.pathname === '/' &&
-               this.isUserAuthenticated();
     }
 
     /**
@@ -218,23 +124,8 @@ class TutorialManager {
                     intro: "Welcome to HattrickPlanner! 👋<br>Let's take a quick tour to help you get started with managing your Hattrick team data."
                 },
                 {
-                    element: '#navbar-team-dropdown',
-                    intro: "Visit your <strong>Team</strong> dropdown to access various team management tools including Players, Training, and Statistics.",
-                    position: 'bottom'
-                },
-                {
-                    element: '#navbar-players-link',
-                    intro: "The <strong>Players</strong> page shows detailed player information, skills, and training progress. This is where you'll spend most of your time analyzing your squad.",
-                    position: 'bottom'
-                },
-                {
-                    element: '#navbar-training-link',
-                    intro: "Track your team's <strong>Training</strong> data and see how your players are developing over time.",
-                    position: 'bottom'
-                },
-                {
-                    element: '#navbar-stats-link',
-                    intro: "Review team <strong>Statistics</strong> and get insights into your squad's overall performance.",
+                    element: '#navbar-team-dropdown-0',
+                    intro: "Your <strong>team menu</strong> has everything about the team: <strong>Players</strong> (skills and groups), <strong>Training</strong>, <strong>Matches</strong>, <strong>Series</strong>, <strong>Formations</strong> and <strong>Statistics</strong>.",
                     position: 'bottom'
                 },
                 {
@@ -550,47 +441,6 @@ class TutorialManager {
     }
 
     /**
-     * Check for new features and show alerts
-     */
-    checkForNewFeatureAlerts() {
-        // Get current app version (could be from meta tag or global variable)
-        const currentVersion = this.getCurrentAppVersion();
-
-        if (this.progress.lastVersion && this.progress.lastVersion !== currentVersion) {
-            this.showNewFeatureAlerts(this.progress.lastVersion, currentVersion);
-        }
-
-        this.progress.lastVersion = currentVersion;
-        this.saveProgress();
-    }
-
-    /**
-     * Get current app version
-     */
-    getCurrentAppVersion() {
-        // Try to get version from meta tag or global variable
-        const metaVersion = document.querySelector('meta[name="app-version"]');
-        return metaVersion ? metaVersion.content : '1.0.0';
-    }
-
-    /**
-     * Show new feature alerts
-     */
-    showNewFeatureAlerts(oldVersion, newVersion) {
-        // This could be expanded to show specific feature notifications
-        // For now, just show a generic update message
-        console.log(`App updated from ${oldVersion} to ${newVersion}`);
-    }
-
-    /**
-     * Setup tour configurations - no longer automatically adds help button
-     */
-    setupTours() {
-        // Tour configurations are now handled dynamically
-        // Help button is added only when tours are available
-    }
-
-    /**
      * Add help button for available tour
      */
     addHelpButton(tour) {
@@ -681,59 +531,9 @@ class TutorialManager {
     }
 
     /**
-     * Show help menu with tutorial options
-     */
-    showHelpMenu() {
-        const options = [
-            'Restart Welcome Tour',
-            'Player Management Help',
-            'Data Update Help',
-            'Reset All Tutorial Progress',
-            'Cancel'
-        ];
-
-        const choice = prompt(`Choose an option:\n\n${options.map((opt, i) => `${i + 1}. ${opt}`).join('\n')}`);
-        const choiceNum = parseInt(choice);
-
-        switch (choiceNum) {
-            case 1:
-                this.restartWelcomeTour();
-                break;
-            case 2:
-                this.startFeatureTour('player-management');
-                break;
-            case 3:
-                this.startFeatureTour('data-update');
-                break;
-            case 4:
-                if (confirm('Reset all tutorial progress? This will make help buttons (?) appear again on pages with available tutorials.')) {
-                    this.resetAllProgress();
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    /**
-     * Restart welcome tour (reset progress)
-     */
-    restartWelcomeTour() {
-        this.progress.welcomeCompleted = false;
-        this.saveProgress();
-        setTimeout(() => this.startWelcomeTour(), 100);
-    }
-
-    /**
      * Check for context-specific tours based on current page
      */
     checkForContextualTours() {
-        // Debug log to help troubleshoot
-        const currentPath = window.location.pathname;
-        const isAuth = this.isUserAuthenticated();
-        const welcomeCompleted = this.progress.welcomeCompleted;
-        console.log('Tutorial debug - Path:', currentPath, 'Auth:', isAuth, 'Welcome completed:', welcomeCompleted);
-
         // Only add help button if there's an available tour for this page
         // No automatic prompts or tour starts
         this.addHelpButtonIfTourAvailable();

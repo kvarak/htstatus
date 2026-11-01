@@ -266,7 +266,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fromPosition: this.dataset.fromPosition || null
         };
 
-        e.dataTransfer.setData('text/html', this.outerHTML);
         e.dataTransfer.setData('text/plain', JSON.stringify(dragData));
     }
 
@@ -294,6 +293,15 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.remove('drag-over');
     }
 
+    function readDragData(e) {
+        try {
+            return JSON.parse(e.dataTransfer.getData('text/plain'));
+        } catch (err) {
+            console.warn('Could not parse drag data:', err);
+            return null;
+        }
+    }
+
     function handleDrop(e) {
         if (e.stopPropagation) {
             e.stopPropagation();
@@ -301,25 +309,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         this.classList.remove('drag-over');
 
-        // Try to get enhanced data format, fallback to simple format
-        let dragData;
-        const rawData = e.dataTransfer.getData('text/plain');
-        try {
-            if (rawData.startsWith('{')) {
-                dragData = JSON.parse(rawData);
-            } else {
-                // Legacy format
-                dragData = {
-                    playerId: rawData,
-                    playerNumber: draggedElement?.dataset.playerNumber || '#',
-                    playerName: draggedElement?.dataset.playerName || 'Player',
-                    fromPosition: draggedElement?.dataset.fromPosition || null
-                };
-            }
-        } catch (e) {
-            console.warn('Could not parse drag data:', e);
-            return false;
-        }
+        const dragData = readDragData(e);
+        if (!dragData) return false;
 
         const positionId = this.dataset.positionId;
 
@@ -338,23 +329,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         this.classList.remove('drag-over');
 
-        // Try to get enhanced data format
-        let dragData;
-        const rawData = e.dataTransfer.getData('text/plain');
-        try {
-            if (rawData.startsWith('{')) {
-                dragData = JSON.parse(rawData);
-            } else {
-                // Legacy format
-                dragData = {
-                    playerId: rawData,
-                    fromPosition: draggedElement?.dataset.fromPosition || null
-                };
-            }
-        } catch (e) {
-            console.warn('Could not parse drag data:', e);
-            return false;
-        }
+        const dragData = readDragData(e);
+        if (!dragData) return false;
 
         // Only allow removing players that are currently on the field
         if (dragData.fromPosition && playerAssignments[dragData.fromPosition]) {

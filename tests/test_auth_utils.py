@@ -2,20 +2,9 @@
 
 from unittest.mock import patch
 
-from app.auth_utils import (
-    get_current_user_id,
-    get_team_info,
-    get_user_teams,
-    require_authentication,
-)
+import pytest
 
-
-def test_module_imports():
-    """Test that all auth utility functions can be imported correctly."""
-    assert callable(get_current_user_id)
-    assert callable(get_user_teams)
-    assert callable(get_team_info)
-    assert callable(require_authentication)
+from app.auth_utils import current_team, get_current_user_id, require_authentication
 
 
 class TestGetCurrentUserId:
@@ -34,73 +23,38 @@ class TestGetCurrentUserId:
             assert result is None
 
 
-class TestGetUserTeams:
-    """Test get_user_teams function."""
+class TestCurrentTeam:
+    TEAMS = {"all_teams": [111, 222], "all_team_names": ["First", "Second"]}
 
-    def test_returns_teams_when_present(self):
-        """Test returns teams and team names from session."""
-        session_data = {
-            "all_teams": [12345, 67890],
-            "all_team_names": ["Team A", "Team B"],
-        }
-        with patch("app.auth_utils.session", session_data):
-            team_ids, team_names = get_user_teams()
-            assert team_ids == [12345, 67890]
-            assert team_names == ["Team A", "Team B"]
+    def _request(self, app, query):
+        ctx = app.test_request_context(query)
+        ctx.push()
+        from flask import session
 
-    def test_returns_empty_lists_when_not_present(self):
-        """Test returns empty lists when teams not in session."""
-        with patch("app.auth_utils.session", {}):
-            team_ids, team_names = get_user_teams()
-            assert team_ids == []
-            assert team_names == []
+        session.update(self.TEAMS)
+        return ctx
 
+    def test_reads_id_from_request(self, app):
+        ctx = self._request(app, "/x?id=222")
+        try:
+            assert current_team() == (222, "Second")
+        finally:
+            ctx.pop()
 
-class TestGetTeamInfo:
-    """Test get_team_info function."""
+    @pytest.mark.parametrize("query", ["/x", "/x?id=", "/x?id=abc", "/x?id=999"])
+    def test_missing_malformed_or_foreign_id(self, app, query):
+        ctx = self._request(app, query)
+        try:
+            assert current_team() == (None, None)
+        finally:
+            ctx.pop()
 
-    def test_valid_team_id_returns_success(self):
-        """Test valid team ID returns success status."""
-        user_teams = ([12345, 67890], ["Team A", "Team B"])
-
-        is_valid, team_name, error = get_team_info(12345, user_teams)
-
-        assert is_valid is True
-        assert team_name == "Team A"
-        assert error is None
-
-    def test_invalid_team_id_returns_error(self):
-        """Test invalid team ID returns error status."""
-        user_teams = ([12345, 67890], ["Team A", "Team B"])
-
-        is_valid, team_name, error = get_team_info(99999, user_teams)
-
-        assert is_valid is False
-        assert team_name is None
-        assert error == "Wrong teamid, try the links."
-
-    def test_uses_session_when_no_user_teams_provided(self):
-        """Test function uses session data when user_teams not provided."""
-        session_data = {
-            "all_teams": [12345, 67890],
-            "all_team_names": ["Team A", "Team B"],
-        }
-        with patch("app.auth_utils.session", session_data):
-            is_valid, team_name, error = get_team_info(12345)
-
-            assert is_valid is True
-            assert team_name == "Team A"
-            assert error is None
-
-    def test_second_team_in_list(self):
-        """Test retrieving second team from list."""
-        user_teams = ([12345, 67890], ["Team A", "Team B"])
-
-        is_valid, team_name, error = get_team_info(67890, user_teams)
-
-        assert is_valid is True
-        assert team_name == "Team B"
-        assert error is None
+    def test_explicit_id_wins(self, app):
+        ctx = self._request(app, "/x?id=222")
+        try:
+            assert current_team("111") == (111, "First")
+        finally:
+            ctx.pop()
 
 
 class TestRequireAuthenticationDecorator:

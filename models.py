@@ -429,9 +429,6 @@ class User(db.Model):
     def __repr__(self):
         return f"<id {self.username}>"
 
-    def getRole(self):
-        return f"{self.role}"
-
     def setRole(self, newrole):
         self.role = newrole
 
@@ -466,9 +463,6 @@ class User(db.Model):
     def matches_archive(self):
         self._count_visit("c_matches_archive")
         self.last_matches_archive = self.last_usage
-
-    def team(self):
-        self._count_visit("c_team")
 
     def training(self):
         self._count_visit("c_training")

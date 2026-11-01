@@ -18,11 +18,3 @@
     border: none !important;
 }
 
-/* Chevron Icon Animations */
-.chevron-icon {
-    transition: transform 0.2s ease-in-out;
-}
-
-.chevron-icon.rotated {
-    transform: rotate(-90deg);
-}

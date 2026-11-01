@@ -440,34 +440,3 @@ class CHPPMatchLineup:
     def __getitem__(self, key: str) -> Any:
         """Support dict-like access."""
         return getattr(self, key)
-
-
-@dataclass
-class CHPPPlayerEvent:
-    """Individual player event for career tracking.
-
-    Attributes:
-        player_id: Hattrick player ID
-        match_id: Match where event occurred
-        event_type: Type of event (goal, assist, card, injury)
-        minute: Match minute when event occurred
-        team_id: Team player was playing for
-        opponent_team_id: Opponent team ID
-        event_text: Description of the event
-        season: Season when event occurred
-        match_date: Date of the match
-    """
-
-    player_id: int
-    match_id: int
-    event_type: str
-    minute: int
-    team_id: int
-    opponent_team_id: int = 0
-    event_text: str = ""
-    season: int = 0
-    match_date: str = ""
-
-    def __getitem__(self, key: str) -> Any:
-        """Support dict-like access."""
-        return getattr(self, key)

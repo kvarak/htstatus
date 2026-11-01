@@ -9,13 +9,6 @@ from app.chpp.models import CHPPMatch
 from app.utils import downloadMatches
 
 
-def test_module_imports():
-    """Test that matches blueprint module imports without errors."""
-    import app.blueprints.matches
-
-    assert app.blueprints.matches is not None
-
-
 class TestDownloadRecentMatches:
     """Test recent matches download functionality."""
 

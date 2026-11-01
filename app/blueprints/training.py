@@ -2,9 +2,14 @@
 
 from datetime import date, timedelta
 
-from flask import Blueprint, request, session
+from flask import Blueprint
 
-from app.auth_utils import require_authentication, track_activity
+from app.auth_utils import (
+    current_team,
+    require_authentication,
+    track_activity,
+    WRONG_TEAM,
+)
 from app.utils import create_page
 
 # Create Blueprint for training routes
@@ -30,18 +35,9 @@ def training():
     from app.roster import latest_player_records, oldest_player_records
     from models import Players  # Import here to avoid circular dependencies
 
-    teamid = request.values.get("id")
-
-    teamid = int(teamid) if teamid else request.form.get("id")
-    all_teams = session["all_teams"]
-
-    error = ""
-    if teamid not in all_teams:
-        error = "Wrong teamid, try the links."
-        return create_page(template="training.html", title="Training")
-
-    all_team_names = session["all_team_names"]
-    teamname = all_team_names[all_teams.index(teamid)]
+    teamid, teamname = current_team()
+    if teamid is None:
+        return create_page(template="training.html", title="Training", error=WRONG_TEAM)
 
     # Get all players you have ever owned
     players_data = (
@@ -156,7 +152,7 @@ def training():
                 changes = [0] * 7
             else:
                 # Compare current skills with chronologically older skills
-                older_date, older_skills = list(reversed(player_data))[i + 1]
+                _older_date, older_skills = list(reversed(player_data))[i + 1]
                 # Positive change = improvement (show green ↑)
                 changes = [skills[j] - older_skills[j] for j in range(7)]
             skill_changes[player_id].append((date_val, skills, changes))
@@ -175,7 +171,6 @@ def training():
     return create_page(
         template="training.html",
         teamname=teamname,
-        error=error,
         skills=tracecolumns,
         teamid=teamid,
         increases=increases,

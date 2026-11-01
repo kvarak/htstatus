@@ -26,28 +26,6 @@ def test_api_routes_basic():
     assert api_bp.url_prefix == "/api"
 
 
-def test_bulk_assign_basic_coverage():
-    """Basic test for bulk assignment route coverage."""
-    from app.api.players import bulk_assign_players
-
-    # Test that function exists and is callable
-    assert callable(bulk_assign_players)
-
-
-def test_api_blueprint_import_coverage():
-    """Import more of the API module for coverage."""
-    from app.api.players import (
-        api_bp,
-        bulk_assign_players,
-        setup_api_blueprint,
-    )
-
-    # Test that all main components exist
-    assert callable(bulk_assign_players)
-    assert callable(setup_api_blueprint)
-    assert api_bp is not None
-
-
 class TestBulkAssign:
     """Real requests against /api/players/bulk-assign (player page bulk actions)."""
 

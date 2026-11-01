@@ -2,184 +2,40 @@
 {% block scripts %}
   {{ super() }}
   <script>
-// Team Statistics Charts
 document.addEventListener('DOMContentLoaded', function() {
+  var charts = {{ charts | tojson }};
 
-// Team Squad Composition Chart
-  var ctx1 = document.getElementById('ageChart');
-  if (ctx1) {
-    // Calculate positions based on player skills (same as "Best Position" logic)
-    var positionCounts = {
-      'Goalkeepers': 0,
-      'Defenders': 0,
-      'Wing Defenders': 0,
-      'Midfielders': 0,
-      'Wingers': 0,
-      'Forwards': 0
-    };
+  function draw(id, config) {
+    var canvas = document.getElementById(id);
+    if (canvas) new Chart(canvas, config);
+  }
 
-    // Use ALL current players for accurate squad composition
-    var players = [];
-    {% if current_players %}
-      {% for player in current_players %}
-      players.push({
-        keeper: {{ player.keeper or 0 }},
-        defender: {{ player.defender or 0 }},
-        playmaker: {{ player.playmaker or 0 }},
-        winger: {{ player.winger or 0 }},
-        passing: {{ player.passing or 0 }},
-        scorer: {{ player.scorer or 0 }}
-      });
-      {% endfor %}
-    {% endif %}
-
-    players.forEach(function(player) {
-      var bestPosition = 'Midfielders'; // default
-      var maxContribution = 0;
-
-      // Position calculations based on your groupings
-      var contributions = {
-        'Goalkeepers': player.keeper, // GC
-        'Defenders': player.defender * 0.8 + player.passing * 0.2, // CD, CDO, CDTW
-        'Wing Defenders': player.defender * 0.7 + player.passing * 0.3, // WBD, WBN, WBO, WBTM
-        'Midfielders': player.playmaker * 0.6 + player.passing * 0.4, // IMN, IMD, IMO, IMTW
-        'Wingers': player.winger * 0.7 + player.passing * 0.3, // WO, WTM, WN, WD
-        'Forwards': player.scorer * 0.8 + player.passing * 0.2 // FW, FTW, DF
-      };
-
-      for (var pos in contributions) {
-        if (contributions[pos] > maxContribution) {
-          maxContribution = contributions[pos];
-          bestPosition = pos;
-        }
-      }
-
-      positionCounts[bestPosition]++;
-    });
-
-    var ageChart = new Chart(ctx1, {
+  function doughnut(id, rows, title) {
+    draw(id, {
       type: 'doughnut',
       data: {
-        labels: [
-          {{ ht_term('MatchPositions', 'Keeper', 'Goalkeepers') | tojson }},
-          {{ ht_term('MatchPositions', 'CentralDefender', 'Defenders') | tojson }},
-          {{ ht_term('MatchPositions', 'WingBack', 'Wing Defenders') | tojson }},
-          {{ ht_term('MatchPositions', 'InnerMidfield', 'Midfielders') | tojson }},
-          {{ ht_term('MatchPositions', 'Winger', 'Wingers') | tojson }},
-          {{ ht_term('MatchPositions', 'Forward', 'Forwards') | tojson }}
-        ],
+        labels: rows.map(function(r) { return r[0]; }),
         datasets: [{
-          data: [
-            positionCounts['Goalkeepers'],
-            positionCounts['Defenders'],
-            positionCounts['Wing Defenders'],
-            positionCounts['Midfielders'],
-            positionCounts['Wingers'],
-            positionCounts['Forwards']
-          ],
-          backgroundColor: [0, 1, 2, 3, 4, 5].map(i => chartColor(i)),
+          data: rows.map(function(r) { return r[1]; }),
+          backgroundColor: rows.map(function(r, i) { return chartColor(i); }),
           borderWidth: 2
         }]
       },
       options: {
         responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          },
-          title: {
-            display: true,
-            text: 'Squad Composition by Best Position'
-          }
-        }
+        plugins: {legend: {position: 'bottom'}, title: {display: true, text: title}}
       }
     });
   }
 
-// Simple Team Age Distribution
-  var ctx2 = document.getElementById('matchResultsChart');
-  if (ctx2) {
-    // Simple team development metrics
-    var developmentChart = new Chart(ctx2, {
-      type: 'doughnut',
-      data: {
-        labels: ['Youth (≤21)', 'Prime (22-28)', 'Veterans (29+)'],
-        datasets: [{
-          data: [
-            {% if current_players %}
-            (function() {
-              var youth = 0, prime = 0, veterans = 0;
-              {% for player in current_players %}
-              var age = {{ player.age_years or 25 }};
-              if (age <= 21) youth++;
-              else if (age <= 28) prime++;
-              else veterans++;
-              {% endfor %}
-              return youth;
-            })(),
-            (function() {
-              var youth = 0, prime = 0, veterans = 0;
-              {% for player in current_players %}
-              var age = {{ player.age_years or 25 }};
-              if (age <= 21) youth++;
-              else if (age <= 28) prime++;
-              else veterans++;
-              {% endfor %}
-              return prime;
-            })(),
-            (function() {
-              var youth = 0, prime = 0, veterans = 0;
-              {% for player in current_players %}
-              var age = {{ player.age_years or 25 }};
-              if (age <= 21) youth++;
-              else if (age <= 28) prime++;
-              else veterans++;
-              {% endfor %}
-              return veterans;
-            })()
-            {% else %}
-            0, 0, 0
-            {% endif %}
-          ],
-          backgroundColor: [
-            chartColor(0), chartColor(1), chartColor(2)
-          ],
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          },
-          title: {
-            display: true,
-            text: 'Team Age Distribution'
-          }
-        }
-      }
-    });
-  }
-
-  // Age Distribution Chart - All Players
-  var ctx3 = document.getElementById('ageDistributionAllChart');
-  if (ctx3) {
-    var ageDistChart = new Chart(ctx3, {
+  function ageBars(id, rows) {
+    draw(id, {
       type: 'bar',
       data: {
-        labels: [
-          {% for age, count in age_distribution_all %}
-          '{{ age }}'{% if not loop.last %},{% endif %}
-          {% endfor %}
-        ],
+        labels: rows.map(function(r) { return String(r[0]); }),
         datasets: [{
           label: 'Number of Players',
-          data: [
-            {% for age, count in age_distribution_all %}
-            {{ count }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          ],
+          data: rows.map(function(r) { return r[1]; }),
           backgroundColor: chartColor(0, 0.8),
           borderColor: chartColor(0),
           borderWidth: 2,
@@ -189,248 +45,87 @@ document.addEventListener('DOMContentLoaded', function() {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false
-          },
-          title: {
-            display: false
-          }
-        },
+        plugins: {legend: {display: false}},
         scales: {
-          y: {
-            beginAtZero: true,
-            suggestedMax: {{ max_count_all }},
-            ticks: {
-              stepSize: 1,
-              precision: 0,
-              callback: function(value) {
-                return Number.isInteger(value) ? value : '';
-              }
-            }
-          },
-          x: {
-            type: 'category',
-            title: {
-              display: true,
-              text: 'Age (years)'
-            },
-            ticks: {
-              autoSkip: false,
-              maxRotation: 0,
-              minRotation: 0
-            }
-          }
+          y: {beginAtZero: true, suggestedMax: charts.max_age_count, ticks: {precision: 0}},
+          x: {title: {display: true, text: 'Age (years)'}, ticks: {autoSkip: false, maxRotation: 0}}
         }
       }
     });
-  } else {
-    console.log('Canvas element not found for all players chart');
   }
 
-  // Age Distribution Chart - Top 11 Players
-  var ctx4 = document.getElementById('ageDistributionTop11Chart');
-  if (ctx4) {
-    var ageDistTop11Chart = new Chart(ctx4, {
-      type: 'bar',
+  // Flag colors on purpose: the one place where many colors carry meaning
+  function countryPie(id, rows) {
+    var total = rows.reduce(function(sum, r) { return sum + r[1]; }, 0);
+    draw(id, {
+      type: 'pie',
       data: {
-        labels: [
-          {% for age, count in age_distribution_top11 %}
-          '{{ age }}'{% if not loop.last %},{% endif %}
-          {% endfor %}
-        ],
+        labels: rows.map(function(r) { return r[0] + ' (' + r[1] + ')'; }),
         datasets: [{
-          label: 'Number of Players',
-          data: [
-            {% for age, count in age_distribution_top11 %}
-            {{ count }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          ],
-          backgroundColor: chartColor(0, 0.8),
-          borderColor: chartColor(0),
-          borderWidth: 2,
-          barThickness: 20
+          data: rows.map(function(r) { return r[1]; }),
+          backgroundColor: rows.map(function(r) { return r[2]; })
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false
-          },
-          title: {
-            display: false
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            suggestedMax: {{ max_count_all }},
-            ticks: {
-              stepSize: 1,
-              precision: 0,
-              callback: function(value) {
-                return Number.isInteger(value) ? value : '';
-              }
-            }
-          },
-          x: {
-            type: 'category',
-            title: {
-              display: true,
-              text: 'Age (years)'
-            },
-            ticks: {
-              autoSkip: false,
-              maxRotation: 0,
-              minRotation: 0
-            }
-          }
+          legend: {position: 'right', labels: {boxWidth: 12, font: {size: 11}}},
+          tooltip: {callbacks: {label: function(ctx) {
+            return ' ' + Math.round(ctx.parsed / total * 100) + '%';
+          }}}
         }
       }
     });
   }
 
-  // Country Distribution Pie Chart - All Players
-  var ctx5 = document.getElementById('countryDistributionAllChart');
-  if (ctx5) {
-    new Chart(ctx5, {
-      type: 'pie',
-      data: {
-        labels: [
-          {% for country, count, color in country_distribution_all %}
-          '{{ country|safe }}'{% if not loop.last %},{% endif %}
-          {% endfor %}
-        ],
-        datasets: [{
-          data: [
-            {% for country, count, color in country_distribution_all %}
-            {{ count }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          ],
-          backgroundColor: [
-            {# Flag colors on purpose: the one place where many colors carry meaning #}{% for country, count, color in country_distribution_all %}{{ color | tojson }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-          position: 'right',
-          labels: {
-            boxWidth: 0,
-            padding: 8,
-            fontSize: 11,
-            generateLabels: function(chart) {
-              var data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                return data.labels.map(function(label, i) {
-                  var dataset = data.datasets[0];
-                  return {
-                    text: label + ' (' + dataset.data[i] + ')',
-                    fillStyle: 'transparent',
-                    strokeStyle: 'transparent',
-                    lineWidth: 0,
-                    hidden: false,
-                    index: i
-                  };
-                });
-              }
-              return [];
-            }
-          }
-        },
-        tooltips: {
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var dataset = data.datasets[tooltipItem.datasetIndex];
-              var total = dataset.data.reduce((a, b) => a + b, 0);
-              var currentValue = dataset.data[tooltipItem.index];
-              var percentage = Math.round((currentValue / total) * 100);
-              return data.labels[tooltipItem.index] + ': ' + currentValue + ' players (' + percentage + '%)';
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // Country Distribution Pie Chart - Top 11 Players
-  var ctx6 = document.getElementById('countryDistributionTop11Chart');
-  if (ctx6) {
-    new Chart(ctx6, {
-      type: 'pie',
-      data: {
-        labels: [
-          {% for country, count, color in country_distribution_top11 %}
-          '{{ country|safe }}'{% if not loop.last %},{% endif %}
-          {% endfor %}
-        ],
-        datasets: [{
-          data: [
-            {% for country, count, color in country_distribution_top11 %}
-            {{ count }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          ],
-          backgroundColor: [
-            {# Flag colors on purpose: the one place where many colors carry meaning #}{% for country, count, color in country_distribution_top11 %}{{ color | tojson }}{% if not loop.last %},{% endif %}
-            {% endfor %}
-          ]
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-          position: 'right',
-          labels: {
-            boxWidth: 0,
-            padding: 8,
-            fontSize: 11,
-            generateLabels: function(chart) {
-              var data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                return data.labels.map(function(label, i) {
-                  var dataset = data.datasets[0];
-                  return {
-                    text: label + ' (' + dataset.data[i] + ')',
-                    fillStyle: 'transparent',
-                    strokeStyle: 'transparent',
-                    lineWidth: 0,
-                    hidden: false,
-                    index: i
-                  };
-                });
-              }
-              return [];
-            }
-          }
-        },
-        tooltips: {
-          callbacks: {
-            label: function(tooltipItem, data) {
-              var dataset = data.datasets[tooltipItem.datasetIndex];
-              var total = dataset.data.reduce((a, b) => a + b, 0);
-              var currentValue = dataset.data[tooltipItem.index];
-              var percentage = Math.round((currentValue / total) * 100);
-              return data.labels[tooltipItem.index] + ': ' + currentValue + ' players (' + percentage + '%)';
-            }
-          }
-        }
-      }
-    });
-  }
-
-
-
+  doughnut('compositionChart', charts.composition, 'Squad Composition by Best Position');
+  doughnut('ageGroupsChart', charts.age_groups, 'Team Age Distribution');
+  ageBars('ageDistributionAllChart', charts.ages_all);
+  ageBars('ageDistributionTop11Chart', charts.ages_top11);
+  countryPie('countryDistributionAllChart', charts.countries_all);
+  countryPie('countryDistributionTop11Chart', charts.countries_top11);
 });
   </script>
 {% endblock %}
 {% block content %}
   {% from "_page.html" import page_header %}
+  {% macro skill_averages_card(title, averages) %}
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-header py-2">
+          <h6 class="mb-0">{{ title }}</h6>
+        </div>
+        <div class="card-body p-2">
+          {% if averages %}
+            {% set labels = skill_labels() %}
+            <table class="table-custom">
+              <tbody>
+                {% for skill, avg in averages.items() %}
+                  <tr>
+                    <td class="text-small">{{ labels.get(skill, skill) }}</td>
+                    <td class="text-small">{{ avg }}</td>
+                    <td class="text-small" style="width: 80%">
+                      <div class="progress" style="height: 13px;">
+                        <div class="progress-bar"
+                             role="progressbar"
+                             style="width: {{ (avg / 20 * 100)|round(1) }}%"
+                             aria-valuenow="{{ (avg / 20 * 100)|round(1) }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100"></div>
+                      </div>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p class="text-muted small mb-0">No skill data available</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endmacro %}
   <div class="container">
     {{ page_header([(teamname, '/') , (title, None)]) }}
     {% if error %}
@@ -439,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Current Competition Status -->
     <div class="row mb-3 g-2">
       <!-- Team Kits Section - Half Width -->
-      {% if competition_info and (competition_info.logo_url or competition_info.dress_uri or competition_info.dress_alternate_uri) %}
+      {% if competition_info and (competition_info.logo_url or competition_info.dress_uri) %}
         <div class="col-md-6">
           <div class="card border-info h-100">
             <div class="card-body p-2">
@@ -467,17 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
                          style="max-height: 70px">
                   </div>
                 {% endif %}
-                {% if competition_info.dress_alternate_uri %}
-                  <div class="col-4">
-                    <p class="small mb-1">
-                      <strong>Away</strong>
-                    </p>
-                    <img src="{{ competition_info.dress_alternate_uri }}"
-                         alt="Away Kit"
-                         class="img-fluid"
-                         style="max-height: 70px">
-                  </div>
-                {% endif %}
               </div>
             </div>
           </div>
@@ -493,8 +177,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <strong>{{ competition_info.league_name }}</strong>
                 <br>
                 Level {{ competition_info.league_level }}
-                <br>
-                <span class="text-muted">{{ competition_info.league_level_unit_name or 'N/A' }}</span>
               </p>
             </div>
           </div>
@@ -508,14 +190,6 @@ document.addEventListener('DOMContentLoaded', function() {
               <h6 class="card-title mb-2 small">📊 Power</h6>
               <p class="card-text small mb-0" style="line-height: 1.4;">
                 <strong>{{ competition_info.power_rating }}</strong>
-                <br>
-                {% if competition_info.power_rating_global_ranking %}
-                  Global: #{{ competition_info.power_rating_global_ranking }}
-                  <br>
-                {% endif %}
-                {% if competition_info.power_rating_league_ranking %}
-                  League: #{{ competition_info.power_rating_league_ranking }}
-                {% endif %}
               </p>
             </div>
           </div>
@@ -585,14 +259,14 @@ document.addEventListener('DOMContentLoaded', function() {
       <div class="col-md-6">
         <div class="card">
           <div class="card-body p-3">
-            <canvas id="ageChart" width="400" height="300"></canvas>
+            <canvas id="compositionChart" width="400" height="300"></canvas>
           </div>
         </div>
       </div>
       <div class="col-md-6">
         <div class="card">
           <div class="card-body p-3">
-            <canvas id="matchResultsChart" width="400" height="300"></canvas>
+            <canvas id="ageGroupsChart" width="400" height="300"></canvas>
           </div>
         </div>
       </div>
@@ -619,10 +293,10 @@ document.addEventListener('DOMContentLoaded', function() {
                   {% for player in top_scorers %}
                     <tr>
                       <td>{{ player.first_name }} {{ player.last_name }}</td>
-                      <td>{{ (player.current_team_goals or player.goals_current_team or player.career_goals) or 0 }}</td>
-                      <td>{{ (player.current_team_matches or player.matches_current_team) or 0 }}</td>
+                      <td>{{ player.current_team_goals or 0 }}</td>
+                      <td>{{ player.current_team_matches or 0 }}</td>
                       <td>
-                        {{ "%.2f"|format(((player.current_team_goals or player.goals_current_team or player.career_goals) or 0) / ((player.current_team_matches or player.matches_current_team) or 1)) if ((player.current_team_matches or player.matches_current_team) or 0) > 0 else "N/A" }}
+                        {{ "%.2f"|format((player.current_team_goals or 0) / player.current_team_matches) if player.current_team_matches else "N/A" }}
                       </td>
                     </tr>
                   {% endfor %}
@@ -668,124 +342,10 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
     </div>
-    <!-- Match Statistics - Hidden until data is available
-  <div class="row mb-3">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header py-2">
-          <h6 class="mb-0">Match Statistics (Last 10 Games)</h6>
-        </div>
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-md-2">
-              <strong>{{ match_stats.total_matches or 0 }}</strong><br>
-              <small class="text-muted">Total Matches</small>
-            </div>
-            <div class="col-md-2">
-              <strong>{{ match_stats.wins or 0 }}</strong><br>
-              <small class="text-muted">Wins</small>
-            </div>
-            <div class="col-md-2">
-              <strong>{{ match_stats.draws or 0 }}</strong><br>
-              <small class="text-muted">Draws</small>
-            </div>
-            <div class="col-md-2">
-              <strong>{{ match_stats.losses or 0 }}</strong><br>
-              <small class="text-muted">Losses</small>
-            </div>
-            <div class="col-md-2">
-              <strong>{{ match_stats.goals_for or 0 }}</strong><br>
-              <small class="text-muted">Goals For</small>
-            </div>
-            <div class="col-md-2">
-              <strong>{{ match_stats.goal_difference or 0 }}</strong><br>
-              <small class="text-muted">Goal Diff</small>
-            </div>
-          </div>
-          {% if match_stats.total_matches > 0 %}
-          <div class="mt-3">
-            <div class="progress">
-              <div class="progress-bar bg-success" role="progressbar" style="width: {{ (match_stats.wins / match_stats.total_matches * 100) }}%">
-                Win Rate: {{ match_stats.win_percentage }}%
-              </div>
-            </div>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
--->
     <!-- Team Skill Averages -->
     <div class="row mb-3 g-2">
-      <!-- All Players Skill Averages - Half Width -->
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header py-2">
-            <h6 class="mb-0">Team Skill Averages</h6>
-          </div>
-          <div class="card-body p-2">
-            {% if team_stats.skill_averages %}
-              <table class="table-custom">
-                <tbody>
-                  {% for skill, avg in team_stats.skill_averages.items() %}
-                    <tr>
-                      <td class="text-small text-capitalize">{{ skill.replace('_', ' ') }}</td>
-                      <td class="text-small">{{ avg }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ (avg / 20 * 100)|round(1) }}%"
-                               aria-valuenow="{{ (avg / 20 * 100)|round(1) }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted small mb-0">No skill data available</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      <!-- Top 11 TSI Players Skill Averages - Half Width -->
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-header py-2">
-            <h6 class="mb-0">Top 11 Players Skill Averages</h6>
-          </div>
-          <div class="card-body p-2">
-            {% if top_11_skill_averages %}
-              <table class="table-custom">
-                <tbody>
-                  {% for skill, avg in top_11_skill_averages.items() %}
-                    <tr>
-                      <td class="text-small text-capitalize">{{ skill.replace('_', ' ') }}</td>
-                      <td class="text-small">{{ avg }}</td>
-                      <td class="text-small" style="width: 80%">
-                        <div class="progress" style="height: 13px;">
-                          <div class="progress-bar"
-                               role="progressbar"
-                               style="width: {{ (avg / 20 * 100)|round(1) }}%"
-                               aria-valuenow="{{ (avg / 20 * 100)|round(1) }}"
-                               aria-valuemin="0"
-                               aria-valuemax="100"></div>
-                        </div>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p class="text-muted small mb-0">No skill data available</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
+      {{ skill_averages_card('Team Skill Averages', team_stats.skill_averages) }}
+      {{ skill_averages_card('Top 11 Players Skill Averages', top_11_skill_averages) }}
     </div>
     <!-- Age Distribution -->
     <div class="row mb-3 g-2">
@@ -846,22 +406,17 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-md-3">
-                <strong>{{ team_stats.total_career_goals or 0 }}</strong>
-                <br>
-                <small class="text-muted">Total Career Goals</small>
-              </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <strong>{{ team_stats.total_matches or 0 }}</strong>
                 <br>
                 <small class="text-muted">Total Team Matches</small>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <strong>{{ team_stats.goals_per_match or 0 }}</strong>
                 <br>
                 <small class="text-muted">Goals per Match</small>
               </div>
-              <div class="col-md-3">
+              <div class="col-md-4">
                 <strong>{{ "{:,}".format(team_stats.avg_wage|int) if team_stats.avg_wage else 0 }}</strong>
                 <br>
                 <small class="text-muted">Average Wage</small>

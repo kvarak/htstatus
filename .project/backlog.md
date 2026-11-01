@@ -13,11 +13,14 @@
 
 ## P2: Worth doing 🎯
 
-*Nothing right now*
+- **[REFACTOR-121]** `app/utils.py` (~1460 lines) mixes match downloading/CHPP enhancement (`downloadMatches`, `downloadRecentMatches`, `fetch_enhanced_match_data`, `_process_matches_enhanced`) with small helpers; move the match download code to its own module so utils is just helpers
+- **[REFACTOR-122]** Blueprints get `db`/columns through `setup_*_blueprint()` module globals (9 blueprints plus `initialize_utils`); import `db` and `app.constants` directly like `series`/`stats` do. Auth's injected `app`, `consumer_key` and `consumer_secret` are never read
 
 ## P3: When you're in that code anyway 🔧
 
 - **[REFACTOR-120]** Feedback blueprint checks `access_key`/`current_user_id` by hand in 5 routes; use `@require_authentication` (and `get_current_user()`) like the other blueprints
+- **[REFACTOR-123]** Route handlers of 110-170 lines (`main.settings`, `player.player`, `training.training`, `compare.compare_players`, `api.bulk_assign_players`, `main.admin`); pull the data preparation into tested helpers (like `app/team_stats.py`) when changing them
+- **[TEST-119]** Overlapping test files (`test_utils`/`test_utils_simple`/`test_utils_coverage`/`test_utils_formatting`, `test_auth`/`test_auth_coverage`) with mock-heavy tests that pin implementation; merge per module and keep the behaviour tests
 
 ---
 

@@ -1,24 +1,16 @@
 """Player management routes blueprint for HT Status application."""
 
-import math
-
 from flask import Blueprint, request, session
 
 from app import transfers
 from app.auth_utils import (
+    current_team,
     get_current_user,
-    get_team_info,
-    get_user_teams,
     require_authentication,
     track_activity,
+    WRONG_TEAM,
 )
 from app.columns import user_columns
-from app.error_handlers import (
-    handle_error,
-    TeamAccessError,
-    validate_team_id,
-    ValidationError,
-)
 from app.utils import create_page, dprint, get_training
 
 # Create Blueprint for player routes
@@ -89,21 +81,9 @@ def player():
     playerid = request.form.get("playerid")
     groupid = request.form.get("groupid")
 
-    teamid = request.values.get("id")
-
-    try:
-        teamid = validate_team_id(teamid if teamid else request.form.get("id"))
-    except ValidationError as e:
-        return handle_error(e)
-
-    dprint(1, teamid)
-
-    # Validate team access using consolidated function
-    all_teams, all_team_names = get_user_teams()
-    is_valid, teamname, error_msg = get_team_info(teamid, (all_teams, all_team_names))
-
-    if not is_valid:
-        return handle_error(TeamAccessError(error_msg))
+    teamid, teamname = current_team()
+    if teamid is None:
+        return create_page(template="main.html", title="Players", error=WRONG_TEAM)
 
     # Get 4-week timeline for this team
     from app.utils import get_team_timeline
@@ -198,28 +178,14 @@ def player():
     user = get_current_user()
     columns = user_columns(user)
 
-    # Import calculateContribution from routes module for backward compatibility
-    from app.utils import calculateContribution, calculateManmark
+    from app.utils import best_position, calculateContribution, calculateManmark
 
-    # Calculate contributions
-    for _x, c in columns:
-        if c in calccolumns:
-            for p in players_now:
-                p[c] = calculateContribution(c, p)
-                p["MMC"] = calculateManmark(p)
-
-    for _x, c in columns:
-        for p in players_now:
-            bestposition = "-"
-            bestval = 0
-            for c in calccolumns:
-                tmp = calculateContribution(c, p)
-                if tmp > bestval:
-                    bestposition = c
-                    bestval = tmp
-            p["bestposition"] = bestposition
-            # Form multiplies to skills
-            p["formfactor"] = round(math.pow(((p["form"] - 0.5) / 7), 0.45), 2)
+    shown_calc_columns = [key for _title, key in columns if key in calccolumns]
+    for p in players_now:
+        for key in shown_calc_columns:
+            p[key] = calculateContribution(key, p)
+        p["MMC"] = calculateManmark(p)
+        p["bestposition"] = best_position(p)
 
     # Group the players into groups
     tmp_player = players_now

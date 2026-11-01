@@ -224,7 +224,7 @@ players = team.players()  # Live data from Hattrick
 #### File Organization Rules
 
 **Backend Structure**:
-- `/app/routes_bp.py`: Blueprint organization and registration
+- `/app/factory.py`: App factory, blueprint setup and registration
 - `/app/blueprints/`: Modular route handlers by feature
 - `/models.py`: SQLAlchemy models defining database schema
 - `/config.py`: Configuration management (not tracked in git)

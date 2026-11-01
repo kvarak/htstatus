@@ -2,7 +2,7 @@
 
 from functools import wraps
 
-from flask import g, render_template, session
+from flask import g, render_template, request, session
 
 
 def require_authentication(f):
@@ -93,31 +93,23 @@ def track_activity(activity):
     return decorator
 
 
-def get_user_teams():
-    """Get current user's teams from session.
+WRONG_TEAM = "Wrong teamid, try the links."
 
-    Returns tuple of (team_ids, team_names) for consistent access.
+
+def current_team(raw_id=None):
+    """The requested team if it is one of the user's teams.
+
+    Reads ``id`` from the query string/form unless ``raw_id`` is given.
+    Returns ``(team_id, team_name)``, or ``(None, None)`` for a missing,
+    malformed or foreign team id.
     """
-    return session.get("all_teams", []), session.get("all_team_names", [])
-
-
-def get_team_info(teamid, user_teams=None):
-    """Get team name for given team ID with validation.
-
-    Args:
-        teamid: Team ID to look up
-        user_teams: Optional tuple of (team_ids, team_names)
-
-    Returns:
-        tuple: (is_valid, team_name, error_message)
-    """
-    if user_teams is None:
-        all_teams, all_team_names = get_user_teams()
-    else:
-        all_teams, all_team_names = user_teams
-
-    if teamid not in all_teams:
-        return False, None, "Wrong teamid, try the links."
-
-    team_name = all_team_names[all_teams.index(teamid)]
-    return True, team_name, None
+    if raw_id is None:
+        raw_id = request.values.get("id")
+    try:
+        team_id = int(raw_id)
+    except (TypeError, ValueError):
+        return None, None
+    teams = session.get("all_teams", [])
+    if team_id not in teams:
+        return None, None
+    return team_id, session.get("all_team_names", [])[teams.index(team_id)]

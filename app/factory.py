@@ -1,21 +1,9 @@
 """Flask application factory for HT Status application."""
 
-import importlib.util
-import pkgutil
-
 from dotenv import load_dotenv
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-
-# Python 3.14 removed pkgutil.get_loader; add a minimal shim for Flask/werkzeug
-if not hasattr(pkgutil, "get_loader"):
-
-    def _get_loader(name):
-        spec = importlib.util.find_spec(name)
-        return spec.loader if spec else None
-
-    pkgutil.get_loader = _get_loader  # type: ignore[attr-defined]
 
 # Load environment variables from .env file
 load_dotenv()
@@ -96,11 +84,6 @@ def setup_routes(app_instance, db_instance):
         app_instance, db_instance, app_instance.config.get("DEBUG_LEVEL", 0)
     )
 
-    # Import and initialize blueprint modules
-    from app.routes_bp import initialize_routes as init_routes_bp
-
-    init_routes_bp(app_instance, db_instance)
-
     # Import blueprint functions and blueprints
     from app.api.players import api_bp, setup_api_blueprint
     from app.blueprints.auth import auth_bp, setup_auth_blueprint
@@ -116,10 +99,7 @@ def setup_routes(app_instance, db_instance):
     )
     from app.blueprints.player import player_bp, setup_player_blueprint
     from app.blueprints.series import series_bp
-    from app.blueprints.stats import (
-        setup_stats_blueprint,
-        stats_bp,
-    )
+    from app.blueprints.stats import stats_bp
     from app.blueprints.team import setup_team_blueprint, team_bp
     from app.blueprints.training import setup_training_blueprint, training_bp
 
@@ -129,9 +109,6 @@ def setup_routes(app_instance, db_instance):
         CALC_COLUMNS,
         DEFAULT_COLUMNS,
         DEFAULT_GROUP_ORDER,
-        HT_MATCH_BEHAVIOUR,
-        HT_MATCH_ROLE,
-        HT_MATCH_TYPE,
         TRACE_COLUMNS,
     )
 
@@ -153,11 +130,7 @@ def setup_routes(app_instance, db_instance):
 
     setup_team_blueprint(db_instance)
 
-    setup_matches_blueprint(
-        db_instance, HT_MATCH_TYPE, HT_MATCH_ROLE, HT_MATCH_BEHAVIOUR
-    )
-
-    setup_stats_blueprint(db_instance)
+    setup_matches_blueprint(db_instance)
 
     setup_training_blueprint(db_instance, TRACE_COLUMNS)
 
@@ -269,7 +242,7 @@ def _get_database_migration_status():
         error_msg = str(e)
         if "does not exist" in error_msg:
             return "🔄 Database: Tables not created"
-        elif "connection" in error_msg.lower():
+        if "connection" in error_msg.lower():
             return "❌ Database: Connection failed"
-        elif "Working outside of application" in error_msg:
+        if "Working outside of application" in error_msg:
             return "🔄 Database: Checking after app startup..."

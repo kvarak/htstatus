@@ -12,7 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Calmer dark mode** - near-black neutral surfaces instead of green-tinted ones, softer accents, a fainter background photo and a dim pitch on the formations page
 - **Hattrick terms and level format everywhere** - training, compare, stats, formations and the update timeline now use your Hattrick language and your "show levels as" setting, like the player page
 
+- **Stats page** - "Squad Composition by Best Position" now uses the same best position as the player table (it had its own rough formula); skill averages use Hattrick skill names; the country charts' legend and tooltips work again (counts and percentages); Top Scorers shows goals and matches for your club only instead of mixing in career goals; removed boxes that always showed "N/A"
+- Removed the unused Team page (`/team`) and the debug-only `/debug/session` and `/index` routes
+
 ### Fixed
+- Update: when an update failed, the error page itself crashed (template error), so you got a generic server error instead of the reason; it now shows the error and its details
+- Welcome tour: the steps pointing at the team menu found nothing and were skipped
+- Pages given a non-numeric team id (`?id=abc`) crashed instead of saying "Wrong teamid"
+- Home page no longer loads every user from the database just to count them
 - Players page: "Assign to group" for selected players failed with a server error (nested database transaction); failures now show a message instead of only logging "undefined"
 - Offline/PWA: our own CSS/JS are now fetched fresh after a deploy (service worker no longer serves stale files); its pre-cache no longer lists files that don't exist
 - Compare page loaded a second, unpinned copy of Chart.js

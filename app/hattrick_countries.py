@@ -388,57 +388,6 @@ COUNTRIES = {
 }
 
 
-def get_country_name(country_id):
-    """
-    Get country name from Hattrick country ID.
-
-    Args:
-        country_id (int): Hattrick country ID
-
-    Returns:
-        str: Country name or 'Unknown' if ID not found
-    """
-    if country_id is None:
-        return "Unknown"
-
-    country_data = COUNTRIES.get(country_id)
-    return country_data["name"] if country_data else "Unknown"
-
-
-def get_country_flag(country_id):
-    """
-    Get country flag emoji from Hattrick country ID.
-
-    Args:
-        country_id (int): Hattrick country ID
-
-    Returns:
-        str: Country flag emoji or '🏳️' if ID not found
-    """
-    if country_id is None:
-        return "🏳️"
-
-    country_data = COUNTRIES.get(country_id)
-    return country_data["flag"] if country_data else "🏳️"
-
-
-def get_country_color(country_id):
-    """
-    Get country color from Hattrick country ID.
-
-    Args:
-        country_id (int): Hattrick country ID
-
-    Returns:
-        str: Country color hex code or '#6B7280' (gray) if ID not found
-    """
-    if country_id is None:
-        return "#6B7280"
-
-    country_data = COUNTRIES.get(country_id)
-    return country_data.get("color", "#6B7280") if country_data else "#6B7280"
-
-
 def get_country_info(country_id):
     """
     Get complete country information from Hattrick country ID.
@@ -459,8 +408,7 @@ def get_country_info(country_id):
             "flag": country_data["flag"],
             "color": country_data.get("color", "#6B7280"),
         }
-    else:
-        return {"name": "Unknown", "flag": "🏳️", "color": "#6B7280"}
+    return {"name": "Unknown", "flag": "🏳️", "color": "#6B7280"}
 
 
 def get_country_display(country_id, include_flag=True):
@@ -478,5 +426,4 @@ def get_country_display(country_id, include_flag=True):
 
     if include_flag:
         return f"{country_info['flag']} {country_info['name']}"
-    else:
-        return country_info["name"]
+    return country_info["name"]

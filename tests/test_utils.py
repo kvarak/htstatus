@@ -11,26 +11,15 @@ from app.utils import (
     calculateContribution,
     calculateManmark,
     create_page,
-    debug_print,
     diff,
     diff_month,
     dprint,
     get_admin_feedback_counts,
-    get_team_match_statistics,
     get_team_timeline,
     get_training,
     get_version_info,
     initialize_utils,
-    player_daily_changes,
-    player_diff,
 )
-
-
-def test_module_imports():
-    """Test that utils module imports without errors."""
-    import app.utils
-
-    assert app.utils is not None
 
 
 class TestInitializeUtils:
@@ -81,26 +70,6 @@ class TestDebugPrint:
         dprint(1, "test", "message")
 
         mock_print.assert_called_once()
-
-    @patch("app.utils.debug_level", 2)
-    @patch("builtins.print")
-    def test_debug_print_enhanced_format(self, mock_print):
-        """Test debug_print with enhanced route formatting."""
-        debug_print("test_route", "test_function", "arg1", "arg2")
-
-        mock_print.assert_called_once()
-        args = str(mock_print.call_args)
-        assert "test_route::test_function()" in args
-        assert "arg1" in args
-        assert "arg2" in args
-
-    @patch("app.utils.debug_level", 1)
-    @patch("builtins.print")
-    def test_debug_print_doesnt_print_low_level(self, mock_print):
-        """Test debug_print doesn't print when debug level too low."""
-        debug_print("test_route", "test_function", "arg1")
-
-        mock_print.assert_not_called()
 
 
 class TestDateUtilities:
@@ -612,11 +581,6 @@ class TestAdminFeedbackCounts:
 class TestTeamTimeline:
     """Test get_team_timeline function."""
 
-    def test_get_team_timeline_imports(self):
-        """Test that get_team_timeline can be imported."""
-        assert get_team_timeline is not None
-        assert callable(get_team_timeline)
-
     def test_get_team_timeline_empty_team(self, app, db_session):
         """Test get_team_timeline with team that has no players."""
 
@@ -813,53 +777,6 @@ class TestUtilityFunctions:
         assert calculateContribution("CD", {"defender": None}) == 0.0
 
 
-class TestTrainingFunctions:
-    """Test training-related utility functions."""
-
-    def test_get_training_empty_data(self):
-        """Test get_training with empty player data."""
-        result = get_training([])
-
-        # Should handle empty input gracefully
-        assert result is not None
-
-    def test_get_training_with_data(self):
-        """Test get_training with sample player data."""
-        # Create mock player data
-        player_data = [Mock()]
-        player_data[0].playername = "Test Player"
-        player_data[0].age = 20
-
-        result = get_training(player_data)
-
-        # Should process player data
-        assert result is not None
-
-
-class TestPlayerDiff:
-    """Test player_diff and related functions."""
-
-    def test_player_diff_basic(self):
-        """Test player_diff function basic functionality."""
-        # This function may require database access, test basic call
-        try:
-            result = player_diff(12345, 7)
-            # Function should return some result structure
-            assert result is not None
-        except Exception:
-            # Expected in test environment without real data
-            pass
-
-    def test_player_daily_changes_basic(self):
-        """Test player_daily_changes function."""
-        try:
-            result = player_daily_changes(12345, 7)
-            assert result is not None
-        except Exception:
-            # Expected in test environment without real data
-            pass
-
-
 class TestPlayerUtilityFunctions:
     """Test player utility functions."""
 
@@ -877,107 +794,5 @@ class TestPlayerUtilityFunctions:
         assert len(result2) > 0
 
 
-class TestTeamStatistics:
-    """Test team statistics functions."""
-
-    def test_calculate_team_statistics_empty(self):
-        """Test calculate_team_statistics with empty players."""
-        from app.utils import calculate_team_statistics
-
-        result = calculate_team_statistics([])
-        assert isinstance(result, dict)
-
-    def test_calculate_team_statistics_with_players(self):
-        """Test calculate_team_statistics with mock players."""
-        from app.utils import calculate_team_statistics
-
-        # Create mock players
-        player1 = Mock()
-        player1.age = 25
-        player1.form = 7
-        player1.stamina = 8
-
-        player2 = Mock()
-        player2.age = 22
-        player2.form = 6
-        player2.stamina = 9
-
-        players = [player1, player2]
-        result = calculate_team_statistics(players)
-
-        assert isinstance(result, dict)
-
-    def test_get_top_scorers_empty(self):
-        """Test get_top_scorers with empty players."""
-        from app.utils import get_top_scorers
-
-        result = get_top_scorers([])
-        assert isinstance(result, list)
-        assert len(result) == 0
-
-    def test_get_top_scorers_with_players(self):
-        """Test get_top_scorers with mock players."""
-        from app.utils import get_top_scorers
-
-        # Create mock players with scoring stats
-        player1 = Mock()
-        player1.playername = "Striker One"
-        player1.goals = 15
-        player1.matches = 10
-
-        player2 = Mock()
-        player2.playername = "Striker Two"
-        player2.goals = 8
-        player2.matches = 12
-
-        players = [player1, player2]
-        result = get_top_scorers(players, limit=2)
-
-        assert isinstance(result, list)
-
-    def test_get_top_performers_empty(self):
-        """Test get_top_performers with empty players."""
-        from app.utils import get_top_performers
-
-        result = get_top_performers([])
-        assert isinstance(result, list)
-        assert len(result) == 0
-
-    def test_get_top_performers_with_players(self):
-        """Test get_top_performers with mock players."""
-        from app.utils import get_top_performers
-
-        # Create mock players with proper tsi attribute
-        player1 = Mock()
-        player1.playername = "Star Player"
-        player1.form = 8
-        player1.experience = 7
-        player1.tsi = 1000  # Proper integer value for comparison
-
-        players = [player1]
-        result = get_top_performers(players, limit=1)
-
-        assert isinstance(result, list)
-
-
-class TestTeamMatchStatistics:
-    """Test team match statistics."""
-
-    def test_get_team_match_statistics_basic(self):
-        """Test get_team_match_statistics function."""
-        try:
-            result = get_team_match_statistics(12345)
-            assert result is not None
-        except Exception:
-            # Expected in test environment without database
-            pass
-
-
 class TestDefaultGroups:
     """Test default group creation."""
-
-    def test_create_default_groups_function_exists(self):
-        """Test that create_default_groups function exists."""
-        from app.utils import create_default_groups
-
-        assert callable(create_default_groups)

@@ -1,100 +1,18 @@
 {% extends 'base.html' %}
-{% block scripts %}{{ super() }}{% endblock %}
-{% endblock %}
 {% block content %}
   {% from "_page.html" import page_header %}
   <div class="update-content">
     <div class="container">
       {{ page_header([(title, None) ]) }}
-      <!-- Status Messages -->
-      {% if error %}
-        <div class="status-message status-error">
-          <strong>{{ error }}</strong>
-          <p style="margin: 0.25rem 0 0 0; font-size: 0.8rem;">{{ timenow }} • {{ fullversion }}</p>
-        </div>
-      {% else %}
-        <div class="status-message status-success">✓ Data downloaded successfully</div>
-      {% endif %}
-      <!-- Players Left -->
-      {% if left_players %}
-        {% for pl in left_players %}
-          <div class="status-message status-warning">⚠ {{ pl[1] }} is no longer in {{ pl[0] }}</div>
-        {% endfor %}
-      {% endif %}
-      <!-- New Players -->
-      {% if new_players %}
-        {% for pl in new_players %}
-          <div class="status-message status-success">✓ {{ pl[1] }} is now playing for {{ pl[0] }}</div>
-        {% endfor %}
-      {% endif %}
-      <!-- Changes Report -->
-      {% if not(error) %}
-        {% if updated %}
-          <!-- Updated Teams -->
-          <div class="updated-teams-box">
-            {% for key, value in updated.items() %}
-              <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-                <span class="font-weight-bold text-primary">{{ value[0] }}:</span>
-                <a href="{{ value[1] }}" class="team-link">{{ value[2] }}</a>
-              </p>
-            {% endfor %}
-          </div>
-          <hr class="divider">
-          <!-- Changes Container -->
-          {% if changes_week or changes_day %}
-            <div class="changes-container">
-              <div class="changes-container-title">Changes</div>
-              <!-- Changes Since Yesterday -->
-              {% if changes_day %}
-                <div class="changes-section">
-                  <div class="changes-section-label">Since yesterday (or previous update)</div>
-                  <div class="changes-box">
-                    {% for cplayer in changes_day %}
-                      <div class="player-entry">
-                        <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
-                        {% for c in cplayer[1:] %}
-                          <div class="skill-item">
-                            {% if c[5] > c[4] %}
-                              <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                            {% else %}
-                              <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                            {% endif %}
-                          </div>
-                        {% endfor %}
-                      </div>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% endif %}
-              <!-- Changes Since One Week Ago -->
-              {% if changes_week %}
-                <div class="changes-section">
-                  <div class="changes-section-label">Since a week ago (or earlier)</div>
-                  <div class="changes-box">
-                    {% for cplayer in changes_week %}
-                      <div class="player-entry">
-                        <div class="player-name">{{ cplayer[0][0] }}: {{ cplayer[0][1] }} {{ cplayer[0][2] }}</div>
-                        {% for c in cplayer[1:] %}
-                          <div class="skill-item">
-                            {% if c[5] > c[4] %}
-                              <span class="skill-up">📈 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                            {% else %}
-                              <span class="skill-down">📉 {{ c[3] }}: {{ c[4] }} → {{ c[5] }}</span>
-                            {% endif %}
-                          </div>
-                        {% endfor %}
-                      </div>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% else %}
-                {% if not changes_day %}
-                  <div class="empty-state">No player changes recorded</div>
-                {% endif %}
-              {% endif %}
-            </div>
-          {% endif %}
-        {% endif %}
+      <div class="status-message status-error">
+        <strong>{{ error }}</strong>
+        <p class="small mb-0 mt-1">{{ timenow }} • {{ fullversion }}</p>
+      </div>
+      {% if errorinfo %}
+        <details class="mt-3">
+          <summary>Details</summary>
+          <pre class="small mt-2">{{ errorinfo }}</pre>
+        </details>
       {% endif %}
     </div>
   </div>

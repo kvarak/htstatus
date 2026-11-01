@@ -103,3 +103,10 @@ def test_formations_tooltip_levels_follow_setting(french_words_client):
     html = french_words_client.get(PAGES["formations"]).get_data(as_text=True)
     assert '"7": "honorable"' in html
     assert "levelText(data.keeper || 0)" in html
+
+
+def test_all_templates_compile(app_with_routes):
+    """A syntax error in a rarely rendered template (e.g. update_error) must fail CI."""
+    env = app_with_routes.jinja_env
+    for name in env.list_templates(filter_func=lambda n: n.endswith(".html")):
+        env.get_template(name)

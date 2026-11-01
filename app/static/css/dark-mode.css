@@ -252,9 +252,6 @@ html.dark-mode table.sortable thead {
   color: var(--dm-text-muted);
 }
 
-html.dark-mode .section-title,
-html.dark-mode .section-subtitle,
-html.dark-mode .changes-container,
 html.dark-mode .status-message,
 html.dark-mode .updated-teams-box,
 html.dark-mode .positioned-player {
@@ -272,7 +269,6 @@ html.dark-mode .available-player {
 html.dark-mode .week-header,
 html.dark-mode .player-entry,
 html.dark-mode .no-changes,
-html.dark-mode .filter-controls,
 html.dark-mode .group-pill,
 html.dark-mode .available-player:hover {
   background: var(--dm-surface-muted);

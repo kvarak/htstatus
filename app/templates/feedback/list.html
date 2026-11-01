@@ -119,7 +119,7 @@
                     <div class="ml-3 text-center" style="min-width: 80px;">
                       <button type="button"
                               class="btn btn-sm {% if user_votes.get(feedback.id) == 'up' %}btn-success{% else %}btn-outline-success{% endif %}"
-                              onclick="event.preventDefault(); event.stopPropagation(); vote({{ feedback.id }}, 'up')"
+                              onclick="event.preventDefault(); event.stopPropagation(); vote(this, {{ feedback.id }})"
                               title="{% if user_votes.get(feedback.id) == 'up' %}Remove your upvote{% else %}Upvote this feedback{% endif %}">
                         ↑ <i class="fas fa-thumbs-up"></i>
                       </button>
@@ -202,39 +202,5 @@
       </div>
     </div>
   </div>
-  <script>
-function vote(feedbackId, voteType) {
-  fetch(`/feedback/${feedbackId}/vote`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({vote_type: voteType})
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // Update vote score
-      document.getElementById(`score-${feedbackId}`).textContent = data.vote_score;
-
-      // Update button state
-      const upBtn = document.querySelector(`button[onclick*="vote(${feedbackId}"]`);
-
-      // Reset button state
-      upBtn.className = upBtn.className.replace('btn-success', 'btn-outline-success');
-
-      // Set active state and tooltip based on vote
-      if (data.user_vote === 'up') {
-        upBtn.className = upBtn.className.replace('btn-outline-success', 'btn-success');
-        upBtn.title = 'Remove your upvote';
-      } else {
-        upBtn.title = 'Upvote this feedback';
-      }
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
-  </script>
+  <script src="{{ url_for('static', filename='js/feedback-vote.js') }}"></script>
 {% endblock %}

@@ -1,74 +1,6 @@
 /* UI Components - Reusable interface elements */
 /* Used across multiple templates for consistent styling */
 
-/* Section Headers */
-.section-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: hsl(var(--primary));
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    background: hsl(var(--card));
-    padding: 0.75rem;
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.25rem;
-}
-
-.section-subtitle {
-    font-size: 0.8rem;
-    color: hsl(var(--muted-foreground));
-    font-style: italic;
-    background: hsl(var(--card));
-    padding: 0.5rem 0.75rem;
-    border: 1px solid hsl(var(--border));
-    border-top: none;
-    border-radius: 0 0 0.25rem 0.25rem;
-    margin: 0 0 0.75rem 0;
-}
-
-/* Content Containers */
-.changes-box {
-    background: hsl(var(--muted));
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.25rem;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.changes-container {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.25rem;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.changes-container-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: hsl(var(--primary));
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid hsl(var(--border));
-}
-
-.changes-section {
-    margin-bottom: 1rem;
-}
-
-.changes-section:last-child {
-    margin-bottom: 0;
-}
-
-.changes-section-label {
-    font-size: 0.85rem;
-    color: hsl(var(--muted-foreground));
-    font-style: italic;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid hsl(var(--border));
-}
-
 .updated-teams-box p {
     margin: 0.5rem 0;
     font-size: 0.9rem;
@@ -110,14 +42,6 @@
     font-weight: 600;
     color: hsl(var(--primary));
     font-size: 0.875rem;
-}
-
-.match-row {
-    transition: background-color 0.15s ease-in-out;
-}
-
-.match-row:hover {
-    background-color: hsl(var(--muted)) !important;
 }
 
 .badge {

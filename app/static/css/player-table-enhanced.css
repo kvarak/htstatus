@@ -121,26 +121,6 @@
   border-color: hsl(var(--accent2));
 }
 
-/* Loading state for bulk operations */
-.bulk-loading {
-  position: relative;
-  pointer-events: none;
-}
-
-.bulk-loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: hsl(var(--background) / 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-}
-
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
   #filter-toolbar .row > div {
@@ -159,19 +139,6 @@
   .player-checkbox {
     transform: scale(1.3); /* Larger for touch screens */
   }
-}
-
-/* Filter active states */
-.filter-active {
-  background-color: hsl(var(--accent2) / 0.1);
-  border-color: hsl(var(--accent2));
-}
-
-/* Player comparison specific styles */
-.comparison-highlight {
-  background-color: hsl(var(--success) / 0.1);
-  color: hsl(var(--success));
-  font-weight: var(--font-weight-semibold);
 }
 
 /* Accessibility improvements */

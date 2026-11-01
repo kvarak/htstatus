@@ -4,18 +4,6 @@
   <div class="container">
     {{ page_header([('Hattrick Planner', None) ]) }}
     {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
-    <!-- <div class="alert alert-warning" role="alert">
-    <p class="card-text">
-      Welcome and thanks for checking this tools out. I'm hoping that it can help you organize
-      your team, players, matches and training. It's always under development and still ongoing
-      changes now and then, so expect changes.
-    </p>
-    <p class="card-text">
-      Start by clicking "Update data" and then you can view your players in the players section.
-      Don't forget to go to "Settings" to add groups, so that you can arrange your players in a much
-      nicer player view.
-    </p>
-</div> -->
     <div class="row">
       <div class="col-md-7">
         <div class="card mb-3">
@@ -109,82 +97,6 @@
             {% endif %}
           </div>
         </div>
-      </div>
-    </div>
-    <!-- Break -->
-    <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
-    <!-- <div class="alert alert-warning" role="alert">
-    <b>Note:</b> Match retrievals have temporarily been put on hold, they take too much
-    bandwidth, maybe they'll come back in the future.
-</div> -->
-    <!-- Break -->
-    <!-- <div class="row"><div class="col-sm"><p></p></div></div> -->
-    <!-- <div class="row"> -->
-    <!-- {% if current_user and changesteams %}
-    {% for id, team in changesteams.items() %}
-    <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">{{ updated[id] }}</h5>
-            <p class="card-text text-sm13">
-              <p class="text-sm13"><i>Changes since one week ago</i></p>
-              <p class="text-sm11"><i>(Or since the previous update)</i></p>
-              <p class="text-sm11">
-                {% for change in team %}
-                  {{ change[0][1] }} {{ change[0][2] }}:
-                  {% for c in change %}
-                    {% if c[5] > c[4] %}
-                      {% set color = "green" %}
-                    {% else %}
-                      {% set color = "red" %}
-                    {% endif %}
-                    <font color="{{ color }}">({{ c[3] }}) {{ c[4] }} -> {{ c[5] }}</font>
-                  {% endfor %}
-                  </br>
-                {% endfor %}
-              </p>
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted"><i><a href="/player?id={{ id }}">{{ updated[id] }}</a></i></small>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-{% endif %} -->
-    <!-- <div class="col-sm">
-      <div class="card-deck">
-        <div class="card">
-          <div class="card-body">
-            <p class="card-text text-sm11"><b>Thanks to</b><br>
-              - <a href="http://www.hattrick.org/">Hattrick</a><br>
-              - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
-            </p>
-            <p class="card-text text-sm11"><b>Beta testers</b><br>
-              - <a href="https://www.hattrick.org/en/Club/Manager/?userId=10507783">Skjoldar</a><br>
-              - <a href="https://www.hattrick.org/en/Club/Manager/?userId=2570032">cassiolaw</a><br>
-            </p>
-            <p class="card-text text-sm11"><b>Source code</b><br>
-              - <a href="https://github.com/kvarak/htstatus">github/kvarak/htstatus</a><br>
-            </p>
-            <p class="card-text text-sm11"><b>Users</b><br>
-              - Total users: {{ usercount }}<br>
-              - Active users: {{ activeusers }}
-            </p>
-          </div>
-          <div class="card-footer">
-            <small class="text-muted"><i>Full version: {{ fullversion }}</i></small>
-          </div>
-        </div>
-      </div>
-    </div> -->
-    <!-- </div> -->
-    <!-- Break -->
-    <div class="row">
-      <div class="col-sm">
-        <p></p>
       </div>
     </div>
   </div>

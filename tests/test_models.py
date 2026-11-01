@@ -8,20 +8,6 @@ import pytest
 from models import Group, Match, MatchPlay, Players, PlayerSetting, User
 
 
-def test_root_models_imports():
-    """Test that root models module imports without errors."""
-    import models
-
-    assert models is not None
-
-
-def test_chpp_models_imports():
-    """Test that CHPP models module imports without errors."""
-    import app.chpp.models
-
-    assert app.chpp.models is not None
-
-
 class TestUserModel:
     """Test User model functionality."""
 
@@ -52,12 +38,10 @@ class TestUserModel:
         """Test User role getter and setter methods."""
         user = User(12345, "test", "user", "pass", "key", "secret")
 
-        # Test default role
-        assert user.getRole() == ""
+        assert user.role == ""
 
-        # Test setting role
         user.setRole("admin")
-        assert user.getRole() == "admin"
+        assert user.role == "admin"
 
     @pytest.mark.parametrize(
         ("ht_id", "role", "expected"),
@@ -99,7 +83,6 @@ class TestUserModel:
         initial_login = user.c_login
         initial_player = user.c_player
         initial_matches = user.c_matches
-        initial_team = user.c_team
         initial_training = user.c_training
         initial_update = user.c_update
 
@@ -112,9 +95,6 @@ class TestUserModel:
 
         user.matches()
         assert user.c_matches == initial_matches + 1
-
-        user.team()
-        assert user.c_team == initial_team + 1
 
         user.training()
         assert user.c_training == initial_training + 1

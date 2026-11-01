@@ -2,7 +2,6 @@
 {% block scripts %}
   {{ super() }}
   <script>
-  // Initialize data for skill charts using HattrickCharts utility
   const playerCharts = {};
   {% set skill_keys = ["keeper", "defender", "playmaker", "winger", "passing", "scorer", "set_pieces"] %}
   {% set skill_names = skill_labels() %}
@@ -38,22 +37,13 @@
     // Create chart using consolidated utility
     const ctx{{ ht_id }} = document.getElementById('playerChart{{ ht_id }}');
     if (ctx{{ ht_id }} && activeSkills{{ ht_id }}.length > 0) {
-      playerCharts[{{ ht_id }}] = window.hattrickCharts.createMultiSkillChart(
+      playerCharts[{{ ht_id }}] = createMultiSkillChart(
         'playerChart{{ ht_id }}',
         playerData{{ ht_id }},
         activeSkills{{ ht_id }}
       );
     }
   {% endfor %}
-
-  // Search and filter functionality
-  function filterPlayers(query) {
-    const items = document.querySelectorAll('[data-player-item]');
-    items.forEach(item => {
-      const text = item.textContent.toLowerCase();
-      item.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
-    });
-  }
 
   // Player selection
   function selectPlayer(ht_id) {
@@ -85,6 +75,24 @@
   {% set skill_keys = ["keeper", "defender", "playmaker", "winger", "passing", "scorer", "set_pieces"] %}
   {% set skill_names = skill_labels() %}
   {% from "_page.html" import page_header %}
+  {# One "first vs current" row; levels (as_level) use the user's level format #}
+  {% macro change_row(label, first, latest, scale=1, suffix='', as_level=False) %}
+    {% set a = first or 0 %}
+    {% set b = latest or 0 %}
+    {% set diff = b - a %}
+    <tr style="height: 25px;">
+      <td class="text-small">
+        <strong>{{ label }}</strong>
+      </td>
+      <td class="text-small text-center">{{ level_text(a) if as_level else (a // scale) ~ suffix }}</td>
+      <td class="text-small text-center">
+        <span class="{{ 'text-success' if diff > 0 else 'text-danger' if diff < 0 else 'text-muted' }}">
+          {{ level_text(b) if as_level else (b // scale) ~ suffix }}
+          {% if diff %}({{ '+' if diff > 0 }}{{ diff // scale }}{{ suffix }}){% endif %}
+        </span>
+      </td>
+    </tr>
+  {% endmacro %}
   <div class="container">
     {{ page_header([(teamname, '/') , (title, None)]) }}
     {% if error %}
@@ -171,74 +179,10 @@
                                 <td class="text-small text-center">{{ first_player.age_years }}y {{ first_player.age_days }}d</td>
                                 <td class="text-small text-center">{{ latest_player.age_years }}y {{ latest_player.age_days }}d</td>
                               </tr>
-                              <tr style="height: 25px;">
-                                <td class="text-small">
-                                  <strong>TSI</strong>
-                                </td>
-                                <td class="text-small text-center">{{ first_player.tsi|default(0) }}</td>
-                                <td class="text-small text-center">
-                                  {% set tsi_change = latest_player.tsi - first_player.tsi %}
-                                  <span class="{% if tsi_change > 0 %}text-success{% elif tsi_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                                    {{ latest_player.tsi|default(0) }}
-                                    {% if tsi_change != 0 %}
-                                      (
-                                      {% if tsi_change > 0 %}+{% endif %}
-                                      {{ tsi_change }})
-                                    {% endif %}
-                                  </span>
-                                </td>
-                              </tr>
-                              <tr style="height: 25px;">
-                                <td class="text-small">
-                                  <strong>Salary</strong>
-                                </td>
-                                <td class="text-small text-center">{{ (first_player.salary or 0) // 1000 }}k</td>
-                                <td class="text-small text-center">
-                                  {% set salary_change = latest_player.salary - first_player.salary %}
-                                  <span class="{% if salary_change > 0 %}text-success{% elif salary_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                                    {{ (latest_player.salary or 0) // 1000 }}k
-                                    {% if salary_change != 0 %}
-                                      (
-                                      {% if salary_change > 0 %}+{% endif %}
-                                      {{ salary_change // 1000 }}k)
-                                    {% endif %}
-                                  </span>
-                                </td>
-                              </tr>
-                              <tr style="height: 25px;">
-                                <td class="text-small">
-                                  <strong>Experience</strong>
-                                </td>
-                                <td class="text-small text-center">{{ first_player.experience|default(0) }}</td>
-                                <td class="text-small text-center">
-                                  {% set exp_change = latest_player.experience - first_player.experience %}
-                                  <span class="{% if exp_change > 0 %}text-success{% elif exp_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                                    {{ latest_player.experience|default(0) }}
-                                    {% if exp_change != 0 %}
-                                      (
-                                      {% if exp_change > 0 %}+{% endif %}
-                                      {{ exp_change }})
-                                    {% endif %}
-                                  </span>
-                                </td>
-                              </tr>
-                              <tr style="height: 25px;">
-                                <td class="text-small">
-                                  <strong>Career Goals</strong>
-                                </td>
-                                <td class="text-small text-center">{{ first_player.career_goals|default(0) }}</td>
-                                <td class="text-small text-center">
-                                  {% set goals_change = latest_player.career_goals - first_player.career_goals %}
-                                  <span class="{% if goals_change > 0 %}text-success{% elif goals_change < 0 %}text-danger{% else %}text-muted{% endif %}">
-                                    {{ latest_player.career_goals|default(0) }}
-                                    {% if goals_change != 0 %}
-                                      (
-                                      {% if goals_change > 0 %}+{% endif %}
-                                      {{ goals_change }})
-                                    {% endif %}
-                                  </span>
-                                </td>
-                              </tr>
+                              {{ change_row('TSI', first_player.tsi, latest_player.tsi) }}
+                              {{ change_row('Salary', first_player.salary, latest_player.salary, scale=1000, suffix='k') }}
+                              {{ change_row(column_label('Experience', 'experience') , first_player.experience, latest_player.experience, as_level=True) }}
+                              {{ change_row('Career Goals', first_player.career_goals, latest_player.career_goals) }}
                             {% endif %}
                             <tr style="height: 25px;">
                               <td class="text-small">

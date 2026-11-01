@@ -177,8 +177,7 @@ class TestAuthRoutes:
         # Call logout
         response = auth_client.get("/logout")
 
-        # Should redirect (302) or show logout page (200)
-        assert response.status_code in [200, 302]
+        assert response.status_code == 302
 
         # Session should be cleared
         with auth_client.session_transaction() as session:
@@ -186,24 +185,11 @@ class TestAuthRoutes:
             assert session.get("access_secret") is None
             assert session.get("current_user") is None
 
-    def test_protected_route_redirect_unauthenticated(self, auth_client):
-        """Test that protected routes redirect when not authenticated."""
-        # Test accessing a protected route without authentication
-        response = auth_client.get("/team")
-        # The route might return 200 with error message or redirect - both acceptable
-        assert response.status_code in [200, 302, 401, 403]
-
-    def test_protected_route_redirect_settings(self, auth_client):
-        """Test settings route requires authentication."""
-        response = auth_client.get("/settings")
-        # The route might return 200 with error message or redirect - both acceptable
-        assert response.status_code in [200, 302, 401, 403]
-
-    def test_protected_route_redirect_update(self, auth_client):
-        """Test update route requires authentication."""
-        response = auth_client.get("/update")
-        # The route might return 200 with error message or redirect - both acceptable
-        assert response.status_code in [200, 302, 401, 403]
+    @pytest.mark.parametrize("path", ["/series", "/settings", "/update"])
+    def test_protected_routes_forward_to_login(self, auth_client, path):
+        response = auth_client.get(path)
+        assert response.status_code == 200
+        assert b"/login" in response.data
         with auth_client.session_transaction() as session:
             session["access_key"] = "test_access_key"
             session["access_secret"] = "test_access_secret"
@@ -378,7 +364,9 @@ class TestAuthHelpers:
             assert sess["all_team_names"] == ["Nine"]
 
     def test_callback_without_identifiable_user_fails_safely(
-        self, app_with_routes, db_session  # noqa: ARG002
+        self,
+        app_with_routes,
+        db_session,  # noqa: ARG002
     ):
         from unittest.mock import MagicMock, patch
 

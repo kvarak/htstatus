@@ -24,7 +24,8 @@
                 <div class="btn-group-vertical" role="group">
                   <button type="button"
                           class="btn {% if user_vote == 'up' %}btn-success{% else %}btn-outline-success{% endif %}"
-                          onclick="vote({{ feedback.id }}, 'up')"
+                          data-show-label
+                          onclick="vote(this, {{ feedback.id }})"
                           title="{% if user_vote == 'up' %}Remove your upvote{% else %}Upvote this feedback{% endif %}">
                     ↑ <i class="fas fa-thumbs-up"></i>
                     {% if user_vote == 'up' %}
@@ -124,41 +125,5 @@
       </div>
     </div>
   </div>
-  <script>
-function vote(feedbackId, voteType) {
-  fetch(`/feedback/${feedbackId}/vote`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({vote_type: voteType})
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // Update vote score
-      document.getElementById(`score-${feedbackId}`).textContent = data.vote_score;
-
-      // Update button state
-      const upBtn = document.querySelector(`button[onclick="vote(${feedbackId}, 'up')"]`);
-
-      // Reset button state
-      upBtn.className = upBtn.className.replace('btn-success', 'btn-outline-success');
-
-      // Set active state, text, and tooltip based on vote
-      if (data.user_vote === 'up') {
-        upBtn.className = upBtn.className.replace('btn-outline-success', 'btn-success');
-        upBtn.title = 'Remove your upvote';
-        upBtn.innerHTML = '↑ <i class="fas fa-thumbs-up"></i> Remove Upvote';
-      } else {
-        upBtn.title = 'Upvote this feedback';
-        upBtn.innerHTML = '↑ <i class="fas fa-thumbs-up"></i> Upvote';
-      }
-    }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-  });
-}
-  </script>
+  <script src="{{ url_for('static', filename='js/feedback-vote.js') }}"></script>
 {% endblock %}

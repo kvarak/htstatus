@@ -11,9 +11,8 @@ from app.auth_utils import (
     get_current_user,
     get_current_user_id,
     require_authentication,
-    track_activity,
 )
-from app.chpp_utilities import fetch_user_teams, get_chpp_client
+from app.chpp_utilities import get_chpp_client
 from app.utils import create_page, diff, dprint
 
 # Create Blueprint for team routes
@@ -110,18 +109,6 @@ def save_team_competition_data(teamid, the_team, user_id):
         db.session.rollback()
         dprint(1, f"Warning: failed to store competition data for team {teamid}: {e}")
         return False
-
-
-@team_bp.route("/team")
-@require_authentication
-@track_activity("team")
-def team():
-    """Display team information."""
-    chpp = get_chpp_client(session)
-
-    team_ids, team_names = fetch_user_teams(chpp)
-
-    return create_page(template="team.html", title="Team")
 
 
 def update_error_page(error, errorinfo=""):

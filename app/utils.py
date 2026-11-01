@@ -30,13 +30,6 @@ def dprint(lvl, *args):
         print(f"[{fname}]", *args)
 
 
-def debug_print(route, function, *args):
-    """Enhanced debug print for route tracing."""
-    if debug_level is None or debug_level >= 2:
-        fname = inspect.stack()[1].filename.split("/")[-1]  # get calling file
-        print(f"[{fname}] {route}::{function}() -", *args)
-
-
 # =============================================================================
 # Date and Comparison Utilities
 # =============================================================================
@@ -191,41 +184,6 @@ def get_admin_feedback_counts(user=None):
 # =============================================================================
 
 
-def disambiguate_team_names(team_ids, team_names):
-    """Add team IDs to duplicate team names for disambiguation.
-
-    Args:
-        team_ids: List of team IDs
-        team_names: List of corresponding team names
-
-    Returns:
-        List of disambiguated team names
-
-    Example:
-        >>> disambiguate_team_names([123, 456], ["Team A", "Team A"])
-        ["Team A (123)", "Team A (456)"]
-        >>> disambiguate_team_names([123, 456], ["Team A", "Team B"])
-        ["Team A", "Team B"]
-    """
-    if not team_ids or not team_names or len(team_ids) != len(team_names):
-        return team_names
-
-    # Count occurrences of each name
-    name_counts = {}
-    for name in team_names:
-        name_counts[name] = name_counts.get(name, 0) + 1
-
-    # Add team ID suffix for duplicate names
-    result = []
-    for team_id, name in zip(team_ids, team_names):
-        if name_counts[name] > 1:
-            result.append(f"{name} ({team_id})")
-        else:
-            result.append(name)
-
-    return result
-
-
 def create_page(template, title, **kwargs):
     """Create standardized page response with common template variables."""
     import time
@@ -327,179 +285,6 @@ def get_training(players_data):
     return allplayerids, allplayers, playernames
 
 
-def player_diff(playerid, daysago, team_name="Unknown Team"):
-    """Get player skill differences over time.
-
-    Args:
-        playerid: Hattrick player ID
-        daysago: Number of days back to compare
-        team_name: Team name for display (default: "Unknown Team")
-
-    Returns:
-        List of changes, each as: [team_name, first_name, last_name, skill, old_val, new_val]
-        Returns empty list if no changes found.
-    """
-    try:
-        from datetime import datetime
-
-        from dateutil.relativedelta import relativedelta
-        from sqlalchemy import desc
-
-        from models import Players
-
-        # Query for player data from specified days ago
-        cutoff_date = datetime.now() - relativedelta(days=daysago)
-
-        # Get the most recent record before or on the cutoff date
-        old_player = (
-            db.session.query(Players)
-            .filter_by(ht_id=playerid)
-            .filter(Players.data_date <= cutoff_date)
-            .order_by(desc(Players.data_date))
-            .first()
-        )
-
-        # Get the most recent record overall
-        current_player = (
-            db.session.query(Players)
-            .filter_by(ht_id=playerid)
-            .order_by(desc(Players.data_date))
-            .first()
-        )
-
-        if not old_player or not current_player:
-            return []
-
-        # Calculate differences for each skill
-        skills = [
-            "keeper",
-            "defender",
-            "playmaker",
-            "winger",
-            "passing",
-            "scorer",
-            "set_pieces",
-        ]
-        differences = []
-
-        for skill in skills:
-            old_val = getattr(old_player, skill, 0) or 0
-            new_val = getattr(current_player, skill, 0) or 0
-
-            if old_val != new_val:
-                differences.append(
-                    [
-                        team_name,
-                        current_player.first_name or "Unknown",
-                        current_player.last_name or "Player",
-                        skill.capitalize(),
-                        old_val,
-                        new_val,
-                    ]
-                )
-
-        # If no differences found, return empty list
-        if not differences:
-            return []
-
-        # Return flat list of changes (simplified API)
-        return differences
-
-    except Exception as e:
-        dprint(1, f"Error in player_diff: {e}")
-        return []
-
-
-def player_daily_changes(playerid, days_ago, team_name="Unknown Team"):
-    """Get player skill changes between two consecutive days (for timeline view).
-
-    This function compares skills between today-days_ago and today-(days_ago+1)
-    to show only changes that occurred on that specific day.
-
-    Args:
-        playerid: Hattrick player ID
-        days_ago: Number of days back to check (0 = today vs yesterday)
-        team_name: Team name for display
-
-    Returns: List with same format as player_diff, but only for day-specific changes
-    """
-    try:
-        from datetime import datetime, timedelta
-
-        from sqlalchemy import cast, Date, desc
-
-        from models import Players
-
-        # Calculate target dates
-        target_date = (datetime.now() - timedelta(days=days_ago)).date()
-
-        # Get the most recent record for target date
-        target_player = (
-            db.session.query(Players)
-            .filter_by(ht_id=playerid)
-            .filter(cast(Players.data_date, Date) == target_date)
-            .order_by(desc(Players.data_date))
-            .first()
-        )
-
-        # Get the most recent record BEFORE target date (not necessarily previous day)
-        prev_player = (
-            db.session.query(Players)
-            .filter_by(ht_id=playerid)
-            .filter(cast(Players.data_date, Date) < target_date)
-            .order_by(desc(Players.data_date))
-            .first()
-        )
-
-        if not target_player or not prev_player:
-            return []
-
-        # Calculate differences for each skill
-        skills = [
-            "keeper",
-            "defender",
-            "playmaker",
-            "winger",
-            "passing",
-            "scorer",
-            "set_pieces",
-        ]
-        differences = []
-
-        for skill in skills:
-            old_val = getattr(prev_player, skill, 0) or 0
-            new_val = getattr(target_player, skill, 0) or 0
-
-            if old_val != new_val:
-                differences.append(
-                    [
-                        team_name,
-                        target_player.first_name or "Unknown",
-                        target_player.last_name or "Player",
-                        skill.capitalize(),
-                        old_val,
-                        new_val,
-                    ]
-                )
-
-        # If no differences found, return empty list
-        if not differences:
-            return []
-
-        # Return nested structure: [[player_info], [changes...]]
-        return [
-            [
-                team_name,
-                target_player.first_name or "Unknown",
-                target_player.last_name or "Player",
-            ]
-        ] + differences
-
-    except Exception as e:
-        dprint(1, f"Error in player_daily_changes: {e}")
-        return []
-
-
 # Attributes shown in the skill-change timeline: attr -> change type
 TIMELINE_ATTRIBUTES = {
     "keeper": "skill",
@@ -591,7 +376,7 @@ def _format_attribute_name(attr):
     attr_name = attr.replace("_", " ").title()
     if attr == "tsi":
         return "TSI"
-    elif attr == "set_pieces":
+    if attr == "set_pieces":
         return "Set Pieces"
     return attr_name
 
@@ -721,286 +506,16 @@ def calculateContribution(position, player):
         return 0.0
 
 
-def calculate_team_statistics(players):
-    """Calculate comprehensive team statistics from player list."""
-    if not players:
-        return {}
+def best_position(player):
+    """The position (CALC_COLUMNS key) where the player contributes most, or "-"."""
+    from app.constants import CALC_COLUMNS
 
-    stats = {
-        "total_players": len(players),
-        "avg_age": 0,
-        "avg_tsi": 0,
-        "total_salary": 0,
-        "skill_averages": {},
-    }
-
-    # Helper function to get player attribute value as numeric
-    def get_player_attr(player, attr):
-        # For SQLAlchemy objects, always use getattr
-        # For dictionaries, use .get() method
-        if hasattr(player, attr):
-            value = getattr(player, attr, 0)
-        elif hasattr(player, "get"):
-            value = player.get(attr, 0)
-        else:
-            value = 0
-
-        # Convert to numeric, handling None, string, and other types
-        if value is None:
-            return 0
-        try:
-            # Try to convert to int first, then float if that fails
-            if isinstance(value, str):
-                # Handle empty strings
-                if not value.strip():
-                    return 0
-                # Try int first, then float
-                try:
-                    return int(value)
-                except ValueError:
-                    return float(value)
-            elif isinstance(value, (int, float)):
-                return value
-            else:
-                return 0
-        except (ValueError, TypeError):
-            return 0
-
-    # Calculate averages - handle age as years from age_years field
-    total_age = sum(
-        get_player_attr(player, "age_years") for player in players
-    )  # Use age_years instead of age string
-    total_tsi = sum(get_player_attr(player, "tsi") for player in players)
-    total_salary = sum(get_player_attr(player, "salary") for player in players)
-    total_goals = sum(
-        get_player_attr(player, "current_team_goals") for player in players
-    )
-
-    # Additional career statistics
-    total_career_goals = sum(
-        get_player_attr(player, "career_goals") for player in players
-    )
-    total_matches = sum(
-        get_player_attr(player, "current_team_matches") for player in players
-    )
-
-    # Breakdown by competition type
-    total_league_goals = sum(
-        get_player_attr(player, "league_goals") for player in players
-    )
-    total_cup_goals = sum(get_player_attr(player, "cup_goals") for player in players)
-    total_friendlies_goals = sum(
-        get_player_attr(player, "friendlies_goals") for player in players
-    )
-
-    stats["avg_age"] = round(total_age / len(players), 1) if len(players) > 0 else 0
-    stats["avg_tsi"] = round(total_tsi / len(players), 0) if len(players) > 0 else 0
-    stats["total_salary"] = total_salary
-    stats["total_team_goals"] = total_goals
-    stats["total_career_goals"] = total_career_goals
-    stats["total_league_goals"] = total_league_goals
-    stats["total_cup_goals"] = total_cup_goals
-    stats["total_friendlies_goals"] = total_friendlies_goals
-    stats["total_matches"] = total_matches
-    stats["goals_per_match"] = (
-        round(total_goals / total_matches, 1) if total_matches > 0 else 0
-    )
-    stats["avg_wage"] = round(total_salary / len(players), 0) if len(players) > 0 else 0
-
-    # Calculate skill averages
-    skills = [
-        "keeper",
-        "defender",
-        "playmaker",
-        "winger",
-        "passing",
-        "scorer",
-        "set_pieces",
-        "leadership",
-    ]
-    for skill in skills:
-        skill_sum = sum(get_player_attr(player, skill) for player in players)
-        avg_skill = round(skill_sum / len(players), 1)
-        stats["skill_averages"][skill] = avg_skill
-
-    return stats
-
-
-def get_top_scorers(players, limit=5, sort_by_ratio=False):
-    """Get top scoring players from the list.
-
-    Enhanced for INFRA-028 to work correctly with both SQLAlchemy and CHPPPlayer data.
-    Returns all players sorted by goals (including 0-goal players) for consistent display.
-
-    Args:
-        players: List of player objects
-        limit: Maximum number of players to return
-        sort_by_ratio: If True, sort by goals/match ratio instead of total goals
-    """
-
-    # Use the same helper function as calculate_team_statistics
-    def get_player_attr(player, attr):
-        # For SQLAlchemy objects, always use getattr
-        # For dictionaries, use .get() method
-        if hasattr(player, attr):
-            value = getattr(player, attr, 0)
-        elif hasattr(player, "get"):
-            value = player.get(attr, 0)
-        else:
-            value = 0
-
-        # Convert to numeric, handling None, string, and other types
-        if value is None:
-            return 0
-        try:
-            return float(value) if value != "" else 0
-        except (ValueError, TypeError):
-            return 0
-
-    # Helper function to get goal count from various goal fields
-    def get_player_goals(player):
-        # Try multiple goal fields for broader compatibility
-        current_team_goals = get_player_attr(player, "current_team_goals") or 0
-        goals_current_team = get_player_attr(player, "goals_current_team") or 0
-        career_goals = get_player_attr(player, "career_goals") or 0
-
-        # Prefer current team goals, fall back to career goals
-        return current_team_goals or goals_current_team or career_goals
-
-    # Helper function to get matches played
-    def get_player_matches(player):
-        current_team_matches = get_player_attr(player, "current_team_matches") or 0
-        matches_current_team = get_player_attr(player, "matches_current_team") or 0
-        return current_team_matches or matches_current_team or 0
-
-    # Helper function to calculate goals per match ratio
-    def get_goals_per_match(player):
-        goals = get_player_goals(player)
-        matches = get_player_matches(player)
-        return goals / matches if matches > 0 else 0
-
-    # Return all players sorted by goals or goals/match ratio
-    all_players = list(players)
-
-    if sort_by_ratio:
-        # Sort by goals/match ratio (for players with at least 1 match)
-        all_players.sort(
-            key=lambda p: (get_player_matches(p) > 0, get_goals_per_match(p)),
-            reverse=True,
-        )
-    else:
-        # Sort by total goals
-        all_players.sort(key=get_player_goals, reverse=True)
-
-    return all_players[:limit]
-
-
-def get_top_performers(players, limit=5):
-    """Get top performing players based on TSI (since rating data may not be available)."""
-    # Filter players with TSI data and sort by TSI
-    performers = [p for p in players if getattr(p, "tsi", 0) and p.tsi > 0]
-    performers.sort(key=lambda x: getattr(x, "tsi", 0) or 0, reverse=True)
-
-    return performers[:limit]
-
-
-def get_team_match_statistics(teamid):
-    """Get comprehensive match statistics for a team."""
-    from models import Match
-
-    try:
-        # Query match data for the team (check both home and away)
-        from sqlalchemy import or_
-
-        matches = (
-            db.session.query(Match)
-            .filter(or_(Match.home_team_id == teamid, Match.away_team_id == teamid))
-            .all()
-        )
-
-        if not matches:
-            # Return empty stats object
-            class EmptyStats:
-                def __init__(self):
-                    self.total_matches = 0
-                    self.wins = 0
-                    self.draws = 0
-                    self.losses = 0
-                    self.goals_for = 0
-                    self.goals_against = 0
-                    self.goal_difference = 0
-                    self.win_percentage = 0
-
-            return EmptyStats()
-
-        stats = {
-            "total_matches": len(matches),
-            "wins": 0,
-            "draws": 0,
-            "losses": 0,
-            "goals_for": 0,
-            "goals_against": 0,
-        }
-
-        for match in matches:
-            # Determine if team was playing at home or away
-            is_home_match = match.home_team_id == teamid
-
-            if is_home_match:
-                stats["goals_for"] += match.home_goals or 0
-                stats["goals_against"] += match.away_goals or 0
-
-                # Determine result for home team
-                if (match.home_goals or 0) > (match.away_goals or 0):
-                    stats["wins"] += 1
-                elif (match.home_goals or 0) == (match.away_goals or 0):
-                    stats["draws"] += 1
-                else:
-                    stats["losses"] += 1
-            else:
-                stats["goals_for"] += match.away_goals or 0
-                stats["goals_against"] += match.home_goals or 0
-
-                # Determine result for away team
-                if (match.away_goals or 0) > (match.home_goals or 0):
-                    stats["wins"] += 1
-                elif (match.away_goals or 0) == (match.home_goals or 0):
-                    stats["draws"] += 1
-                else:
-                    stats["losses"] += 1
-
-        # Calculate derived stats
-        stats["goal_difference"] = stats["goals_for"] - stats["goals_against"]
-        stats["win_percentage"] = (
-            round((stats["wins"] / stats["total_matches"]) * 100, 1)
-            if stats["total_matches"] > 0
-            else 0
-        )
-
-        # Convert to object with dot notation support
-        class MatchStats:
-            def __init__(self, data):
-                for key, value in data.items():
-                    setattr(self, key, value)
-
-        return MatchStats(stats)
-
-    except Exception as e:
-        dprint(1, f"Error getting match statistics for team {teamid}: {e}")
-
-        # Return empty stats on error
-        class EmptyStats:
-            def __init__(self):
-                self.total_matches = 0
-                self.wins = 0
-                self.draws = 0
-                self.losses = 0
-                self.goals_for = 0
-                self.goals_against = 0
-                self.goal_difference = 0
-                self.win_percentage = 0
-
-        return EmptyStats()
+    best, best_value = "-", 0
+    for position in CALC_COLUMNS:
+        value = calculateContribution(position, player)
+        if value > best_value:
+            best, best_value = position, value
+    return best
 
 
 # =============================================================================
@@ -1097,7 +612,7 @@ def downloadRecentMatches(teamid, chpp=None):
                 total_enhanced += enhanced
 
             except Exception as e:
-                dprint(2, f"Warning: Could not process match {match.ht_id}: {str(e)}")
+                dprint(2, f"Warning: Could not process match {match.ht_id}: {e!s}")
                 import traceback
 
                 dprint(3, f"Match processing error details: {traceback.format_exc()}")
@@ -1118,7 +633,7 @@ def downloadRecentMatches(teamid, chpp=None):
         }
 
     except Exception as e:
-        error_msg = f"Error downloading recent matches for team {teamid}: {str(e)}"
+        error_msg = f"Error downloading recent matches for team {teamid}: {e!s}"
         dprint(1, error_msg)
         return {
             "success": False,
@@ -1199,7 +714,7 @@ def downloadMatches(teamid, chpp=None):
                 )
 
         except Exception as e:
-            dprint(1, f"Warning: Could not fetch matches: {str(e)}")
+            dprint(1, f"Warning: Could not fetch matches: {e!s}")
             matches_data = []
 
         # Process matches
@@ -1221,14 +736,14 @@ def downloadMatches(teamid, chpp=None):
         }
 
     except Exception as e:
-        dprint(1, f"Error downloading match archive for team {teamid}: {str(e)}")
+        dprint(1, f"Error downloading match archive for team {teamid}: {e!s}")
         if "db" in locals():
             db.session.rollback()
         return {
             "success": False,
             "error": str(e),
             "count": 0,
-            "message": f"Archive download failed: {str(e)}",
+            "message": f"Archive download failed: {e!s}",
         }
 
 
@@ -1403,7 +918,7 @@ def fetch_enhanced_match_data(match_id, chpp=None):
             dprint(2, f"No enhanced data available for match {match_id}")
 
     except Exception as e:
-        dprint(2, f"Could not fetch enhanced data for match {match_id}: {str(e)}")
+        dprint(2, f"Could not fetch enhanced data for match {match_id}: {e!s}")
         # Return partial data if available
         enhanced_data = {k: v for k, v in enhanced_data.items() if v is not None}
 
@@ -1512,7 +1027,7 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
             db.session.commit()
 
         except Exception as e:
-            dprint(2, f"Error processing match {match.ht_id}: {str(e)}")
+            dprint(2, f"Error processing match {match.ht_id}: {e!s}")
             db.session.rollback()
             continue
 

@@ -152,34 +152,6 @@ class TestDebugUtilities(unittest.TestCase):
 
         mock_print.assert_called_once()
 
-    @patch("builtins.print")
-    def test_debug_print_enabled(self, mock_print):
-        """Test debug_print when debug level is sufficient."""
-        utils.debug_level = 2
-        utils.debug_print("/test", "function_name", "arg1", "arg2")
-
-        mock_print.assert_called_once()
-        call_args = mock_print.call_args[0]
-        assert "/test" in str(call_args)
-        assert "function_name()" in str(call_args)
-        assert "arg1" in str(call_args)
-
-    @patch("builtins.print")
-    def test_debug_print_disabled(self, mock_print):
-        """Test debug_print when debug level is too low."""
-        utils.debug_level = 1
-        utils.debug_print("/test", "function_name", "message")
-
-        mock_print.assert_not_called()
-
-    @patch("builtins.print")
-    def test_debug_print_none_level(self, mock_print):
-        """Test debug_print when debug_level is None."""
-        utils.debug_level = None
-        utils.debug_print("/test", "function_name", "message")
-
-        mock_print.assert_called_once()
-
 
 class TestUtilityInitialization(unittest.TestCase):
     """Test utility module initialization."""

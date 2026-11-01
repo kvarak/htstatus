@@ -234,16 +234,3 @@ class TestDatabaseUtilsIntegration:
         assert results[0]["host"] == "host1"
         assert results[1]["password"] is None
         assert results[2]["port"] == "9999"
-
-
-def test_module_imports():
-    """Test that the db_utils module can be imported successfully."""
-    import db_utils
-
-    # Verify required functions exist
-    assert hasattr(db_utils, "parse_database_url")
-    assert hasattr(db_utils, "load_database_config")
-
-    # Verify functions are callable
-    assert callable(db_utils.parse_database_url)
-    assert callable(db_utils.load_database_config)

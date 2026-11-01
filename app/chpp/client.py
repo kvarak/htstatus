@@ -26,7 +26,6 @@ from app.chpp.models import (
     CHPPMatchDetails,
     CHPPMatchLineup,
     CHPPPlayer,
-    CHPPPlayerEvent,
     CHPPTeam,
     CHPPUser,
 )
@@ -559,30 +558,3 @@ class CHPP:
         # Use matchlineup endpoint with matchID parameter
         root = self.request("matchlineup", "1.3", matchID=id_, isYouth=is_youth)
         return parse_matchlineup(root)
-
-    def playerevents(self, id_: int) -> list["CHPPPlayerEvent"]:
-        """Get player event history for career tracking.
-
-        Fetches individual player events including goals, assists, cards,
-        injuries, and career milestones from playerevents endpoint.
-
-        Args:
-            id_: Hattrick player ID
-
-        Returns:
-            List of CHPPPlayerEvent objects representing player's career events
-
-        Raises:
-            CHPPAuthError: If not authenticated
-            CHPPAPIError: If CHPP API returns error (e.g., unknown player ID)
-
-        Example:
-            >>> events = chpp.playerevents(id_=123456789)
-            >>> goals = [e for e in events if e.event_type == 'goal']
-            >>> print(f"Career goals: {len(goals)}")
-        """
-        from app.chpp.parsers import parse_playerevents
-
-        # Use playerevents endpoint with playerID parameter
-        root = self.request("playerevents", "1.1", playerID=id_)
-        return parse_playerevents(root)

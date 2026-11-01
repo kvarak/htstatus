@@ -91,17 +91,21 @@ class TestRosterPages:
         total = re.search(rb'card-title mb-1">(\d+)</h6>', response.data)
         assert total and total.group(1) == b"2"
 
-    def test_formations_page_script_is_valid_js(self, roster_client):
+    @pytest.mark.parametrize(
+        ("page", "marker"),
+        [
+            ("formations", "colourPitchByEffectiveness"),
+            ("stats", "countryPie('countryDistributionAllChart'"),
+        ],
+    )
+    def test_page_script_is_valid_js(self, roster_client, page, marker):
         import re
         import shutil
         import subprocess  # nosec B404 - static local syntax check only
         import tempfile
 
-        html = roster_client.get(f"/formations?id={self.USER_TEAM}").get_data(
-            as_text=True
-        )
-        assert "const TEAM_SIZE = 11;" in html
-        assert "colourPitchByEffectiveness" in html
+        html = roster_client.get(f"/{page}?id={self.USER_TEAM}").get_data(as_text=True)
+        assert marker in html
 
         if not shutil.which("node"):
             pytest.skip("Node.js not installed")

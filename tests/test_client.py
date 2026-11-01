@@ -6,13 +6,6 @@ import xml.etree.ElementTree as ET
 from app.chpp.client import CHPP
 
 
-def test_module_imports():
-    """Test that CHPP client module imports without errors."""
-    import app.chpp.client
-
-    assert app.chpp.client is not None
-
-
 class TestCHPPClient:
     """Test CHPP client functionality."""
 

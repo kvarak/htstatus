@@ -14,7 +14,6 @@ import pytest
 
 # Import the module under test
 from app.utils import (
-    debug_print,
     diff,
     diff_month,
     dprint,
@@ -78,29 +77,6 @@ class TestUtilsAdvanced:
             dprint(5, "High level message")
 
             # Should not print when level > debug_level
-            mock_print.assert_not_called()
-
-    def test_debug_print_enhanced_format(self):
-        """Test debug_print with enhanced format and filename extraction."""
-        initialize_utils(None, None, 2)
-
-        with patch("builtins.print") as mock_print:
-            debug_print("/test/route", "test_function", "arg1", "arg2")
-
-            mock_print.assert_called_once()
-            args = mock_print.call_args[0]
-            assert "/test/route::test_function() -" in str(args)
-            assert "arg1" in args
-            assert "arg2" in args
-
-    def test_debug_print_doesnt_print_low_level(self):
-        """Test debug_print doesn't print when debug level is too low."""
-        initialize_utils(None, None, 1)
-
-        with patch("builtins.print") as mock_print:
-            debug_print("/route", "function", "message")
-
-            # debug_print requires debug_level >= 2
             mock_print.assert_not_called()
 
     def test_diff_month_same_year(self):
@@ -204,23 +180,3 @@ class TestUtilsAdvanced:
         """Test get_admin_feedback_counts when no user_id provided."""
         result = get_admin_feedback_counts()
         assert result is None
-
-
-def test_module_imports():
-    """Test that utils module imports work correctly."""
-    import app.utils
-
-    # Verify required functions exist
-    assert hasattr(app.utils, "initialize_utils")
-    assert hasattr(app.utils, "dprint")
-    assert hasattr(app.utils, "debug_print")
-    assert hasattr(app.utils, "diff_month")
-    assert hasattr(app.utils, "diff")
-    assert hasattr(app.utils, "get_version_info")
-    assert hasattr(app.utils, "get_admin_feedback_counts")
-    assert hasattr(app.utils, "create_page")
-
-    # Verify functions are callable
-    assert callable(app.utils.initialize_utils)
-    assert callable(app.utils.dprint)
-    assert callable(app.utils.debug_print)

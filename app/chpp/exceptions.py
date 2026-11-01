@@ -9,8 +9,6 @@ from app.chpp.constants import ERROR_CODES
 class CHPPError(Exception):
     """Base exception for all CHPP client errors."""
 
-    pass
-
 
 class CHPPAuthError(CHPPError):
     """OAuth authentication and authorization failures.
@@ -21,8 +19,6 @@ class CHPPAuthError(CHPPError):
     - Invalid OAuth credentials provided
     - OAuth session initialization fails
     """
-
-    pass
 
 
 class CHPPAPIError(CHPPError):

@@ -102,11 +102,10 @@ def create_database_backup(output_dir: str = None) -> str:
             print(f"   Host: {db_config['host']}")
 
             return str(backup_file)
-        else:
-            print("❌ ERROR: Backup file was not created or is empty")
-            if result.stderr:
-                print(f"pg_dump error: {result.stderr}")
-            sys.exit(1)
+        print("❌ ERROR: Backup file was not created or is empty")
+        if result.stderr:
+            print(f"pg_dump error: {result.stderr}")
+        sys.exit(1)
 
     except subprocess.CalledProcessError as e:
         print(f"❌ ERROR: pg_dump failed with exit code {e.returncode}")

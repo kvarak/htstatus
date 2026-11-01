@@ -9,9 +9,6 @@ This directory contains database backup, restoration, and maintenance scripts fo
   - Contains: Complete PostgreSQL database dump with schema and data
   - Purpose: Complete database protection and disaster recovery
 
-- **Match Data Backups**: Created by `backup_matches.py` (legacy)
-  - Format: `matches_backup_YYYYMMDD_HHMMSS.json`
-  - Contains: Complete match data with metadata for rollback capability
 
 ## Backup Commands (Make Targets)
 
@@ -121,12 +118,8 @@ python scripts/database/rollback_match_cleanup.py
 - SSH keys for automation should be dedicated (not personal keys)
 - Regular backup integrity testing recommended
 
-## Manual Backup Commands (Legacy)
+## Listing Backups
 
 ```bash
-# Create manual match backup
-uv run python scripts/database/backup_matches.py
-
-# List all backups
 ls -la scripts/database/backups/
 ```

@@ -1,10 +1,9 @@
 """Player comparison routes and utilities."""
 
-from flask import Blueprint, redirect, request, url_for
+from flask import Blueprint, redirect, request, session, url_for
 
-from app.auth_utils import get_team_info, get_user_teams, require_authentication
-from app.error_handlers import validate_team_id, ValidationError
-from app.utils import create_page, dprint
+from app.auth_utils import current_team, require_authentication, WRONG_TEAM
+from app.utils import best_position, create_page, dprint
 
 # Create Blueprint for player comparison
 compare_bp = Blueprint("compare", __name__, url_prefix="/player")
@@ -24,11 +23,11 @@ def setup_compare_blueprint(db_instance):
 def compare_players():
     """Display player comparison interface."""
     try:
-        team_id = request.args.get("team_id")
+        team_id, _team_name = current_team(request.args.get("team_id"))
         player_ids = request.args.getlist("player_ids")
 
-        if not team_id:
-            return redirect(url_for("player.player"))
+        if team_id is None:
+            return redirect(url_for("player.player", error=WRONG_TEAM))
 
         if not player_ids or len(player_ids) < 2 or len(player_ids) > 8:
             return redirect(
@@ -38,21 +37,6 @@ def compare_players():
                     error="Please select 2-8 players for comparison",
                 )
             )
-
-        # Validate team access
-        try:
-            team_id = validate_team_id(team_id)
-        except ValidationError as e:
-            return redirect(url_for("player.player", error=str(e)))
-
-        # Validate team access using consolidated function
-        all_teams, all_team_names = get_user_teams()
-        is_valid, teamname, error_msg = get_team_info(
-            team_id, (all_teams, all_team_names)
-        )
-
-        if not is_valid:
-            return redirect(url_for("player.player", error=error_msg))
 
         from app.roster import oldest_player_records
         from models import Group, Players, PlayerSetting
@@ -87,23 +71,10 @@ def compare_players():
                 )
 
                 if player:
-                    # Calculate best position using the same logic as player page
-                    from app.constants import CALC_COLUMNS
-                    from app.utils import calculateContribution
-
-                    best_position = "-"
-                    best_val = 0
-                    for position in CALC_COLUMNS:
-                        contribution = calculateContribution(position, player.__dict__)
-                        if contribution > best_val:
-                            best_position = position
-                            best_val = contribution
+                    best = best_position(player.__dict__)
 
                     # Get group information
                     group_name = "No Group"
-                    # Check if player has a group assignment
-                    from flask import session
-
                     player_setting = (
                         db.session.query(PlayerSetting)
                         .filter_by(
@@ -129,7 +100,7 @@ def compare_players():
                             "number": player.number,
                             "age": getattr(player, "age", None),
                             "loyalty": getattr(player, "loyalty", None),
-                            "best_position": best_position,
+                            "best_position": best,
                             "group_name": group_name,
                             "keeper": getattr(player, "keeper", 0),
                             "defender": getattr(player, "defender", 0),

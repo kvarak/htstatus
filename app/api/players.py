@@ -2,8 +2,7 @@
 
 from flask import Blueprint, jsonify, request, session
 
-from app.auth_utils import get_team_info, get_user_teams, require_authentication
-from app.error_handlers import validate_team_id, ValidationError
+from app.auth_utils import current_team, require_authentication, WRONG_TEAM
 from app.utils import dprint
 
 # Create Blueprint for API routes
@@ -43,23 +42,9 @@ def bulk_assign_players():
         if not player_ids:
             return jsonify({"error": "No player IDs provided"}), 400
 
-        if not team_id:
-            return jsonify({"error": "Team ID is required"}), 400
-
-        # Validate team access
-        try:
-            team_id = validate_team_id(team_id)
-        except ValidationError as e:
-            return jsonify({"error": str(e)}), 400
-
-        # Validate team access using consolidated function
-        all_teams, all_team_names = get_user_teams()
-        is_valid, teamname, error_msg = get_team_info(
-            team_id, (all_teams, all_team_names)
-        )
-
-        if not is_valid:
-            return jsonify({"error": error_msg}), 403
+        team_id, _team_name = current_team(team_id)
+        if team_id is None:
+            return jsonify({"error": WRONG_TEAM}), 403
 
         from models import Group, PlayerSetting
 

@@ -233,7 +233,7 @@ class TestSeriesPage:
 
     def test_unknown_team(self, app_with_routes, db_session):
         html = self._client(app_with_routes, db_session).get("/series?id=1")
-        assert "Unknown team." in html.get_data(as_text=True)
+        assert "Wrong teamid" in html.get_data(as_text=True)
 
     def test_nav_links_to_series(self, app_with_routes, db_session):
         html = self._client(app_with_routes, db_session).get(f"/series?id={US}")

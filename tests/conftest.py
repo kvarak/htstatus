@@ -217,41 +217,6 @@ def create_test_team(db_session, team_id=12345, team_name="Test Team", user_id=1
     return team
 
 
-def assert_route_requires_auth(client, route_path, method="GET"):
-    """Utility function to assert that a route requires authentication."""
-    if method.upper() == "GET":
-        response = client.get(route_path)
-    elif method.upper() == "POST":
-        response = client.post(route_path)
-    else:
-        raise ValueError(f"Unsupported method: {method}")
-
-    # Should redirect to login or return 401/403
-    assert response.status_code in [
-        302,
-        401,
-        403,
-    ], f"Route {route_path} should require authentication but returned {response.status_code}"
-
-
-def assert_route_accessible(client, route_path, method="GET", expected_status=200):
-    """Utility function to assert that a route is accessible."""
-    if method.upper() == "GET":
-        response = client.get(route_path)
-    elif method.upper() == "POST":
-        response = client.post(route_path)
-    else:
-        raise ValueError(f"Unsupported method: {method}")
-
-    # Allow some flexibility in status codes for different scenarios
-    if isinstance(expected_status, int):
-        expected_status = [expected_status]
-
-    assert (
-        response.status_code in expected_status
-    ), f"Route {route_path} returned {response.status_code}, expected one of {expected_status}"
-
-
 @pytest.fixture(scope="function")
 def db_session(app):
     """Create a database session for testing with proper transaction isolation.

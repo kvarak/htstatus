@@ -281,29 +281,6 @@ class SessionPersistence {
         }
     }
 
-    /**
-     * Get debug info about session persistence state
-     */
-    getDebugInfo() {
-        return {
-            isPWA: this.isPWA,
-            userLoggedIn: this.isUserLoggedIn(),
-            storedSession: localStorage.getItem(this.sessionKey),
-            currentUser: this.getCurrentUserFromDOM(),
-            restorationAttempts: this.restorationAttempts,
-            restorationInProgress: this.restorationInProgress,
-            maxRestorationAttempts: this.maxRestorationAttempts
-        };
-    }
-
-    /**
-     * Reset restoration attempts (for debugging/testing)
-     */
-    resetRestorationAttempts() {
-        this.restorationAttempts = 0;
-        this.restorationInProgress = false;
-        console.log('SessionPersistence: Restoration attempts reset');
-    }
 }
 
 // Initialize session persistence when DOM is ready
