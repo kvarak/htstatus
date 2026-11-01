@@ -35,7 +35,7 @@ requirements-txt: check-uv
 	@echo "✅ requirements.txt updated"
 
 # Running
-serve: check-venv services changelog ## Start the development server
+serve: stop check-venv services changelog ## Start the development server
 	@$(PYTHON) run.py
 
 # Start the dev PostgreSQL

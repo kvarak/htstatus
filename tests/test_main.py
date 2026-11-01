@@ -234,3 +234,11 @@ def test_pages_include_dark_mode(app_with_routes):
     assert 'id="dark-mode-icon">&#127769;</span>' in html
     assert "css/dark-mode.css" in html
     assert "js/dark-mode.js" in html
+
+
+def test_loading_spinner_is_hidden_when_coming_back(app_with_routes):
+    """Back/forward restores a page with the spinner that loading() showed on leaving."""
+    html = app_with_routes.test_client().get("/changes").get_data(as_text=True)
+
+    handler = html[html.index('addEventListener("pageshow"') :]
+    assert '$("#loading").hide();' in handler[: handler.index("});")]

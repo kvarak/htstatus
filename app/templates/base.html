@@ -645,6 +645,11 @@ $('.toast').toast('show')
     $("#loading").show();
     $("#content").hide();
   }
+  // Back/forward restores the page as it was when we left it, spinner included
+  window.addEventListener("pageshow", function () {
+    $("#loading").hide();
+    $("#content").show();
+  });
 // ]]>
   </script>
   <!-- PWA Service Worker Registration -->
