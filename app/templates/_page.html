@@ -46,3 +46,14 @@
     {% if meta %}<div class="scoreboard-meta">{{ meta }}</div>{% endif %}
   </div>
 {% endmacro %}
+{# Links to a team's pages as poster buttons (home page tiles, update page).
+   extra_class "tile-links-row" puts them all in one row. #}
+{% macro team_links(team_id, team_name, extra_class='') %}
+  <nav class="tile-links {{ extra_class }}" aria-label="{{ team_name }}">
+    {% for (label, page, icon_name) in [('Players', 'player', 'shirt'), ('Formations', 'formations', 'pitch'), ('Matches', 'matches', 'scoreboard'), ('Series', 'series', 'trophy'), ('Training', 'training', 'stopwatch'), ('Statistics', 'stats', 'chart')] %}
+      <a class="tile-link"
+         href="/{{ page }}?id={{ team_id }}"
+         onclick="loading();">{{ icon(icon_name) }} {{ label }}</a>
+    {% endfor %}
+  </nav>
+{% endmacro %}

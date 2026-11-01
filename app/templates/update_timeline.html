@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block scripts %}{{ super() }}{% endblock %}
 {% block content %}
-  {% from "_page.html" import page_header %}
+  {% from "_page.html" import page_header, icon, team_links %}
   <div class="update-content">
     <div class="container">
       {{ page_header([('Update complete - player change timeline', None) ]) }}
@@ -45,15 +45,12 @@
       {% endif %}
       <!-- Updated Teams Links -->
       {% if updated %}
-        <div class="updated-teams-box">
-          {% for teamid, team_data in updated.items() %}
-            <p style="margin: 0.5rem 0; font-size: 0.9rem;">
-              <span class="font-weight-bold text-primary">{{ team_data[0] }}:</span>
-              <a href="{{ team_data[1] }}" class="team-link">{{ team_data[2] }}</a>
-            </p>
-          {% endfor %}
-        </div>
-        <hr class="divider">
+        {% for teamid, team_data in updated.items() %}
+          <section class="tile tile-green mb-3">
+            <h2 class="tile-title">{{ icon('shirt', 'tile-icon') }} {{ team_data[0] }}</h2>
+            {{ team_links(teamid, team_data[0], 'tile-links-row') }}
+          </section>
+        {% endfor %}
       {% endif %}
       <!-- 4-Week Player Change Timeline -->
       {% if timeline_changes %}

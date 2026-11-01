@@ -4,7 +4,7 @@ from datetime import date, timedelta
 
 from flask import Blueprint
 
-from app import training_log
+from app import trainees, training_log
 from app.auth_utils import (
     current_team,
     require_authentication,
@@ -169,6 +169,11 @@ def training():
         for player_id in allplayerids
     }
 
+    training_weeks = training_log.history(teamid)
+    squad = {
+        p.ht_id: playernames[p.ht_id] for p in latest_player_records(Players, teamid)
+    }
+
     return create_page(
         template="training.html",
         teamname=teamname,
@@ -180,7 +185,8 @@ def training():
         allplayers=allplayers,
         skill_changes=skill_changes,
         player_info=player_info,
-        training_weeks=training_log.history(teamid),
+        training_weeks=training_weeks,
+        trained=trainees.weekly_reports(teamid, training_weeks, squad),
         training_type_name=training_log.type_name,
         title="Training",
     )

@@ -606,7 +606,7 @@ def downloadRecentMatches(teamid, chpp=None):
 
                 # Save match to database (use enhanced processing)
                 added, updated, enhanced = _process_matches_enhanced(
-                    [match], chpp, fetch_enhanced=True
+                    [match], chpp, fetch_enhanced=True, team_id=teamid
                 )
                 total_added += added
                 total_enhanced += enhanced
@@ -719,7 +719,7 @@ def downloadMatches(teamid, chpp=None):
 
         # Process matches
         added, updated, enhanced = _process_matches_enhanced(
-            matches_data, chpp, fetch_enhanced=True
+            matches_data, chpp, fetch_enhanced=True, team_id=teamid
         )
 
         message = f"Archive download complete: {added} new, {updated} updated"
@@ -747,12 +747,33 @@ def downloadMatches(teamid, chpp=None):
         }
 
 
-def fetch_enhanced_match_data(match_id, chpp=None):
+def save_position_minutes(match_id, team_id, lineup, details):
+    """Replace the team's stored minutes per player and position for a match."""
+    from app.match_minutes import position_minutes
+    from models import MatchPositionMinutes
+
+    minutes = position_minutes(lineup, details.bookings, details.injuries)
+    MatchPositionMinutes.query.filter_by(match_id=match_id, team_id=team_id).delete()
+    for player_id, per_role in minutes.items():
+        for role_id, played in per_role.items():
+            db.session.add(
+                MatchPositionMinutes(
+                    match_id=match_id,
+                    team_id=team_id,
+                    player_id=player_id,
+                    role_id=role_id,
+                    minutes=played,
+                )
+            )
+
+
+def fetch_enhanced_match_data(match_id, chpp=None, team_id=None):
     """Fetch enhanced match data (statistics, lineup, events) for a finished match.
 
     Args:
         match_id: Hattrick match ID
         chpp: CHPP client (optional, will create if not provided)
+        team_id: our team in the match; its minutes per position are saved (FEAT-036)
 
     Returns:
         dict: Enhanced match data or empty dict if unavailable
@@ -895,7 +916,9 @@ def fetch_enhanced_match_data(match_id, chpp=None):
 
         # Fetch match lineup for formation and tactical data
         dprint(3, f"Fetching match lineup for match {match_id}")
-        lineup = chpp.matchlineup(id_=match_id)
+        lineup = chpp.matchlineup(id_=match_id, team_id=team_id)
+        if team_id is not None:
+            save_position_minutes(match_id, team_id, lineup, details)
 
         enhanced_data.update(
             {
@@ -925,13 +948,14 @@ def fetch_enhanced_match_data(match_id, chpp=None):
     return enhanced_data
 
 
-def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
+def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True, team_id=None):
     """Process matches and optionally fetch enhanced analytics data.
 
     Args:
         matches: List of CHPPMatch objects
         chpp: CHPP client for enhanced data fetching
         fetch_enhanced: Whether to fetch enhanced data for finished matches
+        team_id: our team, for its lineup and minutes per position
 
     Returns:
         tuple: (added_count, updated_count, enhanced_count)
@@ -988,7 +1012,9 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
                 # Fetch enhanced data if match is finished
                 # Always fetch to ensure we have the most complete data available
                 if fetch_enhanced and is_finished and chpp:
-                    enhanced_data = fetch_enhanced_match_data(match.ht_id, chpp)
+                    enhanced_data = fetch_enhanced_match_data(
+                        match.ht_id, chpp, team_id
+                    )
                     if enhanced_data:
                         for field, value in enhanced_data.items():
                             if hasattr(dbmatch, field):
@@ -1015,7 +1041,9 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True):
 
                 # Add enhanced data if available and match is finished
                 if fetch_enhanced and is_finished and chpp:
-                    enhanced_data = fetch_enhanced_match_data(match.ht_id, chpp)
+                    enhanced_data = fetch_enhanced_match_data(
+                        match.ht_id, chpp, team_id
+                    )
                     thismatch.update(enhanced_data)
                     if enhanced_data:
                         enhanced += 1

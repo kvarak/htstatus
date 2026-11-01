@@ -171,32 +171,6 @@
     background: hsl(var(--muted));
 }
 
-/* Updated Teams */
-.updated-teams-box {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: 0.4rem;
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
-    box-shadow: none;
-}
-
-.team-link {
-    color: hsl(var(--primary));
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    transition: all 0.2s ease;
-}
-
-.team-link:hover {
-    background: hsl(var(--muted));
-    text-decoration: none;
-    color: hsl(var(--foreground));
-}
-
 .divider {
     border: none;
     border-top: 2px solid hsl(var(--border));

@@ -640,6 +640,14 @@ table.sortable thead {
   letter-spacing: 0.03em;
 }
 
+.tile-links-row {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+@media (max-width: 767px) {
+  .tile-links-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 .tile-link:hover {
   background-color: hsl(var(--orange));
   color: hsl(var(--brown)) !important;

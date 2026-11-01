@@ -124,6 +124,7 @@
                   <th>Intensity</th>
                   <th>Stamina</th>
                   <th>Coach</th>
+                  <th>Trained</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,6 +138,16 @@
                     <td>{{ week.intensity if week.intensity is not none else "–" }}%</td>
                     <td>{{ week.stamina_share if week.stamina_share is not none else "–" }}%</td>
                     <td>{{ week.trainer_name or "–" }}</td>
+                    <td>
+                      {% set report = trained.get(week.training_date) %}
+                      {% if report %}
+                        {{ report.full }} full
+                        {% if report.partly %}· {{ report.partly }} partly{% endif %}
+                        {% if report.minimal %}· {{ report.minimal }} minimal{% endif %}
+                      {% else %}
+                        –
+                      {% endif %}
+                    </td>
                   </tr>
                 {% endfor %}
               </tbody>
@@ -149,6 +160,66 @@
         {% endif %}
       </div>
     </div>
+    {# FEAT-036: minutes in training positions per week (best 90 count) #}
+    {% macro trained_table(report, needs) %}
+      <div class="tile-scroll">
+        <table class="table table-sm mb-0 small">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Played</th>
+              <th title="Minutes in a fully trained position (count 100%)">Full</th>
+              <th title="Minutes in a partly trained position (count {{ report.factors.partial }}%)">Half</th>
+              <th title="Minutes elsewhere on the pitch (count {{ report.factors.osmosis }}%)">Osmosis</th>
+              <th title="The week's training effect: full minutes + half minutes at {{ report.factors.partial }}% + osmosis minutes at {{ report.factors.osmosis }}%, of a full 90' week">
+                Training
+              </th>
+              {% if needs %}<th>Still needs</th>{% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in report.rows %}
+              <tr>
+                <td>{{ row.name }}</td>
+                <td class="text-muted">{{ row.positions or "–" }}</td>
+                <td>{{ row.full or "" }}</td>
+                <td>{{ row.partial or "" }}</td>
+                <td>{{ row.osmosis or "" }}</td>
+                <td>
+                  {% if row.share >= 100 %}
+                    <span class="badge badge-primary">100%</span>
+                  {% elif row.share > 0 %}
+                    <span class="badge badge-secondary">{{ row.share }}%</span>
+                  {% else %}
+                    <span class="text-muted">–</span>
+                  {% endif %}
+                </td>
+                {% if needs %}<td>{{ row.needs ~ "'" if row.needs else "" }}</td>{% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endmacro %}
+    {% set coming = training_weeks|selectattr('planned')|first if training_weeks else none %}
+    {% set last = training_weeks|rejectattr('planned')|first if training_weeks else none %}
+    {% if (coming and trained.get(coming.training_date)) or (last and trained.get(last.training_date)) %}
+      <div class="row g-4 mb-4" id="who-got-trained">
+        {% for (week, needs, label) in [(coming, true, "This week so far"), (last, false, "Last training")] %}
+          {% if week and trained.get(week.training_date) %}
+            <div class="col-12 col-lg-6 mb-3">
+              <div class="card h-100">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">{{ label }}</h5>
+                  <small class="text-muted">{{ training_type_name(week.training_type) }} · {{ week.training_date.strftime("%Y-%m-%d") }}</small>
+                </div>
+                <div class="card-body p-2">{{ trained_table(trained[week.training_date], needs) }}</div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
     <!-- Main Content Grid -->
     <div class="row g-4">
       <!-- Player List Sidebar -->

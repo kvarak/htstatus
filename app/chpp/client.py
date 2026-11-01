@@ -534,7 +534,9 @@ class CHPP:
         )
         return parse_matchdetails(root)
 
-    def matchlineup(self, id_: int, is_youth: bool = False) -> "CHPPMatchLineup":
+    def matchlineup(
+        self, id_: int, is_youth: bool = False, team_id: int | None = None
+    ) -> "CHPPMatchLineup":
         """Get detailed match lineup with player ratings and formations.
 
         Fetches complete lineup information for finished matches including
@@ -543,6 +545,7 @@ class CHPP:
         Args:
             id_: Hattrick match ID
             is_youth: Youth team flag (default: False)
+            team_id: Which team's lineup (default: the user's primary team)
 
         Returns:
             CHPPMatchLineup object with lineup and rating data
@@ -559,5 +562,8 @@ class CHPP:
         from app.chpp.parsers import parse_matchlineup
 
         # Use matchlineup endpoint with matchID parameter
-        root = self.request("matchlineup", "1.3", matchID=id_, isYouth=is_youth)
+        params = {"matchID": id_, "isYouth": is_youth}
+        if team_id is not None:
+            params["teamID"] = team_id
+        root = self.request("matchlineup", "2.0", **params)
         return parse_matchlineup(root)

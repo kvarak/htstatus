@@ -1032,64 +1032,64 @@ def parse_matchdetails(root: ET.Element) -> "CHPPMatchDetails":
 
 
 def parse_matchlineup(root: ET.Element) -> "CHPPMatchLineup":
-    """Parse matchlineup XML response into CHPPMatchLineup object.
+    """Parse matchlineup 2.0 XML: one team's starting lineup, orders and ratings.
 
-    Args:
-        root: XML root element from matchlineup endpoint
-
-    Returns:
-        CHPPMatchLineup object with lineup and player rating data
+    ``<Team>`` holds the requested team; players in ``<Lineup>`` keep their final
+    role, so ratings are read from there and positions from ``<StartingLineup>``.
     """
     from app.chpp.models import CHPPMatchLineup
 
-    # Extract match ID
-    ht_id = safe_find_int(root, ".//Match/MatchID")
+    team = root.find(".//Team")
+    if team is None:
+        return CHPPMatchLineup(ht_id=safe_find_int(root, ".//MatchID"))
 
-    # Extract formations
-    home_team_formation = safe_find_text(root, ".//HomeTeam/Formation", "")
-    away_team_formation = safe_find_text(root, ".//AwayTeam/Formation", "")
-
-    # Extract tactics
-    home_team_tactic = safe_find_text(root, ".//HomeTeam/TacticType", "")
-    away_team_tactic = safe_find_text(root, ".//AwayTeam/TacticType", "")
-
-    # Parse home team players
-    home_team_players = []
-    for player_elem in root.findall(".//HomeTeam/StartingLineup/Player"):
-        player = CHPPMatchLineupPlayer(
-            player_id=safe_find_int(player_elem, "PlayerID"),
-            name=safe_find_text(player_elem, "PlayerName", ""),
-            rating_stars=safe_find_float(player_elem, "RatingStars", 0.0),
-            rating_stars_eom=safe_find_float(player_elem, "RatingStarsEndOfMatch", 0.0),
-            role_id=safe_find_int(player_elem, "RoleID"),
-            behaviour=safe_find_int(player_elem, "Behaviour"),
-            # Default for starting players, actual substitution logic could be more complex
-            minutes_played=90,
+    players = [
+        CHPPMatchLineupPlayer(
+            player_id=safe_find_int(p, "PlayerID"),
+            name=" ".join(
+                filter(
+                    None,
+                    (
+                        safe_find_text(p, "FirstName", ""),
+                        safe_find_text(p, "LastName", ""),
+                    ),
+                )
+            ),
+            rating_stars=safe_find_float(p, "RatingStars", 0.0),
+            rating_stars_eom=safe_find_float(p, "RatingStarsEndOfMatch", 0.0),
+            role_id=safe_find_int(p, "RoleID"),
+            behaviour=safe_find_int(p, "Behaviour"),
         )
-        home_team_players.append(player)
-
-    # Parse away team players
-    away_team_players = []
-    for player_elem in root.findall(".//AwayTeam/StartingLineup/Player"):
-        player = CHPPMatchLineupPlayer(
-            player_id=safe_find_int(player_elem, "PlayerID"),
-            name=safe_find_text(player_elem, "PlayerName", ""),
-            rating_stars=safe_find_float(player_elem, "RatingStars", 0.0),
-            rating_stars_eom=safe_find_float(player_elem, "RatingStarsEndOfMatch", 0.0),
-            role_id=safe_find_int(player_elem, "RoleID"),
-            behaviour=safe_find_int(player_elem, "Behaviour"),
-            minutes_played=90,
-        )
-        away_team_players.append(player)
-
+        for p in team.findall("Lineup/Player")
+    ]
+    starting_roles = {
+        safe_find_int(p, "PlayerID"): safe_find_int(p, "RoleID")
+        for p in team.findall("StartingLineup/Player")
+    }
+    substitutions = sorted(
+        (
+            {
+                "subject": safe_find_int(o, "SubjectPlayerID"),
+                "object": safe_find_int(o, "ObjectPlayerID"),
+                "order_type": safe_find_int(o, "OrderType"),
+                "new_role": safe_find_int(o, "NewPositionId"),
+                "minute": safe_find_int(o, "MatchMinute"),
+            }
+            for o in team.findall("Substitutions/Substitution")
+        ),
+        key=lambda o: o["minute"],
+    )
+    team_id = safe_find_int(team, "TeamID", None)
+    is_home = team_id is not None and team_id == safe_find_int(
+        root, ".//HomeTeam/HomeTeamID", None
+    )
     return CHPPMatchLineup(
-        ht_id=ht_id,
-        home_team_formation=home_team_formation,
-        away_team_formation=away_team_formation,
-        home_team_players=home_team_players,
-        away_team_players=away_team_players,
-        home_team_tactic=home_team_tactic,
-        away_team_tactic=away_team_tactic,
+        ht_id=safe_find_int(root, ".//MatchID"),
+        home_team_players=players if is_home else [],
+        away_team_players=[] if is_home else players,
+        team_id=team_id,
+        starting_roles=starting_roles,
+        substitutions=substitutions,
     )
 
 

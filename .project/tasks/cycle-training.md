@@ -1,11 +1,11 @@
-# Cycle training (FEAT-036 to FEAT-041; FEAT-035 done)
+# Cycle training (FEAT-037 to FEAT-041; FEAT-035 and FEAT-036 done)
 
 Cycle training: a core group of trainees is trained in several skills in turn (often playmaking, defending, passing, sometimes scoring) over a few seasons, to end up with multi-skilled, valuable players. It's the reason this site exists.
 
 ## Order and why
 
 1. **FEAT-035 Training log (done).** `app/training_log.py` and the `training_week` table: each Update saves the last training (final) and the coming one (planned). The CHPP `training` file, version 2.1. The history only starts from the first Update after deploy.
-2. **FEAT-036 Who got trained.** Training counts only for minutes played in the right position. `MatchLineup` (already used) gives positions and minutes per match; combined with the training log, each player gets full, partial or none per week.
+2. **FEAT-036 Who got trained (done).** `app/training_rules.py` (`TRAINING_POSITION_EFFECTS`: full/partial/osmosis per sector, following HO where it differs from the wiki), `app/match_minutes.py` (minutes from matchlineup 2.0 orders, red cards and injuries, like HO), `match_position_minutes` table, `app/trainees.py` (best 90 minutes per week, shown as one training % per player: full minutes + half minutes at 50% + osmosis minutes at 1/6, 1/8 for playmaking/crossing, 5/39 for wing attacks, as HO's `calcSkillIncrement`; FEAT-039 should reuse `training_share`). Lineups are fetched with the team id for finished matches during Update; only matches downloaded after this release have minutes.
 3. **FEAT-037 Measured speed.** The player snapshots from each Update show when a skill went up. With 035 and 036 we know how many trained weeks each level took. This gives real numbers before any formula is written.
 4. **FEAT-038 Cycle plan.** The first planner, without projections: phases, trainees, a timeline with ages and dates, and squad needs per phase. New tables via a reviewed Alembic migration (additive only).
 5. **FEAT-039 Projection.** Adds expected skills per phase. Use the measured speed when there is enough history, otherwise defaults.

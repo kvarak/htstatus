@@ -1,17 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-  {% from "_page.html" import page_header, icon %}
+  {% from "_page.html" import page_header, icon, team_links %}
   {# One green tile per team; placed between the other tiles so the grid stays filled #}
   {% macro team_tile(team_idx) %}
     <section class="tile tile-green tile-wide">
       <h2 class="tile-title">{{ icon('shirt', 'tile-icon') }} {{ all_team_names[team_idx] }}</h2>
-      <nav class="tile-links" aria-label="{{ all_team_names[team_idx] }}">
-        {% for (label, page, icon_name) in [('Players', 'player', 'shirt'), ('Formations', 'formations', 'pitch'), ('Matches', 'matches', 'scoreboard'), ('Series', 'series', 'trophy'), ('Training', 'training', 'stopwatch'), ('Statistics', 'stats', 'chart')] %}
-          <a class="tile-link"
-             href="/{{ page }}?id={{ all_teams[team_idx] }}"
-             onclick="loading();">{{ icon(icon_name) }} {{ label }}</a>
-        {% endfor %}
-      </nav>
+      {{ team_links(all_teams[team_idx], all_team_names[team_idx]) }}
     </section>
   {% endmacro %}
   <div class="container">

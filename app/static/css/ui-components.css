@@ -1,15 +1,6 @@
 /* UI Components - Reusable interface elements */
 /* Used across multiple templates for consistent styling */
 
-.updated-teams-box p {
-    margin: 0.5rem 0;
-    font-size: 0.9rem;
-}
-
-.updated-teams-box p:last-child {
-    margin-bottom: 0;
-}
-
 /* Comments and Feedback */
 .comment {
     border-radius: 8px;

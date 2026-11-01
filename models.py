@@ -1009,6 +1009,26 @@ class TutorialAnalytics(db.Model):
         return f"<TutorialAnalytics {self.event_type} {self.tour_id} by user {self.user_id} at {self.timestamp}>"
 
 
+class MatchPositionMinutes(db.Model):
+    """Minutes a player played in a field position in a match (FEAT-036).
+
+    Calculated at Update from matchlineup (and red cards/injuries from
+    matchdetails); one row per match, team, player and role.
+    """
+
+    __tablename__ = "match_position_minutes"
+    __table_args__ = (
+        db.UniqueConstraint("match_id", "team_id", "player_id", "role_id"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    match_id = db.Column(db.Integer, nullable=False, index=True)
+    team_id = db.Column(db.Integer, nullable=False, index=True)
+    player_id = db.Column(db.Integer, nullable=False)
+    role_id = db.Column(db.Integer, nullable=False)
+    minutes = db.Column(db.Integer, nullable=False)
+
+
 class TrainingWeek(db.Model):
     """One week of a team's training (FEAT-035), saved at Update.
 

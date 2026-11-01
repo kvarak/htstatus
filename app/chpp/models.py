@@ -435,6 +435,10 @@ class CHPPMatchLineup:
     away_team_players: list[CHPPMatchLineupPlayer] = field(default_factory=list)
     home_team_tactic: str = ""
     away_team_tactic: str = ""
+    # matchlineup 2.0 describes one team (the requested teamID)
+    team_id: int | None = None
+    starting_roles: dict[int, int] = field(default_factory=dict)  # player -> role
+    substitutions: list[dict] = field(default_factory=list)  # orders, by minute
 
     def __getitem__(self, key: str) -> Any:
         """Support dict-like access."""
