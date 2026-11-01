@@ -1,5 +1,5 @@
 # Allow-list: only what the image needs. Keeps .env, .git, database dumps,
-# backups and local clutter (app/static/_more) out of the build context.
+# backups and local clutter out of the build context.
 *
 !app/
 !migrations/
@@ -15,7 +15,6 @@
 !RELEASES.md
 !RELEASES-INTERNAL.md
 
-app/static/_more
 scripts/database/backups
 **/__pycache__
 **/*.pyc

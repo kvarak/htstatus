@@ -2,6 +2,8 @@
 
 Hobby Flask + PostgreSQL app for Hattrick managers (uses the Hattrick CHPP API). Good enough is perfect: simple, reliable, no enterprise patterns.
 
+**Workspace layout:** the VS Code workspace root is the folder *above* the repo. The git repo is `htstatus-2.0/`; run `git`, `make`, `uv` and `./scripts/...` from there. All paths and links below are relative to the repo (`.github` in the workspace root is a symlink to `htstatus-2.0/.github`). `tmp/` in the workspace root is local scratch space outside git (e.g. `tmp/img-ideas/` design references).
+
 ## Hard rules
 
 - **git and ssh: read freely, change only with permission.** Read-only commands are fine: `git status`/`log`/`diff`/`show`/`grep`, and ssh to look at a server (`ls`, `cat`, `docker compose ps`/`logs`, read-only SQL, `pg_dump` to read a database). Anything that changes state needs the user's explicit permission for the task at hand: commits, staging, checkout/reset, tags, push, branch or ref changes, and on servers editing files, restarting services, `docker compose up/down`, crontab or database writes. The user commits and pushes.
