@@ -73,6 +73,33 @@ def test_page_uses_shared_layout(french_words_client, name):
     assert not BOOTSTRAP_BLUE.search(html), BOOTSTRAP_BLUE.search(html)
 
 
+def test_home_page_has_a_tile_with_links_for_each_team(french_words_client):
+    html = french_words_client.get(PAGES["main"]).get_data(as_text=True)
+    for page in ("player", "formations", "matches", "series", "training", "stats"):
+        assert f'href="/{page}?id={TEAM}"' in html
+    assert "img/icons.svg#shirt" in html
+
+
+def test_home_page_spreads_team_tiles_between_the_other_tiles(french_words_client):
+    with french_words_client.session_transaction() as sess:
+        sess["all_teams"] = [TEAM, 222, 333]
+        sess["all_team_names"] = ["First FC", "Second FC", "Third FC"]
+    html = french_words_client.get(PAGES["main"]).get_data(as_text=True)
+
+    order = [
+        html.index(marker)
+        for marker in (
+            "What's New",
+            'aria-label="First FC"',
+            "Give feedback",
+            'aria-label="Second FC"',
+            "Thanks to",
+            'aria-label="Third FC"',
+        )
+    ]
+    assert order == sorted(order)
+
+
 def test_training_uses_terms_and_level_words(french_words_client):
     html = french_words_client.get(PAGES["training"]).get_data(as_text=True)
     assert ">Gardien</th>" in html

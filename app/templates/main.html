@@ -1,103 +1,114 @@
 {% extends 'base.html' %}
 {% block content %}
-  {% from "_page.html" import page_header %}
+  {% from "_page.html" import page_header, icon %}
+  {# One green tile per team; placed between the other tiles so the grid stays filled #}
+  {% macro team_tile(team_idx) %}
+    <section class="tile tile-green tile-wide">
+      <h2 class="tile-title">{{ icon('shirt', 'tile-icon') }} {{ all_team_names[team_idx] }}</h2>
+      <nav class="tile-links" aria-label="{{ all_team_names[team_idx] }}">
+        {% for (label, page, icon_name) in [('Players', 'player', 'shirt'), ('Formations', 'formations', 'pitch'), ('Matches', 'matches', 'scoreboard'), ('Series', 'series', 'trophy'), ('Training', 'training', 'stopwatch'), ('Statistics', 'stats', 'chart')] %}
+          <a class="tile-link"
+             href="/{{ page }}?id={{ all_teams[team_idx] }}"
+             onclick="loading();">{{ icon(icon_name) }} {{ label }}</a>
+        {% endfor %}
+      </nav>
+    </section>
+  {% endmacro %}
   <div class="container">
     {{ page_header([('Hattrick Planner', None) ]) }}
-    {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
-    <div class="row">
-      <div class="col-md-7">
-        <div class="card mb-3">
-          <div class="card-body">
-            <p class="card-text">
-              Welcome to HattrickPlanner! This tool helps you organize and analyze your Hattrick teams with detailed player statistics, formation testing, and training tracking.
-            </p>
-            <p class="card-text">
-              <strong>Getting Started:</strong> Click "Update data" to sync your latest team and player information from Hattrick.
-            </p>
-            <p class="card-text">
-              <strong>Players:</strong> View detailed player statistics, skill development, and organize players into custom groups. Use "Settings" to create groups like "Main Squad" or "Youth Academy".
-            </p>
-            <p class="card-text">
-              <strong>Training & Stats:</strong> Track training progress and analyze team statistics to optimize player development.
-            </p>
-            <p class="card-text">
-              <strong>Feedback:</strong> Share suggestions and vote on features you'd like to see added to the tool.
-            </p>
-            <p class="card-text">
-              <strong>Work in Progress:</strong>
-              <br>
-              • Formation testing tool: experiment with different tactical setups
-              <br>
-              • Detailed match statistics and analysis
-            </p>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <p class="card-text text-sm11">
-              <b>Thanks to</b>
-              <br>
-              - <a href="http://www.hattrick.org/">Hattrick</a>
-              <br>
-              - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
-            </p>
-            <p class="card-text text-sm11">
-              <b>Users</b>
-              <br>
-              - Total users: {{ usercount }}
-              <br>
-              - Active users: {{ activeusers }}
-            </p>
-            <p class="card-text text-sm11">
-              <b>Full version</b>
-              <br>
-              - {{ fullversion }}
-            </p>
-            <p class="card-text text-sm11">
-              <b>Note</b>
-              <br>
-              If you have any issues with not being able to <i>Update data</i>, try to
-              logout and then login again to reset the sessiondata. This can happen for instance if you
-              rename a team, remove a team, etc.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-5">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">
-              <i class="fas fa-rocket"></i> What's New
-            </h5>
-            {% if releases %}
-              <div class="text-sm11">
-                {% for release in releases %}
-                  <div class="mb-2 pb-2 border-bottom">
-                    <h6 class="mb-1 text-primary">
-                      {{ release.version }} <small class="text-muted">{{ release.date }}</small>
-                    </h6>
-                    {% for feature in release.features %}<div class="text-sm10 mb-1">• {{ feature|safe }}</div>{% endfor %}
-                  </div>
+    {% if error %}
+      <div class="alert alert-danger" role="alert">{{ error }}</div>
+    {% endif %}
+    <div class="mosaic">
+      <section class="tile tile-brown tile-wide">
+        <h2 class="tile-title">{{ icon('ball', 'tile-icon') }} Welcome</h2>
+        <p class="mb-0">
+          HattrickPlanner is your notebook for Hattrick: follow how every player develops, plan training, try out line-ups and keep track of your matches and series.
+        </p>
+        <p class="mb-0">
+          It only talks to Hattrick when you log in or click <em>Update data</em>, so browsing here never touches your team.
+        </p>
+      </section>
+      <section class="tile tile-wide">
+        <h2 class="tile-title">{{ icon('tactics', 'tile-icon text-primary') }} Getting started</h2>
+        <p class="mb-0">
+          <strong>1.</strong> Click <em>Update data</em> to fetch your latest players and matches.
+        </p>
+        <p class="mb-0">
+          <strong>2.</strong> Open <em>Players</em> to see skills and changes, and sort players into groups in <em>Settings</em>.
+        </p>
+        <p class="mb-0">
+          <strong>3.</strong> Plan your next move with <em>Training</em>, <em>Formations</em> and <em>Stats</em>.
+        </p>
+      </section>
+      <section class="tile tile-wide">
+        <h2 class="tile-title">{{ icon('star', 'tile-icon text-primary') }} What's New</h2>
+        {% if releases %}
+          <div class="text-sm11 tile-scroll tile-scroll-sm">
+            {% for release in releases %}
+              <div class="mb-2 pb-2 border-bottom">
+                <h6 class="mb-1 text-primary">
+                  {{ release.version }} <small class="text-muted">{{ release.date }}</small>
+                </h6>
+                {% for feature in release.features %}
+                  <div class="text-sm10 mb-1">• {{ feature|safe }}</div>
                 {% endfor %}
               </div>
-              <div class="mt-3">
-                <a href="{{ url_for('main.changes') }}"
-                   class="btn btn-sm btn-outline-primary">
-                  <i class="fas fa-eye"></i> View Complete Development History
-                </a>
-              </div>
-            {% else %}
-              <p class="text-sm11">Release information not available.</p>
-              <div class="mt-3">
-                <a href="{{ url_for('main.changes') }}"
-                   class="btn btn-sm btn-outline-primary">
-                  <i class="fas fa-eye"></i> View Development History
-                </a>
-              </div>
-            {% endif %}
+            {% endfor %}
+          </div>
+          <a href="{{ url_for('main.changes') }}" class="small">Full history →</a>
+        {% else %}
+          <p class="text-sm11">Release information not available.</p>
+          <a href="{{ url_for('main.changes') }}" class="small">Full history →</a>
+        {% endif %}
+      </section>
+      {% if all_teams|length > 0 %}{{ team_tile(0) }}{% endif %}
+      <section class="tile tile-sand">
+        <h2 class="tile-title">{{ icon('scoreboard', 'tile-icon') }} Users</h2>
+        <div class="d-flex" style="gap: 1.5rem">
+          <div>
+            <div class="scoreboard-label">Total</div>
+            <div class="scoreboard-number">{{ usercount }}</div>
+          </div>
+          <div>
+            <div class="scoreboard-label">Active</div>
+            <div class="scoreboard-number">{{ activeusers }}</div>
           </div>
         </div>
-      </div>
+      </section>
+      <section class="tile tile-orange">
+        <h2 class="tile-title">{{ icon('whistle', 'tile-icon') }} Feedback</h2>
+        <p class="mb-0">Share suggestions and vote on features you'd like to see added to the tool.</p>
+        {% if current_user %}
+          <p class="mb-0">
+            <a href="/feedback">Give feedback</a>
+          </p>
+        {% endif %}
+      </section>
+      {% if all_teams|length > 1 %}{{ team_tile(1) }}{% endif %}
+      <section class="tile">
+        <h2 class="tile-title">{{ icon('tactics', 'tile-icon text-primary') }} Work in Progress</h2>
+        <p class="mb-0 small">
+          • Formation testing tool: experiment with different tactical setups
+          <br>
+          • Detailed match statistics and analysis
+        </p>
+      </section>
+      <section class="tile tile-brown text-sm11">
+        <p class="mb-0">
+          <b>Thanks to</b>
+          <br>
+          - <a href="http://www.hattrick.org/">Hattrick</a>
+          <br>
+          - <a href="https://hattrick.org/en/Community/CHPP/">Hattrick CHPP API</a>
+        </p>
+        <p class="mb-0">
+          <b>Full version</b>
+          <br>
+          - {{ fullversion }}
+        </p>
+      </section>
+      {% for team_idx in range(2, all_teams|length) %}{{ team_tile(team_idx) }}{% endfor %}
     </div>
   </div>
 {% endblock %}

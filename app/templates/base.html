@@ -7,7 +7,7 @@
   <link rel="icon" href="{{ url_for('static', filename='ico.jpg') }}">
   <link rel="manifest"
         href="{{ url_for('static', filename='manifest.json') }}">
-  <meta name="theme-color" content="#1f2937">
+  <meta name="theme-color" content="#3b2a26">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Bootstrap: Latest compiled and minified CSS -->
   <link rel="stylesheet"
@@ -22,51 +22,61 @@
      ======================================== */
 
   :root {
-    /* Color System - minimal: neutral grays + one green accent.
-       Warning/destructive are for warnings and errors only. */
-    /* Using HSL without hsl() wrapper for consistent color management */
+    /* "Football poster" palette (UI-024): espresso brown, pitch green, sand,
+       cream and one warm orange. Red/amber only for errors and bad values.
+       HSL without the hsl() wrapper so alpha can be added: hsl(var(--x) / 0.5) */
 
-    --primary: 125 35% 30%;                    /* The one accent: football green */
+    /* Poster colors, for tiles and fixed-color surfaces (same in both modes) */
+    --brown: 11 22% 19%;                       /* navbar, table headers, dark tiles */
+    --green: 92 41% 32%;                       /* pitch green, dark enough for cream text */
+    --sand: 42 22% 72%;
+    --cream: 41 45% 94%;
+    --orange: 30 80% 54%;                      /* bright accent fill, brown text on it */
+
+    --primary: var(--green);                   /* actions, our team */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 125 35% 30%;
+    --primary-glow: var(--green);
 
-    --secondary: 0 0% 95%;
-    --secondary-foreground: 0 0% 15%;
+    --secondary: 40 30% 87%;
+    --secondary-foreground: 11 22% 15%;
 
-    --success: 125 35% 30%;                    /* Same as the accent */
+    --success: var(--green);
     --success-foreground: 0 0% 100%;
 
     --warning: 40 90% 50%;
     --warning-foreground: 40 30% 12%;
 
-    --destructive: 0 65% 50%;
+    --destructive: 0 65% 44%;
     --destructive-foreground: 0 0% 100%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 42%;
+    --muted: 40 30% 87%;
+    --muted-foreground: 20 14% 34%;
 
-    --accent: 125 35% 30%;
+    --accent: var(--green);
     --accent-foreground: 0 0% 100%;
 
-    --accent2: 215 28% 42%;                    /* Second accent: slate blue, balances the green */
+    --accent2: 26 80% 34%;                     /* burnt orange: links, selection, info */
     --accent2-foreground: 0 0% 100%;
 
-    --background: 0 0% 98%;
-    --foreground: 0 0% 13%;
+    --background: 42 24% 80%;                  /* sand page */
+    --foreground: 11 22% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card: var(--cream);
+    --card-foreground: 11 22% 15%;
 
-    --border: 0 0% 88%;
-    --input: 0 0% 82%;
-    --ring: 125 35% 30%;
+    --border: 38 20% 74%;
+    --input: 38 18% 66%;
+    --ring: var(--green);
+
+    --pattern: 42 22% 75%;                     /* kit-icon pattern on the page background */
+    --scoreboard-font: "Oswald", "Arial Narrow", sans-serif-condensed, sans-serif;
 
     /* Legacy color aliases for existing Flask templates */
     --color-primary: hsl(var(--primary));
-    --color-primary-hover: hsl(125, 35%, 24%);
-    --color-primary-light: hsl(125, 30%, 40%);
+    --color-primary-hover: hsl(92, 41%, 26%);
+    --color-primary-light: hsl(92, 35%, 42%);
     --color-success: hsl(var(--success));
-    --color-success-hover: hsl(125, 35%, 24%);
+    --color-success-hover: hsl(92, 41%, 26%);
     --color-warning: hsl(var(--warning));
     --color-warning-hover: hsl(40, 90%, 42%);
     --color-destructive: hsl(var(--destructive));
@@ -88,7 +98,7 @@
     --shadow-elegant: none;
 
     /* Border Radius */
-    --radius: 0.5rem;       /* 8px - default */
+    --radius: 0.25rem;      /* 4px - flat poster tiles, slightly rounded */
 
     /* Typography Scale */
     --font-size-xs: 0.75rem;    /* 12px */
@@ -332,11 +342,9 @@
     color: hsl(var(--foreground));
   }
 
-  .bg-off {
-    background-color:#d6d6d6!important
-  }
   .bg-roundup {
-    background-color:#34c8db!important
+    background-color: hsl(var(--brown)) !important;
+    color: hsl(var(--cream));
   }
   .img-fluid-2 {
     max-height: 100%;
@@ -354,11 +362,6 @@
     padding-bottom: 2rem;
   }
 
-  .td-fixed {
-    background-color:#ffffff!important;
-    position: absolute;
-  }
-
   .text-sm10 {
     font-size: 10px;
   }
@@ -373,8 +376,6 @@
 
   /* Sortable tables */
   table.sortable thead {
-    background-color:#eee;
-    color:#666666;
     font-weight: bold;
     cursor: default;
   }
@@ -382,37 +383,6 @@
   .parent {
     overflow: hidden; /* required */
     height: 1px; /* some non-zero number */
-  }
-
-  .ribbon {
-    margin: 0;
-    padding: 0;
-    background: rgb(36, 13, 165);
-    color:white;
-    padding:1em 0;
-    position: absolute;
-    top:0;
-    right:0;
-    transform: translateX(30%) translateY(0%) rotate(45deg);
-    transform-origin: top left;
-    z-index: 100;
-  }
-  .ribbon:before,
-  .ribbon:after {
-    content: '';
-    position: absolute;
-    top:0;
-    margin: 0 -1px; /* tweak */
-    width: 100%;
-    height: 100%;
-    background: rgb(36, 13, 165);
-  }
-  .ribbon:before {
-    right:100%;
-  }
-
-  .ribbon:after {
-    left:100%;
   }
 
   .chart {
@@ -529,12 +499,11 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: #1f2937;
-    color: white;
+    background: hsl(var(--brown));
+    color: hsl(var(--cream));
     border: none;
     padding: 12px 20px;
-    border-radius: 25px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    border-radius: var(--radius);
     z-index: 1000;
     font-size: 14px;
   }
@@ -595,12 +564,12 @@ $('.toast').toast('show')
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-header {
     padding: 4px 16px !important;
-    background: hsl(120, 45%, 25%) !important;
+    background: hsl(var(--brown)) !important;
     border-radius: 0.375rem 0.375rem 0 0 !important;
 }
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-tooltip-title {
-    color: white !important;
+    color: hsl(var(--cream)) !important;
     font-weight: 600 !important;
 }
 
@@ -611,7 +580,7 @@ $('.toast').toast('show')
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-buttons {
     padding: 0.75rem 1rem !important;
-    border-top: 1px solid hsl(120, 20%, 90%) !important;
+    border-top: 1px solid hsl(var(--border)) !important;
     text-align: right !important;
     display: flex !important;
     justify-content: flex-end !important;
@@ -624,33 +593,33 @@ $('.toast').toast('show')
     margin: 0 !important;
     font-size: 0.875rem !important;
     border-radius: 0.25rem !important;
-    border: 1px solid hsl(120, 20%, 75%) !important;
-    background: white !important;
-    color: hsl(120, 45%, 25%) !important;
+    border: 1px solid hsl(var(--input)) !important;
+    background: hsl(var(--card)) !important;
+    color: hsl(var(--foreground)) !important;
     transition: all 0.2s ease !important;
 }
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-button:hover {
-    background: hsl(120, 45%, 25%) !important;
-    color: white !important;
-    border-color: hsl(120, 45%, 25%) !important;
+    background: hsl(var(--brown)) !important;
+    color: hsl(var(--cream)) !important;
+    border-color: hsl(var(--brown)) !important;
 }
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton {
-    background: hsl(120, 45%, 25%) !important;
-    color: white !important;
-    border-color: hsl(120, 45%, 25%) !important;
+    background: hsl(var(--brown)) !important;
+    color: hsl(var(--cream)) !important;
+    border-color: hsl(var(--brown)) !important;
 }
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-nextbutton:hover {
-    background: hsl(120, 45%, 20%) !important;
-    border-color: hsl(120, 45%, 20%) !important;
+    background: hsl(var(--primary)) !important;
+    border-color: hsl(var(--primary)) !important;
 }
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton {
     padding: 2px 16px !important;
     font-size: 0.75rem !important;
-    color: hsl(120, 15%, 50%) !important;
+    color: hsl(var(--muted-foreground)) !important;
     border: none !important;
     background: transparent !important;
     white-space: nowrap !important;
@@ -659,14 +628,14 @@ $('.toast').toast('show')
 }
 
 .introjs-tooltip.introjs-custom-tooltip .introjs-skipbutton:hover {
-    color: hsl(120, 45%, 25%) !important;
-    background: hsl(120, 8%, 97%) !important;
+    color: hsl(var(--foreground)) !important;
+    background: hsl(var(--muted)) !important;
 }
 
 .introjs-helperNumberLayer.introjs-custom-highlight {
-    border: 3px solid hsl(120, 70%, 45%) !important;
+    border: 3px solid hsl(var(--orange)) !important;
     border-radius: 0.25rem !important;
-    box-shadow: 0 0 0 4px hsla(120, 70%, 45%, 0.3) !important;
+    box-shadow: 0 0 0 4px hsl(var(--orange) / 0.3) !important;
 }
   </style>
   <!-- Tutorial Manager -->
@@ -746,7 +715,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 ## Navbar
 ##########################
 {% block navbar %}
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-poster">
     <button class="navbar-toggler"
             type="button"
             data-toggle="collapse"

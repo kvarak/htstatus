@@ -679,7 +679,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </script>
 {% endblock %}
 {% block content %}
-  {% from "_page.html" import page_header %}
+  {% from "_page.html" import page_header, icon %}
   <!-- Work in Progress Sticker -->
   <div class="container">
     {% call page_header([(teamname, '/'), (title, None)]) %}
@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="text-center text-white">
                   <!-- Available Players Pool -->
                   <div class="mb-4">
-                    <h6 class="mb-2">🏃 Available Players</h6>
+                    <h6 class="mb-2">{{ icon("shirt") }} Available Players</h6>
                     <div id="player-pool">
                       {% for player in current_players %}
                         <div class="position-player available-player"
@@ -842,7 +842,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="col-lg-4 col-md-5">
           <div class="card-custom h-100">
             <div class="card-custom-header">
-              <h6 class="card-custom-title mb-0">📊 Live Formation Analysis</h6>
+              <h6 class="card-custom-title mb-0">{{ icon("chart") }} Live Formation Analysis</h6>
             </div>
             <div class="card-custom-body p-3">
               <div id="live-analysis">
@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <!-- No Formation Selected State -->
         <div class="col-12">
           <div class="card-custom text-center p-5">
-            <h5 class="text-muted-custom mb-3">⚽ Select a Formation</h5>
+            <h5 class="text-muted-custom mb-3">{{ icon("tactics") }} Select a Formation</h5>
             <p class="text-muted-custom mb-4">Choose a formation to start building your lineup</p>
             <form method="GET" action="/formations" class="d-inline">
               <input type="hidden" name="id" value="{{ teamid }}">
@@ -890,7 +890,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="col-12">
           <div class="card-custom">
             <div class="card-custom-header">
-              <h5 class="card-custom-title">📈 Formation Analysis Results</h5>
+              <h5 class="card-custom-title">{{ icon("chart") }} Formation Analysis Results</h5>
             </div>
             <div class="card-custom-body">
               <div class="row">

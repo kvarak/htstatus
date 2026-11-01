@@ -31,8 +31,10 @@ CHPP is called **only** at login/OAuth callback and on the explicit Update (`/up
 
 ## UI conventions
 
-- One look: tokens in `:root` of `base.html`, Bootstrap remap in `static/css/theme.css`, dark mode in `dark-mode.css` (all rules under `html.dark-mode`). Green `--primary` for actions/our team, slate `--accent2` for links/selection/info; red/amber only for errors and bad values. No hard-coded colors in templates.
-- Every page starts with `page_header` from `templates/_page.html`; the footer comes from `_skeleton.html`.
+- One look, a flat "football poster": tokens in `:root` of `base.html`, Bootstrap remap in `static/css/theme.css`, dark mode in `dark-mode.css` (all rules under `html.dark-mode`, brown surfaces). Poster colors `--brown`, `--green`, `--sand`, `--cream`, `--orange` are the same in both modes; semantic tokens map onto them: green `--primary` for actions/our team, burnt orange `--accent2` for links/selection/info; red/amber only for errors and bad values. No hard-coded colors in templates. Flat: no gradients or shadows, small radius.
+- Every page starts with `page_header` from `templates/_page.html` (a brown title tile); the footer comes from `_skeleton.html`.
+- `_page.html` also has `icon(name)` (flat SVG icons from `static/img/icons.svg`, colored by the text color; use them instead of emoji in headings) and `scoreboard(home, away, home_goals, away_goals, us, meta)` for match headers. Big numbers use `.scoreboard-number` (Oswald, self-hosted in `static/fonts/`, OFL). Dashboard-style blocks use `.mosaic` with `.tile` / `.tile-brown|green|sand|orange`.
+- The page background is `static/img/pattern.svg` used as a CSS mask, colored by `--pattern`. Images are cache-first in `static/sw.js`: bump its cache version when changing `icons.svg` or `pattern.svg`.
 - Charts take colors from `chartColor(i, alpha)` / `CHART_DANGER` in `static/js/chart-utils.js` (country charts keep flag colors).
 - Show skills and levels with `column_label`, `ht_term`, `specialty_name`, `level_text`/`level_hint`, so the user's language and level format apply.
 - CSS by function: `ui-components.css`, `utilities.css`, `layout.css`, `charts.css`, `animations.css`; feature files `timeline.css`, `formations.css`, `player-table-enhanced.css` (`components.css` imports them).

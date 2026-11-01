@@ -172,3 +172,23 @@ def test_matches_page_shows_ratings_as_us_vs_them(app_with_routes, db_session):
     assert html.count('class="rating-box"') == 8
     assert re.search(r'class="us"\s+style="width: 80.0%"', html)
     assert "8.0 - 2.0" in html
+
+
+def test_match_header_is_a_scoreboard_with_our_team_highlighted(
+    app_with_routes, db_session
+):
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    db_session.add(_played_match(12345))
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert re.search(r'"scoreboard-team home us"\s+title="Test Team"', html)
+    assert re.search(r'"scoreboard-team away\s*"\s+title="Rivals FC"', html)
+    assert re.search(
+        r'scoreboard-digit">2</span>\s*<span class="scoreboard-digit">1</span>', html
+    )

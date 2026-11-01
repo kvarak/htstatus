@@ -25,6 +25,7 @@ Hobby Flask + PostgreSQL app for Hattrick managers (uses the Hattrick CHPP API).
 
 - Understand the whole flow before changing it; look at similar code first. Prefer removing and simplifying over adding.
 - Small verified steps: the narrowest test first (`make test-single FILE=...`), `make test-all` before calling a task done. Use `uv` (`uv run python ...`) and `make` (`make help`).
+- To check pages in the browser, log in locally as the `ADMIN_HT_ID` user from `.env` with their teams from the dev database (sign a Flask session cookie with `SECRET_KEY`), so no CHPP call is needed. Never open `/update` for this.
 - Ask when a decision changes behaviour, data or scope. Don't guess game rules that might be wrong for some users.
 - Routes: `@require_authentication`, `@track_activity("<page>")`, `get_current_user()` and `current_team()` from `app/auth_utils.py`; admin checks with `user.is_admin()`.
 - UI: follow the conventions in architecture.md (one look, `page_header`, no hard-coded colors, Hattrick terms via `column_label`/`level_text`).

@@ -88,7 +88,10 @@ class TestRosterPages:
         response = roster_client.get(f"/stats?id={self.USER_TEAM}")
 
         assert response.status_code == 200
-        total = re.search(rb'card-title mb-1">(\d+)</h6>', response.data)
+        total = re.search(
+            rb'scoreboard-number">(\d+)</div>\s*<div class="scoreboard-label text-muted">Total Players',
+            response.data,
+        )
         assert total and total.group(1) == b"2"
 
     @pytest.mark.parametrize(

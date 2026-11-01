@@ -138,7 +138,7 @@ class TestVersionInfo:
         result = get_version_info()
 
         mock_subprocess.assert_not_called()
-        assert result["version"] == "3.24"
+        assert result["version"] == "3.24.2"
         assert result["fullversion"] == "3.24.2-gabc1234"
 
     @patch("subprocess.check_output")
@@ -160,7 +160,7 @@ class TestVersionInfo:
 
         result = get_version_info()
 
-        assert result["version"] == "3.12"
+        assert result["version"] == "3.12.0"
         assert result["fullversion"] == "3.12"
         assert result["versionstr"] == "3.12"
 
@@ -182,7 +182,7 @@ class TestVersionInfo:
 
         result = get_version_info()
 
-        assert result["version"] == "v1.0"
+        assert result["version"] == "v1.0.0"
         assert result["fullversion"] == "v1.0"
         assert result["versionstr"] == "v1.0"
 

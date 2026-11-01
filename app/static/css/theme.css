@@ -1,28 +1,56 @@
-/* One look for every page: neutral surfaces, gray borders, green accent (actions,
-   our team) balanced by a slate blue second accent (links, selection, info).
-   Loaded after Bootstrap and the base styles; dark-mode.css overrides the
-   variables used here, so these rules work in both modes.
-   Red/amber only for errors and warnings. */
+/* One look for every page (UI-024 "football poster"): flat tiles in espresso
+   brown, pitch green and sand, cream cards, one warm orange accent.
+   Tokens live in :root of base.html; dark-mode.css overrides them, so these
+   rules work in both modes. Red/amber only for errors and bad values. */
+
+/* Oswald (SIL Open Font License, see ../fonts/OFL-Oswald.txt): headings and
+   scoreboard numbers */
+@font-face {
+  font-family: "Oswald";
+  src: url("../fonts/oswald-latin-wght.woff2") format("woff2");
+  font-weight: 200 700;
+  font-display: swap;
+}
 
 /* ---- Page ---- */
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
+  /* Footer at the bottom of the window on short pages */
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  min-height: 100vh;
 }
 
-/* Background photo, recolored to the theme: its luminosity with the two accents' hues (green -> slate),
-   faded so content stays calm. Dark mode only changes the variables/opacity. */
+body > * {
+  flex-shrink: 0;
+}
+
+.site-footer {
+  margin-top: auto !important;
+}
+
+/* Subtle pattern of flat kit icons; the SVG is only a mask, the color is a token */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
-  background:
-    linear-gradient(135deg, hsl(var(--primary)) 20%, hsl(var(--accent2)) 80%),
-    url("../background.jpg") center / cover no-repeat;
-  background-blend-mode: color;
-  opacity: var(--background-photo-opacity, 0.22);
+  background-color: hsl(var(--pattern));
+  -webkit-mask: url("../img/pattern.svg") 0 0 / 240px 240px repeat;
+  mask: url("../img/pattern.svg") 0 0 / 240px 240px repeat;
   pointer-events: none;
+}
+
+h1, h2, h3, h4, h5, h6,
+.breadcrumb,
+.card-title,
+.card-custom-title,
+.navbar-brand {
+  font-family: var(--scoreboard-font);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.01em;
 }
 
 a {
@@ -38,22 +66,62 @@ a:hover {
   padding-bottom: var(--spacing-8);
 }
 
-/* ---- Navbar ---- */
-.navbar.bg-light {
-  background-color: hsl(var(--card)) !important;
-  border-bottom: 1px solid hsl(var(--border));
+/* ---- Flat icons (static/img/icons.svg, icon() macro in _page.html) ---- */
+.icon {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.2em;
+  fill: currentColor;
+  flex-shrink: 0;
 }
 
-/* ---- Page header (templates/_page.html) ---- */
+.icon-lg {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* ---- Navbar: espresso brown in both modes ---- */
+.navbar.navbar-poster {
+  background-color: hsl(var(--brown));
+  border-bottom: 4px solid hsl(var(--green));
+}
+
+.navbar-poster .navbar-nav .nav-link {
+  color: hsl(var(--cream));
+}
+
+.navbar-poster .navbar-nav .nav-link:hover,
+.navbar-poster .navbar-nav .nav-link:focus,
+.navbar-poster .navbar-nav .show > .nav-link {
+  color: hsl(var(--orange));
+}
+
+.navbar-poster .navbar-toggler {
+  border-color: hsl(var(--cream) / 0.4);
+}
+
+.navbar-poster #dark-mode-toggle {
+  border-color: hsl(var(--cream) / 0.4);
+}
+
+.navbar-poster #dark-mode-toggle:hover {
+  background: hsl(var(--cream) / 0.1);
+}
+
+/* ---- Page header (templates/_page.html): a brown title tile ---- */
 .page-header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-2);
-  padding-bottom: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
   margin-bottom: var(--spacing-4);
-  border-bottom: 1px solid hsl(var(--border));
+  background-color: hsl(var(--brown));
+  color: hsl(var(--cream));
+  border-radius: var(--radius);
+  border-left: 6px solid hsl(var(--green));
 }
 
 .breadcrumb {
@@ -61,17 +129,23 @@ a:hover {
   padding: 0;
   margin: 0;
   border-radius: 0;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xl);
+  text-transform: uppercase;
 }
 
-.breadcrumb-item.active {
-  color: hsl(var(--foreground));
+.page-header .breadcrumb-item a {
+  color: hsl(var(--orange));
+}
+
+.page-header .breadcrumb-item.active,
+.page-header .breadcrumb-item + .breadcrumb-item::before {
+  color: hsl(var(--cream));
 }
 
 .page-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: var(--spacing-2);
 }
 
@@ -79,7 +153,23 @@ a:hover {
   margin: 0;
 }
 
-/* ---- Cards: flat, bordered, no colored headers ---- */
+.page-header .btn-outline-secondary,
+.page-header .btn-outline-primary {
+  color: hsl(var(--cream));
+  border-color: hsl(var(--cream) / 0.5);
+}
+
+.page-header .btn-outline-secondary:hover,
+.page-header .btn-outline-primary:hover {
+  background-color: hsl(var(--cream) / 0.12);
+  color: hsl(var(--cream));
+}
+
+.page-header .text-muted {
+  color: hsl(var(--sand)) !important;
+}
+
+/* ---- Cards: flat cream tiles, sand headers ---- */
 .card,
 .card-custom {
   background-color: hsl(var(--card));
@@ -90,7 +180,7 @@ a:hover {
 
 .card-header,
 .card-custom-header {
-  background-color: transparent;
+  background-color: hsl(var(--muted));
   border-bottom: 1px solid hsl(var(--border));
   color: hsl(var(--foreground));
 }
@@ -112,7 +202,7 @@ a:hover {
 }
 
 .card-footer {
-  background-color: transparent;
+  background-color: hsl(var(--muted));
   border-top: 1px solid hsl(var(--border));
 }
 
@@ -252,7 +342,7 @@ a:hover {
   background-color: hsl(var(--primary));
 }
 
-/* ---- Tables: light header, thin rules ---- */
+/* ---- Tables: brown header, thin rules ---- */
 .table-custom,
 .table {
   background-color: hsl(var(--card));
@@ -262,13 +352,21 @@ a:hover {
 
 .table-custom thead,
 .table thead th,
+.table-custom thead th,
 table.sortable thead {
-  background-color: hsl(var(--muted));
-  color: hsl(var(--foreground));
+  background-color: hsl(var(--brown));
+  color: hsl(var(--cream));
 }
 
-.table-custom thead th {
-  border-bottom: 1px solid hsl(var(--border));
+.table-custom thead th,
+.table thead th {
+  border-bottom: 3px solid hsl(var(--green));
+  border-top-color: hsl(var(--brown));
+}
+
+.table thead th a,
+.table-custom thead th a {
+  color: hsl(var(--orange));
 }
 
 .table td,
@@ -281,10 +379,10 @@ table.sortable thead {
   display: inline-block;
   align-self: center;
   padding: 0.125rem 0.5rem;
-  border: 1px solid hsl(var(--border));
-  border-radius: var(--radius-md);
-  background: hsl(var(--muted));
-  color: hsl(var(--muted-foreground));
+  border-radius: var(--radius-sm);
+  background: hsl(var(--orange));
+  color: hsl(var(--brown));
+  font-family: var(--scoreboard-font);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
   text-transform: uppercase;
@@ -293,8 +391,19 @@ table.sortable thead {
 
 /* ---- Footer ---- */
 .site-footer {
-  border-top: 1px solid hsl(var(--border));
-  background-color: hsl(var(--card));
+  border-top: 4px solid hsl(var(--green));
+  background-color: hsl(var(--brown));
+  color: hsl(var(--sand));
+}
+
+.site-footer .container {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.site-footer .text-muted,
+.site-footer a {
+  color: hsl(var(--sand)) !important;
 }
 
 /* ---- Us vs them (matches): our team = accent, opponent = gray ---- */
@@ -363,7 +472,7 @@ table.sortable thead {
   font-weight: var(--font-weight-bold);
 }
 
-/* ---- Second accent: slate blue (links, selection, info) ---- */
+/* ---- Second accent: burnt orange (links, selection, info) ---- */
 .btn-info {
   background-color: hsl(var(--accent2));
   border-color: hsl(var(--accent2));
@@ -405,8 +514,11 @@ table.sortable thead {
 
 /* ---- Series page (FEAT-030): our team = accent ---- */
 .series-stat {
-  font-size: var(--font-size-2xl, 1.5rem);
+  font-family: var(--scoreboard-font);
+  font-size: var(--font-size-3xl);
   font-weight: var(--font-weight-semibold);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
 }
 
 .series-table td,
@@ -434,3 +546,188 @@ table.sortable thead {
 
 .form-badge.form-W { background-color: hsl(var(--primary)); }
 .form-badge.form-L { background-color: hsl(var(--destructive)); }
+
+/* ---- Poster tiles: flat blocks of one color (dashboard, stats) ----
+   <div class="mosaic"><div class="tile tile-brown tile-wide">...</div></div> */
+.mosaic {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  min-width: 0;
+  padding: var(--spacing-4);
+  border-radius: var(--radius);
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border: 1px solid hsl(var(--border));
+}
+
+.tile-wide { grid-column: span 2; }
+
+.tile-brown,
+.tile-green,
+.tile-sand,
+.tile-orange {
+  border: none;
+}
+
+.tile-brown { background-color: hsl(var(--brown)); color: hsl(var(--cream)); }
+.tile-green { background-color: hsl(var(--green)); color: hsl(var(--cream)); }
+.tile-sand { background-color: hsl(var(--sand)); color: hsl(var(--brown)); }
+.tile-orange { background-color: hsl(var(--orange)); color: hsl(var(--brown)); }
+
+/* Links and muted text keep their contrast on the colored tiles */
+.tile-brown a:not(.btn) { color: hsl(var(--orange)) !important; }
+.tile-green a:not(.btn) { color: hsl(var(--cream)) !important; text-decoration: underline; }
+.tile-sand a:not(.btn),
+.tile-orange a:not(.btn) { color: hsl(var(--brown)) !important; text-decoration: underline; }
+.tile-brown .text-muted { color: hsl(var(--sand)) !important; }
+.tile-green .text-muted { color: hsl(var(--cream) / 0.85) !important; }
+.tile-sand .text-muted,
+.tile-orange .text-muted { color: hsl(var(--brown) / 0.8) !important; }
+
+.tile-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin: 0;
+  font-family: var(--scoreboard-font);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tile-scroll {
+  max-height: 24rem;
+  overflow-y: auto;
+  padding-right: var(--spacing-2);
+}
+
+.tile-scroll-sm {
+  max-height: 7rem;
+}
+
+.tile-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.tile-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: var(--spacing-2);
+}
+
+.tile-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  background-color: hsl(var(--cream) / 0.12);
+  color: inherit !important;
+  text-decoration: none !important;
+  font-family: var(--scoreboard-font);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tile-link:hover {
+  background-color: hsl(var(--orange));
+  color: hsl(var(--brown)) !important;
+}
+
+@media (max-width: 991px) {
+  .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 575px) {
+  .mosaic { grid-template-columns: minmax(0, 1fr); }
+  .tile-wide { grid-column: auto; }
+}
+
+/* ---- Scoreboard: big numbers and the "Home vs Away" match bar ---- */
+.scoreboard-number {
+  font-family: var(--scoreboard-font);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-3xl);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreboard-label {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.scoreboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius);
+  background-color: hsl(var(--brown));
+  color: hsl(var(--cream));
+  font-family: var(--scoreboard-font);
+}
+
+.scoreboard-team {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.scoreboard-team.home { text-align: right; }
+
+.scoreboard-team.us {
+  color: hsl(var(--orange));
+}
+
+.scoreboard-score {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.scoreboard-digit {
+  min-width: 2.4rem;
+  padding: 0.1rem 0.4rem;
+  border: 2px solid hsl(var(--green));
+  border-radius: var(--radius-sm);
+  background-color: hsl(0 0% 0% / 0.35);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.scoreboard-vs {
+  padding: 0 var(--spacing-2);
+  font-size: var(--font-size-lg);
+  color: hsl(var(--sand));
+}
+
+.scoreboard-meta {
+  grid-column: 1 / -1;
+  margin-top: calc(-1 * var(--spacing-2));
+  text-align: center;
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  color: hsl(var(--sand));
+  letter-spacing: 0.05em;
+}

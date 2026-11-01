@@ -456,21 +456,20 @@ class TutorialManager {
             border-radius: 50%;
             width: 50px;
             height: 50px;
-            background-color: #007bff;
-            color: white;
+            background-color: hsl(var(--orange));
+            color: hsl(var(--brown));
             border: none;
             font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         `;
 
         // Add hover effect
         helpBtn.onmouseenter = () => {
-            helpBtn.style.backgroundColor = '#0056b3';
+            helpBtn.style.backgroundColor = 'hsl(var(--orange) / 0.85)';
         };
         helpBtn.onmouseleave = () => {
-            helpBtn.style.backgroundColor = '#007bff';
+            helpBtn.style.backgroundColor = 'hsl(var(--orange))';
         };
 
         // Add click handler to directly start the tour

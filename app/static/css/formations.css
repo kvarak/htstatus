@@ -2,13 +2,31 @@
 /* Used in: formations.html */
 
 /* Formation System Base */
-/* The pitch: one flat green; empty slots are white outlines */
+/* The pitch: flat mown stripes inside a white touchline; empty slots are
+   white outlines. (No halfway line or centre circle: the rows are a list,
+   not real pitch geometry.) */
 .pitch {
+    --pitch: var(--green);
+    --pitch-stripe: 92 38% 36%;
     position: relative;
-    background: hsl(125, 30%, 36%);
-    border-radius: var(--radius, 8px);
-    padding: 20px;
+    background: repeating-linear-gradient(180deg, hsl(var(--pitch)) 0 48px, hsl(var(--pitch-stripe)) 48px 96px);
+    border-radius: var(--radius);
+    padding: 24px;
     min-height: 400px;
+}
+
+.pitch::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    pointer-events: none;
+    border: 2px solid hsl(0 0% 100% / 0.6);
+    border-radius: 2px;
+}
+
+.pitch > * {
+    position: relative;
+    z-index: 1;
 }
 
 .position-slot {
@@ -32,8 +50,8 @@
 }
 
 .position-slot.occupied {
-    background: rgba(255,255,255,0.9) !important;
-    border-color: #fff !important;
+    background: hsl(var(--cream) / 0.9) !important;
+    border-color: hsl(var(--cream)) !important;
     border-style: solid;
 }
 
@@ -41,17 +59,17 @@
    the only colors on the pitch, because they mean something */
 .position-slot.occupied.effect-high {
     background: hsl(var(--primary)) !important;
-    border-color: #fff !important;
+    border-color: hsl(var(--cream)) !important;
 }
 
 .position-slot.occupied.effect-mid {
     background: hsl(var(--warning)) !important;
-    border-color: #fff !important;
+    border-color: hsl(var(--cream)) !important;
 }
 
 .position-slot.occupied.effect-low {
     background: hsl(var(--destructive)) !important;
-    border-color: #fff !important;
+    border-color: hsl(var(--cream)) !important;
 }
 
 .position-slot.drag-over {
@@ -69,7 +87,7 @@
 
 /* Positioned Players */
 .positioned-player {
-    background: #fff;
+    background: hsl(var(--cream));
     color: hsl(var(--foreground));
     border: 2px solid hsl(var(--primary));
     border-radius: 50%;
@@ -130,7 +148,7 @@
 }
 
 .available-player {
-    background: #fff;
+    background: hsl(var(--cream));
     color: hsl(var(--foreground));
     padding: 4px 8px;
     border-radius: 4px;
@@ -157,21 +175,21 @@
 .player-tooltip {
     position: absolute;
     z-index: 2000;
-    background: rgba(0, 0, 0, 0.9);
-    color: white;
+    background: hsl(var(--brown) / 0.95);
+    color: hsl(var(--cream));
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 0.75rem;
     min-width: 200px;
     pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: none;
 }
 
 .tooltip-name {
     font-weight: bold;
     font-size: 0.85rem;
     margin-bottom: 4px;
-    color: hsl(125, 35%, 70%);
+    color: hsl(var(--orange));
 }
 
 .tooltip-stats {
@@ -187,12 +205,12 @@
 }
 
 .stat-label {
-    color: #ccc;
+    color: hsl(var(--sand));
 }
 
 .stat-value {
     font-weight: bold;
-    color: white;
+    color: hsl(var(--cream));
 }
 
 .tooltip-extra {

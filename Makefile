@@ -1,7 +1,7 @@
 # HattrickPlanner development commands (`make help`). Production runs the Docker
 # image built by CI; see DEPLOYMENT.md.
 
-.PHONY: help install update requirements-txt dev stop services docker-up docker-check \
+.PHONY: help install update requirements-txt serve stop services docker-up docker-check \
 	lint lint-templates fileformat security-bandit check-chpp test-python test-single test-all format \
 	clean changelog release-tag db-migrate db-upgrade db-copy-production check-uv check-venv
 
@@ -35,7 +35,7 @@ requirements-txt: check-uv
 	@echo "✅ requirements.txt updated"
 
 # Running
-dev: check-venv services changelog ## Start the development server
+serve: check-venv services changelog ## Start the development server
 	@$(PYTHON) run.py
 
 # Start the dev PostgreSQL

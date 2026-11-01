@@ -4,40 +4,41 @@
 /* ---- Design tokens (override the :root values in base.html) ---- */
 html.dark-mode {
   color-scheme: dark;
-  --background-photo-opacity: 0.07;
-  --accent2: 215 35% 68%;
-  --accent2-foreground: 215 30% 12%;
+  /* Brown becomes the surface, sand the muted text; green and orange stay.
+     The poster colors (--brown, --green, --sand, --cream, --orange) don't change. */
+  --accent2: 30 85% 60%;                       /* bright orange reads well on brown */
+  --accent2-foreground: 11 22% 12%;
+  --text-green: 92 45% 58%;                    /* green as text on dark surfaces */
 
-  /* Near-black neutral surfaces; the two accents are toned down so green
-     stays an accent, not the whole page */
-  --primary: 125 28% 42%;
-  --primary-foreground: 0 0% 98%;
-  --primary-glow: 125 28% 42%;
-  --secondary: 0 0% 16%;
-  --secondary-foreground: 0 0% 90%;
-  --success: 125 28% 42%;
-  --success-foreground: 0 0% 98%;
+  --primary: var(--green);
+  --primary-foreground: 0 0% 100%;
+  --primary-glow: var(--green);
+  --secondary: 11 15% 18%;
+  --secondary-foreground: 41 40% 90%;
+  --success: var(--green);
+  --success-foreground: 0 0% 100%;
   --warning: 40 85% 55%;
   --warning-foreground: 40 30% 10%;
-  --destructive: 0 65% 55%;
-  --destructive-foreground: 0 0% 98%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 65%;
-  --accent: 125 28% 42%;
-  --accent-foreground: 0 0% 98%;
-  --background: 0 0% 6%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 9%;
-  --card-foreground: 0 0% 90%;
-  --border: 0 0% 20%;
-  --input: 0 0% 24%;
-  --ring: 125 28% 42%;
+  --destructive: 0 70% 62%;
+  --destructive-foreground: 11 22% 10%;
+  --muted: 11 15% 18%;
+  --muted-foreground: 40 18% 70%;
+  --accent: var(--green);
+  --accent-foreground: 0 0% 100%;
+  --background: 11 20% 9%;
+  --foreground: 41 40% 90%;
+  --card: 11 18% 13%;
+  --card-foreground: 41 40% 90%;
+  --border: 11 14% 25%;
+  --input: 11 12% 32%;
+  --ring: var(--green);
+  --pattern: 11 18% 13%;
 
   --color-primary: hsl(var(--primary));
-  --color-primary-hover: hsl(125, 28%, 48%);
-  --color-primary-light: hsl(125, 28%, 52%);
+  --color-primary-hover: hsl(92, 41%, 38%);
+  --color-primary-light: hsl(92, 41%, 45%);
   --color-success: hsl(var(--success));
-  --color-success-hover: hsl(125, 28%, 48%);
+  --color-success-hover: hsl(92, 41%, 38%);
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-muted: hsl(var(--muted));
@@ -65,31 +66,25 @@ html.dark-mode a:not(.btn):not(.nav-link):not(.dropdown-item) {
   color: var(--dm-link);
 }
 
+/* Green as text needs to be lighter on brown than as a fill */
+html.dark-mode .text-primary,
+html.dark-mode .text-success,
+html.dark-mode .change-up,
+html.dark-mode .skill-up {
+  color: hsl(var(--text-green)) !important;
+}
+
+html.dark-mode .btn-outline-primary:not(:hover):not(.active),
+html.dark-mode .btn-outline-success:not(:hover):not(.active) {
+  color: hsl(var(--text-green));
+  border-color: hsl(var(--text-green));
+}
+
 /* ---- Bootstrap 4 components ---- */
-html.dark-mode .navbar-light.bg-light,
 html.dark-mode .bg-light,
-html.dark-mode .bg-white,
-html.dark-mode .bg-off {
+html.dark-mode .bg-white {
   background-color: var(--dm-surface) !important;
   color: var(--dm-text);
-}
-
-html.dark-mode .navbar-light .navbar-nav .nav-link,
-html.dark-mode .navbar-light .navbar-brand {
-  color: var(--dm-text);
-}
-
-html.dark-mode .navbar-light .navbar-nav .nav-link:hover,
-html.dark-mode .navbar-light .navbar-nav .active > .nav-link {
-  color: #fff;
-}
-
-html.dark-mode .navbar-light .navbar-toggler {
-  border-color: var(--dm-border);
-}
-
-html.dark-mode .navbar-light .navbar-toggler-icon {
-  filter: invert(1);
 }
 
 html.dark-mode .card,
@@ -112,8 +107,6 @@ html.dark-mode .toast-header {
   border-color: var(--dm-border);
 }
 
-html.dark-mode .breadcrumb-item.active,
-html.dark-mode .breadcrumb-item + .breadcrumb-item::before,
 html.dark-mode .text-muted,
 html.dark-mode .text-secondary,
 html.dark-mode .form-text,
@@ -318,12 +311,21 @@ html.dark-mode #dark-mode-toggle:hover {
   border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* Formations pitch: a dim green so it doesn't dominate the dark page */
+/* Formations pitch: dimmer stripes so it doesn't dominate the dark page */
 html.dark-mode .pitch {
-  background: hsl(125, 15%, 20%);
+  --pitch: 92 30% 22%;
+  --pitch-stripe: 92 30% 26%;
 }
 
 html.dark-mode .position-slot {
   border-color: rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.05);
+}
+
+/* Info fills are bright orange in dark mode: dark text, also where templates say text-white */
+html.dark-mode .bg-info,
+html.dark-mode .bg-info.text-white,
+html.dark-mode .badge-info,
+html.dark-mode .btn-info {
+  color: hsl(var(--accent2-foreground)) !important;
 }

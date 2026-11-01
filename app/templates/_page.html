@@ -19,3 +19,30 @@
     {% if caller is defined %}<div class="page-actions">{{ caller() }}</div>{% endif %}
   </div>
 {% endmacro %}
+{# Flat icon from static/img/icons.svg, colored by the text color:
+   ball, boot, trophy, whistle, scoreboard, shirt, pitch, stopwatch, goal,
+   tactics, star, medal, chart #}
+{% macro icon(name, cls='') -%}
+  <svg class="icon {{ cls }}" aria-hidden="true" focusable="false">
+    <use href="{{ url_for('static', filename='img/icons.svg') }}#{{ name }}"></use>
+  </svg>
+{%- endmacro %}
+{# "Home vs Away" scoreboard bar for a match; our team in orange.
+   Goals None = not played yet (shows "vs"). #}
+{% macro scoreboard(home, away, home_goals, away_goals, us, meta='') %}
+  <div class="scoreboard">
+    <div class="scoreboard-team home {{ 'us' if home == us }}"
+         title="{{ home }}">{{ home }}</div>
+    <div class="scoreboard-score">
+      {% if home_goals is not none and away_goals is not none %}
+        <span class="scoreboard-digit">{{ home_goals }}</span>
+        <span class="scoreboard-digit">{{ away_goals }}</span>
+      {% else %}
+        <span class="scoreboard-vs">vs</span>
+      {% endif %}
+    </div>
+    <div class="scoreboard-team away {{ 'us' if away == us }}"
+         title="{{ away }}">{{ away }}</div>
+    {% if meta %}<div class="scoreboard-meta">{{ meta }}</div>{% endif %}
+  </div>
+{% endmacro %}

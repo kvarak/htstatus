@@ -76,17 +76,21 @@ def get_version_info():
         )
 
         # Parse the git describe output
+        parts = versionstr_raw.split("-")
         if "-" in versionstr_raw:
             # Format: "3.12-1-gedd7f4a" (commits ahead of tag)
-            version = versionstr_raw.split("-")[0]
             # "3.15-8-g5015d35" -> "3.15.8-g5015d35" (replace first hyphen with dot)
             fullversion = versionstr_raw.replace("-", ".", 1)
             versionstr = fullversion
         else:
             # Exact tag match (no commits ahead)
-            version = versionstr_raw
             fullversion = versionstr_raw
             versionstr = versionstr_raw
+        # x.y.z: the tag plus the commits since it ("3.15-8-g5015d35" -> "3.15.8")
+        version = parts[0]
+        if version.count(".") < 2:
+            commits = parts[1] if len(parts) >= 3 and parts[1].isdigit() else "0"
+            version = f"{version}.{commits}"
 
     except (subprocess.CalledProcessError, FileNotFoundError, IndexError):
         # Fallback for development environment

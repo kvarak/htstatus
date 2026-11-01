@@ -29,8 +29,9 @@
       return;
     }
     var dark = isDark();
-    var text = dark ? "#ced4da" : "#666";
-    var grid = dark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.1)";
+    // Sand text on brown in dark mode, muted brown on cream in light mode
+    var text = dark ? "hsl(40, 18%, 70%)" : "hsl(20, 14%, 34%)";
+    var grid = dark ? "hsla(41, 45%, 94%, 0.12)" : "hsla(11, 22%, 19%, 0.1)";
     // New charts pick these up; existing charts cache resolved options, so set them too
     window.Chart.defaults.color = text;
     window.Chart.defaults.borderColor = grid;

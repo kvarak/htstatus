@@ -149,7 +149,7 @@ class TestUtilsAdvanced:
 
         result = get_version_info()
 
-        assert result["version"] == "3.12"
+        assert result["version"] == "3.12.5"
         # First hyphen becomes dot
         assert result["fullversion"] == "3.12.5-g1a2b3c4"
         assert result["versionstr"] == "3.12.5-g1a2b3c4"

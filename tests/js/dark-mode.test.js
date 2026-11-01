@@ -91,14 +91,14 @@ test('follows the system setting only until the user picks a mode', () => {
 test('sets Chart.js defaults and recolours existing charts on toggle', () => {
     const chart = fakeChart();
     const page = setup({ charts: [chart] });
-    assert.equal(page.Chart.defaults.color, '#666');
+    assert.equal(page.Chart.defaults.color, 'hsl(20, 14%, 34%)');
 
     page.click();
 
-    assert.equal(page.Chart.defaults.color, '#ced4da');
-    assert.equal(chart.options.scales.y.ticks.color, '#ced4da');
+    assert.equal(page.Chart.defaults.color, 'hsl(40, 18%, 70%)');
+    assert.equal(chart.options.scales.y.ticks.color, 'hsl(40, 18%, 70%)');
     assert.equal(chart.options.scales.y.ticks.stepSize, 1);
-    assert.equal(chart.options.scales.x.grid.color, 'rgba(255, 255, 255, 0.12)');
-    assert.equal(chart.options.plugins.legend.labels.color, '#ced4da');
+    assert.equal(chart.options.scales.x.grid.color, 'hsla(41, 45%, 94%, 0.12)');
+    assert.equal(chart.options.plugins.legend.labels.color, 'hsl(40, 18%, 70%)');
     assert.ok(chart.updated >= 2);
 });

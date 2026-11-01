@@ -8,7 +8,7 @@
     color: hsl(var(--destructive)) !important;
 }
 
-/* Selectable list items (training players, matches): selection = slate accent */
+/* Selectable list items (training players, matches): selection = orange accent2 */
 [data-player-item],
 [data-match-item] {
     transition: background-color 0.15s ease;

@@ -83,7 +83,7 @@ class TestVersionUtilities(unittest.TestCase):
 
         result = utils.get_version_info()
 
-        assert result["version"] == "3.12"
+        assert result["version"] == "3.12.0"
         assert result["fullversion"] == "3.12"
         assert result["versionstr"] == "3.12"
         mock_subprocess.assert_called_once_with(["git", "describe", "--tags"])
@@ -95,7 +95,7 @@ class TestVersionUtilities(unittest.TestCase):
 
         result = utils.get_version_info()
 
-        assert result["version"] == "3.15"
+        assert result["version"] == "3.15.8"
         assert result["fullversion"] == "3.15.8-g5015d35"
         assert result["versionstr"] == "3.15.8-g5015d35"
 

@@ -31,31 +31,31 @@
       {% if us %}
         <div class="row">
           <div class="col-sm-4 mb-3">
-            <div class="card h-100">
-              <div class="card-body text-center">
+            <div class="tile tile-brown h-100 text-center">
+              <div>
                 <div class="series-stat">{{ us.position }}</div>
-                <div class="text-muted small">Position · {{ us.points }} points</div>
+                <div class="scoreboard-label text-muted">Position · {{ us.points }} points</div>
               </div>
             </div>
           </div>
           <div class="col-sm-4 mb-3">
-            <div class="card h-100">
-              <div class="card-body text-center">
+            <div class="tile tile-green h-100 text-center">
+              <div>
                 {% if us.position == 1 %}
                   <div class="series-stat">1st</div>
-                  <div class="text-muted small">You lead the series</div>
+                  <div class="scoreboard-label text-muted">You lead the series</div>
                 {% else %}
                   <div class="series-stat">{{ view.behind_leader }}</div>
-                  <div class="text-muted small">Points behind the leader</div>
+                  <div class="scoreboard-label text-muted">Points behind the leader</div>
                 {% endif %}
               </div>
             </div>
           </div>
           <div class="col-sm-4 mb-3">
-            <div class="card h-100">
-              <div class="card-body text-center">
+            <div class="tile tile-sand h-100 text-center">
+              <div>
                 <div class="series-stat">{{ form_badges(us.form) if us.form else '—' }}</div>
-                <div class="text-muted small">Your form</div>
+                <div class="scoreboard-label text-muted">Your form</div>
               </div>
             </div>
           </div>

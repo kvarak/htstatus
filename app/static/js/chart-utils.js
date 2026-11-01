@@ -3,18 +3,19 @@
  * Centralized chart configuration and common patterns
  */
 
-// One restrained palette for every chart: green and slate (the two accents)
-// in light/dark shades, plus one gray. Red only for "bad" values (errors, losses).
+// One poster palette for every chart: pitch green, orange, brown, sand and their
+// lighter/darker shades, mid-tones so they read on cream and on dark brown.
+// Red only for "bad" values (errors, losses).
 const CHART_PALETTE = [
-    [125, 35, 30],
-    [215, 28, 45],
-    [125, 25, 55],
-    [215, 25, 68],
-    [0, 0, 55],
-    [125, 20, 75],
-    [215, 30, 28],
+    [92, 41, 36],
+    [30, 80, 54],
+    [11, 25, 40],
+    [42, 28, 58],
+    [92, 35, 58],
+    [20, 65, 45],
+    [40, 8, 55],
 ];
-const CHART_DANGER = 'hsl(0, 65%, 50%)';
+const CHART_DANGER = 'hsl(0, 65%, 48%)';
 
 function chartColor(index, alpha = 1) {
     const [h, s, l] = CHART_PALETTE[index % CHART_PALETTE.length];

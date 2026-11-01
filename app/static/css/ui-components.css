@@ -35,15 +35,6 @@
     padding: 0.25rem 0.5rem;
 }
 
-/* Match Tables */
-.table-custom thead th {
-    background-color: hsl(var(--muted));
-    border-bottom: 2px solid hsl(var(--border));
-    font-weight: 600;
-    color: hsl(var(--primary));
-    font-size: 0.875rem;
-}
-
 .badge {
     font-size: 0.75rem;
 }

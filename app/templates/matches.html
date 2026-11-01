@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-  {% from "_page.html" import page_header %}
+  {% from "_page.html" import page_header, icon, scoreboard %}
   {# One rating: "home - away" plus a thin bar of each side's share (us = accent) #}
   {% macro rating_box(label, home, away, home_is_us, col) %}
     <div class="{{ col }}">
@@ -164,15 +164,15 @@
                data-match-details="{{ m.ht_id }}"
                style="display: none"
                data-opponent-name="{% if m.home_team_name == teamname %}{{ m.away_team_name }}{% else %}{{ m.home_team_name }}{% endif %}">
+            <div class="mb-3">{{ scoreboard(m.home_team_name, m.away_team_name, none, none, teamname, m.datetime.strftime("%Y-%m-%d %H:%M") ) }}</div>
             <!-- Match Planning Section -->
             <div class="card mb-4">
               <div class="card-header">
-                <h6 class="mb-0">Match Planning: {{ m.home_team_name }} vs {{ m.away_team_name }}</h6>
-                <small class="text-muted">{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</small>
+                <h6 class="mb-0">Match Planning</h6>
               </div>
               <div class="card-body">
                 <div class="alert alert-info mb-3">
-                  <h6 class="alert-heading">🔮 Upcoming Match</h6>
+                  <h6 class="alert-heading">{{ icon("stopwatch") }} Upcoming Match</h6>
                   <p class="mb-2">
                     This match is scheduled for <strong>{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</strong>. Plan your tactics and lineup below.
                   </p>
@@ -234,52 +234,14 @@
           <div class="match-details"
                data-match-details="{{ m.ht_id }}"
                style="display: none">
-            <!-- Match Overview -->
-            {% if not m.has_enhanced_data() %}
-              <div class="row mb-4">
-                <div class="col-12">
-                  <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                      <h5 class="mb-0">{{ m.home_team_name }} vs {{ m.away_team_name }}</h5>
-                      <small class="text-muted">{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</small>
-                    </div>
-                    <div class="card-body">
-                      <div class="row">
-                        <div class="col-md-4 text-center">
-                          <h6 class="mb-1">{{ m.home_team_name }}</h6>
-                          <div class="mb-2">
-                            {% if m.home_team_name == teamname %}<span class="badge badge-primary">Home</span>{% endif %}
-                          </div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                          <div class="py-3">
-                            {% if m.home_goals is not none and m.away_goals is not none %}
-                              <h4 class="mb-0">{{ m.home_goals }} - {{ m.away_goals }}</h4>
-                              <small class="text-muted">Final Score</small>
-                            {% else %}
-                              <h4 class="mb-0">vs</h4>
-                              <small class="text-muted">Upcoming</small>
-                            {% endif %}
-                          </div>
-                        </div>
-                        <div class="col-md-4 text-center">
-                          <h6 class="mb-1">{{ m.away_team_name }}</h6>
-                          <div class="mb-2">
-                            {% if m.away_team_name == teamname %}<span class="badge badge-primary">Away</span>{% endif %}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endif %}
+            <div class="mb-3">
+              {{ scoreboard(m.home_team_name, m.away_team_name, m.home_goals, m.away_goals, teamname, m.datetime.strftime("%Y-%m-%d %H:%M") ) }}
+            </div>
             <!-- Enhanced Match Statistics -->
             {% if m.home_goals is not none and m.away_goals is not none %}
               <div class="card mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h6 class="mb-0">{{ m.home_team_name }} vs {{ m.away_team_name }}</h6>
-                  <small class="text-muted">{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</small>
+                <div class="card-header">
+                  <h6 class="mb-0">Match Statistics</h6>
                 </div>
                 <div class="card-body">
                   {% if m.has_enhanced_data() %}
@@ -295,7 +257,7 @@
                               <div class="team-box {{ 'us' if teamname == m.home_team_name else 'them' }}">
                                 <div class="text-muted" style="font-size: 0.75rem;">{{ m.home_team_name }}</div>
                                 <div>
-                                  <strong style="font-size: 1.5rem;">{{ m.home_goals }}</strong> <span class="text-muted">goals</span>
+                                  <strong class="scoreboard-number">{{ m.home_goals }}</strong> <span class="text-muted">goals</span>
                                 </div>
                                 <div class="text-muted" style="font-size: 0.85rem;">
                                   {{ m.home_team_total_chances if m.home_team_total_chances is not none else 'N/A' }} chances
@@ -306,7 +268,7 @@
                               <div class="team-box {{ 'us' if teamname == m.away_team_name else 'them' }}">
                                 <div class="text-muted" style="font-size: 0.75rem;">{{ m.away_team_name }}</div>
                                 <div>
-                                  <strong style="font-size: 1.5rem;">{{ m.away_goals }}</strong> <span class="text-muted">goals</span>
+                                  <strong class="scoreboard-number">{{ m.away_goals }}</strong> <span class="text-muted">goals</span>
                                 </div>
                                 <div class="text-muted" style="font-size: 0.85rem;">
                                   {{ m.away_team_total_chances if m.away_team_total_chances is not none else 'N/A' }} chances
@@ -534,7 +496,7 @@
                 </div>
                 <div class="card-body">
                   <div class="alert alert-info">
-                    <h6 class="alert-heading">🔮 Upcoming Match</h6>
+                    <h6 class="alert-heading">{{ icon("stopwatch") }} Upcoming Match</h6>
                     <p class="mb-2">
                       This match is scheduled for <strong>{{ m.datetime.strftime("%Y-%m-%d %H:%M") }}</strong>. Match statistics and events will be available after the match is played.
                     </p>

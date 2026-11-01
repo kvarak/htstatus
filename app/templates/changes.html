@@ -1,19 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
-  {% from "_page.html" import page_header %}
+  {% from "_page.html" import page_header, icon %}
   <div class="container">
     {{ page_header([('Home', url_for('main.index') ), (title, None)]) }}
     <div class="row">
       <div class="col-sm">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">
-              <i class="fas fa-code-branch"></i> Changes & Development History
-            </h5>
+            <h5 class="card-title">{{ icon("stopwatch") }} Changes & Development History</h5>
             <p class="card-text text-muted">
               Complete timeline of all changes, features, and improvements to HattrickPlanner.
-              <strong class="text-success">🎉 User Releases</strong> highlight features that directly improve your experience.
-              <strong class="text-info">🔧 Technical Releases</strong> show behind-the-scenes improvements and infrastructure updates.
+              <strong class="text-success">{{ icon("star") }} User Releases</strong> highlight features that directly improve your experience.
+              <strong class="text-info">{{ icon("tactics") }} Technical Releases</strong> show behind-the-scenes improvements and infrastructure updates.
             </p>
             <div class="mb-3">
               <button id="toggleAllBtn"
@@ -34,7 +32,7 @@
                   </div>
                 {% elif e.type == "user_release" %}
                   <div class="bg-success text-white p-2 mb-2 rounded shadow-sm">
-                    <strong><i class="fas fa-rocket"></i> {{ e.date }} 🎉 {{ e.version }} USER RELEASE</strong>
+                    <strong>{{ icon("star") }} {{ e.date }} {{ e.version }} USER RELEASE</strong>
                     <br>
                     <small>{{ e.message }}</small>
                   </div>
@@ -45,7 +43,7 @@
                        title="Click to expand/collapse commit details">
                     <strong><span id="chevron-{{ e.group }}"
       style="display: inline-block;
-             transition: transform 0.2s">▼</span> <i class="fas fa-cog"></i> {{ e.date }} 🔧 {{ e.version }} TECHNICAL RELEASE</strong>
+             transition: transform 0.2s">▼</span> {{ icon("tactics") }} {{ e.date }} {{ e.version }} TECHNICAL RELEASE</strong>
                     <br>
                     <small>{{ e.message }}</small>
                   </div>
