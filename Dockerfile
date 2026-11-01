@@ -31,8 +31,11 @@ RUN pip install -r requirements.txt
 
 COPY . .
 # The code is read-only for the app user, whatever the modes were in the checkout.
+# Of scripts/ only the migration runner and the error viewer are needed here.
 RUN cp config.py.example config.py \
     && rm -rf tests RELEASES.md RELEASES-INTERNAL.md pyproject.toml \
+    && find scripts -type f ! -name apply_migrations.py ! -name check_errors.py -delete \
+    && find scripts -type d -empty -delete \
     && chmod -R a+rX,go-w .
 
 # Data fetched at Update (transfer bids, series, Hattrick terms) lives here;
