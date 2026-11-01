@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Hattrick terms and level format everywhere** - training, compare, stats, formations and the update timeline now use your Hattrick language and your "show levels as" setting, like the player page
 
 ### Fixed
+- Players page: "Assign to group" for selected players failed with a server error (nested database transaction); failures now show a message instead of only logging "undefined"
 - Offline/PWA: our own CSS/JS are now fetched fresh after a deploy (service worker no longer serves stale files); its pre-cache no longer lists files that don't exist
 - Compare page loaded a second, unpinned copy of Chart.js
 

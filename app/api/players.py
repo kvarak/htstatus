@@ -72,60 +72,62 @@ def bulk_assign_players():
 
         # Process bulk assignment in database transaction
         try:
-            with db.session.begin():
-                for player_id in player_ids:
-                    try:
-                        player_id = int(player_id)
+            # One commit for all players. (The session already has a transaction
+            # from the auth check, so no nested db.session.begin() here.)
+            for player_id in player_ids:
+                try:
+                    player_id = int(player_id)
 
-                        # Check if player setting already exists
-                        existing_setting = (
-                            db.session.query(PlayerSetting)
-                            .filter_by(player_id=player_id, user_id=current_user_id)
+                    # Check if player setting already exists
+                    existing_setting = (
+                        db.session.query(PlayerSetting)
+                        .filter_by(player_id=player_id, user_id=current_user_id)
+                        .first()
+                    )
+
+                    if group_id is None or group_id == "-1":
+                        # Remove from group (delete setting)
+                        if existing_setting:
+                            db.session.delete(existing_setting)
+                            success_count += 1
+                    else:
+                        # Assign to group
+                        group_id = int(group_id)
+
+                        # Verify group belongs to current user
+                        group = (
+                            db.session.query(Group)
+                            .filter_by(id=group_id, user_id=current_user_id)
                             .first()
                         )
-
-                        if group_id is None or group_id == "-1":
-                            # Remove from group (delete setting)
-                            if existing_setting:
-                                db.session.delete(existing_setting)
-                                success_count += 1
-                        else:
-                            # Assign to group
-                            group_id = int(group_id)
-
-                            # Verify group belongs to current user
-                            group = (
-                                db.session.query(Group)
-                                .filter_by(id=group_id, user_id=current_user_id)
-                                .first()
+                        if not group:
+                            failed_players.append(
+                                {"player_id": player_id, "error": "Invalid group"}
                             )
-                            if not group:
-                                failed_players.append(
-                                    {"player_id": player_id, "error": "Invalid group"}
-                                )
-                                continue
+                            continue
 
-                            if existing_setting:
-                                # Update existing setting
-                                existing_setting.group_id = group_id
-                            else:
-                                # Create new setting
-                                new_setting = PlayerSetting(
-                                    player_id=player_id,
-                                    user_id=current_user_id,
-                                    group_id=group_id,
-                                )
-                                db.session.add(new_setting)
-                            success_count += 1
+                        if existing_setting:
+                            # Update existing setting
+                            existing_setting.group_id = group_id
+                        else:
+                            # Create new setting
+                            new_setting = PlayerSetting(
+                                player_id=player_id,
+                                user_id=current_user_id,
+                                group_id=group_id,
+                            )
+                            db.session.add(new_setting)
+                        success_count += 1
 
-                    except ValueError:
-                        failed_players.append(
-                            {"player_id": player_id, "error": "Invalid player ID"}
-                        )
-                        continue
-                    except Exception as e:
-                        failed_players.append({"player_id": player_id, "error": str(e)})
-                        continue
+                except ValueError:
+                    failed_players.append(
+                        {"player_id": player_id, "error": "Invalid player ID"}
+                    )
+                    continue
+                except Exception as e:
+                    failed_players.append({"player_id": player_id, "error": str(e)})
+                    continue
+            db.session.commit()
 
             dprint(
                 2,

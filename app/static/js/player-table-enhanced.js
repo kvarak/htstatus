@@ -273,8 +273,10 @@ class PlayerTableEnhanced {
                 this.clearSelection();
                 location.reload(); // Refresh to show updated groups
             } else {
-                const error = await response.json();
-                console.error('Assignment error:', error.message);
+                const error = await response.json().catch(() => ({}));
+                const reason = error.error || `HTTP ${response.status}`;
+                console.error('Assignment error:', reason, error.details || '');
+                alert(`Could not update the group: ${reason}`);
             }
         } catch (error) {
             console.error('Bulk assignment error:', error);
