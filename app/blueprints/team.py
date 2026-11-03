@@ -11,6 +11,7 @@ from app.auth_utils import (
     get_current_user,
     get_current_user_id,
     require_authentication,
+    track_activity,
 )
 from app.chpp_utilities import get_chpp_client
 from app.utils import create_page, diff, dprint
@@ -174,7 +175,7 @@ def handle_archive_download(chpp, team_id_arg):
     try:
         user = get_current_user()
         if user:
-            user.matches_archive()
+            user.record_visit("matches_archive")
             db.session.commit()
 
         result = downloadMatches(team_id, chpp)
@@ -321,6 +322,7 @@ def download_recent_matches(chpp, team_ids):
 
 @team_bp.route("/update")
 @require_authentication
+@track_activity("update_page")
 def update():
     """Update player data from Hattrick API (the only routine CHPP sync)."""
     from app.roster import latest_player_records
@@ -420,7 +422,7 @@ def update():
 
     user = get_current_user()
     if user:
-        user.updatedata()
+        user.record_visit("updatedata")
         db.session.commit()
 
     return create_page(

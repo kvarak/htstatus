@@ -2,7 +2,12 @@
 
 from flask import Blueprint, redirect, request, session, url_for
 
-from app.auth_utils import current_team, require_authentication, WRONG_TEAM
+from app.auth_utils import (
+    current_team,
+    require_authentication,
+    track_activity,
+    WRONG_TEAM,
+)
 from app.utils import best_position, create_page, dprint
 
 # Create Blueprint for player comparison
@@ -20,6 +25,7 @@ def setup_compare_blueprint(db_instance):
 
 @compare_bp.route("/compare")
 @require_authentication
+@track_activity("compare")
 def compare_players():
     """Display player comparison interface."""
     try:

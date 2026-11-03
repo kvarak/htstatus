@@ -166,7 +166,10 @@
                     <th scope="col" class="text-small vertical-text">#matches</th>
                     <th scope="col" class="text-small vertical-text">#matches_archive</th>
                     <th scope="col" class="text-small vertical-text">#player</th>
+                    <th scope="col" class="text-small vertical-text">#compare</th>
+                    <th scope="col" class="text-small vertical-text">#series</th>
                     <th scope="col" class="text-small vertical-text">#update</th>
+                    <th scope="col" class="text-small vertical-text">#update_page</th>
                     <th scope="col" class="text-small vertical-text">#settings</th>
                     <th scope="col" class="text-small vertical-text">#tour_welcome_ok</th>
                     <th scope="col" class="text-small vertical-text">#tour_welcome_skip</th>
@@ -234,7 +237,10 @@
                         <td class="text-small">{{ u.c_matches }}</td>
                         <td class="text-small">{{ u.c_matches_archive or 0 }}</td>
                         <td class="text-small">{{ u.c_player }}</td>
+                        <td class="text-small">{{ u.c_compare or 0 }}</td>
+                        <td class="text-small">{{ u.c_series or 0 }}</td>
                         <td class="text-small">{{ u.c_update }}</td>
+                        <td class="text-small">{{ u.c_update_page or 0 }}</td>
                         <td class="text-small">{{ u.c_settings or 0 }}</td>
                         <td class="text-small">{{ u.c_welcome_complete or 0 }}</td>
                         <td class="text-small">{{ u.c_welcome_skip or 0 }}</td>
@@ -272,16 +278,9 @@
                 <h6 class="mb-0">
                   <i class="fas fa-chart-bar mr-2" aria-hidden="true"></i>Chart Controls
                 </h6>
-                <div class="d-flex align-items-center">
-                  <div class="form-check mr-4">
-                    <input class="form-check-input" type="checkbox" id="filterAdmins" checked>
-                    <label class="form-check-label" for="filterAdmins">Hide Admin users from charts</label>
-                  </div>
-                  <button type="button"
-                          class="btn btn-sm btn-outline-secondary"
-                          id="resetCharts">
-                    <i class="fas fa-undo mr-1" aria-hidden="true"></i>Reset Charts
-                  </button>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="filterAdmins" checked>
+                  <label class="form-check-label" for="filterAdmins">Hide Admin users from charts</label>
                 </div>
               </div>
               <!-- Time Range Selector -->
@@ -316,9 +315,9 @@
             },
             {
               "id": "loginTimelineChart",
-              "title": "Activity Over Time",
+              "title": "Last Seen per Week",
               "icon": "fas fa-chart-line",
-              "description": "Weekly activity trends over the last 12 weeks"
+              "description": "Users per week by their most recent visit, last 12 weeks"
             },
             {
               "id": "adoptionRateChart",
@@ -513,7 +512,7 @@ function updateRegistrationTimelineChart(filteredUsers) {
     });
 }
 
-// Chart 6: Login Activity Over Time
+// Chart 6: Last Seen per Week (one bucket per user, by last_usage)
 function updateLoginTimelineChart(filteredUsers) {
     // Group all activity by week for the last 12 weeks
     const weekData = {};
@@ -541,7 +540,7 @@ function updateLoginTimelineChart(filteredUsers) {
         data: {
             labels: Object.keys(weekData),
             datasets: [{
-                label: 'Weekly Activity',
+                label: 'Users last seen',
                 data: Object.values(weekData),
                 borderColor: chartColor(2),
                 backgroundColor: chartColor(2, 0.1),

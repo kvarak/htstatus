@@ -417,6 +417,9 @@ def admin():
             "c_matches": user.c_matches,
             "c_login": user.c_login,
             "c_update": user.c_update,
+            "c_update_page": user.c_update_page or 0,
+            "c_compare": user.c_compare or 0,
+            "c_series": user.c_series or 0,
             "c_settings": user.c_settings or 0,
             # Tour-specific fields
             "c_welcome_complete": user.c_welcome_complete or 0,

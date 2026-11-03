@@ -72,11 +72,11 @@ class TestUserModel:
     def test_visit_counters_and_timestamps(self):
         user = User(1, "test", "user", "pass", "key", "secret")
         with patch("time.strftime", return_value="2026-10-28 19:00:00"):
-            user.stats()
-            user.stats()
-            user.updatedata()
-            user.matches_archive()
-            user.login()
+            user.record_visit("stats")
+            user.record_visit("stats")
+            user.record_visit("updatedata")
+            user.record_visit("matches_archive")
+            user.record_visit("login")
 
         assert user.c_stats == 2
         assert user.c_update == 1
@@ -87,8 +87,30 @@ class TestUserModel:
         assert user.last_login == "2026-10-28 19:00:00"
         assert user.last_usage == "2026-10-28 19:00:00"
 
+    def test_series_compare_and_update_page_visits_are_counted(self):
+        user = User(1, "test", "user", "pass", "key", "secret")
+        before_login = user.c_login
+        before_last_login = user.last_login
+        with patch("time.strftime", return_value="2026-10-28 19:00:00"):
+            user.record_visit("series")
+            user.record_visit("compare")
+            user.record_visit("compare")
+            user.record_visit("update_page")
+        assert user.c_series == 1
+        assert user.c_compare == 2
+        assert user.c_update_page == 1
+        assert user.c_update == 0
+        assert user.last_usage == "2026-10-28 19:00:00"
+        assert user.c_login == before_login
+        assert user.last_login == before_last_login
+
+    def test_unknown_visit_name_is_rejected(self):
+        user = User(1, "test", "user", "pass", "key", "secret")
+        with pytest.raises(KeyError):
+            user.record_visit("no_such_page")
+
     def test_user_activity_tracking(self):
-        """Test User activity tracking methods."""
+        """Test User activity tracking counters."""
         user = User(12345, "test", "user", "pass", "key", "secret")
 
         initial_login = user.c_login
@@ -97,20 +119,19 @@ class TestUserModel:
         initial_training = user.c_training
         initial_update = user.c_update
 
-        # Test each activity tracking method
-        user.login()
+        user.record_visit("login")
         assert user.c_login == initial_login + 1
 
-        user.player()
+        user.record_visit("player")
         assert user.c_player == initial_player + 1
 
-        user.matches()
+        user.record_visit("matches")
         assert user.c_matches == initial_matches + 1
 
-        user.training()
+        user.record_visit("training")
         assert user.c_training == initial_training + 1
 
-        user.updatedata()
+        user.record_visit("updatedata")
         assert user.c_update == initial_update + 1
 
     def test_user_columns_management(self):

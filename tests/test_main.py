@@ -149,7 +149,8 @@ class TestDebugPageAccessibility:
             'role="img"' in html
             and 'aria-describedby="loginTimelineChartDescription"' in html
         )
-        assert 'aria-label="Shrink Activity Over Time chart"' in html
+        assert 'aria-label="Shrink Last Seen per Week chart"' in html
+        assert "#compare" in html and "#series" in html and "#update_page" in html
         assert 'tabindex="0"' in html
         assert html.index("debug-date-filter.js") < html.index("debug-charts.js")
 

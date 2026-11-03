@@ -81,7 +81,7 @@ def _login_with_stored_tokens(user):
     session["access_secret"] = user.access_secret
     session["current_user"] = user.ht_user
     session["current_user_id"] = user.ht_id
-    user.login()
+    user.record_visit("login")
     db.session.commit()
 
     try:

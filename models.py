@@ -348,6 +348,26 @@ class Group(db.Model):
 # --------------------------------------------------------------------------------
 
 
+# Visit name -> (counter column, extra timestamp column). None means "no such column".
+# Each visit increments its counter and sets last_usage.
+VISIT_COUNTERS = {
+    "login": ("c_login", "last_login"),
+    "player": ("c_player", None),
+    "matches": ("c_matches", None),
+    "matches_archive": ("c_matches_archive", "last_matches_archive"),
+    "training": ("c_training", None),
+    "updatedata": ("c_update", "last_update"),
+    "settings": ("c_settings", None),
+    "changes": ("c_changes", None),
+    "feedback": ("c_feedback", None),
+    "formation": ("c_formation", None),
+    "stats": ("c_stats", None),
+    "series": ("c_series", None),
+    "compare": ("c_compare", None),
+    "update_page": ("c_update_page", None),
+}
+
+
 class User(db.Model):
     __tablename__ = "users"
 
@@ -370,7 +390,10 @@ class User(db.Model):
     c_feedback = db.Column(db.Integer, default=0)
     c_formation = db.Column(db.Integer, default=0)
     c_stats = db.Column(db.Integer, default=0)
-    # Tour-specific tracking
+    c_series = db.Column(db.Integer, default=0)
+    c_compare = db.Column(db.Integer, default=0)
+    c_update_page = db.Column(db.Integer, default=0)
+
     c_welcome_complete = db.Column(db.Integer, default=0)  # Welcome tour completions
     c_welcome_skip = db.Column(db.Integer, default=0)  # Welcome tour skips
     # Welcome tour help clicks
@@ -412,7 +435,10 @@ class User(db.Model):
         self.c_matches_archive = 0
         self.c_training = 0
         self.c_update = 0
-        # Initialize tour-specific counters
+        self.c_series = 0
+        self.c_compare = 0
+        self.c_update_page = 0
+
         self.c_welcome_complete = 0
         self.c_welcome_skip = 0
         self.c_welcome_help = 0
@@ -449,50 +475,15 @@ class User(db.Model):
         self.last_login = time.strftime("%Y-%m-%d %H:%M:%S")
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    def _count_visit(self, counter):
-        """Increment a page-visit counter and update last_usage."""
-        setattr(self, counter, (getattr(self, counter) or 0) + 1)
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
-
-    def login(self):
-        self._count_visit("c_login")
-        self.last_login = self.last_usage
-
-    def player(self):
-        self._count_visit("c_player")
-
-    def matches(self):
-        self._count_visit("c_matches")
-
-    def matches_archive(self):
-        self._count_visit("c_matches_archive")
-        self.last_matches_archive = self.last_usage
-
-    def training(self):
-        self._count_visit("c_training")
-
-    def updatedata(self):
-        self._count_visit("c_update")
-        self.last_update = self.last_usage
-
-    def settings(self):
-        self._count_visit("c_settings")
-
-    def changes(self):
-        self._count_visit("c_changes")
-
-    def feedback(self):
-        self._count_visit("c_feedback")
-
-    def formation(self):
-        self._count_visit("c_formation")
-
-    def stats(self):
-        self._count_visit("c_stats")
-
-    def series(self):
-        """Series page visit: no counter column (avoids a migration), just activity."""
-        self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
+    def record_visit(self, activity):
+        """Count one visit to ``activity`` (a key of VISIT_COUNTERS) and update last_usage."""
+        counter, timestamp_field = VISIT_COUNTERS[activity]
+        now = time.strftime("%Y-%m-%d %H:%M:%S")
+        if counter:
+            setattr(self, counter, (getattr(self, counter) or 0) + 1)
+        self.last_usage = now
+        if timestamp_field:
+            setattr(self, timestamp_field, now)
 
     def updateColumns(self, cols, known_keys=()):
         """Save the shown columns and every column key the user has seen.
@@ -1110,7 +1101,7 @@ class AdminPreferences(db.Model):
         return {
             "hide_admin_users": True,
             "activity_table_rows": 20,
-            "date_range": {"default_months": 6, "start_date": None, "end_date": None},
+            "date_range": {"months": 12},
         }
 
     def update_chart_layout(self, layout_data):

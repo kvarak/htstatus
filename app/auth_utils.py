@@ -65,7 +65,7 @@ def get_current_user():
 
 
 def track_activity(activity):
-    """Decorator recording a page visit via ``User.<activity>()`` before the view.
+    """Decorator recording a page visit via ``User.record_visit(activity)`` before the view.
 
     Usage (below the route/auth decorators)::
 
@@ -82,7 +82,7 @@ def track_activity(activity):
         def decorated_function(*args, **kwargs):
             user = get_current_user()
             if user:
-                getattr(user, activity)()
+                user.record_visit(activity)
                 from app import db
 
                 db.session.commit()

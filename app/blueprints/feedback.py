@@ -51,7 +51,7 @@ def list_feedback():
     user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
-    user.feedback()
+    user.record_visit("feedback")
     db.session.commit()
 
     # Handle form submission

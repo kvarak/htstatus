@@ -15,14 +15,10 @@ class TestAdminPreferencesDateRange(unittest.TestCase):
 
         # Verify date range structure
         date_range = default_settings["date_range"]
-        assert "default_months" in date_range
-        assert "start_date" in date_range
-        assert "end_date" in date_range
+        assert "months" in date_range
 
-        # Verify default values
-        assert date_range["default_months"] == 6
-        assert date_range["start_date"] is None
-        assert date_range["end_date"] is None
+        # Verify default value: 1 year
+        assert date_range["months"] == 12
 
         # Verify other settings remain intact
         assert default_settings["hide_admin_users"] is True
@@ -32,21 +28,13 @@ class TestAdminPreferencesDateRange(unittest.TestCase):
         """Test AdminPreferences initialization includes date range."""
         preferences = AdminPreferences(
             user_id=1,
-            filter_settings={
-                "date_range": {
-                    "default_months": 3,
-                    "start_date": "2026-01-01",
-                    "end_date": "2026-02-01",
-                }
-            },
+            filter_settings={"date_range": {"months": 3}},
         )
 
         # Verify filter settings contain date range
         date_range = preferences.filter_settings.get("date_range")
         assert date_range is not None
-        assert date_range["default_months"] == 3
-        assert date_range["start_date"] == "2026-01-01"
-        assert date_range["end_date"] == "2026-02-01"
+        assert date_range["months"] == 3
 
 
 if __name__ == "__main__":
