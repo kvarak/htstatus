@@ -14,6 +14,7 @@ from app.auth_utils import (
     track_activity,
 )
 from app.chpp_utilities import get_chpp_client
+from app.opponents import refresh_opponent_matches
 from app.utils import create_page, diff, dprint
 
 # Create Blueprint for team routes
@@ -419,6 +420,7 @@ def update():
     matches_results, total_recent, total_upcoming = download_recent_matches(
         chpp, all_teams
     )
+    refresh_opponent_matches(chpp, all_teams)
 
     user = get_current_user()
     if user:

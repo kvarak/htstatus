@@ -930,6 +930,8 @@ def parse_matchdetails(root: ET.Element) -> "CHPPMatchDetails":
     away_team_attitude = safe_find_int(root, ".//AwayTeam/TeamAttitude", None)
     home_team_tactic_type = safe_find_int(root, ".//HomeTeam/TacticType", None)
     home_team_tactic_skill = safe_find_int(root, ".//HomeTeam/TacticSkill", None)
+    home_team_formation = safe_find_text(root, ".//HomeTeam/Formation", None)
+    away_team_formation = safe_find_text(root, ".//AwayTeam/Formation", None)
     away_team_tactic_type = safe_find_int(root, ".//AwayTeam/TacticType", None)
     away_team_tactic_skill = safe_find_int(root, ".//AwayTeam/TacticSkill", None)
 
@@ -1024,6 +1026,8 @@ def parse_matchdetails(root: ET.Element) -> "CHPPMatchDetails":
         home_team_attitude=home_team_attitude,
         away_team_attitude=away_team_attitude,
         home_team_tactic_type=home_team_tactic_type,
+        home_team_formation=home_team_formation,
+        away_team_formation=away_team_formation,
         home_team_tactic_skill=home_team_tactic_skill,
         away_team_tactic_type=away_team_tactic_type,
         away_team_tactic_skill=away_team_tactic_skill,

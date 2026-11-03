@@ -4,9 +4,9 @@
 > **Task IDs**: `./scripts/get-next-task-id.sh FEAT` (scans both files). Details go in [tasks/](tasks/) as `<ID>.md`.
 > **Rule**: When a feature is started, mark it 🚀 ACTIVE; when done, delete it (and its task file); Git history is the archive.
 
-## Next Up 🎯
+## Next up
 
-- **[FEAT-008]** Next Game Analyser → [Details](tasks/FEAT-008.md)
+*Nothing right now*
 
 ## Cycle training 🔁
 

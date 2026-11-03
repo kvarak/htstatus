@@ -8,6 +8,8 @@ This directory contains comprehensive documentation for Hattrick Community Premi
 
 **⚠️ CRITICAL**: As a CHPP developer you may ONLY access interfaces documented here, nothing else. It's strictly forbidden to develop products that work with any other part of the site. Violation of these rules might render you to lose your team.
 
+The ids and enumerations used in the XML (MatchTypeID, MatchTacticType, SkillLevel, ...) are listed in [CHPP Data Types](../datatypes.md).
+
 ## Documentation Status
 
 ### ✅ Documented APIs (27/79 total)

@@ -63,7 +63,7 @@ The Match Orders endpoint provides complete match lineup management including vi
 
 ### Tactical Settings
 - **Attitude** - Team attitude/speech level (0-4 scale, owner-only visibility)
-- **TacticType** - Formation tactical approach (0=Normal, 1=Pressing, 2=Counter-attacks, 3=Attack in middle, 4=Attack on wings, 5=Play creatively, 6=Long shots)
+- **TacticType** - Formation tactical approach (0=Normal, 1=Pressing, 2=Counter-attacks, 3=Attack in middle, 4=Attack on wings, 7=Play creatively, 8=Long shots)
 - **CoachModifier** - Playing style (-10 to +10, defensive to offensive)
 
 ### Lineup Structure

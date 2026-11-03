@@ -9,13 +9,15 @@
 
 ## P1: Broken or risky 🔥
 
-*Nothing right now*
+- **[DOC-034]** CHPP denied the function "Player details and progress", so the `players`/`playerdetails` calls every Update makes are in no approved function. Its file list (Players, RegionDetails) doesn't match the code (Players, PlayerDetails) and it bundles unrelated things. Good enough: denial reason read, function resubmitted with the real files and a narrow description, approved. Draft: [tasks/DOC-034.md](tasks/DOC-034.md)
+- **[DOC-035]** CHPP denied the function "Training log and cycle planner" (the `training` call every Update). It lists StaffList, which no code uses yet, and "training speed per player" may read as uncovering hidden game data. Good enough: denial reason read, function resubmitted with only the files in use and plain wording, approved. Draft: [tasks/DOC-035.md](tasks/DOC-035.md)
 
 ## P2: Worth doing 🎯
 
 - **[INFRA-091]** A fresh install can't start from an empty database: the old migration chain doesn't build the schema. Good enough: when the database has no tables, create them from the models and `alembic stamp head` (in the entrypoint), tested with an empty database in CI
 - **[REFACTOR-121]** `app/utils.py` (~1460 lines) mixes match downloading/CHPP enhancement (`downloadMatches`, `downloadRecentMatches`, `fetch_enhanced_match_data`, `_process_matches_enhanced`) with small helpers; move the match download code to its own module so utils is just helpers
 - **[REFACTOR-122]** Blueprints get `db`/columns through `setup_*_blueprint()` module globals (9 blueprints plus `initialize_utils`); import `db` and `app.constants` directly like `series`/`stats` do. Auth's injected `app`, `consumer_key` and `consumer_secret` are never read
+- **[DOC-033]** No privacy policy, which the CHPP license requires (8.1, see `docs/CHPP-ENFORCEMENT.md`). Good enough: a public `/privacy` page (what is stored, why, how long, how to delete the account and revoke Hattrick access, no sharing), no weaker than Hattrick's own policy, linked from the footer and listed in `PUBLIC_PAGES`
 
 ## P3: When you're in that code anyway 🔧
 

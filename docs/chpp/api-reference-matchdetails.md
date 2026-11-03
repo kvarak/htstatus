@@ -180,8 +180,8 @@ The Match Details API provides comprehensive information about specific matches,
 - **2** - Counter-attacks
 - **3** - Attack in the middle
 - **4** - Attack on wings
-- **5** - Play creatively
-- **6** - Long shots
+- **7** - Play creatively
+- **8** - Long shots
 
 ### Match Parts
 - **firstHalf** - First 45 minutes

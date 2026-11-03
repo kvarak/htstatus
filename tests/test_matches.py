@@ -118,7 +118,7 @@ class TestDownloadRecentMatches:
         assert "error" in result or "message" in result
 
 
-def _played_match(team_id, ht_id=990001):
+def _played_match(team_id, ht_id=990001, opponent_id=1):
     from datetime import datetime
 
     from models import Match
@@ -128,7 +128,7 @@ def _played_match(team_id, ht_id=990001):
             "ht_id": ht_id,
             "home_team_id": team_id,
             "home_team_name": "Test Team",
-            "away_team_id": 1,
+            "away_team_id": opponent_id,
             "away_team_name": "Rivals FC",
             "datetime": datetime(2026, 10, 1, 20, 0),
             "matchtype": 1,
@@ -192,3 +192,103 @@ def test_match_header_is_a_scoreboard_with_our_team_highlighted(
     assert re.search(
         r'scoreboard-digit">2</span>\s*<span class="scoreboard-digit">1</span>', html
     )
+
+
+def _upcoming_match(team_id, opponent_id, ht_id):
+    from datetime import datetime
+
+    from models import Match
+
+    return Match(
+        {
+            "ht_id": ht_id,
+            "home_team_id": team_id,
+            "home_team_name": "Test Team",
+            "away_team_id": opponent_id,
+            "away_team_name": "Rivals FC",
+            "datetime": datetime(2099, 10, 1, 20, 0),
+            "matchtype": 1,
+            "context_id": 0,
+            "rule_id": 0,
+            "cup_level": 0,
+            "cup_level_index": 0,
+            "home_goals": None,
+            "away_goals": None,
+        }
+    )
+
+
+def test_upcoming_match_scouting_says_results_come_at_next_update(
+    app_with_routes, db_session
+):
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    db_session.add(_upcoming_match(12345, 1, 990002))
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert "Scouting: Rivals FC" in html
+    assert "fetched at the next Update" in html
+    assert "No previous meetings stored." in html
+
+
+def test_upcoming_match_scouting_shows_stored_head_to_head(app_with_routes, db_session):
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    db_session.add(_upcoming_match(12345, 77, 990003))
+    db_session.add(
+        _played_match(12345, ht_id=990004, opponent_id=77)
+    )  # Test Team 2-1 Rivals FC
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert "Head to head:" in html
+    assert re.search(r"all\s+1-0-0", html)
+    assert "2 - 1" in html
+
+
+def test_upcoming_cup_match_opens_cup_only_setup(app_with_routes, db_session):
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    cup_match = _upcoming_match(12345, 78, 990005)
+    cup_match.matchtype = 3
+    db_session.add(cup_match)
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert re.search(r'nav-link py-0 px-2 active"\s+data-setup-filter="cup"', html)
+    assert re.search(r'px-2"\s+data-setup-filter="league"', html)
+    assert re.search(r'data-setup-panel="cup"\s*>', html)
+    assert re.search(r'data-setup-panel="league"\s+class="d-none"', html)
+
+
+def test_scouting_shows_opponent_stored_setup(app_with_routes, db_session):
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    db_session.add(_upcoming_match(12345, 79, 990006))
+    played = _played_match(12345, ht_id=990007, opponent_id=79)  # opponent is away
+    played.away_team_formation = "4-4-2"
+    played.away_team_tactic_type = 1
+    db_session.add(played)
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert 'title="4-4-2: 1 of 1 (100%)"' in html
+    assert 'title="Pressing: 1 of 1 (100%)"' in html
+    assert re.search(r'>4-4-2</td>\s*<td class="text-nowrap">Pressing</td>', html)

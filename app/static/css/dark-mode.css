@@ -328,3 +328,9 @@ html.dark-mode .badge-info,
 html.dark-mode .btn-info {
   color: hsl(var(--accent2-foreground)) !important;
 }
+
+/* Scouting share bars: brown segments vanish on brown cards */
+html.dark-mode .share-2 {
+  background-color: hsl(var(--cream));
+  color: hsl(var(--brown));
+}

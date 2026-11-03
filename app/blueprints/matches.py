@@ -11,6 +11,7 @@ from app.auth_utils import (
     WRONG_TEAM,
 )
 from app.hattrick_countries import get_country_display
+from app.opponents import scouting_for
 from app.utils import (
     calculate_formation_effectiveness,
     create_page,
@@ -62,6 +63,7 @@ def matches():
         (m for m in team_matches if m.datetime > now), key=lambda m: m.datetime
     )
     history = [m for m in team_matches if m.datetime <= now]
+    scouting = {m.ht_id: scouting_for(m, teamid, now) for m in upcoming}
 
     return create_page(
         template="matches.html",
@@ -69,6 +71,7 @@ def matches():
         upcoming_matches=upcoming,
         history_matches=history,
         has_upcoming=bool(upcoming),
+        scouting=scouting,
         teamname=teamname,
         teamid=teamid,
         title="Matches",

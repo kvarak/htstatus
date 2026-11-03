@@ -477,6 +477,67 @@ table.sortable thead {
   background-color: hsl(var(--muted-foreground) / 0.35);
 }
 
+/* Scouting: stacked share bars (formation, tactic) */
+.share-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-1);
+}
+
+.share-label {
+  flex: 0 0 5.5rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.share-bar {
+  display: flex;
+  flex: 1;
+  height: 1.25rem;
+  border-radius: 2px;
+  overflow: hidden;
+  background-color: hsl(var(--muted));
+}
+
+.share-seg {
+  overflow: hidden;
+  padding: 0 var(--spacing-1);
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-right: 1px solid hsl(var(--card));
+}
+
+.share-seg:last-child {
+  border-right: 0;
+}
+
+.share-0 {
+  background-color: hsl(var(--green));
+  color: hsl(var(--cream));
+}
+
+.share-1 {
+  background-color: hsl(var(--orange));
+  color: hsl(var(--brown));
+}
+
+.share-2 {
+  background-color: hsl(var(--brown));
+  color: hsl(var(--cream));
+}
+
+.share-3 {
+  background-color: hsl(var(--sand));
+  color: hsl(var(--brown));
+}
+
+.share-rest,
+.share-unknown {
+  background-color: hsl(var(--muted-foreground) / 0.35);
+  color: hsl(var(--foreground));
+}
+
 /* ---- Small shared bits ---- */
 .table-icon {
   background-color: hsl(var(--card) / 0.5);

@@ -372,6 +372,8 @@ class CHPPMatchDetails:
     home_team_attitude: int | None = None
     away_team_attitude: int | None = None
     home_team_tactic_type: int | None = None
+    home_team_formation: str | None = None
+    away_team_formation: str | None = None
     home_team_tactic_skill: int | None = None
     away_team_tactic_type: int | None = None
     away_team_tactic_skill: int | None = None

@@ -17,6 +17,30 @@
       </div>
     </div>
   {% endmacro %}
+  {% macro result_badge(result) %}
+    <span class="badge badge-{{ {'W': 'success', 'D': 'warning', 'L': 'danger'}[result] }}">{{ result }}</span>
+  {% endmacro %}
+  {% macro wdl(counts) %}
+    {{ counts.W }}-{{ counts.D }}-{{ counts.L }}
+  {% endmacro %}
+  {# Stacked bar of (value, times, percent) shares; "?" = not stored #}
+  {% macro share_bar(label, items, total) %}
+    <div class="share-row">
+      <div class="share-label">{{ label }}</div>
+      <div class="share-bar">
+        {% for value, n, pct in items %}
+          {% if value is none %}
+            {% set cls = "share-unknown" %}
+          {% else %}
+            {% set cls = "share-" ~ (loop.index0 if loop.index0 < 4 else "rest") %}
+          {% endif %}
+          <span class="share-seg {{ cls }}"
+                style="width: {{ pct }}%"
+                title="{{ value or 'Not stored' }}: {{ n }} of {{ total }} ({{ pct }}%)">{{ value or "?" }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  {% endmacro %}
   <!-- Work in Progress Sticker -->
   <div class="container">
     {% call page_header([(teamname, '/'), (title, None)]) %}
@@ -166,8 +190,7 @@
           <!-- Upcoming Match Details for {{ m.ht_id }} -->
           <div class="match-details upcoming-match-details"
                data-match-details="{{ m.ht_id }}"
-               style="display: none"
-               data-opponent-name="{% if m.home_team_name == teamname %}{{ m.away_team_name }}{% else %}{{ m.home_team_name }}{% endif %}">
+               style="display: none">
             <div class="mb-3">{{ scoreboard(m.home_team_name, m.away_team_name, none, none, teamname, m.datetime.strftime("%Y-%m-%d %H:%M") ) }}</div>
             <!-- Match Planning Section -->
             <div class="card mb-4">
@@ -212,23 +235,86 @@
                 </div>
               </div>
             </div>
-            <!-- Historical Opponent Matches Section -->
+            <!-- Scouting: opponent's recent results and setup, our head-to-head (stored at the last Update) -->
+            {% set s = scouting[m.ht_id] %}
+            {% set h2h = s.head_to_head %}
             <div class="card">
               <div class="card-header">
-                <h6 class="mb-0">
-                  Previous Matches vs
-                  {% if m.home_team_name == teamname %}
-                    {{ m.away_team_name }}
-                  {% else %}
-                    {{ m.home_team_name }}
-                  {% endif %}
-                </h6>
+                <h6 class="mb-0">Scouting: {{ s.opponent_name }}</h6>
               </div>
-              <div class="card-body">
-                <div id="opponent-history-{{ m.ht_id }}"
-                     class="opponent-history-container">
-                  <p class="text-muted small text-center py-3">Loading opponent history...</p>
+              <div class="card-body small">
+                <div class="mb-3">
+                  <strong>Head to head:</strong>
+                  {% if h2h.matches %}
+                    <span class="text-muted">
+                      all {{ wdl(h2h.record.all) }} · home {{ wdl(h2h.record.home) }} · away {{ wdl(h2h.record.away) }} (W-D-L, our side)
+                    </span>
+                    <div class="mt-1">
+                      {% for r in h2h.matches %}
+                        <span class="text-nowrap mr-2" title="{{ 'home' if r.home else 'away' }}">
+                          {{ result_badge(r.result) }} {{ r.goals_for }} - {{ r.goals_against }}
+                          <span class="text-muted">{{ r.date.strftime('%Y-%m-%d') }}</span>
+                        </span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <span class="text-muted">No previous meetings stored.</span>
+                  {% endif %}
                 </div>
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-2">
+                  <strong>{{ s.opponent_name }}'s last 10 matches</strong>
+                  <ul class="nav nav-pills small">
+                    {% for key, label in [("all", "All games"), ("league", "League only"), ("cup", "Cup only")] %}
+                      <li class="nav-item">
+                        <button type="button"
+                                class="nav-link py-0 px-2{% if key == s.setup_default %} active{% endif %}"
+                                data-setup-filter="{{ key }}">{{ label }}</button>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                {% for key in ["all", "league", "cup"] %}
+                  {% set panel = s.setup[key] %}
+                  <div data-setup-panel="{{ key }}"
+                       {% if key != s.setup_default %} class="d-none"{% endif %}>
+                    {% if panel.matches %}
+                      {{ share_bar("Formation", panel.formations, panel.matches|length) }}
+                      {{ share_bar("Tactic", panel.tactics, panel.matches|length) }}
+                      <div class="text-muted mb-2">
+                        all {{ wdl(panel.record.all) }} · home {{ wdl(panel.record.home) }} · away {{ wdl(panel.record.away) }} (W-D-L)
+                      </div>
+                      <table class="table table-sm mb-0 small">
+                        <thead>
+                          <tr>
+                            <th>Date</th>
+                            <th>Opponent</th>
+                            <th>Result</th>
+                            <th>Formation</th>
+                            <th>Tactic</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for r in panel.matches %}
+                            <tr>
+                              <td class="text-nowrap" title="{{ r.date.strftime('%Y-%m-%d') }}">{{ r.date.strftime("%m-%d") }}</td>
+                              <td>
+                                {{ r.opponent }}
+                                <span class="text-muted">({{ "H" if r.home else "A" }})</span>
+                              </td>
+                              <td class="text-nowrap">{{ result_badge(r.result) }} {{ r.goals_for }} - {{ r.goals_against }}</td>
+                              <td class="text-nowrap">{{ r.formation or "?" }}</td>
+                              <td class="text-nowrap">{{ r.tactic or "?" }}</td>
+                            </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    {% elif key == "all" %}
+                      <span class="text-muted">No results stored yet. They are fetched at the next Update.</span>
+                    {% else %}
+                      <span class="text-muted">No matches of this type stored yet.</span>
+                    {% endif %}
+                  </div>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -451,9 +537,9 @@
                                     {% elif m.home_team_tactic_type == 3 %}
                                       AIM
                                     {% elif m.home_team_tactic_type == 7 %}
-                                      Longshots
-                                    {% elif m.home_team_tactic_type == 8 %}
                                       Creative
+                                    {% elif m.home_team_tactic_type == 8 %}
+                                      Longshots
                                     {% else %}
                                       Tactic {{ m.home_team_tactic_type }}
                                     {% endif %}
@@ -477,9 +563,9 @@
                                     {% elif m.away_team_tactic_type == 3 %}
                                       AIM
                                     {% elif m.away_team_tactic_type == 7 %}
-                                      Longshots
-                                    {% elif m.away_team_tactic_type == 8 %}
                                       Creative
+                                    {% elif m.away_team_tactic_type == 8 %}
+                                      Longshots
                                     {% else %}
                                       Tactic {{ m.away_team_tactic_type }}
                                     {% endif %}
@@ -597,50 +683,24 @@ document.addEventListener('DOMContentLoaded', function() {
             const selectedMatchDetails = document.querySelector(`[data-match-details="${matchId}"]`);
             if (selectedMatchDetails) {
                 selectedMatchDetails.style.display = 'block';
-
-                // If this is an upcoming match, populate opponent history
-                if (selectedMatchDetails.classList.contains('upcoming-match-details')) {
-                    const opponentName = selectedMatchDetails.getAttribute('data-opponent-name');
-                    const historyContainer = selectedMatchDetails.querySelector('.opponent-history-container');
-
-                    if (historyContainer && opponentName) {
-                        // Filter history matches against this opponent - only search in the Recent Matches sidebar
-                        const recentMatchesContainer = document.querySelector('.card-body[style*="max-height: 600px"]');
-                        const allHistoryMatches = recentMatchesContainer ? recentMatchesContainer.querySelectorAll('[data-match-item]') : [];
-                        let opponentMatches = [];
-
-                        allHistoryMatches.forEach(histMatch => {
-                            const matchEl = histMatch;
-                            const opponentSpan = matchEl.querySelector('.fw-bold span');
-                            if (opponentSpan) {
-                                const opponentText = opponentSpan.textContent.trim();
-                                if (opponentText === opponentName) {
-                                    opponentMatches.push(histMatch);
-                                }
-                            }
-                        });
-
-                        if (opponentMatches.length > 0) {
-                            let html = '<div class="list-group list-group-flush">';
-                            opponentMatches.forEach(match => {
-                                const clonedMatch = match.cloneNode(true);
-                                clonedMatch.classList.remove('list-group-item-action');
-                                clonedMatch.style.cursor = 'default';
-                                clonedMatch.removeAttribute('data-match');
-                                clonedMatch.removeAttribute('data-match-item');
-                                html += clonedMatch.outerHTML;
-                            });
-                            html += '</div>';
-                            historyContainer.innerHTML = html;
-                        } else {
-                            historyContainer.innerHTML = '<p class="text-muted small text-center py-3">No previous matches found against this opponent.</p>';
-                        }
-                    }
-                }
             }
         });
     });
 
+});
+
+// Scouting card: switch the setup section between League / Cup / All games
+document.querySelectorAll('[data-setup-filter]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        const card = btn.closest('.card-body');
+        const key = btn.dataset.setupFilter;
+        card.querySelectorAll('[data-setup-filter]').forEach(function(b) {
+            b.classList.toggle('active', b === btn);
+        });
+        card.querySelectorAll('[data-setup-panel]').forEach(function(p) {
+            p.classList.toggle('d-none', p.dataset.setupPanel !== key);
+        });
+    });
 });
   </script>
 {% endblock %}

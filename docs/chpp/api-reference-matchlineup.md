@@ -162,8 +162,8 @@ Team's overall tactical approach:
 - **2** - Counter-attacks
 - **3** - Attack in middle
 - **4** - Attack on wings
-- **5** - Play creatively
-- **6** - Long shots
+- **7** - Play creatively
+- **8** - Long shots
 
 ## Implementation Examples
 
