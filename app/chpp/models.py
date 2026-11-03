@@ -253,6 +253,7 @@ class CHPPMatch:
         away_team_name: Away team name
         home_goals: Goals scored by home team
         away_goals: Goals scored by away team
+        status: MatchStatus from CHPP (FINISHED, ONGOING, UPCOMING), None if absent
         matchtype: Match type ID (league, cup, friendly, etc.)
         context_id: Context ID (league/cup ID)
         rule_id: Rule ID (region/rule set)
@@ -269,6 +270,7 @@ class CHPPMatch:
     away_team_name: str
     home_goals: int | None = None
     away_goals: int | None = None
+    status: str | None = None
     matchtype: int | None = None
     context_id: int | None = None
     rule_id: int | None = None

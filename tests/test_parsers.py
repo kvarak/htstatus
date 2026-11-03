@@ -517,6 +517,34 @@ class TestParseMatches:
         assert match.away_team_name == "Away Team"
         assert match.home_goals == 2
         assert match.away_goals == 1
+        assert match.status is None
+
+    def test_parses_match_status(self):
+        """CHPP Status is kept so unfinished matches can be told apart."""
+        xml = """
+        <root>
+            <Team>
+                <MatchList>
+                    <Match>
+                        <MatchID>12345</MatchID>
+                        <MatchDate>2024-01-15 15:00:00</MatchDate>
+                        <MatchType>1</MatchType>
+                        <HomeTeamID>100</HomeTeamID>
+                        <HomeTeamName>Home Team</HomeTeamName>
+                        <AwayTeamID>200</AwayTeamID>
+                        <AwayTeamName>Away Team</AwayTeamName>
+                        <HomeGoals>0</HomeGoals>
+                        <AwayGoals>0</AwayGoals>
+                        <Status>ONGOING</Status>
+                    </Match>
+                </MatchList>
+            </Team>
+        </root>
+        """
+        root = ET.fromstring(xml)
+        matches = parse_matches(root)
+
+        assert matches[0].status == "ONGOING"
 
     def test_parses_multiple_matches(self):
         """Test parsing multiple matches."""

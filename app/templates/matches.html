@@ -110,14 +110,16 @@
           <div class="card-body p-2" style="max-height: 600px; overflow-y: auto;">
             <div class="list-group list-group-flush">
               {% for m in history_matches %}
-                {% if m.home_goals is not none %}
+                {% if m.is_finished or m.status == "ONGOING" %}
                   <div class="list-group-item list-group-item-action p-2 small mb-1 rounded match-item match-type-{{ 'league' if m.matchtype == 1 else 'cup' if m.matchtype == 3 else 'other' }}"
                        style="cursor: pointer"
                        data-match="{{ m.ht_id }}"
                        data-match-item
                        data-matchtype="{{ m.matchtype }}">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                      {% if m.home_team_name == teamname %}
+                      {% if not m.is_finished %}
+                        <span class="badge badge-info badge-sm">In progress</span>
+                      {% elif m.home_team_name == teamname %}
                         {% if m.home_goals > m.away_goals %}
                           <span class="badge badge-success badge-sm">W</span>
                         {% elif m.home_goals < m.away_goals %}
@@ -144,7 +146,9 @@
                           {{ m.home_team_name }}
                         {% endif %}
                       </span>
-                      <span class="text-muted">{{ m.home_goals }}-{{ m.away_goals }}</span>
+                      {% if m.is_finished %}
+                        <span class="text-muted">{{ m.home_goals }}-{{ m.away_goals }}</span>
+                      {% endif %}
                     </div>
                   </div>
                 {% endif %}
@@ -235,10 +239,25 @@
                data-match-details="{{ m.ht_id }}"
                style="display: none">
             <div class="mb-3">
-              {{ scoreboard(m.home_team_name, m.away_team_name, m.home_goals, m.away_goals, teamname, m.datetime.strftime("%Y-%m-%d %H:%M") ) }}
+              {% if m.is_finished %}
+                {{ scoreboard(m.home_team_name, m.away_team_name, m.home_goals, m.away_goals, teamname, m.datetime.strftime("%Y-%m-%d %H:%M") ) }}
+              {% endif %}
             </div>
             <!-- Enhanced Match Statistics -->
-            {% if m.home_goals is not none and m.away_goals is not none %}
+            {% if m.status == "ONGOING" %}
+              <div class="card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">In progress</h6>
+                </div>
+                <div class="card-body">
+                  <div class="alert alert-info mb-0">
+                    <p class="mb-0">
+                      This match is still being played. The result and match details will be available after the next Update that runs once it has ended.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            {% elif m.home_goals is not none and m.away_goals is not none %}
               <div class="card mb-4">
                 <div class="card-header">
                   <h6 class="mb-0">Match Statistics</h6>

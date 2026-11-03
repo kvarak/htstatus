@@ -70,6 +70,8 @@ class Match(db.Model):
     cup_level_index = db.Column(db.Integer)
     home_goals = db.Column(db.Integer)
     away_goals = db.Column(db.Integer)
+    # CHPP MatchStatus (FINISHED, ONGOING, UPCOMING); NULL for rows stored before it was kept
+    status = db.Column(db.String(20), nullable=True)
 
     # Enhanced analytics fields from CHPP matchdetails (nullable for backward compatibility)
     # Possession - stored by half as CHPP provides (at Match level, not inside teams)
@@ -163,6 +165,7 @@ class Match(db.Model):
         self.cup_level_index = matchdata["cup_level_index"]
         self.home_goals = matchdata["home_goals"]
         self.away_goals = matchdata["away_goals"]
+        self.status = matchdata.get("status")
 
         # Enhanced analytics (optional fields)
         self.possession_first_half_home = matchdata.get("possession_first_half_home")
@@ -230,6 +233,13 @@ class Match(db.Model):
         self.away_team_formation = matchdata.get("away_team_formation")
         self.home_team_tactic = matchdata.get("home_team_tactic")
         self.away_team_tactic = matchdata.get("away_team_tactic")
+
+    @property
+    def is_finished(self):
+        """True once the match has a result (legacy rows without a status: goals present)."""
+        if self.status is None:
+            return self.home_goals is not None
+        return self.status == "FINISHED"
 
     @property
     def home_team_possession(self):

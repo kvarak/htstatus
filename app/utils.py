@@ -998,18 +998,24 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True, team_id=N
             # Check if match already exists
             dbmatch = db.session.query(Match).filter_by(ht_id=match.ht_id).first()
 
-            # Determine if match is finished (has goals scored)
-            is_finished = match.home_goals is not None and match.away_goals is not None
+            # Determine if match is finished (CHPP status; goals only when no status is given)
+            if match.status is not None:
+                is_finished = match.status == "FINISHED"
+            else:
+                is_finished = (
+                    match.home_goals is not None and match.away_goals is not None
+                )
 
             if dbmatch:
                 # Update existing match
                 dbmatch.home_goals = match.home_goals
                 dbmatch.away_goals = match.away_goals
+                dbmatch.status = match.status
                 dbmatch.home_team_name = match.home_team_name
                 dbmatch.away_team_name = match.away_team_name
                 updated += 1
 
-                # Fetch enhanced data if match is finished
+                # Fetch enhanced data once the match is finished (so the first Update after it ends gets it)
                 # Always fetch to ensure we have the most complete data available
                 if fetch_enhanced and is_finished and chpp:
                     enhanced_data = fetch_enhanced_match_data(
@@ -1037,6 +1043,7 @@ def _process_matches_enhanced(matches, chpp=None, fetch_enhanced=True, team_id=N
                     "cup_level_index": match.cup_level_index,
                     "home_goals": match.home_goals,
                     "away_goals": match.away_goals,
+                    "status": match.status,
                 }
 
                 # Add enhanced data if available and match is finished

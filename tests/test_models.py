@@ -232,6 +232,39 @@ class TestPlayerSettingModel:
 class TestMatchModel:
     """Test Match model functionality."""
 
+    @pytest.mark.parametrize(
+        "status, goals, expected",
+        [
+            ("FINISHED", (2, 1), True),
+            ("ONGOING", (0, 0), False),
+            ("UPCOMING", (None, None), False),
+            (None, (2, 1), True),  # rows stored before status was kept
+            (None, (None, None), False),
+        ],
+    )
+    def test_is_finished(self, status, goals, expected):
+        """A match is finished by CHPP status, falling back to goals for legacy rows."""
+        match = Match(
+            {
+                "ht_id": 1,
+                "home_team_id": 1,
+                "home_team_name": "H",
+                "away_team_id": 2,
+                "away_team_name": "A",
+                "datetime": datetime(2024, 1, 15, 15, 0),
+                "matchtype": 1,
+                "context_id": 0,
+                "rule_id": 0,
+                "cup_level": 0,
+                "cup_level_index": 0,
+                "home_goals": goals[0],
+                "away_goals": goals[1],
+                "status": status,
+            }
+        )
+
+        assert match.is_finished is expected
+
     def test_match_creation(self):
         """Test Match model initialization with required data."""
         match_data = {

@@ -768,6 +768,7 @@ def parse_matches(root: ET.Element) -> list[CHPPMatch]:
             away_team_id = safe_find_int(match_elem, "AwayTeamID")
         home_goals = safe_find_int(match_elem, "HomeGoals")
         away_goals = safe_find_int(match_elem, "AwayGoals")
+        status = safe_find_text(match_elem, "Status", None)
 
         matchtype = safe_find_int(match_elem, "MatchType")
         context_id = safe_find_int(match_elem, "ContextID")
@@ -784,6 +785,7 @@ def parse_matches(root: ET.Element) -> list[CHPPMatch]:
             away_team_name=away_team_name,
             home_goals=home_goals,
             away_goals=away_goals,
+            status=status,
             matchtype=matchtype,
             context_id=context_id,
             rule_id=rule_id,
