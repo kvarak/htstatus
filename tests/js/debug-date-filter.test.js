@@ -3,11 +3,9 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+    DEFAULT_MONTHS,
     parseDate,
-    formatDateForInput,
-    defaultDateRange,
-    endOfDay,
-    validateDateRange,
+    presetDateRange,
     filterUsersByDateRange,
     filterUsers,
 } = require('../../app/static/js/debug-date-filter.js');
@@ -28,44 +26,26 @@ test('parseDate rejects placeholders and invalid strings', () => {
     assert.equal(parseDate('2026-03-15').toISOString(), '2026-03-15T00:00:00.000Z');
 });
 
-test('formatDateForInput produces YYYY-MM-DD', () => {
-    assert.equal(formatDateForInput(new Date('2026-10-28T19:00:00Z')), '2026-10-28');
-});
-
-test('defaultDateRange spans six months back from now without mutating it', () => {
-    const now = new Date('2026-10-28T12:00:00Z');
-    const { start, end } = defaultDateRange(now);
-    assert.equal(formatDateForInput(start), '2026-04-28');
+test('presetDateRange goes the given number of months back without mutating now', () => {
+    const now = new Date(2026, 9, 28, 12);
+    const { start, end } = presetDateRange(3, now);
+    assert.equal(start.getTime(), new Date(2026, 6, 28, 12).getTime());
     assert.equal(end.getTime(), now.getTime());
     assert.notEqual(end, now);
-    assert.equal(now.toISOString(), '2026-10-28T12:00:00.000Z');
+    assert.equal(now.getTime(), new Date(2026, 9, 28, 12).getTime());
 });
 
-test('validateDateRange requires both dates', () => {
-    assert.match(validateDateRange('', '2026-01-01').error, /both start and end/);
-    assert.match(validateDateRange('2026-01-01', '').error, /both start and end/);
+test('presetDateRange "all" means no date filter', () => {
+    assert.deepEqual(presetDateRange('all'), { start: null, end: null });
 });
 
-test('validateDateRange rejects invalid and reversed ranges', () => {
-    assert.match(validateDateRange('garbage', '2026-01-01').error, /valid dates/);
-    assert.match(validateDateRange('2026-02-01', '2026-01-01').error, /on or before/);
-});
-
-test('validateDateRange allows a single day and makes the end inclusive', () => {
-    const range = validateDateRange('2026-04-30', '2026-04-30');
-    assert.equal(range.error, undefined);
-    assert.equal(range.start.toISOString(), '2026-04-30T00:00:00.000Z');
-    assert.equal(range.end.toISOString(), '2026-04-30T23:59:59.999Z');
-});
-
-test('endOfDay does not mutate its input', () => {
-    const day = new Date('2026-04-30T00:00:00Z');
-    endOfDay(day);
-    assert.equal(day.toISOString(), '2026-04-30T00:00:00.000Z');
+test('default time range is one year', () => {
+    assert.equal(DEFAULT_MONTHS, 12);
 });
 
 test('filterUsersByDateRange keeps users inside the inclusive range', () => {
-    const { start, end } = validateDateRange('2026-03-01', '2026-04-30');
+    const start = new Date('2026-03-01T00:00:00Z');
+    const end = new Date('2026-04-30T23:59:59.999Z');
     const names = filterUsersByDateRange(users, start, end).map(u => u.name);
     assert.deepEqual(names, ['inRange', 'endDayEvening', 'admin', 'onlyUsage']);
 });
@@ -75,7 +55,8 @@ test('filterUsersByDateRange returns all users when no range is set', () => {
 });
 
 test('filterUsers combines admin hiding and date range', () => {
-    const { start, end } = validateDateRange('2026-03-01', '2026-04-30');
+    const start = new Date('2026-03-01T00:00:00Z');
+    const end = new Date('2026-04-30T23:59:59.999Z');
     const names = filterUsers(users, { hideAdmins: true, start, end }).map(u => u.name);
     assert.deepEqual(names, ['inRange', 'endDayEvening', 'onlyUsage']);
 });

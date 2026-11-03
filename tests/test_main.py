@@ -141,13 +141,15 @@ class TestDebugPageAccessibility:
         html = response.get_data(as_text=True)
 
         assert response.status_code == 200
-        assert 'id="dateRangeError"' in html and 'role="alert"' in html
-        assert '<legend class="sr-only">Chart date range</legend>' in html
+        assert 'id="timeRangePills"' in html
+        assert re.search(r'class="nav-link active"\s+data-months="12"', html)
+        assert 'data-months="all"' in html
+        assert 'type="radio"' not in html
         assert (
             'role="img"' in html
-            and 'aria-describedby="userActivityChartDescription"' in html
+            and 'aria-describedby="loginTimelineChartDescription"' in html
         )
-        assert 'aria-label="Shrink User Activity chart"' in html
+        assert 'aria-label="Shrink Activity Over Time chart"' in html
         assert 'tabindex="0"' in html
         assert html.index("debug-date-filter.js") < html.index("debug-charts.js")
 

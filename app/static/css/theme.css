@@ -338,6 +338,27 @@ a:hover {
   color: hsl(var(--accent2));
 }
 
+/* Compact rounded pills, e.g. the time range selector on the admin page */
+.nav-pills-sm .nav-link {
+  border: 1px solid hsl(var(--border));
+  border-radius: 50rem;
+  background-color: transparent;
+  color: hsl(var(--foreground));
+  font-size: 0.875rem;
+  padding: 0.2rem 0.8rem;
+  margin: 0.125rem 0.25rem 0.125rem 0;
+}
+
+.nav-pills-sm .nav-link:hover {
+  background-color: hsl(var(--muted));
+}
+
+.nav-pills-sm .nav-link.active {
+  background-color: hsl(var(--accent2));
+  border-color: hsl(var(--accent2));
+  color: hsl(var(--accent2-foreground));
+}
+
 .progress-bar {
   background-color: hsl(var(--primary));
 }

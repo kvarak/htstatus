@@ -5,7 +5,7 @@
 (function (root) {
     'use strict';
 
-    const DEFAULT_MONTHS = 6;
+    const DEFAULT_MONTHS = 12;
 
     function parseDate(dateStr) {
         if (!dateStr || dateStr === 'N/A' || dateStr === '-') return null;
@@ -13,40 +13,15 @@
         return Number.isNaN(date.getTime()) ? null : date;
     }
 
-    function formatDateForInput(date) {
-        return date.toISOString().split('T')[0];
-    }
-
-    function defaultDateRange(now = new Date(), months = DEFAULT_MONTHS) {
+    /**
+     * Date range for a time range preset: a number of months back from now,
+     * or "all" for no date filter ({start: null, end: null}).
+     */
+    function presetDateRange(months, now = new Date()) {
+        if (months === 'all') return { start: null, end: null };
         const start = new Date(now);
         start.setMonth(start.getMonth() - months);
         return { start, end: new Date(now) };
-    }
-
-    // End date is inclusive: a YYYY-MM-DD end covers that whole (UTC) day.
-    function endOfDay(date) {
-        const end = new Date(date);
-        end.setUTCHours(23, 59, 59, 999);
-        return end;
-    }
-
-    /**
-     * Validate the two date input values.
-     * Returns {start, end} on success or {error} with a user-facing message.
-     */
-    function validateDateRange(startStr, endStr) {
-        if (!startStr || !endStr) {
-            return { error: 'Please select both start and end dates.' };
-        }
-        const start = parseDate(startStr);
-        const end = parseDate(endStr);
-        if (!start || !end) {
-            return { error: 'Please enter valid dates.' };
-        }
-        if (start > end) {
-            return { error: 'Start date must be on or before end date.' };
-        }
-        return { start, end: endOfDay(end) };
     }
 
     function filterUsersByDateRange(users, start, end) {
@@ -65,10 +40,7 @@
     const api = {
         DEFAULT_MONTHS,
         parseDate,
-        formatDateForInput,
-        defaultDateRange,
-        endOfDay,
-        validateDateRange,
+        presetDateRange,
         filterUsersByDateRange,
         filterUsers,
     };

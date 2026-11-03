@@ -284,49 +284,20 @@
                   </button>
                 </div>
               </div>
-              <!-- Date Range Filters -->
-              <fieldset class="mt-3 chart-filters" aria-describedby="dateRangeHint">
-                <legend class="sr-only">Chart date range</legend>
-                <p id="dateRangeHint" class="sr-only">
-                  Charts include users registered or active between the start and end date (inclusive).
-                </p>
-                <div class="row">
-                  <div class="col-md-4">
-                    <label for="dateRangeStart" class="form-label text-small">Start Date</label>
-                    <input type="date"
-                           class="form-control form-control-sm"
-                           id="dateRangeStart"
-                           name="dateRangeStart"
-                           aria-describedby="dateRangeError">
-                  </div>
-                  <div class="col-md-4">
-                    <label for="dateRangeEnd" class="form-label text-small">End Date</label>
-                    <input type="date"
-                           class="form-control form-control-sm"
-                           id="dateRangeEnd"
-                           name="dateRangeEnd"
-                           aria-describedby="dateRangeError">
-                  </div>
-                  <div class="col-md-4 d-flex align-items-end">
-                    <div class="btn-group" role="group" aria-label="Date range actions">
-                      <button type="button"
-                              class="btn btn-primary-custom btn-sm"
-                              onclick="updateChartsDateRange()">
-                        <i class="fas fa-sync mr-1" aria-hidden="true"></i>Update Charts
-                      </button>
-                      <button type="button"
-                              class="btn btn-outline-secondary btn-sm"
-                              onclick="resetDateRangeToDefault()"
-                              aria-label="Reset date range to the last 6 months">
-                        <i class="fas fa-calendar mr-1" aria-hidden="true"></i>6 Months
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div id="dateRangeError"
-                     class="text-danger small mt-2 d-none"
-                     role="alert"></div>
-              </fieldset>
+              <!-- Time Range Selector -->
+              <div class="d-flex align-items-center flex-wrap mt-2">
+                <span class="text-muted small mr-2" id="timeRangeLabel">Time range</span>
+                <nav class="nav nav-pills nav-pills-sm"
+                     id="timeRangePills"
+                     aria-labelledby="timeRangeLabel">
+                  {% for months, label in [(1, '1 month'), (3, '3 months'), (6, '6 months'), (12, '1 year'), (24, '2 years'), ('all', 'All time')] %}
+                    <button type="button"
+                            class="nav-link{% if months == 12 %} active{% endif %}"
+                            data-months="{{ months }}"
+                            aria-pressed="{{ 'true' if months == 12 else 'false' }}">{{ label }}</button>
+                  {% endfor %}
+                </nav>
+              </div>
             </div>
           </div>
         </div>
@@ -337,36 +308,6 @@
           <!-- Chart Configuration -->
           {% set charts = [
             {
-              "id": "tutorialCompletionChart",
-              "title": "Tutorial Completion Rates",
-              "icon": "fas fa-graduation-cap",
-              "description": "Completion vs skip rates for each tutorial tour"
-            },
-            {
-              "id": "tutorialHelpChart",
-              "title": "Tutorial Help Usage",
-              "icon": "fas fa-question-circle",
-              "description": "Help button clicks across different tutorial tours"
-            },
-            {
-              "id": "tutorialResetChart",
-              "title": "Tutorial Reset Behavior",
-              "icon": "fas fa-redo-alt",
-              "description": "Tutorial reset frequency and user re-learning patterns"
-            },
-            {
-              "id": "userActivityChart",
-              "title": "User Activity",
-              "icon": "fas fa-users",
-              "description": "Shows users active in the last 30 days vs inactive users"
-            },
-            {
-              "id": "featureUsageChart",
-              "title": "Feature Usage",
-              "icon": "fas fa-chart-line",
-              "description": "Total usage count for each application feature across all users"
-            },
-            {
               "id": "registrationChart",
               "title": "Registration Timeline",
               "icon": "fas fa-calendar-alt",
@@ -374,70 +315,16 @@
               "height": "150px"
             },
             {
-              "id": "usageFrequencyChart",
-              "title": "Usage Frequency",
-              "icon": "fas fa-clock",
-              "description": "Distribution of users by their total feature usage activity levels"
-            },
-            {
-              "id": "topUsersChart",
-              "title": "Top Users",
-              "icon": "fas fa-trophy",
-              "description": "Most engaged users ranked by total feature usage activity"
-            },
-            {
               "id": "loginTimelineChart",
-              "title": "Login Activity Over Time",
+              "title": "Activity Over Time",
               "icon": "fas fa-chart-line",
-              "description": "Weekly login activity trends over the last 12 weeks"
+              "description": "Weekly activity trends over the last 12 weeks"
             },
             {
               "id": "adoptionRateChart",
               "title": "Feature Adoption Rate",
               "icon": "fas fa-percentage",
               "description": "Percentage of users who have tried each application feature"
-            },
-            {
-              "id": "retentionChart",
-              "title": "User Retention by Month",
-              "icon": "fas fa-calendar",
-              "description": "Percentage of new users still active 30 days after registration"
-            },
-            {
-              "id": "hourlyActivityChart",
-              "title": "Activity by Hour",
-              "icon": "fas fa-clock",
-              "description": "User activity distribution across 24-hour time periods"
-            },
-            {
-              "id": "activityFocusChart",
-              "title": "Team vs Player Focus",
-              "icon": "fas fa-balance-scale",
-              "description": "User preferences: team management vs individual player development"
-            },
-            {
-              "id": "playerBreakdownChart",
-              "title": "Player Activity Breakdown",
-              "icon": "fas fa-running",
-              "description": "Detailed breakdown of player-related activities and training focus"
-            },
-            {
-              "id": "teamBreakdownChart",
-              "title": "Team Management Activity",
-              "icon": "fas fa-users-cog",
-              "description": "Usage of team management features: team views, matches, formations"
-            },
-            {
-              "id": "updateFrequencyChart",
-              "title": "Update Frequency Distribution",
-              "icon": "fas fa-sync-alt",
-              "description": "How frequently users sync their data with Hattrick servers"
-            },
-            {
-              "id": "featureRadarChart",
-              "title": "Feature Usage Radar",
-              "icon": "fas fa-chart-radar",
-              "description": "Radar view of feature adoption showing usage patterns across all features"
             },
             {
               "id": "engagementScoreChart",
@@ -515,114 +402,49 @@ function renderChart(key, canvasId, config) {
     charts[key] = new Chart(document.getElementById(canvasId).getContext('2d'), config);
 }
 
-// Date range state
-let currentDateRange = {
-    start: null,
-    end: null,
-    defaultMonths: 6
-};
+const { parseDate, DEFAULT_MONTHS, presetDateRange, filterUsers } = window.DebugDateFilter;
 
-const { parseDate, formatDateForInput, defaultDateRange, validateDateRange, filterUsers } = window.DebugDateFilter;
+let currentDateRange = { months: DEFAULT_MONTHS, ...presetDateRange(DEFAULT_MONTHS) };
 
-// Initialize default date range (6 months ago to now)
-function initializeDateRange() {
-    const range = defaultDateRange(new Date(), currentDateRange.defaultMonths);
-    currentDateRange.start = range.start;
-    currentDateRange.end = range.end;
-
-    document.getElementById('dateRangeStart').value = formatDateForInput(range.start);
-    document.getElementById('dateRangeEnd').value = formatDateForInput(range.end);
-    showDateRangeError('');
-}
-
-// Show (or clear) the inline, screen-reader-announced date range error
-function showDateRangeError(message) {
-    const errorEl = document.getElementById('dateRangeError');
-    const invalid = Boolean(message);
-    errorEl.textContent = message;
-    errorEl.classList.toggle('d-none', !invalid);
-    ['dateRangeStart', 'dateRangeEnd'].forEach(id => {
-        document.getElementById(id).setAttribute('aria-invalid', String(invalid));
+// Select a time range preset ("all" or a number of months) and highlight its pill
+function setTimeRange(months) {
+    const pill = document.querySelector(`#timeRangePills [data-months="${months}"]`);
+    if (!pill) return false;
+    document.querySelectorAll('#timeRangePills .nav-link').forEach(link => {
+        const active = link === pill;
+        link.classList.toggle('active', active);
+        link.setAttribute('aria-pressed', String(active));
     });
+    currentDateRange = { months, ...presetDateRange(months) };
+    return true;
 }
 
-// Update charts with date range
-function updateChartsDateRange() {
-    const range = validateDateRange(
-        document.getElementById('dateRangeStart').value,
-        document.getElementById('dateRangeEnd').value
-    );
-    if (range.error) {
-        showDateRangeError(range.error);
-        document.getElementById('dateRangeStart').focus();
-        return;
-    }
-    showDateRangeError('');
-
-    currentDateRange.start = range.start;
-    currentDateRange.end = range.end;
-
-    // Update all charts with new date range
-    updateAllCharts();
-
-    // Save date range preference
-    saveDateRangePreference();
-}
-
-// Reset to default date range (6 months)
-function resetDateRangeToDefault() {
-    initializeDateRange();
-    updateAllCharts();
-    saveDateRangePreference();
-}
-
-// Save date range preference
 async function saveDateRangePreference() {
     try {
-        const preferences = {
-            filter_settings: {
-                date_range: {
-                    start_date: currentDateRange.start?.toISOString(),
-                    end_date: currentDateRange.end?.toISOString(),
-                    default_months: currentDateRange.defaultMonths
-                },
-                hide_admin_users: document.getElementById('filterAdmins').checked
-            }
-        };
-
         await fetch('/api/admin/preferences', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(preferences)
+            body: JSON.stringify({
+                filter_settings: {
+                    date_range: { months: currentDateRange.months },
+                    hide_admin_users: document.getElementById('filterAdmins').checked
+                }
+            })
         });
     } catch (error) {
         console.error('Error saving date range preference:', error);
     }
 }
 
-// Load date range preference
 async function loadDateRangePreference() {
     try {
         const response = await fetch('/api/admin/preferences');
-        if (response.ok) {
-            const data = await response.json();
-            const dateRange = data.filter_settings?.date_range;
-
-            if (dateRange?.start_date && dateRange?.end_date) {
-                currentDateRange.start = new Date(dateRange.start_date);
-                currentDateRange.end = new Date(dateRange.end_date);
-
-                document.getElementById('dateRangeStart').value = formatDateForInput(currentDateRange.start);
-                document.getElementById('dateRangeEnd').value = formatDateForInput(currentDateRange.end);
-            } else {
-                initializeDateRange();
-            }
-        } else {
-            initializeDateRange();
-        }
+        if (!response.ok) return;
+        const data = await response.json();
+        const months = data.filter_settings?.date_range?.months;
+        if (months !== undefined && months !== null) setTimeRange(months);
     } catch (error) {
         console.error('Error loading date range preference:', error);
-        initializeDateRange();
     }
 }
 
@@ -639,251 +461,11 @@ function getFilteredUsers() {
 function updateAllCharts() {
     const filteredUsers = getFilteredUsers();
 
-    // Update tutorial charts
-    updateTutorialCompletionChart(filteredUsers);
-    updateTutorialHelpChart(filteredUsers);
-    updateTutorialResetChart(filteredUsers);
-
-    // Update existing charts
-    updateUserActivityChart(filteredUsers);
-    updateFeatureUsageChart(filteredUsers);
+    // Update charts
     updateRegistrationTimelineChart(filteredUsers);
-    updateUsageFrequencyChart(filteredUsers);
-    updateTopUsersChart(filteredUsers);
-
-    // Update new charts
     updateLoginTimelineChart(filteredUsers);
     updateAdoptionRateChart(filteredUsers);
-    updateRetentionChart(filteredUsers);
-    updateHourlyActivityChart(filteredUsers);
-    updateActivityFocusChart(filteredUsers);
-
-    // Update additional charts
-    updatePlayerBreakdownChart(filteredUsers);
-    updateTeamBreakdownChart(filteredUsers);
-    updateUpdateFrequencyChart(filteredUsers);
-    updateFeatureRadarChart(filteredUsers);
     updateEngagementScoreChart(filteredUsers);
-}
-
-// Tutorial Chart 1: Tutorial Completion Rates
-function updateTutorialCompletionChart(filteredUsers) {
-    let tutorialData = {
-        welcome_complete: 0,
-        welcome_skip: 0,
-        player_complete: 0,
-        player_skip: 0,
-        update_complete: 0,
-        update_skip: 0
-    };
-
-    filteredUsers.forEach(user => {
-        tutorialData.welcome_complete += user.c_welcome_complete || 0;
-        tutorialData.welcome_skip += user.c_welcome_skip || 0;
-        tutorialData.player_complete += user.c_player_complete || 0;
-        tutorialData.player_skip += user.c_player_skip || 0;
-        tutorialData.update_complete += user.c_update_complete || 0;
-        tutorialData.update_skip += user.c_update_skip || 0;
-    });
-
-    renderChart('tutorialCompletion', 'tutorialCompletionChart', {
-        type: 'bar',
-        data: {
-            labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
-            datasets: [{
-                label: 'Completed',
-                data: [tutorialData.welcome_complete, tutorialData.player_complete, tutorialData.update_complete],
-                backgroundColor: chartColor(0),
-                borderColor: chartColor(0),
-                borderWidth: 1
-            }, {
-                label: 'Skipped',
-                data: [tutorialData.welcome_skip, tutorialData.player_skip, tutorialData.update_skip],
-                backgroundColor: chartColor(5),
-                borderColor: chartColor(5),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                }
-            }
-        }
-    });
-}
-
-// Tutorial Chart 2: Tutorial Help Usage
-function updateTutorialHelpChart(filteredUsers) {
-    let helpData = {
-        welcome_help: 0,
-        player_help: 0,
-        update_help: 0
-    };
-
-    filteredUsers.forEach(user => {
-        helpData.welcome_help += user.c_welcome_help || 0;
-        helpData.player_help += user.c_player_help || 0;
-        helpData.update_help += user.c_update_help || 0;
-    });
-
-    renderChart('tutorialHelp', 'tutorialHelpChart', {
-        type: 'doughnut',
-        data: {
-            labels: ['Welcome Tour', 'Player Tour', 'Update Tour'],
-            datasets: [{
-                data: [helpData.welcome_help, helpData.player_help, helpData.update_help],
-                backgroundColor: [chartColor(1), chartColor(2), chartColor(4)],
-                borderColor: [chartColor(1), chartColor(2), chartColor(4)],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Tutorial Chart 3: Tutorial Reset Behavior
-function updateTutorialResetChart(filteredUsers) {
-    let resetBuckets = {
-        'No Resets': 0,
-        '1 Reset': 0,
-        '2-3 Resets': 0,
-        '4+ Resets': 0
-    };
-
-    filteredUsers.forEach(user => {
-        const resets = user.c_tutorial_reset || 0;
-        if (resets === 0) {
-            resetBuckets['No Resets']++;
-        } else if (resets === 1) {
-            resetBuckets['1 Reset']++;
-        } else if (resets <= 3) {
-            resetBuckets['2-3 Resets']++;
-        } else {
-            resetBuckets['4+ Resets']++;
-        }
-    });
-
-    renderChart('tutorialReset', 'tutorialResetChart', {
-        type: 'pie',
-        data: {
-            labels: Object.keys(resetBuckets),
-            datasets: [{
-                data: Object.values(resetBuckets),
-                backgroundColor: [chartColor(0), chartColor(5), chartColor(6), CHART_DANGER],
-                borderColor: [chartColor(0), chartColor(5), chartColor(6), CHART_DANGER],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Chart 1: User Activity Distribution
-function updateUserActivityChart(filteredUsers) {
-    let activeUsers = 0;
-    let inactiveUsers = 0;
-
-    filteredUsers.forEach(user => {
-        const lastUsage = parseDate(user.last_usage);
-        const now = new Date();
-        const daysSinceUsage = lastUsage ? Math.floor((now - lastUsage) / (1000 * 60 * 60 * 24)) : 999;
-
-        if (daysSinceUsage <= 30) {
-            activeUsers++;
-        } else {
-            inactiveUsers++;
-        }
-    });
-
-    renderChart('userActivity', 'userActivityChart', {
-        type: 'doughnut',
-        data: {
-            labels: ['Active (30d)', 'Inactive'],
-            datasets: [{
-                data: [activeUsers, inactiveUsers],
-                backgroundColor: [chartColor(0), CHART_DANGER],
-                borderColor: [chartColor(0), CHART_DANGER],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Chart 2: Feature Usage Distribution
-function updateFeatureUsageChart(filteredUsers) {
-    let featureData = {
-        team: 0, training: 0, matches: 0, player: 0, update: 0,
-        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
-    };
-
-    filteredUsers.forEach(user => {
-        featureData.team += user.c_team || 0;
-        featureData.training += user.c_training || 0;
-        featureData.matches += user.c_matches || 0;
-        featureData.player += user.c_player || 0;
-        featureData.update += user.c_update || 0;
-        featureData.settings += user.c_settings || 0;
-        featureData.changes += user.c_changes || 0;
-        featureData.feedback += user.c_feedback || 0;
-        featureData.formation += user.c_formation || 0;
-        featureData.stats += user.c_stats || 0;
-    });
-
-    renderChart('featureUsage', 'featureUsageChart', {
-        type: 'bar',
-        data: {
-            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
-            datasets: [{
-                label: 'Total Usage',
-                data: [featureData.team, featureData.training, featureData.matches, featureData.player, featureData.update, featureData.settings, featureData.changes, featureData.feedback, featureData.formation, featureData.stats],
-                backgroundColor: chartColor(1),
-                borderColor: chartColor(1),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
 }
 
 // Chart 3: Registration Timeline
@@ -931,110 +513,9 @@ function updateRegistrationTimelineChart(filteredUsers) {
     });
 }
 
-// Chart 4: Usage Frequency Distribution
-function updateUsageFrequencyChart(filteredUsers) {
-    let frequencyBuckets = {
-        'Minimal (1-10)': 0,
-        'Light (11-50)': 0,
-        'Moderate (51-150)': 0,
-        'Heavy (150+)': 0
-    };
-
-    filteredUsers.forEach(user => {
-        const totalActivity =
-            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
-            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
-            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
-            (user.c_stats || 0);
-
-        if (totalActivity >= 150) {
-            frequencyBuckets['Heavy (150+)']++;
-        } else if (totalActivity >= 51) {
-            frequencyBuckets['Moderate (51-150)']++;
-        } else if (totalActivity >= 11) {
-            frequencyBuckets['Light (11-50)']++;
-        } else if (totalActivity >= 1) {
-            frequencyBuckets['Minimal (1-10)']++;
-        }
-        // Users with 0 activity are not included
-    });
-
-    renderChart('usageFrequency', 'usageFrequencyChart', {
-        type: 'pie',
-        data: {
-            labels: Object.keys(frequencyBuckets),
-            datasets: [{
-                data: Object.values(frequencyBuckets),
-                backgroundColor: [chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
-                borderColor: [chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Chart 5: Top Users by Activity
-function updateTopUsersChart(filteredUsers) {
-    const usersWithTotalActivity = filteredUsers.map(user => {
-        const totalActivity =
-            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
-            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
-            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
-            (user.c_stats || 0);
-
-        return {
-            name: user.name.length > 12 ? user.name.slice(0, 12) + '...' : user.name,
-            activity: totalActivity
-        };
-    })
-    .filter(user => user.activity > 0)
-    .sort((a, b) => b.activity - a.activity)
-    .slice(0, 5);
-
-    const topUserNames = usersWithTotalActivity.map(user => user.name);
-    const topUserActivity = usersWithTotalActivity.map(user => user.activity);
-
-    renderChart('topUsers', 'topUsersChart', {
-        type: 'bar',
-        data: {
-            labels: topUserNames,
-            datasets: [{
-                label: 'Total Activity',
-                data: topUserActivity,
-                backgroundColor: chartColor(3),
-                borderColor: chartColor(3),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            maintainAspectRatio: true,
-            aspectRatio: 1.5,
-            scales: {
-                x: {
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
-
 // Chart 6: Login Activity Over Time
 function updateLoginTimelineChart(filteredUsers) {
-    // Group logins by week for the last 12 weeks
+    // Group all activity by week for the last 12 weeks
     const weekData = {};
     const now = new Date();
 
@@ -1046,9 +527,9 @@ function updateLoginTimelineChart(filteredUsers) {
     }
 
     filteredUsers.forEach(user => {
-        const lastLogin = parseDate(user.last_login);
-        if (lastLogin && lastLogin >= new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000))) {
-            const weekKey = lastLogin.getFullYear() + '-W' + Math.ceil((lastLogin.getTime() - new Date(lastLogin.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
+        const lastUsage = parseDate(user.last_usage);
+        if (lastUsage && lastUsage >= new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000))) {
+            const weekKey = lastUsage.getFullYear() + '-W' + Math.ceil((lastUsage.getTime() - new Date(lastUsage.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000));
             if (weekData.hasOwnProperty(weekKey)) {
                 weekData[weekKey]++;
             }
@@ -1060,7 +541,7 @@ function updateLoginTimelineChart(filteredUsers) {
         data: {
             labels: Object.keys(weekData),
             datasets: [{
-                label: 'Weekly Logins',
+                label: 'Weekly Activity',
                 data: Object.values(weekData),
                 borderColor: chartColor(2),
                 backgroundColor: chartColor(2, 0.1),
@@ -1145,414 +626,63 @@ function updateAdoptionRateChart(filteredUsers) {
     });
 }
 
-// Chart 8: User Retention by Registration Month
-function updateRetentionChart(filteredUsers) {
-    const retentionData = {};
-    const now = new Date();
-    const threeMonthsAgo = new Date(now.getTime() - (90 * 24 * 60 * 60 * 1000));
-
-    filteredUsers.forEach(user => {
-        const created = parseDate(user.created);
-        const lastUsage = parseDate(user.last_usage);
-
-        if (created && created >= threeMonthsAgo) {
-            const monthKey = created.getFullYear() + '-' + String(created.getMonth() + 1).padStart(2, '0');
-
-            if (!retentionData[monthKey]) {
-                retentionData[monthKey] = { total: 0, active: 0 };
-            }
-
-            retentionData[monthKey].total++;
-
-            if (lastUsage && lastUsage >= new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000))) {
-                retentionData[monthKey].active++;
-            }
-        }
-    });
-
-    const sortedMonths = Object.keys(retentionData).sort();
-    const retentionRates = sortedMonths.map(month => {
-        const data = retentionData[month];
-        return data.total > 0 ? Math.round((data.active / data.total) * 100) : 0;
-    });
-
-    renderChart('retention', 'retentionChart', {
-        type: 'bar',
-        data: {
-            labels: sortedMonths.map(month => month.split('-')[1] + '/' + month.split('-')[0].slice(2)),
-            datasets: [{
-                label: 'Retention Rate (%)',
-                data: retentionRates,
-                backgroundColor: chartColor(6),
-                borderColor: chartColor(6),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
-
-// Chart 9: Activity by Hour of Day
-function updateHourlyActivityChart(filteredUsers) {
-    const hourlyData = new Array(24).fill(0);
-
-    filteredUsers.forEach(user => {
-        const lastUsage = parseDate(user.last_usage);
-        if (lastUsage) {
-            const hour = lastUsage.getHours();
-            hourlyData[hour]++;
-        }
-    });
-
-    const hours = [];
-    for (let i = 0; i < 24; i++) {
-        hours.push(i + ':00');
-    }
-
-    renderChart('hourlyActivity', 'hourlyActivityChart', {
-        type: 'line',
-        data: {
-            labels: hours,
-            datasets: [{
-                label: 'Activity Count',
-                data: hourlyData,
-                borderColor: chartColor(4),
-                backgroundColor: chartColor(4, 0.1),
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                },
-                x: {
-                    ticks: {
-                        maxTicksLimit: 12
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
-
-// Chart 10: Team vs Player Activity Focus
-function updateActivityFocusChart(filteredUsers) {
-    let teamFocused = 0;
-    let playerFocused = 0;
-    let balanced = 0;
-
-    filteredUsers.forEach(user => {
-        const teamActivity = (user.c_team || 0) + (user.c_matches || 0) + (user.c_formation || 0);
-        const playerActivity = (user.c_player || 0) + (user.c_training || 0);
-        const totalActivity = teamActivity + playerActivity;
-
-        if (totalActivity === 0) return;
-
-        const teamRatio = teamActivity / totalActivity;
-
-        if (teamRatio > 0.6) {
-            teamFocused++;
-        } else if (teamRatio < 0.4) {
-            playerFocused++;
-        } else {
-            balanced++;
-        }
-    });
-
-    renderChart('activityFocus', 'activityFocusChart', {
-        type: 'doughnut',
-        data: {
-            labels: ['Team Focused', 'Player Focused', 'Balanced'],
-            datasets: [{
-                data: [teamFocused, playerFocused, balanced],
-                backgroundColor: [chartColor(1), chartColor(0), chartColor(5)],
-                borderColor: [chartColor(1), chartColor(0), chartColor(5)],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Chart 11: Player Activity Breakdown
-function updatePlayerBreakdownChart(filteredUsers) {
-    let playerData = {
-        player: 0,
-        training: 0,
-        formation: 0
-    };
-
-    filteredUsers.forEach(user => {
-        playerData.player += user.c_player || 0;
-        playerData.training += user.c_training || 0;
-        playerData.formation += user.c_formation || 0;
-    });
-
-    renderChart('playerBreakdown', 'playerBreakdownChart', {
-        type: 'bar',
-        data: {
-            labels: ['Player Views', 'Training Analysis', 'Formation Planning'],
-            datasets: [{
-                label: 'Usage Count',
-                data: [playerData.player, playerData.training, playerData.formation],
-                backgroundColor: [chartColor(0), chartColor(2), chartColor(6)],
-                borderColor: [chartColor(0), chartColor(2), chartColor(6)],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
-
-// Chart 12: Team Management Activity
-function updateTeamBreakdownChart(filteredUsers) {
-    let teamData = {
-        team: 0,
-        matches: 0,
-        stats: 0
-    };
-
-    filteredUsers.forEach(user => {
-        teamData.team += user.c_team || 0;
-        teamData.matches += user.c_matches || 0;
-        teamData.stats += user.c_stats || 0;
-    });
-
-    // Debug: Check if we have any data
-    console.log('Team Management Data:', teamData);
-
-    // If no data, use some sample data to show the chart structure
-    if (teamData.team === 0 && teamData.matches === 0 && teamData.stats === 0) {
-        teamData = { team: 1, matches: 1, stats: 1 };
-    }
-
-    renderChart('teamBreakdown', 'teamBreakdownChart', {
-        type: 'doughnut',
-        data: {
-            labels: ['Team Overview', 'Match Analysis', 'Statistics'],
-            datasets: [{
-                data: [teamData.team, teamData.matches, teamData.stats],
-                backgroundColor: [chartColor(1), chartColor(6), chartColor(2)],
-                borderColor: [chartColor(1), chartColor(6), chartColor(2)],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Chart 13: Update Frequency Distribution
-function updateUpdateFrequencyChart(filteredUsers) {
-    let updateBuckets = {
-        'Never (0)': 0,
-        'Rare (1-2)': 0,
-        'Occasional (3-10)': 0,
-        'Regular (11-25)': 0,
-        'Frequent (25+)': 0
-    };
-
-    filteredUsers.forEach(user => {
-        const updates = user.c_update || 0;
-        if (updates === 0) {
-            updateBuckets['Never (0)']++;
-        } else if (updates <= 2) {
-            updateBuckets['Rare (1-2)']++;
-        } else if (updates <= 10) {
-            updateBuckets['Occasional (3-10)']++;
-        } else if (updates <= 25) {
-            updateBuckets['Regular (11-25)']++;
-        } else {
-            updateBuckets['Frequent (25+)']++;
-        }
-    });
-
-    renderChart('updateFrequency', 'updateFrequencyChart', {
-        type: 'pie',
-        data: {
-            labels: Object.keys(updateBuckets),
-            datasets: [{
-                data: Object.values(updateBuckets),
-                backgroundColor: [chartColor(3), chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
-                borderColor: [chartColor(3), chartColor(5), chartColor(2), chartColor(0), CHART_DANGER],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
-
-// Chart 14: Feature Usage Radar
-function updateFeatureRadarChart(filteredUsers) {
-    let featureData = {
-        team: 0, training: 0, matches: 0, player: 0, update: 0,
-        settings: 0, changes: 0, feedback: 0, formation: 0, stats: 0
-    };
-
-    const totalUsers = filteredUsers.length;
-    if (totalUsers === 0) return;
-
-    filteredUsers.forEach(user => {
-        if ((user.c_team || 0) > 0) featureData.team++;
-        if ((user.c_training || 0) > 0) featureData.training++;
-        if ((user.c_matches || 0) > 0) featureData.matches++;
-        if ((user.c_player || 0) > 0) featureData.player++;
-        if ((user.c_update || 0) > 0) featureData.update++;
-        if ((user.c_settings || 0) > 0) featureData.settings++;
-        if ((user.c_changes || 0) > 0) featureData.changes++;
-        if ((user.c_feedback || 0) > 0) featureData.feedback++;
-        if ((user.c_formation || 0) > 0) featureData.formation++;
-        if ((user.c_stats || 0) > 0) featureData.stats++;
-    });
-
-    // Convert to percentages
-    const adoptionPercentages = Object.keys(featureData).map(key =>
-        Math.round((featureData[key] / totalUsers) * 100)
-    );
-
-    renderChart('featureRadar', 'featureRadarChart', {
-        type: 'radar',
-        data: {
-            labels: ['Team', 'Training', 'Matches', 'Players', 'Updates', 'Settings', 'Changes', 'Feedback', 'Formation', 'Stats'],
-            datasets: [{
-                label: 'Adoption Rate (%)',
-                data: adoptionPercentages,
-                borderColor: chartColor(4),
-                backgroundColor: chartColor(4, 0.2),
-                borderWidth: 2,
-                pointBackgroundColor: chartColor(4)
-            }]
-        },
-        options: {
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 100,
-                    ticks: {
-                        callback: function(value) {
-                            return value + '%';
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-}
-
 // Chart 15: User Engagement Score
 function updateEngagementScoreChart(filteredUsers) {
-    const engagementScoreBuckets = {
-        'Low (0-25)': 0,
-        'Medium (26-50)': 0,
-        'High (51-75)': 0,
-        'Very High (76-100)': 0
-    };
+    const engagementScores = filteredUsers.map(user => {
+        const totalActivity =
+            (user.c_team || 0) + (user.c_training || 0) + (user.c_matches || 0) +
+            (user.c_player || 0) + (user.c_update || 0) + (user.c_settings || 0) +
+            (user.c_changes || 0) + (user.c_feedback || 0) + (user.c_formation || 0) +
+            (user.c_stats || 0);
 
-    filteredUsers.forEach(user => {
-        const activities = [
-            user.c_team || 0, user.c_training || 0, user.c_matches || 0,
-            user.c_player || 0, user.c_update || 0, user.c_settings || 0,
-            user.c_changes || 0, user.c_feedback || 0, user.c_formation || 0,
-            user.c_stats || 0
-        ];
-        const totalActivity = activities.reduce((sum, val) => sum + val, 0);
-        const activeFeatures = activities.filter(val => val > 0).length;
-        const score = Math.min(totalActivity + (activeFeatures * 5), 100);
+        let featureCount = 0;
+        if ((user.c_team || 0) > 0) featureCount++;
+        if ((user.c_training || 0) > 0) featureCount++;
+        if ((user.c_matches || 0) > 0) featureCount++;
+        if ((user.c_player || 0) > 0) featureCount++;
+        if ((user.c_update || 0) > 0) featureCount++;
+        if ((user.c_settings || 0) > 0) featureCount++;
+        if ((user.c_changes || 0) > 0) featureCount++;
+        if ((user.c_feedback || 0) > 0) featureCount++;
+        if ((user.c_formation || 0) > 0) featureCount++;
+        if ((user.c_stats || 0) > 0) featureCount++;
 
-        if (score <= 25) engagementScoreBuckets['Low (0-25)']++;
-        else if (score <= 50) engagementScoreBuckets['Medium (26-50)']++;
-        else if (score <= 75) engagementScoreBuckets['High (51-75)']++;
-        else engagementScoreBuckets['Very High (76-100)']++;
+        const lastUsage = parseDate(user.last_usage);
+        const daysSinceUsage = lastUsage ? Math.floor((new Date() - lastUsage) / (1000 * 60 * 60 * 24)) : 999;
+        const recency = Math.max(0, 100 - (daysSinceUsage * 5));
+
+        const engagementScore = (totalActivity * 0.4) + (featureCount * 10) + (recency * 0.2);
+        return Math.round(engagementScore);
     });
 
+    const buckets = {
+        'Highly Engaged (80+)': engagementScores.filter(s => s >= 80).length,
+        'Engaged (50-79)': engagementScores.filter(s => s >= 50 && s < 80).length,
+        'Moderate (20-49)': engagementScores.filter(s => s >= 20 && s < 50).length,
+        'Low (<20)': engagementScores.filter(s => s < 20).length
+    };
+
     renderChart('engagementScore', 'engagementScoreChart', {
-        type: 'bar',
+        type: 'doughnut',
         data: {
-            labels: Object.keys(engagementScoreBuckets),
+            labels: Object.keys(buckets),
             datasets: [{
-                label: 'Number of Users',
-                data: Object.values(engagementScoreBuckets),
-                backgroundColor: [CHART_DANGER, chartColor(5), chartColor(0), chartColor(4)],
-                borderColor: [CHART_DANGER, chartColor(5), chartColor(0), chartColor(4)],
+                data: Object.values(buckets),
+                backgroundColor: [chartColor(0), chartColor(2), chartColor(5), CHART_DANGER],
+                borderColor: [chartColor(0), chartColor(2), chartColor(5), CHART_DANGER],
                 borderWidth: 1
             }]
         },
         options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            },
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'bottom'
                 }
             }
         }
     });
 }
-
 // Initialize all charts on page load and add event listener
 document.addEventListener('DOMContentLoaded', function() {
     // Load date range preference first, then update charts
@@ -1561,6 +691,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.getElementById('filterAdmins').addEventListener('change', updateAllCharts);
+
+    document.getElementById('timeRangePills').addEventListener('click', function(e) {
+        const pill = e.target.closest('[data-months]');
+        if (!pill) return;
+        const value = pill.dataset.months;
+        if (setTimeRange(value === 'all' ? 'all' : Number(value))) {
+            updateAllCharts();
+            saveDateRangePreference();
+        }
+    });
 
     // Initialize chart manager for drag-and-drop functionality
     if (typeof DebugChartManager !== 'undefined') {
