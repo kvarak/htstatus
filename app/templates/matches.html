@@ -211,17 +211,7 @@
                   <div class="card-body p-2 small">
                     <div class="mb-2">
                       <strong>Match Type:</strong>
-                      <span class="text-muted">
-                        {% if m.matchtype == 1 %}
-                          League
-                        {% elif m.matchtype == 3 %}
-                          Cup
-                        {% elif m.matchtype == 4 %}
-                          Friendly
-                        {% else %}
-                          Unknown
-                        {% endif %}
-                      </span>
+                      <span class="text-muted">{{ match_type_names.get(m.matchtype, "Unknown (type %s)" % m.matchtype) }}</span>
                     </div>
                     <div class="mb-2">
                       <strong>Home Team:</strong> <span class="text-muted">{{ m.home_team_name }}</span>

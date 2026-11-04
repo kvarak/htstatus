@@ -292,3 +292,20 @@ def test_scouting_shows_opponent_stored_setup(app_with_routes, db_session):
     assert 'title="4-4-2: 1 of 1 (100%)"' in html
     assert 'title="Pressing: 1 of 1 (100%)"' in html
     assert re.search(r'>4-4-2</td>\s*<td class="text-nowrap">Pressing</td>', html)
+
+
+def test_upcoming_match_shows_every_match_type_name(app_with_routes, db_session):
+    from tests.conftest import create_test_user
+    from tests.factories import setup_authenticated_session
+
+    user = create_test_user(db_session)
+    tournament = _upcoming_match(12345, 80, 990008)
+    tournament.matchtype = 50
+    db_session.add(tournament)
+    db_session.commit()
+    client = setup_authenticated_session(app_with_routes.test_client(), user)
+
+    html = client.get("/matches?id=12345").get_data(as_text=True)
+
+    assert "Tournament league" in html
+    assert "Unknown" not in html

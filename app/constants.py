@@ -122,3 +122,28 @@ CALC_COLUMNS = [
     "FTW",
     "DF",
 ]
+
+# CHPP MatchTypeID -> name (docs/datatypes.md); Hattrick's translations don't include these
+MATCH_TYPE_NAMES = {
+    1: "League",
+    2: "Qualification",
+    3: "Cup",
+    4: "Friendly",
+    5: "Friendly (cup rules)",
+    7: "Hattrick Masters",
+    8: "International friendly",
+    9: "International friendly (cup rules)",
+    10: "National teams competition",
+    11: "National teams competition (cup rules)",
+    12: "National teams friendly",
+    50: "Tournament league",
+    51: "Tournament playoff",
+    61: "Duel",
+    62: "Ladder",
+    80: "Preparation",
+    100: "Youth league",
+    101: "Youth friendly",
+    103: "Youth friendly (cup rules)",
+    105: "Youth international friendly",
+    106: "Youth international friendly (cup rules)",
+}

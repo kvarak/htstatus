@@ -10,6 +10,7 @@ from app.auth_utils import (
     track_activity,
     WRONG_TEAM,
 )
+from app.constants import MATCH_TYPE_NAMES
 from app.hattrick_countries import get_country_display
 from app.opponents import scouting_for
 from app.utils import (
@@ -72,6 +73,7 @@ def matches():
         history_matches=history,
         has_upcoming=bool(upcoming),
         scouting=scouting,
+        match_type_names=MATCH_TYPE_NAMES,
         teamname=teamname,
         teamid=teamid,
         title="Matches",
