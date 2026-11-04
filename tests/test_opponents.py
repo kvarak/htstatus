@@ -9,7 +9,6 @@ from app.opponents import (
     refresh_opponent_matches,
     setup_summary,
     summarise,
-    tactic_label,
 )
 from models import Match
 
@@ -167,22 +166,6 @@ class TestDefaultSetup:
         assert default_setup(None) == "all"
 
 
-class TestTacticLabel:
-    def test_known_and_unknown_types(self):
-        assert tactic_label(1) == "Pressing"
-        assert tactic_label(5) == "Tactic 5"
-
-    def test_missing_type_is_none(self):
-        assert tactic_label(None) is None
-
-    def test_zero_is_normal(self):
-        assert tactic_label(0) == "Normal"
-
-    def test_creative_and_longshots_follow_chpp(self):
-        assert tactic_label(7) == "Creative"
-        assert tactic_label(8) == "Longshots"
-
-
 class TestSetupSummary:
     def setup_method(self):
         self.matches = [
@@ -197,14 +180,14 @@ class TestSetupSummary:
 
         assert len(result["matches"]) == 2
         assert result["formations"] == [("4-4-2", 2, 100)]
-        assert result["tactics"] == [("Pressing", 2, 100)]
+        assert result["tactics"] == [(1, 2, 100)]
 
     def test_cup_only_keeps_cup_matches(self):
         result = setup_summary(self.matches, OUR_ID, "cup")
 
         assert len(result["matches"]) == 1
         assert result["formations"] == [("5-3-2", 1, 100)]
-        assert result["tactics"] == [("Counter-Attack", 1, 100)]
+        assert result["tactics"] == [(2, 1, 100)]
 
     def test_all_keeps_every_match_type(self):
         result = setup_summary(self.matches, OUR_ID, "all")
@@ -233,7 +216,13 @@ class TestSetupSummary:
         result = setup_summary(matches, OUR_ID, "league")
 
         assert result["formations"] == [("4-4-2", 2, 50), (None, 2, 50)]
-        assert result["tactics"] == [("Pressing", 3, 75), (None, 1, 25)]
+        assert result["tactics"] == [(1, 3, 75), (None, 1, 25)]
+
+    def test_normal_tactic_counts_as_a_tactic(self):
+        matches = [make_setup_match(datetime(2024, 1, 1), 1, "4-4-2", 0)]
+        result = setup_summary(matches, OUR_ID, "league")
+
+        assert result["tactics"] == [(0, 1, 100)]
 
     def test_no_matches_give_no_shares(self):
         result = setup_summary([], OUR_ID, "cup")

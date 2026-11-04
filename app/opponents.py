@@ -13,16 +13,6 @@ from app.utils import _process_matches_enhanced, dprint
 RECENT_LIMIT = 10
 # matchtype 1 = league, 3 = cup (same as matches.html); None = every match type
 SETUP_FILTERS = {"league": (1,), "cup": (3,), "all": None}
-# matchdetails TacticType values, named as on the matches page
-TACTIC_NAMES = {
-    0: "Normal",
-    1: "Pressing",
-    2: "Counter-Attack",
-    3: "AIM",
-    4: "AOW",
-    7: "Creative",
-    8: "Longshots",
-}
 
 
 def opponent_of(match, team_id):
@@ -70,13 +60,6 @@ def _past_matches(team_id, now):
     )
 
 
-def tactic_label(tactic_type):
-    """Readable name of a matchdetails TacticType (same names as the matches page)."""
-    if tactic_type is None:
-        return None
-    return TACTIC_NAMES.get(tactic_type, f"Tactic {tactic_type}")
-
-
 def _save_missing_setups(chpp, team_id, matches):
     """Store formation and tactic of team_id for its last RECENT_LIMIT finished matches.
 
@@ -108,7 +91,8 @@ def summarise(matches, team_id, limit=None):
 
     Returns {"matches": [row, ...], "record": {"W": n, "D": n, "L": n}}, where
     record is overall and "home"/"away" split the same way. limit keeps only
-    the newest matches. Each row has the formation and tactic of team_id.
+    the newest matches. Each row has the formation and tactic type of team_id
+    (the template names the tactic with ``tactic_name``).
     """
     rows = []
     for m in sorted(matches, key=lambda m: m.datetime, reverse=True):
@@ -135,7 +119,7 @@ def summarise(matches, team_id, limit=None):
                 "formation": (
                     m.home_team_formation if at_home else m.away_team_formation
                 ),
-                "tactic": tactic_label(
+                "tactic": (
                     m.home_team_tactic_type if at_home else m.away_team_tactic_type
                 ),
             }
@@ -178,10 +162,10 @@ def setup_summary(matches, team_id, kind):
 
 def shares(values):
     """(value, times, percent) per value, most used first, unknown (None or "") last."""
-    values = [v or None for v in values]
+    values = [None if v == "" else v for v in values]
     if not values:
         return []
-    counts = Counter(v for v in values if v).most_common()
+    counts = Counter(v for v in values if v is not None).most_common()
     unknown = values.count(None)
     if unknown:
         counts.append((None, unknown))

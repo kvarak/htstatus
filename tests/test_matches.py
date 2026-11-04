@@ -171,7 +171,7 @@ def test_matches_page_shows_ratings_as_us_vs_them(app_with_routes, db_session):
     assert "team-box us" in html and "team-box them" in html
     assert html.count('class="rating-box"') == 8
     assert re.search(r'class="us"\s+style="width: 80.0%"', html)
-    assert "8.0 - 2.0" in html
+    assert re.search(r">8</span> - <span[^>]*>2</span>", html)
 
 
 def test_match_header_is_a_scoreboard_with_our_team_highlighted(

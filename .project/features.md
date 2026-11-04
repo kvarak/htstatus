@@ -20,6 +20,7 @@ Built in this order; each step is useful on its own. Design notes: [tasks/cycle-
 
 ## Later 🔮
 
+- **[FEAT-045]** Team mood: team spirit, self-confidence, fan mood, fan expectations (season and each upcoming match) and sponsor popularity for the own team, in Hattrick's words with the change since the last Update. Needs Fans and Economy approved in the functional description first. Record: [tasks/FEAT-045.md](tasks/FEAT-045.md)
 - **[FEAT-019]** Player Skill Changes Timeline - 4-week timeline with better browser compatibility and simplified approach
 - **[FEAT-016]** Alternative Leadership Indicators (30 min) - Replace complex charts with simple metrics
 - **[FEAT-017]** User Preference System (60 min) - Store user chart/visualization preferences

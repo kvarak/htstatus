@@ -50,6 +50,23 @@ ENGLISH_SPECIALTIES = {
     8: "Support",
 }
 
+# matchdetails TacticType (docs/datatypes.md); there are no tactics 5 and 6
+ENGLISH_TACTICS = {
+    0: "Normal",
+    1: "Pressing",
+    2: "Counter-attacks",
+    3: "Attack in the middle",
+    4: "Attack on wings",
+    7: "Play creatively",
+    8: "Long shots",
+}
+
+ENGLISH_ATTITUDES = {-1: "Play it cool", 0: "Normal", 1: "Match of the season"}
+
+# MatchRating 1-80: four sub-levels per SkillLevel (docs/datatypes.md)
+SUB_LEVEL_KEYS = ("0", "0,25", "0,5", "0,75")
+ENGLISH_SUB_LEVELS = ("very low", "low", "high", "very high")
+
 FOLDER = "translations"
 
 
@@ -131,6 +148,22 @@ def specialty_name(specialty):
     )
 
 
+def tactic_name(tactic_type):
+    """Hattrick's name for a TacticType ("" when unknown/not stored)."""
+    if tactic_type is None:
+        return ""
+    english = ENGLISH_TACTICS.get(tactic_type, f"Tactic {tactic_type}")
+    return ht_term("TacticTypes", tactic_type, english)
+
+
+def attitude_name(attitude):
+    """Hattrick's name for a TeamAttitude ("" when not given)."""
+    if attitude is None:
+        return ""
+    english = ENGLISH_ATTITUDES.get(attitude, str(attitude))
+    return ht_term("TeamAttitude", attitude, english)
+
+
 def specialty_names():
     return {key: specialty_name(key) for key in ENGLISH_SPECIALTIES}
 
@@ -151,6 +184,38 @@ def level_text(value, section="SkillLevels"):
     if not word:
         return str(value)
     return f"{word} ({value})" if fmt == "both" else word
+
+
+def _rating_words(rating):
+    """ "solid (high)" for a MatchRating, "" when the level word isn't cached."""
+    rating = int(rating)
+    level, sub = (rating - 1) // 4 + 1, (rating - 1) % 4
+    word = ht_term("SkillLevels", level)
+    if not word:
+        return ""
+    sub_word = ht_term("SkillSubLevels", SUB_LEVEL_KEYS[sub], ENGLISH_SUB_LEVELS[sub])
+    return f"{word} ({sub_word})"
+
+
+def rating_text(rating):
+    """A match rating (1-80) as the user wants it: "28", "solid (high)" or "solid (high) 28"."""
+    if rating is None:
+        return "N/A"
+    fmt = level_format()
+    words = _rating_words(rating) if fmt != "numbers" else ""
+    if not words:
+        return str(int(rating))
+    return f"{words} {int(rating)}" if fmt == "both" else words
+
+
+def rating_hint(rating):
+    """The form of a match rating not shown, for tooltips."""
+    if rating is None:
+        return ""
+    fmt = level_format()
+    if fmt == "words":
+        return str(int(rating))
+    return _rating_words(rating) if fmt == "numbers" else ""
 
 
 def level_texts(max_level=20):
@@ -182,4 +247,8 @@ def init_app(app):
             "skill_labels": skill_labels,
             "specialty_name": specialty_name,
             "specialty_names": specialty_names,
+            "tactic_name": tactic_name,
+            "attitude_name": attitude_name,
+            "rating_text": rating_text,
+            "rating_hint": rating_hint,
         }

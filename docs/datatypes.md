@@ -100,7 +100,7 @@ The matches XML sends the status as text (`UPCOMING`, `ONGOING`, `FINISHED`), st
 
 ### MatchTacticType
 
-Stored as `home_team_tactic_type` / `away_team_tactic_type` on `Match` and named in `TACTIC_NAMES` in `app/opponents.py`. There are no values 5 and 6.
+Stored as `home_team_tactic_type` / `away_team_tactic_type` on `Match` and named with `tactic_name` in `app/translations.py` (Hattrick's `TacticTypes` translations, English fallback). There are no values 5 and 6.
 
 | Value | Description |
 | --- | --- |

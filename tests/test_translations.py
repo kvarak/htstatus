@@ -26,6 +26,9 @@ TRANSLATIONS_XML = """<HattrickData>
       <Level Value="0">inexistant</Level>
       <Level Value="7">honorable</Level>
     </SkillLevels>
+    <SkillSubLevels>
+      <Level Value="0,5">haut</Level>
+    </SkillSubLevels>
     <PlayerSpecialties Label="Spécialité ">
       <Item Value="0">Aucune spécialité</Item>
       <Item Value="1">Technique</Item>
@@ -34,6 +37,9 @@ TRANSLATIONS_XML = """<HattrickData>
     <PlayerHonesty Label="Honnêteté">
       <Level Value="2">honnête</Level>
     </PlayerHonesty>
+    <TacticTypes Label="Tactique">
+      <Item Value="7">Jouer créatif</Item>
+    </TacticTypes>
     <MatchPositions Label="Position">
       <Item Type="Keeper">Gardien de but</Item>
       <Item Type="Forward">Attaquant</Item>
@@ -94,6 +100,16 @@ class TestTranslations:
             assert translations.column_label("Set pieces", "set_pieces") == "Set pieces"
             assert translations.column_label("Name", "name") == "Name"
             assert translations.specialty_name(8) == "Support"
+            assert translations.tactic_name(0) == "Normal"
+            assert translations.tactic_name(7) == "Play creatively"
+            assert translations.tactic_name(8) == "Long shots"
+            assert translations.tactic_name(5) == "Tactic 5"
+            assert translations.tactic_name(None) == ""
+            assert translations.attitude_name(1) == "Match of the season"
+            assert translations.attitude_name(None) == ""
+            assert translations.rating_text(28.0) == "28"
+            assert translations.rating_text(None) == "N/A"
+            assert translations.rating_hint(28.0) == ""
             assert translations.level_text(7) == "7"
             assert translations.level_hint(7) == ""
             assert translations.available_languages() == []
@@ -109,6 +125,11 @@ class TestTranslations:
             assert translations.column_label("Specialty", "specialty") == "Spécialité"
             assert translations.column_label("Name", "name") == "Name"
             assert translations.specialty_name(1) == "Technique"
+            assert translations.tactic_name(7) == "Jouer créatif"
+            assert translations.tactic_name(8) == "Long shots"  # untranslated
+            # MatchRating 27/28 = level 7 (honorable), sub-levels high/very high
+            assert translations.rating_text(27.0) == "honorable (haut) 27"
+            assert translations.rating_text(28) == "honorable (very high) 28"
             assert translations.level_text(7) == "honorable (7)"  # default: both
             assert translations.level_hint(7) == ""
             assert translations.skill_labels()["keeper"] == "Gardien"

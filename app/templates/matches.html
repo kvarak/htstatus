@@ -6,7 +6,9 @@
     <div class="{{ col }}">
       <div class="rating-box">
         <div class="rating-label">{{ label }}</div>
-        <div>{{ home|round(1) if home is not none else 'N/A' }} - {{ away|round(1) if away is not none else 'N/A' }}</div>
+        <div>
+          <span class="text-nowrap" title="{{ rating_hint(home) }}">{{ rating_text(home) }}</span> - <span class="text-nowrap" title="{{ rating_hint(away) }}">{{ rating_text(away) }}</span>
+        </div>
         {% if home is not none and away is not none and home + away > 0 %}
           <div class="rating-split">
             <span class="{{ 'us' if home_is_us else 'them' }}"
@@ -23,12 +25,13 @@
   {% macro wdl(counts) %}
     {{ counts.W }}-{{ counts.D }}-{{ counts.L }}
   {% endmacro %}
-  {# Stacked bar of (value, times, percent) shares; "?" = not stored #}
-  {% macro share_bar(label, items, total) %}
+  {# Stacked bar of (value, times, percent) shares; name() turns a value into text; "?" = not stored #}
+  {% macro share_bar(label, items, total, name=None) %}
     <div class="share-row">
       <div class="share-label">{{ label }}</div>
       <div class="share-bar">
         {% for value, n, pct in items %}
+          {% set text = "?" if value is none else (name(value) if name else value) %}
           {% if value is none %}
             {% set cls = "share-unknown" %}
           {% else %}
@@ -36,7 +39,7 @@
           {% endif %}
           <span class="share-seg {{ cls }}"
                 style="width: {{ pct }}%"
-                title="{{ value or 'Not stored' }}: {{ n }} of {{ total }} ({{ pct }}%)">{{ value or "?" }}</span>
+                title="{{ 'Not stored' if value is none else text }}: {{ n }} of {{ total }} ({{ pct }}%)">{{ text }}</span>
         {% endfor %}
       </div>
     </div>
@@ -269,7 +272,7 @@
                        {% if key != s.setup_default %} class="d-none"{% endif %}>
                     {% if panel.matches %}
                       {{ share_bar("Formation", panel.formations, panel.matches|length) }}
-                      {{ share_bar("Tactic", panel.tactics, panel.matches|length) }}
+                      {{ share_bar(ht_label("TacticTypes", "Tactic") , panel.tactics, panel.matches|length, tactic_name) }}
                       <div class="text-muted mb-2">
                         all {{ wdl(panel.record.all) }} · home {{ wdl(panel.record.home) }} · away {{ wdl(panel.record.away) }} (W-D-L)
                       </div>
@@ -280,7 +283,7 @@
                             <th>Opponent</th>
                             <th>Result</th>
                             <th>Formation</th>
-                            <th>Tactic</th>
+                            <th>{{ ht_label('TacticTypes', 'Tactic') }}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -293,7 +296,7 @@
                               </td>
                               <td class="text-nowrap">{{ result_badge(r.result) }} {{ r.goals_for }} - {{ r.goals_against }}</td>
                               <td class="text-nowrap">{{ r.formation or "?" }}</td>
-                              <td class="text-nowrap">{{ r.tactic or "?" }}</td>
+                              <td class="text-nowrap">{{ tactic_name(r.tactic) or "?" }}</td>
                             </tr>
                           {% endfor %}
                         </tbody>
@@ -412,7 +415,7 @@
                                 <span class="me-3">Possession: {{ m.home_team_possession|round(1) }}% - {{ m.away_team_possession|round(1) }}%</span>
                               {% endif %}
                               {% if m.home_team_rating is not none and m.away_team_rating is not none %}
-                                <span>Midfield: {{ m.home_team_rating|round(1) }} - {{ m.away_team_rating|round(1) }}</span>
+                                <span>{{ ht_term('RatingSectors', 'Midfield', 'Midfield') }}: <span title="{{ rating_hint(m.home_team_rating) }}">{{ rating_text(m.home_team_rating) }}</span> - <span title="{{ rating_hint(m.away_team_rating) }}">{{ rating_text(m.away_team_rating) }}</span></span>
                               {% endif %}
                             </div>
                           </div>
@@ -420,9 +423,9 @@
                         <div class="card-body p-2">
                           {% set home_is_us = teamname == m.home_team_name %}
                           {% for (section, boxes) in [
-                            ("Defense", [("Right", m.home_team_rating_right_def, m.away_team_rating_right_def), ("Center", m.home_team_rating_mid_def, m.away_team_rating_mid_def), ("Left", m.home_team_rating_left_def, m.away_team_rating_left_def)]),
-                            ("Attack", [("Right", m.home_team_rating_right_att, m.away_team_rating_right_att), ("Center", m.home_team_rating_mid_att, m.away_team_rating_mid_att), ("Left", m.home_team_rating_left_att, m.away_team_rating_left_att)]),
-                            ("Set Pieces", [("Defense", m.home_team_rating_set_pieces_def, m.away_team_rating_set_pieces_def), ("Attack", m.home_team_rating_set_pieces_att, m.away_team_rating_set_pieces_att)]),
+                            (ht_term("RatingSectors", "Defense", "Defense"), [(ht_term("RatingSectors", "RightDefense", "Right"), m.home_team_rating_right_def, m.away_team_rating_right_def), (ht_term("RatingSectors", "CentralDefense", "Center"), m.home_team_rating_mid_def, m.away_team_rating_mid_def), (ht_term("RatingSectors", "LeftDefense", "Left"), m.home_team_rating_left_def, m.away_team_rating_left_def)]),
+                            (ht_term("RatingSectors", "Attack", "Attack"), [(ht_term("RatingSectors", "RightAttack", "Right"), m.home_team_rating_right_att, m.away_team_rating_right_att), (ht_term("RatingSectors", "CentralAttack", "Center"), m.home_team_rating_mid_att, m.away_team_rating_mid_att), (ht_term("RatingSectors", "LeftAttack", "Left"), m.home_team_rating_left_att, m.away_team_rating_left_att)]),
+                            (ht_term("RatingSectors", "Indirect set pieces", "Set Pieces"), [(ht_term("RatingSectors", "Defense", "Defense"), m.home_team_rating_set_pieces_def, m.away_team_rating_set_pieces_def), (ht_term("RatingSectors", "Attack", "Attack"), m.home_team_rating_set_pieces_att, m.away_team_rating_set_pieces_att)]),
                             ] %}
                             <div class="mb-3">
                               <strong class="small d-block mb-2">{{ section }}</strong>
@@ -520,21 +523,12 @@
                                 </div>
                                 {% if m.home_team_tactic_type is not none and m.home_team_tactic_type > 0 %}
                                   <div class="text-muted" style="font-size: 0.85rem;">
-                                    {% if m.home_team_tactic_type == 1 %}
-                                      Pressing
-                                    {% elif m.home_team_tactic_type == 2 %}
-                                      Counter-Attack
-                                    {% elif m.home_team_tactic_type == 3 %}
-                                      AIM
-                                    {% elif m.home_team_tactic_type == 7 %}
-                                      Creative
-                                    {% elif m.home_team_tactic_type == 8 %}
-                                      Longshots
-                                    {% else %}
-                                      Tactic {{ m.home_team_tactic_type }}
-                                    {% endif %}
-                                    ({{ m.home_team_tactic_skill }})
+                                    {{ tactic_name(m.home_team_tactic_type) }}
+                                    ({{ level_text(m.home_team_tactic_skill) }})
                                   </div>
+                                {% endif %}
+                                {% if m.home_team_attitude is not none %}
+                                  <div class="text-muted" style="font-size: 0.85rem;">{{ ht_label('TeamAttitude', 'Attitude') }}: {{ attitude_name(m.home_team_attitude) }}</div>
                                 {% endif %}
                               </div>
                             </div>
@@ -546,21 +540,12 @@
                                 </div>
                                 {% if m.away_team_tactic_type is not none and m.away_team_tactic_type > 0 %}
                                   <div class="text-muted" style="font-size: 0.85rem;">
-                                    {% if m.away_team_tactic_type == 1 %}
-                                      Pressing
-                                    {% elif m.away_team_tactic_type == 2 %}
-                                      Counter-Attack
-                                    {% elif m.away_team_tactic_type == 3 %}
-                                      AIM
-                                    {% elif m.away_team_tactic_type == 7 %}
-                                      Creative
-                                    {% elif m.away_team_tactic_type == 8 %}
-                                      Longshots
-                                    {% else %}
-                                      Tactic {{ m.away_team_tactic_type }}
-                                    {% endif %}
-                                    ({{ m.away_team_tactic_skill }})
+                                    {{ tactic_name(m.away_team_tactic_type) }}
+                                    ({{ level_text(m.away_team_tactic_skill) }})
                                   </div>
+                                {% endif %}
+                                {% if m.away_team_attitude is not none %}
+                                  <div class="text-muted" style="font-size: 0.85rem;">{{ ht_label('TeamAttitude', 'Attitude') }}: {{ attitude_name(m.away_team_attitude) }}</div>
                                 {% endif %}
                               </div>
                             </div>

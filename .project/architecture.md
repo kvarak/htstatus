@@ -43,7 +43,7 @@ CHPP is called **only** at login/OAuth callback and on the explicit Update (`/up
 - `_page.html` also has `icon(name)` (flat SVG icons from `static/img/icons.svg`, colored by the text color; use them instead of emoji in headings) and `scoreboard(home, away, home_goals, away_goals, us, meta)` for match headers. Big numbers use `.scoreboard-number` (Oswald, self-hosted in `static/fonts/`, OFL). Dashboard-style blocks use `.mosaic` with `.tile` / `.tile-brown|green|sand|orange`.
 - The page background is `static/img/pattern.svg` used as a CSS mask, colored by `--pattern`. Images are cache-first in `static/sw.js`: bump its cache version when changing `icons.svg` or `pattern.svg`.
 - Charts take colors from `chartColor(i, alpha)` / `CHART_DANGER` in `static/js/chart-utils.js` (country charts keep flag colors).
-- Show skills and levels with `column_label`, `ht_term`, `specialty_name`, `level_text`/`level_hint`, so the user's language and level format apply.
+- Show skills and levels with `column_label`, `ht_term`, `specialty_name`, `tactic_name`, `attitude_name`, `level_text`/`level_hint` (match ratings: `rating_text`/`rating_hint`), so the user's language and level format apply. Hattrick has no translations for match types, weather, injuries or position variants (CDO, WTM, ...); those stay English.
 - CSS by function: `ui-components.css`, `utilities.css`, `layout.css`, `charts.css`, `animations.css`; feature files `timeline.css`, `formations.css`, `player-table-enhanced.css` (`components.css` imports them).
 
 ## Search engines
