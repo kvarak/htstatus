@@ -41,7 +41,7 @@ markupsafe==3.0.3
     #   jinja2
     #   mako
     #   werkzeug
-oauthlib==4.0.0
+oauthlib==4.0.1
     # via requests-oauthlib
 psycopg2-binary==2.9.12
     # via htstatus (pyproject.toml)
