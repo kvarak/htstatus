@@ -2,7 +2,7 @@
 
 Show the mood around the user's own team: team spirit, self-confidence, fan mood, the fans' expectations (season and next matches) and sponsor popularity, in Hattrick's own words (the cached translations already have TeamSpirit, Confidence, FanMood, FanMatchExpectations, FanSeasonExpectations and Sponsors).
 
-## Feature record (`.github/CHPP-implementation-rules.md`)
+## Feature record ([docs/CHPP.md](../../docs/CHPP.md))
 
 - **Feature name:** Team mood
 - **User story:** a manager clicks "Update data" and then sees on the team page how the team spirit, confidence, fans and sponsors stand now, and how they changed since earlier updates. On the matches page, each upcoming match shows what the fans expect.
@@ -16,7 +16,7 @@ Show the mood around the user's own team: team spirit, self-confidence, fan mood
 - **Free, public, English:** yes, same as the rest of the site. Words follow the user's Hattrick language.
 - **User-initiated downloads:** yes, only during "Update data" (`app/blueprints/team.py`). No timers or background jobs.
 - **Hattrick write actions:** none.
-- **CHPP category:** 1 (own-team data, read only). Fans and Economy are still new files for the product, so update the functional description first.
+- **CHPP category:** 1 (own-team data, read only). Fans and Economy are new files for the product, so submit the function below first.
 
 ## Functional description (submit before coding)
 
@@ -24,9 +24,9 @@ Title: **Team mood**
 
 > Team spirit, self-confidence, fan mood, the fans' expectations for the season and coming matches, and sponsor popularity for the user's own team(s), shown in Hattrick's words with the change since the user's previous update. Read only, and fetched only when the user clicks "Update data".
 
-Xml files: **Training, Fans, Economy**
+Xml files: **Fans, Economy**
 
-Training is part of the denied "Training log" function (DOC-035). Either get DOC-035 approved first and add Fans and Economy here, or list Training in this function too.
+Training (team spirit and confidence) is already approved in the "Training log" function. Its text doesn't mention team spirit and confidence, so either name them in this function's text (as above) or extend the "Training log" text.
 
 ## Gotchas
 

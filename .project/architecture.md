@@ -34,7 +34,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 
 ## CHPP usage (rate-limited, expensive)
 
-CHPP is called **only** at login/OAuth callback and on the explicit Update (`/update`). Page views, settings, voting and admin checks use the session and the database. `make check-chpp` (in `make test-all` and CI) enforces this.
+CHPP is called **only** at login/OAuth callback and on the explicit Update (`/update`). Page views, settings, voting and admin checks use the session and the database. `make check-chpp` (in `make test-all` and CI) enforces this. All CHPP rules: [docs/CHPP.md](../docs/CHPP.md).
 
 ## UI conventions
 

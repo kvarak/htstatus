@@ -73,7 +73,7 @@ Production backs up before every deploy and nightly (see [DEPLOYMENT.md](DEPLOYM
 
 - **[.project/architecture.md](.project/architecture.md)** - Code layout, data model, conventions, database rules
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Hosting (Docker), releasing, backups
-- **[docs/CHPP-ENFORCEMENT.md](docs/CHPP-ENFORCEMENT.md)** - When the app may call the Hattrick API
+- **[docs/CHPP.md](docs/CHPP.md)** - CHPP rules: when the app may call the Hattrick API and what it may do with the data
 - **[scripts/database/README.md](scripts/database/README.md)** - Migration and database helper scripts
 - **[RELEASES.md](RELEASES.md)** - What's new for users
 

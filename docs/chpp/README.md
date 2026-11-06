@@ -208,4 +208,4 @@ When adding new API documentation:
 
 - [Official CHPP Documentation](http://hattrick.org/goto.ashx?path=/Help/Rules/CHPP.aspx)
 - [HattrickPlanner Architecture](../../.project/architecture.md)
-- [When the app may call CHPP](../CHPP-ENFORCEMENT.md)
+- [CHPP rules and how we follow them](../CHPP.md)

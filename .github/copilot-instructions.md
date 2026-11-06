@@ -17,7 +17,8 @@ Hobby Flask + PostgreSQL app for Hattrick managers (uses the Hattrick CHPP API).
 
 - [.project/architecture.md](../.project/architecture.md): layout, data model, CHPP and UI conventions, database rules
 - [.project/goals.md](../.project/goals.md): what the project is for
-- [.project/backlog.md](../.project/backlog.md) (improvements, bugs, refactors, tests, infra) and [.project/features.md](../.project/features.md) (new features); details in [.project/tasks/](../.project/tasks/)
+- [.project/todo.md](../.project/todo.md): what to do (Now / Next / Maybe); notes in [.project/tasks/](../.project/tasks/) only when needed
+- [docs/CHPP.md](../docs/CHPP.md): the CHPP rules and how we follow them; read it before anything that touches Hattrick data
 - [DEPLOYMENT.md](../DEPLOYMENT.md): hosting (Docker on a small server), releasing, database safety
 - Skills: [refactor](skills/refactor/SKILL.md), [docker-hosting](skills/docker-hosting/SKILL.md)
 
@@ -31,7 +32,7 @@ Hobby Flask + PostgreSQL app for Hattrick managers (uses the Hattrick CHPP API).
 - UI: follow the conventions in architecture.md (one look, `page_header`, no hard-coded colors, Hattrick terms via `column_label`/`level_text`).
 - New player table column: append it to `ALL_COLUMNS` in `app/constants.py` (never to `COLUMNS_BEFORE_AUTO_ADD`); everyone gets it once.
 - Add a test when fixing a bug or changing behaviour. Tests needing the developer environment are marked `@pytest.mark.local_only`.
-- Backlog and features: one line per item about a real problem and what "good enough" looks like; IDs from `./scripts/get-next-task-id.sh <TYPE>` (BUG, REFACTOR, TEST, INFRA, UI, FEAT, DOC). When done, delete the line and its `tasks/` file.
+- To do items: one line about a real problem and what "good enough" looks like; IDs from `./scripts/get-next-task-id.sh <TYPE>` (BUG, REFACTOR, TEST, INFRA, UI, FEAT, DOC). When done, delete the line and its `tasks/` file. Keep it small: no priorities, estimates or process.
 - Hattrick: the 7 core skills are keeper, defender, playmaker, winger, passing, scorer, set pieces; position contributions are `calculateContribution` / `best_position` in `app/utils.py`.
 - When done: update the docs that describe what changed (architecture.md, DEPLOYMENT.md, README.md), and summarise what the user still has to do (commit, push, deploy).
 - User-visible changes go into the next release notes (RELEASES.md, RELEASES-INTERNAL.md) when releasing; see DEPLOYMENT.md "Releasing".

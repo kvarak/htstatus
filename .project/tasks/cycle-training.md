@@ -1,4 +1,4 @@
-# Cycle training (FEAT-038 to FEAT-041; FEAT-035 to FEAT-037 and FEAT-042 done)
+# Cycle training (FEAT-038, FEAT-039; FEAT-035 to FEAT-037 and FEAT-042 done)
 
 Cycle training: a core group of trainees is trained in several skills in turn (often playmaking, defending, passing, sometimes scoring) over a few seasons, to end up with multi-skilled, valuable players. It's the reason this site exists.
 
@@ -10,8 +10,6 @@ Cycle training: a core group of trainees is trained in several skills in turn (o
 3b. **FEAT-042 Training speed overview (admin, done).** `app/training_speed_stats.py`, top of `/debug`: measured single-type pops of all teams per training type × age band × intensity band: n (players, teams), mean weeks/level, 95% CI (t), min-max, Schum's expected weeks for the same pops and the measured/Schum ratio. Rows with < 5 pops are marked "few". Schum's formula (`training_rules.schum_weeks_per_level`, from HO) assumes a solid coach and no assistants until StaffList is fetched; then group by coach level too and pass the real values. Computed on page view.
 4. **FEAT-038 Cycle plan.** The first planner, without projections: phases, trainees, a timeline with ages and dates, and squad needs per phase. New tables via a reviewed Alembic migration (additive only).
 5. **FEAT-039 Projection.** Adds expected skills per phase. Use the measured speed when there is enough history, otherwise defaults.
-6. **FEAT-040 Targets and warnings.** Needs 039. Advisory only, never blocking.
-7. **FEAT-041 Scenarios.** Templates, cloning, side-by-side comparison, export.
 
 Skipped on purpose (maybe later): market value, sale timing, purchase suggestions and wage modelling, automatic "best order" optimisation.
 
@@ -34,7 +32,7 @@ Sources: the Hattrick wiki pages [Training](https://wiki.hattrick.org/wiki/Train
   - skill drops can start at 27-28, small around 30 and larger around 35
   - scoring drops fastest and goalkeeping slowest
 - **Wages:** very high main skills push wages up, and you can "overtrain" a player into an unsustainable salary. Warn about it, but don't model wages exactly.
-- **The existing planner:** its core is a weekly progress table (skills and stamina, highlighting increases and drops), a wages table and "when will each player reach the target". That's the bar for FEAT-039 and FEAT-040.
+- **The existing planner:** its core is a weekly progress table (skills and stamina, highlighting increases and drops), a wages table and "when will each player reach the target". That's the bar for FEAT-039.
 
 ## Confirmed facts
 

@@ -9,7 +9,7 @@ Your product is approved. It means that you can develop it freely as well as pub
 ## Functions
 
 ### Title: Training log
-Status: Pending
+Status: Approved
 Last updated: 2026-11-03 22:16:00
 
 Description:
@@ -19,7 +19,7 @@ Xml files:
 Training
 
 ### Title: Players and their progress
-Status: Pending
+Status: Approved
 Last updated: 2026-11-03 22:14:00
 
 Description:
@@ -27,16 +27,6 @@ The players of the user's own team(s), as Hattrick shows them to the owner: skil
 
 Xml files:
 Players, PlayerDetails
-
-### Title: Training log and cycle planner
-Status: Denied
-Last updated: 2026-11-01 15:19:00
-
-Description:
-Training history, training speed per player, and multi-season training plans. Read only, and fetched only when the user clicks "Update data".
-
-Xml files:
-Training, StaffList
 
 ### Title: Hattrick terms
 Status: Approved
@@ -67,16 +57,6 @@ Recent and upcoming matches, with score, ratings, chances and lineup. Older seas
 
 Xml files:
 Matches, MatchesArchive, MatchDetails, MatchLineup, MatchOrders
-
-### Title: Player details and progress
-Status: Denied
-Last updated: 2026-11-01 13:37:00
-
-Description:
-Skills, TSI, salary, form and specialty per player, with changes since the last update. Also covers training progress, the formation tester, team stats and bids on transfer-listed players.
-
-Xml files:
-Players, RegionDetails
 
 ### Title: Overview of team and progression
 Status: Approved
