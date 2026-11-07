@@ -39,6 +39,11 @@ PUBLIC_PAGES = {
         "Log in or sign up with your Hattrick account (CHPP, Hattrick's own "
         "login) to use HattrickPlanner, the free tool for Hattrick managers.",
     ),
+    "/privacy": (
+        "Privacy policy · HattrickPlanner",
+        "What HattrickPlanner stores about you and your Hattrick teams, why, "
+        "who sees it, and how to delete your account.",
+    ),
 }
 SHARE_IMAGE = "img/share.png"
 

@@ -7,7 +7,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 | Path | What |
 |---|---|
 | `app/factory.py` | App factory: config, extensions, blueprint registration |
-| `app/blueprints/` | Routes by feature: `auth` (login/OAuth), `main` (home, settings, admin `/debug`, changes), `team` (the Update action), `player`, `stats`, `training`, `matches` (also formations), `series`, `compare`, `feedback` |
+| `app/blueprints/` | Routes by feature: `auth` (login/OAuth), `main` (home, settings, admin `/debug`, changes, privacy, account deletion), `team` (the Update action), `player`, `stats`, `training`, `matches` (also formations), `series`, `compare`, `feedback` |
 | `app/api/players.py` | JSON API (bulk group assignment) |
 | `app/chpp/` | Own CHPP client: OAuth 1.0, XML parsing (`CHPP` in `client.py`) |
 | `app/auth_utils.py` | `@require_authentication`, `get_current_user()`, `current_team()`, `@track_activity` |
@@ -18,6 +18,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 | `app/training_rules.py`, `app/match_minutes.py`, `app/trainees.py` | Which positions each training trains (from HO and the wiki; change only with a source), minutes per player and position from a match lineup, and who got trained per week |
 | `app/opponents.py` | Next Game Analyser: at Update, saves each upcoming opponent's matches and their formation/tactic (matchdetails, last 10 finished, one call per match) (`refresh_opponent_matches`); the matches page shows the opponent's last 10 results, head-to-head and setup (League / Cup / All) from the database only |
 | `app/translations.py`, `app/instance_cache.py` | Hattrick's own terms per language, cached as JSON in `instance/` (also transfer bids and series data) |
+| `app/account.py` | "Delete my account" (Settings): removes the user and everything stored for their teams (players, matches, training, groups, feedback, cached JSON); a match against another user's team stays. Update it when adding a table or cache with user or team data; the `/privacy` page (`templates/privacy.html`) describes what is stored and must stay true |
 | `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `TrainingWeek`, `MatchPositionMinutes`, `Feedback*`, `ErrorLog`, ...) |
 | `migrations/` | Alembic migrations |
 | `app/templates/`, `app/static/` | Jinja2 + Bootstrap 4 (CDN), CSS, Chart.js |
@@ -48,7 +49,7 @@ CHPP is called **only** at login/OAuth callback and on the explicit Update (`/up
 
 ## Search engines
 
-`app/seo.py`: only `/`, `/changes` and `/login` are public (`PUBLIC_PAGES`, with their titles and descriptions); every other page gets `noindex` and is disallowed in `/robots.txt`. `/sitemap.xml`, canonical links and Open Graph/Twitter tags use the public address from `CALLBACK_URL`. The tags come from `templates/_seo_meta.html` (included by `_skeleton.html`); the home page also has WebApplication JSON-LD. The share image is `static/img/share.png` (1200×630). The site icon is the tactics-board icon on a brown tile: `static/img/icon.svg` (master) with PNG sizes, `apple-touch-icon.png`, a maskable version and `/favicon.ico`; regenerate the PNGs when the SVG changes and bump the cache version in `sw.js`. Never put team or player data in these tags.
+`app/seo.py`: only `/`, `/changes`, `/privacy` and `/login` are public (`PUBLIC_PAGES`, with their titles and descriptions); every other page gets `noindex` and is disallowed in `/robots.txt`. `/sitemap.xml`, canonical links and Open Graph/Twitter tags use the public address from `CALLBACK_URL`. The tags come from `templates/_seo_meta.html` (included by `_skeleton.html`); the home page also has WebApplication JSON-LD. The share image is `static/img/share.png` (1200×630). The site icon is the tactics-board icon on a brown tile: `static/img/icon.svg` (master) with PNG sizes, `apple-touch-icon.png`, a maskable version and `/favicon.ico`; regenerate the PNGs when the SVG changes and bump the cache version in `sw.js`. Never put team or player data in these tags.
 
 ## Database rules
 

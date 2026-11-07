@@ -4,6 +4,7 @@ from datetime import date
 import json
 import os
 import re
+import secrets
 
 from dateutil.relativedelta import relativedelta
 from flask import (
@@ -18,7 +19,7 @@ from flask import (
     url_for,
 )
 
-from app import training_log, training_speed_stats, translations
+from app import account, training_log, training_speed_stats, translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
@@ -264,6 +265,7 @@ def settings():
             language_choice=language_choice,
             level_format=level_format,
             display_saved=form_language is not None or form_level_format is not None,
+            delete_token=delete_account_token(),
         )
     )
     if form_language is not None:
@@ -358,6 +360,38 @@ def changes():
         title="Changes & Development History",
         changelog_entries=entries,
     )
+
+
+@main_bp.route("/privacy")
+def privacy():
+    """Public privacy policy (CHPP license 8.1)."""
+    return create_page(
+        template="privacy.html",
+        title="Privacy policy",
+        deleted=request.args.get("deleted") == "1",
+    )
+
+
+def delete_account_token():
+    """Per-session token for the delete form, so other sites can't post it."""
+    if "delete_account_token" not in session:
+        session["delete_account_token"] = secrets.token_urlsafe(16)
+    return session["delete_account_token"]
+
+
+@main_bp.route("/settings/delete-account", methods=["POST"])
+@require_authentication
+def delete_account():
+    """Delete the account and all its data, log out, and show the privacy page."""
+    expected = session.get("delete_account_token", "")
+    sent = request.form.get("token", "")
+    if not expected or not secrets.compare_digest(expected, sent):
+        return redirect(url_for("main.settings"))
+    user = get_current_user()
+    dprint(1, f"Deleting account {user.ht_id}")
+    account.delete_account(user)
+    session.clear()
+    return redirect(url_for("main.privacy", deleted=1))
 
 
 @main_bp.route("/debug", methods=["GET", "POST"])

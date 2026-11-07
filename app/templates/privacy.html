@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% from "_page.html" import page_header %}
+  <div class="container">
+    {{ page_header([('Home', url_for('main.index') ), (title, None)]) }}
+    {% if deleted %}
+      <div class="alert alert-success" role="status">
+        Your account and all its data are deleted. To finish, remove its permission on Hattrick (step 2 under "Delete your account" below).
+      </div>
+    {% endif %}
+    <div class="card">
+      <div class="card-body privacy">
+        <h5 class="card-title">Privacy policy</h5>
+        <p>
+          {{ apptitle }} is a free hobby project for Hattrick managers, run by the Hattrick user Kvarak.
+          It is an approved CHPP product: it reads your Hattrick data through Hattrick's official interface (CHPP), with your permission.
+          Questions: send a Hattrick mail (HT-mail) to Kvarak.
+        </p>
+        <h6>What is stored, and why</h6>
+        <ul>
+          <li>
+            <strong>Your account:</strong> your Hattrick user id and login name, your {{ apptitle }} username and password (hashed), and the access key Hattrick gives us when you log in.
+            The key only lets {{ apptitle }} read your data; it can't change anything in your team. We never see or store your Hattrick password.
+          </li>
+          <li>
+            <strong>Your teams:</strong> what Hattrick sends when you log in or click "Update data": your teams, your players (with their history, so you can see how they develop), your matches with line-ups and ratings, training, your series table and bids on your players.
+            For the scouting of your next matches we also keep recent results of your opponents.
+          </li>
+          <li>
+            <strong>What you add:</strong> player groups, column and display choices, and feedback posts, comments and votes.
+          </li>
+          <li>
+            <strong>Usage:</strong> when you last logged in, updated and used the site, and how often you open each page and the guided tours. This shows which features are used.
+          </li>
+          <li>
+            <strong>Errors and logs:</strong> when something breaks, the error with the page, browser and your user id, so it can be fixed.
+            The web server keeps short-lived request logs (IP address, page, time).
+          </li>
+        </ul>
+        <h6>Cookies</h6>
+        <p>
+          A login cookie keeps you logged in and is removed when you log out.
+          If you change the language or the skill level format in Settings, that choice is kept in a cookie too.
+          {% if config.GOATCOUNTER_URL %}
+            Page views are counted with <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, which uses no cookies and collects no personal data.
+          {% endif %}
+        </p>
+        <h6>Who sees it</h6>
+        <p>
+          Your team and player data is shown only to you. Feedback posts and comments are visible to other logged-in users.
+          The site admin can see the list of users and their usage, to run the site.
+          Nothing is sold or shared with other sites or apps, and public pages never show team or player data.
+        </p>
+        <h6>How long</h6>
+        <p>Your data stays as long as you have an account. Database backups are kept for about a month and then deleted.</p>
+        <h6 id="delete">Delete your account</h6>
+        <ol>
+          <li>
+            Log in, open <a href="{{ url_for('main.settings') }}">Settings</a> and click "Delete my account".
+            This removes your account, teams, players, matches, groups, settings and feedback right away.
+            A match against another {{ apptitle }} user's team stays for that user, and error reports stay without your user id.
+          </li>
+          <li>
+            On Hattrick, go to My Hattrick → Preferences →
+            <a href="https://www.hattrick.org/MyHattrick/Preferences/ExternalAccessGrants.aspx"
+               target="_blank"
+               rel="noopener">CHPP products</a>
+            and click "Remove permission" next to {{ apptitle }}.
+            This withdraws the access key; logging out of {{ apptitle }} doesn't.
+          </li>
+        </ol>
+        <p class="mb-0">Changes to this policy are listed on the <a href="{{ url_for('main.changes') }}">changes page</a>.</p>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -33,7 +33,11 @@ def test_sitemap_lists_public_pages_with_the_public_address(client):
     xml = response.get_data(as_text=True)
 
     assert response.mimetype == "application/xml"
-    assert re.findall(r"<loc>([^<]+)</loc>", xml) == [f"{SITE}/", f"{SITE}/changes"]
+    assert re.findall(r"<loc>([^<]+)</loc>", xml) == [
+        f"{SITE}/",
+        f"{SITE}/changes",
+        f"{SITE}/privacy",
+    ]
 
 
 def test_home_page_has_description_preview_and_structured_data(client):

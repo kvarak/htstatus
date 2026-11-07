@@ -21,6 +21,15 @@ Hobby Flask + PostgreSQL app for Hattrick managers (uses the Hattrick CHPP API).
 - [docs/CHPP.md](../docs/CHPP.md): the CHPP rules and how we follow them; read it before anything that touches Hattrick data
 - [DEPLOYMENT.md](../DEPLOYMENT.md): hosting (Docker on a small server), releasing, database safety
 - Skills: [refactor](skills/refactor/SKILL.md), [docker-hosting](skills/docker-hosting/SKILL.md)
+- Agents: [Planner (Opus)](agents/planner.agent.md) and [Quick (Haiku)](agents/quick.agent.md); see "Delegating" below
+
+## Delegating
+
+When work is split off to a subagent, use these two agents (not the built-in task/general-purpose/code-review agents):
+- **Quick (Haiku):** running `make test-all` or other test/lint runs and reporting the result, small edits in one or two files, renames, doc and `todo.md` tidying, release notes.
+- **Planner (Opus):** designing or planning a feature, reviewing a diff or plan, refactors across several files, anything touching database models/migrations, CHPP (`docs/CHPP.md`) or Hattrick game logic, and bugs whose cause isn't clear. Planner only plans and reviews (no edit or terminal tools); it hands the edits and test runs to Quick, step by step, and checks the results.
+- Small lookups and a single trace through the code are done directly, without a subagent.
+- If Quick stops because a task is outside its limits, continue with Planner.
 
 ## Working
 

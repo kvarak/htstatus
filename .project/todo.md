@@ -7,7 +7,6 @@ Hobby project: good enough is perfect. One line per item: the problem and what "
 - **[INFRA-092]** CHPP requests don't say who we are, and the required Hattrick attribution isn't shown. Good enough: a `HattrickPlanner, v<version>` User-Agent on every CHPP request, and the attribution sentence from [docs/CHPP.md](../docs/CHPP.md) in the footer
 - **[INFRA-093]** The OAuth tokens live in Flask's cookie session (readable on the client). Good enough: the session keeps only the user id; CHPP calls read the tokens from the database
 - **[INFRA-094]** Opponent matches from scouting (FEAT-008) are kept forever, and no approved function covers them. Good enough: Update keeps only what the scouting card needs (the next opponents' last 10 matches); a "Next game scouting" function submitted to Hattrick
-- **[DOC-033]** No privacy policy (CHPP license 8.1). Good enough: a public `/privacy` page (what is stored and why, how to delete the account and revoke Hattrick access, no sharing), linked from the footer
 
 ## Next
 

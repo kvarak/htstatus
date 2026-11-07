@@ -43,7 +43,7 @@ def stats():
 **Branding and privacy**
 - Show this sentence (INFRA-092): "This application uses information from the online game service Hattrick.org. This use has been approved by the developers and copyright owners of Hattrick.org, Extralives AB."
 - Only the CHPP logo, never the Hattrick logo or site graphics (license 7.2).
-- A published privacy policy (license 8.1, DOC-033).
+- A published privacy policy (license 8.1): the public `/privacy` page, linked from the footer. Keep it true when storing new data; users delete their account themselves in Settings (`app/account.py`).
 - Don't copy Hattrick Supporter features without approval (license 9.1).
 
 ## A new feature that uses CHPP

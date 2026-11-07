@@ -333,5 +333,27 @@ function resetTutorialProgress() {
         </div>
       </div>
     </div>
+    <div class="row mt-3">
+      <div class="col-sm">
+        <div class="card border-danger">
+          <div class="card-body">
+            <h5 class="card-title">Delete account</h5>
+            <p class="text-sm13 card-text">
+              Removes your account, teams, players, matches, groups, settings and feedback from {{ apptitle }} right away. It can't be undone.
+              Afterwards, also remove its permission on Hattrick under My Hattrick → Preferences →
+              <a href="https://www.hattrick.org/MyHattrick/Preferences/ExternalAccessGrants.aspx"
+                 target="_blank"
+                 rel="noopener">CHPP products</a>.
+            </p>
+            <form method="POST"
+                  action="{{ url_for('main.delete_account') }}"
+                  onsubmit="return confirm('Delete your account and all your data? This cannot be undone.');">
+              <input type="hidden" name="token" value="{{ delete_token }}">
+              <button type="submit" class="btn btn-outline-danger btn-sm">Delete my account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 Used instead of new database tables for data that is fine to lose and refetch.
 """
 
+import contextlib
 import json
 import os
 import time
@@ -45,6 +46,14 @@ def is_fresh(folder, name, max_age_seconds):
         return time.time() - os.path.getmtime(path(folder, name)) < max_age_seconds
     except OSError:
         return False
+
+
+def remove(folder, name):
+    """Delete a file if it exists."""
+    file = path(folder, name)
+    _cache.pop(file, None)
+    with contextlib.suppress(FileNotFoundError):
+        os.remove(file)
 
 
 def clear():
