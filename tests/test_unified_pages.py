@@ -55,8 +55,6 @@ def french_words_client(app_with_routes, db_session):
     client = setup_authenticated_session(app_with_routes.test_client(), TEAM, "kvarak")
     with client.session_transaction() as sess:
         sess["ht_language_id"] = 5
-        sess["access_key"] = "k"
-        sess["access_secret"] = "s"
     client.set_cookie(translations.LEVEL_FORMAT_COOKIE, "words")
     return client
 

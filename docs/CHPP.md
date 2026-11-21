@@ -31,7 +31,7 @@ def stats():
 
 **Data**
 - Download only what a feature needs, and reuse what is stored (license 5.4).
-- OAuth tokens stay on the server: never in URLs, logs, error messages or client-side storage. Not done yet: they are in the cookie session (INFRA-093).
+- OAuth tokens stay on the server: never in URLs, logs, error messages or client-side storage. They live in the database (the `User` row); the cookie session only holds the user id, and CHPP clients read the tokens from the database.
 - No sharing with other apps or sites (license 5.2). Public pages and share tags never contain team or player data (`app/seo.py`).
 - Open questions in DOC-037: storing the Hattrick login name, invalidating the token at logout.
 
@@ -41,7 +41,7 @@ def stats():
 - Not allowed: following other teams over time (their players' skills, form, injuries, transfers), "spy" overviews, or statistics comparing many teams without approval (the admin training speed overview: DOC-037).
 
 **Branding and privacy**
-- Show this sentence (in the "Thanks to" box on the home page, `app/templates/main.html`): "This application uses information from the online game service Hattrick.org. This use has been approved by the developers and copyright owners of Hattrick.org, Extralives AB."
+- Show this sentence (in the "Thanks to" box on the home page, `app/templates/main.html`): "This app uses information from the online game service Hattrick.org. This use has been approved by the developers and copyright owners of Hattrick.org, Extralives AB."
 - Only the CHPP logo, never the Hattrick logo or site graphics (license 7.2).
 - A published privacy policy (license 8.1): the public `/privacy` page, linked from the footer. Keep it true when storing new data; users delete their account themselves in Settings (`app/account.py`).
 - Don't copy Hattrick Supporter features without approval (license 9.1).

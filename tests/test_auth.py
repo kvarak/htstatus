@@ -107,29 +107,13 @@ def test_session_cleanup(client):
 
 def test_authentication_required_decorator_simulation(authenticated_session):
     """Test simulation of authentication-required routes."""
-    # This tests our authenticated_session fixture
+    # This tests our authenticated_session fixture. OAuth tokens are never kept in
+    # the session (INFRA-093); the session only identifies the user.
     with authenticated_session.session_transaction() as session:
-        assert session.get("access_key") is not None
-        assert session.get("access_secret") is not None
+        assert session.get("current_user_id") is not None
         assert session.get("current_user") is not None
-
-
-def test_oauth_token_storage(client):
-    """Test that OAuth tokens are stored correctly in session."""
-    test_access_key = "test_oauth_access_key_12345"
-    test_access_secret = "test_oauth_access_secret_67890"
-
-    with client.session_transaction() as session:
-        session["access_key"] = test_access_key
-        session["access_secret"] = test_access_secret
-
-    # Verify tokens are stored correctly
-    with client.session_transaction() as session:
-        assert session["access_key"] == test_access_key
-        assert session["access_secret"] == test_access_secret
-        # Tokens should be strings
-        assert isinstance(session["access_key"], str)
-        assert isinstance(session["access_secret"], str)
+        assert "access_key" not in session
+        assert "access_secret" not in session
 
 
 def test_default_groups_creation_function_exists():
@@ -254,8 +238,6 @@ class TestSessionValidationAPI:
 
         with client.session_transaction() as session:
             session["current_user_id"] = 12345
-            session["access_key"] = "test_access_key"
-            session["access_secret"] = "test_access_secret"
             session["current_user"] = "testuser"
 
         response = client.get("/validate-session")
@@ -320,6 +302,9 @@ class TestAuthHelpers:
             assert sess["current_user_id"] == 556001
             assert sess["all_teams"] == [7, 8]
             assert sess["team_id"] == 7
+            # Tokens stay in the database, never in the cookie session (INFRA-093)
+            assert "access_key" not in sess
+            assert "access_secret" not in sess
 
     def test_login_wrong_password(self, app_with_routes, db_session):
         self._user(db_session)
@@ -362,6 +347,8 @@ class TestAuthHelpers:
         with client.session_transaction() as sess:
             assert sess["current_user_id"] == 556001
             assert sess["all_team_names"] == ["Nine"]
+            assert "access_key" not in sess
+            assert "access_secret" not in sess
 
     def test_callback_without_identifiable_user_fails_safely(
         self,

@@ -110,8 +110,6 @@ def authenticated_client(app_with_routes):
     """Routed test client with a logged-in session for team 12345."""
     client = app_with_routes.test_client()
     with client.session_transaction() as session:
-        session["access_key"] = "test_access_key"
-        session["access_secret"] = "test_access_secret"
         session["current_user_id"] = 12345
         session["all_teams"] = [12345]
         session["all_team_names"] = ["Test Team"]
@@ -149,8 +147,6 @@ def client(app):
 def authenticated_session(client):
     """Create a test client with authenticated session for testing protected routes."""
     with client.session_transaction() as session:
-        session["access_key"] = "test_access_key"
-        session["access_secret"] = "test_access_secret"
         session["current_user_id"] = 12345
         session["current_user"] = "testuser"
         session["all_teams"] = [12345, 67890]
@@ -177,8 +173,6 @@ def authenticated_route_client(app):
 
     with app.test_client() as client:
         with client.session_transaction() as session:
-            session["access_key"] = "test_access_key"
-            session["access_secret"] = "test_access_secret"
             session["current_user_id"] = 12345
             session["current_user"] = "testuser"
             session["all_teams"] = [12345]

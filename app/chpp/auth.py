@@ -97,8 +97,8 @@ def get_access_token(
 
     Example:
         >>> tokens = get_access_token(key, secret, req_token, req_secret, verifier)
-        >>> session["access_key"] = tokens["key"]
-        >>> session["access_secret"] = tokens["secret"]
+        >>> user.access_key = tokens["key"]
+        >>> user.access_secret = tokens["secret"]
     """
     try:
         oauth = OAuth1Session(

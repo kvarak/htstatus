@@ -45,7 +45,7 @@ def list_feedback():
     from models import Feedback, FeedbackVote
 
     # Check authentication - session only, no CHPP calls
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
     user = get_current_user()
@@ -130,7 +130,7 @@ def new_feedback():
     from models import Feedback
 
     # Check authentication - session only, no CHPP calls
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
     user = get_current_user()
@@ -212,7 +212,7 @@ def detail(id):
     from models import Feedback, FeedbackComment, FeedbackVote
 
     # Check authentication - session only, no CHPP calls
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
     user = get_current_user()
@@ -255,7 +255,7 @@ def vote(id):
     from models import Feedback, FeedbackVote
 
     # Check authentication - just verify session, no CHPP calls needed
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return jsonify({"error": "Authentication required"}), 401
 
     user_id = session["current_user_id"]
@@ -314,7 +314,7 @@ def add_comment(id):
     from models import Feedback, FeedbackComment
 
     # Check authentication - just verify session
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
     user_id = session["current_user_id"]
@@ -357,7 +357,7 @@ def update_status(id):
     from models import Feedback
 
     # Check authentication - verify admin without CHPP calls
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
     user = get_current_user()
@@ -391,7 +391,7 @@ def toggle_archive(id):
     from models import Feedback
 
     # Check authentication - verify admin without CHPP calls
-    if "access_key" not in session or "current_user_id" not in session:
+    if "current_user_id" not in session:
         return redirect(url_for("auth.login"))
 
     user = get_current_user()

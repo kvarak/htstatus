@@ -30,7 +30,7 @@ class TestMainRoutes:
         """INFRA-092: the required Hattrick/Extralives sentence is on the public home page."""
         html = app_with_routes.test_client().get("/").get_data(as_text=True)
         assert (
-            "This application uses information from the online game service "
+            "This app uses information from the online game service "
             "Hattrick.org." in html
         )
         assert "Extralives&nbsp;AB" in html

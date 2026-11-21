@@ -523,6 +523,18 @@ def best_position(player):
 # =============================================================================
 
 
+def _current_user_tokens():
+    """OAuth tokens for the logged-in user, read from the database (INFRA-093).
+
+    The tokens are never kept in the Flask session; CHPP clients built here read
+    them from the ``User`` row instead. Returns ``(None, None)`` with no user.
+    """
+    from app.auth_utils import get_current_user
+
+    user = get_current_user()
+    return (user.access_key, user.access_secret) if user else (None, None)
+
+
 def downloadRecentMatches(teamid, chpp=None):
     """Download recent and upcoming matches for a team.
 
@@ -538,7 +550,7 @@ def downloadRecentMatches(teamid, chpp=None):
     """
     from datetime import datetime
 
-    from flask import current_app, session
+    from flask import current_app
 
     try:
         # Use provided CHPP client or create one
@@ -561,8 +573,7 @@ def downloadRecentMatches(teamid, chpp=None):
             chpp = CHPP(
                 consumer_key,
                 consumer_secret,
-                session["access_key"],
-                session["access_secret"],
+                *_current_user_tokens(),
             )
 
         dprint(2, f"Fetching recent/upcoming matches for team {teamid}")
@@ -659,7 +670,7 @@ def downloadMatches(teamid, chpp=None):
     Returns:
         dict with 'success', 'count', 'updated', 'message' keys
     """
-    from flask import current_app, session
+    from flask import current_app
 
     try:
         # Use provided CHPP client or create one
@@ -672,8 +683,7 @@ def downloadMatches(teamid, chpp=None):
             chpp = CHPP(
                 consumer_key,
                 consumer_secret,
-                session["access_key"],
-                session["access_secret"],
+                *_current_user_tokens(),
             )
 
         dprint(1, f"Downloading recent match archive for team {teamid}")
@@ -779,7 +789,7 @@ def fetch_enhanced_match_data(match_id, chpp=None, team_id=None):
         dict: Enhanced match data or empty dict if unavailable
     """
 
-    from flask import current_app, session
+    from flask import current_app
 
     if chpp is None:
         from app.chpp import CHPP
@@ -793,8 +803,7 @@ def fetch_enhanced_match_data(match_id, chpp=None, team_id=None):
         chpp = CHPP(
             consumer_key,
             consumer_secret,
-            session["access_key"],
-            session["access_secret"],
+            *_current_user_tokens(),
         )
 
     enhanced_data = {}

@@ -20,9 +20,9 @@ def _fake_chpp():
     return chpp
 
 
-def test_get_chpp_client_uses_app_config_and_session(app):
+def test_get_chpp_client_uses_app_config_and_tokens(app):
     with app.app_context(), patch("app.chpp_utilities.CHPP") as chpp_cls:
-        get_chpp_client({"access_key": "ak", "access_secret": "as"})
+        get_chpp_client("ak", "as")
 
     chpp_cls.assert_called_once_with(
         app.config["CONSUMER_KEY"], app.config["CONSUMER_SECRETS"], "ak", "as"
@@ -31,7 +31,7 @@ def test_get_chpp_client_uses_app_config_and_session(app):
 
 def test_get_chpp_client_explicit_credentials():
     with patch("app.chpp_utilities.CHPP") as chpp_cls:
-        get_chpp_client({"access_key": "ak", "access_secret": "as"}, "ck", "cs")
+        get_chpp_client("ak", "as", "ck", "cs")
 
     chpp_cls.assert_called_once_with("ck", "cs", "ak", "as")
 

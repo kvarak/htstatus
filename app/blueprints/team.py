@@ -332,7 +332,8 @@ def update():
     from models import Players
 
     try:
-        chpp = get_chpp_client(session)
+        user = get_current_user()
+        chpp = get_chpp_client(user.access_key, user.access_secret)
         refresh_user_teams(chpp)
     except Exception as e:
         dprint(1, f"CHPP initialization failed: {traceback.format_exc()}")

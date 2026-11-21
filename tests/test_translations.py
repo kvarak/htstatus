@@ -199,8 +199,6 @@ class TestSettingsLanguage:
         db_session.commit()
         client = tr_app.test_client()
         with client.session_transaction() as sess:
-            sess["access_key"] = "k"
-            sess["access_secret"] = "s"
             sess["current_user_id"] = 12345
             sess["current_user"] = "testuser"
             sess["all_teams"] = [12345]

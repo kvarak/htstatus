@@ -78,17 +78,13 @@ def _check_password(user, password):
 
 def _login_with_stored_tokens(user):
     """Log in a user whose Hattrick OAuth tokens are already stored."""
-    session["access_key"] = user.access_key
-    session["access_secret"] = user.access_secret
     session["current_user"] = user.ht_user
     session["current_user_id"] = user.ht_id
     record_activity(user, "login")
     db.session.commit()
 
     try:
-        chpp = get_chpp_client(
-            {"access_key": user.access_key, "access_secret": user.access_secret}
-        )
+        chpp = get_chpp_client(user.access_key, user.access_secret)
         ht_user = chpp.user()
         team_ids, team_names = fetch_user_teams(chpp, ht_user)
         if not team_ids:
@@ -205,8 +201,8 @@ def _save_oauth_user(current_user, access_token):
                     existing_user,
                     username=session.get("username", current_user.username),
                     password=new_password,  # This will be a modern scrypt hash
-                    access_key=session["access_key"],
-                    access_secret=session["access_secret"],
+                    access_key=access_token["key"],
+                    access_secret=access_token["secret"],
                 )
             else:
                 # No new password, just update OAuth tokens but keep migration marker
@@ -214,8 +210,8 @@ def _save_oauth_user(current_user, access_token):
                     existing_user,
                     username=session.get("username", current_user.username),
                     password=existing_user.password,  # Keep migration marker
-                    access_key=session["access_key"],
-                    access_secret=session["access_secret"],
+                    access_key=access_token["key"],
+                    access_secret=access_token["secret"],
                 )
         else:
             # Normal existing user update
@@ -223,8 +219,8 @@ def _save_oauth_user(current_user, access_token):
                 existing_user,
                 username=session.get("username", current_user.username),
                 password=session.get("password", ""),
-                access_key=session["access_key"],
-                access_secret=session["access_secret"],
+                access_key=access_token["key"],
+                access_secret=access_token["secret"],
             )
     else:
         # Create new user
@@ -241,7 +237,7 @@ def _save_oauth_user(current_user, access_token):
     db.session.commit()
 
 
-def _find_user_for_tokens():
+def _find_user_for_tokens(access_token):
     """Find our User when CHPP user() fails: by form username, then by token."""
     from models import User
 
@@ -249,7 +245,7 @@ def _find_user_for_tokens():
     if session.get("username"):
         user = User.query.filter_by(username=session["username"]).first()
     if not user:
-        user = User.query.filter_by(access_key=session["access_key"]).first()
+        user = User.query.filter_by(access_key=access_token["key"]).first()
     return user
 
 
@@ -262,9 +258,7 @@ def handle_oauth_callback(oauth_verifier):
             request_token_secret=session["req_secret"],
             code=oauth_verifier,
         )
-        session["access_key"] = access_token["key"]
-        session["access_secret"] = access_token["secret"]
-        chpp = get_chpp_client(session)
+        chpp = get_chpp_client(access_token["key"], access_token["secret"])
 
         teams = None
         language_id = None
@@ -279,7 +273,7 @@ def handle_oauth_callback(oauth_verifier):
             dprint(1, f"CHPP user() failed (likely YouthTeamId): {chpp_error}")
             # Only fall back to a user we can identify by form username or token;
             # never guess, to avoid logging into someone else's account
-            existing_user = _find_user_for_tokens()
+            existing_user = _find_user_for_tokens(access_token)
             if not existing_user:
                 _clear_login_session()
                 return _login_page(
@@ -329,8 +323,8 @@ def validate_session():
         if not user_id:
             return {"valid": False, "reason": "no_session"}, 401
 
-        # Check if session data is complete
-        required_keys = ["access_key", "access_secret", "current_user"]
+        # Check if session data is complete (tokens live in the database, not here)
+        required_keys = ["current_user"]
         missing_keys = [key for key in required_keys if not session.get(key)]
 
         if missing_keys:

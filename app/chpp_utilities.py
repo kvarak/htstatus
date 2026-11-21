@@ -11,7 +11,7 @@ This module consolidates CHPP initialization logic previously duplicated across:
 Usage:
     from app.chpp_utilities import get_chpp_client, fetch_user_teams
 
-    chpp = get_chpp_client(session)
+    chpp = get_chpp_client(user.access_key, user.access_secret)
     teams = fetch_user_teams(chpp)
 """
 
@@ -21,25 +21,28 @@ from app.chpp import CHPP
 
 
 def get_chpp_client(
-    flask_session: dict,
+    access_key: str,
+    access_secret: str,
     consumer_key: str | None = None,
     consumer_secret: str | None = None,
 ) -> CHPP:
-    """Initialize CHPP client with session credentials.
+    """Initialize a CHPP client for a user's stored OAuth tokens.
+
+    The tokens come from the database (the ``User`` row) or straight from a fresh
+    OAuth exchange, never from the Flask cookie session (INFRA-093), so they are
+    never exposed to the browser.
 
     Args:
-        flask_session: Flask session containing access_key and access_secret
+        access_key: OAuth access token (``User.access_key``)
+        access_secret: OAuth access token secret (``User.access_secret``)
         consumer_key: Optional CHPP consumer key (uses app config if not provided)
         consumer_secret: Optional CHPP consumer secret (uses app config if not provided)
 
     Returns:
         CHPP: Initialized CHPP client instance
 
-    Raises:
-        KeyError: If required session keys or config values are missing
-
     Example:
-        >>> chpp = get_chpp_client(session)
+        >>> chpp = get_chpp_client(user.access_key, user.access_secret)
         >>> user = chpp.user()
     """
     # Use provided credentials or fall back to app config
@@ -48,13 +51,7 @@ def get_chpp_client(
     if consumer_secret is None:
         consumer_secret = current_app.config["CONSUMER_SECRETS"]
 
-    # Initialize with session OAuth tokens
-    return CHPP(
-        consumer_key,
-        consumer_secret,
-        flask_session["access_key"],
-        flask_session["access_secret"],
-    )
+    return CHPP(consumer_key, consumer_secret, access_key, access_secret)
 
 
 def get_chpp_client_no_auth(
@@ -123,7 +120,7 @@ def get_current_user_context(chpp: CHPP) -> dict:
         dict: User context containing user object, team IDs, and team names
 
     Example:
-        >>> chpp = get_chpp_client(session)
+        >>> chpp = get_chpp_client(user.access_key, user.access_secret)
         >>> context = get_current_user_context(chpp)
         >>> print(f"User: {context['user'].username}")
         >>> print(f"Teams: {context['team_names']}")

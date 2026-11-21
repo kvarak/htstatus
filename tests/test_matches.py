@@ -57,9 +57,6 @@ class TestDownloadRecentMatches:
         return mock_client
 
     @patch("app.utils.db")
-    @patch(
-        "app.utils.session", {"access_key": "test_key", "access_secret": "test_secret"}
-    )
     def test_download_recent_matches_success(self, mock_db, mock_chpp_client):
         """Test successful recent matches download."""
         # Mock database session
@@ -87,9 +84,6 @@ class TestDownloadRecentMatches:
         assert mock_db.session.commit.call_count >= 0
 
     @patch("app.utils.db")
-    @patch(
-        "app.utils.session", {"access_key": "test_key", "access_secret": "test_secret"}
-    )
     def test_download_recent_matches_error_handling(self, mock_db):
         """Test error handling in recent matches download."""
         # Mock CHPP client that raises an exception
@@ -108,14 +102,14 @@ class TestDownloadRecentMatches:
 
     @patch("app.utils.db")
     def test_download_recent_matches_without_chpp_client(self, mock_db):
-        """Test downloadMatches when session access fails."""
-        # Test the function without proper session - should handle error gracefully
+        """Without a client or a logged-in user there are no tokens; handle it gracefully."""
         result = downloadMatches(1001)
 
-        # Since there's no session data, it should handle the error gracefully
+        # No tokens means the CHPP call fails, but the download still returns a
+        # result dict with no matches rather than raising.
         assert result is not None, "Result should not be None"
-        assert result["success"] is False
-        assert "error" in result or "message" in result
+        assert result["count"] == 0
+        assert "message" in result
 
 
 def _played_match(team_id, ht_id=990001, opponent_id=1):

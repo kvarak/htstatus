@@ -31,7 +31,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 - `Players` rows are snapshots: one row per player per Update (`data_date`); `Players.owner` is the team id, `0` once sold. `app/roster.py` gets the latest/oldest record per player.
 - `TrainingWeek`: one row per team and training Thursday (`training_date`): type, intensity, stamina share, coach. The coming week is `planned` until an Update after it; finished weeks are never overwritten.
 - `MatchPositionMinutes`: minutes per match, team, player and field role, calculated at Update from matchlineup 2.0 (orders) and matchdetails (red cards, injuries). A match counts for the training on the Thursday on or after it; only league, qualification, cup, friendly and Masters matches count.
-- Session: `current_user_id` = user id, `all_teams` / `all_team_names` = the user's team ids and names. Never use a user id where a team id is expected.
+- Session: `current_user_id` = user id, `all_teams` / `all_team_names` = the user's team ids and names. Never use a user id where a team id is expected. OAuth tokens are **not** in the session; they live on the `User` row, and CHPP clients are built from `user.access_key`/`user.access_secret` via `get_chpp_client` (INFRA-093).
 
 ## CHPP usage (rate-limited, expensive)
 
