@@ -307,6 +307,12 @@
           <!-- Chart Configuration -->
           {% set charts = [
             {
+              "id": "activityHistoryChart",
+              "title": "Activity Over Time",
+              "icon": "fas fa-wave-square",
+              "description": "Page visits per week, stacked by feature, over the selected range"
+            },
+            {
               "id": "registrationChart",
               "title": "Registration Timeline",
               "icon": "fas fa-calendar-alt",
@@ -389,6 +395,9 @@
 // User data from backend
 const usersData = JSON.parse('{{ users | tojson | safe }}');
 
+// Daily usage history: [{day, activity, is_admin, count}, ...]
+const activityHistory = JSON.parse('{{ activity_history | tojson | safe }}');
+
 // Chart instances by key, so a redraw can destroy the previous chart
 let charts = {};
 
@@ -461,10 +470,66 @@ function updateAllCharts() {
     const filteredUsers = getFilteredUsers();
 
     // Update charts
+    updateActivityHistoryChart();
     updateRegistrationTimelineChart(filteredUsers);
     updateLoginTimelineChart(filteredUsers);
     updateAdoptionRateChart(filteredUsers);
     updateEngagementScoreChart(filteredUsers);
+}
+
+// Monday (local) of the week containing `date`, as a YYYY-MM-DD key
+function weekKey(date) {
+    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const day = (d.getDay() + 6) % 7; // 0 = Monday
+    d.setDate(d.getDate() - day);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+// Chart: Activity Over Time (weekly page visits, stacked by feature)
+function updateActivityHistoryChart() {
+    const hideAdmins = document.getElementById('filterAdmins').checked;
+    const start = currentDateRange.start;
+    const end = currentDateRange.end;
+
+    // weekKey -> activity -> visits
+    const weeks = {};
+    const activities = new Set();
+
+    activityHistory.forEach(row => {
+        if (hideAdmins && row.is_admin) return;
+        const day = parseDate(row.day);
+        if (!day) return;
+        if (start && day < start) return;
+        if (end && day > end) return;
+        const key = weekKey(day);
+        if (!weeks[key]) weeks[key] = {};
+        weeks[key][row.activity] = (weeks[key][row.activity] || 0) + row.count;
+        activities.add(row.activity);
+    });
+
+    const labels = Object.keys(weeks).sort();
+    const activityList = Array.from(activities).sort();
+    const datasets = activityList.map((activity, i) => ({
+        label: activity,
+        data: labels.map(week => weeks[week][activity] || 0),
+        backgroundColor: chartColor(i, 0.8),
+        borderColor: chartColor(i),
+        borderWidth: 1,
+    }));
+
+    renderChart('activityHistory', 'activityHistoryChart', {
+        type: 'bar',
+        data: { labels, datasets },
+        options: {
+            scales: {
+                x: { stacked: true },
+                y: { stacked: true, beginAtZero: true },
+            },
+            plugins: {
+                legend: { display: true, position: 'bottom' },
+            },
+        },
+    });
 }
 
 // Chart 3: Registration Timeline

@@ -202,6 +202,56 @@ class TestCurrentUserAndActivity:
         assert user.c_training == 2
         assert user.last_usage
 
+    def test_track_activity_records_usage_history(self, app, db_session):
+        """Visits also land in ActivityLog; same-day visits share one row."""
+        from app.auth_utils import track_activity
+        from models import ActivityLog
+
+        self._user(db_session)
+
+        @track_activity("training")
+        def view():
+            return "ok"
+
+        with app.test_request_context():
+            from flask import session
+
+            session["current_user_id"] = 777001
+            view()
+            view()
+
+        rows = (
+            db_session.query(ActivityLog)
+            .filter_by(user_id=777001, activity="training")
+            .all()
+        )
+        assert len(rows) == 1
+        assert rows[0].count == 2
+
+    def test_record_activity_separates_days_and_features(self, app, db_session):
+        """ActivityLog keeps one row per (user, activity, day)."""
+        from datetime import datetime
+
+        from app.auth_utils import record_activity
+        from models import ActivityLog
+
+        user = self._user(db_session)
+
+        with app.test_request_context():
+            record_activity(user, "training")
+            ActivityLog.record(user.ht_id, "training", when=datetime(2026, 1, 1))
+            record_activity(user, "stats")
+        db_session.flush()
+
+        rows = db_session.query(ActivityLog).filter_by(user_id=user.ht_id).all()
+        assert {(r.activity, r.count) for r in rows} == {
+            ("training", 1),  # today
+            ("training", 1),  # 2026-01-01
+            ("stats", 1),
+        }
+        assert user.c_training == 1
+        assert user.c_stats == 1
+
     def test_track_activity_ignores_anonymous(self, app):
         from app.auth_utils import track_activity
 

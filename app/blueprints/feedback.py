@@ -12,7 +12,7 @@ from flask import (
 from sqlalchemy import desc
 from werkzeug.exceptions import abort
 
-from app.auth_utils import get_current_user
+from app.auth_utils import get_current_user, record_activity
 from app.utils import create_page, dprint
 
 # Create Blueprint for feedback routes
@@ -51,7 +51,7 @@ def list_feedback():
     user = get_current_user()
     if not user:
         return redirect(url_for("auth.login"))
-    user.record_visit("feedback")
+    record_activity(user, "feedback")
     db.session.commit()
 
     # Handle form submission

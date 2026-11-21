@@ -59,6 +59,7 @@ def _play(match_id, player_id):
 def two_users(db_session):
     """Us and another user; our teams played each other once (match 2)."""
     from models import (
+        ActivityLog,
         ErrorLog,
         Feedback,
         FeedbackComment,
@@ -108,6 +109,12 @@ def two_users(db_session):
             FeedbackComment(theirs.id, US, "our comment"),
             FeedbackComment(theirs.id, OTHER, "their comment"),
             FeedbackVote(theirs.id, US, "up"),
+            ActivityLog(
+                user_id=US, activity="training", day=date(2026, 10, 2), count=3
+            ),
+            ActivityLog(
+                user_id=OTHER, activity="stats", day=date(2026, 10, 2), count=1
+            ),
         ]
     )
     db_session.commit()
@@ -142,6 +149,7 @@ def test_delete_needs_the_token_from_settings(app_with_routes, db_session):
 @pytest.mark.usefixtures("two_users")
 def test_delete_account_removes_our_data_and_keeps_others(app_with_routes, db_session):
     from models import (
+        ActivityLog,
         ErrorLog,
         Feedback,
         FeedbackComment,
@@ -181,6 +189,7 @@ def test_delete_account_removes_our_data_and_keeps_others(app_with_routes, db_se
     assert [f.title for f in Feedback.query.all()] == ["Theirs"]
     assert [c.content for c in FeedbackComment.query.all()] == ["their comment"]
     assert FeedbackVote.query.count() == 0
+    assert [a.user_id for a in ActivityLog.query.all()] == [OTHER]
     assert [e.user_id for e in ErrorLog.query.filter_by(message="boom")] == [None]
     assert "deleted" in client.get(response.headers["Location"]).get_data(as_text=True)
 

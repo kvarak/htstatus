@@ -14,6 +14,7 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import translations
+from app.auth_utils import record_activity
 from app.chpp_utilities import (
     fetch_user_teams,
     get_chpp_client,
@@ -81,7 +82,7 @@ def _login_with_stored_tokens(user):
     session["access_secret"] = user.access_secret
     session["current_user"] = user.ht_user
     session["current_user_id"] = user.ht_id
-    user.record_visit("login")
+    record_activity(user, "login")
     db.session.commit()
 
     try:

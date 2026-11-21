@@ -11,6 +11,7 @@ from app import db, instance_cache, series, transfers
 def delete_account(user):
     """Remove the user, their teams and all their data, then commit."""
     from models import (
+        ActivityLog,
         AdminPreferences,
         ErrorLog,
         Feedback,
@@ -63,6 +64,7 @@ def delete_account(user):
     Group.query.filter_by(user_id=user_id).delete()
     AdminPreferences.query.filter_by(user_id=user_id).delete()
     TutorialAnalytics.query.filter_by(user_id=user_id).delete()
+    ActivityLog.query.filter_by(user_id=user_id).delete()
     ErrorLog.query.filter_by(user_id=user_id).update({"user_id": None})
     Team.query.filter_by(user_id=user_id).delete()
     User.query.filter_by(ht_id=user_id).delete()

@@ -504,10 +504,40 @@ def admin():
         }
         errors.append(error_data)
 
+    # Daily usage history for the "activity over time" chart. Aggregated per day
+    # and feature (and whether the user is an admin, so the dashboard can hide
+    # admins like the other charts) to keep the payload small.
+    from sqlalchemy import case, func
+
+    from models import ActivityLog
+
+    admin_ids = {u.ht_id for u in allusers if u.is_admin()}
+    is_admin_case = case((ActivityLog.user_id.in_(admin_ids), True), else_=False)
+    history_rows = (
+        db.session.query(
+            ActivityLog.day,
+            ActivityLog.activity,
+            is_admin_case.label("is_admin"),
+            func.sum(ActivityLog.count).label("visits"),
+        )
+        .group_by(ActivityLog.day, ActivityLog.activity, is_admin_case)
+        .all()
+    )
+    activity_history = [
+        {
+            "day": row.day.isoformat(),
+            "activity": row.activity,
+            "is_admin": bool(row.is_admin),
+            "count": int(row.visits or 0),
+        }
+        for row in history_rows
+    ]
+
     return create_page(
         template="debug.html",
         title="Debug",
         users=users,
+        activity_history=activity_history,
         errors=errors,
         form_error=form_error,
         superadmin_id=superadmin_ht_id(),

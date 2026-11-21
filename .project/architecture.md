@@ -19,7 +19,7 @@ A Flask + PostgreSQL web app for Hattrick managers. It syncs a team's players an
 | `app/opponents.py` | Next Game Analyser: at Update, saves each upcoming opponent's matches and their formation/tactic (matchdetails, last 10 finished, one call per match) (`refresh_opponent_matches`); the matches page shows the opponent's last 10 results, head-to-head and setup (League / Cup / All) from the database only |
 | `app/translations.py`, `app/instance_cache.py` | Hattrick's own terms per language, cached as JSON in `instance/` (also transfer bids and series data) |
 | `app/account.py` | "Delete my account" (Settings): removes the user and everything stored for their teams (players, matches, training, groups, feedback, cached JSON); a match against another user's team stays. Update it when adding a table or cache with user or team data; the `/privacy` page (`templates/privacy.html`) describes what is stored and must stay true |
-| `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `TrainingWeek`, `MatchPositionMinutes`, `Feedback*`, `ErrorLog`, ...) |
+| `models.py` | SQLAlchemy models (`User`, `Players`, `Team`, `Match`, `MatchPlay`, `Group`, `PlayerSetting`, `TrainingWeek`, `MatchPositionMinutes`, `ActivityLog`, `Feedback*`, `ErrorLog`, ...) |
 | `migrations/` | Alembic migrations |
 | `app/templates/`, `app/static/` | Jinja2 + Bootstrap 4 (CDN), CSS, Chart.js |
 | `tests/` | pytest (PostgreSQL, CHPP mocked) and `tests/js/` (node --test) |

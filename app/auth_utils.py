@@ -64,8 +64,21 @@ def get_current_user():
     return user
 
 
+def record_activity(user, activity):
+    """Record one visit for ``user``: update the counters and the usage history.
+
+    Combines the latest-per-feature view (``User.record_visit``) with the
+    over-time view (``ActivityLog``). Does not commit; the caller commits as
+    part of its own transaction.
+    """
+    from models import ActivityLog
+
+    user.record_visit(activity)
+    ActivityLog.record(user.ht_id, activity)
+
+
 def track_activity(activity):
-    """Decorator recording a page visit via ``User.record_visit(activity)`` before the view.
+    """Decorator recording a page visit via ``record_activity`` before the view.
 
     Usage (below the route/auth decorators)::
 
@@ -82,7 +95,7 @@ def track_activity(activity):
         def decorated_function(*args, **kwargs):
             user = get_current_user()
             if user:
-                user.record_visit(activity)
+                record_activity(user, activity)
                 from app import db
 
                 db.session.commit()

@@ -10,6 +10,7 @@ from app import series, training_log, transfers, translations
 from app.auth_utils import (
     get_current_user,
     get_current_user_id,
+    record_activity,
     require_authentication,
     track_activity,
 )
@@ -176,7 +177,7 @@ def handle_archive_download(chpp, team_id_arg):
     try:
         user = get_current_user()
         if user:
-            user.record_visit("matches_archive")
+            record_activity(user, "matches_archive")
             db.session.commit()
 
         result = downloadMatches(team_id, chpp)
@@ -424,7 +425,7 @@ def update():
 
     user = get_current_user()
     if user:
-        user.record_visit("updatedata")
+        record_activity(user, "updatedata")
         db.session.commit()
 
     return create_page(

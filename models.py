@@ -486,7 +486,12 @@ class User(db.Model):
         self.last_usage = time.strftime("%Y-%m-%d %H:%M:%S")
 
     def record_visit(self, activity):
-        """Count one visit to ``activity`` (a key of VISIT_COUNTERS) and update last_usage."""
+        """Count one visit to ``activity`` (a key of VISIT_COUNTERS) and update last_usage.
+
+        This keeps the running totals and the latest-per-feature timestamps only.
+        Usage history over time is recorded separately via ``ActivityLog`` (see
+        ``app.auth_utils.record_activity``), so this stays a pure in-memory mutator.
+        """
         counter, timestamp_field = VISIT_COUNTERS[activity]
         now = time.strftime("%Y-%m-%d %H:%M:%S")
         if counter:
@@ -520,6 +525,52 @@ class User(db.Model):
         """Column keys the user has seen, or None for lists saved before tracking."""
         data = self._columnData()
         return set(data.get("known", [])) if isinstance(data, dict) else None
+
+
+# --------------------------------------------------------------------------------
+
+
+class ActivityLog(db.Model):
+    """Daily usage history: one row per user, activity and day with a visit count.
+
+    The ``c_*`` counters and ``last_*`` timestamps on ``User`` only keep totals and
+    the latest visit per feature. This table keeps the shape of usage over time so
+    the admin dashboard can show when features are actually used, without growing a
+    row per request (visits on the same day share one row).
+    """
+
+    __tablename__ = "activity_log"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("users.ht_id"), nullable=False, index=True
+    )
+    activity = db.Column(db.String(50), nullable=False)
+    day = db.Column(db.Date, nullable=False)
+    count = db.Column(db.Integer, nullable=False, default=0)
+
+    __table_args__ = (
+        db.UniqueConstraint(
+            "user_id", "activity", "day", name="uq_activity_log_user_activity_day"
+        ),
+    )
+
+    @classmethod
+    def record(cls, user_id, activity, when=None):
+        """Add one visit to ``activity`` for ``user_id`` on the day of ``when`` (UTC today)."""
+        day = (when or utc_now()).date()
+        row = (
+            db.session.query(cls)
+            .filter_by(user_id=user_id, activity=activity, day=day)
+            .first()
+        )
+        if row:
+            row.count = (row.count or 0) + 1
+        else:
+            db.session.add(cls(user_id=user_id, activity=activity, day=day, count=1))
+
+    def __repr__(self):
+        return f"<ActivityLog {self.activity} x{self.count} by user {self.user_id} on {self.day}>"
 
 
 # --------------------------------------------------------------------------------
