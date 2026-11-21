@@ -26,6 +26,15 @@ class TestMainRoutes:
         assert response.status_code == 200
         assert b"<html" in response.data
 
+    def test_index_shows_hattrick_attribution(self, app_with_routes):
+        """INFRA-092: the required Hattrick/Extralives sentence is on the public home page."""
+        html = app_with_routes.test_client().get("/").get_data(as_text=True)
+        assert (
+            "This application uses information from the online game service "
+            "Hattrick.org." in html
+        )
+        assert "Extralives&nbsp;AB" in html
+
     def test_index_authenticated(self, app_with_routes, db_session):
         response = _client(app_with_routes, db_session).get("/")
         assert response.status_code == 200

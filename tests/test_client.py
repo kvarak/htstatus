@@ -81,3 +81,59 @@ class TestCHPPClient:
 
             # Verify returned data structure
             assert isinstance(matches, list)
+
+
+class TestChppUserAgent:
+    """INFRA-092: every CHPP request identifies the app in the User-Agent."""
+
+    def test_user_agent_format(self):
+        from app.chpp.constants import chpp_user_agent
+
+        assert chpp_user_agent().startswith("HattrickPlanner, v")
+
+    def test_data_session_sets_user_agent(self):
+        from app.chpp.constants import chpp_user_agent
+
+        client = CHPP("ck", "cs", "access_key", "access_secret")
+
+        assert client.session is not None
+        assert client.session.headers["User-Agent"] == chpp_user_agent()
+
+    def test_request_token_session_sets_user_agent(self):
+        from unittest.mock import MagicMock, patch
+
+        from app.chpp.constants import chpp_user_agent
+
+        instance = MagicMock()
+        instance.headers = {}
+        instance.fetch_request_token.return_value = {
+            "oauth_token": "t",
+            "oauth_token_secret": "s",
+        }
+        instance.authorization_url.return_value = "https://auth"
+
+        with patch("app.chpp.auth.OAuth1Session", return_value=instance):
+            from app.chpp.auth import get_request_token
+
+            get_request_token("ck", "cs", "http://cb")
+
+        assert instance.headers["User-Agent"] == chpp_user_agent()
+
+    def test_access_token_session_sets_user_agent(self):
+        from unittest.mock import MagicMock, patch
+
+        from app.chpp.constants import chpp_user_agent
+
+        instance = MagicMock()
+        instance.headers = {}
+        instance.fetch_access_token.return_value = {
+            "oauth_token": "k",
+            "oauth_token_secret": "s",
+        }
+
+        with patch("app.chpp.auth.OAuth1Session", return_value=instance):
+            from app.chpp.auth import get_access_token
+
+            get_access_token("ck", "cs", "rt", "rts", "verifier")
+
+        assert instance.headers["User-Agent"] == chpp_user_agent()

@@ -10,6 +10,7 @@ from app.chpp.constants import (
     CHPP_ACCESS_TOKEN_URL,
     CHPP_AUTHORIZE_URL,
     CHPP_REQUEST_TOKEN_URL,
+    chpp_user_agent,
 )
 from app.chpp.exceptions import CHPPAuthError
 
@@ -49,6 +50,7 @@ def get_request_token(
             client_secret=consumer_secret,
             callback_uri=callback_url,
         )
+        oauth.headers["User-Agent"] = chpp_user_agent()
 
         # Fetch request token from CHPP
         tokens = oauth.fetch_request_token(CHPP_REQUEST_TOKEN_URL)
@@ -106,6 +108,7 @@ def get_access_token(
             resource_owner_secret=request_token_secret,
             verifier=verifier,
         )
+        oauth.headers["User-Agent"] = chpp_user_agent()
 
         # Exchange temporary tokens for permanent access tokens
         tokens = oauth.fetch_access_token(CHPP_ACCESS_TOKEN_URL)

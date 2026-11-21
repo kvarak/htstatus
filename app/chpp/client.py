@@ -16,6 +16,7 @@ from app.chpp.auth import get_access_token as auth_get_access_token
 from app.chpp.auth import get_request_token as auth_get_request_token
 from app.chpp.constants import (
     CHPP_BASE_URL,
+    chpp_user_agent,
     RETRY_BACKOFF_FACTOR,
     RETRY_REDIRECT,
     RETRY_TOTAL,
@@ -113,6 +114,7 @@ class CHPP:
                 resource_owner_key=self.access_key,
                 resource_owner_secret=self.access_secret,
             )
+            self.session.headers["User-Agent"] = chpp_user_agent()
 
             # Configure retry strategy for transient failures
             retry_strategy = Retry(

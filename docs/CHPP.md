@@ -27,7 +27,7 @@ def stats():
 - Only the CHPP XML files (`chppxml.ashx`); never scrape Hattrick pages or use other sources.
 - OAuth only (`app/chpp/auth.py`). Never ask for, store or log the Hattrick password. The password on `/login` is the user's own HattrickPlanner password.
 - Read only: no scopes are requested (`scope=""`), so no bids, training, lineups or other game actions.
-- Every request identifies the app in the User-Agent (`HattrickPlanner, v<version>`). Not done yet: INFRA-092.
+- Every request identifies the app in the User-Agent (`HattrickPlanner, v<version>`, set in `app/chpp/`).
 
 **Data**
 - Download only what a feature needs, and reuse what is stored (license 5.4).
@@ -41,7 +41,7 @@ def stats():
 - Not allowed: following other teams over time (their players' skills, form, injuries, transfers), "spy" overviews, or statistics comparing many teams without approval (the admin training speed overview: DOC-037).
 
 **Branding and privacy**
-- Show this sentence (INFRA-092): "This application uses information from the online game service Hattrick.org. This use has been approved by the developers and copyright owners of Hattrick.org, Extralives AB."
+- Show this sentence (in the "Thanks to" box on the home page, `app/templates/main.html`): "This application uses information from the online game service Hattrick.org. This use has been approved by the developers and copyright owners of Hattrick.org, Extralives AB."
 - Only the CHPP logo, never the Hattrick logo or site graphics (license 7.2).
 - A published privacy policy (license 8.1): the public `/privacy` page, linked from the footer. Keep it true when storing new data; users delete their account themselves in Settings (`app/account.py`).
 - Don't copy Hattrick Supporter features without approval (license 9.1).

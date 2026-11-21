@@ -3,6 +3,8 @@
 Hattrick CHPP API endpoints, versions, and error code mappings.
 """
 
+from functools import lru_cache
+
 # OAuth Endpoints
 CHPP_REQUEST_TOKEN_URL = "https://chpp.hattrick.org/oauth/request_token.ashx"
 CHPP_ACCESS_TOKEN_URL = "https://chpp.hattrick.org/oauth/access_token.ashx"
@@ -29,3 +31,15 @@ ERROR_CODES = {
 RETRY_TOTAL = 5
 RETRY_BACKOFF_FACTOR = 0.5
 RETRY_REDIRECT = 5
+
+
+@lru_cache(maxsize=1)
+def chpp_user_agent():
+    """``HattrickPlanner, v<version>`` sent on every CHPP request (INFRA-092).
+
+    The CHPP license requires each request to identify the app. Reuses the app's
+    version detection so the User-Agent matches the version shown in the footer.
+    """
+    from app.utils import get_version_info
+
+    return f"HattrickPlanner, v{get_version_info()['version']}"

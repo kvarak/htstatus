@@ -740,7 +740,14 @@ window.addEventListener('beforeinstallprompt', (e) => {
         <!-- Authenticated navigation -->
         <ul class="navbar-nav" id="navbar-authenticated">
           <li>
-            <img height="30" src="{{ url_for('static', filename='chpp.png') }}">
+            <a href="https://hattrick.org/en/Community/CHPP/"
+               target="_blank"
+               rel="noopener"
+               aria-label="Approved CHPP product (opens Hattrick CHPP portal)">
+              <img height="30"
+                   src="{{ url_for('static', filename='chpp.png') }}"
+                   alt="Approved CHPP product">
+            </a>
             &nbsp;&nbsp;&nbsp;
           </li>
           <li class="nav-item active">
