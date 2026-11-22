@@ -4,7 +4,7 @@ Hobby project: good enough is perfect. One line per item: the problem and what "
 
 ## Now
 
-- **[INFRA-094]** Opponent matches from scouting (FEAT-008) are kept forever, and no approved function covers them. Good enough: Update keeps only what the scouting card needs (the next opponents' last 10 matches); a "Next game scouting" function submitted to Hattrick
+- **[INFRA-094]** Scouting opponent matches (FEAT-008): retention is done (Update prunes to the current opponents' last 10 finished matches, `prune_opponent_matches`). Left: submit the "Next game scouting" function to Hattrick: [tasks/INFRA-094.md](tasks/INFRA-094.md)
 
 ## Next
 

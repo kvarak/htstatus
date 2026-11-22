@@ -60,6 +60,83 @@ def _past_matches(team_id, now):
     )
 
 
+def _current_opponent_ids(ht_team_ids, now):
+    """Opponent team ids in every upcoming match of a HattrickPlanner team."""
+    from app import db
+    from models import Match
+
+    if not ht_team_ids:
+        return set()
+    ids = list(ht_team_ids)
+    upcoming = (
+        db.session.query(Match)
+        .filter(
+            Match.home_team_id.in_(ids) | Match.away_team_id.in_(ids),
+            Match.datetime > now,
+        )
+        .all()
+    )
+    opponents = set()
+    for match in upcoming:
+        for team_id in (match.home_team_id, match.away_team_id):
+            if team_id and team_id > 0 and team_id not in ht_team_ids:
+                opponents.add(team_id)
+    return opponents
+
+
+def _scouting_keep_ids(opponent_id, now):
+    """Match ids the scouting card needs for one opponent: its last RECENT_LIMIT
+    finished matches in each setup filter (league, cup, all)."""
+    past = [m for m in _past_matches(opponent_id, now) if m.is_finished]
+    keep = set()
+    for allowed in SETUP_FILTERS.values():
+        picked = [m for m in past if allowed is None or m.matchtype in allowed]
+        picked.sort(key=lambda m: m.datetime, reverse=True)
+        keep.update(m.ht_id for m in picked[:RECENT_LIMIT])
+    return keep
+
+
+def prune_opponent_matches():
+    """Delete scouting-only matches we no longer need (INFRA-094).
+
+    Scouting saves opponents' matches to the Match table, and opponents change every
+    week, so without pruning the table grows forever with matches no feature reads.
+
+    Kept: every match involving a HattrickPlanner team (someone's own history and the
+    head-to-head record), and, for teams that are a current upcoming opponent, the
+    last RECENT_LIMIT finished matches the scouting card shows per filter. Every other
+    match fetched purely for scouting is removed. Returns the number deleted.
+    """
+    from app import db
+    from models import Match, MatchPlay, Team
+
+    now = datetime.now()
+    ht_team_ids = {t.ht_id for t in db.session.query(Team.ht_id)}
+
+    keep_ids = set()
+    for opponent_id in _current_opponent_ids(ht_team_ids, now):
+        keep_ids |= _scouting_keep_ids(opponent_id, now)
+
+    ht_ids = list(ht_team_ids)
+    stale = (
+        db.session.query(Match.ht_id)
+        .filter(
+            ~Match.home_team_id.in_(ht_ids),
+            ~Match.away_team_id.in_(ht_ids),
+            ~Match.ht_id.in_(keep_ids),
+        )
+        .all()
+    )
+    stale_ids = [row.ht_id for row in stale]
+    if stale_ids:
+        MatchPlay.query.filter(MatchPlay.match_id.in_(stale_ids)).delete(
+            synchronize_session=False
+        )
+        Match.query.filter(Match.ht_id.in_(stale_ids)).delete(synchronize_session=False)
+        db.session.commit()
+    return len(stale_ids)
+
+
 def _save_missing_setups(chpp, team_id, matches):
     """Store formation and tactic of team_id for its last RECENT_LIMIT finished matches.
 
@@ -172,11 +249,6 @@ def shares(values):
     return [(v, n, round(n * 100 / len(values))) for v, n in counts]
 
 
-def default_setup(matchtype):
-    """Setup filter selected first: league or cup when the upcoming match is one."""
-    return {1: "league", 3: "cup"}.get(matchtype, "all")
-
-
 def scouting_for(match, team_id, now):
     """What the matches page shows for one upcoming match, from stored data only."""
     opponent_id = opponent_of(match, team_id)
@@ -190,7 +262,7 @@ def scouting_for(match, team_id, now):
     return {
         "opponent_name": opponent_name,
         "head_to_head": summarise(meetings, team_id),
-        "setup_default": default_setup(match.matchtype),
+        "setup_default": "all",
         "setup": {
             kind: setup_summary(opponent_matches, opponent_id, kind)
             for kind in SETUP_FILTERS

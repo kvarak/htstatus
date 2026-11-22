@@ -1,11 +1,11 @@
 """Tests for app/opponents.py (FEAT-008 scouting)."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import Mock, patch
 
 from app.opponents import (
-    default_setup,
     opponent_of,
+    prune_opponent_matches,
     refresh_opponent_matches,
     setup_summary,
     summarise,
@@ -155,15 +155,16 @@ def make_setup_match(when, matchtype, formation, tactic_type, team_side="home"):
 
 
 class TestDefaultSetup:
-    def test_league_match_defaults_to_league(self):
-        assert default_setup(1) == "league"
+    def test_scouting_defaults_to_all_regardless_of_match_type(self):
+        from app.opponents import scouting_for
 
-    def test_cup_match_defaults_to_cup(self):
-        assert default_setup(3) == "cup"
+        now = datetime(2030, 1, 1)
+        league = make_match(OUR_ID, THEIR_ID, None, None, now, status=None, matchtype=1)
+        cup = make_match(OUR_ID, THEIR_ID, None, None, now, status=None, matchtype=3)
 
-    def test_other_match_types_default_to_all(self):
-        assert default_setup(2) == "all"
-        assert default_setup(None) == "all"
+        with patch("app.opponents._past_matches", return_value=[]):
+            assert scouting_for(league, OUR_ID, now)["setup_default"] == "all"
+            assert scouting_for(cup, OUR_ID, now)["setup_default"] == "all"
 
 
 class TestSetupSummary:
@@ -294,3 +295,72 @@ class TestSaveMissingSetups:
 
         assert match.home_team_formation is None
         mock_db.session.commit.assert_not_called()
+
+
+class TestPruneOpponentMatches:
+    """INFRA-094: Update keeps only the scouting card's matches, not every opponent match."""
+
+    @staticmethod
+    def _our_team(db_session, ht_id=OUR_ID):
+        from models import Team, User
+
+        db_session.add(User(ht_id, "HT", f"u{ht_id}", "pw", "k", "s"))
+        db_session.flush()
+        db_session.add(Team(ht_id=ht_id, team_name=f"Team {ht_id}", user_id=ht_id))
+        db_session.flush()
+
+    def test_keeps_owned_and_recent_opponent_matches_deletes_the_rest(self, db_session):
+        self._our_team(db_session)
+        now = datetime.now()
+
+        # Upcoming match makes team 2 a current opponent (this match is ours -> kept).
+        upcoming = make_match(
+            OUR_ID, 2, None, None, now + timedelta(days=3), status=None
+        )
+        db_session.add(upcoming)
+
+        # Opponent 2: 12 finished league matches -> only the last 10 are needed.
+        opp2 = [
+            make_match(2, 50, 1, 0, now - timedelta(days=40 - i)) for i in range(12)
+        ]
+        db_session.add_all(opp2)
+
+        # Opponent 3 is no longer upcoming -> its scouting match is dropped entirely.
+        old_opponent = make_match(3, 60, 2, 2, now - timedelta(days=5))
+        db_session.add(old_opponent)
+
+        # Our own past match against a non-user team -> owned history, kept.
+        own_history = make_match(OUR_ID, 70, 3, 1, now - timedelta(days=5))
+        db_session.add(own_history)
+        db_session.commit()
+
+        keep_recent = opp2[2].ht_id
+        gone_old = [opp2[0].ht_id, opp2[1].ht_id, old_opponent.ht_id]
+        upcoming_id, own_id = upcoming.ht_id, own_history.ht_id
+
+        deleted = prune_opponent_matches()
+
+        remaining = {m.ht_id for m in db_session.query(Match).all()}
+        assert deleted == 3  # 2 oldest opponent-2 matches + the old opponent match
+        assert all(ht_id not in remaining for ht_id in gone_old)
+        assert keep_recent in remaining
+        assert upcoming_id in remaining
+        assert own_id in remaining
+
+    def test_no_upcoming_opponents_removes_all_scouting_only_matches(self, db_session):
+        self._our_team(db_session)
+        now = datetime.now()
+
+        own_history = make_match(OUR_ID, 70, 1, 0, now - timedelta(days=5))
+        scouting_only = make_match(2, 50, 1, 0, now - timedelta(days=5))
+        db_session.add_all([own_history, scouting_only])
+        db_session.commit()
+
+        own_id, scouting_id = own_history.ht_id, scouting_only.ht_id
+
+        deleted = prune_opponent_matches()
+
+        remaining = {m.ht_id for m in db_session.query(Match).all()}
+        assert deleted == 1
+        assert scouting_id not in remaining
+        assert own_id in remaining

@@ -37,7 +37,7 @@ def stats():
 
 **Own team and opponents**
 - Own team: statistics, history, training, matches and player development are fine, and may be stored.
-- Opponents: only what helps with one upcoming or played match (results, ratings, lineup, league table), at most one season back, and kept only as long as the feature needs it (INFRA-094).
+- Opponents: only what helps with one upcoming or played match (results, ratings, lineup, league table), at most one season back, and kept only as long as the feature needs it. Update prunes scouting matches to the current opponents' last 10 finished matches (`prune_opponent_matches` in `app/opponents.py`); the "Next game scouting" function still needs submitting to Hattrick (INFRA-094, [.project/tasks/INFRA-094.md](../.project/tasks/INFRA-094.md)).
 - Not allowed: following other teams over time (their players' skills, form, injuries, transfers), "spy" overviews, or statistics comparing many teams without approval (the admin training speed overview: DOC-037).
 
 **Branding and privacy**

@@ -15,7 +15,7 @@ from app.auth_utils import (
     track_activity,
 )
 from app.chpp_utilities import get_chpp_client
-from app.opponents import refresh_opponent_matches
+from app.opponents import prune_opponent_matches, refresh_opponent_matches
 from app.utils import create_page, diff, dprint
 
 # Create Blueprint for team routes
@@ -423,6 +423,11 @@ def update():
         chpp, all_teams
     )
     refresh_opponent_matches(chpp, all_teams)
+    try:
+        prune_opponent_matches()
+    except Exception as e:
+        db.session.rollback()
+        dprint(1, f"Opponent match prune failed: {e}")
 
     user = get_current_user()
     if user:
