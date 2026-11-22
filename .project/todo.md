@@ -13,6 +13,7 @@ Hobby project: good enough is perfect. One line per item: the problem and what "
 - **[FEAT-044]** Coaching staff: fetch StaffList at Update so the training speed overview and Schum use the real coach and assistants. Needs StaffList added to the approved "Training log" function first
 - **[FEAT-038]** Cycle plan: a saved plan per team (training type + weeks per phase, players full/half/not trained) on a timeline with dates and ages. Submit a "Training plan" function before release. Notes: [tasks/cycle-training.md](tasks/cycle-training.md)
 - **[FEAT-039]** Cycle projection: expected skill level per player per week of the plan, from the measured speeds with Schum's formula as the fallback, shown as "around"
+- **[FEAT-046]** Remake the `/stats` page into a richer, fun club dashboard (lots of stats from data we already store) and fix the current bugs: the kit (stale/http/only home kit shown), stale cup data, and misleading metrics. No new CHPP calls for the core remake: [tasks/FEAT-046.md](tasks/FEAT-046.md)
 - **[REFACTOR-121]** `app/utils.py` (~1460 lines) mixes match downloading with small helpers. Good enough: match download code in its own module
 - **[REFACTOR-122]** Blueprints get `db`/columns through `setup_*_blueprint()` globals. Good enough: import `db` and `app.constants` directly like `series`/`stats` do
 
