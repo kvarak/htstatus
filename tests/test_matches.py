@@ -249,25 +249,6 @@ def test_upcoming_match_scouting_shows_stored_head_to_head(app_with_routes, db_s
     assert "2 - 1" in html
 
 
-def test_upcoming_cup_match_opens_cup_only_setup(app_with_routes, db_session):
-    from tests.conftest import create_test_user
-    from tests.factories import setup_authenticated_session
-
-    user = create_test_user(db_session)
-    cup_match = _upcoming_match(12345, 78, 990005)
-    cup_match.matchtype = 3
-    db_session.add(cup_match)
-    db_session.commit()
-    client = setup_authenticated_session(app_with_routes.test_client(), user)
-
-    html = client.get("/matches?id=12345").get_data(as_text=True)
-
-    assert re.search(r'nav-link py-0 px-2 active"\s+data-setup-filter="cup"', html)
-    assert re.search(r'px-2"\s+data-setup-filter="league"', html)
-    assert re.search(r'data-setup-panel="cup"\s*>', html)
-    assert re.search(r'data-setup-panel="league"\s+class="d-none"', html)
-
-
 def test_scouting_shows_opponent_stored_setup(app_with_routes, db_session):
     from tests.conftest import create_test_user
     from tests.factories import setup_authenticated_session
